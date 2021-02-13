@@ -1,0 +1,41 @@
+﻿設定:
+    key1: value1changed
+    __Key2__: value2changed  #コメント
+        #コメント
+    Key3: value3changed  #コメント
+
+手順:
+    - cd ".."
+    - echo  "value2changed"
+        #template: - echo  "__Key2__"
+    - value1changed
+        #template: - key1
+    - "value3changed"
+        #template: - "Key3"
+    - "value3changed"
+        #template: - "Key3"
+    - "value3changed"  #template: - "Key3"
+    - "value3changed"  #template: - "Key3"
+    - １行に２つのケース： value3changed, value3changed
+        #template: Key3, Key3
+
+設定:
+    key1: value11
+
+手順:
+    - value11
+        #template: - key1
+    - "value3"
+        #template: - "Key3"
+        #// 置き換えないこと
+    - value31
+        #template: - key3
+    - １行に２つのケース： value3, value3
+        #template: Key3, Key3
+    - ２行上のケース： "value11"
+        #// comment
+        #template-at(-2): "key1"
+    - ３行上のケース： "value11"
+        #// comment
+        #// comment
+        #template-at(-3): "key1"

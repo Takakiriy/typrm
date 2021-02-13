@@ -1,0 +1,24 @@
+﻿設定:
+    Name: Changed
+    SettingIndex: 1
+    key1: value1changed
+    __Key2__: value2  #//コメント
+    Key3: value3changed  #★秘密: コメント
+
+設定:
+    Name: Original
+    SettingIndex: 1
+    key1: value1
+    __Key2__: value2  #コメント
+    Key3: value3      #★秘密:仮 コメント
+
+設定:
+    Name: SettingIndex  #コメント
+    SettingIndex: 2     #コメント
+    key1: value1changed
+
+設定:
+    Name: AllSetting
+    SettingIndex: all
+    key1: value1changed
+    Key3: value3changed  #★秘密: コメント

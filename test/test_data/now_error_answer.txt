@@ -1,0 +1,13 @@
+﻿YAML UTF-8 file path>
+WarningLine: 2
+  Contents: #★Now:
+  SettingIndex: 0
+
+WarningLine: 3
+  Contents: #★now: ネストされた手順
+  SettingIndex: 0
+
+Warning: 2, Error: 0
+template count = 0
+Press Enter key to retry checking.
+The line number to change the variable value >

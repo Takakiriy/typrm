@@ -1,0 +1,73 @@
+﻿YAML UTF-8 file path>
+ErrorLine: 11
+  Contents: - echo  "value  2"
+  Expected: - echo  "value2"
+  Template: - echo  "__Key2__"
+  SettingIndex: 1
+
+ErrorLine: 13
+  Contents: - v1
+  Expected: - value1
+  Template: - key1
+  SettingIndex: 1
+
+ErrorLine: 15
+  Contents: - ? "value3"
+  Expected: - "value3"
+  Template: - "Key3"
+  SettingIndex: 1
+
+ErrorLine: 17
+  Contents: - ? "value3"  #template: - "Key3"
+  Expected: - "value3"
+  Template: - "Key3"
+  SettingIndex: 1
+
+ErrorLine: 23
+  Contents: - value1
+  Expected: - value11
+  Template: - key1
+  SettingIndex: 2
+
+ErrorLine: 25
+  Contents: - １行に２つのケース： value1, value11
+  Expected: value11, value11
+  Template: key1, key1
+  SettingIndex: 2
+
+ErrorLine: 27
+  Contents: - １行に２つのケース： value11, value1
+  Expected: value11, value11
+  Template: key1, key1
+  SettingIndex: 2
+
+ErrorLine: 29
+  Contents: - ２行上のケース： "value11x"
+  Expected: "value11"
+  Template: "key1"
+  SettingIndex: 2
+
+ErrorLine: 32
+  Contents: - ３行上のケース： "value11x"
+  Expected: "value11"
+  Template: "key1"
+  SettingIndex: 2
+
+ErrorLine: 36
+  Contents: - ０行上のケース： "value11x"  #template-at(0): "key1"
+  Expected: "value11"
+  Template: "key1"
+  SettingIndex: 2
+
+ErrorLine: 38
+  Contents: #template-at(1): "key1"
+  Error: The parameter must be less than 0
+
+ErrorLine: 40
+  Contents: #template-at(2): "key1"
+  Error: The parameter must be less than 0
+
+Warning: 0, Error: 12
+template count = 12
+Press Enter key to retry checking.
+The line number to change the variable value >

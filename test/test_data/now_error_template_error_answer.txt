@@ -1,0 +1,17 @@
+﻿YAML UTF-8 file path>
+ErrorLine: 6
+  Contents: #★Now:
+  SettingIndex: 1
+
+ErrorLine: 7
+  Contents: #★Now:
+  SettingIndex: 1
+
+ErrorLine: 9
+  Contents: - v1
+  Expected: - value1
+
+Warning: 2, Error: 1
+template count = 1
+Press Enter key to retry checking.
+The line number to change the variable value >

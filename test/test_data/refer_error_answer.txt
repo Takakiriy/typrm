@@ -1,0 +1,20 @@
+﻿YAML UTF-8 file path>
+ErrorLine: 5
+  Not found "タイトル１" above
+
+ErrorLine: 7
+  Not found "タイトル２" following
+
+ErrorLine: 7
+  Not found "タイトル３" following
+
+ErrorLine: 7
+  Not found "タイトル４" above
+
+ErrorLine: 7
+  Not found "タイトル５" above
+
+Warning: 0, Error: 5
+template count = 0
+Press Enter key to retry checking.
+The line number to change the variable value >
