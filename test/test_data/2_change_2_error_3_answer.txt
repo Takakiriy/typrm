@@ -8,7 +8,9 @@ ErrorLine: 18
 Warning: 0, Error: 1
 template count = 7
 Press Enter key to retry checking.
-The line number to change the variable value >key>new value>
+The line number to change the variable value >SettingIndex: 1
+Enter only: finish to input setting
+key: new_value>
 ErrorLine: 18
   Error: Not found any replacing target
   Solution: Set old value at setting in replacing file
@@ -16,5 +18,4 @@ ErrorLine: 18
   Expected: - "value3"
   Template: - "Key3"
   SettingIndex: 1
-Press Enter key to retry checking.
-The line number to change the variable value >
+key: new_value>key: new_value>

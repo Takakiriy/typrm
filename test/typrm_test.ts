@@ -1,15 +1,13 @@
 ﻿import * as fs from 'fs';
 import * as child_process from 'child_process';
 
-const  scriptPath = String.raw `..\out\check_template_line.js`;
-const  testFolderPath = String.raw `..\check_template_line\test_data` + "\\";
+const  scriptPath = String.raw `..\out\typrm.js`;
+const  testFolderPath = String.raw `..\typrm\test_data` + "\\";
 
 async function  main() {
 	await TestOfCheck();
 	await TestOfChange();
 	await TestOfChangeError();
-	await TestOfChanges();
-	await TestOfChangeSet();
 	deleteFile(testFolderPath + '_output.txt');
 	console.log('Pass');
 }
@@ -17,132 +15,48 @@ async function  main() {
 async function  TestOfCheck() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = ["now_error", "refer_ok", "refer_error", "secret_error",
-		"template_error", "template_ok", "var_ref_error",
+	const fileNameHeads = [
+		"1_template_1_ok",
+		"1_template_2_error",
+		"now_1_error",
+		"now_2_error_template_error",
+		"refer_1_ok",
+		"refer_2_error",
+		"secret_1_error",
+		"var_ref_1_error",
 	];
 	for (const fileNameHead of fileNameHeads) {
 
 		// Test Main
 		returns = await callChildProccess(`node ${scriptPath} --english`,
 			{inputLines: [
-				testFolderPath + fileNameHead + ".yaml",
+				testFolderPath + fileNameHead + "_1.yaml",
 				"exit"
 			]}
 		);
-		const  answer = fs.readFileSync(testFolderPath + fileNameHead + "_answer.txt")
+		const  answer = fs.readFileSync(testFolderPath + fileNameHead + "_3_answer.txt")
 			.toString().substr(cutBOM);
 
 		// Check
 		if (returns.stdout !== answer) {
-			console.log('Error: different between "_output.txt" and "' + fileNameHead + '_answer.txt"');
+			console.log('Error: different between "_output.txt" and "' + fileNameHead + '_3_answer.txt"');
 			fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
 			throw new Error();
 		}
 	}
 }
 
+// TestOfChange
 async function  TestOfChange() {
-	const fileNameHeads = ["change"];
-	for (const fileNameHead of fileNameHeads) {
-		const  sourceFilePath   = testFolderPath + fileNameHead + ".yaml";
-		const  backUpFilePath   = testFolderPath + fileNameHead + "_changing.yaml.backup";
-		const  changingFilePath = testFolderPath + fileNameHead + "_changing.yaml";
-		const  answerFilePath   = testFolderPath + fileNameHead + "_after_answer.yaml";
-		deleteFile(changingFilePath);
-		deleteFile(backUpFilePath);
-		fs.copyFileSync(sourceFilePath, changingFilePath);
-
-		// Test Main
-		await callChildProccess(`node ${scriptPath} --english`,
-			{inputLines: [
-				changingFilePath,
-				"I1",
-				"Key3",
-				"value3changed",
-				"exit",
-			]}
-		);
-		const  source   = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-		const  backUp   = fs.readFileSync(backUpFilePath).toString().substr(cutBOM);
-		const  changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-		const  answer   = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
-
-		// Check
-		if (changing !== answer) {
-			console.log(`Error: different between ` +
-				`"${fileNameHead}_changing.yaml" and ` +
-				`"${fileNameHead}_after_answer.yaml"`);
-			throw new Error();
-		}
-		if (backUp !== source) {
-			console.log(`Error: different between ` +
-				`"${fileNameHead}_changing.yaml.backup" and ` +
-				`"${fileNameHead}.yaml"`);
-			throw new Error();
-		}
-
-		deleteFile(changingFilePath);
-		deleteFile(backUpFilePath);
-	}
-}
-
-async function  TestOfChangeError() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = ["change_error"];
-	for (const fileNameHead of fileNameHeads) {
-		const  sourceFilePath   = testFolderPath + fileNameHead + ".yaml";
-		const  backUpFilePath   = testFolderPath + fileNameHead + "_changing.yaml.backup";
-		const  changingFilePath = testFolderPath + fileNameHead + "_changing.yaml";
-		const  answerFilePath   = testFolderPath + fileNameHead + "_after_answer.yaml";
-		const  logAnswerFilePath   = testFolderPath + fileNameHead + "_answer.txt";
-		deleteFile(changingFilePath);
-		deleteFile(backUpFilePath);
-		fs.copyFileSync(sourceFilePath, changingFilePath);
-
-		// Test Main
-		returns = await callChildProccess(`node ${scriptPath} --english`,
-			{inputLines: [
-				changingFilePath,
-				"I1",
-				"Key3",
-				"value3changed",
-				"exit",
-			]}
-		);
-		const  changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-		const  answer   = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
-		const  logAnswer = fs.readFileSync(logAnswerFilePath).toString().substr(cutBOM);
-
-		// Check
-		if (returns.stdout !== logAnswer) {
-			console.log('Error: different between "_output.txt" and "' + fileNameHead + '_answer.txt"');
-			fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-			throw new Error();
-		}
-		if (changing !== answer) {
-			console.log(`Error: different between ` +
-				`"${fileNameHead}_changing.yaml" and ` +
-				`"${fileNameHead}_after_answer.yaml"`);
-			throw new Error();
-		}
-
-		deleteFile(changingFilePath);
-		deleteFile(backUpFilePath);
-	}
-}
-
-// TestOfChanges
-async function  TestOfChanges() {
-	let  returns: ProcessReturns;
-
-	const fileNameHeads = ["changes"];
+	const fileNameHeads = ["2_change_1_ok"];
 	for (const fileNameHead of fileNameHeads) {
 		for (const target of ["1", "2"]) {
-			const  sourceFilePath   = testFolderPath + fileNameHead + ".yaml";
-			const  backUpFilePath   = testFolderPath + fileNameHead + "_changing.yaml.backup";
-			const  changingFilePath = testFolderPath + fileNameHead + "_changing.yaml";
-			const  answerFilePath   = testFolderPath + fileNameHead + `_${target}_after_answer.yaml`;
+			const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
+			const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
+			const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
+			const  answerFilePath   = testFolderPath + fileNameHead + `_2_${target}_after_answer.yaml`;
 			deleteFile(changingFilePath);
 			deleteFile(backUpFilePath);
 			fs.copyFileSync(sourceFilePath, changingFilePath);
@@ -178,14 +92,14 @@ async function  TestOfChanges() {
 			// Check
 			if (changing !== answer) {
 				console.log(`Error: different between ` +
-					`"${fileNameHead}_changing.yaml" and ` +
-					`"${fileNameHead}_${target}_after_answer.yaml`);
+					`"${fileNameHead}_1_changing.yaml" and ` +
+					`"${fileNameHead}_2_${target}_after_answer.yaml`);
 				throw new Error();
 			}
 			if (backUp !== source) {
 				console.log(`Error: different between ` +
-					`"${fileNameHead}_changing.yaml.backup" and ` +
-					`"${fileNameHead}.yaml"`);
+					`"${fileNameHead}_1_changing.yaml.backup" and ` +
+					`"${fileNameHead}_1.yaml"`);
 				throw new Error();
 			}
 
@@ -195,70 +109,48 @@ async function  TestOfChanges() {
 	}
 }
 
-// TestOfChangeSet
-async function  TestOfChangeSet() {
+async function  TestOfChangeError() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = ["change_set"];
+	const fileNameHeads = ["2_change_2_error"];
 	for (const fileNameHead of fileNameHeads) {
-		for (const target of ["Changed", "Original", "SettingIndex", "ErrorBadName", "AllSetting"]) {
-			let  filaNameTail: string;
-			if ( ! target.startsWith('Error')) {
-				filaNameTail = 'after_answer.yaml';
-			} else {
-				filaNameTail = 'answer.txt';
-			}
-			const  sourceFilePath   = testFolderPath + fileNameHead + ".yaml";
-			const  backUpFilePath   = testFolderPath + fileNameHead + "_changing.yaml.backup";
-			const  changingFilePath = testFolderPath + fileNameHead + "_changing.yaml";
-			const  answerFilePath   = testFolderPath + fileNameHead + `_${target}_${filaNameTail}`;
-			deleteFile(changingFilePath);
-			deleteFile(backUpFilePath);
-			fs.copyFileSync(sourceFilePath, changingFilePath);
+		const  sourceFilePath    = testFolderPath + fileNameHead + "_1.yaml";
+		const  backUpFilePath    = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
+		const  changingFilePath  = testFolderPath + fileNameHead + "_1_changing.yaml";
+		const  answerFilePath    = testFolderPath + fileNameHead + "_2_after_answer.yaml";
+		const  logAnswerFilePath = testFolderPath + fileNameHead + "_3_answer.txt";
+		deleteFile(changingFilePath);
+		deleteFile(backUpFilePath);
+		fs.copyFileSync(sourceFilePath, changingFilePath);
 
-			// Test Main
-			returns = await callChildProccess(`node ${scriptPath} --english`,
-				{inputLines: [
-					changingFilePath,
-					"file",
-					testFolderPath + fileNameHead + "_setting.yaml",
-					target,
-					"exit",
-				]}
-			);
-			const  source   = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-			const  changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-			const  answer   = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
-			let  backUp = "dummy";
-			if ( ! target.startsWith('Error')) {
-				backUp = fs.readFileSync(backUpFilePath).toString().substr(cutBOM);
-			}
+		// Test Main
+		returns = await callChildProccess(`node ${scriptPath} --english`,
+			{inputLines: [
+				changingFilePath,
+				"4",
+				"Key3: value3changed",
+				"exit",
+			]}
+		);
+		const  changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+		const  answer   = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
+		const  logAnswer = fs.readFileSync(logAnswerFilePath).toString().substr(cutBOM);
 
-			// Check
-			if ( ! target.startsWith('Error')) {
-				if (changing !== answer) {
-					console.log(`Error: different between ` +
-						`"${fileNameHead}_changing.yaml" and ` +
-						`"${fileNameHead}_${target}_after_answer.yaml`);
-					throw new Error();
-				}
-				if (backUp !== source) {
-					console.log(`Error: different between ` +
-						`"${fileNameHead}_changing.yaml.backup" and ` +
-						`"${fileNameHead}.yaml"`);
-					throw new Error();
-				}
-			} else {
-				if (returns.stdout !== answer) {
-					console.log(`Error: different between "_output.txt" and "${fileNameHead}_${target}_${filaNameTail}"`);
-					fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-					throw new Error();
-				}
-			}
-
-			deleteFile(changingFilePath);
-			deleteFile(backUpFilePath);
+		// Check
+		if (returns.stdout !== logAnswer) {
+			console.log('Error: different between "_output.txt" and "' + fileNameHead + '_3_answer.txt"');
+			fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
+			throw new Error();
 		}
+		if (changing !== answer) {
+			console.log(`Error: different between ` +
+				`"${fileNameHead}_1_changing.yaml" and ` +
+				`"${fileNameHead}_2_after_answer.yaml"`);
+			throw new Error();
+		}
+
+		deleteFile(changingFilePath);
+		deleteFile(backUpFilePath);
 	}
 }
 

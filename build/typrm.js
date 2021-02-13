@@ -232,21 +232,6 @@ function main() {
                 if (key === 'exit') {
                     return;
                 }
-                else if (key.substr(0, 1).toUpperCase() === 'I') {
-                    const changingSettingIndex = parseInt(key.substr(1));
-                    if (changingSettingIndex >= 1) {
-                        const changingKey = yield input('key>');
-                        const changedValue = yield input('new value>');
-                        errorCount = yield changeSetting(inputFilePath, changingSettingIndex, changingKey, changedValue);
-                    }
-                }
-                else if (key === 'file') {
-                    yield printSettingLines(inputFilePath);
-                    console.log('');
-                    const settingFilePath = yield inputPath('setting UTF-8 file path>');
-                    const targetSettingsName = yield input('target settings name >');
-                    errorCount = yield changeSettings(inputFilePath, settingFilePath, targetSettingsName);
-                }
                 else if (key !== '') {
                     const lineNum = parseInt(key);
                     const changingSettingIndex = yield getSettingIndexFromLineNum(inputFilePath, lineNum);
