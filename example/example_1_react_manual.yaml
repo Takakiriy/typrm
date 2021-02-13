@@ -1,0 +1,7 @@
+﻿Create a react project:
+    設定:
+        __ProjectName__: react1
+        __npxOption__: --template typescript
+    Create a react project:
+        - npx create-react-app --template typescript  "react2"
+            #template: create-react-app __npxOption__  "__ProjectName__"
