@@ -21,7 +21,7 @@ example_1_react_manual.yaml
 If you creates the project named with react2,
 input like the following typrm command.
 
-    $ typrm
+    $ node typrm
     YAML UTF-8 file path> example_1_react_manual.yaml
     The line number to change the variable value > 5
     key: new_value> __ProjectName__: react2
