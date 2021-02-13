@@ -3,13 +3,16 @@ import path from "path";  // or path = require("path")
 import { program, CommanderError } from 'commander'
 import readline from 'readline';
 const  settingStartLabel = "設定:";
+const  settingStartLabelEn = "settings:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
+const  secretLabelEn = "#secret";
 const  secretExamleLabel = "#★秘密:仮";
-const  referPattern = /(上記|下記)「([^」]*)」/g;
+const  secretExamleLabelEn = "#secret:example";
+const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 
 async function  main() {
 	const  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
@@ -57,7 +60,7 @@ async function  main() {
 					if (value !== '') {
 
 						setting[key] = {value, isReferenced: false, lineNum};
-					} else if (key + ':' !== settingStartLabel) {
+					} else if (key + ':' !== settingStartLabel  &&  key + ':' !== settingStartLabelEn) {
 						isReadingSetting = false;
 					}
 				}
@@ -77,7 +80,7 @@ async function  main() {
 			if (templateTag.isFound) {
 				templateCount += 1;
 				const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-				const  expected = getExpected(setting, templateTag.template, -1);
+				const  expected = getExpected(setting, templateTag.template);
 
 				if (checkingLine.indexOf(expected) === notFound) {
 					console.log("");
@@ -102,12 +105,14 @@ async function  main() {
 			}
 
 			// Check if there is not secret tag.
-			if (line.indexOf( secretLabel ) !== notFound) {
-				if (line.indexOf( secretExamleLabel ) === notFound) {
+			if (line.indexOf( secretLabel ) !== notFound  ||  line.indexOf( secretLabelEn ) !== notFound) {
+				if (line.indexOf( secretExamleLabel ) === notFound  &&  line.indexOf( secretExamleLabelEn ) === notFound) {
 					if (secretLabelCount === 0) {  // Because there will be many secret data.
 						console.log("");
 						console.log(`${translate('WarningLine')}: ${lineNum}`);
-						console.log(`  ${translate('This is a secret value. Change "#★秘密" to "#★秘密:仮".')}`);
+						console.log(`  ${translate('This is a secret value.')}`);
+						console.log('  '+ translate`Change "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
+						console.log('  '+ translate`Change "${secretLabel}" to "${secretExamleLabel}".'`);
 						console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
 						warningCount += 1;
 					}
@@ -122,11 +127,11 @@ async function  main() {
 			while ( (match = referPattern.exec( line )) !== null ) {
 				const  keyword = new SearchKeyword();
 				const  label = match[1];
-				keyword.keyword = match[2];
-				if (label === "上記") {
+				keyword.keyword = match[3];
+				if (label === "上記"  ||  label === "above") {
 					keyword.startLineNum = lineNum - 1;
 					keyword.direction = Direction.Above;
-				} else if (label === "下記") {
+				} else if (label === "下記"  ||  label === "following") {
 					keyword.startLineNum = lineNum + 1;
 					keyword.direction = Direction.Following;
 				}
@@ -237,26 +242,6 @@ function onEndOfSetting(setting: Settings) {
 	}
 }
 
-// printSettingLines
-async function  printSettingLines(inputFilePath: string) {
-	const  reader = readline.createInterface({
-		input: fs.createReadStream(inputFilePath),
-		crlfDelay: Infinity
-	});
-	let  settingCount = 0;
-	let  lineNum = 0;
-
-	for await (const line1 of reader) {
-		const  line: string = line1;
-		lineNum += 1;
-
-		if (line.trim() === settingStartLabel) {
-			settingCount += 1;
-			console.log(`${settingStartLabel} SettingIndex: ${settingCount}, Line: ${lineNum}`)
-		}
-	}
-}
-
 // getSettingIndexFromLineNum
 async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum: number): Promise<number> {
 	const  reader = readline.createInterface({
@@ -270,7 +255,7 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
 		const  line: string = line1;
 		lineNum += 1;
 
-		if (line.trim() === settingStartLabel) {
+		if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
 			settingCount += 1;
 		}
 
@@ -279,86 +264,6 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
 		}
 	}
 	return  0;
-}
-
-// changeSettings
-async function  changeSettings(inputFilePath: string, settingFilePath: string,
-		targetSettingsName: string): Promise<number>/*errorCount*/ {
-
-	const  settingReader = readline.createInterface({
-		input: fs.createReadStream(settingFilePath),
-		crlfDelay: Infinity
-	});
-	let  setting: Settings = {};
-	let  settingCount = 0;
-	let  usedSettingCount = 0;
-	let  errorCount = 0;
-	let  lineNum = 0;
-
-	for await (const line1 of settingReader) {
-		const  line: string = line1;
-		lineNum += 1;
-
-		// setting = ...
-		if (line.trim() === settingStartLabel) {
-			if (settingCount >= 1) {
-				if ('Name' in setting  &&  getValue( setting['Name'].value, noSeparator)
-						=== targetSettingsName) {
-					errorCount += await callChangeSetting(inputFilePath, setting);
-					usedSettingCount += 1;
-				}
-			}
-			setting = {};
-			settingCount += 1;
-		} else {
-			const  separator = line.indexOf(':');
-			if (separator !== notFound) {
-				const  key = line.substr(0, separator).trim();
-				const  value = line.substr(separator + 1).trim();
-				if (value !== '') {
-
-					setting[key] = {value, isReferenced: false, lineNum};
-				}
-			}
-		}
-	}
-
-	if ('Name' in setting  &&  setting['Name'].value === targetSettingsName) {
-		errorCount += await callChangeSetting(inputFilePath, setting);
-		usedSettingCount += 1;
-	} else {
-		if (usedSettingCount === 0) {
-			console.log(``);
-			console.log(`Error: Not found Name: ${targetSettingsName}`);
-			errorCount += 1;
-		}
-	}
-	return errorCount;
-}
-
-// callChangeSetting
-async function  callChangeSetting(inputFilePath: string, setting: Settings): Promise<number>/*errorCount*/ {
-	let  changingSettingIndex: number;
-	if (!('SettingIndex' in setting)) {
-		throw new Error("Not found SettingIndex in setting file");
-	}
-	const  settingIndex = getValue( setting['SettingIndex'].value, noSeparator);
-	if (settingIndex.toLowerCase() === "all") {
-		changingSettingIndex = allSetting;
-	} else {
-		changingSettingIndex = parseInt(settingIndex, 10);
-	}
-	delete  setting['Name'];
-	delete  setting['SettingIndex'];
-	let  errorCount = 0;
-	for (const key of Object.keys(setting)) {
-		
-		errorCount += await changeSetting(
-			inputFilePath, changingSettingIndex,
-			key, setting[key].value
-		);
-	}
-	return errorCount;
 }
 
 // changeSettingByKeyValue
@@ -409,7 +314,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 		let  output = false;
 
 		// setting = ...
-		if (line.trim() === settingStartLabel) {
+		if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
 			isReadingSetting = true;
 			setting = {};
 			settingCount += 1;
@@ -431,7 +336,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 					if (value !== '') {
 
 						setting[key] = {value, isReferenced: false, lineNum};
-					} else if (key + ':' !== settingStartLabel) {
+					} else if (key + ':' !== settingStartLabel  &&  key + ':' !== settingStartLabelEn) {
 						isReadingSetting = false;
 					}
 
@@ -449,60 +354,37 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 
 			// Out of settings
 			} else {
-				const  templateTagIndex = line.indexOf(templateLabel);
-				let    templateAt = parseTemplateAtTag(line);
-				if (templateTagIndex !== notFound  ||  templateAt !== undefined) {
-					let  template = '';
-					let  expected = '';
-					if (templateTagIndex !== notFound) {
-						template = line.substr(templateTagIndex + templateLabel.length).trim();
-						expected = getExpected(setting, template, templateTagIndex);
-					} else { // templateAt
-						template = line.substr(templateAt.endIndexInLine + templateAtEndLabel.length).trim();
-						expected = getExpected(setting, template, templateAt.startIndexInLine);
-					}
-						
-					if (template.indexOf(changingKey) !== notFound) {
-						const  leftOfTemplate = line.substr(0, templateTagIndex).trim();
-						let  checkingLine: string;
-						if (templateAt) {
-							checkingLine = lines[lines.length - 1 + templateAt.lineNumOffset];
-						} else if (leftOfTemplate === '') {
-							checkingLine = previousLine.trim();
+				const  templateTag = parseTemplateTag(line);
+				if (templateTag.isFound) {
+					const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+					const  expected = getExpected(setting, templateTag.template);
+
+					if (checkingLine.indexOf(expected) !== notFound) {
+						const  before = expected;
+						const  changingValue = setting[changingKey].value;
+						setting[changingKey].value = changedValue;
+						const  after = getExpected(setting, templateTag.template);
+						setting[changingKey].value = changingValue;
+						if (templateTag.lineNumOffset <= -1) {
+							const  aboveLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+							writer.replaceAboveLine(templateTag.lineNumOffset,
+								aboveLine.replace(before, after)+"\n");
 						} else {
-							checkingLine = leftOfTemplate;
+
+							writer.write(line.replace(before, after) +"\n");
+							output = true;
 						}
-
-						if (checkingLine.indexOf(expected) !== notFound) {
-							const  changingValue = setting[changingKey].value;
-							setting[changingKey].value = changedValue;
-							const  before = expected;
-							const  after = getExpected(setting, template, templateTagIndex);
-							setting[changingKey].value = changingValue;
-							if (templateAt) {
-								const  aboveLine = lines[lines.length - 1 + templateAt.lineNumOffset];
-								writer.replaceAboveLine(templateAt.lineNumOffset,
-									aboveLine.replace(before, after)+"\n");
-							} else if (leftOfTemplate === '') {
-								writer.replaceAboveLine(-1,
-									previousLine.replace(before, after)+"\n");
-							} else {
-
-								writer.write(line.replace(before, after) +"\n");
-								output = true;
-							}
-						} else {
-							if (errorCount === 0) { // Since only one old value can be replaced at a time
-								console.log('');
-								console.log(`ErrorLine: ${lineNum}`);
-								console.log(`  Error: Not found any replacing target`);
-								console.log(`  Solution: Set old value at setting in replacing file`);
-								console.log(`  Contents: ${line.trim()}`);
-								console.log(`  Expected: ${expected.trim()}`);
-								console.log(`  Template: ${template.trim()}`);
-								console.log(`  SettingIndex: ${settingCount}`);
-								errorCount += 1;
-							}
+					} else {
+						if (errorCount === 0) { // Since only one old value can be replaced at a time
+							console.log('');
+							console.log(`${translate('ErrorLine')}: ${lineNum}`);
+							console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
+							console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
+							console.log(`  ${translate('Contents')}: ${line.trim()}`);
+							console.log(`  ${translate('Expected')}: ${expected.trim()}`);
+							console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
+							console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
+							errorCount += 1;
 						}
 					}
 				}
@@ -563,7 +445,7 @@ function  getValue(line: string, separatorIndex: number) {
 }
 
 // getExpected
-function  getExpected(setting: Settings, template: string, templateTagIndex: number) {
+function  getExpected(setting: Settings, template: string) {
 	let  expected = template;
 
 	for (const key of Object.keys(setting)) {
@@ -628,24 +510,6 @@ function  parseTemplateTag(line: string): TemplateTag | undefined {
 	return  tag;
 }
 
-// parseTemplateAtTag
-function  parseTemplateAtTag(line: string): TemplateAtTag | undefined {
-	const  tag = new TemplateAtTag();
-
-	tag.startIndexInLine = line.indexOf(templateAtStartLabel);
-	if (tag.startIndexInLine !== notFound) {
-		tag.endIndexInLine =  line.indexOf(templateAtEndLabel, tag.startIndexInLine);
-		if (tag.endIndexInLine !== notFound) {
-
-			tag.lineNumOffset = parseInt(line.substring(
-				tag.startIndexInLine + templateAtStartLabel.length,
-				tag.endIndexInLine ));
-			return  tag;
-		}
-	}
-	return  undefined;
-}
-
 // TemplateTag
 class  TemplateTag {
 	template = '';
@@ -658,14 +522,6 @@ class  TemplateTag {
 	lineNumOffset = 0;  
 	startIndexInLine = notFound;
 	endIndexInLine = notFound;
-}
-
-// TemplateAtTag
-class  TemplateAtTag {
-	lineNumOffset = 0;
-	template = '';
-	startIndexInLine = 0;
-	endIndexInLine = 0;
 }
 
 // escapeRegularExpression
@@ -724,7 +580,7 @@ class InputOption {
 	}
 }
 
-const  testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\check_template_line\test_data`+'\\';
+const  testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\typrm\test_data`+'\\';
 
 // inputOption
 const inputOption = new InputOption([
@@ -852,7 +708,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 	if (locale === 'ja-JP') {
 		dictionary = {
 			"YAML UTF-8 file path>": "YAML UTF-8 ファイル パス>",
-			"This is a secret value. Change \"#★秘密\" to \"#★秘密:仮\".": "これは秘密の値です。\"#★秘密\" を \"#★秘密:仮 に変更してください\"",
+			"This is a secret value.": "これは秘密の値です。",
+			"Change \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に変更してください。",
 			"Press Enter key to retry checking.": "Enter キーを押すと再チェックします。",
 			"The line number to change the variable value >": "変更する変数値がある行番号 >",
 			"Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
@@ -862,13 +719,17 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 			"Warning": "警告",
 			"Error": "エラー",
 			"ErrorLine": "エラー行",
+			"Solution": "解決法",
 			"Contents": "内容",
 			"Expected": "期待",
 			"Template": "雛形",
 			"WarningLine": "警告行",
 			"Found": "見つかったもの",
 			"SettingIndex": "設定番号",
+			"Not found any replacing target": "置き換える対象が見つかりません",
+			"Set old value at settings in the replacing file": "置き換えるファイルの中の設定に古い値を設定してください",
 			"The parameter must be less than 0": "パラメーターは 0 より小さくしてください",
+			"Not found \"${0}\" above": "上方向に「${0}」が見つかりません",
 			"Not found \"${0}\" following": "下方向に「${0}」が見つかりません",
 			"Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）",
 		};
@@ -905,17 +766,18 @@ function  exitFromCommander(e: CommanderError) {
 }
 async function  callMain() {
 	program.version('0.1.1').exitOverride(exitFromCommander)
-		.option("-e, --english")
+		.option("-l, --locale <s>")
+		.option("-t, --test")
 		.parse(process.argv);
 	
 	locale = Intl.NumberFormat().resolvedOptions().locale;
-	if (programOptions.english) {
-		locale = "en-US";
+	if (programOptions.locale) {
+		locale = programOptions.locale;
 	}
 	try {
 		await  main();
 	} catch (e) {
-		if (process.argv[2] == '--test'){
+		if (programOptions.test){
 			throw e;
 		} else {
 			console.log( `ERROR: ${e.message}` );

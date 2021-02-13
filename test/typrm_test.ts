@@ -28,7 +28,7 @@ async function  TestOfCheck() {
 	for (const fileNameHead of fileNameHeads) {
 
 		// Test Main
-		returns = await callChildProccess(`node ${scriptPath} --english`,
+		returns = await callChildProccess(`node ${scriptPath} --test --locale en-US`,
 			{inputLines: [
 				testFolderPath + fileNameHead + "_1.yaml",
 				"exit"
@@ -50,9 +50,13 @@ async function  TestOfCheck() {
 async function  TestOfChange() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = ["2_change_1_ok"];
-	for (const fileNameHead of fileNameHeads) {
-		for (const target of ["1", "2"]) {
+	const fileNameHeads = {
+		"2_change_1_ok": 2,
+		"2_change_3_English": 1,
+	};
+	for (const fileNameHead in fileNameHeads) {
+		const  caseCount = fileNameHeads[fileNameHead];
+		for (let target = 1;  target < caseCount;  target+=1) {
 			const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
 			const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
 			const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
@@ -62,18 +66,28 @@ async function  TestOfChange() {
 			fs.copyFileSync(sourceFilePath, changingFilePath);
 
 			// Test Main
-			let  inputLines;
-			if (target === "1") {
-				inputLines =  [
-					changingFilePath,
-					"1",
-					"key1: value1changed",
-					"  __Key2__: value2changed  #コメント  ",
-					"Key3: value3changed  #コメント",
-					"",
-					"exit",
-				];
-			} else{
+			let  inputLines: string[];
+			if (fileNameHead === '2_change_1_ok') {
+				if (target === 1) {
+					inputLines = [
+						changingFilePath,
+						"1",
+						"key1: value1changed",
+						"  __Key2__: value2changed  #コメント  ",
+						"Key3: value3changed  #コメント",
+						"",
+						"exit",
+					];
+				} else {
+					inputLines =  [
+						changingFilePath,
+						"25",
+						"key1: value11changed",
+						"",
+						"exit",
+					];
+				}
+			} else if (fileNameHead === '2_change_1_ok') {
 				inputLines =  [
 					changingFilePath,
 					"25",
@@ -83,7 +97,7 @@ async function  TestOfChange() {
 				];
 			}
 
-			returns = await callChildProccess(`node ${scriptPath} --english`, {inputLines});
+			returns = await callChildProccess(`node ${scriptPath} --test --locale en-US`, {inputLines});
 			const  source   = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
 			const  changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
 			const  answer   = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
@@ -109,11 +123,16 @@ async function  TestOfChange() {
 	}
 }
 
+// TestOfChangeError
 async function  TestOfChangeError() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = ["2_change_2_error"];
-	for (const fileNameHead of fileNameHeads) {
+	const fileNameHeads = {
+		"2_change_2_error": {locale: "--test --locale en-US"},
+		"2_change_4_Japanese": {locale: "--test --locale ja-JP"},
+	};
+	for (const fileNameHead in fileNameHeads) {
+		const  caseData = fileNameHeads[fileNameHead];
 		const  sourceFilePath    = testFolderPath + fileNameHead + "_1.yaml";
 		const  backUpFilePath    = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
 		const  changingFilePath  = testFolderPath + fileNameHead + "_1_changing.yaml";
@@ -124,7 +143,7 @@ async function  TestOfChangeError() {
 		fs.copyFileSync(sourceFilePath, changingFilePath);
 
 		// Test Main
-		returns = await callChildProccess(`node ${scriptPath} --english`,
+		returns = await callChildProccess(`node ${scriptPath} ${caseData.locale}`,
 			{inputLines: [
 				changingFilePath,
 				"4",

@@ -13,7 +13,7 @@ Enter only: finish to input setting
 key: new_value>
 ErrorLine: 18
   Error: Not found any replacing target
-  Solution: Set old value at setting in replacing file
+  Solution: Set old value at settings in the replacing file
   Contents: - "value3_bad"  #template: - "Key3"
   Expected: - "value3"
   Template: - "Key3"
