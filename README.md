@@ -43,3 +43,9 @@ You can create the React project by coping and pasting the following text only!
 
     npx create-react-app --template typescript  "react2"
     cd  react2
+
+You can paste the text with the comment as it is. # is treated as a comment in many shells.
+
+    npx create-react-app --template typescript  "react2"
+        #template: create-react-app __npxOption__  "__ProjectName__"
+    cd  react2  #template: __ProjectName__
