@@ -32,7 +32,7 @@ example_1_react_manual.yaml or .txt file will be chaned to the following content
 
     Create a react project:
         settings:
-            __ProjectName__: react1
+            __ProjectName__: react2
             __npxOption__: --template typescript
         Create a react project:
             npx create-react-app --template typescript  "react2"

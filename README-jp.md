@@ -30,7 +30,7 @@ example_1_react_manual.yaml or .txt ファイルは次のような内容に変�
 
     Create a react project:
         設定:
-            __ProjectName__: react1
+            __ProjectName__: react2
             __npxOption__: --template typescript
         React のプロジェクトを生成します:
             npx create-react-app --template typescript  "react2"
