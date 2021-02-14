@@ -43,8 +43,8 @@ example_1_react_manual.yaml or .txt ファイルは次のような内容に変�
     npx create-react-app --template typescript  "react2"
     cd  react2
 
-コメントの付いたテキストをそのまま貼り付けることができます。
-# は多くのシェルでコメントとして扱われます。
+コメントの付いたテキストをそのまま貼り付けることができます。 # は
+多くのシェルでコメントとして扱われます。
 
     npx create-react-app --template typescript  "react2"
         #template: create-react-app __npxOption__  "__ProjectName__"
