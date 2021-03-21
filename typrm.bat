@@ -1,5 +1,5 @@
 @echo off
 set NODE_PATH=%USERPROFILE%\AppData\Roaming\npm\node_modules
 
-node  build/typrm.js
+"C:\Program Files\nodejs\node"  build/typrm.js
 pause
