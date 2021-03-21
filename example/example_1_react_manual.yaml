@@ -2,6 +2,7 @@
     設定:
         __ProjectName__: react1
         __npxOption__: --template typescript
-    Create a react project:
-        - npx create-react-app --template typescript  "react2"
+    React のプロジェクトを生成します:
+        npx create-react-app --template typescript  "react1"
             #template: create-react-app __npxOption__  "__ProjectName__"
+        cd  "react1"  #template: __ProjectName__

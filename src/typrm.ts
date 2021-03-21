@@ -567,6 +567,10 @@ class  StandardInputBuffer {
 			}
 		});
 	}
+
+	close() {
+		this.readlines.close();
+	}
 }
 
 // InputOption
@@ -774,15 +778,23 @@ async function  callMain() {
 	if (programOptions.locale) {
 		locale = programOptions.locale;
 	}
-	try {
-		await  main();
-	} catch (e) {
-		if (programOptions.test){
-			throw e;
-		} else {
-			console.log( `ERROR: ${e.message}` );
-			await new Promise(resolve => setTimeout(resolve, 5000));
-		}
-	}
+
+	await  main()
+		.catch( async (e)=>{
+			if (programOptions.test) {
+				throw e;
+			} else {
+
+				console.log( `ERROR: ${e.message}` );
+				const  timeOver = new Date();
+				timeOver.setSeconds( timeOver.getSeconds() + 5 );
+
+				while ((new Date()).getTime() < timeOver.getTime()) {
+				}
+			}
+		})
+		.finally(()=>{
+			InputObject.close();
+		});
 }
 callMain();
