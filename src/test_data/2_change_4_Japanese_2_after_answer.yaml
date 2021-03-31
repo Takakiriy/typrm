@@ -1,0 +1,29 @@
+﻿# 設定タグが日本語のケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3changed
+
+    手順:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3changed"
+            #template: - "Key3"
+        - "value3changed"  #template: - "Key3"
+        - "value3_bad"  #template: - "Key3"
+
+手順B:
+    設定:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1

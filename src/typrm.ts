@@ -1,7 +1,7 @@
-import fs from "fs"; // file system
-import path from "path";  // or path = require("path")
-import { program, CommanderError } from 'commander'
-import readline from 'readline';
+import * as fs from 'fs'; // file system
+import * as path from "path";  // or path = require("path")
+import { program, CommanderError } from 'commander';
+import * as readline from 'readline';
 const  settingStartLabel = "設定:";
 const  settingStartLabelEn = "settings:";
 const  templateLabel = "#template:";
@@ -80,7 +80,7 @@ async function  main() {
 			if (templateTag.isFound) {
 				templateCount += 1;
 				const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-				const  expected = getExpected(setting, templateTag.template);
+				const  expected = getExpectedLine(setting, templateTag.template);
 
 				if (checkingLine.indexOf(expected) === notFound) {
 					console.log("");
@@ -357,14 +357,12 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 				const  templateTag = parseTemplateTag(line);
 				if (templateTag.isFound) {
 					const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-					const  expected = getExpected(setting, templateTag.template);
+					const  expected = getExpectedLine(setting, templateTag.template);
+					const  changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
 
 					if (checkingLine.indexOf(expected) !== notFound) {
 						const  before = expected;
-						const  changingValue = setting[changingKey].value;
-						setting[changingKey].value = changedValue;
-						const  after = getExpected(setting, templateTag.template);
-						setting[changingKey].value = changingValue;
+						const  after = changed;
 						if (templateTag.lineNumOffset <= -1) {
 							const  aboveLine = lines[lines.length - 1 + templateTag.lineNumOffset];
 							writer.replaceAboveLine(templateTag.lineNumOffset,
@@ -374,6 +372,8 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 							writer.write(line.replace(before, after) +"\n");
 							output = true;
 						}
+					} else if (checkingLine.indexOf(changed) !== notFound) {
+						// Do nothing
 					} else {
 						if (errorCount === 0) { // Since only one old value can be replaced at a time
 							console.log('');
@@ -444,8 +444,8 @@ function  getValue(line: string, separatorIndex: number) {
 	return  value;
 }
 
-// getExpected
-function  getExpected(setting: Settings, template: string) {
+// getExpectedLine
+function  getExpectedLine(setting: Settings, template: string) {
 	let  expected = template;
 
 	for (const key of Object.keys(setting)) {
@@ -458,6 +458,22 @@ function  getExpected(setting: Settings, template: string) {
 		expected = expectedAfter;
 	}
 	return  expected;
+}
+
+// getChangedLine
+function  getChangedLine(setting: Settings, template: string, changingKey: string, changedValue: string) {
+	let  changedLine = '';
+	if (changingKey in setting) {
+		const  changingValue = setting[changingKey].value;
+
+		setting[changingKey].value = changedValue;
+
+		changedLine = getExpectedLine(setting, template);
+		setting[changingKey].value = changingValue;
+	} else {
+		changedLine = getExpectedLine(setting, template);
+	}
+	return  changedLine;
 }
 
 // getChangedValue
@@ -474,7 +490,7 @@ function  getChangedValue(changedValueAndComment: string): string {
 }
 
 // parseTemplateTag
-function  parseTemplateTag(line: string): TemplateTag | undefined {
+function  parseTemplateTag(line: string): TemplateTag {
 	const  tag = new TemplateTag();
 
 	tag.indexInLine = line.indexOf(templateLabel);
@@ -505,7 +521,7 @@ function  parseTemplateTag(line: string): TemplateTag | undefined {
 		}
 	}
 
-	tag.template = undefined;
+	tag.template = '';
 	tag.lineNumOffset = 0;
 	return  tag;
 }

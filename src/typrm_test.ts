@@ -1,8 +1,8 @@
 ﻿import * as fs from 'fs';
 import * as child_process from 'child_process';
 
-const  scriptPath = String.raw `..\out\typrm.js`;
-const  testFolderPath = String.raw `..\typrm\test_data` + "\\";
+const  scriptPath = String.raw `..\build\typrm.js`;
+const  testFolderPath = String.raw `.\test_data` + "\\";
 
 async function  main() {
 	await TestOfCheck();
@@ -26,6 +26,7 @@ async function  TestOfCheck() {
 		"var_ref_1_error",
 	];
 	for (const fileNameHead of fileNameHeads) {
+		console.log(`TestCase: TestOfCheck >> ${fileNameHead}`);
 
 		// Test Main
 		returns = await callChildProccess(`node ${scriptPath} --test --locale en-US`,
@@ -50,13 +51,14 @@ async function  TestOfCheck() {
 async function  TestOfChange() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = {
+	const fileNameHeads: {[name: string]: number} = {
 		"2_change_1_ok": 2,
 		"2_change_3_English": 1,
 	};
 	for (const fileNameHead in fileNameHeads) {
 		const  caseCount = fileNameHeads[fileNameHead];
 		for (let target = 1;  target < caseCount;  target+=1) {
+			console.log(`TestCase: TestOfChange >> ${fileNameHead} >> ${target}`);
 			const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
 			const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
 			const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
@@ -66,12 +68,12 @@ async function  TestOfChange() {
 			fs.copyFileSync(sourceFilePath, changingFilePath);
 
 			// Test Main
-			let  inputLines: string[];
+			let  inputLines: string[] = [];
 			if (fileNameHead === '2_change_1_ok') {
 				if (target === 1) {
 					inputLines = [
 						changingFilePath,
-						"1",
+						"10",
 						"key1: value1changed",
 						"  __Key2__: value2changed  #コメント  ",
 						"Key3: value3changed  #コメント",
@@ -81,13 +83,13 @@ async function  TestOfChange() {
 				} else {
 					inputLines =  [
 						changingFilePath,
-						"25",
+						"29",
 						"key1: value11changed",
 						"",
 						"exit",
 					];
 				}
-			} else if (fileNameHead === '2_change_1_ok') {
+			} else if (fileNameHead === '2_change_3_English') {
 				inputLines =  [
 					changingFilePath,
 					"25",
@@ -127,11 +129,12 @@ async function  TestOfChange() {
 async function  TestOfChangeError() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads = {
+	const fileNameHeads: {[name: string]: any} = {
 		"2_change_2_error": {locale: "--test --locale en-US"},
 		"2_change_4_Japanese": {locale: "--test --locale ja-JP"},
 	};
 	for (const fileNameHead in fileNameHeads) {
+		console.log(`TestCase: TestOfChangeError >> ${fileNameHead}`);
 		const  caseData = fileNameHeads[fileNameHead];
 		const  sourceFilePath    = testFolderPath + fileNameHead + "_1.yaml";
 		const  backUpFilePath    = testFolderPath + fileNameHead + "_1_changing.yaml.backup";

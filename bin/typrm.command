@@ -5,4 +5,4 @@ export  parent_path="${script_file_path%/*}"
 cd  "${parent_path}"
 export  NODE_PATH=/usr/local/lib/node_modules
 
-node  build/typrm.js
+node  ../build/typrm.js

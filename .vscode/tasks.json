@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "TypeScript Compile Task",
+            "type": "shell",
+            "command": "cd  '${workspaceFolder}'  &&  node_modules/.bin/tsc.cmd  -p tsconfig.json --watch",
+            "isBackground": true,
+            "problemMatcher": [
+                "$tsc-watch"
+            ]
+        }
+    ]
+}

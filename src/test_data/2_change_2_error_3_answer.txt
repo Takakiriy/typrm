@@ -1,5 +1,5 @@
 ﻿YAML UTF-8 file path>
-ErrorLine: 18
+ErrorLine: 19
   Contents: - "value3_bad"  #template: - "Key3"
   Expected: - "value3"
   Template: - "Key3"
@@ -11,7 +11,7 @@ Press Enter key to retry checking.
 The line number to change the variable value >SettingIndex: 1
 Enter only: finish to input setting
 key: new_value>
-ErrorLine: 18
+ErrorLine: 19
   Error: Not found any replacing target
   Solution: Set old value at settings in the replacing file
   Contents: - "value3_bad"  #template: - "Key3"

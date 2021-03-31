@@ -1,0 +1,45 @@
+﻿# Case of that setting tag is English
+
+Process A:
+    settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #コメント
+
+    steps:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3changed"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+        - "value3changed"  #template: - "Key3"
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+
+Process B:
+    settings:
+        key1: value11
+
+    steps:
+        - value11
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： "value11"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
