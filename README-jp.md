@@ -18,6 +18,11 @@ Windows の場合
         - ダウンロードしたファイル（例：node-v14.16.0-x64.exe）を開きます
         - インストール オプションはデフォルトを使用
 
+    プロキシがある LAN に Windows がある場合:
+        - Windows スタート >> PowerShell
+        - npm config -g set proxy "http://___.___.___.___:____"
+        - npm config -g set https-proxy "http://___.___.___.___:____"
+
     typrm が使う commander パッケージをインストールします:
         - Windows スタート >> PowerShell
         - npm install -g  commander

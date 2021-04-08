@@ -20,6 +20,11 @@ For Windows:
         - Open the downloaded file (e.g. node-v14.16.0-x64.exe)
         - Installation options are defaults
 
+    If there is your Windows in the LAN with the proxy:
+        - Windows Start >> PowerShell
+        - npm config -g set proxy "http://___.___.___.___:____"
+        - npm config -g set https-proxy "http://___.___.___.___:____"
+
     Install the commander package used by typrm:
         - Windows Start >> PowerShell
         - npm install -g  commander
