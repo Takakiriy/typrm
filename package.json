@@ -1,8 +1,10 @@
 {
-    "name": "TypeScript",
+    "name": "typrm",
     "version": "0.0.1",
     "description": "",
     "scripts": {
+        "setup": "npm ci",
+        "clean": "rm -rf node_modules",
         "test": "jest --watchAll"
     },
     "author": "",

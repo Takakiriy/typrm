@@ -1,8 +1,8 @@
 ﻿import * as fs from 'fs';
 import * as child_process from 'child_process';
 
-const  scriptPath = String.raw `..\build\typrm.js`;
-const  testFolderPath = String.raw `.\test_data` + "\\";
+const  scriptPath =  `../build/typrm.js`;
+const  testFolderPath = `./test_data` + "/";
 
 async function  main() {
 	await TestOfCheck();
