@@ -4,6 +4,69 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
 同じ内容にすべきテキストを同じように置き換えるため、入力ミスが少なくなります。
 
 
+## 最初のサンプル
+
+新しいフォルダーを作成してその中でシェルのコマンドを実行することを指示するマニュアルには、
+以下のようにシェルに入力するように書かれているでしょう。
+
+    mkdir work1
+    cd    work1
+
+これをコピー＆ペーストすれば簡単に実行することができます。
+
+しかし、work1 フォルダーがすでに存在していて削除したくないときは、
+以下のようにシェルに入力するでしょう。
+
+    mkdir work2
+    cd    work2
+
+この場合、マニュアルからコピー＆ペーストできません。
+
+typrm コマンドはこのように複数の箇所を一度に書き換えて、
+コピー＆ペーストできるようにします。
+
+typrm が使えるようにするには、ファイルを以下のようにします。
+
+new_folder.yaml
+
+    設定:
+        __Name__: work1
+    shell:
+        mkdir work1  #template: __Name__
+        cd    work1  #template: __Name__
+
+設定: に変更する部分に関する 変数名: 値 を書きます。
+変更する部分と同じ行の末尾に #template: タグを書きます。
+（後で説明しますが、別の行に書くこともできます）
+
+Windows の場合、typrm.bat をダブルクリックして、下記のように入力します。
+
+    YAML UTF-8 ファイル パス> new_folder.yaml
+    変更する変数値がある行番号 > 4
+    変数名: 新しい変数値> __Name__: work2
+
+ファイル パス は、キーボードから入力しなくても、
+ファイルをドラッグ＆ドロップして入力できます。
+
+行番号は「設定:」が書いてある部分より下、
+次の「設定:」が書いてある行より上であれば、
+どの行番号を入力しても構いません。
+
+new_folder.yaml ファイルは次のような内容に変わります。
+
+    設定:
+        __Name__: work2
+    shell:
+        mkdir work2  #template: __Name__
+        cd    work2  #template: __Name__
+
+コメントの付いたテキストはそのまま貼り付けることができます。 # は
+多くのシェルでコメントとして扱われます。
+
+「変数名: 新しい変数値」を複数入力するときは、
+複数行をコピー＆ペーストして連続入力することができます。
+
+
 ## インストール
 
 typrm を使うには Node.js のインストールが必要です。
@@ -18,7 +81,7 @@ Windows の場合
         - ダウンロードしたファイル（例：node-v14.16.0-x64.exe）を開きます
         - インストール オプションはデフォルトを使用
 
-    プロキシがある LAN に Windows がある場合:
+    社内など、プロキシがある LAN に Windows がある場合:
         - Windows スタート >> PowerShell
         - npm config -g set proxy "http://___.___.___.___:____"
         - npm config -g set https-proxy "http://___.___.___.___:____"
@@ -51,60 +114,40 @@ mac の場合
     bin フォルダーの中の typrm.command ファイルをダブルクリックすると typrm が起動します:
 
 
-## 最初のサンプル
+CentOS7の場合
 
-テキスト ファイル に下記のような React のプロジェクトを生成するコマンドが書いてあるとします。
+    typrm をダウンロードして展開します:
+        - cd  ~/Downloads
+        - wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        - unzip -o typrm.zip
 
-example_1_react_manual.yaml
+    Node.js をインストールします:
+        - https://nodejs.org/ja/download/ >> (click 64-bit at the right of) Linux Binaries (x64) >>
+            Copy the link
+        #// Case of version 14.16.0
+        - cd ${HOME}
+        - curl -L -O https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.xz
+        - tar -Jxvf  node-v14.16.0-linux-x64.tar.xz
+        - rm  node-v14.16.0-linux-x64.tar.xz
+        - sudo mv  node-v14.16.0-linux-x64  /opt
+        - cd /opt
+        - sudo ln -s  node-v14.16.0-linux-x64  node
+        - cd ${HOME}
+        - PATH=/opt/node/bin:$PATH
+        - node --version
+        - echo 'export PATH="/opt/node/bin:$PATH"' >> ~/.bashrc
 
-    Create a react project:
-        設定:
-            __ProjectName__: react1
-            __npxOption__: --template typescript
-        React のプロジェクトを生成します:
-            npx create-react-app --template typescript  "react1"
-                #template: create-react-app __npxOption__  "__ProjectName__"
-            cd  "react1"  #template: __ProjectName__
+    typrm が使う commander パッケージをインストールします:
+        - npm install -g commander
 
-書かれているコマンドはコピー＆ペーストするだけで簡単に実行することができますが、
-プロジェクト名が react1 ではないときは、プロジェクト名を変えてから
-コピー＆ペーストできます。 上記の場合、2箇所を変えなければなりません。
-
-このように複数の箇所を書き換えることを支援するのが typerm コマンドです。
-
-Windows の場合、typrm.bat をダブルクリックして、下記のように入力します。
-
-    YAML UTF-8 ファイル パス> example_1_react_manual.yaml
-    変更する変数値がある行番号 > 5
-    変数名: 新しい変数値> __ProjectName__: react2
-
-ファイル パス は、キーボードから入力しなくても、
-ファイルをドラッグ＆ドロップして入力できます。
-行番号は「設定:」が書いてある行より下、
-設定が複数あるときは、次の「設定:」が書いてある行より上であれば、
-どの行番号を入力しても構いません。 
-
-example_1_react_manual.yaml ファイルは次のような内容に変わります。
-
-    Create a react project:
-        設定:
-            __ProjectName__: react2
-            __npxOption__: --template typescript
-        React のプロジェクトを生成します:
-            npx create-react-app --template typescript  "react2"
-                #template: create-react-app __npxOption__  "__ProjectName__"
-            cd  "react2"  #template: __ProjectName__
-
-これで、npx コマンドと cd コマンドをコピー＆ペーストするだけで簡単に実行することができます！
-
-    npx create-react-app --template typescript  "react2"
-    cd  "react2"
-
-コメントの付いたテキストをそのまま貼り付けることができます。 # は
-多くのシェルでコメントとして扱われます。
-
-「変数名: 新しい変数値」を複数入力するときは、
-複数行をコピー＆ペーストして連続入力することができます。
+    typrm.sh ファイルに実行属性を追加して、PATH が通ったディレクトリにコピーします:
+        - cd  typrm-master/bin
+        - nano  typrm.sh : |
+            node  ~/Downloads/typrm-master/build/typrm.js
+        - chmod +x  typrm.sh
+        - mkdir -p ~/bin
+        - cp  typrm.sh  ~/bin/typrm
+        - typrm
 
 
 ## 設定タグと #template タグについて
