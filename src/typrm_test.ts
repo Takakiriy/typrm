@@ -8,6 +8,7 @@ async function  main() {
 	await TestOfCheck();
 	await TestOfChange();
 	await TestOfChangeError();
+//	await TestOfFileCheck();
 	deleteFile(testFolderPath + '_output.txt');
 	console.log('Pass');
 }
@@ -57,7 +58,7 @@ async function  TestOfChange() {
 	};
 	for (const fileNameHead in fileNameHeads) {
 		const  caseCount = fileNameHeads[fileNameHead];
-		for (let target = 1;  target < caseCount;  target+=1) {
+		for (let target = 1;  target <= caseCount;  target+=1) {
 			console.log(`TestCase: TestOfChange >> ${fileNameHead} >> ${target}`);
 			const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
 			const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
@@ -92,7 +93,7 @@ async function  TestOfChange() {
 			} else if (fileNameHead === '2_change_3_English') {
 				inputLines =  [
 					changingFilePath,
-					"25",
+					"30",
 					"key1: value11changed",
 					"",
 					"exit",
@@ -175,6 +176,57 @@ async function  TestOfChangeError() {
 		deleteFile(backUpFilePath);
 	}
 }
+
+// TestOfFileCheck
+async function  TestOfFileCheck() {
+	let  returns: ProcessReturns;
+
+	const fileNameHeads: {[name: string]: number} = {
+		"file_1_ok_and_bad": 1,
+		"file_2_tab": 1,
+		"file_3_file_name": 1,
+	};
+	for (const fileNameHead in fileNameHeads) {
+		const  caseCount = fileNameHeads[fileNameHead];
+		for (let target = 1;  target <= caseCount;  target+=1) {
+			console.log(`TestCase: TestOfFileCheck >> ${fileNameHead} >> ${target}`);
+			const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
+			const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
+			const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
+			deleteFile(changingFilePath);
+			deleteFile(backUpFilePath);
+			fs.copyFileSync(sourceFilePath, changingFilePath);
+
+			// Test Main
+			let  inputLines: string[] = [];
+			if (fileNameHead === 'file_1_ok_and_bad') {
+				inputLines = [
+					changingFilePath,
+					"6",
+					"__User__: user2",
+					"",
+					"exit",
+				];
+			} else {
+				inputLines = [
+					changingFilePath,
+					"exit",
+				];
+			}
+
+			returns = await callChildProccess(`node ${scriptPath} --test --locale en-US`, {inputLines});
+			const  answer = fs.readFileSync(testFolderPath + fileNameHead + "_4_answer.txt")
+				.toString().substr(cutBOM);
+
+			// Check
+			if (returns.stdout !== answer) {
+				console.log('Error: different between "_output.txt" and "' + fileNameHead + '_4_answer.txt"');
+				fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
+				throw new Error();
+			}
+		}
+	}
+}	
 
 // callChildProccess
 async function  callChildProccess(commandLine: string,  option?: ProcessOption): Promise<ProcessReturns> {

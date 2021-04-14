@@ -1,0 +1,12 @@
+YAML UTF-8 file path>
+Warning: 0, Error: 0
+template count = 4
+Press Enter key to retry checking.
+The line number to change the variable value >6
+SettingIndex: 1
+Enter only: finish to input setting
+
+ErrorFile: ./file_1_ok_2_target.yaml:3:
+  Contents: - user: 'user1'
+  Expected: - user2
+  Template: - __User__

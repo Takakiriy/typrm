@@ -7,6 +7,7 @@ const  settingStartLabelEn = "settings:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
+const  fileTemplateLabel = "#file-template:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";
@@ -16,6 +17,8 @@ const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/
 
 async function  main() {
 	const  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
+	const  parentPath = path.dirname(inputFilePath);
+	let  fileTemplateTag: TemplateTag | null = null;
 	let  previousTemplateCount = 0;
 	for(;;) {
 		let  reader = readline.createInterface({
@@ -41,7 +44,7 @@ async function  main() {
 			const  previousIsReadingSetting = isReadingSetting;
 
 			// setting = ...
-			if (line.trim() === settingStartLabel) {
+			if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
 				if (settingCount >= 1) {
 					onEndOfSetting(setting);
 				}
@@ -91,6 +94,22 @@ async function  main() {
 					console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
 					errorCount += 1;
 				}
+			}
+
+			// Check target file contents by "#file-template:" tag.
+			if (fileTemplateTag) {
+				const continue_ = fileTemplateTag.onReadLine(line);
+				if (!continue_) {
+
+					const  checkPassed = await fileTemplateTag.checkTargetContents(setting, parentPath);
+					if (!checkPassed) {
+						errorCount += 1;
+					}
+					fileTemplateTag = null;
+				}
+			}
+			if (templateTag.label === fileTemplateLabel) {
+				fileTemplateTag = templateTag;
 			}
 
 			// Check if there is not "#★Now:".
@@ -445,8 +464,11 @@ function  getValue(line: string, separatorIndex: number) {
 }
 
 // getExpectedLine
-function  getExpectedLine(setting: Settings, template: string) {
+function  getExpectedLine(setting: Settings, template: string): string {
 	let  expected = template;
+if (!template) {
+return template;
+}
 
 	for (const key of Object.keys(setting)) {
 		const  re = new RegExp( escapeRegularExpression(key), "gi" );
@@ -456,6 +478,19 @@ function  getExpectedLine(setting: Settings, template: string) {
 			setting[key].isReferenced = true;
 		}
 		expected = expectedAfter;
+	}
+	return  expected;
+}
+
+// getExpectedLineInFileTemplate
+function  getExpectedLineInFileTemplate(setting: Settings, template: string) {
+
+	let  expected = getExpectedLine(setting, template);
+	const  templateIndex = expected.indexOf(templateLabel);
+	if (templateIndex !== notFound) {
+
+		expected = expected.substr(0, templateIndex);
+		expected = expected.trimRight();
 	}
 	return  expected;
 }
@@ -493,12 +528,20 @@ function  getChangedValue(changedValueAndComment: string): string {
 function  parseTemplateTag(line: string): TemplateTag {
 	const  tag = new TemplateTag();
 
+	tag.label = templateLabel;
 	tag.indexInLine = line.indexOf(templateLabel);
+	if (tag.indexInLine === notFound) {
+		tag.label = fileTemplateLabel;
+		tag.indexInLine = line.indexOf(fileTemplateLabel);
+	}
 	if (tag.indexInLine !== notFound) {
 		tag.isFound = true;
 		const  leftOfTemplate = line.substr(0, tag.indexInLine).trim();
+		if (tag.label === fileTemplateLabel) {
+			tag.onFileTemplateTagReading(line);
+		}
 
-		tag.template = line.substr(tag.indexInLine + templateLabel.length).trim();
+		tag.template = line.substr(tag.indexInLine + tag.label.length).trim();
 		if (leftOfTemplate === '') {
 			tag.lineNumOffset = -1;
 		} else {
@@ -507,6 +550,7 @@ function  parseTemplateTag(line: string): TemplateTag {
 		return  tag;
 	}
 
+	tag.label = templateAtStartLabel;
 	tag.startIndexInLine = line.indexOf(templateAtStartLabel);
 	if (tag.startIndexInLine !== notFound) {
 		tag.isFound = true;
@@ -521,6 +565,7 @@ function  parseTemplateTag(line: string): TemplateTag {
 		}
 	}
 
+	tag.label = '';
 	tag.template = '';
 	tag.lineNumOffset = 0;
 	return  tag;
@@ -528,6 +573,7 @@ function  parseTemplateTag(line: string): TemplateTag {
 
 // TemplateTag
 class  TemplateTag {
+	label = '';
 	template = '';
 	isFound = false;
 
@@ -538,6 +584,82 @@ class  TemplateTag {
 	lineNumOffset = 0;  
 	startIndexInLine = notFound;
 	endIndexInLine = notFound;
+
+	// for file-template tag
+	templateLines: string[] = [];
+	indentAtTag = '';
+	minIndentLength = 0;
+
+	onFileTemplateTagReading(line: string) {
+		this.indentAtTag = indentRegularExpression.exec(line)![0];
+		this.minIndentLength = maxNumber;
+	}
+	onReadLine(line: string): boolean {
+		const  currentIndent = indentRegularExpression.exec(line)![0];
+		let  readingNext = true;
+		if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
+
+			this.templateLines.push(line.substr(this.indentAtTag.length));
+			this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
+		} else {
+			this.templateLines = this.templateLines.map((line)=>(
+				line.substr(this.minIndentLength)));
+			readingNext = false;
+		}
+		return  readingNext;
+	}
+	async  checkTargetContents(setting: Settings, parentPath: string): Promise<boolean> {
+		const  targetFilePath = path.join(parentPath, getExpectedLine(setting, this.template));
+		if (!fs.existsSync(targetFilePath)) {
+			console.log("");
+			console.log(`Error: ${translate('NotFound')}: ${targetFilePath}`);
+			return  false;
+		}
+		const  targetFileReader = readline.createInterface({
+			input: fs.createReadStream(targetFilePath),
+			crlfDelay: Infinity
+		});
+		if (this.templateLines.length === 0) {
+			return  false;
+		}
+		const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
+		let  templateLineIndex = 0;
+		let  targetLineNum = 0;
+		let  indent = '';
+		let  same = false;
+
+		for await (const line1 of targetFileReader) {
+			const  targetLine: string = line1;
+			targetLineNum += 1;
+			if (templateLineIndex === 0) {
+
+				const  indentLength = targetLine.indexOf(expectedFirstLine);
+				if (indentLength === notFound) {
+					same = false;
+				} else {
+					same = true;
+					indent = targetLine.substr(0, indentLength);
+				}
+			} else { // lineIndex >= 1
+				const  expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
+
+				same = (targetLine === indent + expected);
+			}
+			if (same) {
+				templateLineIndex += 1;
+				if (templateLineIndex >= this.templateLines.length) {
+					break;
+				}
+			} else {
+				templateLineIndex = 0;
+			}
+		}
+		if (!same) {
+			console.log("");
+			console.log(`${translate('Error')}:`);
+		}
+		return  same;
+	}
 }
 
 // escapeRegularExpression
@@ -772,8 +894,10 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 	return  translated;
 }
 
+const  indentRegularExpression = /^( |¥t)*/;
 const  minLineNum = 0;
 const  maxLineNum = 999999999;
+const  maxNumber = 999999999;
 const  foundForAbove = minLineNum;
 const  foundForFollowing = maxLineNum;
 const  notFound = -1;

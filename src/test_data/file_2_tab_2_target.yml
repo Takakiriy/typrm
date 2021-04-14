@@ -1,0 +1,3 @@
+sign in:
+  user: 'user1'  #template: __User__
+  password: pass
