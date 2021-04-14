@@ -2,6 +2,8 @@ import * as fs from 'fs'; // file system
 import * as path from "path";  // or path = require("path")
 import { program, CommanderError } from 'commander';
 import * as readline from 'readline';
+import { DefaultDeserializer } from 'v8';
+const dd = console.log;
 const  settingStartLabel = "設定:";
 const  settingStartLabelEn = "settings:";
 const  templateLabel = "#template:";
@@ -18,7 +20,7 @@ const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/
 async function  main() {
 	const  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
 	const  parentPath = path.dirname(inputFilePath);
-	let  fileTemplateTag: TemplateTag | null = null;
+	inputFileParentPath = parentPath;
 	let  previousTemplateCount = 0;
 	for(;;) {
 		let  reader = readline.createInterface({
@@ -28,9 +30,9 @@ async function  main() {
 		let  isReadingSetting = false;
 		let  setting: Settings = {};
 		let  settingCount = 0;
-		let  previousLine = '';
 		let  lineNum = 0;
 		let  templateCount = 0;
+		let  fileTemplateTag: TemplateTag | null = null;
 		let  errorCount = 0;
 		let  warningCount = 0;
 		let  secretLabelCount = 0;
@@ -69,7 +71,7 @@ async function  main() {
 				}
 			}
 
-			// Check if "previousLine" has "template" replaced contents.
+			// Check if previous line has "template" replaced contents.
 			const  templateTag = parseTemplateTag(line);
 			if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
 				console.log("");
@@ -101,7 +103,8 @@ async function  main() {
 				const continue_ = fileTemplateTag.onReadLine(line);
 				if (!continue_) {
 
-					const  checkPassed = await fileTemplateTag.checkTargetContents(setting, parentPath);
+					const  checkPassed = await fileTemplateTag.checkTargetContents(
+						setting, inputFilePath, lineNum);
 					if (!checkPassed) {
 						errorCount += 1;
 					}
@@ -156,8 +159,6 @@ async function  main() {
 				}
 				keywords.push(keyword);
 			}
-
-			previousLine = line;
 		}
 		if (settingCount >= 1) {
 			onEndOfSetting(setting);
@@ -320,7 +321,6 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 	let  isReadingSetting = false;
 	let  setting: Settings = {};
 	let  settingCount = 0;
-	let  previousLine = '';
 	let  changedValue = getChangedValue(changedValueAndComment);
 	let  lineNum = 0;
 	let  errorCount = 0;
@@ -412,7 +412,6 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 		if (!output) {
 			writer.write(line +"\n");
 		}
-		previousLine = line;
 	}
 	writer.end();
 	return new Promise( (resolve) => {
@@ -608,7 +607,8 @@ class  TemplateTag {
 		}
 		return  readingNext;
 	}
-	async  checkTargetContents(setting: Settings, parentPath: string): Promise<boolean> {
+	async  checkTargetContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
+		const  parentPath = path.dirname(inputFilePath);
 		const  targetFilePath = path.join(parentPath, getExpectedLine(setting, this.template));
 		if (!fs.existsSync(targetFilePath)) {
 			console.log("");
@@ -625,6 +625,11 @@ class  TemplateTag {
 		const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
 		let  templateLineIndex = 0;
 		let  targetLineNum = 0;
+		let  errorTemplateLineIndex = 0;
+		let  errorTargetLineNum = 0;
+		let  errorContents = '';
+		let  errorExpected = '';
+		let  errorTemplate = '';
 		let  indent = '';
 		let  same = false;
 
@@ -641,9 +646,17 @@ class  TemplateTag {
 					indent = targetLine.substr(0, indentLength);
 				}
 			} else { // lineIndex >= 1
-				const  expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
+				const  expected = getExpectedLineInFileTemplate(
+					setting, this.templateLines[templateLineIndex]);
 
 				same = (targetLine === indent + expected);
+				if (!same) {
+					errorTemplateLineIndex = templateLineIndex;
+					errorTargetLineNum = targetLineNum;
+					errorContents = targetLine;
+					errorExpected = indent + expected;
+					errorTemplate = indent + this.templateLines[templateLineIndex];
+				}
 			}
 			if (same) {
 				templateLineIndex += 1;
@@ -655,8 +668,13 @@ class  TemplateTag {
 			}
 		}
 		if (!same) {
+			const  templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
 			console.log("");
-			console.log(`${translate('Error')}:`);
+			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);
+			console.log(`${translate('typrmFile')}: ${getTestable(inputFilePath)}:${templateLineNum}`);
+			console.log(`  Contents: ${errorContents}`);
+			console.log(`  Expected: ${errorExpected}`);
+			console.log(`  Template: ${errorTemplate}`);
 		}
 		return  same;
 	}
@@ -908,6 +926,19 @@ const  programOptions = program.opts();
 function  exitFromCommander(e: CommanderError) {
 	console.log(e.message);
 }
+function  getTestable(path: string) {
+	if (programOptions.test) {
+		if (path.startsWith(inputFileParentPath)) {
+			return  '${inputFileParentPath}' + path.substr(inputFileParentPath.length);
+		} else {
+			return  path;
+		}
+	} else {
+		return  path;
+	}
+}
+let  inputFileParentPath = '';
+
 async function  callMain() {
 	program.version('0.1.1').exitOverride(exitFromCommander)
 		.option("-l, --locale <s>")
@@ -920,7 +951,7 @@ async function  callMain() {
 	}
 
 	await  main()
-		.catch( async (e)=>{
+		.catch( (e)=>{
 			if (programOptions.test) {
 				throw e;
 			} else {
