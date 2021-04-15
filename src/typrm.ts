@@ -598,7 +598,7 @@ class  TemplateTag {
 		let  readingNext = true;
 		if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
 
-			this.templateLines.push(line.substr(this.indentAtTag.length));
+			this.templateLines.push(line);
 			this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
 		} else {
 			this.templateLines = this.templateLines.map((line)=>(
@@ -670,8 +670,8 @@ class  TemplateTag {
 		if (!same) {
 			const  templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
 			console.log("");
-			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);
 			console.log(`${translate('typrmFile')}: ${getTestable(inputFilePath)}:${templateLineNum}`);
+			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);
 			console.log(`  Contents: ${errorContents}`);
 			console.log(`  Expected: ${errorExpected}`);
 			console.log(`  Template: ${errorTemplate}`);
