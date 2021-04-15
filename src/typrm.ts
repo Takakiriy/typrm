@@ -733,10 +733,12 @@ class  StandardInputBuffer {
 class InputOption {
 	inputLines: string[];
 	nextLineIndex: number;
+	nextParameterIndex: number;  // The index of the starting process parameters
 
 	constructor(inputLines: string[]) {
 		this.inputLines = inputLines;
 		this.nextLineIndex = 0;
+		this.nextParameterIndex = 2;
 	}
 }
 
@@ -761,7 +763,22 @@ async function  input( guide: string ): Promise<string> {
 			const  value = inputOption.inputLines[inputOption.nextLineIndex];
 			inputOption.nextLineIndex += 1;
 			console.log(guide + value);
+
 			return  value;
+		}
+	}
+
+	// Read the starting process parameters
+	while (inputOption.nextParameterIndex < process.argv.length) {
+		const  value = process.argv[inputOption.nextParameterIndex];
+		inputOption.nextParameterIndex += 1;
+		if (value.substr(0,1) !== '-') {
+			console.log(guide + value);
+
+			return  value;
+		}
+		if (value !== '--test') {
+			inputOption.nextParameterIndex += 1;
 		}
 	}
 
