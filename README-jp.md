@@ -71,7 +71,7 @@ new_folder.yaml ファイルは次のような内容に変わります。
 
 typrm を使うには Node.js のインストールが必要です。
 
-Windows の場合
+### Windows の場合
 
     typrm をダウンロードして展開します:
         - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
@@ -92,7 +92,7 @@ Windows の場合
 
     bin フォルダーの中の typrm.bat ファイルをダブルクリックすると typrm が起動します:
 
-mac の場合
+### mac の場合
 
     typrm をダウンロードして展開します:
         - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
@@ -114,7 +114,7 @@ mac の場合
     bin フォルダーの中の typrm.command ファイルをダブルクリックすると typrm が起動します:
 
 
-CentOS7の場合
+### CentOS 7 の場合
 
     typrm をダウンロードして展開します:
         - cd  ~/Downloads
@@ -142,12 +142,19 @@ CentOS7の場合
 
     typrm.sh ファイルに実行属性を追加して、PATH が通ったディレクトリにコピーします:
         - cd  typrm-master/bin
-        - nano  typrm.sh : |
+        - nano  typrm.sh : |  #// インストール先を変える場合
             node  ~/Downloads/typrm-master/build/typrm.js
         - chmod +x  typrm.sh
         - mkdir -p ~/bin
         - cp  typrm.sh  ~/bin/typrm
+
+    typrm を実行します:
         - typrm
+
+    （使わなくなったら）typrm を削除します:
+        - rm ~/bin/typrm
+        - rm ~/Downloads/typrm.zip
+        - rm -rf ~/Downloads/typrm-master/
 
 
 ## 設定タグと #template タグについて
@@ -202,7 +209,9 @@ __ProjectName__ を react2 に置き換えるときに、置き換えた後に�
     pushd  "react1"  #template: cd  "__ProjectName__"
 
 
-## 開発環境の構築手順 (Windows)
+## 開発環境の構築手順
+
+### Windows の場合
 
 Node.js をインストールします:
 
@@ -236,7 +245,7 @@ Visual Studio Code をインストールします:
 F5 キーを押すと、テストが動きます:
 
 
-## 開発環境の構築手順 (mac)
+### mac の場合
 
 Node.js をインストールします:
 

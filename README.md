@@ -68,7 +68,7 @@ you can copy and paste multiple linees and enter them continuously.
 
 To use typrm, you must install Node.js.
 
-For Windows:
+### For Windows
 
     Download and expand typrm:
         - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
@@ -89,7 +89,7 @@ For Windows:
 
     To start typrm, double click typrm.bat file in bin folder:
 
-For mac:
+### For mac
 
     Download and expand typrm:
         - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
@@ -111,7 +111,7 @@ For mac:
     To start typrm, double click typrm.command file in bin folder:
 
 
-For CentOS7:
+### For CentOS 7
 
     Download and expand typrm:
         - cd  ~/Downloads
@@ -139,12 +139,19 @@ For CentOS7:
 
     Add execution attributes to "typrm.sh" file and copy to to a directory in your PATH:
         - cd  typrm-master/bin
-        - nano  typrm.sh : |
+        - nano  typrm.sh : |  #// The case of changing install target
             node  ~/Downloads/typrm-master/build/typrm.js
         - chmod +x  typrm.sh
         - mkdir -p ~/bin
         - cp  typrm.sh  ~/bin/typrm
+
+    Start typrm:
         - typrm
+
+    (If you do not use) delete typrm:
+        - rm ~/bin/typrm
+        - rm ~/Downloads/typrm.zip
+        - rm -rf ~/Downloads/typrm-master/
 
 
 ## About settings tags and #template tags
@@ -200,7 +207,9 @@ The sample that an error occurs:
     pushd  "react1"  #template: cd  "__ProjectName__"
 
 
-## How to build the development environment for Windows
+## How to build the development environment
+
+### For Windows
 
 Install Node.js:
 
@@ -234,8 +243,7 @@ Double click "cmd menu.bat" and select "1. open_VisualStudioCode":
 
 Press F5 key, then the test runs:
 
-
-## How to build the development environment for mac
+### For mac
 
 Install Node.js:
 
