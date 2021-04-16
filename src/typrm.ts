@@ -4,18 +4,6 @@ import { program, CommanderError } from 'commander';
 import * as readline from 'readline';
 import { DefaultDeserializer } from 'v8';
 const dd = console.log;
-const  settingStartLabel = "設定:";
-const  settingStartLabelEn = "settings:";
-const  templateLabel = "#template:";
-const  templateAtStartLabel = "#template-at(";
-const  templateAtEndLabel = "):";
-const  fileTemplateLabel = "#file-template:";
-const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
-const  secretLabel = "#★秘密";
-const  secretLabelEn = "#secret";
-const  secretExamleLabel = "#★秘密:仮";
-const  secretExamleLabelEn = "#secret:example";
-const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 
 async function  main() {
 	const  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
@@ -253,39 +241,6 @@ async function  main() {
 	}
 }
 
-// onEndOfSetting
-function onEndOfSetting(setting: Settings) {
-	for (const key of Object.keys(setting)) {
-		if (!setting[key].isReferenced) {
-			console.log(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);
-		}
-	}
-}
-
-// getSettingIndexFromLineNum
-async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum: number): Promise<number> {
-	const  reader = readline.createInterface({
-		input: fs.createReadStream(inputFilePath),
-		crlfDelay: Infinity
-	});
-	let  settingCount = 0;
-	let  lineNum = 0;
-
-	for await (const line1 of reader) {
-		const  line: string = line1;
-		lineNum += 1;
-
-		if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
-			settingCount += 1;
-		}
-
-		if (lineNum === targetLineNum) {
-			return  settingCount;
-		}
-	}
-	return  0;
-}
-
 // changeSettingByKeyValue
 async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIndex: number,
 		keyValue: string): Promise<number>/*errorCount*/ {
@@ -423,6 +378,154 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 	});
 }
 
+// TemplateTag
+class  TemplateTag {
+
+	label = '';
+	template = '';
+	isFound = false;
+
+	// template tag
+	indexInLine = notFound;
+
+	// template-at tag
+	lineNumOffset = 0;  
+	startIndexInLine = notFound;
+	endIndexInLine = notFound;
+
+	// for file-template tag
+	templateLines: string[] = [];
+	indentAtTag = '';
+	minIndentLength = 0;
+
+	onFileTemplateTagReading(line: string) {
+		this.indentAtTag = indentRegularExpression.exec(line)![0];
+		this.minIndentLength = maxNumber;
+	}
+	onReadLine(line: string): boolean {
+		const  currentIndent = indentRegularExpression.exec(line)![0];
+		let  readingNext = true;
+		if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
+
+			this.templateLines.push(line);
+			this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
+		} else {
+			this.templateLines = this.templateLines.map((line)=>(
+				line.substr(this.minIndentLength)));
+			readingNext = false;
+		}
+		return  readingNext;
+	}
+	async  checkTargetContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
+
+		// TODO: インデントをスマートに揃える
+		// どうやって？
+	
+		const  parentPath = path.dirname(inputFilePath);
+		const  targetFilePath = path.join(parentPath, getExpectedLine(setting, this.template));
+		if (!fs.existsSync(targetFilePath)) {
+			console.log("");
+			console.log(`Error: ${translate('NotFound')}: ${targetFilePath}`);
+			return  false;
+		}
+		const  targetFileReader = readline.createInterface({
+			input: fs.createReadStream(targetFilePath),
+			crlfDelay: Infinity
+		});
+		if (this.templateLines.length === 0) {
+			return  false;
+		}
+		const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
+		let  templateLineIndex = 0;
+		let  targetLineNum = 0;
+		let  errorTemplateLineIndex = 0;
+		let  errorTargetLineNum = 0;
+		let  errorContents = '';
+		let  errorExpected = '';
+		let  errorTemplate = '';
+		let  indent = '';
+		let  same = false;
+
+		for await (const line1 of targetFileReader) {
+			const  targetLine: string = line1;
+			targetLineNum += 1;
+			if (templateLineIndex === 0) {
+
+				const  indentLength = targetLine.indexOf(expectedFirstLine);
+				if (indentLength === notFound) {
+					same = false;
+				} else {
+					same = true;
+					indent = targetLine.substr(0, indentLength);
+				}
+			} else { // lineIndex >= 1
+				const  expected = getExpectedLineInFileTemplate(
+					setting, this.templateLines[templateLineIndex]);
+
+				same = (targetLine === indent + expected);
+				if (!same) {
+					errorTemplateLineIndex = templateLineIndex;
+					errorTargetLineNum = targetLineNum;
+					errorContents = targetLine;
+					errorExpected = indent + expected;
+					errorTemplate = indent + this.templateLines[templateLineIndex];
+				}
+			}
+			if (same) {
+				templateLineIndex += 1;
+				if (templateLineIndex >= this.templateLines.length) {
+					break;
+				}
+			} else {
+				templateLineIndex = 0;
+			}
+		}
+		if (!same) {
+			const  templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
+			console.log("");
+			console.log(`${translate('typrmFile')}: ${getTestable(inputFilePath)}:${templateLineNum}`);
+			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);
+			console.log(`  Contents: ${errorContents}`);
+			console.log(`  Expected: ${errorExpected}`);
+			console.log(`  Template: ${errorTemplate}`);
+		}
+		return  same;
+	}
+}
+
+// onEndOfSetting
+function onEndOfSetting(setting: Settings) {
+	for (const key of Object.keys(setting)) {
+		if (!setting[key].isReferenced) {
+			console.log(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);
+		}
+	}
+}
+
+// getSettingIndexFromLineNum
+async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum: number): Promise<number> {
+	const  reader = readline.createInterface({
+		input: fs.createReadStream(inputFilePath),
+		crlfDelay: Infinity
+	});
+	let  settingCount = 0;
+	let  lineNum = 0;
+
+	for await (const line1 of reader) {
+		const  line: string = line1;
+		lineNum += 1;
+
+		if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
+			settingCount += 1;
+		}
+
+		if (lineNum === targetLineNum) {
+			return  settingCount;
+		}
+	}
+	return  0;
+}
+
 // isEndOfSetting
 function  isEndOfSetting(line: string, isReadingSetting: boolean): boolean {
 	let  returnValue = false;
@@ -465,9 +568,6 @@ function  getValue(line: string, separatorIndex: number) {
 // getExpectedLine
 function  getExpectedLine(setting: Settings, template: string): string {
 	let  expected = template;
-if (!template) {
-return template;
-}
 
 	for (const key of Object.keys(setting)) {
 		const  re = new RegExp( escapeRegularExpression(key), "gi" );
@@ -568,116 +668,6 @@ function  parseTemplateTag(line: string): TemplateTag {
 	tag.template = '';
 	tag.lineNumOffset = 0;
 	return  tag;
-}
-
-// TemplateTag
-class  TemplateTag {
-	label = '';
-	template = '';
-	isFound = false;
-
-	// template tag
-	indexInLine = notFound;
-
-	// template-at tag
-	lineNumOffset = 0;  
-	startIndexInLine = notFound;
-	endIndexInLine = notFound;
-
-	// for file-template tag
-	templateLines: string[] = [];
-	indentAtTag = '';
-	minIndentLength = 0;
-
-	onFileTemplateTagReading(line: string) {
-		this.indentAtTag = indentRegularExpression.exec(line)![0];
-		this.minIndentLength = maxNumber;
-	}
-	onReadLine(line: string): boolean {
-		const  currentIndent = indentRegularExpression.exec(line)![0];
-		let  readingNext = true;
-		if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
-
-			this.templateLines.push(line);
-			this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
-		} else {
-			this.templateLines = this.templateLines.map((line)=>(
-				line.substr(this.minIndentLength)));
-			readingNext = false;
-		}
-		return  readingNext;
-	}
-	async  checkTargetContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
-		const  parentPath = path.dirname(inputFilePath);
-		const  targetFilePath = path.join(parentPath, getExpectedLine(setting, this.template));
-		if (!fs.existsSync(targetFilePath)) {
-			console.log("");
-			console.log(`Error: ${translate('NotFound')}: ${targetFilePath}`);
-			return  false;
-		}
-		const  targetFileReader = readline.createInterface({
-			input: fs.createReadStream(targetFilePath),
-			crlfDelay: Infinity
-		});
-		if (this.templateLines.length === 0) {
-			return  false;
-		}
-		const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
-		let  templateLineIndex = 0;
-		let  targetLineNum = 0;
-		let  errorTemplateLineIndex = 0;
-		let  errorTargetLineNum = 0;
-		let  errorContents = '';
-		let  errorExpected = '';
-		let  errorTemplate = '';
-		let  indent = '';
-		let  same = false;
-
-		for await (const line1 of targetFileReader) {
-			const  targetLine: string = line1;
-			targetLineNum += 1;
-			if (templateLineIndex === 0) {
-
-				const  indentLength = targetLine.indexOf(expectedFirstLine);
-				if (indentLength === notFound) {
-					same = false;
-				} else {
-					same = true;
-					indent = targetLine.substr(0, indentLength);
-				}
-			} else { // lineIndex >= 1
-				const  expected = getExpectedLineInFileTemplate(
-					setting, this.templateLines[templateLineIndex]);
-
-				same = (targetLine === indent + expected);
-				if (!same) {
-					errorTemplateLineIndex = templateLineIndex;
-					errorTargetLineNum = targetLineNum;
-					errorContents = targetLine;
-					errorExpected = indent + expected;
-					errorTemplate = indent + this.templateLines[templateLineIndex];
-				}
-			}
-			if (same) {
-				templateLineIndex += 1;
-				if (templateLineIndex >= this.templateLines.length) {
-					break;
-				}
-			} else {
-				templateLineIndex = 0;
-			}
-		}
-		if (!same) {
-			const  templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
-			console.log("");
-			console.log(`${translate('typrmFile')}: ${getTestable(inputFilePath)}:${templateLineNum}`);
-			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);
-			console.log(`  Contents: ${errorContents}`);
-			console.log(`  Expected: ${errorExpected}`);
-			console.log(`  Template: ${errorTemplate}`);
-		}
-		return  same;
-	}
 }
 
 // escapeRegularExpression
@@ -929,6 +919,18 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 	return  translated;
 }
 
+const  settingStartLabel = "設定:";
+const  settingStartLabelEn = "settings:";
+const  templateLabel = "#template:";
+const  templateAtStartLabel = "#template-at(";
+const  templateAtEndLabel = "):";
+const  fileTemplateLabel = "#file-template:";
+const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
+const  secretLabel = "#★秘密";
+const  secretLabelEn = "#secret";
+const  secretExamleLabel = "#★秘密:仮";
+const  secretExamleLabelEn = "#secret:example";
+const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
 const  minLineNum = 0;
 const  maxLineNum = 999999999;

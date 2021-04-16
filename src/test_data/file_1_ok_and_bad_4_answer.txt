@@ -1,4 +1,4 @@
-YAML UTF-8 file path>
+﻿YAML UTF-8 file path>
 Warning: 0, Error: 0
 template count = 4
 Press Enter key to retry checking.
@@ -6,11 +6,11 @@ The line number to change the variable value >SettingIndex: 1
 Enter only: finish to input setting
 key: new_value>key: new_value>========================================
 
-ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_2_target.yaml:3
 typrmFile: ${inputFileParentPath}/file_1_ok_and_bad_1_changing.yaml:6
-  Contents:         user: 'user1'
-  Expected:         user: 'user2'
-  Template:         user: 'user2'  #template: __User__
+ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_2_target.yaml:4
+  Contents:             user: 'user1'
+  Expected:             user: 'user2'
+  Template:             user: 'user2'  #template: __User__
 
 Warning: 0, Error: 1
 template count = 4 (in previous check)
