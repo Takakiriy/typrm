@@ -1,9 +1,12 @@
 設定:
     __Base__: .
     __User__: user2
+    __HoneBin__: ~/bin
 nano ./file_1_ok_and_bad_2_target.yaml の一部:  #file-template: __Base__/file_1_ok_and_bad_2_target.yaml
     sign in:
         user: 'user2'  #template: __User__
         password: pass
 sudo nano ./file_1_ok_and_bad_3_target.sh: |  #file-template: __Base__/file_1_ok_and_bad_3_target.sh
     login user2  #template: __User__
+~/bin/gitlog :  #file-template: __HoneBin__/gitlog
+    git fetch

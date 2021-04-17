@@ -417,10 +417,6 @@ class  TemplateTag {
 		return  readingNext;
 	}
 	async  checkTargetContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
-
-		// TODO: インデントをスマートに揃える
-		// どうやって？
-	
 		const  parentPath = path.dirname(inputFilePath);
 		const  targetFilePath = path.join(parentPath, getExpectedLine(setting, this.template));
 		if (!fs.existsSync(targetFilePath)) {
@@ -482,6 +478,11 @@ class  TemplateTag {
 		}
 		if (!same) {
 			const  templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
+			if (errorContents === '') {
+				errorContents = '(Not found)';
+				errorExpected = expectedFirstLine;
+				errorTemplate = this.templateLines[0];
+			}
 			console.log("");
 			console.log(`${translate('typrmFile')}: ${getTestable(inputFilePath)}:${templateLineNum}`);
 			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);

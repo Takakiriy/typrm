@@ -5,10 +5,10 @@ const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `./test_data` + "/";
 
 async function  main() {
-	await TestOfCheck();
+/*	await TestOfCheck();
 	await TestOfChange();
 	await TestOfChangeError();
-//	await TestOfFileCheck();
+*/	await TestOfFileCheck();
 	deleteFile(testFolderPath + '_output.txt');
 	console.log('Pass');
 }
