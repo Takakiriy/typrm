@@ -152,6 +152,16 @@ async function  main() {
 			onEndOfSetting(setting);
 		}
 
+		// Check target file contents by "#file-template:" tag (2).
+		if (fileTemplateTag) {
+
+			const  checkPassed = await fileTemplateTag.checkTargetContents(
+				setting, inputFilePath, lineNum);
+			if (!checkPassed) {
+				errorCount += 1;
+			}
+		}
+
 		// Check if there is the title above or following.
 		reader = readline.createInterface({
 			input: fs.createReadStream(inputFilePath),
@@ -418,7 +428,7 @@ class  TemplateTag {
 	}
 	async  checkTargetContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
 		const  parentPath = path.dirname(inputFilePath);
-		const  targetFilePath = path.join(parentPath, getExpectedLine(setting, this.template));
+		const  targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
 		if (!fs.existsSync(targetFilePath)) {
 			console.log("");
 			console.log(`Error: ${translate('NotFound')}: ${targetFilePath}`);
@@ -547,6 +557,19 @@ function  isEndOfSetting(line: string, isReadingSetting: boolean): boolean {
 		}
 	}
 	return  returnValue;
+}
+
+// getFullPath
+function  getFullPath(relativePath: string, basePath: string): string {
+	var  fullPath = '';
+	if (relativePath.substr(0,1) === '/') {
+		fullPath = relativePath;
+	} else if (relativePath.substr(0,1) === '~') {
+		fullPath = relativePath.replace('~', process.env.HOME!);
+	} else {
+		fullPath = path.join(basePath, relativePath);
+	}
+	return  fullPath;
 }
 
 // deleteFile

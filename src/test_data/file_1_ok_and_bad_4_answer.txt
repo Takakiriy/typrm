@@ -1,6 +1,6 @@
 ﻿YAML UTF-8 file path>
 Warning: 0, Error: 0
-template count = 5
+template count = 6
 Press Enter key to retry checking.
 The line number to change the variable value >SettingIndex: 1
 Enter only: finish to input setting
@@ -18,8 +18,14 @@ ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_3_target.sh:0
   Expected: login user2
   Template: login user2  #template: __User__
 
-Warning: 0, Error: 2
-template count = 5 (in previous check)
-template count = 5
+typrmFile: ${inputFileParentPath}/file_1_ok_and_bad_1_changing.yaml:11
+ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_3_target.sh:0
+  Contents: (Not found)
+  Expected:     login user2
+  Template:     login user2  #template: __User__
+
+Warning: 0, Error: 3
+template count = 6 (in previous check)
+template count = 6
 Press Enter key to retry checking.
 The line number to change the variable value >
