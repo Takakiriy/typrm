@@ -21,8 +21,8 @@ ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_3_target.sh:0
 typrmFile: ${inputFileParentPath}/file_1_ok_and_bad_1_changing.yaml:11
 ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_3_target.sh:0
   Contents: (Not found)
-  Expected:     login user2
-  Template:     login user2  #template: __User__
+  Expected: login user2
+  Template: login user2  #template: __User__
 
 Warning: 0, Error: 3
 template count = 6 (in previous check)

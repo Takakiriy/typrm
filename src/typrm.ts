@@ -154,6 +154,7 @@ async function  main() {
 
 		// Check target file contents by "#file-template:" tag (2).
 		if (fileTemplateTag) {
+			fileTemplateTag.onReadLine('');  // Cut indent
 
 			const  checkPassed = await fileTemplateTag.checkTargetContents(
 				setting, inputFilePath, lineNum);
