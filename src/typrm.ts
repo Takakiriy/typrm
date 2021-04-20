@@ -34,7 +34,7 @@ async function  main() {
 			const  previousIsReadingSetting = isReadingSetting;
 
 			// setting = ...
-			if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
+			if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
 				if (settingCount >= 1) {
 					onEndOfSetting(setting);
 				}
@@ -53,7 +53,7 @@ async function  main() {
 					if (value !== '') {
 
 						setting[key] = {value, isReferenced: false, lineNum};
-					} else if (key + ':' !== settingStartLabel  &&  key + ':' !== settingStartLabelEn) {
+					} else if (!settingStartLabel.test(key + ':')  &&  !settingStartLabelEn.test(key + ':')) {
 						isReadingSetting = false;
 					}
 				}
@@ -299,7 +299,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 		let  output = false;
 
 		// setting = ...
-		if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
+		if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
 			isReadingSetting = true;
 			setting = {};
 			settingCount += 1;
@@ -321,7 +321,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 					if (value !== '') {
 
 						setting[key] = {value, isReferenced: false, lineNum};
-					} else if (key + ':' !== settingStartLabel  &&  key + ':' !== settingStartLabelEn) {
+					} else if (!settingStartLabel.test(key + ':')  &&  !settingStartLabelEn.test(key + ':')) {
 						isReadingSetting = false;
 					}
 
@@ -527,7 +527,7 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
 		const  line: string = line1;
 		lineNum += 1;
 
-		if (line.trim() === settingStartLabel  ||  line.trim() === settingStartLabelEn) {
+		if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
 			settingCount += 1;
 		}
 
@@ -944,8 +944,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 	return  translated;
 }
 
-const  settingStartLabel = "設定:";
-const  settingStartLabelEn = "settings:";
+const  settingStartLabel = /^設定(\(|（[^\)]*\)|）)?:$/;
+const  settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";

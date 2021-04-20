@@ -11,6 +11,8 @@ if (!debug) {
 	await TestOfCheck();
 	await TestOfChange();
 	await TestOfChangeError();
+} else {
+	await TestOfChange();
 }
 	await TestOfFileCheck();
 	deleteFile(testFolderPath + '_output.txt');
@@ -56,10 +58,16 @@ async function  TestOfCheck() {
 async function  TestOfChange() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads: {[name: string]: number} = {
-		"2_change_1_ok": 2,
-		"2_change_3_English": 1,
-	};
+	if (!debug) {
+		var fileNameHeads: {[name: string]: number} = {
+			"2_change_1_ok": 2,
+			"2_change_3_English": 1,
+		};
+	} else {
+		var fileNameHeads: {[name: string]: number} = {
+			"2_change_5_setting_name": 2,
+		};
+	}
 	for (const fileNameHead in fileNameHeads) {
 		const  caseCount = fileNameHeads[fileNameHead];
 		for (let target = 1;  target <= caseCount;  target+=1) {
