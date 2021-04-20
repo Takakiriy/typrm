@@ -4,11 +4,15 @@ import * as child_process from 'child_process';
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `./test_data` + "/";
 
+const  debug = false;
+
 async function  main() {
+if (!debug) {
 	await TestOfCheck();
 	await TestOfChange();
 	await TestOfChangeError();
-//	await TestOfFileCheck();
+}
+	await TestOfFileCheck();
 	deleteFile(testFolderPath + '_output.txt');
 	console.log('Pass');
 }
@@ -181,11 +185,19 @@ async function  TestOfChangeError() {
 async function  TestOfFileCheck() {
 	let  returns: ProcessReturns;
 
-	const fileNameHeads: {[name: string]: number} = {
-		"file_1_ok_and_bad": 1,
-		"file_2_tab": 1,
-		"file_3_file_name": 1,
-	};
+	if (debug) {
+		var fileNameHeads: {[name: string]: number} = {
+	//		"file_1_ok_and_bad": 1,
+			"file_2_tab": 1,
+			"file_3_file_name": 1,
+		};
+	} else {
+		var fileNameHeads: {[name: string]: number} = {
+			"file_1_ok_and_bad": 1,
+	//		"file_2_tab": 1,
+	//		"file_3_file_name": 1,
+		};
+	}
 	for (const fileNameHead in fileNameHeads) {
 		const  caseCount = fileNameHeads[fileNameHead];
 		for (let target = 1;  target <= caseCount;  target+=1) {

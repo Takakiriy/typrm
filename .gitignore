@@ -2,5 +2,6 @@ node_modules
 **/.DS_Store
 
 **/*.backup
-**/*_changing.ya?ml
+**/*_changing.yml
+**/*_changing.yaml
 bin/chmod+x.command
