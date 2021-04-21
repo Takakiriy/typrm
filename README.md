@@ -46,8 +46,8 @@ For Windows, double click typrm.bat file and type:
 
 You can drag and drop a file to enter the file without having to type it from the keyboard.
 
-The line number is below the line where "Setting:" is written,
-and above the line where the next "Setting:" is written.
+The line number is below the line where "setting:" is written,
+and above the line where the next "setting:" is written.
 
 new_folder.yaml file will be chaned to the following contents.
 
@@ -188,13 +188,13 @@ Replaces only when it matches the text that you replaced with the value before y
 It does nothing when it matches the text after replacing it.
 If neither match is matched, an error occurs.
 
-The sample to match before replacing, when replacing a with react2:
+The sample to match before replacing, when replacing __ProjectName__ with react2:
 
     settings:
         __ProjectName__: react1
     cd  "react1"  #template: cd  "__ProjectName__"
 
-The sample that match after replacement, when replacing a with react2:
+The sample that match after replacement, when replacing __ProjectName__ with react2:
 
     settings:
         __ProjectName__: react1
@@ -243,6 +243,7 @@ Double click "cmd menu.bat" and select "1. open_VisualStudioCode":
 
 Press F5 key, then the test runs:
 
+
 ### For mac
 
 Install Node.js:
@@ -272,3 +273,71 @@ Add "cmd menu.command" file executable permission:
 Double click "cmd menu.command" file and select "1. open_VisualStudioCode":
 
 To run the test, press fn + F5 key:
+
+
+### For Windows host OS and CentOS 7 guest OS
+
+Install typrm
+
+    See above
+
+Install Visual Studio Code:
+
+    - https://code.visualstudio.com/
+    - Open the downloaded file (e.g. VSCodeUserSetup-x64-1.54.3.exe)
+    - Installation options are defaults
+    - VSCode >> Terminal >> New Terminal
+    - If you see powershell in the top right corner of the open shell, click there and 
+        [ Select Default Shell >> Git bash ]
+    - (recommend) Pin Visual Studio Code to the taskbar
+    - (recommend) Set to save all files when Ctrl+S is pressed: |
+        File >> Preferences >> Keyboard Shortcuts >> (input) save all >>
+            (double click) File: Save All >> Ctrl + S key >> Enter key
+
+Add a virtual local network adapter to the VM:
+
+    Power off the VM:
+    Menu: VirtualBox >> (target VM) >> Setting(up) >> Network >>
+        Adapter 2 >> Enables network adapter >> Allocation = Host Only Adapter
+    Start the VM:
+    Make a note of the IP address of the guest operating system:
+        CentOS >> shell:
+            ip a
+            #// enp0s8 (IP address, inet line)
+
+Set the firewall to open the VM's ports:
+
+    - sudo firewall-cmd --list-all  #// Shows current zone and settings
+    - sudo firewall-cmd --set-default-zone=trusted  #// Change the default zone. trusted is all open
+    - sudo firewall-cmd --reload  #// Reboot to apply settings
+
+Install the Remote Development extension:
+
+    VSCode >> Extension button(left) >> Remote Development
+
+Remote Explorer icon(left):
+
+    REMOTE EXPLORER: SSH Targets
+    SSH TARGETS: + button
+    Enter SSH Connection Command: ssh user1@192.168.0.100
+    Select SSH configuration file to update:
+        C:\Users\____\.ssh\config
+    (If) changing the user name to log in or deleting the old target:
+        Open and edit C:\Users\____\.ssh\config
+    Push 192.168.0.100 ('s right folder) button:
+
+A new Visual Studio Code window opens:
+
+    (First time only) Select the guest OS type: Linux
+    (First time only) Select continue for fingerprint:
+    Enter the guest OS user password (twice):
+        #// If you log in successfully, the server name will be displayed in green at the bottom left.
+    Open the folder in guest operating system:
+        Opened VSCode window >> File >> Open Folder >> /home/user1/Downloads/typrm-master/
+    Enter the password of the guest OS user:
+
+Restore the node_modules folder:
+
+    VSCode >> Terminal >> New Terminal >> npm ci
+
+To run the test, press F5 key:

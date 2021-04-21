@@ -274,3 +274,70 @@ Visual Studio Code をインストールします:
 "cmd menu.command" ファイルをダブルクリックして、1. open_VisualStudioCode を選びます:
 
 fn + F5 キーを押すと、テストが動きます:
+
+
+### ホストOSが Windows、ゲストOSが CentOS 7 の場合
+
+typrm をインストールします:
+
+    上記を参照
+
+Visual Studio Code をインストールします:
+
+    - https://code.visualstudio.com/
+    - ダウンロードしたファイル（例：VSCodeUserSetup-x64-1.54.3.exe）を開きます
+    - インストール オプションはデフォルトを使用
+    - VSCode >> Terminal >> New Terminal
+    - 開いたシェルの右上に 1:powershell が表示されていたら、そこをクリックして Select Default Shell >> Git bash
+    - （推奨）Visual Studio Code をタスクバーにピン止めします:
+    - （推奨）Ctrl + S キーを押したときに全てのファイルを保存するように設定します: |
+        File >> Preferences >> Keyboard Shortcuts >> save all （と入力） >>
+            File: Save All （をダブルクリック） >> Ctrl + S キー >> Enter キー
+
+仮想的にローカル接続する ネットワーク アダプター を VM に追加します:
+
+    VM の電源をオフにします:
+    メニュー: VirtualBox >> （対象のVM）>> 設定（上）>> ネットワーク >>
+        アダプター 2 >> ネットワークアダプターを有効化 >> 割り当て＝ホストオンリーアダプター
+    VM を起動します:
+    ゲストOSのIPアドレスをメモします:
+        CentOS >> shell:
+            ip a
+            #// enp0s8 （の IP アドレス、inet の行）
+
+VM のポートを解放するようにファイアーウォールを設定します:
+
+    - sudo firewall-cmd --list-all  #// 現在のゾーンと設定を表示します
+    - sudo firewall-cmd --set-default-zone=trusted  #// デフォルトゾーンを変更します。trusted は全てオープン
+    - sudo firewall-cmd --reload  #// 設定を適用するために再起動します
+
+Remote Development 拡張機能をインストールします:
+
+    VSCode >> 拡張機能 ボタン（左） >> Remote Development
+
+Remote Explorer アイコン（左）:
+
+    REMOTE EXPLORER: SSH Targets
+    SSH TARGETS: + ボタン
+    Enter SSH Connection Command: ssh user1@192.168.0.100
+    Select SSH configuration file to update:
+        C:\Users\____\.ssh\config
+    （もし）ログインするユーザー名を変えるときや、古いターゲットを消すとき:
+        C:\Users\____\.ssh\config を開いて編集します
+    192.168.0.100 （の右のフォルダー）ボタン を押します:
+
+新しい Visual Studio Code ウィンドウが開きます:
+
+    （初回のみ）ゲストOS の種類を選びます: Linux
+    （初回のみ）fingerprint に対して continue を選びます:
+    ゲストOSのユーザーのパスワードを入力します(2回):
+        #// ログインに成功すると左下に緑色でサーバー名が表示されます
+    ゲストOSのフォルダーを開きます:
+        開いた VSCode ウィンドウ >> File >> Open Folder >> /home/user1/Downloads/typrm-master/
+    ゲストOSのユーザーのパスワードを入力します:
+
+node_modules フォルダーを復帰します:
+
+    VSCode >> Terminal >> New Terminal >> npm ci
+
+F5 キーを押すと、テストが動きます:
