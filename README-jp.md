@@ -3,6 +3,22 @@
 typrm は テキスト ファイル に書いたキーボードから手動で入力する内容のパラメーターを置き換えます。
 同じ内容にすべきテキストを同じように置き換えるため、入力ミスが少なくなります。
 
+<!-- TOC depthFrom:1 -->
+
+- [typrm](#typrm)
+  - [最初のサンプル](#最初のサンプル)
+  - [インストール](#インストール)
+    - [Windows の場合](#windows-の場合)
+    - [mac の場合](#mac-の場合)
+    - [CentOS 7 の場合](#centos-7-の場合)
+  - [設定タグと #template タグについて](#設定タグと-template-タグについて)
+  - [開発環境の構築手順](#開発環境の構築手順)
+    - [Windows の場合](#windows-の場合-1)
+    - [mac の場合](#mac-の場合-1)
+    - [ホストOSが Windows、ゲストOSが CentOS 7 の場合](#ホストosが-windowsゲストosが-centos-7-の場合)
+
+<!-- /TOC -->
+
 
 ## 最初のサンプル
 
@@ -35,7 +51,7 @@ new_folder.yaml
         mkdir work1  #template: __Name__
         cd    work1  #template: __Name__
 
-設定: に変更する部分に関する 変数名: 値 を書きます。
+`設定:` に変更する部分に関する 変数名: 値 を書きます。
 変更する部分と同じ行の末尾に #template: タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
@@ -48,8 +64,8 @@ Windows の場合、typrm.bat をダブルクリックして、下記のよう�
 ファイル パス は、キーボードから入力しなくても、
 ファイルをドラッグ＆ドロップして入力できます。
 
-行番号は「設定:」が書いてある部分より下、
-次の「設定:」が書いてある行より上であれば、
+行番号は `設定:` が書いてある部分より下、
+次の `設定:` が書いてある行より上であれば、
 どの行番号を入力しても構いません。
 
 new_folder.yaml ファイルは次のような内容に変わります。
@@ -106,7 +122,7 @@ typrm を使うには Node.js のインストールが必要です。
         - Launchpad >> Terminal
         - sudo npm install -g  commander
 
-    typrm.command ファイルに実行属性を追加します:
+    `typrm.command` ファイルに実行属性を追加します:
         - (ターミナルの続き)
         - cd bin  #// bin の部分は typrm の bin フォルダーをターミナルにドラッグ＆ドロップします
         - chmod +x typrm.command
@@ -140,7 +156,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm が使う commander パッケージをインストールします:
         - npm install -g commander
 
-    typrm.sh ファイルに実行属性を追加して、PATH が通ったディレクトリにコピーします:
+    `typrm.sh` ファイルに実行属性を追加して、PATH が通ったディレクトリにコピーします:
         - cd  typrm-master/bin
         - nano  typrm.sh : |  #// インストール先を変える場合
             node  ~/Downloads/typrm-master/build/typrm.js
@@ -159,7 +175,7 @@ typrm を使うには Node.js のインストールが必要です。
 
 ## 設定タグと #template タグについて
 
-置き換えるテキストは、設定: が書かれた行の下に 変数名: 値 を書きます。
+置き換えるテキストは、`設定:` が書かれた行の下に 変数名: 値 を書きます。
 
     設定:
         __ProjectName__: react1
@@ -240,15 +256,15 @@ Visual Studio Code をインストールします:
             File: Save All （をダブルクリック） >> Ctrl + S キー >> Enter キー
     - Visual Studio Code を閉じます
 
-"cmd menu.bat" をダブルクリックして、1. open_VisualStudioCode を選びます:
+`cmd menu.bat` をダブルクリックして、`1. open_VisualStudioCode` を選びます:
 
-typrm_test_1.ts ファイルのテストを実行します:
+`typrm_test_1.ts` ファイルのテストを実行します:
 
     - ソース ファイルの行番号の左をクリックして、ブレーク ポイントを設定します
     - F5 キーを押します
     - （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
 
-typrm.test.ts ファイルのテスト(Jest)を実行します:
+`typrm.test.ts` ファイルのテスト(Jest)を実行します:
 
     - ソース ファイルの行番号の左をクリックして、ブレークポイントを設定します:
     - Jest のウォッチモードを起動します:
@@ -279,15 +295,15 @@ Visual Studio Code をインストールします:
             File: Save All （をダブルクリック） >> Command + S キー >> Enter キー
     - Visual Studio Code を閉じます
 
-"cmd menu.command" ファイルに実行権限を追加します:
+`cmd menu.command` ファイルに実行権限を追加します:
 
-    - "bin/chmod+x.command.zip" ファイルをダブルクリックします
-    - 解凍してできた "chmod+x.command" ファイルを右クリック >> 開く >> 開く
-    - "cmd menu.command" ファイルを開いたウィンドウにドラッグ＆ドロップして、Enter キーを押し、ウィンドウを閉じます
-    - "cmd menu.command" ファイルを右クリック >> 開く >> 開く
+    - `bin/chmod+x.command.zip` ファイルをダブルクリックします
+    - 解凍してできた `chmod+x.command` ファイルを右クリック >> 開く >> 開く
+    - `cmd menu.command` ファイルを開いたウィンドウにドラッグ＆ドロップして、Enter キーを押し、ウィンドウを閉じます
+    - `cmd menu.command` ファイルを右クリック >> 開く >> 開く
     - 開いたウィンドウを閉じます
 
-"cmd menu.command" ファイルをダブルクリックして、1. open_VisualStudioCode を選びます:
+`cmd menu.command` ファイルをダブルクリックして、`1. open_VisualStudioCode` を選びます:
 
 fn + F5 キーを押すと、テストが動きます:
 

@@ -5,6 +5,22 @@ It replaces the text that should be the same in the same way, resulting in fewer
 
 [日本語 README](./README-jp.md)
 
+<!-- TOC depthFrom:1 -->
+
+- [typrm](#typrm)
+  - [First example](#first-example)
+  - [Install](#install)
+    - [For Windows](#for-windows)
+    - [For mac](#for-mac)
+    - [For CentOS 7](#for-centos-7)
+  - [About settings tags and #template tags](#about-settings-tags-and-template-tags)
+  - [How to build the development environment](#how-to-build-the-development-environment)
+    - [For Windows](#for-windows-1)
+    - [For mac](#for-mac-1)
+    - [For Windows host OS and CentOS 7 guest OS](#for-windows-host-os-and-centos-7-guest-os)
+
+<!-- /TOC -->
+
 
 ## First example
 
@@ -34,7 +50,7 @@ new_folder.yaml
         mkdir work1  #template: __Name__
         cd    work1  #template: __Name__
 
-Write "variable_name: value" at "settings:" for the part you want to change to.
+Write "variable_name: value" at `settings:` for the part you want to change to.
 Write the #template: tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
@@ -46,8 +62,8 @@ For Windows, double click typrm.bat file and type:
 
 You can drag and drop a file to enter the file without having to type it from the keyboard.
 
-The line number is below the line where "setting:" is written,
-and above the line where the next "setting:" is written.
+The line number is below the line where `setting:` is written,
+and above the line where the next `setting:` is written.
 
 new_folder.yaml file will be chaned to the following contents.
 
@@ -103,7 +119,7 @@ To use typrm, you must install Node.js.
         - Launchpad >> Terminal
         - sudo npm install -g  commander
 
-    Add execution attributes to "typrm.command" file:
+    Add execution attributes to `typrm.command` file:
         - (Continue in the Terminal)
         - cd bin  #// bin is written by drag and drop typrm bin folder into terminal
         - chmod +x typrm.command
@@ -137,7 +153,7 @@ To use typrm, you must install Node.js.
     Install the commander package used by typrm:
         - npm install -g commander
 
-    Add execution attributes to "typrm.sh" file and copy to to a directory in your PATH:
+    Add execution attributes to `typrm.sh` file and copy to to a directory in your PATH:
         - cd  typrm-master/bin
         - nano  typrm.sh : |  #// The case of changing install target
             node  ~/Downloads/typrm-master/build/typrm.js
@@ -156,7 +172,7 @@ To use typrm, you must install Node.js.
 
 ## About settings tags and #template tags
 
-About the text you want to replace, you must write "variable name: value" below "setting:".
+About the text you want to replace, you must write `variable name: value` below `setting:`.
 
     settings:
         __ProjectName__: react1
@@ -239,9 +255,25 @@ Install Visual Studio Code:
             (double click) File: Save All >> Ctrl + S key >> Enter key
     - Close Visual Studio Code
 
-Double click "cmd menu.bat" and select "1. open_VisualStudioCode":
+Double click `cmd menu.bat` and select `1. open_VisualStudioCode`:
 
-Press F5 key, then the test runs:
+Test the `typrm_test_1.ts` file:
+
+    - To set the break point, click at the left of line number of the source file
+    - Press F5 key, then the test runs
+    - (When you finish,) Terminal tab (bottom) >> Recycle box icon (right)
+
+Test the `typrm.test.ts` file (Jest):
+
+    - To set the break point, click at the left of line number of the source file
+    - Start Jest watch mode:
+        - Menu: Visual Studio Code >> Terminal >> New Terminal >> 1: (shell) >> Create JavaScript Debug Terminal
+        npm test --watch
+            #// If you end the debugger, press Ctrl + C and restart by `npm test --watch`
+    - Restart the test:
+        - Continue button:  #// Run to the end of program
+        - Press `f` key in the terminal running `npm test --watch`
+    - (When you finish,) Terminal tab (bottom) >> Recycle box icon (right)
 
 
 ### For mac
@@ -262,15 +294,15 @@ Install Visual Studio Code:
             (double click) File: Save All >> Ctrl + S key >> Enter key
     - Close Visual Studio Code
 
-Add "cmd menu.command" file executable permission:
+Add `cmd menu.command` file executable permission:
 
-    - Double click "bin/chmod+x.command.zip" file
-    - Right click at the expanded "chmod+x.command" file >> Open >> Open
-    - Drag and drop "cmd menu.command" file to the opened window, push Enter key and close the window
-    - Right click at "cmd menu.command" file >> Open >> Open
+    - Double click `bin/chmod+x.command.zip` file
+    - Right click at the expanded `chmod+x.command` file >> Open >> Open
+    - Drag and drop `cmd menu.command` file to the opened window, push Enter key and close the window
+    - Right click at `cmd menu.command` file >> Open >> Open
     - Close the opened window
 
-Double click "cmd menu.command" file and select "1. open_VisualStudioCode":
+Double click `cmd menu.command` file and select `1. open_VisualStudioCode`:
 
 To run the test, press fn + F5 key:
 
