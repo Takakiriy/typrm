@@ -3,8 +3,7 @@
     "declaration": true,
     "strict": true,
     "lib": [ "es2015", "dom" ],
-    "inlineSourceMap": true,
-    "inlineSources": true,
+    "sourceMap": true,
     "outDir": "build"
-  },
+  }
 }

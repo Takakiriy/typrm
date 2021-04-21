@@ -242,7 +242,23 @@ Visual Studio Code をインストールします:
 
 "cmd menu.bat" をダブルクリックして、1. open_VisualStudioCode を選びます:
 
-F5 キーを押すと、テストが動きます:
+typrm_test_1.ts ファイルのテストを実行します:
+
+    - ソース ファイルの行番号の左をクリックして、ブレーク ポイントを設定します
+    - F5 キーを押します
+    - （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
+
+typrm.test.ts ファイルのテスト(Jest)を実行します:
+
+    - ソース ファイルの行番号の左をクリックして、ブレークポイントを設定します:
+    - Jest のウォッチモードを起動します:
+        メニュー: Visual Studio Code >> Terminal >> New Terminal >> 1: (shell) >> Create JavaScript Debug Terminal
+        npm test --watch
+            #// デバッガーを終了させてしまったら、Ctrl + C と npm test --watch で再起動してください
+    - テストを再起動します:
+        - Continue ボタン:  #// 最後まで実行します
+        - npm test --watch が動いている Terminal で f キーを押します
+    - （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
 
 
 ### mac の場合

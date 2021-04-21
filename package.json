@@ -33,6 +33,7 @@
         ],
         "transform": {
             "^.+\\.(ts|tsx)$": "ts-jest"
-        }
+        },
+        "maxWorkers": 1
     }
 }
