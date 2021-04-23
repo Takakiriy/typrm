@@ -42,6 +42,8 @@ async function  main() {
 
 				setting = {};
 				settingCount += 1;
+				// const  match = settingStartLabel.exec(line.trim());
+				// settingName = match[1];
 			} else if (isEndOfSetting(line, isReadingSetting)) {
 				isReadingSetting = false;
 			}

@@ -62,8 +62,8 @@ For Windows, double click typrm.bat file and type:
 
 You can drag and drop a file to enter the file without having to type it from the keyboard.
 
-The line number is below the line where `setting:` is written,
-and above the line where the next `setting:` is written.
+The line number is below the line where `settings:` is written,
+and above the line where the next `settings:` is written.
 
 new_folder.yaml file will be chaned to the following contents.
 
@@ -172,7 +172,7 @@ To use typrm, you must install Node.js.
 
 ## About settings tags and #template tags
 
-About the text you want to replace, you must write `variable name: value` below `setting:`.
+About the text you want to replace, you must write `variable name: value` below `settings:`.
 
     settings:
         __ProjectName__: react1

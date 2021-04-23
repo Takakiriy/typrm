@@ -1,4 +1,12 @@
-﻿export {};
+﻿test('because: カスタム エラーメッセージ', () => {
+    const  a = 2;
+    const  b = 3;
+    const  c = 5;
+
+    expect( c === a + b ).because(`${c} != ${a} + ${b}`);
+});
+
+export {};
 declare global {  // for TypeScript
     namespace jest {
         interface Matchers<R> {
@@ -14,12 +22,4 @@ expect.extend({
             message: () => errorMessage,
         };
     },
-});
-
-it('case', () => {
-    const  a = 2;
-    const  b = 3;
-    const  c = 4;
-
-    expect( c == a + b ).because(`${c} != ${a} + ${b}`);
 });
