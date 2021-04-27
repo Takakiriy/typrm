@@ -3,13 +3,9 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
     return cooked;
 };
-test.each(__makeTemplateObject(["\n    a  |  b  | expected\n    1  |  1  | 2\n    1  |  2  | 3\n    2  |  1  | 3\n"], ["\n    a  |  b  | expected\n    1  |  1  | 2\n    1  |  2  | 3\n    2  |  1  | 3\n"]))('.add(%i, %i)', function (a, b, expected) {
+var c = 2;
+test.each(__makeTemplateObject(["\n    a    | b    | expected  | comment\n    ", " | ", " | ", " | ", "\n    ", " | ", " | ", " | ", "\n    ", " | ", " | ", " | ", "\n"], ["\n    a    | b    | expected  | comment\n    ", " | ", " | ", " | ", "\n    ", " | ", " | ", " | ", "\n    ", " | ", " | ", " | ", "\n"]), 1, 1, 2, '＄で値を囲みます', 1, c, 3, '変数の参照もできます', 2, 3, 5, '')("returns $expected when $a is added $b", function (_a) {
+    var a = _a.a, b = _a.b, expected = _a.expected;
     expect(a + b).toBe(expected);
-});
-test('case', function () {
-    var a = 2;
-    var b = 3;
-    var c = 5;
-    expect(a + b).toBe(c);
 });
 //# sourceMappingURL=for.test.js.map

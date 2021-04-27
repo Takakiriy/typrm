@@ -52,7 +52,29 @@ var path = require("path"); // or path = require("path")
 var commander_1 = require("commander");
 var readline = require("readline");
 var dd = console.log;
+// main
 function main() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!(commander_1.program.args.length === 0)) return [3 /*break*/, 2];
+                    return [4 /*yield*/, oldMain()];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 3];
+                case 2:
+                    if (commander_1.program.args[0] === 's' || commander_1.program.args[0] === 'search') {
+                        search();
+                    }
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+// oldMain
+function oldMain() {
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
         var inputFilePath, parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
@@ -682,6 +704,13 @@ var TemplateTag = /** @class */ (function () {
     };
     return TemplateTag;
 }());
+// search
+function search() {
+    var keyword = commander_1.program.args[1];
+    var targetFolder = commander_1.program.opts().folder;
+    console.log("search!" + keyword);
+    console.log("targetFolder: " + targetFolder);
+}
 // onEndOfSetting
 function onEndOfSetting(setting) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
@@ -1179,6 +1208,7 @@ function callMain() {
                     commander_1.program.version('0.1.1').exitOverride(exitFromCommander)
                         .option("-l, --locale <s>")
                         .option("-t, --test")
+                        .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
                         .parse(process.argv);
                     locale = Intl.NumberFormat().resolvedOptions().locale;
                     if (programOptions.locale) {

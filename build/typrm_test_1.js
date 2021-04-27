@@ -56,13 +56,16 @@ function main() {
                     return [4 /*yield*/, TestOfChangeError()];
                 case 3:
                     _a.sent();
-                    return [3 /*break*/, 6];
-                case 4: return [4 /*yield*/, TestOfChange()];
+                    return [3 /*break*/, 7];
+                case 4: return [4 /*yield*/, TestOfSearch()];
                 case 5:
                     _a.sent();
-                    _a.label = 6;
-                case 6: return [4 /*yield*/, TestOfFileCheck()];
-                case 7:
+                    return [4 /*yield*/, TestOfChange()];
+                case 6:
+                    _a.sent();
+                    _a.label = 7;
+                case 7: return [4 /*yield*/, TestOfFileCheck()];
+                case 8:
                     _a.sent();
                     deleteFile(testFolderPath + '_output.txt');
                     console.log('Pass');
@@ -360,6 +363,20 @@ function TestOfFileCheck() {
                     _i++;
                     return [3 /*break*/, 1];
                 case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+// TestOfSearch
+function TestOfSearch() {
+    return __awaiter(this, void 0, void 0, function () {
+        var returns;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " search abc  --folder test_data/search/1")];
+                case 1:
+                    returns = _a.sent();
+                    return [2 /*return*/];
             }
         });
     });

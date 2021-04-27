@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-test('case', function () {
+test('because: カスタム エラーメッセージ', function () {
     var a = 2;
     var b = 3;
     var c = 5;

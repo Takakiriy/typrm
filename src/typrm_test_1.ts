@@ -12,6 +12,7 @@ if (!debug) {
 	await TestOfChange();
 	await TestOfChangeError();
 } else {
+	await TestOfSearch();
 	await TestOfChange();
 }
 	await TestOfFileCheck();
@@ -247,6 +248,13 @@ async function  TestOfFileCheck() {
 		}
 	}
 }	
+
+// TestOfSearch
+async function  TestOfSearch() {
+	let  returns: ProcessReturns;
+
+	returns = await callChildProccess(`node ${scriptPath} search abc  --folder test_data/search/1`);
+}
 
 // callChildProccess
 async function  callChildProccess(commandLine: string,  option?: ProcessOption): Promise<ProcessReturns> {

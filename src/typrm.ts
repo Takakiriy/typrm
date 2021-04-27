@@ -5,7 +5,19 @@ import * as readline from 'readline';
 import { DefaultDeserializer } from 'v8';
 const dd = console.log;
 
+// main
 async function  main() {
+	if (program.args.length === 0 ) {
+		await oldMain();
+	} else {
+		if (program.args[0] === 's'  ||  program.args[0] === 'search') {
+			search();
+		}
+	}
+}
+
+// oldMain
+async function  oldMain() {
 	const  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
 	const  parentPath = path.dirname(inputFilePath);
 	inputFileParentPath = parentPath;
@@ -507,6 +519,14 @@ class  TemplateTag {
 	}
 }
 
+// search
+function search() {
+	const  keyword = program.args[1];
+	const  targetFolder = program.opts().folder;
+	console.log("search!" + keyword);
+	console.log("targetFolder: " + targetFolder);
+}
+
 // onEndOfSetting
 function onEndOfSetting(setting: Settings) {
 	for (const key of Object.keys(setting)) {
@@ -989,6 +1009,7 @@ async function  callMain() {
 	program.version('0.1.1').exitOverride(exitFromCommander)
 		.option("-l, --locale <s>")
 		.option("-t, --test")
+		.option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
 		.parse(process.argv);
 	
 	locale = Intl.NumberFormat().resolvedOptions().locale;
