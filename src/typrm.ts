@@ -1,5 +1,6 @@
 import * as fs from 'fs'; // file system
 import * as path from "path";  // or path = require("path")
+import * as globby from 'globby';
 import { program, CommanderError } from 'commander';
 import * as readline from 'readline';
 import { DefaultDeserializer } from 'v8';
@@ -11,7 +12,7 @@ async function  main() {
 		await oldMain();
 	} else {
 		if (program.args[0] === 's'  ||  program.args[0] === 'search') {
-			search();
+			await search();
 		}
 	}
 }
@@ -523,11 +524,34 @@ class  TemplateTag {
 }
 
 // search
-function search() {
+async function  search() {
 	const  keyword = program.args[1];
 	const  targetFolder = program.opts().folder;
-	console.log("search!" + keyword);
-	console.log("targetFolder: " + targetFolder);
+	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+	const  oldCurrentFoldderPath = process.cwd();
+	process.chdir(targetFolder);
+	const  filePaths: string[] = await globby(['**/*']);
+	process.chdir(oldCurrentFoldderPath);
+
+	for (const inputFilePath of filePaths) {
+		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+		const  reader = readline.createInterface({
+			input: fs.createReadStream(inputFileFullPath),
+			crlfDelay: Infinity
+		});
+		var  lineNum = 0;
+
+		for await (const line1 of reader) {
+			const  line: string = line1;
+			lineNum += 1;
+
+			if (line.indexOf(keywordLabel) !== notFound) {
+				if (line.indexOf(keyword) !== notFound) {
+					console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}:${line}`);
+				}
+			}
+		}
+	}
 }
 
 // onEndOfSetting
@@ -604,6 +628,32 @@ function  getHomePath(): string {
 		return  process.env.HOME;
 	} else {
 		return  process.env.USERPROFILE!;
+	}
+}
+
+// getTestablePath
+function  getTestablePath(path_: string) {
+	if (programOptions.test) {
+		const  home = getHomePath();
+
+		if (path_.startsWith(inputFileParentPath + path.sep)) {
+			return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
+		} else if (path_.startsWith(home)) {
+			return  '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
+		} else {
+			return  path_;
+		}
+	} else {
+		return  path_;
+	}
+}
+
+// print
+function  print(message: any) {
+	if (withJest) {
+		outputToJest.push(message);
+	} else {
+		console.log(message);
 	}
 }
 
@@ -984,6 +1034,7 @@ const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
 const  fileTemplateLabel = "#file-template:";
+const  keywordLabel = "#keyword:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";
@@ -999,25 +1050,12 @@ const  foundForFollowing = maxLineNum;
 const  notFound = -1;
 const  allSetting = 0;
 const  noSeparator = -1;
+const  withJest = false;
+const  outputToJest: string[] = [];
 let    locale: string;
 const  programOptions = program.opts();
 function  exitFromCommander(e: CommanderError) {
 	console.log(e.message);
-}
-function  getTestablePath(path_: string) {
-	if (programOptions.test) {
-		const  home = getHomePath();
-
-		if (path_.startsWith(inputFileParentPath + path.sep)) {
-			return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1);
-		} else if (path_.startsWith(home)) {
-			return  '${HOME}' + path_.substr(home.length);
-		} else {
-			return  path_;
-		}
-	} else {
-		return  path_;
-	}
 }
 let  inputFileParentPath = '';
 

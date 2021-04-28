@@ -49,6 +49,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 exports.__esModule = true;
 var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
+var globby = require("globby");
 var commander_1 = require("commander");
 var readline = require("readline");
 var dd = console.log;
@@ -62,13 +63,14 @@ function main() {
                     return [4 /*yield*/, oldMain()];
                 case 1:
                     _a.sent();
-                    return [3 /*break*/, 3];
+                    return [3 /*break*/, 4];
                 case 2:
-                    if (commander_1.program.args[0] === 's' || commander_1.program.args[0] === 'search') {
-                        search();
-                    }
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+                    if (!(commander_1.program.args[0] === 's' || commander_1.program.args[0] === 'search')) return [3 /*break*/, 4];
+                    return [4 /*yield*/, search()];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -709,10 +711,74 @@ var TemplateTag = /** @class */ (function () {
 }());
 // search
 function search() {
-    var keyword = commander_1.program.args[1];
-    var targetFolder = commander_1.program.opts().folder;
-    console.log("search!" + keyword);
-    console.log("targetFolder: " + targetFolder);
+    var e_5, _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var keyword, targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, _i, filePaths_1, inputFilePath, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, e_5_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    keyword = commander_1.program.args[1];
+                    targetFolder = commander_1.program.opts().folder;
+                    targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+                    oldCurrentFoldderPath = process.cwd();
+                    process.chdir(targetFolder);
+                    return [4 /*yield*/, globby(['**/*'])];
+                case 1:
+                    filePaths = _b.sent();
+                    process.chdir(oldCurrentFoldderPath);
+                    _i = 0, filePaths_1 = filePaths;
+                    _b.label = 2;
+                case 2:
+                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 15];
+                    inputFilePath = filePaths_1[_i];
+                    inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+                    reader = readline.createInterface({
+                        input: fs.createReadStream(inputFileFullPath),
+                        crlfDelay: Infinity
+                    });
+                    lineNum = 0;
+                    _b.label = 3;
+                case 3:
+                    _b.trys.push([3, 8, 9, 14]);
+                    reader_4 = (e_5 = void 0, __asyncValues(reader));
+                    _b.label = 4;
+                case 4: return [4 /*yield*/, reader_4.next()];
+                case 5:
+                    if (!(reader_4_1 = _b.sent(), !reader_4_1.done)) return [3 /*break*/, 7];
+                    line1 = reader_4_1.value;
+                    line = line1;
+                    lineNum += 1;
+                    if (line.indexOf(keywordLabel) !== notFound) {
+                        if (line.indexOf(keyword) !== notFound) {
+                            console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ":" + line);
+                        }
+                    }
+                    _b.label = 6;
+                case 6: return [3 /*break*/, 4];
+                case 7: return [3 /*break*/, 14];
+                case 8:
+                    e_5_1 = _b.sent();
+                    e_5 = { error: e_5_1 };
+                    return [3 /*break*/, 14];
+                case 9:
+                    _b.trys.push([9, , 12, 13]);
+                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 11];
+                    return [4 /*yield*/, _a.call(reader_4)];
+                case 10:
+                    _b.sent();
+                    _b.label = 11;
+                case 11: return [3 /*break*/, 13];
+                case 12:
+                    if (e_5) throw e_5.error;
+                    return [7 /*endfinally*/];
+                case 13: return [7 /*endfinally*/];
+                case 14:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 15: return [2 /*return*/];
+            }
+        });
+    });
 }
 // onEndOfSetting
 function onEndOfSetting(setting) {
@@ -725,9 +791,9 @@ function onEndOfSetting(setting) {
 }
 // getSettingIndexFromLineNum
 function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
-    var e_5, _a;
+    var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var reader, settingCount, lineNum, reader_4, reader_4_1, line1, line, e_5_1;
+        var reader, settingCount, lineNum, reader_5, reader_5_1, line1, line, e_6_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -740,12 +806,12 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 6, 7, 12]);
-                    reader_4 = __asyncValues(reader);
+                    reader_5 = __asyncValues(reader);
                     _b.label = 2;
-                case 2: return [4 /*yield*/, reader_4.next()];
+                case 2: return [4 /*yield*/, reader_5.next()];
                 case 3:
-                    if (!(reader_4_1 = _b.sent(), !reader_4_1.done)) return [3 /*break*/, 5];
-                    line1 = reader_4_1.value;
+                    if (!(reader_5_1 = _b.sent(), !reader_5_1.done)) return [3 /*break*/, 5];
+                    line1 = reader_5_1.value;
                     line = line1;
                     lineNum += 1;
                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
@@ -758,19 +824,19 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                 case 4: return [3 /*break*/, 2];
                 case 5: return [3 /*break*/, 12];
                 case 6:
-                    e_5_1 = _b.sent();
-                    e_5 = { error: e_5_1 };
+                    e_6_1 = _b.sent();
+                    e_6 = { error: e_6_1 };
                     return [3 /*break*/, 12];
                 case 7:
                     _b.trys.push([7, , 10, 11]);
-                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 9];
-                    return [4 /*yield*/, _a.call(reader_4)];
+                    if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5["return"]))) return [3 /*break*/, 9];
+                    return [4 /*yield*/, _a.call(reader_5)];
                 case 8:
                     _b.sent();
                     _b.label = 9;
                 case 9: return [3 /*break*/, 11];
                 case 10:
-                    if (e_5) throw e_5.error;
+                    if (e_6) throw e_6.error;
                     return [7 /*endfinally*/];
                 case 11: return [7 /*endfinally*/];
                 case 12: return [2 /*return*/, 0];
@@ -820,6 +886,33 @@ function getHomePath() {
     }
     else {
         return process.env.USERPROFILE;
+    }
+}
+// getTestablePath
+function getTestablePath(path_) {
+    if (programOptions.test) {
+        var home = getHomePath();
+        if (path_.startsWith(inputFileParentPath + path.sep)) {
+            return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
+        }
+        else if (path_.startsWith(home)) {
+            return '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
+        }
+        else {
+            return path_;
+        }
+    }
+    else {
+        return path_;
+    }
+}
+// print
+function print(message) {
+    if (withJest) {
+        outputToJest.push(message);
+    }
+    else {
+        console.log(message);
     }
 }
 // deleteFile
@@ -1178,6 +1271,7 @@ var templateLabel = "#template:";
 var templateAtStartLabel = "#template-at(";
 var templateAtEndLabel = "):";
 var fileTemplateLabel = "#file-template:";
+var keywordLabel = "#keyword:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";
@@ -1193,27 +1287,12 @@ var foundForFollowing = maxLineNum;
 var notFound = -1;
 var allSetting = 0;
 var noSeparator = -1;
+var withJest = false;
+var outputToJest = [];
 var locale;
 var programOptions = commander_1.program.opts();
 function exitFromCommander(e) {
     console.log(e.message);
-}
-function getTestablePath(path_) {
-    if (programOptions.test) {
-        var home = getHomePath();
-        if (path_.startsWith(inputFileParentPath + path.sep)) {
-            return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1);
-        }
-        else if (path_.startsWith(home)) {
-            return '${HOME}' + path_.substr(home.length);
-        }
-        else {
-            return path_;
-        }
-    }
-    else {
-        return path_;
-    }
 }
 var inputFileParentPath = '';
 function callMain() {

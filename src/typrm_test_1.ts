@@ -15,7 +15,6 @@ if (!debug) {
 	await TestOfFileCheck();
 } else {
 	await TestOfFileCheck();
-	await TestOfSearch();
 	await TestOfChange();
 }
 	deleteFile(testFolderPath + '_output.txt');
@@ -243,13 +242,6 @@ async function  TestOfFileCheck() {
 			}
 		}
 	}
-}	
-
-// TestOfSearch
-async function  TestOfSearch() {
-	let  returns: ProcessReturns;
-
-	returns = await callChildProccess(`node ${scriptPath} search abc  --folder test_data/search/1`);
 }
 
 // callChildProccess
@@ -315,6 +307,17 @@ function  printDifferentPaths(path1: string, path2: string) {
 	console.log(`Error: different between the following files`);
 	console.log(`  Path1: ${testFolderFullPath + path1}`);
 	console.log(`  Path2: ${testFolderFullPath + path2}`);
+}
+
+// diffStrings
+function  diffStrings(result: string, answer: string) {
+	const  resultFilePath = '_output.txt';
+	const  answerFilePath = '_answer.txt';
+
+	fs.writeFileSync(testFolderFullPath + resultFilePath, result);
+	fs.writeFileSync(testFolderFullPath + answerFilePath, answer);
+
+	printDifferentPaths(resultFilePath, answerFilePath);
 }
 
 // ProcessOption

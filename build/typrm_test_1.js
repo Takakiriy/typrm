@@ -60,18 +60,15 @@ function main() {
                     return [4 /*yield*/, TestOfFileCheck()];
                 case 4:
                     _a.sent();
-                    return [3 /*break*/, 9];
+                    return [3 /*break*/, 8];
                 case 5: return [4 /*yield*/, TestOfFileCheck()];
                 case 6:
                     _a.sent();
-                    return [4 /*yield*/, TestOfSearch()];
+                    return [4 /*yield*/, TestOfChange()];
                 case 7:
                     _a.sent();
-                    return [4 /*yield*/, TestOfChange()];
+                    _a.label = 8;
                 case 8:
-                    _a.sent();
-                    _a.label = 9;
-                case 9:
                     deleteFile(testFolderPath + '_output.txt');
                     console.log('Pass');
                     return [2 /*return*/];
@@ -366,20 +363,6 @@ function TestOfFileCheck() {
         });
     });
 }
-// TestOfSearch
-function TestOfSearch() {
-    return __awaiter(this, void 0, void 0, function () {
-        var returns;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " search abc  --folder test_data/search/1")];
-                case 1:
-                    returns = _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
 // callChildProccess
 function callChildProccess(commandLine, option) {
     return __awaiter(this, void 0, void 0, function () {
@@ -464,6 +447,14 @@ function printDifferentPaths(path1, path2) {
     console.log("Error: different between the following files");
     console.log("  Path1: " + (testFolderFullPath + path1));
     console.log("  Path2: " + (testFolderFullPath + path2));
+}
+// diffStrings
+function diffStrings(result, answer) {
+    var resultFilePath = '_output.txt';
+    var answerFilePath = '_answer.txt';
+    fs.writeFileSync(testFolderFullPath + resultFilePath, result);
+    fs.writeFileSync(testFolderFullPath + answerFilePath, answer);
+    printDifferentPaths(resultFilePath, answerFilePath);
 }
 // ProcessOption
 var ProcessOption = /** @class */ (function () {
