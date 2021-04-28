@@ -36,42 +36,81 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var commander = require("commander");
+var fs = require("fs");
+var path = require("path");
 var main = require("./main");
-function exitFromCommander(e) {
-    console.log(e.message);
+var callMain = main.callMainFromJest;
+if (path.basename(process.cwd()) !== 'src') { // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
+    process.chdir('src');
 }
-function callMain() {
-    return __awaiter(this, void 0, void 0, function () {
+var scriptPath = "../build/typrm.js";
+var testFolderPath = "test_data" + path.sep;
+describe('search', function () {
+    test.each([
+        [
+            '1st',
+            ['search', 'ABC'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.txt:3:#keyword: ABC, "do it", "a,b"\n'
+        ],
+        [
+            'not found',
+            ['search', 'notFound'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            ''
+        ], [
+            'space',
+            ['search', 'do it'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.txt:3:#keyword: ABC, "do it", "a,b"\n'
+        ], [
+            'comma',
+            ['search', 'a,b'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.txt:3:#keyword: ABC, "do it", "a,b"\n'
+        ]
+    ])('%s', function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    commander.program.version('0.1.1').exitOverride(exitFromCommander)
-                        .option("-l, --locale <s>")
-                        .option("-t, --test")
-                        .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
-                        .parse(process.argv);
-                    Object.assign(main.programOptions, commander.program.opts());
-                    return [4 /*yield*/, main.main()["catch"](function (e) {
-                            if (main.programOptions.test) {
-                                throw e;
-                            }
-                            else {
-                                console.log("ERROR: " + e.message);
-                                var timeOver = new Date();
-                                timeOver.setSeconds(timeOver.getSeconds() + 5);
-                                while ((new Date()).getTime() < timeOver.getTime()) {
-                                }
-                            }
-                        })["finally"](function () {
-                            main.InputObject.close();
-                        })];
+                case 0: return [4 /*yield*/, callMain(arguments_, options)];
                 case 1:
                     _a.sent();
+                    expect(main.stdout).toBe(answer);
                     return [2 /*return*/];
             }
         });
-    });
+    }); });
+});
+// deleteFile
+function deleteFile(path) {
+    if (fs.existsSync(path)) {
+        fs.unlinkSync(path);
+    }
 }
-callMain();
-//# sourceMappingURL=typrm.js.map
+// getFullPath
+function getFullPath(relativePath, basePath) {
+    var fullPath = '';
+    if (relativePath.substr(0, 1) === '/') {
+        fullPath = relativePath;
+    }
+    else {
+        fullPath = path.join(basePath, relativePath);
+    }
+    return fullPath;
+}
+// printDifferentPaths
+function printDifferentPaths(path1, path2) {
+    console.log("Error: different between the following files");
+    console.log("  Path1: " + (testFolderFullPath + path1));
+    console.log("  Path2: " + (testFolderFullPath + path2));
+}
+var testFolderFullPath = getFullPath("../src/" + testFolderPath, __dirname);
+expect.extend({
+    because: function (isPassed, errorMessage) {
+        return {
+            pass: isPassed,
+            message: function () { return errorMessage; }
+        };
+    }
+});
+//# sourceMappingURL=main.test.js.map

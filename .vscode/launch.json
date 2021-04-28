@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "Run TypeScript",
             "preLaunchTask": "TypeScript Compile Task",
-            "program": "${workspaceFolder}/src/typrm_test_1.ts",
+            "program": "${workspaceFolder}/src/typrm_test.ts",
             "args": [],
             "cwd": "${workspaceFolder}/src",
             "smartStep": true,
