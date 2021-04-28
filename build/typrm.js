@@ -594,15 +594,18 @@ var TemplateTag = /** @class */ (function () {
     TemplateTag.prototype.checkTargetContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_4, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, same, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_4_1, templateLineNum;
+            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, same, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_4_1, templateLineNum;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         parentPath = path.dirname(inputFilePath);
                         targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
                         if (!fs.existsSync(targetFilePath)) {
+                            templateLineNum = templateEndLineNum - this.templateLines.length;
                             console.log("");
-                            console.log("Error: " + translate('NotFound') + ": " + targetFilePath);
+                            console.log("Error:");
+                            console.log("  " + translate('NotFound') + ": " + targetFilePath);
+                            console.log("  Template: " + inputFilePath + ":" + templateLineNum);
                             return [2 /*return*/, false];
                         }
                         targetFileReader = readline.createInterface({
@@ -691,8 +694,8 @@ var TemplateTag = /** @class */ (function () {
                                 errorTemplate = this.templateLines[0];
                             }
                             console.log("");
-                            console.log(translate('typrmFile') + ": " + getTestable(inputFilePath) + ":" + templateLineNum);
-                            console.log(translate('ErrorFile') + ": " + getTestable(targetFilePath) + ":" + errorTargetLineNum);
+                            console.log(translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + templateLineNum);
+                            console.log(translate('ErrorFile') + ": " + getTestablePath(targetFilePath) + ":" + errorTargetLineNum);
                             console.log("  Contents: " + errorContents);
                             console.log("  Expected: " + errorExpected);
                             console.log("  Template: " + errorTemplate);
@@ -803,12 +806,21 @@ function getFullPath(relativePath, basePath) {
         fullPath = relativePath;
     }
     else if (relativePath.substr(0, 1) === '~') {
-        fullPath = relativePath.replace('~', process.env.HOME);
+        fullPath = relativePath.replace('~', getHomePath());
     }
     else {
         fullPath = path.join(basePath, relativePath);
     }
     return fullPath;
+}
+// getHomePath
+function getHomePath() {
+    if (process.env.HOME) {
+        return process.env.HOME;
+    }
+    else {
+        return process.env.USERPROFILE;
+    }
 }
 // deleteFile
 function deleteFile(path) {
@@ -1186,17 +1198,21 @@ var programOptions = commander_1.program.opts();
 function exitFromCommander(e) {
     console.log(e.message);
 }
-function getTestable(path) {
+function getTestablePath(path_) {
     if (programOptions.test) {
-        if (path.startsWith(inputFileParentPath)) {
-            return '${inputFileParentPath}' + path.substr(inputFileParentPath.length);
+        var home = getHomePath();
+        if (path_.startsWith(inputFileParentPath + path.sep)) {
+            return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1);
+        }
+        else if (path_.startsWith(home)) {
+            return '${HOME}' + path_.substr(home.length);
         }
         else {
-            return path;
+            return path_;
         }
     }
     else {
-        return path;
+        return path_;
     }
 }
 var inputFileParentPath = '';

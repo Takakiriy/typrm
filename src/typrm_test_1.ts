@@ -1,8 +1,9 @@
 ﻿import * as fs from 'fs';
 import * as child_process from 'child_process';
+import * as path from 'path';
 
 const  scriptPath =  `../build/typrm.js`;
-const  testFolderPath = `./test_data` + "/";
+const  testFolderPath = `test_data` + path.sep;
 
 const  debug = false;
 
@@ -11,11 +12,12 @@ if (!debug) {
 	await TestOfCheck();
 	await TestOfChange();
 	await TestOfChangeError();
+	await TestOfFileCheck();
 } else {
+	await TestOfFileCheck();
 	await TestOfSearch();
 	await TestOfChange();
 }
-	await TestOfFileCheck();
 	deleteFile(testFolderPath + '_output.txt');
 	console.log('Pass');
 }
@@ -48,7 +50,7 @@ async function  TestOfCheck() {
 
 		// Check
 		if (returns.stdout !== answer) {
-			console.log('Error: different between "_output.txt" and "' + fileNameHead + '_3_answer.txt"');
+			printDifferentPaths(`_output.txt`, fileNameHead + '_3_answer.txt');
 			fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
 			throw new Error();
 		}
@@ -121,15 +123,11 @@ async function  TestOfChange() {
 
 			// Check
 			if (changing !== answer) {
-				console.log(`Error: different between ` +
-					`"${fileNameHead}_1_changing.yaml" and ` +
-					`"${fileNameHead}_2_${target}_after_answer.yaml`);
+				printDifferentPaths(`${fileNameHead}_1_changing.yaml`, `${fileNameHead}_2_${target}_after_answer.yaml`);
 				throw new Error();
 			}
 			if (backUp !== source) {
-				console.log(`Error: different between ` +
-					`"${fileNameHead}_1_changing.yaml.backup" and ` +
-					`"${fileNameHead}_1.yaml"`);
+				printDifferentPaths(`${fileNameHead}_1_changing.yaml.backup`, `${fileNameHead}_1.yaml`);
 				throw new Error();
 			}
 
@@ -174,14 +172,12 @@ async function  TestOfChangeError() {
 
 		// Check
 		if (returns.stdout !== logAnswer) {
-			console.log('Error: different between "_output.txt" and "' + fileNameHead + '_3_answer.txt"');
+			printDifferentPaths('_output.txt', fileNameHead + '_3_answer.txt');
 			fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
 			throw new Error();
 		}
 		if (changing !== answer) {
-			console.log(`Error: different between ` +
-				`"${fileNameHead}_1_changing.yaml" and ` +
-				`"${fileNameHead}_2_after_answer.yaml"`);
+			printDifferentPaths(`${fileNameHead}_1_changing.yaml`, `${fileNameHead}_2_after_answer.yaml`);
 			throw new Error();
 		}
 
@@ -196,7 +192,7 @@ async function  TestOfFileCheck() {
 
 	if (debug) {
 		var fileNameHeads: {[name: string]: number} = {
-	//		"file_1_ok_and_bad": 1,
+			"file_1_ok_and_bad": 1,
 			"file_2_tab": 1,
 			"file_3_file_name": 1,
 		};
@@ -241,7 +237,7 @@ async function  TestOfFileCheck() {
 
 			// Check
 			if (returns.stdout !== answer) {
-				console.log('Error: different between "_output.txt" and "' + fileNameHead + '_4_answer.txt"');
+				printDifferentPaths('_output.txt', fileNameHead + '_4_answer.txt');
 				fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
 				throw new Error();
 			}
@@ -303,6 +299,24 @@ function  deleteFile(path: string) {
     }
 }
 
+// getFullPath
+function  getFullPath(relativePath: string, basePath: string): string {
+	var  fullPath = '';
+	if (relativePath.substr(0,1) === '/') {
+		fullPath = relativePath;
+	} else {
+		fullPath = path.join(basePath, relativePath);
+	}
+	return  fullPath;
+}
+
+// printDifferentPaths
+function  printDifferentPaths(path1: string, path2: string) {
+	console.log(`Error: different between the following files`);
+	console.log(`  Path1: ${testFolderFullPath + path1}`);
+	console.log(`  Path2: ${testFolderFullPath + path2}`);
+}
+
 // ProcessOption
 class ProcessOption {
 	inputLines?: string[];
@@ -315,6 +329,7 @@ class ProcessReturns {
 	stderr: string = '';
 }
 
+const  testFolderFullPath = getFullPath( `../src/${testFolderPath}`, __dirname);
 const  cutBOM = 1;
 const  notFound = -1;
 main();

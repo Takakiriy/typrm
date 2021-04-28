@@ -445,8 +445,11 @@ class  TemplateTag {
 		const  parentPath = path.dirname(inputFilePath);
 		const  targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
 		if (!fs.existsSync(targetFilePath)) {
+			const  templateLineNum = templateEndLineNum - this.templateLines.length;
 			console.log("");
-			console.log(`Error: ${translate('NotFound')}: ${targetFilePath}`);
+			console.log(`Error:`);
+			console.log(`  ${translate('NotFound')}: ${targetFilePath}`);
+			console.log(`  Template: ${inputFilePath}:${templateLineNum}`);
 			return  false;
 		}
 		const  targetFileReader = readline.createInterface({
@@ -509,8 +512,8 @@ class  TemplateTag {
 				errorTemplate = this.templateLines[0];
 			}
 			console.log("");
-			console.log(`${translate('typrmFile')}: ${getTestable(inputFilePath)}:${templateLineNum}`);
-			console.log(`${translate('ErrorFile')}: ${getTestable(targetFilePath)}:${errorTargetLineNum}`);
+			console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
+			console.log(`${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
 			console.log(`  Contents: ${errorContents}`);
 			console.log(`  Expected: ${errorExpected}`);
 			console.log(`  Template: ${errorTemplate}`);
@@ -588,11 +591,20 @@ function  getFullPath(relativePath: string, basePath: string): string {
 	if (relativePath.substr(0,1) === '/') {
 		fullPath = relativePath;
 	} else if (relativePath.substr(0,1) === '~') {
-		fullPath = relativePath.replace('~', process.env.HOME!);
+		fullPath = relativePath.replace('~', getHomePath() );
 	} else {
 		fullPath = path.join(basePath, relativePath);
 	}
 	return  fullPath;
+}
+
+// getHomePath
+function  getHomePath(): string {
+	if (process.env.HOME) {
+		return  process.env.HOME;
+	} else {
+		return  process.env.USERPROFILE!;
+	}
 }
 
 // deleteFile
@@ -992,15 +1004,19 @@ const  programOptions = program.opts();
 function  exitFromCommander(e: CommanderError) {
 	console.log(e.message);
 }
-function  getTestable(path: string) {
+function  getTestablePath(path_: string) {
 	if (programOptions.test) {
-		if (path.startsWith(inputFileParentPath)) {
-			return  '${inputFileParentPath}' + path.substr(inputFileParentPath.length);
+		const  home = getHomePath();
+
+		if (path_.startsWith(inputFileParentPath + path.sep)) {
+			return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1);
+		} else if (path_.startsWith(home)) {
+			return  '${HOME}' + path_.substr(home.length);
 		} else {
-			return  path;
+			return  path_;
 		}
 	} else {
-		return  path;
+		return  path_;
 	}
 }
 let  inputFileParentPath = '';

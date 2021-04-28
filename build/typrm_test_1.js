@@ -38,15 +38,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var fs = require("fs");
 var child_process = require("child_process");
+var path = require("path");
 var scriptPath = "../build/typrm.js";
-var testFolderPath = "./test_data" + "/";
+var testFolderPath = "test_data" + path.sep;
 var debug = false;
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!!debug) return [3 /*break*/, 4];
+                    if (!!debug) return [3 /*break*/, 5];
                     return [4 /*yield*/, TestOfCheck()];
                 case 1:
                     _a.sent();
@@ -56,17 +57,21 @@ function main() {
                     return [4 /*yield*/, TestOfChangeError()];
                 case 3:
                     _a.sent();
-                    return [3 /*break*/, 7];
-                case 4: return [4 /*yield*/, TestOfSearch()];
-                case 5:
+                    return [4 /*yield*/, TestOfFileCheck()];
+                case 4:
                     _a.sent();
-                    return [4 /*yield*/, TestOfChange()];
+                    return [3 /*break*/, 9];
+                case 5: return [4 /*yield*/, TestOfFileCheck()];
                 case 6:
                     _a.sent();
-                    _a.label = 7;
-                case 7: return [4 /*yield*/, TestOfFileCheck()];
+                    return [4 /*yield*/, TestOfSearch()];
+                case 7:
+                    _a.sent();
+                    return [4 /*yield*/, TestOfChange()];
                 case 8:
                     _a.sent();
+                    _a.label = 9;
+                case 9:
                     deleteFile(testFolderPath + '_output.txt');
                     console.log('Pass');
                     return [2 /*return*/];
@@ -107,7 +112,7 @@ function TestOfCheck() {
                         .toString().substr(cutBOM);
                     // Check
                     if (returns.stdout !== answer) {
-                        console.log('Error: different between "_output.txt" and "' + fileNameHead + '_3_answer.txt"');
+                        printDifferentPaths("_output.txt", fileNameHead + '_3_answer.txt');
                         fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
                         throw new Error();
                     }
@@ -200,15 +205,11 @@ function TestOfChange() {
                     backUp = fs.readFileSync(backUpFilePath).toString().substr(cutBOM);
                     // Check
                     if (changing !== answer) {
-                        console.log("Error: different between " +
-                            ("\"" + fileNameHead + "_1_changing.yaml\" and ") +
-                            ("\"" + fileNameHead + "_2_" + target + "_after_answer.yaml"));
+                        printDifferentPaths(fileNameHead + "_1_changing.yaml", fileNameHead + "_2_" + target + "_after_answer.yaml");
                         throw new Error();
                     }
                     if (backUp !== source) {
-                        console.log("Error: different between " +
-                            ("\"" + fileNameHead + "_1_changing.yaml.backup\" and ") +
-                            ("\"" + fileNameHead + "_1.yaml\""));
+                        printDifferentPaths(fileNameHead + "_1_changing.yaml.backup", fileNameHead + "_1.yaml");
                         throw new Error();
                     }
                     deleteFile(changingFilePath);
@@ -268,14 +269,12 @@ function TestOfChangeError() {
                     logAnswer = fs.readFileSync(logAnswerFilePath).toString().substr(cutBOM);
                     // Check
                     if (returns.stdout !== logAnswer) {
-                        console.log('Error: different between "_output.txt" and "' + fileNameHead + '_3_answer.txt"');
+                        printDifferentPaths('_output.txt', fileNameHead + '_3_answer.txt');
                         fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
                         throw new Error();
                     }
                     if (changing !== answer) {
-                        console.log("Error: different between " +
-                            ("\"" + fileNameHead + "_1_changing.yaml\" and ") +
-                            ("\"" + fileNameHead + "_2_after_answer.yaml\""));
+                        printDifferentPaths(fileNameHead + "_1_changing.yaml", fileNameHead + "_2_after_answer.yaml");
                         throw new Error();
                     }
                     deleteFile(changingFilePath);
@@ -298,7 +297,7 @@ function TestOfFileCheck() {
                 case 0:
                     if (debug) {
                         fileNameHeads = {
-                            //		"file_1_ok_and_bad": 1,
+                            "file_1_ok_and_bad": 1,
                             "file_2_tab": 1,
                             "file_3_file_name": 1
                         };
@@ -351,7 +350,7 @@ function TestOfFileCheck() {
                         .toString().substr(cutBOM);
                     // Check
                     if (returns.stdout !== answer) {
-                        console.log('Error: different between "_output.txt" and "' + fileNameHead + '_4_answer.txt"');
+                        printDifferentPaths('_output.txt', fileNameHead + '_4_answer.txt');
                         fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
                         throw new Error();
                     }
@@ -449,6 +448,23 @@ function deleteFile(path) {
         fs.unlinkSync(path);
     }
 }
+// getFullPath
+function getFullPath(relativePath, basePath) {
+    var fullPath = '';
+    if (relativePath.substr(0, 1) === '/') {
+        fullPath = relativePath;
+    }
+    else {
+        fullPath = path.join(basePath, relativePath);
+    }
+    return fullPath;
+}
+// printDifferentPaths
+function printDifferentPaths(path1, path2) {
+    console.log("Error: different between the following files");
+    console.log("  Path1: " + (testFolderFullPath + path1));
+    console.log("  Path2: " + (testFolderFullPath + path2));
+}
 // ProcessOption
 var ProcessOption = /** @class */ (function () {
     function ProcessOption() {
@@ -464,6 +480,7 @@ var ProcessReturns = /** @class */ (function () {
     }
     return ProcessReturns;
 }());
+var testFolderFullPath = getFullPath("../src/" + testFolderPath, __dirname);
 var cutBOM = 1;
 var notFound = -1;
 main();

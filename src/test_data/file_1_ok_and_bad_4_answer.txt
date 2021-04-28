@@ -19,7 +19,7 @@ ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_3_target.sh:0
   Template: login user2  #template: __User__
 
 typrmFile: ${inputFileParentPath}/file_1_ok_and_bad_1_changing.yaml:11
-ErrorFile: ${inputFileParentPath}/file_1_ok_and_bad_3_target.sh:0
+ErrorFile: ${HOME}/Desktop/typrm/src/test_data/file_1_ok_and_bad_3_target.sh:0
   Contents: (Not found)
   Expected: login user2
   Template: login user2  #template: __User__
