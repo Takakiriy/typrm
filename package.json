@@ -4,7 +4,7 @@
     "description": "",
     "scripts": {
         "setup": "npm ci",
-        "test":  "jest --watchAll",
+        "test": "jest --watchAll",
         "clean": "powershell rm -r -fo node_modules"
     },
     "author": "",
@@ -21,8 +21,10 @@
         "typescript": "^4.1.2"
     },
     "dependencies": {
+        "@types/csv-parse": "^1.2.2",
         "@types/globby": "^9.1.0",
         "commander": "^7.2.0",
+        "csv-parse": "^4.15.4",
         "globby": "^11.0.3"
     },
     "jest": {

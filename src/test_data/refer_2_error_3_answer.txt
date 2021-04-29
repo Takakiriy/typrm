@@ -17,4 +17,4 @@ ErrorLine: 7
 Warning: 0, Error: 5
 template count = 0
 Press Enter key to retry checking.
-The line number to change the variable value >
+The line number to change the variable value >exit

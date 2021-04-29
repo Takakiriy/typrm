@@ -16,4 +16,4 @@ ErrorLine: 9
 Warning: 2, Error: 1
 template count = 1
 Press Enter key to retry checking.
-The line number to change the variable value >
+The line number to change the variable value >exit

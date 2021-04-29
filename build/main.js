@@ -52,7 +52,8 @@ var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
 var globby = require("globby");
 var readline = require("readline");
-var dd = console.log;
+var stream = require("stream");
+var csvParse = require("csv-parse");
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
@@ -63,18 +64,23 @@ function main() {
                     if ('locale' in exports.programOptions) {
                         locale = exports.programOptions.locale;
                     }
-                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 2];
+                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 4];
                     return [4 /*yield*/, oldMain()];
                 case 1:
                     _a.sent();
-                    return [3 /*break*/, 4];
+                    if (!exports.programOptions.test) return [3 /*break*/, 3];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 100); })];
                 case 2:
-                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 4];
-                    return [4 /*yield*/, search()];
-                case 3:
                     _a.sent();
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
+                    _a.label = 3;
+                case 3: return [3 /*break*/, 6];
+                case 4:
+                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 6];
+                    return [4 /*yield*/, search()];
+                case 5:
+                    _a.sent();
+                    _a.label = 6;
+                case 6: return [2 /*return*/];
             }
         });
     });
@@ -718,11 +724,11 @@ var TemplateTag = /** @class */ (function () {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, _i, filePaths_1, inputFilePath, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, e_5_1;
+        var keyword, targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, indentAtStart, inGlossary, _i, filePaths_1, inputFilePath, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    keyword = exports.programArguments[1];
+                    keyword = exports.programArguments[1].replace('"', '""');
                     targetFolder = exports.programOptions.folder;
                     targetFolderFullPath = getFullPath(targetFolder, process.cwd());
                     oldCurrentFoldderPath = process.cwd();
@@ -731,10 +737,12 @@ function search() {
                 case 1:
                     filePaths = _b.sent();
                     process.chdir(oldCurrentFoldderPath);
+                    indentAtStart = '';
+                    inGlossary = false;
                     _i = 0, filePaths_1 = filePaths;
                     _b.label = 2;
                 case 2:
-                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 15];
+                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 17];
                     inputFilePath = filePaths_1[_i];
                     inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
                     reader = readline.createInterface({
@@ -744,43 +752,65 @@ function search() {
                     lineNum = 0;
                     _b.label = 3;
                 case 3:
-                    _b.trys.push([3, 8, 9, 14]);
+                    _b.trys.push([3, 10, 11, 16]);
                     reader_4 = (e_5 = void 0, __asyncValues(reader));
                     _b.label = 4;
                 case 4: return [4 /*yield*/, reader_4.next()];
                 case 5:
-                    if (!(reader_4_1 = _b.sent(), !reader_4_1.done)) return [3 /*break*/, 7];
+                    if (!(reader_4_1 = _b.sent(), !reader_4_1.done)) return [3 /*break*/, 9];
                     line1 = reader_4_1.value;
                     line = line1;
                     lineNum += 1;
-                    if (line.indexOf(keywordLabel) !== notFound) {
-                        if (line.indexOf(keyword) !== notFound) {
-                            println(getTestablePath(inputFileFullPath) + ":" + lineNum + ":" + line);
+                    if (!(line.indexOf(keywordLabel) !== notFound)) return [3 /*break*/, 7];
+                    if (!(line.indexOf(keyword) !== notFound)) return [3 /*break*/, 7];
+                    csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                    return [4 /*yield*/, parseCSVColumns(csv)];
+                case 6:
+                    columns = _b.sent();
+                    if (columns.indexOf(keyword.replace('""', '"')) !== notFound) {
+                        println(getTestablePath(inputFileFullPath) + ":" + lineNum + ":" + line);
+                    }
+                    _b.label = 7;
+                case 7:
+                    // glossary tag
+                    if (line.indexOf(glossaryLabel) !== notFound) {
+                        inGlossary = true;
+                        indentAtStart = indentRegularExpression.exec(line)[0];
+                    }
+                    else if (inGlossary) {
+                        currentIndent = indentRegularExpression.exec(line)[0];
+                        if (line.indexOf(keyword) === currentIndent.length) {
+                            if (line[currentIndent.length + keyword.length] === ':') {
+                                println(getTestablePath(inputFileFullPath) + ":" + lineNum + ":" + line);
+                            }
+                        }
+                        if (currentIndent.length <= indentAtStart.length) {
+                            inGlossary = false;
                         }
                     }
-                    _b.label = 6;
-                case 6: return [3 /*break*/, 4];
-                case 7: return [3 /*break*/, 14];
-                case 8:
+                    _b.label = 8;
+                case 8: return [3 /*break*/, 4];
+                case 9: return [3 /*break*/, 16];
+                case 10:
                     e_5_1 = _b.sent();
                     e_5 = { error: e_5_1 };
-                    return [3 /*break*/, 14];
-                case 9:
-                    _b.trys.push([9, , 12, 13]);
-                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 11];
+                    return [3 /*break*/, 16];
+                case 11:
+                    _b.trys.push([11, , 14, 15]);
+                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 13];
                     return [4 /*yield*/, _a.call(reader_4)];
-                case 10:
-                    _b.sent();
-                    _b.label = 11;
-                case 11: return [3 /*break*/, 13];
                 case 12:
+                    _b.sent();
+                    _b.label = 13;
+                case 13: return [3 /*break*/, 15];
+                case 14:
                     if (e_5) throw e_5.error;
                     return [7 /*endfinally*/];
-                case 13: return [7 /*endfinally*/];
-                case 14:
+                case 15: return [7 /*endfinally*/];
+                case 16:
                     _i++;
                     return [3 /*break*/, 2];
-                case 15: return [2 /*return*/];
+                case 17: return [2 /*return*/];
             }
         });
     });
@@ -1016,6 +1046,24 @@ function parseTemplateTag(line) {
     tag.lineNumOffset = 0;
     return tag;
 }
+// parseCSVColumns
+function parseCSVColumns(columns) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
+                    var columnArray = [];
+                    stream.Readable.from(columns)
+                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                        .on('data', function (columns) {
+                        columnArray = columns;
+                    })
+                        .on('end', function () {
+                        resolveFunction(columnArray);
+                    });
+                })];
+        });
+    });
+}
 // escapeRegularExpression
 function escapeRegularExpression(expression) {
     return expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
@@ -1070,6 +1118,9 @@ var WriteBuffer = /** @class */ (function () {
 }());
 // println
 function println(message) {
+    if (typeof message === 'object') {
+        message = JSON.stringify(message);
+    }
     if (withJest) {
         exports.stdout += message.toString() + '\n';
     }
@@ -1306,6 +1357,7 @@ var templateAtStartLabel = "#template-at(";
 var templateAtEndLabel = "):";
 var fileTemplateLabel = "#file-template:";
 var keywordLabel = "#keyword:";
+var glossaryLabel = "#glossary:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";

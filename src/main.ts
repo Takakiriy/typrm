@@ -2,8 +2,8 @@ import * as fs from 'fs'; // file system
 import * as path from "path";  // or path = require("path")
 import * as globby from 'globby';
 import * as readline from 'readline';
-import { DefaultDeserializer } from 'v8';
-const dd = console.log;
+import * as stream from 'stream';
+import * as csvParse from 'csv-parse';
 
 // main
 export async function  main() {
@@ -14,6 +14,10 @@ export async function  main() {
 
 	if (programArguments.length === 0 ) {
 		await oldMain();
+
+		if (programOptions.test) {  // Scan last input command line for the test
+			await new Promise(resolve => setTimeout(resolve, 100));
+		}
 	} else {
 		if (programArguments[0] === 's'  ||  programArguments[0] === 'search') {
 			await search();
@@ -529,13 +533,15 @@ class  TemplateTag {
 
 // search
 async function  search() {
-	const  keyword = programArguments[1];
+	const  keyword = programArguments[1].replace('"', '""');
 	const  targetFolder = programOptions.folder;
 	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
 	const  oldCurrentFoldderPath = process.cwd();
 	process.chdir(targetFolder);
 	const  filePaths: string[] = await globby(['**/*']);
 	process.chdir(oldCurrentFoldderPath);
+	var  indentAtStart = '';
+	var  inGlossary = false;
 
 	for (const inputFilePath of filePaths) {
 		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
@@ -549,9 +555,33 @@ async function  search() {
 			const  line: string = line1;
 			lineNum += 1;
 
+			// keyword tag
 			if (line.indexOf(keywordLabel) !== notFound) {
 				if (line.indexOf(keyword) !== notFound) {
-					println(`${getTestablePath(inputFileFullPath)}:${lineNum}:${line}`);
+					const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+					const  columns = await parseCSVColumns(csv);
+					if (columns.indexOf(keyword.replace('""','"')) !== notFound) {
+
+						println(`${getTestablePath(inputFileFullPath)}:${lineNum}:${line}`);
+					}
+				}
+			}
+
+			// glossary tag
+			if (line.indexOf(glossaryLabel) !== notFound) {
+				inGlossary = true;
+				indentAtStart = indentRegularExpression.exec(line)![0];
+			}
+			else if (inGlossary) {
+				const  currentIndent = indentRegularExpression.exec(line)![0];
+
+				if (line.indexOf(keyword) === currentIndent.length) {
+					if (line[currentIndent.length + keyword.length] === ':') {
+						println(`${getTestablePath(inputFileFullPath)}:${lineNum}:${line}`);
+					}
+				}
+				if (currentIndent.length <= indentAtStart.length) {
+					inGlossary = false;
 				}
 			}
 		}
@@ -774,6 +804,24 @@ function  parseTemplateTag(line: string): TemplateTag {
 	return  tag;
 }
 
+// parseCSVColumns
+async function  parseCSVColumns(columns: string): Promise<string[]> {
+    return new Promise((resolveFunction, rejectFunction) => {
+        let  columnArray: string[] = [];
+
+        stream.Readable.from(columns)
+            .pipe(
+                csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
+            )
+            .on('data', (columns) => {
+                columnArray = columns;
+            })
+            .on('end', () => {
+                resolveFunction(columnArray);
+            });
+    });
+}
+
 // escapeRegularExpression
 function  escapeRegularExpression(expression: string) {
 	return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
@@ -834,6 +882,9 @@ class  WriteBuffer {
 
 // println
 function  println(message: any) {
+	if (typeof message === 'object') {
+		message = JSON.stringify(message);
+	}
 	if (withJest) {
 		stdout += message.toString() + '\n';
 	} else {
@@ -1057,6 +1108,7 @@ const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
 const  fileTemplateLabel = "#file-template:";
 const  keywordLabel = "#keyword:";
+const  glossaryLabel = "#glossary:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";

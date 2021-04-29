@@ -70,4 +70,4 @@ ErrorLine: 42
 Warning: 0, Error: 12
 template count = 12
 Press Enter key to retry checking.
-The line number to change the variable value >
+The line number to change the variable value >exit

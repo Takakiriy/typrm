@@ -1,0 +1,11 @@
+# Test of glossary
+
+NotGlossary1:
+    ABC: abc
+    DE: de
+Glossary:  #glossary:
+    ABC: abc
+    DE: de
+NotGlossary2:
+    ABC: abc
+    DE: de

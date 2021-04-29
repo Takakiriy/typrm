@@ -2,7 +2,8 @@
 Warning: 0, Error: 0
 template count = 6
 Press Enter key to retry checking.
-The line number to change the variable value >SettingIndex: 1
+The line number to change the variable value >6
+SettingIndex: 1
 Enter only: finish to input setting
 key: new_value>key: new_value>========================================
 

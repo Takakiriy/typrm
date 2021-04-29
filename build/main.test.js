@@ -45,29 +45,73 @@ if (path.basename(process.cwd()) !== 'src') { // Jest watch mode で２回目の
 }
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-describe('search', function () {
+describe('search tag', function () {
     test.each([
         [
             '1st',
             ['search', 'ABC'],
             { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.txt:3:#keyword: ABC, "do it", "a,b"\n'
-        ],
-        [
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+        ], [
             'not found',
             ['search', 'notFound'],
             { 'folder': 'test_data/search/1', 'test': '' },
             ''
         ], [
+            'acronym',
+            ['s', 'ABC'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+        ], [
             'space',
             ['search', 'do it'],
             { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.txt:3:#keyword: ABC, "do it", "a,b"\n'
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
         ], [
             'comma',
             ['search', 'a,b'],
             { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.txt:3:#keyword: ABC, "do it", "a,b"\n'
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+        ], [
+            'double quotation',
+            ['search', 'double quotation is ".'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4:#keyword: "double quotation is ""."\n'
+        ], [
+            'word(1)',
+            ['search', 'AB'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            ''
+        ], [
+            'word(2)',
+            ['search', 'do'],
+            { 'folder': 'test_data/search/1', 'test': '' },
+            ''
+        ]
+    ])('%s', function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                case 1:
+                    _a.sent();
+                    expect(main.stdout).toBe(answer);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('glossary tag', function () {
+    test.each([
+        [
+            '1st',
+            ['search', 'ABC'],
+            { 'folder': 'test_data/search/glossary/1', 'test': '' },
+            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:    ABC: abc\n'
+        ], [
+            'word',
+            ['search', 'AB'],
+            { 'folder': 'test_data/search/glossary/1', 'test': '' },
+            ''
         ]
     ])('%s', function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {

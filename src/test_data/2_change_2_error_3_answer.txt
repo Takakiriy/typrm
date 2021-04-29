@@ -8,7 +8,8 @@ ErrorLine: 19
 Warning: 0, Error: 1
 template count = 7
 Press Enter key to retry checking.
-The line number to change the variable value >SettingIndex: 1
+The line number to change the variable value >4
+SettingIndex: 1
 Enter only: finish to input setting
 key: new_value>
 ErrorLine: 19
