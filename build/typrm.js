@@ -43,14 +43,19 @@ function exitFromCommander(e) {
 }
 function callMain() {
     return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _i, _a, arg;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     commander.program.version('0.1.1').exitOverride(exitFromCommander)
                         .option("-l, --locale <s>")
                         .option("-t, --test")
                         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
                         .parse(process.argv);
+                    for (_i = 0, _a = commander.program.args; _i < _a.length; _i++) {
+                        arg = _a[_i];
+                        main.programArguments.push(arg);
+                    }
                     Object.assign(main.programOptions, commander.program.opts());
                     return [4 /*yield*/, main.main()["catch"](function (e) {
                             if (main.programOptions.test) {
@@ -67,7 +72,7 @@ function callMain() {
                             main.InputObject.close();
                         })];
                 case 1:
-                    _a.sent();
+                    _b.sent();
                     return [2 /*return*/];
             }
         });

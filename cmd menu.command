@@ -7,7 +7,7 @@ export code="${HOME}/Downloads/Visual Studio Code.app/Contents/MacOS/Electron"
 
 echo  ""
 echo  "1. open_VisualStudioCode"
-echo  "2. setup"
+echo  "2. setup only"
 echo  "9. clean"
 read -p "number>"  key
 

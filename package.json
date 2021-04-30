@@ -12,6 +12,8 @@
     "private": false,
     "devDependencies": {
         "@types/bluebird-global": "^3.5.12",
+        "@types/csv-parse": "^1.2.2",
+        "@types/globby": "^9.1.0",
         "@types/jest": "^26.0.16",
         "@types/node": "^13.13.4",
         "bluebird": "^3.7.2",
@@ -21,8 +23,6 @@
         "typescript": "^4.1.2"
     },
     "dependencies": {
-        "@types/csv-parse": "^1.2.2",
-        "@types/globby": "^9.1.0",
         "commander": "^7.2.0",
         "csv-parse": "^4.15.4",
         "globby": "^11.0.3"

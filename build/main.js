@@ -69,7 +69,7 @@ function main() {
                 case 1:
                     _a.sent();
                     if (!exports.programOptions.test) return [3 /*break*/, 3];
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 100); })];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
                 case 2:
                     _a.sent();
                     _a.label = 3;
@@ -927,11 +927,11 @@ function getHomePath() {
 function getTestablePath(path_) {
     if ('test' in exports.programOptions) {
         var home = getHomePath();
-        if (path_.startsWith(inputFileParentPath + path.sep)) {
-            return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
-        }
-        else if (path_.startsWith(home)) {
+        if (path_.startsWith(home)) {
             return '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
+        }
+        else if (path_.startsWith(inputFileParentPath + path.sep)) {
+            return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
         }
         else {
             return path_;

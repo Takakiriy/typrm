@@ -11,6 +11,9 @@ async function  callMain() {
 		.option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
 		.parse(process.argv);
 	
+	for (const arg of commander.program.args) {
+		main.programArguments.push(arg);
+	}
 	Object.assign(main.programOptions, commander.program.opts());
 
 	await  main.main()

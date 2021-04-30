@@ -45,7 +45,38 @@ if (path.basename(process.cwd()) !== 'src') { // Jest watch mode で２回目の
 }
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-describe('search tag', function () {
+describe.skip('checks template value', function () {
+    test.each([
+        ['1_template_1_ok'],
+        ['1_template_2_error'],
+        ['now_1_error'],
+        ['now_2_error_template_error'],
+        ['refer_1_ok'],
+        ['refer_2_error'],
+        ['secret_1_error'],
+        ['var_ref_1_error'],
+    ])('%s', function (fileNameHead) { return __awaiter(void 0, void 0, void 0, function () {
+        var answer;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    answer = fs.readFileSync(testFolderPath + fileNameHead + "_3_answer.txt")
+                        .toString().substr(cutBOM);
+                    // Test Main
+                    return [4 /*yield*/, callMain(['check'], {
+                            'file': "" + testFolderPath + fileNameHead + "_1.yaml",
+                            'test': '',
+                            'locale': 'en-US'
+                        })];
+                case 1:
+                    // Test Main
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe('searches keyword tag', function () {
     test.each([
         [
             '1st',
@@ -100,7 +131,7 @@ describe('search tag', function () {
         });
     }); });
 });
-describe('glossary tag', function () {
+describe('searches glossary tag', function () {
     test.each([
         [
             '1st',
@@ -157,4 +188,5 @@ expect.extend({
         };
     }
 });
+var cutBOM = 1;
 //# sourceMappingURL=main.test.js.map

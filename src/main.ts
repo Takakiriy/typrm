@@ -16,7 +16,7 @@ export async function  main() {
 		await oldMain();
 
 		if (programOptions.test) {  // Scan last input command line for the test
-			await new Promise(resolve => setTimeout(resolve, 100));
+			await new Promise(resolve => setTimeout(resolve, 500));
 		}
 	} else {
 		if (programArguments[0] === 's'  ||  programArguments[0] === 'search') {
@@ -670,10 +670,10 @@ function  getTestablePath(path_: string) {
 	if ('test' in programOptions) {
 		const  home = getHomePath();
 
-		if (path_.startsWith(inputFileParentPath + path.sep)) {
-			return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
-		} else if (path_.startsWith(home)) {
+		if (path_.startsWith(home)) {
 			return  '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
+		} else if (path_.startsWith(inputFileParentPath + path.sep)) {
+			return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
 		} else {
 			return  path_;
 		}

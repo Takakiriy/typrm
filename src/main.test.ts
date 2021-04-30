@@ -9,7 +9,34 @@ if (path.basename(process.cwd()) !== 'src') {  // Jest watch mode で２回目�
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
 
-describe('search tag', () => {
+describe.skip('checks template value', () => {
+
+    test.each([
+        ['1_template_1_ok'],
+		['1_template_2_error'],
+		['now_1_error'],
+		['now_2_error_template_error'],
+		['refer_1_ok'],
+		['refer_2_error'],
+		['secret_1_error'],
+		['var_ref_1_error'],
+    ])('%s', async (fileNameHead) => {
+
+        const  answer = fs.readFileSync(testFolderPath + fileNameHead + "_3_answer.txt")
+            .toString().substr(cutBOM);
+
+		// Test Main
+        await callMain(['check'], {
+            'file':   `${testFolderPath}${fileNameHead}_1.yaml`,
+            'test':   '',
+            'locale': 'en-US'
+        });
+
+        // expect(main.stdout).toBeSameWithTheFile(`${testFolderPath}${fileNameHead}_3_answer.txt`);
+    });
+})
+
+describe('searches keyword tag', () => {
 
     test.each([
         [
@@ -60,7 +87,7 @@ describe('search tag', () => {
     });
 });
 
-describe('glossary tag', () => {
+describe('searches glossary tag', () => {
 
     test.each([
         [
@@ -125,3 +152,5 @@ expect.extend({
         };
     },
 });
+
+const  cutBOM = 1;

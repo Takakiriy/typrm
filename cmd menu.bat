@@ -1,6 +1,6 @@
 @echo off
 echo 1. open_VisualStudioCode
-echo 2. setup
+echo 2. setup only
 echo 9. clean
 set key=
 
