@@ -17,6 +17,9 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
     - [ホストOSが Windows、ゲストOSが CentOS 7 の場合](#ホストosが-windowsゲストosが-centos-7-の場合)
+  - [テスト](#テスト)
+    - [Jest を使うテスト](#jest-を使うテスト)
+    - [Jest を使わないテスト](#jest-を使わないテスト)
 
 <!-- /TOC -->
 
@@ -388,3 +391,17 @@ node_modules フォルダーを復帰します:
     VSCode >> Terminal >> New Terminal >> npm ci
 
 F5 キーを押すと、テストが動きます:
+
+
+## テスト
+
+Jest を使うテストと Jest を使わないテストがあります。
+
+### Jest を使うテスト
+
+- Visual Studio Code >> New Terminal >> Terminal >>（＋の左の 1:__shell__）>> Create JavaScript Debug Terminal
+- npm test
+
+### Jest を使わないテスト
+
+- Visual Studio Code >> F5 キー

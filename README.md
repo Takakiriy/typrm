@@ -18,6 +18,9 @@ It replaces the text that should be the same in the same way, resulting in fewer
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
     - [For Windows host OS and CentOS 7 guest OS](#for-windows-host-os-and-centos-7-guest-os)
+  - [Test](#test)
+    - [Test using Jest](#test-using-jest)
+    - [Tst without Jest](#tst-without-jest)
 
 <!-- /TOC -->
 
@@ -386,3 +389,17 @@ Restore the node_modules folder:
     VSCode >> Terminal >> New Terminal >> npm ci
 
 To run the test, press F5 key:
+
+
+## Test
+
+There are the test using Jest and the test without Jest.
+
+### Test using Jest
+
+- Visual Studio Code >> New Terminal >> Terminal >> (1:__shell__ at the left of +) >> Create JavaScript Debug Terminal
+- npm test
+
+### Tst without Jest
+
+- Visual Studio Code >> F5 key
