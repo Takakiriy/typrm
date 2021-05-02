@@ -47,8 +47,8 @@ new_folder.yaml
     settings:
         __Name__: work1
     shell:
-        mkdir work1  #template: __Name__
-        cd    work1  #template: __Name__
+        - mkdir work1  #template: __Name__
+        - cd    work1  #template: __Name__
 
 Write "variable_name: value" at `settings:` for the part you want to change to.
 Write the #template: tag at the end of the same line as the part you want to change.
@@ -60,6 +60,12 @@ For Windows, double click typrm.bat file and type:
     The line number to change the variable value > 4
     key: new_value> __Name__: work2
 
+In bash case, type the following commands.
+
+    cp  "typrm/example/new_folder.yaml"  "."  #// Temporary copy to change from the original file
+
+    typrm replace  new_folder.yaml  4  "__Name__:work2"
+
 You can drag and drop a file to enter the file without having to type it from the keyboard.
 
 The line number is below the line where `settings:` is written,
@@ -70,8 +76,8 @@ new_folder.yaml file will be chaned to the following contents.
     settings:
         __Name__: work2
     shell:
-        mkdir work2  #template: __Name__
-        cd    work2  #template: __Name__
+        - mkdir work2  #template: __Name__
+        - cd    work2  #template: __Name__
 
 You can paste the text with the comment as it is. # is
 treated as a comment in many shells.
@@ -115,16 +121,23 @@ To use typrm, you must install Node.js.
         - Open the downloaded file (e.g. node-v14.16.0.pkg)
         - Installation options are defaults
 
-    Install the commander package used by typrm:
-        - Launchpad >> Terminal
-        - sudo npm install -g  commander
+    Install Node.js packages used by typrm:
+        #// Launchpad >> Terminal
+        cd typrm  #// The folder extracted from the Zip file
+        npm install --only=production
 
-    Add execution attributes to `typrm.command` file:
-        - (Continue in the Terminal)
-        - cd bin  #// bin is written by drag and drop typrm bin folder into terminal
-        - chmod +x typrm.command
+    Make the script file in the PATH folder to start typrm:
+        cd typrm  #// The folder extracted from the Zip file
+        OUT_="$HOME/bin/typrm"
+        rm -f "${OUT_}"
+        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${OUT_}"
+        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${OUT_}"
+        echo "node  $(pwd)/build/typrm.js \$*" >> "${OUT_}"
+        chmod +x "${OUT_}"
+        unset OUT_
 
-    To start typrm, double click typrm.command file in bin folder:
+    Check to use typrm command:
+        typrm --version
 
 
 ### For CentOS 7

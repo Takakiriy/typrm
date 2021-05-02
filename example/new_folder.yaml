@@ -1,0 +1,5 @@
+設定:
+    __Name__: work1
+shell:
+    - mkdir work1  #template: __Name__
+    - cd    work1  #template: __Name__

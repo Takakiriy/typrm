@@ -49,8 +49,8 @@ new_folder.yaml
     設定:
         __Name__: work1
     shell:
-        mkdir work1  #template: __Name__
-        cd    work1  #template: __Name__
+        - mkdir work1  #template: __Name__
+        - cd    work1  #template: __Name__
 
 `設定:` に変更する部分に関する 変数名: 値 を書きます。
 変更する部分と同じ行の末尾に #template: タグを書きます。
@@ -61,6 +61,12 @@ Windows の場合、typrm.bat をダブルクリックして、下記のよう�
     YAML UTF-8 ファイル パス> new_folder.yaml
     変更する変数値がある行番号 > 4
     変数名: 新しい変数値> __Name__: work2
+
+bash の場合、以下のように入力します。
+
+    cp  "typrm/example/new_folder.yaml"  "."  #// 変更するので一時的にコピーします
+
+    typrm replace  new_folder.yaml  4  "__Name__:work2"
 
 ファイル パス は、キーボードから入力しなくても、
 ファイルをドラッグ＆ドロップして入力できます。
@@ -74,8 +80,8 @@ new_folder.yaml ファイルは次のような内容に変わります。
     設定:
         __Name__: work2
     shell:
-        mkdir work2  #template: __Name__
-        cd    work2  #template: __Name__
+        - mkdir work2  #template: __Name__
+        - cd    work2  #template: __Name__
 
 コメントの付いたテキストはそのまま貼り付けることができます。 # は
 多くのシェルでコメントとして扱われます。
@@ -120,16 +126,23 @@ typrm を使うには Node.js のインストールが必要です。
         - ダウンロードしたファイル（例：node-v14.16.0.pkg）を開きます
         - インストール オプションはデフォルトを使用
 
-    typrm が使う commander パッケージをインストールします:
-        - Launchpad >> Terminal
-        - sudo npm install -g  commander
+    typrm が使う Node.js パッケージをインストールします:
+        #// Launchpad >> Terminal
+        cd typrm  #// Zip ファイルを展開したフォルダー
+        npm install --only=production
 
-    `typrm.command` ファイルに実行属性を追加します:
-        - (ターミナルの続き)
-        - cd bin  #// bin の部分は typrm の bin フォルダーをターミナルにドラッグ＆ドロップします
-        - chmod +x typrm.command
+    PATH が通ったフォルダーに typrm を起動する スクリプト ファイル を作ります:
+        cd typrm  #// Zip ファイルを展開したフォルダー
+        OUT_="$HOME/bin/typrm"
+        rm -f "${OUT_}"
+        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${OUT_}"
+        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${OUT_}"
+        echo "node  $(pwd)/build/typrm.js \$*" >> "${OUT_}"
+        chmod +x "${OUT_}"
+        unset OUT_
 
-    bin フォルダーの中の typrm.command ファイルをダブルクリックすると typrm が起動します:
+    typrm が使えることを確認します:
+        typrm --version
 
 
 ### CentOS 7 の場合
