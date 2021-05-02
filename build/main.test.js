@@ -58,53 +58,111 @@ describe("checks template value", function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    mkdirSync('test_data/checking');
-                    fs.copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/checking/" + fileNameHead + "_1.yaml");
+                    mkdirSync('test_data/_checking');
+                    fs.copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/_checking/" + fileNameHead + "_1.yaml");
                     return [4 /*yield*/, callMain(["check"], {
-                            folder: 'test_data/checking', test: "", locale: "en-US"
+                            folder: 'test_data/_checking', test: "", locale: "en-US"
                         })];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toMatchSnapshot();
-                    deleteFileSync("test_data/checking/" + fileNameHead + "_1.yaml");
-                    deleteFolderSync('test_data/checking/');
+                    deleteFileSync("test_data/_checking/" + fileNameHead + "_1.yaml");
+                    deleteFolderSync('test_data/_checking');
                     return [2 /*return*/];
             }
         });
     }); });
 });
-describe.skip("update settings", function () {
+describe("checks file contents", function () {
+    test.skip('file_2_tab', function () { });
+    test.skip('file_3_file_name', function () { });
     test.each([
-        ["2_update_1_ok_1", 1],
-        //        ["2_update_1_ok_1", 2],
-    ])("%s", function (fileNameHead, caseCount) { return __awaiter(void 0, void 0, void 0, function () {
-        var target, sourceFilePath, backUpFilePath, changingFilePath, answerFilePath;
+        [
+            "file_1_ok_and_bad", "file/1", "", 0, 0, "",
+        ], [
+            "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+        ]
+    ])("in %s, %s %s", function (fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFilePath, changingFilePath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    target = 1;
-                    _a.label = 1;
-                case 1:
-                    if (!(target <= caseCount)) return [3 /*break*/, 4];
                     sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    backUpFilePath = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
-                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-                    answerFilePath = testFolderPath + fileNameHead + ("_2_" + target + "_after_answer.yaml");
+                    changingFilePath = testFolderPath + '_checking/document/' + fileNameHead + "_1_changing.yaml";
+                    mkdirSync('test_data/_checking');
+                    mkdirSync('test_data/_checking/document');
                     deleteFileSync(changingFilePath);
-                    deleteFileSync(backUpFilePath);
                     fs.copyFileSync(sourceFilePath, changingFilePath);
-                    // Test Main
-                    return [4 /*yield*/, callMain(["update", changingFilePath], {
+                    if (!(optionOperation === 'replace')) return [3 /*break*/, 2];
+                    return [4 /*yield*/, callMain(["replace", changingFilePath, String(lineNum), keyValues], {
                             folder: 'test_data', test: "", locale: "en-US"
                         })];
-                case 2:
+                case 1:
+                    _a.sent();
+                    _a.label = 2;
+                case 2: 
+                // Test Main
+                return [4 /*yield*/, callMain(["check"], {
+                        folder: 'test_data/_checking/document', test: "", locale: "en-US"
+                    })];
+                case 3:
                     // Test Main
                     _a.sent();
-                    _a.label = 3;
-                case 3:
-                    target += 1;
-                    return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
+                    expect(main.stdout).toMatchSnapshot('stdout');
+                    deleteFileSync(changingFilePath);
+                    deleteFolderSync('test_data/_checking/document');
+                    deleteFolderSync('test_data/_checking');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe("replaces settings", function () {
+    test.skip('2_replace_5_setting_name', function () { });
+    test.each([
+        [
+            '2_replace_1_ok', 10, 1, 'en-US',
+            "key1: value1changed\n   __Key2__: value2changed  #\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u30B3\u30E1\u30F3\u30C8",
+            true,
+        ], [
+            '2_replace_1_ok', 29, 2, 'en-US',
+            "key1: value1changed",
+            true,
+        ], [
+            '2_replace_2_error', 4, 1, 'en-US',
+            "Key3: value3changed",
+            false,
+        ], [
+            '2_replace_3_English', 30, 1, 'en-US',
+            "key1: value11changed",
+            true,
+        ], [
+            '2_replace_4_Japanese', 30, 1, 'ja-JP',
+            "Key3: value3changed",
+            false,
+        ],
+    ])("in %s(%i) setting %i", function (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFilePath, changingFilePath, updatedFileContents;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
+                    deleteFileSync(changingFilePath);
+                    fs.copyFileSync(sourceFilePath, changingFilePath);
+                    // Test Main
+                    return [4 /*yield*/, callMain(["replace", changingFilePath, String(lineNum), keyValues], {
+                            folder: 'test_data', test: "",
+                            locale: locale
+                        })];
+                case 1:
+                    // Test Main
+                    _a.sent();
+                    updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                    expect(main.stdout).toMatchSnapshot('stdout');
+                    expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
+                    deleteFileSync(changingFilePath);
+                    return [2 /*return*/];
             }
         });
     }); });
@@ -189,6 +247,19 @@ describe("searches glossary tag", function () {
             }
         });
     }); });
+});
+describe("test of test", function () {
+    test("checks snapshots files are confirmed", function () {
+        var activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
+        var backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.confirmed.snap_').toString();
+        var confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.new_back_up.snap_').toString();
+        // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
+        expect(activeSnapshots).toBe(backUpSnapshots);
+        expect(backUpSnapshots).toBe(confirmedSnapshots);
+    });
+});
+afterAll(function () {
+    deleteFileSync('test_data/_output.txt');
 });
 // mkdirSync
 function mkdirSync(path) {

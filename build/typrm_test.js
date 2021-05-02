@@ -41,275 +41,73 @@ var child_process = require("child_process");
 var path = require("path");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-var debug = false;
+var debug = true;
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    if (!!debug) return [3 /*break*/, 4];
-                    return [4 /*yield*/, TestOfChange()];
+                case 0: return [4 /*yield*/, TestOfCommandLine()];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, TestOfChangeError()];
-                case 2:
-                    _a.sent();
-                    return [4 /*yield*/, TestOfFileCheck()];
-                case 3:
-                    _a.sent();
-                    return [3 /*break*/, 7];
-                case 4: return [4 /*yield*/, TestOfFileCheck()];
-                case 5:
-                    _a.sent();
-                    return [4 /*yield*/, TestOfChange()];
-                case 6:
-                    _a.sent();
-                    _a.label = 7;
-                case 7:
-                    deleteFile(testFolderPath + '_output.txt');
                     console.log('Pass');
                     return [2 /*return*/];
             }
         });
     });
 }
-// TestOfChange
-function TestOfChange() {
-    return __awaiter(this, void 0, void 0, function () {
-        var returns, fileNameHeads, fileNameHeads, _a, _b, _i, fileNameHead, caseCount, target, sourceFilePath, backUpFilePath, changingFilePath, answerFilePath, inputLines, source, changing, answer, backUp;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    if (!debug) {
-                        fileNameHeads = {
-                            "2_change_1_ok": 2,
-                            "2_change_3_English": 1
-                        };
-                    }
-                    else {
-                        fileNameHeads = {
-                            "2_change_5_setting_name": 2
-                        };
-                    }
-                    _a = [];
-                    for (_b in fileNameHeads)
-                        _a.push(_b);
-                    _i = 0;
-                    _c.label = 1;
-                case 1:
-                    if (!(_i < _a.length)) return [3 /*break*/, 6];
-                    fileNameHead = _a[_i];
-                    caseCount = fileNameHeads[fileNameHead];
-                    target = 1;
-                    _c.label = 2;
-                case 2:
-                    if (!(target <= caseCount)) return [3 /*break*/, 5];
-                    console.log("TestCase: TestOfChange >> " + fileNameHead + " >> " + target);
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    backUpFilePath = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
-                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-                    answerFilePath = testFolderPath + fileNameHead + ("_2_" + target + "_after_answer.yaml");
-                    deleteFile(changingFilePath);
-                    deleteFile(backUpFilePath);
-                    fs.copyFileSync(sourceFilePath, changingFilePath);
-                    inputLines = [];
-                    if (fileNameHead === '2_change_1_ok') {
-                        if (target === 1) {
-                            inputLines = [
-                                changingFilePath,
-                                "10",
-                                "key1: value1changed",
-                                "  __Key2__: value2changed  #コメント  ",
-                                "Key3: value3changed  #コメント",
-                                "",
-                                "exit",
-                            ];
-                        }
-                        else {
-                            inputLines = [
-                                changingFilePath,
-                                "29",
-                                "key1: value11changed",
-                                "",
-                                "exit",
-                            ];
-                        }
-                    }
-                    else if (fileNameHead === '2_change_3_English') {
-                        inputLines = [
-                            changingFilePath,
-                            "30",
-                            "key1: value11changed",
-                            "",
-                            "exit",
-                        ];
-                    }
-                    return [4 /*yield*/, callChildProccess("node " + scriptPath + " --test --locale en-US", { inputLines: inputLines })];
-                case 3:
-                    returns = _c.sent();
-                    source = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-                    changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-                    answer = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
-                    backUp = fs.readFileSync(backUpFilePath).toString().substr(cutBOM);
-                    // Check
-                    if (changing !== answer) {
-                        printDifferentPaths(fileNameHead + "_1_changing.yaml", fileNameHead + "_2_" + target + "_after_answer.yaml");
-                        throw new Error();
-                    }
-                    if (backUp !== source) {
-                        printDifferentPaths(fileNameHead + "_1_changing.yaml.backup", fileNameHead + "_1.yaml");
-                        throw new Error();
-                    }
-                    deleteFile(changingFilePath);
-                    deleteFile(backUpFilePath);
-                    _c.label = 4;
-                case 4:
-                    target += 1;
-                    return [3 /*break*/, 2];
-                case 5:
-                    _i++;
-                    return [3 /*break*/, 1];
-                case 6: return [2 /*return*/];
-            }
-        });
-    });
-}
-// TestOfChangeError
-function TestOfChangeError() {
-    return __awaiter(this, void 0, void 0, function () {
-        var returns, fileNameHeads, _a, _b, _i, fileNameHead, caseData, sourceFilePath, backUpFilePath, changingFilePath, answerFilePath, logAnswerFilePath, changing, answer, logAnswer;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    fileNameHeads = {
-                        "2_change_2_error": { locale: "--test --locale en-US" },
-                        "2_change_4_Japanese": { locale: "--test --locale ja-JP" }
-                    };
-                    _a = [];
-                    for (_b in fileNameHeads)
-                        _a.push(_b);
-                    _i = 0;
-                    _c.label = 1;
-                case 1:
-                    if (!(_i < _a.length)) return [3 /*break*/, 4];
-                    fileNameHead = _a[_i];
-                    console.log("TestCase: TestOfChangeError >> " + fileNameHead);
-                    caseData = fileNameHeads[fileNameHead];
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    backUpFilePath = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
-                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-                    answerFilePath = testFolderPath + fileNameHead + "_2_after_answer.yaml";
-                    logAnswerFilePath = testFolderPath + fileNameHead + "_3_answer.txt";
-                    deleteFile(changingFilePath);
-                    deleteFile(backUpFilePath);
-                    fs.copyFileSync(sourceFilePath, changingFilePath);
-                    return [4 /*yield*/, callChildProccess("node " + scriptPath + " " + caseData.locale, { inputLines: [
-                                changingFilePath,
-                                "4",
-                                "Key3: value3changed",
-                                "exit",
-                            ] })];
-                case 2:
-                    // Test Main
-                    returns = _c.sent();
-                    changing = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-                    answer = fs.readFileSync(answerFilePath).toString().substr(cutBOM);
-                    logAnswer = fs.readFileSync(logAnswerFilePath).toString().substr(cutBOM);
-                    // Check
-                    if (returns.stdout !== logAnswer) {
-                        printDifferentPaths('_output.txt', fileNameHead + '_3_answer.txt');
-                        fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                        throw new Error();
-                    }
-                    if (changing !== answer) {
-                        printDifferentPaths(fileNameHead + "_1_changing.yaml", fileNameHead + "_2_after_answer.yaml");
-                        throw new Error();
-                    }
-                    deleteFile(changingFilePath);
-                    deleteFile(backUpFilePath);
-                    _c.label = 3;
-                case 3:
-                    _i++;
-                    return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
-            }
-        });
-    });
-}
 // TestOfFileCheck
-function TestOfFileCheck() {
+function TestOfCommandLine() {
     return __awaiter(this, void 0, void 0, function () {
-        var returns, fileNameHeads, fileNameHeads, _a, _b, _i, fileNameHead, caseCount, target, sourceFilePath, backUpFilePath, changingFilePath, inputLines, answer;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var returns, cases, cases, _i, cases_1, case_, answer;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     if (debug) {
-                        fileNameHeads = {
-                            "file_1_ok_and_bad": 1,
-                            "file_2_tab": 1,
-                            "file_3_file_name": 1
-                        };
+                        cases = [{
+                                "name": "version",
+                                "parameters": "--version",
+                                "expected": "(not check)"
+                            }, {
+                                "name": "locale",
+                                "parameters": "search ABC --folder test_data/search/1",
+                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\""
+                            }];
                     }
                     else {
-                        fileNameHeads = {
-                            "file_1_ok_and_bad": 1
-                        };
+                        cases = [{
+                                "name": "locale",
+                                "parameters": "search ABC --folder test_data/search/1",
+                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\""
+                            }];
                     }
-                    _a = [];
-                    for (_b in fileNameHeads)
-                        _a.push(_b);
-                    _i = 0;
-                    _c.label = 1;
+                    _i = 0, cases_1 = cases;
+                    _a.label = 1;
                 case 1:
-                    if (!(_i < _a.length)) return [3 /*break*/, 6];
-                    fileNameHead = _a[_i];
-                    caseCount = fileNameHeads[fileNameHead];
-                    target = 1;
-                    _c.label = 2;
+                    if (!(_i < cases_1.length)) return [3 /*break*/, 4];
+                    case_ = cases_1[_i];
+                    console.log("TestCase: TestOfCommandLine >> " + case_.name);
+                    return [4 /*yield*/, callChildProccess("node ../build/typrm.js " + case_.parameters + " --test", {})];
                 case 2:
-                    if (!(target <= caseCount)) return [3 /*break*/, 5];
-                    console.log("TestCase: TestOfFileCheck >> " + fileNameHead + " >> " + target);
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    backUpFilePath = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
-                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-                    deleteFile(changingFilePath);
-                    deleteFile(backUpFilePath);
-                    fs.copyFileSync(sourceFilePath, changingFilePath);
-                    inputLines = [];
-                    if (fileNameHead === 'file_1_ok_and_bad') {
-                        inputLines = [
-                            changingFilePath,
-                            "6",
-                            "__User__: user2",
-                            "",
-                            "exit",
-                        ];
-                    }
-                    else {
-                        inputLines = [
-                            changingFilePath,
-                            "exit",
-                        ];
-                    }
-                    return [4 /*yield*/, callChildProccess("node " + scriptPath + " --test --locale en-US", { inputLines: inputLines })];
-                case 3:
-                    returns = _c.sent();
-                    answer = fs.readFileSync(testFolderPath + fileNameHead + "_4_answer.txt")
-                        .toString().substr(cutBOM);
+                    // Test Main
+                    returns = _a.sent();
                     // Check
-                    if (returns.stdout !== answer) {
-                        printDifferentPaths('_output.txt', fileNameHead + '_4_answer.txt');
-                        fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                        throw new Error();
+                    if (case_.expected !== '(not check)') {
+                        answer = fs.readFileSync("test_data/command_line/" + case_.name + ".txt").toString();
+                        if (returns.stdout !== answer) {
+                            printDifferentPaths('_output.txt', '_expected.txt');
+                            fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
+                            fs.writeFileSync(testFolderPath + "_expected.txt", returns.stdout);
+                            throw new Error();
+                        }
                     }
-                    _c.label = 4;
-                case 4:
-                    target += 1;
-                    return [3 /*break*/, 2];
-                case 5:
+                    _a.label = 3;
+                case 3:
                     _i++;
                     return [3 /*break*/, 1];
-                case 6: return [2 /*return*/];
+                case 4:
+                    deleteFile(testFolderPath + "_output.txt");
+                    deleteFile(testFolderPath + "_expected.txt");
+                    return [2 /*return*/];
             }
         });
     });

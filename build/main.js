@@ -66,46 +66,43 @@ function main() {
                     if ('locale' in exports.programOptions) {
                         locale = exports.programOptions.locale;
                     }
-                    if (!exports.programOptions.version) return [3 /*break*/, 1];
-                    println(typrmVersion);
-                    return [3 /*break*/, 12];
-                case 1:
-                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 5];
+                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 4];
                     return [4 /*yield*/, oldMain(true, '')];
+                case 1:
+                    _a.sent();
+                    if (!exports.programOptions.test) return [3 /*break*/, 3];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
                 case 2:
                     _a.sent();
-                    if (!exports.programOptions.test) return [3 /*break*/, 4];
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4: return [3 /*break*/, 12];
-                case 5:
-                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 12];
-                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 7];
+                    _a.label = 3;
+                case 3: return [3 /*break*/, 11];
+                case 4:
+                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 11];
+                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 6];
                     return [4 /*yield*/, search()];
+                case 5:
+                    _a.sent();
+                    return [3 /*break*/, 11];
                 case 6:
-                    _a.sent();
-                    return [3 /*break*/, 12];
-                case 7:
-                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 9];
+                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 8];
                     return [4 /*yield*/, check()];
-                case 8:
+                case 7:
                     _a.sent();
-                    return [3 /*break*/, 12];
-                case 9:
-                    if (!(exports.programArguments[0] === 'u' || exports.programArguments[0] === 'update')) return [3 /*break*/, 11];
+                    return [3 /*break*/, 11];
+                case 8:
+                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 10];
+                    varidateUpdateCommandArguments();
                     inputFilePath = exports.programArguments[1];
                     changingLineNum = parseInt(exports.programArguments[2]);
                     keyValues = exports.programArguments[3];
-                    return [4 /*yield*/, updateSettings(inputFilePath, changingLineNum, keyValues)];
-                case 10:
+                    return [4 /*yield*/, replaceSettings(inputFilePath, changingLineNum, keyValues)];
+                case 9:
                     _a.sent();
-                    return [3 /*break*/, 12];
-                case 11:
+                    return [3 /*break*/, 11];
+                case 10:
                     println("Unknown command \"" + exports.programArguments[0] + "\".");
-                    _a.label = 12;
-                case 12: return [2 /*return*/];
+                    _a.label = 11;
+                case 11: return [2 /*return*/];
             }
         });
     });
@@ -434,7 +431,7 @@ function oldMain(isModal, inputFilePath) {
     });
 }
 // updateParameters
-function updateSettings(inputFilePath, changingLineNum, keyValues) {
+function replaceSettings(inputFilePath, changingLineNum, keyValues) {
     return __awaiter(this, void 0, void 0, function () {
         var errorCount, changingSettingIndex, _i, _a, keyValue, _b;
         return __generator(this, function (_c) {
@@ -444,7 +441,7 @@ function updateSettings(inputFilePath, changingLineNum, keyValues) {
                     return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, changingLineNum)];
                 case 1:
                     changingSettingIndex = _c.sent();
-                    _i = 0, _a = keyValues.split('¥n');
+                    _i = 0, _a = keyValues.split('\n');
                     _c.label = 2;
                 case 2:
                     if (!(_i < _a.length)) return [3 /*break*/, 5];
@@ -491,9 +488,11 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    backUpFilePath = inputFilePath + ".backup";
-                    if (!fs.existsSync(backUpFilePath)) {
-                        fs.copyFileSync(inputFilePath, backUpFilePath);
+                    if (false) {
+                        backUpFilePath = inputFilePath + ".backup";
+                        if (!fs.existsSync(backUpFilePath)) {
+                            fs.copyFileSync(inputFilePath, backUpFilePath);
+                        }
                     }
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
@@ -564,7 +563,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                         }
                         else {
                             templateTag = parseTemplateTag(line);
-                            if (templateTag.isFound) {
+                            if (templateTag.isFound && templateTag.template.indexOf(changingKey) !== notFound) {
                                 checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                                 expected = getExpectedLine(setting, templateTag.template);
                                 changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
@@ -866,7 +865,7 @@ function search() {
                 case 6:
                     columns = _b.sent();
                     if (columns.indexOf(keyword.replace('""', '"')) !== notFound) {
-                        println(getTestablePath(inputFileFullPath) + ":" + lineNum + ":" + line);
+                        println(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
                     }
                     _b.label = 7;
                 case 7:
@@ -879,7 +878,7 @@ function search() {
                         currentIndent = indentRegularExpression.exec(line)[0];
                         if (line.indexOf(keyword) === currentIndent.length) {
                             if (line[currentIndent.length + keyword.length] === ':') {
-                                println(getTestablePath(inputFileFullPath) + ":" + lineNum + ":" + line);
+                                println(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
                             }
                         }
                         if (currentIndent.length <= indentAtStart.length) {
@@ -912,6 +911,12 @@ function search() {
             }
         });
     });
+}
+// varidateUpdateCommandArguments
+function varidateUpdateCommandArguments() {
+    if (exports.programArguments.length < 4) {
+        throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  __KeyColonValue__');
+    }
 }
 // onEndOfSetting
 function onEndOfSetting(setting) {

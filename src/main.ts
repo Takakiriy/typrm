@@ -14,9 +14,7 @@ export async function  main() {
 		locale = programOptions.locale;
 	}
 
-	if (programOptions.version) {
-		println(typrmVersion);
-	} else if (programArguments.length === 0 ) {
+	if (programArguments.length === 0) {
 		await oldMain(true, '');
 
 		if (programOptions.test) {  // Scan last input command line for the test
@@ -330,9 +328,11 @@ async function  changeSettingByKeyValueOld(inputFilePath: string, changingSettin
 async function  changeSetting(inputFilePath: string, changingSettingIndex: number,
 		changingKey: string, changedValueAndComment: string): Promise<number>/*errorCount*/ {
 
-	const  backUpFilePath = inputFilePath +".backup";
-	if (!fs.existsSync(backUpFilePath)) {
-		fs.copyFileSync(inputFilePath, backUpFilePath);
+	if (false) {
+		const  backUpFilePath = inputFilePath +".backup";
+		if (!fs.existsSync(backUpFilePath)) {
+			fs.copyFileSync(inputFilePath, backUpFilePath);
+		}
 	}
 
 	const  oldFilePath = inputFilePath;
@@ -613,7 +613,7 @@ async function  search() {
 					const  columns = await parseCSVColumns(csv);
 					if (columns.indexOf(keyword.replace('""','"')) !== notFound) {
 
-						println(`${getTestablePath(inputFileFullPath)}:${lineNum}:${line}`);
+						println(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
 					}
 				}
 			}
@@ -628,7 +628,7 @@ async function  search() {
 
 				if (line.indexOf(keyword) === currentIndent.length) {
 					if (line[currentIndent.length + keyword.length] === ':') {
-						println(`${getTestablePath(inputFileFullPath)}:${lineNum}:${line}`);
+						println(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
 					}
 				}
 				if (currentIndent.length <= indentAtStart.length) {

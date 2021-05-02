@@ -20,27 +20,51 @@ describe("checks template value", () => {
         ["var_not_ref_1_error"],
 
     ])("%s", async (fileNameHead) => {
-        mkdirSync('test_data/checking');
-        fs.copyFileSync(`test_data/${fileNameHead}_1.yaml`, `test_data/checking/${fileNameHead}_1.yaml`);
+        mkdirSync('test_data/_checking');
+        fs.copyFileSync(`test_data/${fileNameHead}_1.yaml`, `test_data/_checking/${fileNameHead}_1.yaml`);
 
         await callMain(["check"], {
-            folder: 'test_data/checking', test: "", locale: "en-US",
+            folder: 'test_data/_checking', test: "", locale: "en-US",
         });
 
         expect(main.stdout).toMatchSnapshot();
-        deleteFileSync(`test_data/checking/${fileNameHead}_1.yaml`);
-        deleteFolderSync('test_data/checking/');
+        deleteFileSync(`test_data/_checking/${fileNameHead}_1.yaml`);
+        deleteFolderSync('test_data/_checking');
     });
 });
 
 describe("checks file contents", () => {
-    test.skip('2_replace_5_setting_name',()=>{});
+    test.skip('file_2_tab',()=>{});
+    test.skip('file_3_file_name',()=>{});
     test.each([
         [
-			"file_1_ok_and_bad"
-            "file_2_tab"
-            "file_3_file_name"
+			"file_1_ok_and_bad", "file/1", "", 0, 0, "",
+        ],[
+			"file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
         ]
+    ])("in %s, %s %s", async (fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
+        const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
+        const  changingFilePath = testFolderPath + '_checking/document/' + fileNameHead + "_1_changing.yaml";
+        mkdirSync('test_data/_checking');
+        mkdirSync('test_data/_checking/document');
+        deleteFileSync(changingFilePath);
+        fs.copyFileSync(sourceFilePath, changingFilePath);
+
+        if (optionOperation === 'replace') {
+            await callMain(["replace", changingFilePath, String(lineNum), keyValues], {
+                folder: 'test_data', test: "", locale: "en-US",
+            });
+        }
+
+        // Test Main
+        await callMain(["check"], {
+            folder: 'test_data/_checking/document', test: "", locale: "en-US",
+        });
+
+        expect(main.stdout).toMatchSnapshot('stdout');
+        deleteFileSync(changingFilePath);
+        deleteFolderSync('test_data/_checking/document');
+        deleteFolderSync('test_data/_checking');
     });
 });
 
@@ -73,25 +97,19 @@ Key3: value3changed  #コメント`,
 
     ])("in %s(%i) setting %i", async (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) => {
         const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
-        const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
         const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
         deleteFileSync(changingFilePath);
-        deleteFileSync(backUpFilePath);
         fs.copyFileSync(sourceFilePath, changingFilePath);
 
         // Test Main
         await callMain(["replace", changingFilePath, String(lineNum), keyValues], {
             folder: 'test_data', test: "", locale,
         });
-        const  sourceFileContents  = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
         const  updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-        const  backUpFileContents  = fs.readFileSync(backUpFilePath).toString().substr(cutBOM);
 
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-        expect(sourceFileContents).toBe(backUpFileContents);
         deleteFileSync(changingFilePath);
-        deleteFileSync(backUpFilePath);
     });
 });
 
@@ -162,6 +180,18 @@ describe("searches glossary tag", () => {
     await callMain(arguments_, options);
     expect(main.stdout).toBe(answer);
   });
+});
+
+describe("test of test", () => {
+    test("checks snapshots files are confirmed", () => {
+        const  activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
+        const  backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.confirmed.snap_').toString();
+        const  confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.new_back_up.snap_').toString();
+            // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
+
+        expect(activeSnapshots).toBe(backUpSnapshots);
+        expect(backUpSnapshots).toBe(confirmedSnapshots);
+    });
 });
 
 afterAll(()=>{

@@ -5,11 +5,10 @@ function  exitFromCommander(e: commander.CommanderError) {
 	console.log(e.message);
 }
 async function  callMain() {
-	commander.program.version('0.1.1').exitOverride(exitFromCommander)
+	commander.program.version('0.1.2').exitOverride(exitFromCommander)
 		.option("-l, --locale <s>")
 		.option("-t, --test")
 		.option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
-		.option("-v, --version")
 		.parse(process.argv);
 	
 	for (const arg of commander.program.args) {

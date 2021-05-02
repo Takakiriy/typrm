@@ -5,75 +5,53 @@ import * as path from 'path';
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
 
-const  debug = false;
+const  debug = true;
 
 async function  main() {
-if (!debug) {
-	await TestOfFileCheck();
-} else {
-	await TestOfFileCheck();
-}
-	deleteFile(testFolderPath + '_output.txt');
+	await TestOfCommandLine();
 	console.log('Pass');
 }
 
 // TestOfFileCheck
-async function  TestOfFileCheck() {
+async function  TestOfCommandLine() {
 	let  returns: ProcessReturns;
 
 	if (debug) {
-		var fileNameHeads: {[name: string]: number} = {
-			"file_1_ok_and_bad": 1,
-			"file_2_tab": 1,
-			"file_3_file_name": 1,
-		};
+		var cases: ({[name: string]: string})[] = [{
+			"name": "version",
+			"parameters": "--version",
+			"expected": "(not check)",
+		},{
+			"name": "locale",
+			"parameters": "search ABC --folder test_data/search/1",
+			"expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+		}];
 	} else {
-		var fileNameHeads: {[name: string]: number} = {
-			"file_1_ok_and_bad": 1,
-	//		"file_2_tab": 1,
-	//		"file_3_file_name": 1,
-		};
+		var cases: ({[name: string]: string})[] = [{
+			"name": "locale",
+			"parameters": "search ABC --folder test_data/search/1",
+			"expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+		}];
 	}
-	for (const fileNameHead in fileNameHeads) {
-		const  caseCount = fileNameHeads[fileNameHead];
-		for (let target = 1;  target <= caseCount;  target+=1) {
-			console.log(`TestCase: TestOfFileCheck >> ${fileNameHead} >> ${target}`);
-			const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
-			const  backUpFilePath   = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
-			const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-			deleteFile(changingFilePath);
-			deleteFile(backUpFilePath);
-			fs.copyFileSync(sourceFilePath, changingFilePath);
+	for (const case_ of cases) {
+		console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
 
-			// Test Main
-			let  inputLines: string[] = [];
-			if (fileNameHead === 'file_1_ok_and_bad') {
-				inputLines = [
-					changingFilePath,
-					"6",
-					"__User__: user2",
-					"",
-					"exit",
-				];
-			} else {
-				inputLines = [
-					changingFilePath,
-					"exit",
-				];
-			}
+		// Test Main
+		returns = await callChildProccess(`node ../build/typrm.js ${case_.parameters} --test`, {});
 
-			returns = await callChildProccess(`node ${scriptPath} --test --locale en-US`, {inputLines});
-			const  answer = fs.readFileSync(testFolderPath + fileNameHead + "_4_answer.txt")
-				.toString().substr(cutBOM);
-
-			// Check
+		// Check
+		if (case_.expected !== '(not check)') {
+			const  answer = fs.readFileSync(`test_data/command_line/${case_.name}.txt`).toString(); //.substr(cutBOM);
 			if (returns.stdout !== answer) {
-				printDifferentPaths('_output.txt', fileNameHead + '_4_answer.txt');
+				printDifferentPaths('_output.txt', '_expected.txt');
 				fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
+				fs.writeFileSync(testFolderPath + "_expected.txt", returns.stdout);
 				throw new Error();
 			}
 		}
 	}
+	deleteFile(testFolderPath + "_output.txt");
+	deleteFile(testFolderPath + "_expected.txt");
 }
 
 // callChildProccess
