@@ -1,9 +1,0 @@
-﻿YAML UTF-8 file path>Not referenced: key1 in line 2
-Not referenced: Key3 in line 5
-Not referenced: key1 in line 12
-Not referenced: __Key2__ in line 13
-
-Warning: 0, Error: 0
-template count = 2
-Press Enter key to retry checking.
-The line number to change the variable value >exit

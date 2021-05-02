@@ -1,5 +1,0 @@
-﻿YAML UTF-8 file path>
-Warning: 0, Error: 0
-template count = 8
-Press Enter key to retry checking.
-The line number to change the variable value >exit

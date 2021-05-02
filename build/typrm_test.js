@@ -47,77 +47,28 @@ function main() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!!debug) return [3 /*break*/, 5];
-                    return [4 /*yield*/, TestOfCheck()];
+                    if (!!debug) return [3 /*break*/, 4];
+                    return [4 /*yield*/, TestOfChange()];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, TestOfChange()];
+                    return [4 /*yield*/, TestOfChangeError()];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, TestOfChangeError()];
+                    return [4 /*yield*/, TestOfFileCheck()];
                 case 3:
                     _a.sent();
-                    return [4 /*yield*/, TestOfFileCheck()];
-                case 4:
-                    _a.sent();
-                    return [3 /*break*/, 8];
-                case 5: return [4 /*yield*/, TestOfFileCheck()];
-                case 6:
+                    return [3 /*break*/, 7];
+                case 4: return [4 /*yield*/, TestOfFileCheck()];
+                case 5:
                     _a.sent();
                     return [4 /*yield*/, TestOfChange()];
-                case 7:
+                case 6:
                     _a.sent();
-                    _a.label = 8;
-                case 8:
+                    _a.label = 7;
+                case 7:
                     deleteFile(testFolderPath + '_output.txt');
                     console.log('Pass');
                     return [2 /*return*/];
-            }
-        });
-    });
-}
-function TestOfCheck() {
-    return __awaiter(this, void 0, void 0, function () {
-        var returns, fileNameHeads, _i, fileNameHeads_1, fileNameHead, answer;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    fileNameHeads = [
-                        "1_template_1_ok",
-                        "1_template_2_error",
-                        "now_1_error",
-                        "now_2_error_template_error",
-                        "refer_1_ok",
-                        "refer_2_error",
-                        "secret_1_error",
-                        "var_ref_1_error",
-                    ];
-                    _i = 0, fileNameHeads_1 = fileNameHeads;
-                    _a.label = 1;
-                case 1:
-                    if (!(_i < fileNameHeads_1.length)) return [3 /*break*/, 4];
-                    fileNameHead = fileNameHeads_1[_i];
-                    console.log("TestCase: TestOfCheck >> " + fileNameHead);
-                    return [4 /*yield*/, callChildProccess("node " + scriptPath + " --test --locale en-US", { inputLines: [
-                                testFolderPath + fileNameHead + "_1.yaml",
-                                "exit"
-                            ] })];
-                case 2:
-                    // Test Main
-                    returns = _a.sent();
-                    answer = fs.readFileSync(testFolderPath + fileNameHead + "_3_answer.txt")
-                        .toString().substr(cutBOM);
-                    // Check
-                    if (returns.stdout !== answer) {
-                        printDifferentPaths("_output.txt", fileNameHead + '_3_answer.txt');
-                        fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                        throw new Error();
-                    }
-                    _a.label = 3;
-                case 3:
-                    _i++;
-                    return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
             }
         });
     });

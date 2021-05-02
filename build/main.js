@@ -54,9 +54,11 @@ var globby = require("globby");
 var readline = require("readline");
 var stream = require("stream");
 var csvParse = require("csv-parse");
+var typrmVersion = "0.0.1";
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
+        var inputFilePath, changingLineNum, keyValues;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -64,43 +66,71 @@ function main() {
                     if ('locale' in exports.programOptions) {
                         locale = exports.programOptions.locale;
                     }
-                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 4];
-                    return [4 /*yield*/, oldMain()];
+                    if (!exports.programOptions.version) return [3 /*break*/, 1];
+                    println(typrmVersion);
+                    return [3 /*break*/, 12];
                 case 1:
-                    _a.sent();
-                    if (!exports.programOptions.test) return [3 /*break*/, 3];
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
+                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 5];
+                    return [4 /*yield*/, oldMain(true, '')];
                 case 2:
                     _a.sent();
-                    _a.label = 3;
-                case 3: return [3 /*break*/, 6];
-                case 4:
-                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 6];
-                    return [4 /*yield*/, search()];
-                case 5:
+                    if (!exports.programOptions.test) return [3 /*break*/, 4];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 500); })];
+                case 3:
                     _a.sent();
-                    _a.label = 6;
-                case 6: return [2 /*return*/];
+                    _a.label = 4;
+                case 4: return [3 /*break*/, 12];
+                case 5:
+                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 12];
+                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 7];
+                    return [4 /*yield*/, search()];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 12];
+                case 7:
+                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 9];
+                    return [4 /*yield*/, check()];
+                case 8:
+                    _a.sent();
+                    return [3 /*break*/, 12];
+                case 9:
+                    if (!(exports.programArguments[0] === 'u' || exports.programArguments[0] === 'update')) return [3 /*break*/, 11];
+                    inputFilePath = exports.programArguments[1];
+                    changingLineNum = parseInt(exports.programArguments[2]);
+                    keyValues = exports.programArguments[3];
+                    return [4 /*yield*/, updateSettings(inputFilePath, changingLineNum, keyValues)];
+                case 10:
+                    _a.sent();
+                    return [3 /*break*/, 12];
+                case 11:
+                    println("Unknown command \"" + exports.programArguments[0] + "\".");
+                    _a.label = 12;
+                case 12: return [2 /*return*/];
             }
         });
     });
 }
 exports.main = main;
 // oldMain
-function oldMain() {
+function oldMain(isModal, inputFilePath) {
+    var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var inputFilePath, parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
-                case 0: return [4 /*yield*/, inputPath(translate('YAML UTF-8 file path>'))];
+                case 0:
+                    if (!isModal) return [3 /*break*/, 2];
+                    return [4 /*yield*/, inputPath(translate('YAML UTF-8 file path>'))];
                 case 1:
                     inputFilePath = _h.sent();
+                    _h.label = 2;
+                case 2:
                     parentPath = path.dirname(inputFilePath);
                     inputFileParentPath = parentPath;
                     previousTemplateCount = 0;
-                    _h.label = 2;
-                case 2:
+                    _h.label = 3;
+                case 3:
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFilePath),
                         crlfDelay: Infinity
@@ -116,14 +146,14 @@ function oldMain() {
                     secretLabelCount = 0;
                     lines = [];
                     keywords = [];
-                    _h.label = 3;
-                case 3:
-                    _h.trys.push([3, 10, 11, 16]);
-                    reader_1 = (e_1 = void 0, __asyncValues(reader));
                     _h.label = 4;
-                case 4: return [4 /*yield*/, reader_1.next()];
-                case 5:
-                    if (!(reader_1_1 = _h.sent(), !reader_1_1.done)) return [3 /*break*/, 9];
+                case 4:
+                    _h.trys.push([4, 11, 12, 17]);
+                    reader_1 = (e_1 = void 0, __asyncValues(reader));
+                    _h.label = 5;
+                case 5: return [4 /*yield*/, reader_1.next()];
+                case 6:
+                    if (!(reader_1_1 = _h.sent(), !reader_1_1.done)) return [3 /*break*/, 10];
                     line1 = reader_1_1.value;
                     line = line1;
                     lines.push(line);
@@ -180,18 +210,18 @@ function oldMain() {
                             errorCount += 1;
                         }
                     }
-                    if (!fileTemplateTag) return [3 /*break*/, 7];
+                    if (!fileTemplateTag) return [3 /*break*/, 8];
                     continue_ = fileTemplateTag.onReadLine(line);
-                    if (!!continue_) return [3 /*break*/, 7];
+                    if (!!continue_) return [3 /*break*/, 8];
                     return [4 /*yield*/, fileTemplateTag.checkTargetContents(setting, inputFilePath, lineNum)];
-                case 6:
+                case 7:
                     checkPassed = _h.sent();
                     if (!checkPassed) {
                         errorCount += 1;
                     }
                     fileTemplateTag = null;
-                    _h.label = 7;
-                case 7:
+                    _h.label = 8;
+                case 8:
                     if (templateTag.label === fileTemplateLabel) {
                         fileTemplateTag = templateTag;
                     }
@@ -237,53 +267,53 @@ function oldMain() {
                         }
                         keywords.push(keyword);
                     }
-                    _h.label = 8;
-                case 8: return [3 /*break*/, 4];
-                case 9: return [3 /*break*/, 16];
-                case 10:
+                    _h.label = 9;
+                case 9: return [3 /*break*/, 5];
+                case 10: return [3 /*break*/, 17];
+                case 11:
                     e_1_1 = _h.sent();
                     e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 16];
-                case 11:
-                    _h.trys.push([11, , 14, 15]);
-                    if (!(reader_1_1 && !reader_1_1.done && (_a = reader_1["return"]))) return [3 /*break*/, 13];
-                    return [4 /*yield*/, _a.call(reader_1)];
+                    return [3 /*break*/, 17];
                 case 12:
+                    _h.trys.push([12, , 15, 16]);
+                    if (!(reader_1_1 && !reader_1_1.done && (_a = reader_1["return"]))) return [3 /*break*/, 14];
+                    return [4 /*yield*/, _a.call(reader_1)];
+                case 13:
                     _h.sent();
-                    _h.label = 13;
-                case 13: return [3 /*break*/, 15];
-                case 14:
+                    _h.label = 14;
+                case 14: return [3 /*break*/, 16];
+                case 15:
                     if (e_1) throw e_1.error;
                     return [7 /*endfinally*/];
-                case 15: return [7 /*endfinally*/];
-                case 16:
+                case 16: return [7 /*endfinally*/];
+                case 17:
                     if (settingCount >= 1) {
                         onEndOfSetting(setting);
                     }
-                    if (!fileTemplateTag) return [3 /*break*/, 18];
+                    if (!fileTemplateTag) return [3 /*break*/, 19];
                     fileTemplateTag.onReadLine(''); // Cut indent
                     return [4 /*yield*/, fileTemplateTag.checkTargetContents(setting, inputFilePath, lineNum)];
-                case 17:
+                case 18:
                     checkPassed = _h.sent();
                     if (!checkPassed) {
                         errorCount += 1;
                     }
-                    _h.label = 18;
-                case 18:
+                    _h.label = 19;
+                case 19:
                     // Check if there is the title above or following.
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFilePath),
                         crlfDelay: Infinity
                     });
                     lineNum = 0;
-                    _h.label = 19;
-                case 19:
-                    _h.trys.push([19, 24, 25, 30]);
-                    reader_2 = (e_2 = void 0, __asyncValues(reader));
                     _h.label = 20;
-                case 20: return [4 /*yield*/, reader_2.next()];
-                case 21:
-                    if (!(reader_2_1 = _h.sent(), !reader_2_1.done)) return [3 /*break*/, 23];
+                case 20:
+                    _h.trys.push([20, 25, 26, 31]);
+                    reader_2 = (e_2 = void 0, __asyncValues(reader));
+                    _h.label = 21;
+                case 21: return [4 /*yield*/, reader_2.next()];
+                case 22:
+                    if (!(reader_2_1 = _h.sent(), !reader_2_1.done)) return [3 /*break*/, 24];
                     line1 = reader_2_1.value;
                     line = line1;
                     lineNum += 1;
@@ -304,26 +334,26 @@ function oldMain() {
                             }
                         }
                     }
-                    _h.label = 22;
-                case 22: return [3 /*break*/, 20];
-                case 23: return [3 /*break*/, 30];
-                case 24:
+                    _h.label = 23;
+                case 23: return [3 /*break*/, 21];
+                case 24: return [3 /*break*/, 31];
+                case 25:
                     e_2_1 = _h.sent();
                     e_2 = { error: e_2_1 };
-                    return [3 /*break*/, 30];
-                case 25:
-                    _h.trys.push([25, , 28, 29]);
-                    if (!(reader_2_1 && !reader_2_1.done && (_b = reader_2["return"]))) return [3 /*break*/, 27];
-                    return [4 /*yield*/, _b.call(reader_2)];
+                    return [3 /*break*/, 31];
                 case 26:
+                    _h.trys.push([26, , 29, 30]);
+                    if (!(reader_2_1 && !reader_2_1.done && (_b = reader_2["return"]))) return [3 /*break*/, 28];
+                    return [4 /*yield*/, _b.call(reader_2)];
+                case 27:
                     _h.sent();
-                    _h.label = 27;
-                case 27: return [3 /*break*/, 29];
-                case 28:
+                    _h.label = 28;
+                case 28: return [3 /*break*/, 30];
+                case 29:
                     if (e_2) throw e_2.error;
                     return [7 /*endfinally*/];
-                case 29: return [7 /*endfinally*/];
-                case 30:
+                case 30: return [7 /*endfinally*/];
+                case 31:
                     for (_d = 0, keywords_2 = keywords; _d < keywords_2.length; _d++) {
                         keyword = keywords_2[_d];
                         if (keyword.direction === Direction.Above) {
@@ -350,42 +380,45 @@ function oldMain() {
                         println(translate('template count') + " = " + previousTemplateCount + " (" + translate('in previous check') + ")");
                     }
                     println(translate('template count') + " = " + templateCount);
+                    if (!isModal) {
+                        return [3 /*break*/, 43];
+                    }
                     loop = true;
-                    _h.label = 31;
-                case 31:
-                    if (!loop) return [3 /*break*/, 40];
+                    _h.label = 32;
+                case 32:
+                    if (!loop) return [3 /*break*/, 41];
                     println(translate('Press Enter key to retry checking.'));
                     return [4 /*yield*/, input(translate('The line number to change the variable value >'))];
-                case 32:
+                case 33:
                     key = _h.sent();
                     errorCount = 0;
-                    if (!(key === 'exit')) return [3 /*break*/, 33];
+                    if (!(key === 'exit')) return [3 /*break*/, 34];
                     return [2 /*return*/];
-                case 33:
-                    if (!(key !== '')) return [3 /*break*/, 39];
+                case 34:
+                    if (!(key !== '')) return [3 /*break*/, 40];
                     lineNum_1 = parseInt(key);
                     return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, lineNum_1)];
-                case 34:
+                case 35:
                     changingSettingIndex = _h.sent();
                     println(translate('SettingIndex') + ": " + changingSettingIndex);
                     println(translate('Enter only: finish to input setting'));
-                    _h.label = 35;
-                case 35: return [4 /*yield*/, input(translate('key: new_value>'))];
-                case 36:
+                    _h.label = 36;
+                case 36: return [4 /*yield*/, input(translate('key: new_value>'))];
+                case 37:
                     keyValue = _h.sent();
                     if (keyValue === '') {
-                        return [3 /*break*/, 39];
+                        return [3 /*break*/, 40];
                     }
                     _e = errorCount;
-                    return [4 /*yield*/, changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue)];
-                case 37:
+                    return [4 /*yield*/, changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue)];
+                case 38:
                     errorCount = _e + _h.sent();
-                    _h.label = 38;
-                case 38: return [3 /*break*/, 35];
-                case 39:
-                    loop = (errorCount >= 1);
-                    return [3 /*break*/, 31];
+                    _h.label = 39;
+                case 39: return [3 /*break*/, 36];
                 case 40:
+                    loop = (errorCount >= 1);
+                    return [3 /*break*/, 32];
+                case 41:
                     // Rescan
                     println('========================================');
                     previousTemplateCount = templateCount;
@@ -393,15 +426,47 @@ function oldMain() {
                         key = _g[_f];
                         setting[key].isReferenced = false;
                     }
-                    _h.label = 41;
-                case 41: return [3 /*break*/, 2];
-                case 42: return [2 /*return*/];
+                    _h.label = 42;
+                case 42: return [3 /*break*/, 3];
+                case 43: return [2 /*return*/];
+            }
+        });
+    });
+}
+// updateParameters
+function updateSettings(inputFilePath, changingLineNum, keyValues) {
+    return __awaiter(this, void 0, void 0, function () {
+        var errorCount, changingSettingIndex, _i, _a, keyValue, _b;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    errorCount = 0;
+                    return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, changingLineNum)];
+                case 1:
+                    changingSettingIndex = _c.sent();
+                    _i = 0, _a = keyValues.split('¥n');
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    keyValue = _a[_i];
+                    _b = errorCount;
+                    return [4 /*yield*/, changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue)];
+                case 3:
+                    errorCount = _b + _c.sent();
+                    _c.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5:
+                    println('');
+                    println(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
+                    return [2 /*return*/];
             }
         });
     });
 }
 // changeSettingByKeyValue
-function changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue) {
+function changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue) {
     return __awaiter(this, void 0, void 0, function () {
         var separator, key, value;
         return __generator(this, function (_a) {
@@ -720,11 +785,44 @@ var TemplateTag = /** @class */ (function () {
     };
     return TemplateTag;
 }());
+// check
+function check() {
+    return __awaiter(this, void 0, void 0, function () {
+        var targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, _i, filePaths_1, inputFilePath, inputFileFullPath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    targetFolder = exports.programOptions.folder;
+                    targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+                    oldCurrentFoldderPath = process.cwd();
+                    process.chdir(targetFolder);
+                    return [4 /*yield*/, globby(['**/*'])];
+                case 1:
+                    filePaths = _a.sent();
+                    process.chdir(oldCurrentFoldderPath);
+                    _i = 0, filePaths_1 = filePaths;
+                    _a.label = 2;
+                case 2:
+                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 5];
+                    inputFilePath = filePaths_1[_i];
+                    inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+                    return [4 /*yield*/, oldMain(false, inputFileFullPath)];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
 // search
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, indentAtStart, inGlossary, _i, filePaths_1, inputFilePath, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
+        var keyword, targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, indentAtStart, inGlossary, _i, filePaths_2, inputFilePath, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -739,11 +837,11 @@ function search() {
                     process.chdir(oldCurrentFoldderPath);
                     indentAtStart = '';
                     inGlossary = false;
-                    _i = 0, filePaths_1 = filePaths;
+                    _i = 0, filePaths_2 = filePaths;
                     _b.label = 2;
                 case 2:
-                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 17];
-                    inputFilePath = filePaths_1[_i];
+                    if (!(_i < filePaths_2.length)) return [3 /*break*/, 17];
+                    inputFilePath = filePaths_2[_i];
                     inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFileFullPath),

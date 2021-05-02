@@ -5,6 +5,8 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 
+const  typrmVersion = "0.0.1";
+
 // main
 export async function  main() {
 	locale = Intl.NumberFormat().resolvedOptions().locale;
@@ -12,22 +14,40 @@ export async function  main() {
 		locale = programOptions.locale;
 	}
 
-	if (programArguments.length === 0 ) {
-		await oldMain();
+	if (programOptions.version) {
+		println(typrmVersion);
+	} else if (programArguments.length === 0 ) {
+		await oldMain(true, '');
 
 		if (programOptions.test) {  // Scan last input command line for the test
 			await new Promise(resolve => setTimeout(resolve, 500));
 		}
-	} else {
+	} else if (programArguments.length >= 1 ) {
 		if (programArguments[0] === 's'  ||  programArguments[0] === 'search') {
 			await search();
+		}
+		else if (programArguments[0] === 'c'  ||  programArguments[0] === 'check') {
+			await check();
+		}
+		else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
+			varidateUpdateCommandArguments();
+			const  inputFilePath = programArguments[1];
+			const  changingLineNum = parseInt(programArguments[2]);
+			const  keyValues = programArguments[3];
+
+			await replaceSettings(inputFilePath, changingLineNum, keyValues);
+		}
+		else {
+			println(`Unknown command "${programArguments[0]}".`);
 		}
 	}
 }
 
 // oldMain
-async function  oldMain() {
-	const  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
+async function  oldMain(isModal: boolean, inputFilePath: string) {
+	if (isModal) {
+		var  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
+	}
 	const  parentPath = path.dirname(inputFilePath);
 	inputFileParentPath = parentPath;
 	let  previousTemplateCount = 0;
@@ -241,6 +261,10 @@ async function  oldMain() {
 		}
 		println(`${translate('template count')} = ${templateCount}`);
 
+		if (!isModal) {
+			break;
+		}
+
 		// Rescan or change a value
 		let  loop = true;
 		while (loop) {
@@ -260,7 +284,7 @@ async function  oldMain() {
 					if (keyValue === '') {
 						break;
 					}
-					errorCount += await changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue);
+					errorCount += await changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue);
 				}
 			}
 			loop = (errorCount >= 1);
@@ -275,8 +299,20 @@ async function  oldMain() {
 	}
 }
 
+// updateParameters
+async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValues: string) {
+
+	var    errorCount = 0;
+	const  changingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, changingLineNum);
+	for (const keyValue of keyValues.split('\n')) {
+		errorCount += await changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue);
+	}
+	println('');
+	println(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
+}
+
 // changeSettingByKeyValue
-async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIndex: number,
+async function  changeSettingByKeyValueOld(inputFilePath: string, changingSettingIndex: number,
 		keyValue: string): Promise<number>/*errorCount*/ {
 
 	const  separator = keyValue.indexOf(':');
@@ -363,7 +399,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 			// Out of settings
 			} else {
 				const  templateTag = parseTemplateTag(line);
-				if (templateTag.isFound) {
+				if (templateTag.isFound  &&  templateTag.template.indexOf(changingKey) !== notFound) {
 					const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
 					const  expected = getExpectedLine(setting, templateTag.template);
 					const  changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
@@ -531,6 +567,21 @@ class  TemplateTag {
 	}
 }
 
+// check
+async function  check() {
+	const  targetFolder = programOptions.folder;
+	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+	const  oldCurrentFoldderPath = process.cwd();
+	process.chdir(targetFolder);
+	const  filePaths: string[] = await globby(['**/*']);
+	process.chdir(oldCurrentFoldderPath);
+
+	for (const inputFilePath of filePaths) {
+		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+		await oldMain(false, inputFileFullPath);
+	}
+}
+
 // search
 async function  search() {
 	const  keyword = programArguments[1].replace('"', '""');
@@ -585,6 +636,13 @@ async function  search() {
 				}
 			}
 		}
+	}
+}
+
+// varidateUpdateCommandArguments
+function  varidateUpdateCommandArguments() {
+	if (programArguments.length < 4) {
+		throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  __KeyColonValue__')
 	}
 }
 

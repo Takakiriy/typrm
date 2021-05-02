@@ -3,7 +3,7 @@ export {};
 declare global {
     namespace jest {
         interface Matchers<R> {
-            because: (expected: string) => CustomMatcherResult;
+            because: (errorMessage: string) => CustomMatcherResult;
         }
     }
 }

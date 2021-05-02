@@ -113,6 +113,7 @@ typrm を使うには Node.js のインストールが必要です。
 
     typrm をダウンロードして展開します:
         - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
+        - （必要なら）Zip ファイルを展開したフォルダーを格納する場所に移動します
 
     Node.js をインストールします:
         - https://nodejs.org/ja/download/ >> macOS Installer (.pkg) >> 64-bit

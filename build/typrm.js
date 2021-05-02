@@ -51,6 +51,7 @@ function callMain() {
                         .option("-l, --locale <s>")
                         .option("-t, --test")
                         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
+                        .option("-v, --version")
                         .parse(process.argv);
                     for (_i = 0, _a = commander.program.args; _i < _a.length; _i++) {
                         arg = _a[_i];

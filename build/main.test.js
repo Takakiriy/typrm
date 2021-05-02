@@ -40,86 +40,119 @@ var fs = require("fs");
 var path = require("path");
 var main = require("./main");
 var callMain = main.callMainFromJest;
-if (path.basename(process.cwd()) !== 'src') { // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
-    process.chdir('src');
+if (path.basename(process.cwd()) !== "src") {
+    // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
+    process.chdir("src");
 }
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-describe.skip('checks template value', function () {
+describe("checks template value", function () {
     test.each([
-        ['1_template_1_ok'],
-        ['1_template_2_error'],
-        ['now_1_error'],
-        ['now_2_error_template_error'],
-        ['refer_1_ok'],
-        ['refer_2_error'],
-        ['secret_1_error'],
-        ['var_ref_1_error'],
-    ])('%s', function (fileNameHead) { return __awaiter(void 0, void 0, void 0, function () {
-        var answer;
+        ["1_template_1_ok"],
+        ["1_template_2_error"],
+        ["refer_1_ok"],
+        ["refer_2_error"],
+        ["secret_1_error"],
+        ["var_not_ref_1_error"],
+    ])("%s", function (fileNameHead) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    answer = fs.readFileSync(testFolderPath + fileNameHead + "_3_answer.txt")
-                        .toString().substr(cutBOM);
-                    // Test Main
-                    return [4 /*yield*/, callMain(['check'], {
-                            'file': "" + testFolderPath + fileNameHead + "_1.yaml",
-                            'test': '',
-                            'locale': 'en-US'
+                    mkdirSync('test_data/checking');
+                    fs.copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/checking/" + fileNameHead + "_1.yaml");
+                    return [4 /*yield*/, callMain(["check"], {
+                            folder: 'test_data/checking', test: "", locale: "en-US"
                         })];
                 case 1:
+                    _a.sent();
+                    expect(main.stdout).toMatchSnapshot();
+                    deleteFileSync("test_data/checking/" + fileNameHead + "_1.yaml");
+                    deleteFolderSync('test_data/checking/');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe.skip("update settings", function () {
+    test.each([
+        ["2_update_1_ok_1", 1],
+        //        ["2_update_1_ok_1", 2],
+    ])("%s", function (fileNameHead, caseCount) { return __awaiter(void 0, void 0, void 0, function () {
+        var target, sourceFilePath, backUpFilePath, changingFilePath, answerFilePath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    target = 1;
+                    _a.label = 1;
+                case 1:
+                    if (!(target <= caseCount)) return [3 /*break*/, 4];
+                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+                    backUpFilePath = testFolderPath + fileNameHead + "_1_changing.yaml.backup";
+                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
+                    answerFilePath = testFolderPath + fileNameHead + ("_2_" + target + "_after_answer.yaml");
+                    deleteFileSync(changingFilePath);
+                    deleteFileSync(backUpFilePath);
+                    fs.copyFileSync(sourceFilePath, changingFilePath);
+                    // Test Main
+                    return [4 /*yield*/, callMain(["update", changingFilePath], {
+                            folder: 'test_data', test: "", locale: "en-US"
+                        })];
+                case 2:
                     // Test Main
                     _a.sent();
-                    return [2 /*return*/];
+                    _a.label = 3;
+                case 3:
+                    target += 1;
+                    return [3 /*break*/, 1];
+                case 4: return [2 /*return*/];
             }
         });
     }); });
 });
-describe('searches keyword tag', function () {
+describe("searches keyword tag", function () {
     test.each([
         [
-            '1st',
-            ['search', 'ABC'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+            "1st",
+            ["search", "ABC"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
         ], [
-            'not found',
-            ['search', 'notFound'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            ''
+            "not found",
+            ["search", "notFound"],
+            { folder: "test_data/search/1", test: "" },
+            "",
         ], [
-            'acronym',
-            ['s', 'ABC'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+            "acronym",
+            ["s", "ABC"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
         ], [
-            'space',
-            ['search', 'do it'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+            "space",
+            ["search", "do it"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
         ], [
-            'comma',
-            ['search', 'a,b'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n'
+            "comma",
+            ["search", "a,b"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
         ], [
-            'double quotation',
-            ['search', 'double quotation is ".'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4:#keyword: "double quotation is ""."\n'
+            "double quotation",
+            ["search", 'double quotation is ".'],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4:#keyword: "double quotation is ""."\n',
         ], [
-            'word(1)',
-            ['search', 'AB'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            ''
+            "word(1)",
+            ["search", "AB"],
+            { folder: "test_data/search/1", test: "" },
+            "",
         ], [
-            'word(2)',
-            ['search', 'do'],
-            { 'folder': 'test_data/search/1', 'test': '' },
-            ''
-        ]
-    ])('%s', function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            "word(2)",
+            ["search", "do"],
+            { folder: "test_data/search/1", test: "" },
+            "",
+        ],
+    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, callMain(arguments_, options)];
@@ -131,20 +164,21 @@ describe('searches keyword tag', function () {
         });
     }); });
 });
-describe('searches glossary tag', function () {
+describe("searches glossary tag", function () {
     test.each([
         [
-            '1st',
-            ['search', 'ABC'],
-            { 'folder': 'test_data/search/glossary/1', 'test': '' },
-            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:    ABC: abc\n'
-        ], [
-            'word',
-            ['search', 'AB'],
-            { 'folder': 'test_data/search/glossary/1', 'test': '' },
-            ''
-        ]
-    ])('%s', function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            "1st",
+            ["search", "ABC"],
+            { folder: "test_data/search/glossary/1", test: "" },
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:    ABC: abc\n",
+        ],
+        [
+            "word",
+            ["search", "AB"],
+            { folder: "test_data/search/glossary/1", test: "" },
+            "",
+        ],
+    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, callMain(arguments_, options)];
@@ -156,16 +190,28 @@ describe('searches glossary tag', function () {
         });
     }); });
 });
-// deleteFile
-function deleteFile(path) {
+// mkdirSync
+function mkdirSync(path) {
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path);
+    }
+}
+// deleteFileSync
+function deleteFileSync(path) {
     if (fs.existsSync(path)) {
         fs.unlinkSync(path);
     }
 }
+// deleteFolderSync
+function deleteFolderSync(path) {
+    if (fs.existsSync(path)) {
+        fs.rmdirSync(path);
+    }
+}
 // getFullPath
 function getFullPath(relativePath, basePath) {
-    var fullPath = '';
-    if (relativePath.substr(0, 1) === '/') {
+    var fullPath = "";
+    if (relativePath.substr(0, 1) === "/") {
         fullPath = relativePath;
     }
     else {
