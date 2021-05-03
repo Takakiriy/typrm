@@ -5,8 +5,6 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 
-const  typrmVersion = "0.0.1";
-
 // main
 export async function  main() {
 	locale = Intl.NumberFormat().resolvedOptions().locale;
@@ -21,11 +19,17 @@ export async function  main() {
 			await new Promise(resolve => setTimeout(resolve, 500));
 		}
 	} else if (programArguments.length >= 1 ) {
+
 		if (programArguments[0] === 's'  ||  programArguments[0] === 'search') {
 			await search();
 		}
 		else if (programArguments[0] === 'c'  ||  programArguments[0] === 'check') {
-			await check();
+			var  checkingFilePath: string | undefined;
+			if (programArguments.length >= 2) {
+				checkingFilePath = programArguments[1];
+			}
+
+			await check(checkingFilePath);
 		}
 		else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
 			varidateUpdateCommandArguments();
@@ -299,10 +303,10 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 
 // updateParameters
 async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValues: string) {
-
 	var    errorCount = 0;
 	const  changingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, changingLineNum);
 	for (const keyValue of keyValues.split('\n')) {
+
 		errorCount += await changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue);
 	}
 	println('');
@@ -338,8 +342,9 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 	const  oldFilePath = inputFilePath;
 	const  newFilePath = inputFilePath +".new";
 	const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
+	const  readStream = fs.createReadStream(oldFilePath);
 	const  reader = readline.createInterface({
-		input: fs.createReadStream(oldFilePath),
+		input: readStream,
 		crlfDelay: Infinity
 	});
 	const  lines = [];
@@ -442,7 +447,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 	return new Promise( (resolve) => {
 		writer.on('finish', () => {
 			fs.copyFileSync(newFilePath, inputFilePath);
-			deleteFile(newFilePath);
+			deleteFileSync(newFilePath);
 			resolve(errorCount);
 		});
 	});
@@ -568,16 +573,30 @@ class  TemplateTag {
 }
 
 // check
-async function  check() {
+async function  check(checkingFilePath?: string) {
 	const  targetFolder = programOptions.folder;
 	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
-	const  oldCurrentFoldderPath = process.cwd();
-	process.chdir(targetFolder);
-	const  filePaths: string[] = await globby(['**/*']);
-	process.chdir(oldCurrentFoldderPath);
+	if (checkingFilePath) {
+		const  inputFileFullPath = targetFolderFullPath + path.sep + checkingFilePath;
+		if (!fs.existsSync(inputFileFullPath)) {
+			throw new Error(`Not found specified target file at "${inputFileFullPath}".`);
+		}
+
+		var  filePaths = [checkingFilePath];
+	} else {
+		const  oldCurrentFoldderPath = process.cwd();
+		if (!fs.existsSync(targetFolderFullPath)) {
+			throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
+		}
+		process.chdir(targetFolder);
+
+		var  filePaths: string[] = await globby(['**/*']);
+		process.chdir(oldCurrentFoldderPath);
+	}
 
 	for (const inputFilePath of filePaths) {
 		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+
 		await oldMain(false, inputFileFullPath);
 	}
 }
@@ -663,20 +682,31 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
 	});
 	let  settingCount = 0;
 	let  lineNum = 0;
+	let  loop = true;
+	let  exception: any;
 
 	for await (const line1 of reader) {
-		const  line: string = line1;
-		lineNum += 1;
+		if (!loop) {continue;}  // "reader" requests read all lines
+		try {
+			const  line: string = line1;
+			lineNum += 1;
 
-		if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-			settingCount += 1;
-		}
+			if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+				settingCount += 1;
+			}
 
-		if (lineNum === targetLineNum) {
-			return  settingCount;
+			if (lineNum === targetLineNum) {
+				loop = false;
+			}
+		} catch (e) {
+			exception = e;
+			loop = false;
 		}
 	}
-	return  0;
+	if (exception) {
+		throw exception;
+	}
+	return  settingCount;
 }
 
 // isEndOfSetting
@@ -741,7 +771,7 @@ function  getTestablePath(path_: string) {
 }
 
 // deleteFile
-function  deleteFile(path: string) {
+function  deleteFileSync(path: string) {
     if (fs.existsSync(path)) {
         fs.unlinkSync(path);
     }
@@ -936,6 +966,23 @@ class  WriteBuffer {
 	replaceAboveLine(relativeLineNum: number, line: string) {
 		this.lineBuffer[this.lineBuffer.length + relativeLineNum] = line;
 	}
+}
+
+// dd
+// debugOut の内容が見えないときは、 const debugOut_ = debugOut; を書いて debugOut_ の内容を見ます。
+function  dd(message: any) {
+	if (typeof message === 'object') {
+		message = JSON.stringify(message);
+	}
+	debugOut.push(message.toString());
+}
+export const  debugOut: string[] = [];
+
+// watchPrint
+function  watchPrint() {
+	const  s = stdout;
+	const  debugOut_ = stdout.split('\n');
+	return;  // Set break point here
 }
 
 // println

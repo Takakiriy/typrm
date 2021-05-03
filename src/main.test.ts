@@ -31,6 +31,13 @@ describe("checks template value", () => {
         deleteFileSync(`test_data/_checking/${fileNameHead}_1.yaml`);
         deleteFolderSync('test_data/_checking');
     });
+
+    test("check one file only", async () => {
+        await callMain(["check", "1_template_1_ok_1.yaml"], {
+            folder: 'test_data', test: "", locale: "en-US",
+        });
+        expect(main.stdout).toMatchSnapshot();
+    });
 });
 
 describe("checks file contents", () => {
@@ -86,11 +93,11 @@ Key3: value3changed  #コメント`,
             `Key3: value3changed`,
             false,
         ],[
-            '2_replace_3_English', 30, 1, 'en-US',
-            `key1: value11changed`,
+            '2_replace_3_English', 10, 1, 'en-US',
+            `Key3: value3changed`,
             true,
         ],[
-            '2_replace_4_Japanese', 30, 1, 'ja-JP',
+            '2_replace_4_Japanese', 10, 1, 'ja-JP',
             `Key3: value3changed`,
             false,
         ],
@@ -119,7 +126,7 @@ describe("searches keyword tag", () => {
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],[
         "not found",
         ["search", "notFound"],
@@ -129,22 +136,22 @@ describe("searches keyword tag", () => {
             "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],[
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],[
             "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],[
             "double quotation",
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4:#keyword: "double quotation is ""."\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
         ],[
             "word(1)",
             ["search", "AB"],
@@ -168,7 +175,7 @@ describe("searches glossary tag", () => {
       "1st",
       ["search", "ABC"],
       { folder: "test_data/search/glossary/1", test: "" },
-      "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:    ABC: abc\n",
+      "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
     ],
     [
       "word",
@@ -184,9 +191,9 @@ describe("searches glossary tag", () => {
 
 describe("test of test", () => {
     test("checks snapshots files are confirmed", () => {
-        const  activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
-        const  backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.confirmed.snap_').toString();
-        const  confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.new_back_up.snap_').toString();
+        const  activeSnapshots    = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
+        const  backUpSnapshots    = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();
+        const  confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.2.new_back_up.snap_').toString();
             // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
 
         expect(activeSnapshots).toBe(backUpSnapshots);

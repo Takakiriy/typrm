@@ -114,6 +114,13 @@ template count = 12
 "
 `;
 
+exports[`checks template value check one file only 1`] = `
+"
+Warning: 0, Error: 0
+template count = 8
+"
+`;
+
 exports[`checks template value refer_1_ok 1`] = `
 "
 Warning: 0, Error: 0
@@ -328,13 +335,21 @@ exports[`replaces settings in 2_replace_2_error(4) setting 1: updatedFileContent
 "
 `;
 
-exports[`replaces settings in 2_replace_3_English(30) setting 1: stdout 1`] = `
+exports[`replaces settings in 2_replace_3_English(10) setting 1: stdout 1`] = `
 "
-Warning: 0, Error: 0
+ErrorLine: 21
+  Error: Not found any replacing target
+  Solution: Set old value at settings in the replacing file
+  Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
+  Expected: - \\"value3\\"
+  Template: - \\"Key3\\"
+  SettingIndex: 1
+
+Warning: 0, Error: 1
 "
 `;
 
-exports[`replaces settings in 2_replace_3_English(30) setting 1: updatedFileContents 1`] = `
+exports[`replaces settings in 2_replace_3_English(10) setting 1: updatedFileContents 1`] = `
 "# Case of that setting tag is English
 
 Process A:
@@ -342,7 +357,7 @@ Process A:
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3  #コメント
+        Key3: value3changed  #コメント
 
     steps:
         - cd \\"..\\"
@@ -350,21 +365,21 @@ Process A:
             #template: - echo  \\"__Key2__\\"
         - value1
             #template: - key1
-        - \\"value3\\"
+        - \\"value3changed\\"
             #template: - \\"Key3\\"
         - \\"value3changed\\"
             #template: - \\"Key3\\"
-        - \\"value3\\"  #template: - \\"Key3\\"
         - \\"value3changed\\"  #template: - \\"Key3\\"
-        - １行に２つのケース： value3, value3
+        - \\"value3_bad\\"  #template: - \\"Key3\\"
+        - １行に２つのケース： value3changed, value3changed
             #template: Key3, Key3
 
 Process B:
     settings:
-        key1: value11changed
+        key1: value11
 
     steps:
-        - value11changed
+        - value11
             #template: - key1
         - \\"value3\\"
             #template: - \\"Key3\\"
@@ -373,17 +388,17 @@ Process B:
             #template: - key3
         - １行に２つのケース： value3, value3
             #template: Key3, Key3
-        - ２行上のケース： \\"value11changed\\"
+        - ２行上のケース： \\"value11\\"
             #// comment
             #template-at(-2): \\"key1\\"
-        - ３行上のケース： \\"value11changed\\"
+        - ３行上のケース： \\"value11\\"
             #// comment
             #// comment
             #template-at(-3): \\"key1\\"
 "
 `;
 
-exports[`replaces settings in 2_replace_4_Japanese(30) setting 1: stdout 1`] = `
+exports[`replaces settings in 2_replace_4_Japanese(10) setting 1: stdout 1`] = `
 "
 エラー行: 19
   エラー: 置き換える対象が見つかりません
@@ -397,7 +412,7 @@ exports[`replaces settings in 2_replace_4_Japanese(30) setting 1: stdout 1`] = `
 "
 `;
 
-exports[`replaces settings in 2_replace_4_Japanese(30) setting 1: updatedFileContents 1`] = `
+exports[`replaces settings in 2_replace_4_Japanese(10) setting 1: updatedFileContents 1`] = `
 "# 設定タグが日本語のケース
 
 手順A:
