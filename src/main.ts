@@ -696,7 +696,8 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
 			}
 
 			if (lineNum === targetLineNum) {
-				loop = false;
+				loop = false;  // return or break must not be written.
+				// https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
 			}
 		} catch (e) {
 			exception = e;
