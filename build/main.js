@@ -47,18 +47,17 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 exports.__esModule = true;
-exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.InputObject = exports.main = void 0;
+exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.InputObject = exports.debugOut = exports.main = void 0;
 var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
 var globby = require("globby");
 var readline = require("readline");
 var stream = require("stream");
 var csvParse = require("csv-parse");
-var typrmVersion = "0.0.1";
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var inputFilePath, changingLineNum, keyValues;
+        var checkingFilePath, inputFilePath, changingLineNum, keyValues;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -85,7 +84,10 @@ function main() {
                     return [3 /*break*/, 11];
                 case 6:
                     if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 8];
-                    return [4 /*yield*/, check()];
+                    if (exports.programArguments.length >= 2) {
+                        checkingFilePath = exports.programArguments[1];
+                    }
+                    return [4 /*yield*/, check(checkingFilePath)];
                 case 7:
                     _a.sent();
                     return [3 /*break*/, 11];
@@ -484,7 +486,7 @@ function changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValu
 function changeSetting(inputFilePath, changingSettingIndex, changingKey, changedValueAndComment) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var backUpFilePath, oldFilePath, newFilePath, writer, reader, lines, isReadingSetting, setting, settingCount, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, commentIndex, comment, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
+        var backUpFilePath, oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, commentIndex, comment, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -497,8 +499,9 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
                     writer = new WriteBuffer(fs.createWriteStream(newFilePath));
+                    readStream = fs.createReadStream(oldFilePath);
                     reader = readline.createInterface({
-                        input: fs.createReadStream(oldFilePath),
+                        input: readStream,
                         crlfDelay: Infinity
                     });
                     lines = [];
@@ -625,7 +628,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     return [2 /*return*/, new Promise(function (resolve) {
                             writer.on('finish', function () {
                                 fs.copyFileSync(newFilePath, inputFilePath);
-                                deleteFile(newFilePath);
+                                deleteFileSync(newFilePath);
                                 resolve(errorCount);
                             });
                         })];
@@ -785,34 +788,47 @@ var TemplateTag = /** @class */ (function () {
     return TemplateTag;
 }());
 // check
-function check() {
+function check(checkingFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, _i, filePaths_1, inputFilePath, inputFileFullPath;
+        var targetFolder, targetFolderFullPath, inputFileFullPath, filePaths, oldCurrentFoldderPath, filePaths, _i, filePaths_1, inputFilePath, inputFileFullPath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     targetFolder = exports.programOptions.folder;
                     targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+                    if (!checkingFilePath) return [3 /*break*/, 1];
+                    inputFileFullPath = targetFolderFullPath + path.sep + checkingFilePath;
+                    if (!fs.existsSync(inputFileFullPath)) {
+                        throw new Error("Not found specified target file at \"" + inputFileFullPath + "\".");
+                    }
+                    filePaths = [checkingFilePath];
+                    return [3 /*break*/, 3];
+                case 1:
                     oldCurrentFoldderPath = process.cwd();
+                    if (!fs.existsSync(targetFolderFullPath)) {
+                        throw new Error("Not found target folder at \"" + targetFolderFullPath + "\".");
+                    }
                     process.chdir(targetFolder);
                     return [4 /*yield*/, globby(['**/*'])];
-                case 1:
+                case 2:
                     filePaths = _a.sent();
                     process.chdir(oldCurrentFoldderPath);
+                    _a.label = 3;
+                case 3:
                     _i = 0, filePaths_1 = filePaths;
-                    _a.label = 2;
-                case 2:
-                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 5];
+                    _a.label = 4;
+                case 4:
+                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 7];
                     inputFilePath = filePaths_1[_i];
                     inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
                     return [4 /*yield*/, oldMain(false, inputFileFullPath)];
-                case 3:
+                case 5:
                     _a.sent();
-                    _a.label = 4;
-                case 4:
+                    _a.label = 6;
+                case 6:
                     _i++;
-                    return [3 /*break*/, 2];
-                case 5: return [2 /*return*/];
+                    return [3 /*break*/, 4];
+                case 7: return [2 /*return*/];
             }
         });
     });
@@ -931,7 +947,7 @@ function onEndOfSetting(setting) {
 function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var reader, settingCount, lineNum, reader_5, reader_5_1, line1, line, e_6_1;
+        var reader, settingCount, lineNum, loop, exception, reader_5, reader_5_1, line1, line, e_6_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -941,6 +957,7 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                     });
                     settingCount = 0;
                     lineNum = 0;
+                    loop = true;
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 6, 7, 12]);
@@ -950,13 +967,23 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                 case 3:
                     if (!(reader_5_1 = _b.sent(), !reader_5_1.done)) return [3 /*break*/, 5];
                     line1 = reader_5_1.value;
-                    line = line1;
-                    lineNum += 1;
-                    if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                        settingCount += 1;
+                    if (!loop) {
+                        return [3 /*break*/, 4];
+                    } // "reader" requests read all lines
+                    try {
+                        line = line1;
+                        lineNum += 1;
+                        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+                            settingCount += 1;
+                        }
+                        if (lineNum === targetLineNum) {
+                            loop = false; // return or break must not be written.
+                            // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                        }
                     }
-                    if (lineNum === targetLineNum) {
-                        return [2 /*return*/, settingCount];
+                    catch (e) {
+                        exception = e;
+                        loop = false;
                     }
                     _b.label = 4;
                 case 4: return [3 /*break*/, 2];
@@ -977,7 +1004,11 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                     if (e_6) throw e_6.error;
                     return [7 /*endfinally*/];
                 case 11: return [7 /*endfinally*/];
-                case 12: return [2 /*return*/, 0];
+                case 12:
+                    if (exception) {
+                        throw exception;
+                    }
+                    return [2 /*return*/, settingCount];
             }
         });
     });
@@ -1006,11 +1037,18 @@ function isEndOfSetting(line, isReadingSetting) {
 // getFullPath
 function getFullPath(relativePath, basePath) {
     var fullPath = '';
+    var slashRelativePath = relativePath.replace('\\', '/');
+    var colonSlashIndex = slashRelativePath.indexOf(':/');
+    var slashFirstIndex = slashRelativePath.indexOf('/');
+    var withProtocol = (colonSlashIndex + 1 === slashFirstIndex); // e.g.) C:/, http://
     if (relativePath.substr(0, 1) === '/') {
         fullPath = relativePath;
     }
     else if (relativePath.substr(0, 1) === '~') {
         fullPath = relativePath.replace('~', getHomePath());
+    }
+    else if (withProtocol) {
+        fullPath = relativePath;
     }
     else {
         fullPath = path.join(basePath, relativePath);
@@ -1045,7 +1083,7 @@ function getTestablePath(path_) {
     }
 }
 // deleteFile
-function deleteFile(path) {
+function deleteFileSync(path) {
     if (fs.existsSync(path)) {
         fs.unlinkSync(path);
     }
@@ -1219,6 +1257,21 @@ var WriteBuffer = /** @class */ (function () {
     };
     return WriteBuffer;
 }());
+// dd
+// debugOut の内容が見えないときは、 const debugOut_ = debugOut; を書いて debugOut_ の内容を見ます。
+function dd(message) {
+    if (typeof message === 'object') {
+        message = JSON.stringify(message);
+    }
+    exports.debugOut.push(message.toString());
+}
+exports.debugOut = [];
+// watchPrint
+function watchPrint() {
+    var s = exports.stdout;
+    var debugOut_ = exports.stdout.split('\n');
+    return; // Set break point here
+}
 // println
 function println(message) {
     if (typeof message === 'object') {

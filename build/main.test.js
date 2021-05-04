@@ -72,6 +72,19 @@ describe("checks template value", function () {
             }
         });
     }); });
+    test("check one file only", function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, callMain(["check", "1_template_1_ok_1.yaml"], {
+                        folder: 'test_data', test: "", locale: "en-US"
+                    })];
+                case 1:
+                    _a.sent();
+                    expect(main.stdout).toMatchSnapshot();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
 describe("checks file contents", function () {
     test.skip('file_2_tab', function () { });
@@ -133,11 +146,11 @@ describe("replaces settings", function () {
             "Key3: value3changed",
             false,
         ], [
-            '2_replace_3_English', 30, 1, 'en-US',
-            "key1: value11changed",
+            '2_replace_3_English', 10, 1, 'en-US',
+            "Key3: value3changed",
             true,
         ], [
-            '2_replace_4_Japanese', 30, 1, 'ja-JP',
+            '2_replace_4_Japanese', 10, 1, 'ja-JP',
             "Key3: value3changed",
             false,
         ],
@@ -173,7 +186,7 @@ describe("searches keyword tag", function () {
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "not found",
             ["search", "notFound"],
@@ -183,22 +196,22 @@ describe("searches keyword tag", function () {
             "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3:#keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "double quotation",
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4:#keyword: "double quotation is ""."\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
         ], [
             "word(1)",
             ["search", "AB"],
@@ -209,6 +222,12 @@ describe("searches keyword tag", function () {
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
             "",
+        ],
+        [
+            "Windows typrm folder path",
+            ["search", "ABC"],
+            { folder: process.cwd() + "\\test_data\\search\\1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -228,7 +247,7 @@ describe("searches glossary tag", function () {
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/glossary/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:    ABC: abc\n",
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
         ],
         [
             "word",
@@ -251,8 +270,8 @@ describe("searches glossary tag", function () {
 describe("test of test", function () {
     test("checks snapshots files are confirmed", function () {
         var activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
-        var backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.confirmed.snap_').toString();
-        var confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.new_back_up.snap_').toString();
+        var backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();
+        var confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.2.new_back_up.snap_').toString();
         // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
         expect(activeSnapshots).toBe(backUpSnapshots);
         expect(backUpSnapshots).toBe(confirmedSnapshots);

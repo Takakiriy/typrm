@@ -99,24 +99,60 @@ typrm を使うには Node.js のインストールが必要です。
 
 ### Windows の場合
 
-    typrm をダウンロードして展開します:
-        - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
-
     Node.js をインストールします:
         - https://nodejs.org/ja/download/ >> Windows Installer (.msi) >> 64-bit
         - ダウンロードしたファイル（例：node-v14.16.0-x64.exe）を開きます
         - インストール オプションはデフォルトを使用
 
     社内など、プロキシがある LAN に Windows がある場合:
-        - Windows スタート >> PowerShell
-        - npm config -g set proxy "http://___.___.___.___:____"
-        - npm config -g set https-proxy "http://___.___.___.___:____"
+        Windows スタート >> PowerShell（と入力）:
+            npm config -g set proxy "http://___.___.___.___:____"
+            npm config -g set https-proxy "http://___.___.___.___:____"
 
-    typrm が使う commander パッケージをインストールします:
-        - Windows スタート >> PowerShell
-        - npm install -g  commander
+    typrm が使う Node.js パッケージをインストールします:
+        Windows スタート >> PowerShell（と入力）:
+            cd  ${env:USERPROFILE}\Downloads
+            Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
+            Expand-Archive -Path typrm.zip -DestinationPath "."
+            cd  "typrm-master"
 
-    bin フォルダーの中の typrm.bat ファイルをダブルクリックすると typrm が起動します:
+            npm install --only=production
+
+    PowerShell の PATH が通ったフォルダーに typrm を起動する PS1 スクリプト ファイル を作ります:
+        Windows スタート >> PowerShell（と入力） :
+            cd  ${env:USERPROFILE}\Downloads\typrm-master
+            ${current_folder} = Convert-Path "."
+            ${typrm_folder} = "${env:USERPROFILE}\steps"
+            ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
+
+            echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
+            echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
+            echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+
+            Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// スクリプトを実行できるようにします
+
+    Git bash を使う場合:
+        Git for Windows をインストールします:
+            - https://git-scm.com/ >> Downloads >> Windows
+            - ダウンロードしたファイル（例：Git-2.31.1-64-bit.exe）を開く
+            - Next を8回押す
+            - Configuring the line ending conversions: Checkout as-is, commit as-is
+            - 他のインストール オプションはデフォルトを使用
+        PATH が通ったフォルダーに typrm を起動する bash スクリプト ファイル を作ります:
+            フォルダーを右クリック >> Git bash :
+                cd  ${HOME}/Downloads/typrm-master
+                current_folder="$(pwd)"
+                typrm_folder="${HOME}\steps"
+                script="${HOME}\bin\typrm"
+                mkdir -p "${HOME}\bin"
+
+                echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+                echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+                echo  "node  ${current_folder}/build/typrm.js \$*" >> ${script}
+
+    typrm が使えることを確認します:
+        PowerShell または Git bash を新しく開いて:
+            typrm --version
 
 ### mac の場合
 

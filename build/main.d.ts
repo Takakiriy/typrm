@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import * as readline from 'readline';
 export declare function main(): Promise<void>;
+export declare const debugOut: string[];
 declare class StandardInputBuffer {
     readlines: readline.Interface;
     inputBuffer: string[];

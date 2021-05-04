@@ -95,24 +95,60 @@ To use typrm, you must install Node.js.
 
 ### For Windows
 
-    Download and expand typrm:
-        - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
-
     Install Node.js:
         - https://nodejs.org/ja/download/ >> Windows Installer (.msi) >> 64-bit
         - Open the downloaded file (e.g. node-v14.16.0-x64.exe)
         - Installation options are defaults
 
     If there is your Windows in the LAN with the proxy in the company and so on:
-        - Windows Start >> PowerShell
-        - npm config -g set proxy "http://___.___.___.___:____"
-        - npm config -g set https-proxy "http://___.___.___.___:____"
+        Windows Start >> (Input) PowerShell :
+            - npm config -g set proxy "http://___.___.___.___:____"
+            - npm config -g set https-proxy "http://___.___.___.___:____"
 
-    Install the commander package used by typrm:
-        - Windows Start >> PowerShell
-        - npm install -g  commander
+    Install Node.js packages used by typrm:
+        Windows Start >> (Input) PowerShell :
+            cd  ${env:USERPROFILE}\Downloads
+            Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
+            Expand-Archive -Path typrm.zip -DestinationPath "."
+            cd  "typrm-master"
 
-    To start typrm, double click typrm.bat file in bin folder:
+            npm install --only=production
+
+    Create a PS1 script file that launches typrm into the folder where PATH of PowerShell:
+        Windows Start >> (Input) PowerShell :
+            cd  ${env:USERPROFILE}\Downloads\typrm-master
+            ${current_folder} = Convert-Path "."
+            ${typrm_folder} = "${env:USERPROFILE}\steps"
+            ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
+
+            echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
+            echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
+            echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+
+            Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// Make the script run
+
+    If you use Git bash:
+        Install Git for Windows:
+            - https://git-scm.com/ >> Downloads >> Windows
+            - Open the downloaded file (e.g. Git-2.31.1-64-bit.exe)
+            - Press Next button 8 times
+            - Configuring the line ending conversions: Checkout as-is, commit as-is
+            - Other installation options are defaults
+        Create a bash script file that launches typrm into the folder where PATH passed:
+            Right click at any folder >> Git bash :
+                cd  ${HOME}/Downloads/typrm-master
+                current_folder="$(pwd)"
+                typrm_folder="${HOME}\steps"
+                script="${HOME}\bin\typrm"
+                mkdir -p "${HOME}\bin"
+
+                echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+                echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+                echo  "node  ${current_folder}/build/typrm.js \$*" >> ${script}
+
+    Check to use typrm command:
+        Open new PowerShell or new Git bash:
+            typrm --version
 
 ### For mac
 

@@ -734,11 +734,18 @@ function  isEndOfSetting(line: string, isReadingSetting: boolean): boolean {
 
 // getFullPath
 function  getFullPath(relativePath: string, basePath: string): string {
-	var  fullPath = '';
+	var    fullPath = '';
+	const  slashRelativePath = relativePath.replace('\\','/');
+	const  colonSlashIndex = slashRelativePath.indexOf(':/');
+	const  slashFirstIndex = slashRelativePath.indexOf('/');
+	const  withProtocol = (colonSlashIndex + 1 === slashFirstIndex);  // e.g.) C:/, http://
+
 	if (relativePath.substr(0,1) === '/') {
 		fullPath = relativePath;
 	} else if (relativePath.substr(0,1) === '~') {
 		fullPath = relativePath.replace('~', getHomePath() );
+	} else if (withProtocol) {
+		fullPath = relativePath;
 	} else {
 		fullPath = path.join(basePath, relativePath);
 	}

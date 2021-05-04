@@ -128,10 +128,10 @@ describe("searches keyword tag", () => {
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],[
-        "not found",
-        ["search", "notFound"],
-        { folder: "test_data/search/1", test: "" },
-        "",
+            "not found",
+            ["search", "notFound"],
+            { folder: "test_data/search/1", test: "" },
+            "",
         ],[
             "acronym",
             ["s", "ABC"],
@@ -162,6 +162,11 @@ describe("searches keyword tag", () => {
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
             "",
+        ],[
+            "Windows typrm folder path",
+            ["search", "ABC"],
+            { folder: `${process.cwd()}\\test_data\\search\\1`, test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
         await callMain(arguments_, options);
