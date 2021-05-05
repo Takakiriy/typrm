@@ -303,11 +303,14 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 
 // updateParameters
 async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValues: string) {
+	const  targetFolder = programOptions.folder;
+	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+	const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
 	var    errorCount = 0;
-	const  changingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, changingLineNum);
+	const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
 	for (const keyValue of keyValues.split('\n')) {
 
-		errorCount += await changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue);
+		errorCount += await changeSettingByKeyValueOld(inputFileFullPath, changingSettingIndex, keyValue);
 	}
 	println('');
 	println(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);

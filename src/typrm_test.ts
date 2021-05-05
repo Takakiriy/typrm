@@ -8,8 +8,18 @@ const  testFolderPath = `test_data` + path.sep;
 const  debug = true;
 
 async function  main() {
+	if (false) {
+		await DoCustomDebug();
+	}
 	await TestOfCommandLine();
 	console.log('Pass');
+}
+
+// DoCustomDebug
+async function  DoCustomDebug() {
+	const  returns = await callChildProccess(`node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+	console.log(returns.stdout);
+	console.log('Done');
 }
 
 // TestOfFileCheck
@@ -42,6 +52,7 @@ async function  TestOfCommandLine() {
 		// Check
 		if (case_.expected !== '(not check)') {
 			const  answer = fs.readFileSync(`test_data/command_line/${case_.name}.txt`).toString(); //.substr(cutBOM);
+
 			if (returns.stdout !== answer) {
 				printDifferentPaths('_output.txt', '_expected.txt');
 				fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);

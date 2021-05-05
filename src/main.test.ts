@@ -20,6 +20,7 @@ describe("checks template value", () => {
         ["var_not_ref_1_error"],
 
     ])("%s", async (fileNameHead) => {
+        fs.rmdirSync('test_data/_checking', {recursive: true});
         copyFileSync(`test_data/${fileNameHead}_1.yaml`, `test_data/_checking/${fileNameHead}_1.yaml`);
 
         await callMain(["check"], {
@@ -48,13 +49,14 @@ describe("checks file contents", () => {
 			"file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
         ]
     ])("in %s, %s %s", async (fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
-        const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
-        const  changingFilePath = testFolderPath + '_checking/document/' + fileNameHead + "_1_changing.yaml";
+        const  sourceFilePath   = 'test_data/' + fileNameHead + "_1.yaml";
+        const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
+        const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
         fs.rmdirSync('test_data/_checking', {recursive: true});
         copyFileSync(sourceFilePath, changingFilePath);
 
         if (optionOperation === 'replace') {
-            await callMain(["replace", changingFilePath, String(lineNum), keyValues], {
+            await callMain(["replace", changingFileRelativePath, String(lineNum), keyValues], {
                 folder: 'test_data', test: "", locale: "en-US",
             });
         }
@@ -98,19 +100,21 @@ Key3: value3changed  #コメント`,
 
     ])("in %s(%i) setting %i", async (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) => {
         const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
-        const  changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-        deleteFileSync(changingFilePath);
-        fs.copyFileSync(sourceFilePath, changingFilePath);
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFileName = fileNameHead + "_1_changing.yaml";
+        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+        fs.rmdirSync('_changing', {recursive: true});
+        copyFileSync(sourceFilePath, changingFilePath);
 
         // Test Main
-        await callMain(["replace", changingFilePath, String(lineNum), keyValues], {
-            folder: 'test_data', test: "", locale,
+        await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+            folder: changingFolderPath, test: "", locale,
         });
         const  updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
 
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-        deleteFileSync(changingFilePath);
+        fs.rmdirSync('_changing', {recursive: true});
     });
 });
 

@@ -46,10 +46,32 @@ function main() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, TestOfCommandLine()];
+                case 0:
+                    if (!false) return [3 /*break*/, 2];
+                    return [4 /*yield*/, DoCustomDebug()];
                 case 1:
                     _a.sent();
+                    _a.label = 2;
+                case 2: return [4 /*yield*/, TestOfCommandLine()];
+                case 3:
+                    _a.sent();
                     console.log('Pass');
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+// DoCustomDebug
+function DoCustomDebug() {
+    return __awaiter(this, void 0, void 0, function () {
+        var returns;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, callChildProccess("node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
+                case 1:
+                    returns = _a.sent();
+                    console.log(returns.stdout);
+                    console.log('Done');
                     return [2 /*return*/];
             }
         });

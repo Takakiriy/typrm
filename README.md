@@ -109,6 +109,7 @@ To use typrm, you must install Node.js.
         Windows Start >> (Input) PowerShell :
             cd  ${env:USERPROFILE}\Downloads
             Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
+            rm -r -fo  "typrm-master"
             Expand-Archive -Path typrm.zip -DestinationPath "."
             cd  "typrm-master"
 
@@ -118,7 +119,7 @@ To use typrm, you must install Node.js.
         Windows Start >> (Input) PowerShell :
             cd  ${env:USERPROFILE}\Downloads\typrm-master
             ${current_folder} = Convert-Path "."
-            ${typrm_folder} = "${env:USERPROFILE}\steps"
+            ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
             ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
             echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
@@ -138,13 +139,13 @@ To use typrm, you must install Node.js.
             Right click at any folder >> Git bash :
                 cd  ${HOME}/Downloads/typrm-master
                 current_folder="$(pwd)"
-                typrm_folder="${HOME}\steps"
-                script="${HOME}\bin\typrm"
-                mkdir -p "${HOME}\bin"
+                typrm_folder="${HOME}/Documents/typrm"
+                script="${HOME}/bin/typrm"
+                mkdir -p "${HOME}/bin"
 
                 echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
                 echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-                echo  "node  ${current_folder}/build/typrm.js \$*" >> ${script}
+                echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
 
     Check to use typrm command:
         Open new PowerShell or new Git bash:

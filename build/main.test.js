@@ -58,6 +58,7 @@ describe("checks template value", function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
                     copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/_checking/" + fileNameHead + "_1.yaml");
                     return [4 /*yield*/, callMain(["check"], {
                             folder: 'test_data/_checking', test: "", locale: "en-US"
@@ -94,16 +95,17 @@ describe("checks file contents", function () {
             "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
         ]
     ])("in %s, %s %s", function (fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFilePath, changingFilePath;
+        var sourceFilePath, changingFilePath, changingFileRelativePath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    changingFilePath = testFolderPath + '_checking/document/' + fileNameHead + "_1_changing.yaml";
+                    sourceFilePath = 'test_data/' + fileNameHead + "_1.yaml";
+                    changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
+                    changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     copyFileSync(sourceFilePath, changingFilePath);
                     if (!(optionOperation === 'replace')) return [3 /*break*/, 2];
-                    return [4 /*yield*/, callMain(["replace", changingFilePath, String(lineNum), keyValues], {
+                    return [4 /*yield*/, callMain(["replace", changingFileRelativePath, String(lineNum), keyValues], {
                             folder: 'test_data', test: "", locale: "en-US"
                         })];
                 case 1:
@@ -149,17 +151,19 @@ describe("replaces settings", function () {
             false,
         ],
     ])("in %s(%i) setting %i", function (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFilePath, changingFilePath, updatedFileContents;
+        var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, updatedFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    changingFilePath = testFolderPath + fileNameHead + "_1_changing.yaml";
-                    deleteFileSync(changingFilePath);
-                    fs.copyFileSync(sourceFilePath, changingFilePath);
+                    changingFolderPath = testFolderPath + '_changing';
+                    changingFileName = fileNameHead + "_1_changing.yaml";
+                    changingFilePath = changingFolderPath + '/' + changingFileName;
+                    fs.rmdirSync('_changing', { recursive: true });
+                    copyFileSync(sourceFilePath, changingFilePath);
                     // Test Main
-                    return [4 /*yield*/, callMain(["replace", changingFilePath, String(lineNum), keyValues], {
-                            folder: 'test_data', test: "",
+                    return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                            folder: changingFolderPath, test: "",
                             locale: locale
                         })];
                 case 1:
@@ -168,7 +172,7 @@ describe("replaces settings", function () {
                     updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
                     expect(main.stdout).toMatchSnapshot('stdout');
                     expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-                    deleteFileSync(changingFilePath);
+                    fs.rmdirSync('_changing', { recursive: true });
                     return [2 /*return*/];
             }
         });

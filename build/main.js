@@ -435,12 +435,15 @@ function oldMain(isModal, inputFilePath) {
 // updateParameters
 function replaceSettings(inputFilePath, changingLineNum, keyValues) {
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, changingSettingIndex, _i, _a, keyValue, _b;
+        var targetFolder, targetFolderFullPath, inputFileFullPath, errorCount, changingSettingIndex, _i, _a, keyValue, _b;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
+                    targetFolder = exports.programOptions.folder;
+                    targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+                    inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
                     errorCount = 0;
-                    return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, changingLineNum)];
+                    return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, changingLineNum)];
                 case 1:
                     changingSettingIndex = _c.sent();
                     _i = 0, _a = keyValues.split('\n');
@@ -449,7 +452,7 @@ function replaceSettings(inputFilePath, changingLineNum, keyValues) {
                     if (!(_i < _a.length)) return [3 /*break*/, 5];
                     keyValue = _a[_i];
                     _b = errorCount;
-                    return [4 /*yield*/, changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue)];
+                    return [4 /*yield*/, changeSettingByKeyValueOld(inputFileFullPath, changingSettingIndex, keyValue)];
                 case 3:
                     errorCount = _b + _c.sent();
                     _c.label = 4;
