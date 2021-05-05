@@ -166,7 +166,13 @@ describe("searches keyword tag", () => {
             { folder: `${process.cwd()}\\test_data\\search\\1`, test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],
-    ])("%s", async (_caseName, arguments_, options, answer) => {
+    ])("%s", async (caseName, arguments_, options, answer) => {
+        const  isWindowsEnvironment = (path.sep === '\\');
+        const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
+        if (!isWindowsEnvironment && isWindowsCase) {
+            return;
+        }
+
         await callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
     });
@@ -266,3 +272,4 @@ expect.extend({
 });
 
 const cutBOM = 1;
+const notFound = -1;
