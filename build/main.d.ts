@@ -3,10 +3,10 @@ import * as readline from 'readline';
 export declare function main(): Promise<void>;
 export declare const debugOut: string[];
 declare class StandardInputBuffer {
-    readlines: readline.Interface;
+    readlines: readline.Interface | undefined;
     inputBuffer: string[];
     inputResolver?: (answer: string) => void;
-    constructor();
+    delayedConstructor(): void;
     input(guide: string): Promise<string>;
     close(): void;
 }

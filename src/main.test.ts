@@ -20,16 +20,14 @@ describe("checks template value", () => {
         ["var_not_ref_1_error"],
 
     ])("%s", async (fileNameHead) => {
-        mkdirSync('test_data/_checking');
-        fs.copyFileSync(`test_data/${fileNameHead}_1.yaml`, `test_data/_checking/${fileNameHead}_1.yaml`);
+        copyFileSync(`test_data/${fileNameHead}_1.yaml`, `test_data/_checking/${fileNameHead}_1.yaml`);
 
         await callMain(["check"], {
             folder: 'test_data/_checking', test: "", locale: "en-US",
         });
 
         expect(main.stdout).toMatchSnapshot();
-        deleteFileSync(`test_data/_checking/${fileNameHead}_1.yaml`);
-        deleteFolderSync('test_data/_checking');
+        fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
     test("check one file only", async () => {
@@ -52,10 +50,8 @@ describe("checks file contents", () => {
     ])("in %s, %s %s", async (fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
         const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFilePath = testFolderPath + '_checking/document/' + fileNameHead + "_1_changing.yaml";
-        mkdirSync('test_data/_checking');
-        mkdirSync('test_data/_checking/document');
-        deleteFileSync(changingFilePath);
-        fs.copyFileSync(sourceFilePath, changingFilePath);
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+        copyFileSync(sourceFilePath, changingFilePath);
 
         if (optionOperation === 'replace') {
             await callMain(["replace", changingFilePath, String(lineNum), keyValues], {
@@ -69,9 +65,7 @@ describe("checks file contents", () => {
         });
 
         expect(main.stdout).toMatchSnapshot('stdout');
-        deleteFileSync(changingFilePath);
-        deleteFolderSync('test_data/_checking/document');
-        deleteFolderSync('test_data/_checking');
+        fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 });
 
@@ -210,24 +204,22 @@ afterAll(()=>{
     deleteFileSync('test_data/_output.txt')
 })
 
-// mkdirSync
-function  mkdirSync(path: string) {
-    if (!fs.existsSync(path)) {
-        fs.mkdirSync(path);
-    }
+// copyFileSync
+// #keyword: copyFileSync
+// This also makes the copy target folder.
+function  copyFileSync(sourceFilePath: string, destinationFilePath: string) {
+	const  destinationFolderPath = path.dirname(destinationFilePath);
+	fs.mkdirSync(destinationFolderPath, {recursive: true});
+
+	fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
 
 // deleteFileSync
+// #keyword: deleteFileSync, unlinkSync
+// This does not occurr any errors, even if there is not the file at the specified path.
 function  deleteFileSync(path: string) {
     if (fs.existsSync(path)) {
         fs.unlinkSync(path);
-    }
-}
-
-// deleteFolderSync
-function  deleteFolderSync(path: string) {
-    if (fs.existsSync(path)) {
-        fs.rmdirSync(path);
     }
 }
 

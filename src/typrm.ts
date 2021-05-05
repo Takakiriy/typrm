@@ -2,10 +2,12 @@ import * as commander from 'commander';
 import * as main from './main';
 
 function  exitFromCommander(e: commander.CommanderError) {
-	console.log(e.message);
+	if (e.code !== 'commander.version') {
+		console.log(e.message);
+	}
 }
 async function  callMain() {
-	commander.program.version('0.1.2').exitOverride(exitFromCommander)
+	commander.program.version('0.1.3').exitOverride(exitFromCommander)
 		.option("-l, --locale <s>")
 		.option("-t, --test")
 		.option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)

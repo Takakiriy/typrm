@@ -1007,11 +1007,11 @@ function  println(message: any) {
 
 // StandardInputBuffer
 class  StandardInputBuffer {
-	readlines: readline.Interface;
+	readlines: readline.Interface | undefined;
 	inputBuffer: string[] = [];
 	inputResolver?: (answer:string)=>void = undefined;
 
-	constructor() {
+	delayedConstructor() {  // It is not constructor, because "createInterface" stops the program, if stdin was not used.
 		this.readlines = readline.createInterface({
 			input: process.stdin,
 			output: process.stdout
@@ -1030,6 +1030,10 @@ class  StandardInputBuffer {
 	}
 
 	async  input(guide: string): Promise<string> {
+		if (!this.readlines) {
+			this.delayedConstructor();
+		}
+
 		return  new Promise(
 			(resolve: (answer:string)=>void,  reject: (answer:string)=>void ) =>
 		{
@@ -1045,7 +1049,9 @@ class  StandardInputBuffer {
 	}
 
 	close() {
-		this.readlines.close();
+		if (this.readlines) {
+			this.readlines.close();
+		}
 	}
 }
 

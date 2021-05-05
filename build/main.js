@@ -1287,9 +1287,11 @@ function println(message) {
 // StandardInputBuffer
 var StandardInputBuffer = /** @class */ (function () {
     function StandardInputBuffer() {
-        var _this = this;
         this.inputBuffer = [];
         this.inputResolver = undefined;
+    }
+    StandardInputBuffer.prototype.delayedConstructor = function () {
+        var _this = this;
         this.readlines = readline.createInterface({
             input: process.stdin,
             output: process.stdout
@@ -1308,11 +1310,14 @@ var StandardInputBuffer = /** @class */ (function () {
         }); });
         this.readlines.setPrompt('');
         this.readlines.prompt();
-    }
+    };
     StandardInputBuffer.prototype.input = function (guide) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
+                if (!this.readlines) {
+                    this.delayedConstructor();
+                }
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         var nextLine = _this.inputBuffer.shift();
                         if (nextLine) {
@@ -1328,7 +1333,9 @@ var StandardInputBuffer = /** @class */ (function () {
         });
     };
     StandardInputBuffer.prototype.close = function () {
-        this.readlines.close();
+        if (this.readlines) {
+            this.readlines.close();
+        }
     };
     return StandardInputBuffer;
 }());
