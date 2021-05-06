@@ -591,7 +591,7 @@ async function  check(checkingFilePath?: string) {
 		if (!fs.existsSync(targetFolderFullPath)) {
 			throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
 		}
-		process.chdir(targetFolder);
+		process.chdir(targetFolderFullPath);
 
 		var  filePaths: string[] = await globby(['**/*']);
 		process.chdir(oldCurrentFoldderPath);
@@ -610,8 +610,9 @@ async function  search() {
 	const  targetFolder = programOptions.folder;
 	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
 	const  oldCurrentFoldderPath = process.cwd();
-	process.chdir(targetFolder);
-	const  filePaths: string[] = await globby(['**/*']);
+	process.chdir(targetFolderFullPath);
+	const  fileRelativePaths: string[] = await globby(['**/*']);
+	const  filePaths = fileRelativePaths;
 	process.chdir(oldCurrentFoldderPath);
 	var  indentAtStart = '';
 	var  inGlossary = false;

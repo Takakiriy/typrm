@@ -161,6 +161,11 @@ describe("searches keyword tag", () => {
             { folder: "test_data/search/1", test: "" },
             "",
         ],[
+            "Multi folder",
+            ["search", "ABC"],
+            { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+        ],[
             "Windows typrm folder path",
             ["search", "ABC"],
             { folder: `${process.cwd()}\\test_data\\search\\1`, test: "" },
@@ -185,17 +190,21 @@ describe("searches glossary tag", () => {
       ["search", "ABC"],
       { folder: "test_data/search/glossary/1", test: "" },
       "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+    ],[
+        "word",
+        ["search", "AB"],
+        { folder: "test_data/search/glossary/1", test: "" },
+        "",
+    ],[
+        "Multi folder",
+        ["search", "ABC"],
+        { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
+        "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
     ],
-    [
-      "word",
-      ["search", "AB"],
-      { folder: "test_data/search/glossary/1", test: "" },
-      "",
-    ],
-  ])("%s", async (_caseName, arguments_, options, answer) => {
-    await callMain(arguments_, options);
-    expect(main.stdout).toBe(answer);
-  });
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
 });
 
 describe("test of test", () => {
