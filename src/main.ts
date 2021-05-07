@@ -612,13 +612,12 @@ async function  search() {
 	const  oldCurrentFoldderPath = process.cwd();
 	process.chdir(targetFolderFullPath);
 	const  fileRelativePaths: string[] = await globby(['**/*']);
-	const  filePaths = fileRelativePaths;
+	const  fileFullPaths = fileRelativePaths.map((relativePath) => getFullPath(relativePath, targetFolderFullPath));
 	process.chdir(oldCurrentFoldderPath);
 	var  indentAtStart = '';
 	var  inGlossary = false;
 
-	for (const inputFilePath of filePaths) {
-		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+	for (const inputFileFullPath of fileFullPaths) {
 		const  reader = readline.createInterface({
 			input: fs.createReadStream(inputFileFullPath),
 			crlfDelay: Infinity
