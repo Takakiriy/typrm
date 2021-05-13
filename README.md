@@ -205,6 +205,7 @@ To use typrm, you must install Node.js.
     Download and expand typrm, and install the commander package used by typrm:
         cd  ~/Downloads
         wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        (When you updated,) rm -rf  typrm-old  &&  mv  typrm  typrm-old
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// The folder extracted from the Zip file
         cd  typrm
@@ -213,14 +214,15 @@ To use typrm, you must install Node.js.
 
     Create a bash script file that launches typrm into the folder where PATH passed:
         cd  ${HOME}/Downloads/typrm
-        current_folder="$(pwd)"
         typrm_folder="${HOME}/Documents/typrm"
         script="${HOME}/bin/typrm"
         mkdir -p "${HOME}/bin"
 
-        echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+        echo  "export NODE_PATH=\"$(pwd)/node_modules"" > ${script}
         echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-        echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+        echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
+        chmod +x "${script}"
+        unset script
 
     Check to use typrm command:
         typrm --version

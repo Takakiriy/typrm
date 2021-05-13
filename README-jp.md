@@ -210,6 +210,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
         cd  ~/Downloads
         wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        （更新するときは） rm -rf  typrm-old  &&  mv  typrm  typrm-old
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
         cd  typrm
@@ -218,14 +219,15 @@ typrm を使うには Node.js のインストールが必要です。
 
     PATH が通ったフォルダーに typrm を起動する bash スクリプト ファイル を作ります:
         cd  ${HOME}/Downloads/typrm
-        current_folder="$(pwd)"
         typrm_folder="${HOME}/Documents/typrm"
         script="${HOME}/bin/typrm"
         mkdir -p "${HOME}/bin"
 
-        echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+        echo  "export NODE_PATH=\"$(pwd)/node_modules"" > ${script}
         echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-        echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+        echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
+        chmod +x "${script}"
+        unset script
 
     typrm が使えることを確認します:
         typrm --version
