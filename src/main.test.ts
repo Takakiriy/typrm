@@ -164,7 +164,8 @@ describe("searches keyword tag", () => {
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
+            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n',
         ],[
             "Windows typrm folder path",
             ["search", "ABC"],
@@ -199,6 +200,7 @@ describe("searches glossary tag", () => {
         "Multi folder",
         ["search", "ABC"],
         { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
+        '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
         "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
     ],
     ])("%s", async (_caseName, arguments_, options, answer) => {

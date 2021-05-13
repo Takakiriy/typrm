@@ -220,6 +220,12 @@ describe("searches keyword tag", function () {
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
             "",
+        ], [
+            "Multi folder",
+            ["search", "ABC"],
+            { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n',
         ],
         [
             "Windows typrm folder path",
@@ -227,10 +233,17 @@ describe("searches keyword tag", function () {
             { folder: process.cwd() + "\\test_data\\search\\1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],
-    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+    ])("%s", function (caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+        var isWindowsEnvironment, isWindowsCase;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                case 0:
+                    isWindowsEnvironment = (path.sep === '\\');
+                    isWindowsCase = (caseName.indexOf('Windows') !== notFound);
+                    if (!isWindowsEnvironment && isWindowsCase) {
+                        return [2 /*return*/];
+                    }
+                    return [4 /*yield*/, callMain(arguments_, options)];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);
@@ -246,12 +259,17 @@ describe("searches glossary tag", function () {
             ["search", "ABC"],
             { folder: "test_data/search/glossary/1", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
-        ],
-        [
+        ], [
             "word",
             ["search", "AB"],
             { folder: "test_data/search/glossary/1", test: "" },
             "",
+        ], [
+            "Multi folder",
+            ["search", "ABC"],
+            { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
+                "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
         ],
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -321,4 +339,5 @@ expect.extend({
     }
 });
 var cutBOM = 1;
+var notFound = -1;
 //# sourceMappingURL=main.test.js.map

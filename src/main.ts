@@ -40,7 +40,7 @@ export async function  main() {
 			await replaceSettings(inputFilePath, changingLineNum, keyValues);
 		}
 		else {
-			println(`Unknown command "${programArguments[0]}".`);
+			console.log(`Unknown command "${programArguments[0]}".`);
 		}
 	}
 }
@@ -107,10 +107,10 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 			// Check if previous line has "template" replaced contents.
 			const  templateTag = parseTemplateTag(line);
 			if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
-				println("");
-				println(`${translate('ErrorLine')}: ${lineNum}`);
-				println(`  ${translate('Contents')}: ${line.trim()}`);
-				println(`  ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
+				console.log("");
+				console.log(`${translate('ErrorLine')}: ${lineNum}`);
+				console.log(`  ${translate('Contents')}: ${line.trim()}`);
+				console.log(`  ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
 				templateTag.isFound = false;
 				templateCount += 1;
 				errorCount += 1;
@@ -121,12 +121,12 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 				const  expected = getExpectedLine(setting, templateTag.template);
 
 				if (checkingLine.indexOf(expected) === notFound) {
-					println("");
-					println(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
-					println(`  ${translate('Contents')}: ${checkingLine.trim()}`);
-					println(`  ${translate('Expected')}: ${expected}`);
-					println(`  ${translate('Template')}: ${templateTag.template}`);
-					println(`  ${translate('SettingIndex')}: ${settingCount}`);
+					console.log("");
+					console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
+					console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
+					console.log(`  ${translate('Expected')}: ${expected}`);
+					console.log(`  ${translate('Template')}: ${templateTag.template}`);
+					console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
 					errorCount += 1;
 				}
 			}
@@ -151,10 +151,10 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 			// Check if there is not "#★Now:".
 			for (let temporaryLabel of temporaryLabels) {
 				if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound) {
-					println("");
-					println(`${translate('WarningLine')}: ${lineNum}`);
-					println(`  ${translate('Contents')}: ${line.trim()}`);
-					println(`  ${translate('SettingIndex')}: ${settingCount}`);
+					console.log("");
+					console.log(`${translate('WarningLine')}: ${lineNum}`);
+					console.log(`  ${translate('Contents')}: ${line.trim()}`);
+					console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
 					warningCount += 1;
 				}
 			}
@@ -163,12 +163,12 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 			if (line.indexOf( secretLabel ) !== notFound  ||  line.indexOf( secretLabelEn ) !== notFound) {
 				if (line.indexOf( secretExamleLabel ) === notFound  &&  line.indexOf( secretExamleLabelEn ) === notFound) {
 					if (secretLabelCount === 0) {  // Because there will be many secret data.
-						println("");
-						println(`${translate('WarningLine')}: ${lineNum}`);
-						println(`  ${translate('This is a secret value.')}`);
-						println('  '+ translate`Change "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
-						println('  '+ translate`Change "${secretLabel}" to "${secretExamleLabel}".'`);
-						println(`  ${translate('SettingIndex')}: ${settingCount}`);
+						console.log("");
+						console.log(`${translate('WarningLine')}: ${lineNum}`);
+						console.log(`  ${translate('This is a secret value.')}`);
+						console.log('  '+ translate`Change "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
+						console.log('  '+ translate`Change "${secretLabel}" to "${secretExamleLabel}".'`);
+						console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
 						warningCount += 1;
 					}
 					secretLabelCount += 1;
@@ -240,28 +240,28 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 		for (const keyword of keywords) {
 			if (keyword.direction === Direction.Above) {
 				if (keyword.startLineNum !== foundForAbove) {
-					println('');
-					println(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
-					println('  ' + translate`Not found "${keyword.keyword}" above`);
+					console.log('');
+					console.log(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
+					console.log('  ' + translate`Not found "${keyword.keyword}" above`);
 					errorCount += 1;
 				}
 			} else if (keyword.direction === Direction.Following) {
 				if (keyword.startLineNum !== foundForFollowing) {
-					println('');
-					println(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
-					println('  ' + translate`Not found "${keyword.keyword}" following`);
+					console.log('');
+					console.log(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
+					console.log('  ' + translate`Not found "${keyword.keyword}" following`);
 					errorCount += 1;
 				}
 			}
 		}
 
 		// Show the result
-		println('');
-		println(`${translate('Warning')}: ${warningCount}, ${translate('Error')}: ${errorCount}`);
+		console.log('');
+		console.log(`${translate('Warning')}: ${warningCount}, ${translate('Error')}: ${errorCount}`);
 		if (previousTemplateCount) {
-			println(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
+			console.log(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
 		}
-		println(`${translate('template count')} = ${templateCount}`);
+		console.log(`${translate('template count')} = ${templateCount}`);
 
 		if (!isModal) {
 			break;
@@ -270,7 +270,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 		// Rescan or change a value
 		let  loop = true;
 		while (loop) {
-			println(translate('Press Enter key to retry checking.'));
+			console.log(translate('Press Enter key to retry checking.'));
 
 			const  key = await input(translate('The line number to change the variable value >'));
 			errorCount = 0;
@@ -279,8 +279,8 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 			} else if (key !== '') {
 				const  lineNum = parseInt(key);
 				const  changingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, lineNum);
-				println(`${translate('SettingIndex')}: ${changingSettingIndex}`);
-				println(translate('Enter only: finish to input setting'));
+				console.log(`${translate('SettingIndex')}: ${changingSettingIndex}`);
+				console.log(translate('Enter only: finish to input setting'));
 				for (;;) {
 					const  keyValue = await input(translate('key: new_value>'));
 					if (keyValue === '') {
@@ -293,7 +293,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 		}
 
 		// Rescan
-		println('========================================');
+		console.log('========================================');
 		previousTemplateCount = templateCount
 		for (const key of Object.keys(setting)) {
 			setting[key].isReferenced = false;
@@ -312,8 +312,8 @@ async function  replaceSettings(inputFilePath: string, changingLineNum: number, 
 
 		errorCount += await changeSettingByKeyValueOld(inputFileFullPath, changingSettingIndex, keyValue);
 	}
-	println('');
-	println(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
+	console.log('');
+	console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
 }
 
 // changeSettingByKeyValue
@@ -428,14 +428,14 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 						// Do nothing
 					} else {
 						if (errorCount === 0) { // Since only one old value can be replaced at a time
-							println('');
-							println(`${translate('ErrorLine')}: ${lineNum}`);
-							println(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
-							println(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
-							println(`  ${translate('Contents')}: ${line.trim()}`);
-							println(`  ${translate('Expected')}: ${expected.trim()}`);
-							println(`  ${translate('Template')}: ${templateTag.template.trim()}`);
-							println(`  ${translate('SettingIndex')}: ${settingCount}`);
+							console.log('');
+							console.log(`${translate('ErrorLine')}: ${lineNum}`);
+							console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
+							console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
+							console.log(`  ${translate('Contents')}: ${line.trim()}`);
+							console.log(`  ${translate('Expected')}: ${expected.trim()}`);
+							console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
+							console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
 							errorCount += 1;
 						}
 					}
@@ -499,10 +499,10 @@ class  TemplateTag {
 		const  targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
 		if (!fs.existsSync(targetFilePath)) {
 			const  templateLineNum = templateEndLineNum - this.templateLines.length;
-			println("");
-			println(`Error:`);
-			println(`  ${translate('NotFound')}: ${targetFilePath}`);
-			println(`  Template: ${inputFilePath}:${templateLineNum}`);
+			console.log("");
+			console.log(`Error:`);
+			console.log(`  ${translate('NotFound')}: ${targetFilePath}`);
+			console.log(`  Template: ${inputFilePath}:${templateLineNum}`);
 			return  false;
 		}
 		const  targetFileReader = readline.createInterface({
@@ -564,12 +564,12 @@ class  TemplateTag {
 				errorExpected = expectedFirstLine;
 				errorTemplate = this.templateLines[0];
 			}
-			println("");
-			println(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
-			println(`${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
-			println(`  Contents: ${errorContents}`);
-			println(`  Expected: ${errorExpected}`);
-			println(`  Template: ${errorTemplate}`);
+			console.log("");
+			console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
+			console.log(`${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
+			console.log(`  Contents: ${errorContents}`);
+			console.log(`  Expected: ${errorExpected}`);
+			console.log(`  Template: ${errorTemplate}`);
 		}
 		return  same;
 	}
@@ -608,12 +608,19 @@ async function  check(checkingFilePath?: string) {
 async function  search() {
 	const  keyword = programArguments[1].replace('"', '""');
 	const  targetFolder = programOptions.folder;
-	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
-	const  oldCurrentFoldderPath = process.cwd();
-	process.chdir(targetFolderFullPath);
-	const  fileRelativePaths: string[] = await globby(['**/*']);
-	const  fileFullPaths = fileRelativePaths.map((relativePath) => getFullPath(relativePath, targetFolderFullPath));
-	process.chdir(oldCurrentFoldderPath);
+	const  currentFolder = process.cwd();
+	const  fileFullPaths: string[] = [];
+	const  targetFolders = await parseCSVColumns(targetFolder);
+	for (const folder of targetFolders) {
+		const  targetFolderFullPath = getFullPath(folder, currentFolder);
+		process.chdir(targetFolderFullPath);
+		const scanedPaths = await globby(['**/*']);
+		scanedPaths.forEach((scanedPath) => {
+
+			fileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath))
+		});
+	}
+	process.chdir(currentFolder);
 	var  indentAtStart = '';
 	var  inGlossary = false;
 
@@ -635,7 +642,7 @@ async function  search() {
 					const  columns = await parseCSVColumns(csv);
 					if (columns.indexOf(keyword.replace('""','"')) !== notFound) {
 
-						println(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
+						console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
 					}
 				}
 			}
@@ -650,7 +657,7 @@ async function  search() {
 
 				if (line.indexOf(keyword) === currentIndent.length) {
 					if (line[currentIndent.length + keyword.length] === ':') {
-						println(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
+						console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
 					}
 				}
 				if (currentIndent.length <= indentAtStart.length) {
@@ -672,7 +679,7 @@ function  varidateUpdateCommandArguments() {
 function onEndOfSetting(setting: Settings) {
 	for (const key of Object.keys(setting)) {
 		if (!setting[key].isReferenced) {
-			println(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);
+			console.log(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);
 		}
 	}
 }
@@ -980,33 +987,67 @@ class  WriteBuffer {
 }
 
 // dd
-// debugOut の内容が見えないときは、 const debugOut_ = debugOut; を書いて debugOut_ の内容を見ます。
+// Debug print.
+// #keyword: dd
+// Example:
+//    dd(var);
+// Example:
+//    var d = dd(var);  // Set break point here and watch the variable d
+// Example:
+//    try {
+//
+//		  await main();
+//    } catch (e) {
+//        var d = dd(e);  // Set break point here and watch the variable d
+//        throw e;
+//    }
 function  dd(message: any) {
 	if (typeof message === 'object') {
 		message = JSON.stringify(message);
 	}
 	debugOut.push(message.toString());
+	return debugOut;
 }
 export const  debugOut: string[] = [];
 
-// watchPrint
-function  watchPrint() {
-	const  s = stdout;
-	const  debugOut_ = stdout.split('\n');
-	return;  // Set break point here
+// cc
+// #keyword: cc
+// Example:
+//   cc(9999);
+// Example:
+//   if ( cc(2).isTarget )
+//   var d = dd('');  // Set break point here and watch the variable d
+function  cc( targetCount: number, label: string = '0' ) {
+	if (!(label in gCount)) {
+		gCount[label] = 0;
+	}
+
+	gCount[label] += 1;
+    dd( `${label}:countThrough[${label}] = ${gCount[label]}` );
+	const isTarget = ( gCount[label] === targetCount );
+
+	if (isTarget) {
+        dd( '    **** It is before the target! ****' );
+    }
+    return  { isTarget, debugOut };
 }
+const  gCount: {[name: string]: number} = {};
 
 // println
-function  println(message: any) {
-	if (typeof message === 'object') {
+// #keyword: println, console.log, consoleLog
+// Output any text to standard output.
+function  println(message: any, delayedExpanding: boolean = false) {
+	if (typeof message === 'object' && !delayedExpanding) {
 		message = JSON.stringify(message);
 	}
-	if (withJest) {
+	if (withJest && !delayedExpanding) {
 		stdout += message.toString() + '\n';
 	} else {
-		console.log(message);
+		consoleLog(message);
 	}
 }
+const  consoleLog = console.log;
+console.log = println;
 
 // StandardInputBuffer
 class  StandardInputBuffer {
@@ -1042,7 +1083,7 @@ class  StandardInputBuffer {
 		{
 			const  nextLine = this.inputBuffer.shift();
 			if (nextLine) {
-				println(guide + nextLine);
+				console.log(guide + nextLine);
 				resolve(nextLine);
 			} else {
 				process.stdout.write(guide);
@@ -1091,7 +1132,7 @@ async function  input( guide: string ): Promise<string> {
 		if (inputOption.nextLineIndex < inputOption.inputLines.length) {
 			const  value = inputOption.inputLines[inputOption.nextLineIndex];
 			inputOption.nextLineIndex += 1;
-			println(guide + value);
+			console.log(guide + value);
 
 			return  value;
 		}
@@ -1102,7 +1143,7 @@ async function  input( guide: string ): Promise<string> {
 		const  value = process.argv[inputOption.nextParameterIndex];
 		inputOption.nextParameterIndex += 1;
 		if (value.substr(0,1) !== '-') {
-			println(guide + value);
+			console.log(guide + value);
 
 			return  value;
 		}
@@ -1219,8 +1260,13 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     } else {
         programOptions = {};
     }
+	try {
 
-    await main();
+		await main();
+	} catch(e) {
+		var d = dd(e);
+		throw e;
+	}
 }
 
 const  settingStartLabel = /^設定(\(|（[^\)]*\)|）)?:$/;

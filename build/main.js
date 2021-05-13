@@ -102,7 +102,7 @@ function main() {
                     _a.sent();
                     return [3 /*break*/, 11];
                 case 10:
-                    println("Unknown command \"" + exports.programArguments[0] + "\".");
+                    console.log("Unknown command \"" + exports.programArguments[0] + "\".");
                     _a.label = 11;
                 case 11: return [2 /*return*/];
             }
@@ -187,10 +187,10 @@ function oldMain(isModal, inputFilePath) {
                     }
                     templateTag = parseTemplateTag(line);
                     if (templateTag.lineNumOffset >= 1 && templateTag.isFound) {
-                        println("");
-                        println(translate('ErrorLine') + ": " + lineNum);
-                        println("  " + translate('Contents') + ": " + line.trim());
-                        println("  " + translate('Error') + ": " + translate('The parameter must be less than 0'));
+                        console.log("");
+                        console.log(translate('ErrorLine') + ": " + lineNum);
+                        console.log("  " + translate('Contents') + ": " + line.trim());
+                        console.log("  " + translate('Error') + ": " + translate('The parameter must be less than 0'));
                         templateTag.isFound = false;
                         templateCount += 1;
                         errorCount += 1;
@@ -200,12 +200,12 @@ function oldMain(isModal, inputFilePath) {
                         checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                         expected = getExpectedLine(setting, templateTag.template);
                         if (checkingLine.indexOf(expected) === notFound) {
-                            println("");
-                            println(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
-                            println("  " + translate('Contents') + ": " + checkingLine.trim());
-                            println("  " + translate('Expected') + ": " + expected);
-                            println("  " + translate('Template') + ": " + templateTag.template);
-                            println("  " + translate('SettingIndex') + ": " + settingCount);
+                            console.log("");
+                            console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
+                            console.log("  " + translate('Contents') + ": " + checkingLine.trim());
+                            console.log("  " + translate('Expected') + ": " + expected);
+                            console.log("  " + translate('Template') + ": " + templateTag.template);
+                            console.log("  " + translate('SettingIndex') + ": " + settingCount);
                             errorCount += 1;
                         }
                     }
@@ -228,10 +228,10 @@ function oldMain(isModal, inputFilePath) {
                     for (_i = 0, temporaryLabels_1 = temporaryLabels; _i < temporaryLabels_1.length; _i++) {
                         temporaryLabel = temporaryLabels_1[_i];
                         if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound) {
-                            println("");
-                            println(translate('WarningLine') + ": " + lineNum);
-                            println("  " + translate('Contents') + ": " + line.trim());
-                            println("  " + translate('SettingIndex') + ": " + settingCount);
+                            console.log("");
+                            console.log(translate('WarningLine') + ": " + lineNum);
+                            console.log("  " + translate('Contents') + ": " + line.trim());
+                            console.log("  " + translate('SettingIndex') + ": " + settingCount);
                             warningCount += 1;
                         }
                     }
@@ -239,12 +239,12 @@ function oldMain(isModal, inputFilePath) {
                     if (line.indexOf(secretLabel) !== notFound || line.indexOf(secretLabelEn) !== notFound) {
                         if (line.indexOf(secretExamleLabel) === notFound && line.indexOf(secretExamleLabelEn) === notFound) {
                             if (secretLabelCount === 0) { // Because there will be many secret data.
-                                println("");
-                                println(translate('WarningLine') + ": " + lineNum);
-                                println("  " + translate('This is a secret value.'));
-                                println('  ' + translate(templateObject_1 || (templateObject_1 = __makeTemplateObject(["Change \"", "\" to \"", "\".'"], ["Change \"", "\" to \"", "\".'"])), secretLabelEn, secretExamleLabelEn));
-                                println('  ' + translate(templateObject_2 || (templateObject_2 = __makeTemplateObject(["Change \"", "\" to \"", "\".'"], ["Change \"", "\" to \"", "\".'"])), secretLabel, secretExamleLabel));
-                                println("  " + translate('SettingIndex') + ": " + settingCount);
+                                console.log("");
+                                console.log(translate('WarningLine') + ": " + lineNum);
+                                console.log("  " + translate('This is a secret value.'));
+                                console.log('  ' + translate(templateObject_1 || (templateObject_1 = __makeTemplateObject(["Change \"", "\" to \"", "\".'"], ["Change \"", "\" to \"", "\".'"])), secretLabelEn, secretExamleLabelEn));
+                                console.log('  ' + translate(templateObject_2 || (templateObject_2 = __makeTemplateObject(["Change \"", "\" to \"", "\".'"], ["Change \"", "\" to \"", "\".'"])), secretLabel, secretExamleLabel));
+                                console.log("  " + translate('SettingIndex') + ": " + settingCount);
                                 warningCount += 1;
                             }
                             secretLabelCount += 1;
@@ -357,28 +357,28 @@ function oldMain(isModal, inputFilePath) {
                         keyword = keywords_2[_d];
                         if (keyword.direction === Direction.Above) {
                             if (keyword.startLineNum !== foundForAbove) {
-                                println('');
-                                println(translate('ErrorLine') + ": " + (keyword.startLineNum + 1));
-                                println('  ' + translate(templateObject_3 || (templateObject_3 = __makeTemplateObject(["Not found \"", "\" above"], ["Not found \"", "\" above"])), keyword.keyword));
+                                console.log('');
+                                console.log(translate('ErrorLine') + ": " + (keyword.startLineNum + 1));
+                                console.log('  ' + translate(templateObject_3 || (templateObject_3 = __makeTemplateObject(["Not found \"", "\" above"], ["Not found \"", "\" above"])), keyword.keyword));
                                 errorCount += 1;
                             }
                         }
                         else if (keyword.direction === Direction.Following) {
                             if (keyword.startLineNum !== foundForFollowing) {
-                                println('');
-                                println(translate('ErrorLine') + ": " + (keyword.startLineNum - 1));
-                                println('  ' + translate(templateObject_4 || (templateObject_4 = __makeTemplateObject(["Not found \"", "\" following"], ["Not found \"", "\" following"])), keyword.keyword));
+                                console.log('');
+                                console.log(translate('ErrorLine') + ": " + (keyword.startLineNum - 1));
+                                console.log('  ' + translate(templateObject_4 || (templateObject_4 = __makeTemplateObject(["Not found \"", "\" following"], ["Not found \"", "\" following"])), keyword.keyword));
                                 errorCount += 1;
                             }
                         }
                     }
                     // Show the result
-                    println('');
-                    println(translate('Warning') + ": " + warningCount + ", " + translate('Error') + ": " + errorCount);
+                    console.log('');
+                    console.log(translate('Warning') + ": " + warningCount + ", " + translate('Error') + ": " + errorCount);
                     if (previousTemplateCount) {
-                        println(translate('template count') + " = " + previousTemplateCount + " (" + translate('in previous check') + ")");
+                        console.log(translate('template count') + " = " + previousTemplateCount + " (" + translate('in previous check') + ")");
                     }
-                    println(translate('template count') + " = " + templateCount);
+                    console.log(translate('template count') + " = " + templateCount);
                     if (!isModal) {
                         return [3 /*break*/, 43];
                     }
@@ -386,7 +386,7 @@ function oldMain(isModal, inputFilePath) {
                     _h.label = 32;
                 case 32:
                     if (!loop) return [3 /*break*/, 41];
-                    println(translate('Press Enter key to retry checking.'));
+                    console.log(translate('Press Enter key to retry checking.'));
                     return [4 /*yield*/, input(translate('The line number to change the variable value >'))];
                 case 33:
                     key = _h.sent();
@@ -399,8 +399,8 @@ function oldMain(isModal, inputFilePath) {
                     return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, lineNum_1)];
                 case 35:
                     changingSettingIndex = _h.sent();
-                    println(translate('SettingIndex') + ": " + changingSettingIndex);
-                    println(translate('Enter only: finish to input setting'));
+                    console.log(translate('SettingIndex') + ": " + changingSettingIndex);
+                    console.log(translate('Enter only: finish to input setting'));
                     _h.label = 36;
                 case 36: return [4 /*yield*/, input(translate('key: new_value>'))];
                 case 37:
@@ -419,7 +419,7 @@ function oldMain(isModal, inputFilePath) {
                     return [3 /*break*/, 32];
                 case 41:
                     // Rescan
-                    println('========================================');
+                    console.log('========================================');
                     previousTemplateCount = templateCount;
                     for (_f = 0, _g = Object.keys(setting); _f < _g.length; _f++) {
                         key = _g[_f];
@@ -460,8 +460,8 @@ function replaceSettings(inputFilePath, changingLineNum, keyValues) {
                     _i++;
                     return [3 /*break*/, 2];
                 case 5:
-                    println('');
-                    println(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
+                    console.log('');
+                    console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
                     return [2 /*return*/];
             }
         });
@@ -590,14 +590,14 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                                 }
                                 else {
                                     if (errorCount === 0) { // Since only one old value can be replaced at a time
-                                        println('');
-                                        println(translate('ErrorLine') + ": " + lineNum);
-                                        println("  " + translate('Error') + ": " + translate('Not found any replacing target'));
-                                        println("  " + translate('Solution') + ": " + translate('Set old value at settings in the replacing file'));
-                                        println("  " + translate('Contents') + ": " + line.trim());
-                                        println("  " + translate('Expected') + ": " + expected.trim());
-                                        println("  " + translate('Template') + ": " + templateTag.template.trim());
-                                        println("  " + translate('SettingIndex') + ": " + settingCount);
+                                        console.log('');
+                                        console.log(translate('ErrorLine') + ": " + lineNum);
+                                        console.log("  " + translate('Error') + ": " + translate('Not found any replacing target'));
+                                        console.log("  " + translate('Solution') + ": " + translate('Set old value at settings in the replacing file'));
+                                        console.log("  " + translate('Contents') + ": " + line.trim());
+                                        console.log("  " + translate('Expected') + ": " + expected.trim());
+                                        console.log("  " + translate('Template') + ": " + templateTag.template.trim());
+                                        console.log("  " + translate('SettingIndex') + ": " + settingCount);
                                         errorCount += 1;
                                     }
                                 }
@@ -685,10 +685,10 @@ var TemplateTag = /** @class */ (function () {
                         targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
                         if (!fs.existsSync(targetFilePath)) {
                             templateLineNum = templateEndLineNum - this.templateLines.length;
-                            println("");
-                            println("Error:");
-                            println("  " + translate('NotFound') + ": " + targetFilePath);
-                            println("  Template: " + inputFilePath + ":" + templateLineNum);
+                            console.log("");
+                            console.log("Error:");
+                            console.log("  " + translate('NotFound') + ": " + targetFilePath);
+                            console.log("  Template: " + inputFilePath + ":" + templateLineNum);
                             return [2 /*return*/, false];
                         }
                         targetFileReader = readline.createInterface({
@@ -776,12 +776,12 @@ var TemplateTag = /** @class */ (function () {
                                 errorExpected = expectedFirstLine;
                                 errorTemplate = this.templateLines[0];
                             }
-                            println("");
-                            println(translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + templateLineNum);
-                            println(translate('ErrorFile') + ": " + getTestablePath(targetFilePath) + ":" + errorTargetLineNum);
-                            println("  Contents: " + errorContents);
-                            println("  Expected: " + errorExpected);
-                            println("  Template: " + errorTemplate);
+                            console.log("");
+                            console.log(translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + templateLineNum);
+                            console.log(translate('ErrorFile') + ": " + getTestablePath(targetFilePath) + ":" + errorTargetLineNum);
+                            console.log("  Contents: " + errorContents);
+                            console.log("  Expected: " + errorExpected);
+                            console.log("  Template: " + errorTemplate);
                         }
                         return [2 /*return*/, same];
                 }
@@ -811,7 +811,7 @@ function check(checkingFilePath) {
                     if (!fs.existsSync(targetFolderFullPath)) {
                         throw new Error("Not found target folder at \"" + targetFolderFullPath + "\".");
                     }
-                    process.chdir(targetFolder);
+                    process.chdir(targetFolderFullPath);
                     return [4 /*yield*/, globby(['**/*'])];
                 case 2:
                     filePaths = _a.sent();
@@ -840,54 +840,82 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, targetFolder, targetFolderFullPath, oldCurrentFoldderPath, filePaths, indentAtStart, inGlossary, _i, filePaths_2, inputFilePath, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var keyword, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     keyword = exports.programArguments[1].replace('"', '""');
                     targetFolder = exports.programOptions.folder;
-                    targetFolderFullPath = getFullPath(targetFolder, process.cwd());
-                    oldCurrentFoldderPath = process.cwd();
-                    process.chdir(targetFolder);
-                    return [4 /*yield*/, globby(['**/*'])];
+                    currentFolder = process.cwd();
+                    fileFullPaths = [];
+                    return [4 /*yield*/, parseCSVColumns(targetFolder)];
                 case 1:
-                    filePaths = _b.sent();
-                    process.chdir(oldCurrentFoldderPath);
+                    targetFolders = _c.sent();
+                    _loop_1 = function (folder) {
+                        var targetFolderFullPath, scanedPaths;
+                        return __generator(this, function (_d) {
+                            switch (_d.label) {
+                                case 0:
+                                    targetFolderFullPath = getFullPath(folder, currentFolder);
+                                    process.chdir(targetFolderFullPath);
+                                    return [4 /*yield*/, globby(['**/*'])];
+                                case 1:
+                                    scanedPaths = _d.sent();
+                                    scanedPaths.forEach(function (scanedPath) {
+                                        fileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath));
+                                    });
+                                    return [2 /*return*/];
+                            }
+                        });
+                    };
+                    _i = 0, targetFolders_1 = targetFolders;
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < targetFolders_1.length)) return [3 /*break*/, 5];
+                    folder = targetFolders_1[_i];
+                    return [5 /*yield**/, _loop_1(folder)];
+                case 3:
+                    _c.sent();
+                    _c.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5:
+                    process.chdir(currentFolder);
                     indentAtStart = '';
                     inGlossary = false;
-                    _i = 0, filePaths_2 = filePaths;
-                    _b.label = 2;
-                case 2:
-                    if (!(_i < filePaths_2.length)) return [3 /*break*/, 17];
-                    inputFilePath = filePaths_2[_i];
-                    inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+                    _b = 0, fileFullPaths_1 = fileFullPaths;
+                    _c.label = 6;
+                case 6:
+                    if (!(_b < fileFullPaths_1.length)) return [3 /*break*/, 21];
+                    inputFileFullPath = fileFullPaths_1[_b];
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFileFullPath),
                         crlfDelay: Infinity
                     });
                     lineNum = 0;
-                    _b.label = 3;
-                case 3:
-                    _b.trys.push([3, 10, 11, 16]);
+                    _c.label = 7;
+                case 7:
+                    _c.trys.push([7, 14, 15, 20]);
                     reader_4 = (e_5 = void 0, __asyncValues(reader));
-                    _b.label = 4;
-                case 4: return [4 /*yield*/, reader_4.next()];
-                case 5:
-                    if (!(reader_4_1 = _b.sent(), !reader_4_1.done)) return [3 /*break*/, 9];
+                    _c.label = 8;
+                case 8: return [4 /*yield*/, reader_4.next()];
+                case 9:
+                    if (!(reader_4_1 = _c.sent(), !reader_4_1.done)) return [3 /*break*/, 13];
                     line1 = reader_4_1.value;
                     line = line1;
                     lineNum += 1;
-                    if (!(line.indexOf(keywordLabel) !== notFound)) return [3 /*break*/, 7];
-                    if (!(line.indexOf(keyword) !== notFound)) return [3 /*break*/, 7];
+                    if (!(line.indexOf(keywordLabel) !== notFound)) return [3 /*break*/, 11];
+                    if (!(line.indexOf(keyword) !== notFound)) return [3 /*break*/, 11];
                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
                     return [4 /*yield*/, parseCSVColumns(csv)];
-                case 6:
-                    columns = _b.sent();
+                case 10:
+                    columns = _c.sent();
                     if (columns.indexOf(keyword.replace('""', '"')) !== notFound) {
-                        println(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
+                        console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
                     }
-                    _b.label = 7;
-                case 7:
+                    _c.label = 11;
+                case 11:
                     // glossary tag
                     if (line.indexOf(glossaryLabel) !== notFound) {
                         inGlossary = true;
@@ -897,36 +925,36 @@ function search() {
                         currentIndent = indentRegularExpression.exec(line)[0];
                         if (line.indexOf(keyword) === currentIndent.length) {
                             if (line[currentIndent.length + keyword.length] === ':') {
-                                println(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
+                                console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
                             }
                         }
                         if (currentIndent.length <= indentAtStart.length) {
                             inGlossary = false;
                         }
                     }
-                    _b.label = 8;
-                case 8: return [3 /*break*/, 4];
-                case 9: return [3 /*break*/, 16];
-                case 10:
-                    e_5_1 = _b.sent();
-                    e_5 = { error: e_5_1 };
-                    return [3 /*break*/, 16];
-                case 11:
-                    _b.trys.push([11, , 14, 15]);
-                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 13];
-                    return [4 /*yield*/, _a.call(reader_4)];
-                case 12:
-                    _b.sent();
-                    _b.label = 13;
-                case 13: return [3 /*break*/, 15];
+                    _c.label = 12;
+                case 12: return [3 /*break*/, 8];
+                case 13: return [3 /*break*/, 20];
                 case 14:
+                    e_5_1 = _c.sent();
+                    e_5 = { error: e_5_1 };
+                    return [3 /*break*/, 20];
+                case 15:
+                    _c.trys.push([15, , 18, 19]);
+                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 17];
+                    return [4 /*yield*/, _a.call(reader_4)];
+                case 16:
+                    _c.sent();
+                    _c.label = 17;
+                case 17: return [3 /*break*/, 19];
+                case 18:
                     if (e_5) throw e_5.error;
                     return [7 /*endfinally*/];
-                case 15: return [7 /*endfinally*/];
-                case 16:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 17: return [2 /*return*/];
+                case 19: return [7 /*endfinally*/];
+                case 20:
+                    _b++;
+                    return [3 /*break*/, 6];
+                case 21: return [2 /*return*/];
             }
         });
     });
@@ -942,7 +970,7 @@ function onEndOfSetting(setting) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         if (!setting[key].isReferenced) {
-            println(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
+            console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
         }
     }
 }
@@ -1261,32 +1289,66 @@ var WriteBuffer = /** @class */ (function () {
     return WriteBuffer;
 }());
 // dd
-// debugOut の内容が見えないときは、 const debugOut_ = debugOut; を書いて debugOut_ の内容を見ます。
+// Debug print.
+// #keyword: dd
+// Example:
+//    dd(var);
+// Example:
+//    var d = dd(var);  // Set break point here and watch the variable d
+// Example:
+//    try {
+//
+//		  await main();
+//    } catch (e) {
+//        var d = dd(e);  // Set break point here and watch the variable d
+//        throw e;
+//    }
 function dd(message) {
     if (typeof message === 'object') {
         message = JSON.stringify(message);
     }
     exports.debugOut.push(message.toString());
+    return exports.debugOut;
 }
 exports.debugOut = [];
-// watchPrint
-function watchPrint() {
-    var s = exports.stdout;
-    var debugOut_ = exports.stdout.split('\n');
-    return; // Set break point here
+// cc
+// #keyword: cc
+// Example:
+//   cc(9999);
+// Example:
+//   if ( cc(2).isTarget )
+//   var d = dd('');  // Set break point here and watch the variable d
+function cc(targetCount, label) {
+    if (label === void 0) { label = '0'; }
+    if (!(label in gCount)) {
+        gCount[label] = 0;
+    }
+    gCount[label] += 1;
+    dd(label + ":countThrough[" + label + "] = " + gCount[label]);
+    var isTarget = (gCount[label] === targetCount);
+    if (isTarget) {
+        dd('    **** It is before the target! ****');
+    }
+    return { isTarget: isTarget, debugOut: exports.debugOut };
 }
+var gCount = {};
 // println
-function println(message) {
-    if (typeof message === 'object') {
+// #keyword: println, console.log, consoleLog
+// Output any text to standard output.
+function println(message, delayedExpanding) {
+    if (delayedExpanding === void 0) { delayedExpanding = false; }
+    if (typeof message === 'object' && !delayedExpanding) {
         message = JSON.stringify(message);
     }
-    if (withJest) {
+    if (withJest && !delayedExpanding) {
         exports.stdout += message.toString() + '\n';
     }
     else {
-        console.log(message);
+        consoleLog(message);
     }
 }
+var consoleLog = console.log;
+console.log = println;
 // StandardInputBuffer
 var StandardInputBuffer = /** @class */ (function () {
     function StandardInputBuffer() {
@@ -1324,7 +1386,7 @@ var StandardInputBuffer = /** @class */ (function () {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         var nextLine = _this.inputBuffer.shift();
                         if (nextLine) {
-                            println(guide + nextLine);
+                            console.log(guide + nextLine);
                             resolve(nextLine);
                         }
                         else {
@@ -1372,7 +1434,7 @@ function input(guide) {
                 if (inputOption.nextLineIndex < inputOption.inputLines.length) {
                     value = inputOption.inputLines[inputOption.nextLineIndex];
                     inputOption.nextLineIndex += 1;
-                    println(guide + value);
+                    console.log(guide + value);
                     return [2 /*return*/, value];
                 }
             }
@@ -1381,7 +1443,7 @@ function input(guide) {
                 value = process.argv[inputOption.nextParameterIndex];
                 inputOption.nextParameterIndex += 1;
                 if (value.substr(0, 1) !== '-') {
-                    println(guide + value);
+                    console.log(guide + value);
                     return [2 /*return*/, value];
                 }
                 if (value !== '--test') {
@@ -1490,6 +1552,7 @@ function translate(englishLiterals) {
 // callMainFromJest
 function callMainFromJest(parameters, options) {
     return __awaiter(this, void 0, void 0, function () {
+        var e_7, d;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1507,10 +1570,18 @@ function callMainFromJest(parameters, options) {
                     else {
                         exports.programOptions = {};
                     }
-                    return [4 /*yield*/, main()];
+                    _a.label = 1;
                 case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, main()];
+                case 2:
                     _a.sent();
-                    return [2 /*return*/];
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_7 = _a.sent();
+                    d = dd(e_7);
+                    throw e_7;
+                case 4: return [2 /*return*/];
             }
         });
     });
