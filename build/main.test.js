@@ -211,6 +211,11 @@ describe("searches keyword tag", function () {
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
         ], [
+            "ignore case",
+            ["search", "DO It"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+        ], [
             "word(1)",
             ["search", "AB"],
             { folder: "test_data/search/1", test: "" },
@@ -261,10 +266,15 @@ describe("searches glossary tag", function () {
             { folder: "test_data/search/glossary/1", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
         ], [
+            "ignore case",
+            ["search", "abc"],
+            { folder: "test_data/search/glossary/1", test: "" },
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+        ], [
             "word",
             ["search", "AB"],
             { folder: "test_data/search/glossary/1", test: "" },
-            "",
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
         ], [
             "Multi folder",
             ["search", "ABC"],

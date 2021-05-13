@@ -840,7 +840,7 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
+        var keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, colonPosition, wordInGlossary, e_5_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -924,8 +924,16 @@ function search() {
                     }
                     else if (inGlossary) {
                         currentIndent = indentRegularExpression.exec(line)[0];
-                        if (line.indexOf(keyword) === currentIndent.length) {
-                            if (line[currentIndent.length + keyword.length] === ':') {
+                        pp(120);
+                        pp(line);
+                        pp(keywordOfDoubleQuotedLowerCase);
+                        if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
+                            colonPosition = line.indexOf(':', currentIndent.length);
+                            wordInGlossary = line.substr(currentIndent.length, colonPosition);
+                            pp(121);
+                            pp(wordInGlossary);
+                            pp(keyword);
+                            if (getKeywordMatchedScore([wordInGlossary], keyword) >= 1) {
                                 console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
                             }
                         }
@@ -1328,7 +1336,7 @@ var WriteBuffer = /** @class */ (function () {
 //        var d = dd(e);  // Set break point here and watch the variable d
 //        throw e;
 //    }
-function dd(message) {
+function pp(message) {
     if (typeof message === 'object') {
         message = JSON.stringify(message);
     }
@@ -1350,10 +1358,10 @@ function cc(targetCount, label) {
         gCount[label] = 0;
     }
     gCount[label] += 1;
-    dd(label + ":countThrough[" + label + "] = " + gCount[label]);
+    pp(label + ":countThrough[" + label + "] = " + gCount[label]);
     var isTarget = (gCount[label] === targetCount);
     if (isTarget) {
-        dd('    **** It is before the target! ****');
+        pp('    **** It is before the target! ****');
     }
     return { isTarget: isTarget, debugOut: exports.debugOut };
 }
@@ -1604,7 +1612,7 @@ function callMainFromJest(parameters, options) {
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 3:
-                    d = dd('');
+                    d = pp('');
                     d = []; // Set break point here and watch the variable d
                     return [7 /*endfinally*/];
                 case 4: return [2 /*return*/];

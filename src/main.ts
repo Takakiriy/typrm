@@ -656,8 +656,11 @@ async function  search() {
 			else if (inGlossary) {
 				const  currentIndent = indentRegularExpression.exec(line)![0];
 
-				if (line.indexOf(keyword) === currentIndent.length) {
-					if (line[currentIndent.length + keyword.length] === ':') {
+				if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
+					const  colonPosition = line.indexOf(':', currentIndent.length);
+					const  wordInGlossary = line.substr(currentIndent.length, colonPosition);
+					if (getKeywordMatchedScore([wordInGlossary], keyword) >= 1) {
+
 						console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
 					}
 				}
@@ -1028,7 +1031,7 @@ class  WriteBuffer {
 //        var d = dd(e);  // Set break point here and watch the variable d
 //        throw e;
 //    }
-function  dd(message: any) {
+function  pp(message: any) {
 	if (typeof message === 'object') {
 		message = JSON.stringify(message);
 	}
@@ -1051,11 +1054,11 @@ function  cc( targetCount: number, label: string = '0' ) {
 	}
 
 	gCount[label] += 1;
-    dd( `${label}:countThrough[${label}] = ${gCount[label]}` );
+    pp( `${label}:countThrough[${label}] = ${gCount[label]}` );
 	const isTarget = ( gCount[label] === targetCount );
 
 	if (isTarget) {
-        dd( '    **** It is before the target! ****' );
+        pp( '    **** It is before the target! ****' );
     }
     return  { isTarget, debugOut };
 }
@@ -1292,7 +1295,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
 
 		await main();
 	} finally {
-		var d = dd('');
+		var d = pp('');
 		d = [];  // Set break point here and watch the variable d
 	}
 }
