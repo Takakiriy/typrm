@@ -840,11 +840,12 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
+        var keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, e_5_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    keyword = exports.programArguments[1].replace('"', '""');
+                    keyword = exports.programArguments[1];
+                    keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
                     targetFolder = exports.programOptions.folder;
                     currentFolder = process.cwd();
                     fileFullPaths = [];
@@ -906,12 +907,12 @@ function search() {
                     line = line1;
                     lineNum += 1;
                     if (!(line.indexOf(keywordLabel) !== notFound)) return [3 /*break*/, 11];
-                    if (!(line.indexOf(keyword) !== notFound)) return [3 /*break*/, 11];
+                    if (!(line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound)) return [3 /*break*/, 11];
                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
                     return [4 /*yield*/, parseCSVColumns(csv)];
                 case 10:
                     columns = _c.sent();
-                    if (columns.indexOf(keyword.replace('""', '"')) !== notFound) {
+                    if (getKeywordMatchedScore(columns, keyword) >= 1) {
                         console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
                     }
                     _c.label = 11;
@@ -958,6 +959,30 @@ function search() {
             }
         });
     });
+}
+// getKeywordMatchedScore
+function getKeywordMatchedScore(testingStrings, keyword) {
+    if (testingStrings.indexOf(keyword) !== notFound) {
+        return fullMatchScore;
+    }
+    else {
+        var lowerKeyword_1 = keyword.toLowerCase();
+        var score = testingStrings.reduce(function (score, testingString) {
+            if (testingString.indexOf(keyword) != notFound) {
+                score += partMatchScore;
+            }
+            else if (testingString.toLowerCase().indexOf(lowerKeyword_1) != notFound) {
+                if (testingString.length == lowerKeyword_1.length) {
+                    score += caseIgnoredFullMatchScore;
+                }
+                else {
+                    score += caseIgnoredPartMatchScore;
+                }
+            }
+            return score;
+        }, 0);
+        return score;
+    }
 }
 // varidateUpdateCommandArguments
 function varidateUpdateCommandArguments() {
@@ -1312,6 +1337,7 @@ function dd(message) {
 }
 exports.debugOut = [];
 // cc
+// Through counter.
 // #keyword: cc
 // Example:
 //   cc(9999);
@@ -1552,7 +1578,7 @@ function translate(englishLiterals) {
 // callMainFromJest
 function callMainFromJest(parameters, options) {
     return __awaiter(this, void 0, void 0, function () {
-        var e_7, d;
+        var d;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1572,15 +1598,15 @@ function callMainFromJest(parameters, options) {
                     }
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
+                    _a.trys.push([1, , 3, 4]);
                     return [4 /*yield*/, main()];
                 case 2:
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 3:
-                    e_7 = _a.sent();
-                    d = dd(e_7);
-                    throw e_7;
+                    d = dd('');
+                    d = []; // Set break point here and watch the variable d
+                    return [7 /*endfinally*/];
                 case 4: return [2 /*return*/];
             }
         });
@@ -1602,6 +1628,10 @@ var secretExamleLabel = "#★秘密:仮";
 var secretExamleLabelEn = "#secret:example";
 var referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 var indentRegularExpression = /^( |¥t)*/;
+var fullMatchScore = 100;
+var caseIgnoredFullMatchScore = 8;
+var partMatchScore = 5;
+var caseIgnoredPartMatchScore = 3;
 var minLineNum = 0;
 var maxLineNum = 999999999;
 var maxNumber = 999999999;

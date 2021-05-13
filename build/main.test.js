@@ -214,12 +214,13 @@ describe("searches keyword tag", function () {
             "word(1)",
             ["search", "AB"],
             { folder: "test_data/search/1", test: "" },
-            "",
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
-            "",
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
         ], [
             "Multi folder",
             ["search", "ABC"],

@@ -606,7 +606,8 @@ async function  check(checkingFilePath?: string) {
 
 // search
 async function  search() {
-	const  keyword = programArguments[1].replace('"', '""');
+	const  keyword = programArguments[1];
+	const  keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
 	const  targetFolder = programOptions.folder;
 	const  currentFolder = process.cwd();
 	const  fileFullPaths: string[] = [];
@@ -637,10 +638,10 @@ async function  search() {
 
 			// keyword tag
 			if (line.indexOf(keywordLabel) !== notFound) {
-				if (line.indexOf(keyword) !== notFound) {
+				if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
 					const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
 					const  columns = await parseCSVColumns(csv);
-					if (columns.indexOf(keyword.replace('""','"')) !== notFound) {
+					if (getKeywordMatchedScore(columns, keyword) >= 1) {
 
 						console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
 					}
@@ -665,6 +666,32 @@ async function  search() {
 				}
 			}
 		}
+	}
+}
+
+// getKeywordMatchedScore
+function  getKeywordMatchedScore(testingStrings: string[], keyword: string): number {
+
+	if (testingStrings.indexOf(keyword) !== notFound) {
+		return  fullMatchScore;
+    } else {
+		const  lowerKeyword = keyword.toLowerCase();
+		const  score = testingStrings.reduce(
+			(score: number, testingString: string) => {
+
+				if (testingString.indexOf(keyword) != notFound) {
+					score += partMatchScore;
+				} else if (testingString.toLowerCase().indexOf(lowerKeyword) != notFound) {
+					if (testingString.length == lowerKeyword.length) {
+						score += caseIgnoredFullMatchScore;
+					} else {
+						score += caseIgnoredPartMatchScore;
+					}
+				}
+				return score;
+			}, 0);
+
+		return  score;
 	}
 }
 
@@ -1011,6 +1038,7 @@ function  dd(message: any) {
 export const  debugOut: string[] = [];
 
 // cc
+// Through counter.
 // #keyword: cc
 // Example:
 //   cc(9999);
@@ -1263,9 +1291,9 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
 	try {
 
 		await main();
-	} catch(e) {
-		var d = dd(e);
-		throw e;
+	} finally {
+		var d = dd('');
+		d = [];  // Set break point here and watch the variable d
 	}
 }
 
@@ -1284,6 +1312,10 @@ const  secretExamleLabel = "#★秘密:仮";
 const  secretExamleLabelEn = "#secret:example";
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
+const  fullMatchScore = 100;
+const  caseIgnoredFullMatchScore = 8;
+const  partMatchScore = 5;
+const  caseIgnoredPartMatchScore = 3;
 const  minLineNum = 0;
 const  maxLineNum = 999999999;
 const  maxNumber = 999999999;
