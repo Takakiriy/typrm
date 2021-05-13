@@ -6,6 +6,7 @@ NotGlossary1:
 Glossary:  #glossary:
     ABC: abc
     DE: de
+    de: de
 NotGlossary2:
     ABC: abc
     DE: de

@@ -840,9 +840,9 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, currentIndent, colonPosition, wordInGlossary, e_5_1;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1, _c, foundScores_1, found;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
                     keyword = exports.programArguments[1];
                     keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
@@ -851,17 +851,17 @@ function search() {
                     fileFullPaths = [];
                     return [4 /*yield*/, parseCSVColumns(targetFolder)];
                 case 1:
-                    targetFolders = _c.sent();
+                    targetFolders = _d.sent();
                     _loop_1 = function (folder) {
                         var targetFolderFullPath, scanedPaths;
-                        return __generator(this, function (_d) {
-                            switch (_d.label) {
+                        return __generator(this, function (_e) {
+                            switch (_e.label) {
                                 case 0:
                                     targetFolderFullPath = getFullPath(folder, currentFolder);
                                     process.chdir(targetFolderFullPath);
                                     return [4 /*yield*/, globby(['**/*'])];
                                 case 1:
-                                    scanedPaths = _d.sent();
+                                    scanedPaths = _e.sent();
                                     scanedPaths.forEach(function (scanedPath) {
                                         fileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath));
                                     });
@@ -870,14 +870,14 @@ function search() {
                         });
                     };
                     _i = 0, targetFolders_1 = targetFolders;
-                    _c.label = 2;
+                    _d.label = 2;
                 case 2:
                     if (!(_i < targetFolders_1.length)) return [3 /*break*/, 5];
                     folder = targetFolders_1[_i];
                     return [5 /*yield**/, _loop_1(folder)];
                 case 3:
-                    _c.sent();
-                    _c.label = 4;
+                    _d.sent();
+                    _d.label = 4;
                 case 4:
                     _i++;
                     return [3 /*break*/, 2];
@@ -885,8 +885,9 @@ function search() {
                     process.chdir(currentFolder);
                     indentAtStart = '';
                     inGlossary = false;
+                    foundScores = [];
                     _b = 0, fileFullPaths_1 = fileFullPaths;
-                    _c.label = 6;
+                    _d.label = 6;
                 case 6:
                     if (!(_b < fileFullPaths_1.length)) return [3 /*break*/, 21];
                     inputFileFullPath = fileFullPaths_1[_b];
@@ -895,14 +896,14 @@ function search() {
                         crlfDelay: Infinity
                     });
                     lineNum = 0;
-                    _c.label = 7;
+                    _d.label = 7;
                 case 7:
-                    _c.trys.push([7, 14, 15, 20]);
+                    _d.trys.push([7, 14, 15, 20]);
                     reader_4 = (e_5 = void 0, __asyncValues(reader));
-                    _c.label = 8;
+                    _d.label = 8;
                 case 8: return [4 /*yield*/, reader_4.next()];
                 case 9:
-                    if (!(reader_4_1 = _c.sent(), !reader_4_1.done)) return [3 /*break*/, 13];
+                    if (!(reader_4_1 = _d.sent(), !reader_4_1.done)) return [3 /*break*/, 13];
                     line1 = reader_4_1.value;
                     line = line1;
                     lineNum += 1;
@@ -911,11 +912,17 @@ function search() {
                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
                     return [4 /*yield*/, parseCSVColumns(csv)];
                 case 10:
-                    columns = _c.sent();
-                    if (getKeywordMatchedScore(columns, keyword) >= 1) {
-                        console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
+                    columns = _d.sent();
+                    matchedScore = getKeywordMatchedScore(columns, keyword);
+                    if (matchedScore >= 1) {
+                        found = new FoundScore();
+                        found.path = getTestablePath(inputFileFullPath);
+                        found.lineNum = lineNum;
+                        found.line = line;
+                        found.score = matchedScore;
+                        foundScores.push(found);
                     }
-                    _c.label = 11;
+                    _d.label = 11;
                 case 11:
                     // glossary tag
                     if (line.indexOf(glossaryLabel) !== notFound) {
@@ -924,37 +931,37 @@ function search() {
                     }
                     else if (inGlossary) {
                         currentIndent = indentRegularExpression.exec(line)[0];
-                        pp(120);
-                        pp(line);
-                        pp(keywordOfDoubleQuotedLowerCase);
                         if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
                             colonPosition = line.indexOf(':', currentIndent.length);
-                            wordInGlossary = line.substr(currentIndent.length, colonPosition);
-                            pp(121);
-                            pp(wordInGlossary);
-                            pp(keyword);
-                            if (getKeywordMatchedScore([wordInGlossary], keyword) >= 1) {
-                                console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + line);
+                            wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                            matchedScore = getKeywordMatchedScore([wordInGlossary], keyword);
+                            if (matchedScore >= 1) {
+                                found = new FoundScore();
+                                found.path = getTestablePath(inputFileFullPath);
+                                found.lineNum = lineNum;
+                                found.line = line;
+                                found.score = matchedScore;
+                                foundScores.push(found);
                             }
                         }
                         if (currentIndent.length <= indentAtStart.length) {
                             inGlossary = false;
                         }
                     }
-                    _c.label = 12;
+                    _d.label = 12;
                 case 12: return [3 /*break*/, 8];
                 case 13: return [3 /*break*/, 20];
                 case 14:
-                    e_5_1 = _c.sent();
+                    e_5_1 = _d.sent();
                     e_5 = { error: e_5_1 };
                     return [3 /*break*/, 20];
                 case 15:
-                    _c.trys.push([15, , 18, 19]);
+                    _d.trys.push([15, , 18, 19]);
                     if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 17];
                     return [4 /*yield*/, _a.call(reader_4)];
                 case 16:
-                    _c.sent();
-                    _c.label = 17;
+                    _d.sent();
+                    _d.label = 17;
                 case 17: return [3 /*break*/, 19];
                 case 18:
                     if (e_5) throw e_5.error;
@@ -963,7 +970,27 @@ function search() {
                 case 20:
                     _b++;
                     return [3 /*break*/, 6];
-                case 21: return [2 /*return*/];
+                case 21:
+                    foundScores.sort(function (a, b) {
+                        var different = a.score - b.score;
+                        if (different === 0) {
+                            if (a.path < b.path) {
+                                different = -1;
+                            }
+                            else if (a.path > b.path) {
+                                different = +1;
+                            }
+                            else {
+                                different = a.lineNum - b.lineNum;
+                            }
+                        }
+                        return different;
+                    });
+                    for (_c = 0, foundScores_1 = foundScores; _c < foundScores_1.length; _c++) {
+                        found = foundScores_1[_c];
+                        console.log(found.toString());
+                    }
+                    return [2 /*return*/];
             }
         });
     });
@@ -1282,6 +1309,19 @@ var Setting = /** @class */ (function () {
     }
     return Setting;
 }());
+// FoundScore
+var FoundScore = /** @class */ (function () {
+    function FoundScore() {
+        this.path = '';
+        this.lineNum = 0;
+        this.line = '';
+        this.score = 0;
+    }
+    FoundScore.prototype.toString = function () {
+        return this.path + ":" + this.lineNum + ": " + this.line;
+    };
+    return FoundScore;
+}());
 // SearchKeyword
 var SearchKeyword = /** @class */ (function () {
     function SearchKeyword() {
@@ -1321,19 +1361,23 @@ var WriteBuffer = /** @class */ (function () {
     };
     return WriteBuffer;
 }());
-// dd
+// getStdOut
+function getStdOut() {
+    return exports.stdout.split('\n');
+}
+// pp
 // Debug print.
-// #keyword: dd
+// #keyword: pp
 // Example:
-//    dd(var);
+//    pp(var);
 // Example:
-//    var d = dd(var);  // Set break point here and watch the variable d
+//    var d = pp(var);  // Set break point here and watch the variable d
 // Example:
 //    try {
 //
 //		  await main();
 //    } catch (e) {
-//        var d = dd(e);  // Set break point here and watch the variable d
+//        var d = pp(e);  // Set break point here and watch the variable d
 //        throw e;
 //    }
 function pp(message) {
@@ -1351,7 +1395,7 @@ exports.debugOut = [];
 //   cc(9999);
 // Example:
 //   if ( cc(2).isTarget )
-//   var d = dd('');  // Set break point here and watch the variable d
+//   var d = pp('');  // Set break point here and watch the variable d
 function cc(targetCount, label) {
     if (label === void 0) { label = '0'; }
     if (!(label in gCount)) {
@@ -1586,7 +1630,7 @@ function translate(englishLiterals) {
 // callMainFromJest
 function callMainFromJest(parameters, options) {
     return __awaiter(this, void 0, void 0, function () {
-        var d;
+        var d, a;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1613,6 +1657,7 @@ function callMainFromJest(parameters, options) {
                     return [3 /*break*/, 4];
                 case 3:
                     d = pp('');
+                    a = getStdOut();
                     d = []; // Set break point here and watch the variable d
                     return [7 /*endfinally*/];
                 case 4: return [2 /*return*/];

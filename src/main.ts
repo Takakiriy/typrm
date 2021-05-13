@@ -624,6 +624,7 @@ async function  search() {
 	process.chdir(currentFolder);
 	var  indentAtStart = '';
 	var  inGlossary = false;
+	const  foundScores: FoundScore[] = [];
 
 	for (const inputFileFullPath of fileFullPaths) {
 		const  reader = readline.createInterface({
@@ -641,9 +642,15 @@ async function  search() {
 				if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
 					const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
 					const  columns = await parseCSVColumns(csv);
-					if (getKeywordMatchedScore(columns, keyword) >= 1) {
+					const  matchedScore = getKeywordMatchedScore(columns, keyword);
+					if (matchedScore >= 1) {
 
-						console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
+						const  found = new FoundScore();
+						found.path = getTestablePath(inputFileFullPath);
+						found.lineNum = lineNum;
+						found.line = line;
+						found.score = matchedScore;
+						foundScores.push(found);
 					}
 				}
 			}
@@ -658,10 +665,16 @@ async function  search() {
 
 				if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
 					const  colonPosition = line.indexOf(':', currentIndent.length);
-					const  wordInGlossary = line.substr(currentIndent.length, colonPosition);
-					if (getKeywordMatchedScore([wordInGlossary], keyword) >= 1) {
+					const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+					const  matchedScore = getKeywordMatchedScore([wordInGlossary], keyword);
+					if (matchedScore >= 1) {
 
-						console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${line}`);
+						const  found = new FoundScore();
+						found.path = getTestablePath(inputFileFullPath);
+						found.lineNum = lineNum;
+						found.line = line;
+						found.score = matchedScore;
+						foundScores.push(found);
 					}
 				}
 				if (currentIndent.length <= indentAtStart.length) {
@@ -669,6 +682,24 @@ async function  search() {
 				}
 			}
 		}
+	}
+
+	foundScores.sort( (a, b) => {
+		var  different = a.score - b.score;
+		if (different === 0) {
+			if (a.path < b.path) {
+				different = -1;
+			} else if (a.path > b.path) {
+				different = +1;
+			} else {
+				different = a.lineNum - b.lineNum;
+			}
+		}
+		return  different;
+	});
+	for (const found of foundScores) {
+
+		console.log(found.toString());
 	}
 }
 
@@ -973,6 +1004,18 @@ class Setting {
 	isReferenced: boolean = false;
 }
 
+// FoundScore
+class FoundScore {
+	path: string = '';
+	lineNum: number = 0;
+	line: string = '';
+	score: number = 0;
+
+	toString(): string {
+		return `${this.path}:${this.lineNum}: ${this.line}`;
+	}
+}
+
 // SearchKeyword
 class SearchKeyword {
 	keyword: string = '';
@@ -1016,19 +1059,24 @@ class  WriteBuffer {
 	}
 }
 
-// dd
+// getStdOut
+function  getStdOut(): string[] {
+	return  stdout.split('\n');
+}
+
+// pp
 // Debug print.
-// #keyword: dd
+// #keyword: pp
 // Example:
-//    dd(var);
+//    pp(var);
 // Example:
-//    var d = dd(var);  // Set break point here and watch the variable d
+//    var d = pp(var);  // Set break point here and watch the variable d
 // Example:
 //    try {
 //
 //		  await main();
 //    } catch (e) {
-//        var d = dd(e);  // Set break point here and watch the variable d
+//        var d = pp(e);  // Set break point here and watch the variable d
 //        throw e;
 //    }
 function  pp(message: any) {
@@ -1047,7 +1095,7 @@ export const  debugOut: string[] = [];
 //   cc(9999);
 // Example:
 //   if ( cc(2).isTarget )
-//   var d = dd('');  // Set break point here and watch the variable d
+//   var d = pp('');  // Set break point here and watch the variable d
 function  cc( targetCount: number, label: string = '0' ) {
 	if (!(label in gCount)) {
 		gCount[label] = 0;
@@ -1296,6 +1344,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
 		await main();
 	} finally {
 		var d = pp('');
+		var s = getStdOut();
 		d = [];  // Set break point here and watch the variable d
 	}
 }

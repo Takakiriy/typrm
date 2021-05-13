@@ -204,7 +204,8 @@ describe("searches keyword tag", function () {
             "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "A,B"\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "double quotation",
             ["search", 'double quotation is ".'],
@@ -226,6 +227,18 @@ describe("searches keyword tag", function () {
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
                 '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
+        ], [
+            "output order (1)",
+            ["search", "a,b"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "A,B"\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+        ], [
+            "output order (2)",
+            ["search", "A,B"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "A,B"\n',
         ], [
             "Multi folder",
             ["search", "ABC"],
@@ -275,6 +288,18 @@ describe("searches glossary tag", function () {
             ["search", "AB"],
             { folder: "test_data/search/glossary/1", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+        ], [
+            "output order (1)",
+            ["search", "de"],
+            { folder: "test_data/search/glossary/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     DE: de\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     de: de\n',
+        ], [
+            "output order (2)",
+            ["search", "DE"],
+            { folder: "test_data/search/glossary/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     de: de\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     DE: de\n',
         ], [
             "Multi folder",
             ["search", "ABC"],
