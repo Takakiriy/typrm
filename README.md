@@ -105,7 +105,7 @@ To use typrm, you must install Node.js.
             - npm config -g set proxy "http://___.___.___.___:____"
             - npm config -g set https-proxy "http://___.___.___.___:____"
 
-    Install Node.js packages used by typrm:
+    Download and expand typrm and install Node.js packages used by typrm:
         Windows Start >> (Input) PowerShell :
             cd  ${env:USERPROFILE}\Downloads
             Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
@@ -115,18 +115,19 @@ To use typrm, you must install Node.js.
 
             npm install --only=production
 
-    Create a PS1 script file that launches typrm into the folder where PATH of PowerShell:
-        Windows Start >> (Input) PowerShell :
-            cd  ${env:USERPROFILE}\Downloads\typrm-master
-            ${current_folder} = Convert-Path "."
-            ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
-            ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
+    If you use PowerShell:
+        Create a PS1 script file that launches typrm into the folder where PATH of PowerShell:
+            Windows Start >> (Input) PowerShell :
+                cd  ${env:USERPROFILE}\Downloads\typrm-master
+                ${current_folder} = Convert-Path "."
+                ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
+                ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
-            echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
-            echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
-            echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+                echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
+                echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
+                echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
-            Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// Make the script run
+                Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// Make the script run
 
     If you use Git bash:
         Install Git for Windows:
@@ -168,24 +169,18 @@ To use typrm, you must install Node.js.
 
     Make the script file in the PATH folder to start typrm:
         cd typrm  #// The folder extracted from the Zip file
-        OUT_="$HOME/bin/typrm"
-        rm -f "${OUT_}"
-        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${OUT_}"
-        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${OUT_}"
-        echo "node  $(pwd)/build/typrm.js \$*" >> "${OUT_}"
-        chmod +x "${OUT_}"
-        unset OUT_
+        script="$HOME/bin/typrm"
+        rm -f "${script}"
+        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
+        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
+        echo "node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        chmod +x "${script}"
+        unset script
 
     Check to use typrm command:
         typrm --version
 
-
 ### For CentOS 7
-
-    Download and expand typrm:
-        - cd  ~/Downloads
-        - wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        - unzip -o typrm.zip
 
     Install Node.js:
         - https://nodejs.org/ja/download/ >> (click 64-bit at the right of) Linux Binaries (x64) >>
@@ -203,24 +198,37 @@ To use typrm, you must install Node.js.
         - node --version
         - echo 'export PATH="/opt/node/bin:$PATH"' >> ~/.bashrc
 
-    Install the commander package used by typrm:
-        - npm install -g commander
+    If there is your machine in the LAN with the proxy in the company and so on:
+        npm config -g set proxy "http://___.___.___.___:____"
+        npm config -g set https-proxy "http://___.___.___.___:____"
 
-    Add execution attributes to `typrm.sh` file and copy to to a directory in your PATH:
-        - cd  typrm-master/bin
-        - nano  typrm.sh : |  #// The case of changing install target
-            node  ~/Downloads/typrm-master/build/typrm.js
-        - chmod +x  typrm.sh
-        - mkdir -p ~/bin
-        - cp  typrm.sh  ~/bin/typrm
+    Download and expand typrm, and install the commander package used by typrm:
+        cd  ~/Downloads
+        wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        unzip -o typrm.zip
+        mv  typrm-master  typrm  #// The folder extracted from the Zip file
+        cd  typrm
 
-    Start typrm:
-        - typrm
+        npm install --only=production
+
+    Create a bash script file that launches typrm into the folder where PATH passed:
+        cd  ${HOME}/Downloads/typrm
+        current_folder="$(pwd)"
+        typrm_folder="${HOME}/Documents/typrm"
+        script="${HOME}/bin/typrm"
+        mkdir -p "${HOME}/bin"
+
+        echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+        echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+
+    Check to use typrm command:
+        typrm --version
 
     (If you do not use) delete typrm:
         - rm ~/bin/typrm
         - rm ~/Downloads/typrm.zip
-        - rm -rf ~/Downloads/typrm-master/
+        - rm -rf ~/Downloads/typrm/
 
 
 ## About settings tags and #template tags

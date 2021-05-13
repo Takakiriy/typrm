@@ -109,7 +109,7 @@ typrm を使うには Node.js のインストールが必要です。
             npm config -g set proxy "http://___.___.___.___:____"
             npm config -g set https-proxy "http://___.___.___.___:____"
 
-    typrm が使う Node.js パッケージをインストールします:
+    typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
         Windows スタート >> PowerShell（と入力）:
             cd  ${env:USERPROFILE}\Downloads
             Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
@@ -119,18 +119,19 @@ typrm を使うには Node.js のインストールが必要です。
 
             npm install --only=production
 
-    PowerShell の PATH が通ったフォルダーに typrm を起動する PS1 スクリプト ファイル を作ります:
-        Windows スタート >> PowerShell（と入力） :
-            cd  ${env:USERPROFILE}\Downloads\typrm-master
-            ${current_folder} = Convert-Path "."
-            ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
-            ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
+    PowerShell を使う場合:
+        PowerShell の PATH が通ったフォルダーに typrm を起動する PS1 スクリプト ファイル を作ります:
+            Windows スタート >> PowerShell（と入力） :
+                cd  ${env:USERPROFILE}\Downloads\typrm-master
+                ${current_folder} = Convert-Path "."
+                ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
+                ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
-            echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
-            echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
-            echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+                echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
+                echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
+                echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
-            Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// スクリプトを実行できるようにします
+                Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// スクリプトを実行できるようにします
 
     Git bash を使う場合:
         Git for Windows をインストールします:
@@ -173,24 +174,18 @@ typrm を使うには Node.js のインストールが必要です。
 
     PATH が通ったフォルダーに typrm を起動する スクリプト ファイル を作ります:
         cd typrm  #// Zip ファイルを展開したフォルダー
-        OUT_="$HOME/bin/typrm"
-        rm -f "${OUT_}"
-        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${OUT_}"
-        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${OUT_}"
-        echo "node  $(pwd)/build/typrm.js \$*" >> "${OUT_}"
-        chmod +x "${OUT_}"
-        unset OUT_
+        script="$HOME/bin/typrm"
+        rm -f "${script}"
+        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
+        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
+        echo "node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        chmod +x "${script}"
+        unset script
 
     typrm が使えることを確認します:
         typrm --version
 
-
 ### CentOS 7 の場合
-
-    typrm をダウンロードして展開します:
-        - cd  ~/Downloads
-        - wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        - unzip -o typrm.zip
 
     Node.js をインストールします:
         - https://nodejs.org/ja/download/ >> (click 64-bit at the right of) Linux Binaries (x64) >>
@@ -208,24 +203,37 @@ typrm を使うには Node.js のインストールが必要です。
         - node --version
         - echo 'export PATH="/opt/node/bin:$PATH"' >> ~/.bashrc
 
-    typrm が使う commander パッケージをインストールします:
-        - npm install -g commander
+    社内など、プロキシがある LAN にある場合:
+        npm config -g set proxy "http://___.___.___.___:____"
+        npm config -g set https-proxy "http://___.___.___.___:____"
 
-    `typrm.sh` ファイルに実行属性を追加して、PATH が通ったディレクトリにコピーします:
-        - cd  typrm-master/bin
-        - nano  typrm.sh : |  #// インストール先を変える場合
-            node  ~/Downloads/typrm-master/build/typrm.js
-        - chmod +x  typrm.sh
-        - mkdir -p ~/bin
-        - cp  typrm.sh  ~/bin/typrm
+    typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
+        cd  ~/Downloads
+        wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        unzip -o typrm.zip
+        mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
+        cd  typrm
 
-    typrm を実行します:
-        - typrm
+        npm install --only=production
+
+    PATH が通ったフォルダーに typrm を起動する bash スクリプト ファイル を作ります:
+        cd  ${HOME}/Downloads/typrm
+        current_folder="$(pwd)"
+        typrm_folder="${HOME}/Documents/typrm"
+        script="${HOME}/bin/typrm"
+        mkdir -p "${HOME}/bin"
+
+        echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+        echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+
+    typrm が使えることを確認します:
+        typrm --version
 
     （使わなくなったら）typrm を削除します:
         - rm ~/bin/typrm
         - rm ~/Downloads/typrm.zip
-        - rm -rf ~/Downloads/typrm-master/
+        - rm -rf ~/Downloads/typrm/
 
 
 ## 設定タグと #template タグについて
