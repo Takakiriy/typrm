@@ -136,6 +136,16 @@ describe("searches keyword tag", () => {
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ],[
+            "ommit command name (1)",
+            ["ABC"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+        ],[
+            "ommit command name (2)",
+            ["do", "it"],
+            { folder: "test_data/search/1", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+        ],[
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },

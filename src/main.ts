@@ -40,7 +40,7 @@ export async function  main() {
 			await replaceSettings(inputFilePath, changingLineNum, keyValues);
 		}
 		else {
-			console.log(`Unknown command "${programArguments[0]}".`);
+			await search();
 		}
 	}
 }
@@ -606,7 +606,8 @@ async function  check(checkingFilePath?: string) {
 
 // search
 async function  search() {
-	const  keyword = programArguments[1];
+	const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
+	const  keyword = programArguments.slice(startIndex).join(' ');
 	const  keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
 	const  targetFolder = programOptions.folder;
 	const  currentFolder = process.cwd();

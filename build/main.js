@@ -74,14 +74,14 @@ function main() {
                 case 2:
                     _a.sent();
                     _a.label = 3;
-                case 3: return [3 /*break*/, 11];
+                case 3: return [3 /*break*/, 12];
                 case 4:
-                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 11];
+                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 12];
                     if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 6];
                     return [4 /*yield*/, search()];
                 case 5:
                     _a.sent();
-                    return [3 /*break*/, 11];
+                    return [3 /*break*/, 12];
                 case 6:
                     if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 8];
                     if (exports.programArguments.length >= 2) {
@@ -90,7 +90,7 @@ function main() {
                     return [4 /*yield*/, check(checkingFilePath)];
                 case 7:
                     _a.sent();
-                    return [3 /*break*/, 11];
+                    return [3 /*break*/, 12];
                 case 8:
                     if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 10];
                     varidateUpdateCommandArguments();
@@ -100,11 +100,12 @@ function main() {
                     return [4 /*yield*/, replaceSettings(inputFilePath, changingLineNum, keyValues)];
                 case 9:
                     _a.sent();
-                    return [3 /*break*/, 11];
-                case 10:
-                    console.log("Unknown command \"" + exports.programArguments[0] + "\".");
-                    _a.label = 11;
-                case 11: return [2 /*return*/];
+                    return [3 /*break*/, 12];
+                case 10: return [4 /*yield*/, search()];
+                case 11:
+                    _a.sent();
+                    _a.label = 12;
+                case 12: return [2 /*return*/];
             }
         });
     });
@@ -840,11 +841,12 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1, _c, foundScores_1, found;
+        var startIndex, keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1, _c, foundScores_1, found;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
-                    keyword = exports.programArguments[1];
+                    startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
+                    keyword = exports.programArguments.slice(startIndex).join(' ');
                     keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
                     targetFolder = exports.programOptions.folder;
                     currentFolder = process.cwd();
@@ -1630,7 +1632,7 @@ function translate(englishLiterals) {
 // callMainFromJest
 function callMainFromJest(parameters, options) {
     return __awaiter(this, void 0, void 0, function () {
-        var d, a;
+        var d, s;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1657,7 +1659,7 @@ function callMainFromJest(parameters, options) {
                     return [3 /*break*/, 4];
                 case 3:
                     d = pp('');
-                    a = getStdOut();
+                    s = getStdOut();
                     d = []; // Set break point here and watch the variable d
                     return [7 /*endfinally*/];
                 case 4: return [2 /*return*/];
