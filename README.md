@@ -218,7 +218,7 @@ To use typrm, you must install Node.js.
         script="${HOME}/bin/typrm"
         mkdir -p "${HOME}/bin"
 
-        echo  "export NODE_PATH=\"$(pwd)/node_modules"" > ${script}
+        echo  "export NODE_PATH=\"$(pwd)/node_modules\"" > ${script}
         echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
         echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x "${script}"
