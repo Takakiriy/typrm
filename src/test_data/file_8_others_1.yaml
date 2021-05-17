@@ -1,16 +1,16 @@
 設定:
     __Base__: ../../file_target/1
-    __Forth__: forth
+    __Fourth__: fourth
 
 file-template-any-lines:
     OK:
         ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
             first
             #file-template-any-lines:
-            forth  #template: __Forth__
+            fourth  #template: __Fourth__
 
     NG:
         ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
             first
             #file-template-any-lines:
-            not found
+            not fourth  #template: __Fourth__

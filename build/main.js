@@ -213,7 +213,7 @@ function oldMain(isModal, inputFilePath) {
                     if (!fileTemplateTag) return [3 /*break*/, 8];
                     continue_ = fileTemplateTag.onReadLine(line);
                     if (!!continue_) return [3 /*break*/, 8];
-                    return [4 /*yield*/, fileTemplateTag.checkTargetContents(setting, inputFilePath, lineNum)];
+                    return [4 /*yield*/, fileTemplateTag.checkTargetFileContents(setting, inputFilePath, lineNum)];
                 case 7:
                     checkPassed = _h.sent();
                     if (!checkPassed) {
@@ -292,7 +292,7 @@ function oldMain(isModal, inputFilePath) {
                     }
                     if (!fileTemplateTag) return [3 /*break*/, 19];
                     fileTemplateTag.onReadLine(''); // Cut indent
-                    return [4 /*yield*/, fileTemplateTag.checkTargetContents(setting, inputFilePath, lineNum)];
+                    return [4 /*yield*/, fileTemplateTag.checkTargetFileContents(setting, inputFilePath, lineNum)];
                 case 18:
                     checkPassed = _h.sent();
                     if (!checkPassed) {
@@ -675,10 +675,10 @@ var TemplateTag = /** @class */ (function () {
         }
         return readingNext;
     };
-    TemplateTag.prototype.checkTargetContents = function (setting, inputFilePath, templateEndLineNum) {
+    TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_4, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, same, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_4_1, templateLineNum;
+            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_4_1, templateLineNum;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -708,7 +708,17 @@ var TemplateTag = /** @class */ (function () {
                         errorExpected = '';
                         errorTemplate = '';
                         indent = '';
-                        same = false;
+                        (function (Result) {
+                            Result[Result["same"] = 0] = "same";
+                            Result[Result["different"] = 1] = "different";
+                            Result[Result["skipped"] = 2] = "skipped";
+                        })(Result || (Result = {}));
+                        ;
+                        skipTo = '';
+                        skipToTemplate = '';
+                        skipFrom = '';
+                        skipStartLineNum = 0;
+                        loop = true;
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 6, 7, 12]);
@@ -718,37 +728,70 @@ var TemplateTag = /** @class */ (function () {
                     case 3:
                         if (!(targetFileReader_1_1 = _b.sent(), !targetFileReader_1_1.done)) return [3 /*break*/, 5];
                         line1 = targetFileReader_1_1.value;
-                        targetLine = line1;
-                        targetLineNum += 1;
-                        if (templateLineIndex === 0) {
-                            indentLength = targetLine.indexOf(expectedFirstLine);
-                            if (indentLength === notFound) {
-                                same = false;
+                        if (!loop) {
+                            return [3 /*break*/, 4];
+                        } // "reader" requests read all lines
+                        try {
+                            targetLine = line1;
+                            targetLineNum += 1;
+                            if (templateLineIndex === 0) {
+                                indentLength = targetLine.indexOf(expectedFirstLine);
+                                if (indentLength === notFound) {
+                                    result = Result.different;
+                                }
+                                else {
+                                    result = Result.same;
+                                    indent = targetLine.substr(0, indentLength);
+                                }
+                            }
+                            else if (skipTo === '') { // lineIndex >= 1
+                                expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
+                                if (targetLine === indent + expected) {
+                                    result = Result.same;
+                                }
+                                else if (expected === fileTemplateAnyLinesLabel) {
+                                    result = Result.skipped;
+                                    templateLineIndex += 1;
+                                    skipToTemplate = this.templateLines[templateLineIndex];
+                                    skipTo = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
+                                    skipFrom = targetLine;
+                                    skipStartLineNum = targetLineNum;
+                                }
+                                else {
+                                    result = Result.different;
+                                    errorTemplateLineIndex = templateLineIndex;
+                                    errorTargetLineNum = targetLineNum;
+                                    errorContents = targetLine;
+                                    errorExpected = indent + expected;
+                                    errorTemplate = indent + this.templateLines[templateLineIndex];
+                                }
+                            }
+                            else { // skipTo
+                                if (targetLine === indent + skipTo) {
+                                    skipTo = '';
+                                    result = Result.same;
+                                }
+                                else {
+                                    result = Result.skipped;
+                                }
+                            }
+                            if (result === Result.same) {
+                                templateLineIndex += 1;
+                                if (templateLineIndex >= this.templateLines.length) {
+                                    loop = false; // return or break must not be written.
+                                    // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                                }
+                            }
+                            else if (result === Result.skipped) {
+                                // Do nothing
                             }
                             else {
-                                same = true;
-                                indent = targetLine.substr(0, indentLength);
+                                templateLineIndex = 0;
                             }
                         }
-                        else { // lineIndex >= 1
-                            expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
-                            same = (targetLine === indent + expected);
-                            if (!same) {
-                                errorTemplateLineIndex = templateLineIndex;
-                                errorTargetLineNum = targetLineNum;
-                                errorContents = targetLine;
-                                errorExpected = indent + expected;
-                                errorTemplate = indent + this.templateLines[templateLineIndex];
-                            }
-                        }
-                        if (same) {
-                            templateLineIndex += 1;
-                            if (templateLineIndex >= this.templateLines.length) {
-                                return [3 /*break*/, 5];
-                            }
-                        }
-                        else {
-                            templateLineIndex = 0;
+                        catch (e) {
+                            exception = e;
+                            loop = false;
                         }
                         _b.label = 4;
                     case 4: return [3 /*break*/, 2];
@@ -770,8 +813,21 @@ var TemplateTag = /** @class */ (function () {
                         return [7 /*endfinally*/];
                     case 11: return [7 /*endfinally*/];
                     case 12:
-                        if (!same) {
-                            templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
+                        if (exception) {
+                            throw exception;
+                        }
+                        if (result !== Result.same) {
+                            templateLineNum = 0;
+                            if (result === Result.different) {
+                                templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
+                            }
+                            if (result === Result.skipped) {
+                                templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex + 1;
+                                errorContents = skipFrom;
+                                errorExpected = skipTo;
+                                errorTemplate = skipToTemplate;
+                                errorTargetLineNum = skipStartLineNum;
+                            }
                             if (errorContents === '') {
                                 errorContents = '(Not found)';
                                 errorExpected = expectedFirstLine;
@@ -780,11 +836,11 @@ var TemplateTag = /** @class */ (function () {
                             console.log("");
                             console.log(translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + templateLineNum);
                             console.log(translate('ErrorFile') + ": " + getTestablePath(targetFilePath) + ":" + errorTargetLineNum);
-                            console.log("  Contents: " + errorContents);
-                            console.log("  Expected: " + errorExpected);
                             console.log("  Template: " + errorTemplate);
+                            console.log("  Expected: " + errorExpected);
+                            console.log("  Contents: " + errorContents);
                         }
-                        return [2 /*return*/, same];
+                        return [2 /*return*/, result === Result.same];
                 }
             });
         });
@@ -1399,6 +1455,7 @@ exports.debugOut = [];
 //   if ( cc(2).isTarget )
 //   var d = pp('');  // Set break point here and watch the variable d
 function cc(targetCount, label) {
+    if (targetCount === void 0) { targetCount = 9999999; }
     if (label === void 0) { label = '0'; }
     if (!(label in gCount)) {
         gCount[label] = 0;
@@ -1674,6 +1731,7 @@ var templateLabel = "#template:";
 var templateAtStartLabel = "#template-at(";
 var templateAtEndLabel = "):";
 var fileTemplateLabel = "#file-template:";
+var fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];

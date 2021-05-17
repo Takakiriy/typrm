@@ -136,7 +136,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 				const continue_ = fileTemplateTag.onReadLine(line);
 				if (!continue_) {
 
-					const  checkPassed = await fileTemplateTag.checkTargetContents(
+					const  checkPassed = await fileTemplateTag.checkTargetFileContents(
 						setting, inputFilePath, lineNum);
 					if (!checkPassed) {
 						errorCount += 1;
@@ -201,7 +201,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 		if (fileTemplateTag) {
 			fileTemplateTag.onReadLine('');  // Cut indent
 
-			const  checkPassed = await fileTemplateTag.checkTargetContents(
+			const  checkPassed = await fileTemplateTag.checkTargetFileContents(
 				setting, inputFilePath, lineNum);
 			if (!checkPassed) {
 				errorCount += 1;
@@ -494,7 +494,7 @@ class  TemplateTag {
 		}
 		return  readingNext;
 	}
-	async  checkTargetContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
+	async  checkTargetFileContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
 		const  parentPath = path.dirname(inputFilePath);
 		const  targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
 		if (!fs.existsSync(targetFilePath)) {
@@ -521,44 +521,91 @@ class  TemplateTag {
 		let  errorExpected = '';
 		let  errorTemplate = '';
 		let  indent = '';
-		let  same = false;
+		enum Result { same, different, skipped };
+		let  result: Result | undefined;
+		let  skipTo = '';
+		let  skipToTemplate = '';
+		let  skipFrom = '';
+		let  skipStartLineNum = 0;
+		let  loop = true;
+		let  exception: any;
 
 		for await (const line1 of targetFileReader) {
-			const  targetLine: string = line1;
-			targetLineNum += 1;
-			if (templateLineIndex === 0) {
+			if (!loop) {continue;}  // "reader" requests read all lines
+			try {
+				const  targetLine: string = line1;
+				targetLineNum += 1;
+				if (templateLineIndex === 0) {
 
-				const  indentLength = targetLine.indexOf(expectedFirstLine);
-				if (indentLength === notFound) {
-					same = false;
+					const  indentLength = targetLine.indexOf(expectedFirstLine);
+					if (indentLength === notFound) {
+						result = Result.different;
+					} else {
+						result = Result.same;
+						indent = targetLine.substr(0, indentLength);
+					}
+				} else if (skipTo === '') { // lineIndex >= 1
+					const  expected = getExpectedLineInFileTemplate(
+						setting, this.templateLines[templateLineIndex]);
+
+					if (targetLine === indent + expected) {
+						result = Result.same;
+					} else if (expected === fileTemplateAnyLinesLabel) {
+						result = Result.skipped;
+						templateLineIndex += 1;
+						skipToTemplate = this.templateLines[templateLineIndex];
+						skipTo = getExpectedLineInFileTemplate(
+							setting, this.templateLines[templateLineIndex]);
+						skipFrom = targetLine;
+						skipStartLineNum = targetLineNum;
+					} else {
+						result = Result.different;
+						errorTemplateLineIndex = templateLineIndex;
+						errorTargetLineNum = targetLineNum;
+						errorContents = targetLine;
+						errorExpected = indent + expected;
+						errorTemplate = indent + this.templateLines[templateLineIndex];
+					}
+				} else { // skipTo
+					if (targetLine === indent + skipTo) {
+						skipTo = '';
+						result = Result.same;
+					} else {
+						result = Result.skipped;
+					}
+				}
+
+				if (result === Result.same) {
+					templateLineIndex += 1;
+					if (templateLineIndex >= this.templateLines.length) {
+						loop = false;  // return or break must not be written.
+						// https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+					}
+				} else if (result === Result.skipped) {
+					// Do nothing
 				} else {
-					same = true;
-					indent = targetLine.substr(0, indentLength);
+					templateLineIndex = 0;
 				}
-			} else { // lineIndex >= 1
-				const  expected = getExpectedLineInFileTemplate(
-					setting, this.templateLines[templateLineIndex]);
-
-				same = (targetLine === indent + expected);
-				if (!same) {
-					errorTemplateLineIndex = templateLineIndex;
-					errorTargetLineNum = targetLineNum;
-					errorContents = targetLine;
-					errorExpected = indent + expected;
-					errorTemplate = indent + this.templateLines[templateLineIndex];
-				}
-			}
-			if (same) {
-				templateLineIndex += 1;
-				if (templateLineIndex >= this.templateLines.length) {
-					break;
-				}
-			} else {
-				templateLineIndex = 0;
+			} catch (e) {
+				exception = e;
+				loop = false;
 			}
 		}
-		if (!same) {
-			const  templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
+		if (exception) {
+			throw exception;
+		}
+		if (result !== Result.same) {
+			let  templateLineNum = 0;
+			if (result === Result.different) {
+				templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
+			}
+			if (result === Result.skipped) {
+				templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex + 1;
+				errorContents = skipFrom;
+				errorExpected = skipTo;
+				errorTemplate = skipToTemplate;
+				errorTargetLineNum = skipStartLineNum;
+			}
 			if (errorContents === '') {
 				errorContents = '(Not found)';
 				errorExpected = expectedFirstLine;
@@ -567,11 +614,11 @@ class  TemplateTag {
 			console.log("");
 			console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
 			console.log(`${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
-			console.log(`  Contents: ${errorContents}`);
-			console.log(`  Expected: ${errorExpected}`);
 			console.log(`  Template: ${errorTemplate}`);
+			console.log(`  Expected: ${errorExpected}`);
+			console.log(`  Contents: ${errorContents}`);
 		}
-		return  same;
+		return  result === Result.same;
 	}
 }
 
@@ -1097,7 +1144,7 @@ export const  debugOut: string[] = [];
 // Example:
 //   if ( cc(2).isTarget )
 //   var d = pp('');  // Set break point here and watch the variable d
-function  cc( targetCount: number, label: string = '0' ) {
+function  cc( targetCount: number = 9999999, label: string = '0' ) {
 	if (!(label in gCount)) {
 		gCount[label] = 0;
 	}
@@ -1356,6 +1403,7 @@ const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
 const  fileTemplateLabel = "#file-template:";
+const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];

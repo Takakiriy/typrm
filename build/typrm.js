@@ -49,7 +49,7 @@ function callMain() {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    commander.program.version('0.1.3').exitOverride(exitFromCommander)
+                    commander.program.version('0.2.0').exitOverride(exitFromCommander)
                         .option("-l, --locale <s>")
                         .option("-t, --test")
                         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)

@@ -90,11 +90,13 @@ describe("checks file contents", function () {
     test.skip('file_3_file_name', function () { });
     test.each([
         [
-            "file_1_ok_and_bad", "file/1", "", 0, 0, "",
+            "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
         ], [
-            "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+            "NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+        ], [
+            "any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
-    ])("in %s, %s %s", function (fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
+    ])("%s in %s, %s %s", function (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFilePath, changingFilePath, changingFileRelativePath;
         return __generator(this, function (_a) {
             switch (_a.label) {

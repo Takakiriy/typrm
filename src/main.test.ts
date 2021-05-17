@@ -42,7 +42,7 @@ describe("checks template value", () => {
 describe("checks file contents", () => {
     test.skip('file_2_tab',()=>{});
     test.skip('file_3_file_name',()=>{});
-    test.only.each([
+    test.each([
         [
 			"OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
         ],[
@@ -51,7 +51,6 @@ describe("checks file contents", () => {
 			"any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
     ])("%s in %s, %s %s", async (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
-if (caseName !== 'any_lines') {return;}
         const  sourceFilePath   = 'test_data/' + fileNameHead + "_1.yaml";
         const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
         const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
@@ -71,7 +70,6 @@ if (caseName !== 'any_lines') {return;}
 
         expect(main.stdout).toMatchSnapshot('stdout');
         fs.rmdirSync('test_data/_checking', {recursive: true});
-expect('test code').toBe('deleted skip code.');
     });
 });
 

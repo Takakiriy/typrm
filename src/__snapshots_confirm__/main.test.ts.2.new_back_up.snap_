@@ -4,21 +4,21 @@ exports[`checks file contents NG in file_1_ok_and_bad, file/1 replace: stdout 1`
 "
 typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:7
 ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:4
-  Contents:             user: 'user1'
-  Expected:             user: 'user2'
   Template:             user: 'user2'  #template: __User__
+  Expected:             user: 'user2'
+  Contents:             user: 'user1'
 
 typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:10
 ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
-  Contents: (Not found)
-  Expected: login user2
   Template: login user2  #template: __User__
+  Expected: login user2
+  Contents: (Not found)
 
 typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:11
 ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
-  Contents: (Not found)
-  Expected: login user2
   Template: login user2  #template: __User__
+  Expected: login user2
+  Contents: (Not found)
 
 Warning: 0, Error: 3
 template count = 6
@@ -29,6 +29,19 @@ exports[`checks file contents OK in file_1_ok_and_bad, file/1 : stdout 1`] = `
 "
 Warning: 0, Error: 0
 template count = 6
+"
+`;
+
+exports[`checks file contents any_lines in file_8_others, file/1 : stdout 1`] = `
+"
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_8_others_1_changing.yaml:16
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:3
+  Template: not fourth  #template: __Fourth__
+  Expected: not fourth
+  Contents:     second
+
+Warning: 0, Error: 1
+template count = 4
 "
 `;
 
