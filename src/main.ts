@@ -656,6 +656,7 @@ async function  search() {
 	const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
 	const  keyword = programArguments.slice(startIndex).join(' ');
 	const  keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
+	const  keywordDoubleQuoted = keyword.replace('"', '""');
 	const  targetFolder = programOptions.folder;
 	const  currentFolder = process.cwd();
 	const  fileFullPaths: string[] = [];
@@ -687,19 +688,17 @@ async function  search() {
 
 			// keyword tag
 			if (line.indexOf(keywordLabel) !== notFound) {
-				if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
-					const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
-					const  columns = await parseCSVColumns(csv);
-					const  matchedScore = getKeywordMatchedScore(columns, keyword);
-					if (matchedScore >= 1) {
+				const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+				const  columns = await parseCSVColumns(csv);
+				const  matchedScore = getKeywordMatchedScore(columns, keywordDoubleQuoted);
+				if (matchedScore >= 1) {
 
-						const  found = new FoundScore();
-						found.path = getTestablePath(inputFileFullPath);
-						found.lineNum = lineNum;
-						found.line = line;
-						found.score = matchedScore;
-						foundScores.push(found);
-					}
+					const  found = new FoundScore();
+					found.path = getTestablePath(inputFileFullPath);
+					found.lineNum = lineNum;
+					found.line = line;
+					found.score = matchedScore;
+					foundScores.push(found);
 				}
 			}
 
@@ -710,20 +709,17 @@ async function  search() {
 			}
 			else if (inGlossary) {
 				const  currentIndent = indentRegularExpression.exec(line)![0];
+				const  colonPosition = line.indexOf(':', currentIndent.length);
+				const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+				const  matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
+				if (matchedScore >= 1) {
 
-				if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
-					const  colonPosition = line.indexOf(':', currentIndent.length);
-					const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-					const  matchedScore = getKeywordMatchedScore([wordInGlossary], keyword);
-					if (matchedScore >= 1) {
-
-						const  found = new FoundScore();
-						found.path = getTestablePath(inputFileFullPath);
-						found.lineNum = lineNum;
-						found.line = line;
-						found.score = matchedScore;
-						foundScores.push(found);
-					}
+					const  found = new FoundScore();
+					found.path = getTestablePath(inputFileFullPath);
+					found.lineNum = lineNum;
+					found.line = line;
+					found.score = matchedScore;
+					foundScores.push(found);
 				}
 				if (currentIndent.length <= indentAtStart.length) {
 					inGlossary = false;
@@ -752,35 +748,74 @@ async function  search() {
 }
 
 // getKeywordMatchedScore
-function  getKeywordMatchedScore(testingStrings: string[], keyword: string): number {
+function  getKeywordMatchedScore(testingStrings: string[], keyphrase: string): number {
+	const  lowerKeyphrase = keyphrase.toLowerCase();
 
-	if (testingStrings.indexOf(keyword) !== notFound) {
-		return  fullMatchScore;
-    } else {
-		const  lowerKeyword = keyword.toLowerCase();
+	function  subMain() {
 		const  score = testingStrings.reduce(
-			(score: number, testingString: string) => {
+			(score: number, aTestingString: string) => {
+				const  keywords = keyphrase.split(' ');
+				let  thisScore = 0;
 
-				if (testingString.indexOf(keyword) != notFound) {
-					score += partMatchScore;
-				} else if (testingString.toLowerCase().indexOf(lowerKeyword) != notFound) {
-					if (testingString.length == lowerKeyword.length) {
-						score += caseIgnoredFullMatchScore;
-					} else {
-						score += caseIgnoredPartMatchScore;
+				const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase);
+				if (result.score !== 0) {
+					thisScore = result.score + keywords.length * phraseMatchScoreWeight;
+				} else {
+					let  previousPosition = -1;
+
+					for (const keyword of keywords) {
+						if (keyword === '') {continue;}
+
+						const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase());
+						if (result.position > previousPosition) {
+							thisScore += result.score * orderMatchScoreWeight;
+						} else {
+							thisScore += result.score;
+						}
+						if (result.position !== notFound) {
+							previousPosition = result.position;
+						}
 					}
 				}
-				return score;
+				return score + thisScore;
 			}, 0);
 
 		return  score;
 	}
+
+	interface  Result {
+		score: number;
+		position: number;
+	}
+
+	function  getSubMatchedScore(testingString: string, keyword: string, lowerKeyword: string): Result {
+		let  score = 0;
+		let  position = notFound;
+
+		if ((position = testingString.indexOf(keyword)) !== notFound) {
+			if (testingString.length === keyword.length) {
+				score += fullMatchScore;
+			} else {
+				score += partMatchScore;
+			}
+		} else if ((position = testingString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
+			if (testingString.length === lowerKeyword.length) {
+				score += caseIgnoredFullMatchScore;
+			} else {
+				score += caseIgnoredPartMatchScore;
+			}
+		}
+		return { score, position };
+	}
+
+	const  score = subMain();
+	return  score;
 }
 
 // varidateUpdateCommandArguments
 function  varidateUpdateCommandArguments() {
 	if (programArguments.length < 4) {
-		throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  __KeyColonValue__')
+		throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  "__KeyColonValue__"')
 	}
 }
 
@@ -1417,6 +1452,8 @@ const  fullMatchScore = 100;
 const  caseIgnoredFullMatchScore = 8;
 const  partMatchScore = 5;
 const  caseIgnoredPartMatchScore = 3;
+const  phraseMatchScoreWeight = 4;
+const  orderMatchScoreWeight = 2;
 const  minLineNum = 0;
 const  maxLineNum = 999999999;
 const  maxNumber = 999999999;

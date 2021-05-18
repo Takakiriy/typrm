@@ -3,6 +3,7 @@
 
 typrm は テキスト ファイル に書いたキーボードから手動で入力する内容のパラメーターを置き換えます。
 同じ内容にすべきテキストを同じように置き換えるため、入力ミスが少なくなります。
+また、置き換え機能とは別の検索機能もあります。
 
 <!-- TOC depthFrom:1 -->
 
@@ -12,7 +13,8 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
     - [Windows の場合](#windows-の場合)
     - [mac の場合](#mac-の場合)
     - [CentOS 7 の場合](#centos-7-の場合)
-  - [設定タグと #template タグについて](#設定タグと-template-タグについて)
+  - [設定タグと #template タグ](#設定タグと-template-タグ)
+  - [keyword タグを使った精度の高い検索](#keyword-タグを使った精度の高い検索)
   - [開発環境の構築手順](#開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
@@ -238,7 +240,7 @@ typrm を使うには Node.js のインストールが必要です。
         - rm -rf ~/Downloads/typrm/
 
 
-## 設定タグと #template タグについて
+## 設定タグと #template タグ
 
 置き換えるテキストは、`設定:` が書かれた行の下に 変数名: 値 を書きます。
 
@@ -288,6 +290,59 @@ __ProjectName__ を react2 に置き換えるときに、置き換えた後に�
     設定:
         __ProjectName__: react1
     pushd  "react1"  #template: cd  "__ProjectName__"
+
+
+## keyword タグを使った精度の高い検索
+
+typrm の検索機能は、テキスト ファイルの中の
+#keyword タグに続いて書かれたキーワードだけが検索対象であり、
+検索ノイズが小さくなります。
+
+テキスト ファイル の内容のサンプル:
+
+    Shows all files:  #keyword: ls -a
+    Example: ls -a sub_folder
+
+typrm コマンド:
+
+    $ typrm ls -a
+    .../text.txt:1: Shows all files:  #keyword: ls -a
+
+上記の例の場合、Example の行にはヒットしません。
+なぜなら #keyword タグがないからです。 #keyword タグがないテキストを
+検索するときは、grep など一般的な全文検索ツールを使ってください。
+
+typrm search コマンドのコマンド名（search）は省略できます。
+search コマンドの短いコマンド名は s です。
+
+typrm search コマンドの書式:
+
+    typrm __Keyword__
+
+または
+
+    typrm search __Keyword__
+
+または
+
+    typrm s __Keyword__
+
+検索キーワードが typrm のコマンド名と同じときは、
+コマンド名（search または s）を省略できません。
+
+テキスト ファイルに書くキーワードは、
+#keyword タグに続けて CSV 形式（コンマ区切り）で
+複数指定することができます。
+
+    #keyword: CSV, comma separated value, "a,b"
+
+複数の単語からなる検索キーワードを指定するとき、" " で囲む必要はありません。
+また、大文字小文字が違っていてもヒットしますが、
+大文字小文字が同じテキストが上位に表示されます。
+typrm では上位にヒットしたテキストが下側に表示されます。
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated value
 
 
 ## 開発環境の構築手順

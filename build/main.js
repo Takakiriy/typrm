@@ -897,13 +897,14 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keywordOfDoubleQuotedLowerCase, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1, _c, foundScores_1, found;
+        var startIndex, keyword, keywordOfDoubleQuotedLowerCase, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1, _c, foundScores_1, found;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
                     startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
                     keyword = exports.programArguments.slice(startIndex).join(' ');
                     keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
+                    keywordDoubleQuoted = keyword.replace('"', '""');
                     targetFolder = exports.programOptions.folder;
                     currentFolder = process.cwd();
                     fileFullPaths = [];
@@ -966,12 +967,11 @@ function search() {
                     line = line1;
                     lineNum += 1;
                     if (!(line.indexOf(keywordLabel) !== notFound)) return [3 /*break*/, 11];
-                    if (!(line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound)) return [3 /*break*/, 11];
                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
                     return [4 /*yield*/, parseCSVColumns(csv)];
                 case 10:
                     columns = _d.sent();
-                    matchedScore = getKeywordMatchedScore(columns, keyword);
+                    matchedScore = getKeywordMatchedScore(columns, keywordDoubleQuoted);
                     if (matchedScore >= 1) {
                         found = new FoundScore();
                         found.path = getTestablePath(inputFileFullPath);
@@ -989,18 +989,16 @@ function search() {
                     }
                     else if (inGlossary) {
                         currentIndent = indentRegularExpression.exec(line)[0];
-                        if (line.toLowerCase().indexOf(keywordOfDoubleQuotedLowerCase) !== notFound) {
-                            colonPosition = line.indexOf(':', currentIndent.length);
-                            wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                            matchedScore = getKeywordMatchedScore([wordInGlossary], keyword);
-                            if (matchedScore >= 1) {
-                                found = new FoundScore();
-                                found.path = getTestablePath(inputFileFullPath);
-                                found.lineNum = lineNum;
-                                found.line = line;
-                                found.score = matchedScore;
-                                foundScores.push(found);
-                            }
+                        colonPosition = line.indexOf(':', currentIndent.length);
+                        wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                        matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
+                        if (matchedScore >= 1) {
+                            found = new FoundScore();
+                            found.path = getTestablePath(inputFileFullPath);
+                            found.lineNum = lineNum;
+                            found.line = line;
+                            found.score = matchedScore;
+                            foundScores.push(found);
                         }
                         if (currentIndent.length <= indentAtStart.length) {
                             inGlossary = false;
@@ -1054,33 +1052,74 @@ function search() {
     });
 }
 // getKeywordMatchedScore
-function getKeywordMatchedScore(testingStrings, keyword) {
-    if (testingStrings.indexOf(keyword) !== notFound) {
-        return fullMatchScore;
-    }
-    else {
-        var lowerKeyword_1 = keyword.toLowerCase();
-        var score = testingStrings.reduce(function (score, testingString) {
-            if (testingString.indexOf(keyword) != notFound) {
-                score += partMatchScore;
+function getKeywordMatchedScore(testingStrings, keyphrase) {
+    var lowerKeyphrase = keyphrase.toLowerCase();
+    cc();
+    pp('getKeywordMatchedScore');
+    function subMain() {
+        var score = testingStrings.reduce(function (score, aTestingString) {
+            var keywords = keyphrase.split(' ');
+            var thisScore = 0;
+            var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase);
+            if (result.score !== 0) {
+                thisScore = result.score + keywords.length * phraseMatchScoreWeight;
             }
-            else if (testingString.toLowerCase().indexOf(lowerKeyword_1) != notFound) {
-                if (testingString.length == lowerKeyword_1.length) {
-                    score += caseIgnoredFullMatchScore;
-                }
-                else {
-                    score += caseIgnoredPartMatchScore;
+            else {
+                var previousPosition = -1;
+                for (var _i = 0, keywords_3 = keywords; _i < keywords_3.length; _i++) {
+                    var keyword = keywords_3[_i];
+                    if (keyword === '') {
+                        continue;
+                    }
+                    pp(keyword);
+                    var result_1 = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase());
+                    if (result_1.position > previousPosition) {
+                        thisScore += result_1.score * orderMatchScoreWeight;
+                    }
+                    else {
+                        thisScore += result_1.score;
+                    }
+                    if (result_1.position !== notFound) {
+                        previousPosition = result_1.position;
+                    }
+                    pp(thisScore);
                 }
             }
-            return score;
+            return score + thisScore;
         }, 0);
         return score;
     }
+    function getSubMatchedScore(testingString, keyword, lowerKeyword) {
+        var score = 0;
+        var position = notFound;
+        if ((position = testingString.indexOf(keyword)) !== notFound) {
+            if (testingString.length === keyword.length) {
+                score += fullMatchScore;
+            }
+            else {
+                score += partMatchScore;
+            }
+        }
+        else if ((position = testingString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
+            if (testingString.length === lowerKeyword.length) {
+                score += caseIgnoredFullMatchScore;
+            }
+            else {
+                score += caseIgnoredPartMatchScore;
+            }
+        }
+        return { score: score, position: position };
+    }
+    var score = subMain();
+    pp(testingStrings);
+    pp(keyphrase);
+    pp(score);
+    return score;
 }
 // varidateUpdateCommandArguments
 function varidateUpdateCommandArguments() {
     if (exports.programArguments.length < 4) {
-        throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  __KeyColonValue__');
+        throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  "__KeyColonValue__"');
     }
 }
 // onEndOfSetting
@@ -1717,7 +1756,7 @@ function callMainFromJest(parameters, options) {
                 case 3:
                     d = pp('');
                     s = getStdOut();
-                    d = []; // Set break point here and watch the variable d
+                    d = []; // Set break point here and watch the variable dd
                     return [7 /*endfinally*/];
                 case 4: return [2 /*return*/];
             }
@@ -1745,6 +1784,8 @@ var fullMatchScore = 100;
 var caseIgnoredFullMatchScore = 8;
 var partMatchScore = 5;
 var caseIgnoredPartMatchScore = 3;
+var phraseMatchScoreWeight = 4;
+var orderMatchScoreWeight = 2;
 var minLineNum = 0;
 var maxLineNum = 999999999;
 var maxNumber = 999999999;

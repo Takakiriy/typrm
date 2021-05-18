@@ -181,7 +181,7 @@ describe("replaces settings", function () {
     }); });
 });
 describe("searches keyword tag", function () {
-    test.each([
+    test.only.each([
         [
             "1st",
             ["search", "ABC"],
@@ -206,12 +206,14 @@ describe("searches keyword tag", function () {
             "ommit command name (2)",
             ["do", "it"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "comma",
             ["search", "a,b"],
@@ -227,7 +229,8 @@ describe("searches keyword tag", function () {
             "ignore case",
             ["search", "DO It"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
         ], [
             "word(1)",
             ["search", "AB"],
@@ -239,6 +242,19 @@ describe("searches keyword tag", function () {
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
                 '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
+        ], [
+            "words order score",
+            ["search", "aaa bbb ccc"],
+            { folder: "test_data/search/2", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: bbb aaa xxx\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: aaa bbb xxx\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: aaa bbb ccc\n',
+        ], [
+            "compound word",
+            ["search", "ソース ファイル"],
+            { folder: "test_data/search/2", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: ソースファイル\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: ソース ファイル\n',
         ], [
             "output order (1)",
             ["search", "a,b"],

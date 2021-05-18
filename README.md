@@ -2,6 +2,7 @@
 
 typrm replaces the parameters of what you type manually from the keyboard you write in a text file.
 It replaces the text that should be the same in the same way, resulting in fewer typos.
+Also, there is a search function that is separated from the replace function.
 
 [日本語 README](./README-jp.md)
 
@@ -13,7 +14,8 @@ It replaces the text that should be the same in the same way, resulting in fewer
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
-  - [About settings tags and #template tags](#about-settings-tags-and-template-tags)
+  - [Settings tags and #template tags](#settings-tags-and-template-tags)
+  - [Highly accurate search using keyword tags](#highly-accurate-search-using-keyword-tags)
   - [How to build the development environment](#how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -233,7 +235,7 @@ To use typrm, you must install Node.js.
         - rm -rf ~/Downloads/typrm/
 
 
-## About settings tags and #template tags
+## Settings tags and #template tags
 
 About the text you want to replace, you must write `variable name: value` below `settings:`.
 
@@ -284,6 +286,60 @@ The sample that an error occurs:
     settings:
         __ProjectName__: react1
     pushd  "react1"  #template: cd  "__ProjectName__"
+
+
+## Highly accurate search using keyword tags
+
+The search function of typrm only searches for keywords written
+after the #keyword tag in a text file. It makes to reduce search noise.
+
+Sample text file content:
+
+    Shows all files:  #keyword: ls -a
+    Example: ls -a sub_folder
+
+typrm command:
+
+    $ typrm ls -a
+    .../text.txt:1: Shows all files:  #keyword: ls -a
+
+In the case of the above example, the Example line will not be hit.
+Because there is no #keyword tag.
+If you want to search for text that does not have the #keyword tag,
+use a common full-text search tool such as grep.
+
+The typrm search command name (search) can be omitted.
+The short command name for the search command is s.
+
+typrm search command format:
+
+    typrm __Keyword__
+
+or
+
+    typrm search __Keyword__
+
+or
+
+    typrm s __Keyword__
+
+If the search keyword was the same as the command name of typrm,
+the command name (search or s) cannot be omitted.
+
+You can specify multiple keywords to be written
+by CSV format (comma separated values) after the #keyword tag
+in the text file.
+
+    #keyword: CSV, comma separated value, "a,b"
+
+If specifying a search keyword consisting of multiple words,
+it is not necessary to enclose it in "".
+Also, even if the case is different, it will be hit,
+but the text with the same case will be displayed at the top.
+In typrm, the text that hits the top is displayed at the bottom.
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated value
 
 
 ## How to build the development environment
