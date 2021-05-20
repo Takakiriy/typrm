@@ -4,6 +4,7 @@ import * as globby from 'globby';
 import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
+process.env['typrm_aaa'] = 'aaa';
 
 // main
 export async function  main() {
@@ -108,13 +109,16 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 			// Set condition by "#if:" tag.
 			if (line.indexOf(ifLabel) != notFound) {
 				const  condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-				enabled = (condition === 'true' ||
-					condition == '$settings.__Stage__ == develop' ||
-					condition == '$settings.__Stage__ != product' ||
-					condition == '$env.typrm_aaa == aaa' ||
-					condition == '$env.typrm_aaa != bbb' ||
-					condition == '$env.typrm_aaa != ""' ||
-					condition == '$env.undefined == ""');
+
+				const  evaluatedContidion = evaluateIfCondition(condition, setting);
+				if (typeof evaluatedContidion === 'boolean') {
+					enabled = evaluatedContidion;
+				} else {
+					console.log('');
+					console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+					console.log(`  Contents: ${condition}`);
+					enabled = true;
+				}
 			}
 
 			// Check if previous line has "template" replaced contents.
@@ -624,7 +628,7 @@ class  TemplateTag {
 				errorExpected = expectedFirstLine;
 				errorTemplate = this.templateLines[0];
 			}
-			console.log("");
+			console.log('');
 			console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
 			console.log(`${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
 			console.log(`  Template: ${errorTemplate}`);
@@ -843,6 +847,63 @@ function onEndOfSetting(setting: Settings) {
 			console.log(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);
 		}
 	}
+}
+
+// evaluateIfCondition
+function   evaluateIfCondition(condition: string, setting: Settings): boolean | Error {
+
+	if (condition === 'true') {
+		return  true;
+	} else if (condition === 'false') {
+		return  false;
+	}
+	const  settingsDot = '$settings.';
+	const  envDot = '$env.';
+	let    match: RegExpExecArray | null = null;
+	let    parent = '';
+	if (condition.startsWith(settingsDot)) {
+		parent = settingsDot;
+
+		// e.g. $settings.__Stage__ == develop
+		// e.g. $settings.__Stage__ != develop
+		match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(condition);
+	}
+	else if (condition.startsWith(envDot)) {
+		parent = envDot;
+
+		// e.g. $env.typrm_aaa == aaa
+		// e.g. $env.typrm_aaa != aaa
+		// e.g. $env.typrm_aaa == ""
+		// e.g. $env.typrm_aaa != ""
+		match = /\$env.([^ ]*) *(==|!=) *([^ ]*)/.exec(condition);
+	}
+	if (match && parent) {
+		const  name = match[1];
+		const  operator = match[2];
+		let    rightValue = match[3];
+		if (parent === settingsDot) {
+			var  leftValue = setting[name].value;
+		} else if (parent === envDot) {
+			const  envValue = process.env[name];
+			if (envValue) {
+				var  leftValue = envValue;
+			} else {
+				var  leftValue = '';
+			}
+		} else { // if no parent
+			var  leftValue = '';
+		}
+		if (rightValue === '""') {
+			rightValue = '';
+		}
+
+		if (operator === '==') {
+			return  leftValue === rightValue;
+		} else if (operator === '!=') {
+			return  leftValue !== rightValue;
+		}
+	}
+	return  new Error('syntax error');
 }
 
 // getSettingIndexFromLineNum

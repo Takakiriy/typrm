@@ -53,7 +53,6 @@ describe("checks file contents", () => {
             "any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
     ])("%s in %s, %s %s", async (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
-//if (caseName !== 'if') {return;}
         const  sourceFilePath   = 'test_data/' + fileNameHead + "_1.yaml";
         const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
         const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
@@ -73,7 +72,6 @@ describe("checks file contents", () => {
 
         expect(main.stdout).toMatchSnapshot('stdout');
         fs.rmdirSync('test_data/_checking', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
     });
 });
 

@@ -54,6 +54,7 @@ var globby = require("globby");
 var readline = require("readline");
 var stream = require("stream");
 var csvParse = require("csv-parse");
+process.env['typrm_aaa'] = 'aaa';
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
@@ -116,7 +117,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, condition, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, condition, evaluatedContidion, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -190,13 +191,16 @@ function checkRoutine(isModal, inputFilePath) {
                     // Set condition by "#if:" tag.
                     if (line.indexOf(ifLabel) != notFound) {
                         condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-                        enabled = (condition === 'true' ||
-                            condition == '$settings.__Stage__ == develop' ||
-                            condition == '$settings.__Stage__ != product' ||
-                            condition == '$env.typrm_aaa == aaa' ||
-                            condition == '$env.typrm_aaa != bbb' ||
-                            condition == '$env.typrm_aaa != ""' ||
-                            condition == '$env.undefined == ""');
+                        evaluatedContidion = evaluateIfCondition(condition, setting);
+                        if (typeof evaluatedContidion === 'boolean') {
+                            enabled = evaluatedContidion;
+                        }
+                        else {
+                            console.log('');
+                            console.log(translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
+                            console.log("  Contents: " + condition);
+                            enabled = true;
+                        }
                     }
                     templateTag = parseTemplateTag(line);
                     if (templateTag.lineNumOffset >= 1 && templateTag.isFound) {
@@ -845,7 +849,7 @@ var TemplateTag = /** @class */ (function () {
                                 errorExpected = expectedFirstLine;
                                 errorTemplate = this.templateLines[0];
                             }
-                            console.log("");
+                            console.log('');
                             console.log(translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + templateLineNum);
                             console.log(translate('ErrorFile') + ": " + getTestablePath(targetFilePath) + ":" + errorTargetLineNum);
                             console.log("  Template: " + errorTemplate);
@@ -1151,6 +1155,63 @@ function onEndOfSetting(setting) {
             console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
         }
     }
+}
+// evaluateIfCondition
+function evaluateIfCondition(condition, setting) {
+    if (condition === 'true') {
+        return true;
+    }
+    else if (condition === 'false') {
+        return false;
+    }
+    var settingsDot = '$settings.';
+    var envDot = '$env.';
+    var match = null;
+    var parent = '';
+    if (condition.startsWith(settingsDot)) {
+        parent = settingsDot;
+        // e.g. $settings.__Stage__ == develop
+        // e.g. $settings.__Stage__ != develop
+        match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(condition);
+    }
+    else if (condition.startsWith(envDot)) {
+        parent = envDot;
+        // e.g. $env.typrm_aaa == aaa
+        // e.g. $env.typrm_aaa != aaa
+        // e.g. $env.typrm_aaa == ""
+        // e.g. $env.typrm_aaa != ""
+        match = /\$env.([^ ]*) *(==|!=) *([^ ]*)/.exec(condition);
+    }
+    if (match && parent) {
+        var name_1 = match[1];
+        var operator = match[2];
+        var rightValue = match[3];
+        if (parent === settingsDot) {
+            var leftValue = setting[name_1].value;
+        }
+        else if (parent === envDot) {
+            var envValue = process.env[name_1];
+            if (envValue) {
+                var leftValue = envValue;
+            }
+            else {
+                var leftValue = '';
+            }
+        }
+        else { // if no parent
+            var leftValue = '';
+        }
+        if (rightValue === '""') {
+            rightValue = '';
+        }
+        if (operator === '==') {
+            return leftValue === rightValue;
+        }
+        else if (operator === '!=') {
+            return leftValue !== rightValue;
+        }
+    }
+    return new Error('syntax error');
 }
 // getSettingIndexFromLineNum
 function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
