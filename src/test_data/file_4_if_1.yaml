@@ -28,14 +28,16 @@ nested if:
             - check: 'yes'  #template: __Stage__
         case of false:  #if: false
             - check: 'no'  #template: __Stage__
-        common case:  #// else
+
+        common case:  #// else. The above empty line is for the test of indent.
             - check: 'yes'  #template: __Stage__
     false: #if: false
         case of true:  #if: true
             - check: 'no'  #template: __Stage__
         case of false:  #if: false
             - check: 'no'  #template: __Stage__
-        common case:  #// else
+
+        common case:  #// else. The above empty line is for the test of indent.
             - check: 'no'  #template: __Stage__
     common case:  #// else
         - check: 'yes'  #template: __Stage__

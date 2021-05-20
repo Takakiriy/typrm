@@ -192,9 +192,11 @@ function checkRoutine(isModal, inputFilePath) {
                         }
                     }
                     indentLength = indentRegularExpression.exec(line)[0].length;
-                    while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
-                        indentLengthsOfIfTag.pop();
-                        enabled = lastOf(indentLengthsOfIfTag).enabled;
+                    if (line.trim() !== '') {
+                        while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
+                            indentLengthsOfIfTag.pop();
+                            enabled = lastOf(indentLengthsOfIfTag).enabled;
+                        }
                     }
                     if (line.indexOf(ifLabel) != notFound) {
                         condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();

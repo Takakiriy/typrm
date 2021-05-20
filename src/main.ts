@@ -111,10 +111,12 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
 			// Set condition by "#if:" tag.
 			const  indentLength = indentRegularExpression.exec(line)![0].length;
-			while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
+			if (line.trim() !== '') {
+				while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
 
-				indentLengthsOfIfTag.pop();
-				enabled = lastOf(indentLengthsOfIfTag).enabled;
+					indentLengthsOfIfTag.pop();
+					enabled = lastOf(indentLengthsOfIfTag).enabled;
+				}
 			}
 			if (line.indexOf(ifLabel) != notFound) {
 				const  condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
