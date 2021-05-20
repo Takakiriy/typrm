@@ -14,6 +14,8 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
     - [mac の場合](#mac-の場合)
     - [CentOS 7 の場合](#centos-7-の場合)
   - [設定タグと #template タグ](#設定タグと-template-タグ)
+  - [file-template タグを使ったファイルの内容のチェック](#file-template-タグを使ったファイルの内容のチェック)
+  - [if タグを使ったチェックの無効化](#if-タグを使ったチェックの無効化)
   - [keyword タグを使った精度の高い検索](#keyword-タグを使った精度の高い検索)
   - [開発環境の構築手順](#開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
@@ -242,7 +244,7 @@ typrm を使うには Node.js のインストールが必要です。
 
 ## 設定タグと #template タグ
 
-置き換えるテキストは、`設定:` が書かれた行の下に 変数名: 値 を書きます。
+置き換えるテキストは、`設定:` または `setting:` が書かれた行の下に 変数名: 値 を書きます。
 
     設定:
         __ProjectName__: react1
@@ -290,6 +292,108 @@ __ProjectName__ を react2 に置き換えるときに、置き換えた後に�
     設定:
         __ProjectName__: react1
     pushd  "react1"  #template: cd  "__ProjectName__"
+
+
+## file-template タグを使ったファイルの内容のチェック
+
+別のファイルの内容が設定値に合っていることをチェックすることができます。
+
+たとえば、下記にように書くと、`my.json` ファイルの中の設定値が、
+`設定:` タグに書かれた設定値と同じことをチェックするようになります。
+同じでなければ check コマンドを実行したときにエラーが表示されます。
+
+__Project__/root.yaml ファイル:
+
+    設定:
+        __Stage__: develop
+    ./my.json の一部:  #file-template: ./my.json
+        "stage": "develop"  #template: "__Stage__"
+
+__Project__/my.json ファイル:
+
+    {
+        "stage": "develop"
+    }
+
+もし、設定を下記のように変更したら、エラーになります。
+
+__Project__/root.yaml ファイル:
+
+    設定:
+        __Stage__: product
+    ./my.json の一部:  #file-template: ./my.json
+        "stage": "product"  #template: "__Stage__"
+
+内容をチェックするときは、`#template:` タグを削除した内容と比較します。
+
+`#file-template:` より右に書かれたパスが、
+`#file-template:` タグより左に書かれていなければ、エラーになります。
+
+チェックする対象のファイルの一部だけ比較します。
+上記の例の場合、{ の行と } の行はチェックしていません。
+別の言い方をすれば、チェックする内容で対象のファイルの中を検索をします。
+見つからなかったらエラーになります。
+
+複数行チェックすることもできます。
+`#file-template:` タグが対象とする行の範囲は、
+`#file-template:` タグがある行のインデントと同じか浅いインデントの行の前までです。
+
+    ./my.json の一部:  #file-template: ./my.json
+        チェック内容
+        チェック内容
+        チェック内容
+    チェックしない内容
+
+`#file-template:` より右に書かれたパスが相対パスのときは、その基準は、
+`#file-template:` タグが書かれているファイルがあるフォルダーです。
+
+`#file-template-any-lines:` タグをチェックする内容の一部に書くと、
+その行（0行以上）は対象のファイルの内容と比較しません。
+
+    ./my.json の一部:  #file-template: ./my.json
+        チェック内容
+        #file-template-any-lines:
+        チェック内容
+    チェックしない内容
+
+チェック内容の1行目で対象のファイルの中を検索します。
+チェック内容の2行目以降は、その検索によって見つかった行のすぐ下の行から比較します。
+チェック内容が `#file-template-any-lines:` のときは、
+その次の行に書かれているチェック内容で対象のファイルの中を検索します。
+
+
+## if タグを使ったチェックの無効化
+
+`#if:` タグを書くと、条件を満たしたときだけ、
+`#template:` タグや `#file-template:` タグによる内容が
+合っているかどうかのチェックをするようになります。
+
+    設定:
+        __Stage__: develop
+    コマンド:
+        リリース時:  #if: $settings.__Stage__ != develop
+            cp  build  stage  #template: __Stage__
+
+上記の場合、`__Stage__` の値が develop 以外のときだけ、
+`#template:` タグとその左側の内容が合っているかどうかをチェックします。
+
+`#if:` タグの対象となる `#template:` タグや `#file-template:` タグの範囲は、
+`#if:` タグが書かれている行のインデントの深さと同じか浅いインデントの行の前までです。
+
+`#if:` の右は、以下の書式に合う条件のみ書くことができます。
+
+    #if: $settings.__SettingsName__ == __Value__
+    #if: $settings.__SettingsName__ != __Value__
+    #if: $env.__EnvName__ == __Value__
+    #if: $env.__EnvName__ != __Value__
+
+`__SettingsName__` は、`設定:` に書かれている変数名です。
+`__EnvName__` は、環境変数名です。
+環境変数が定義されていないときは "" になります。
+たとえば、Windows であるという条件は、Windows でデフォルトで定義されていて
+Windows 以外では定義しない環境変数 `windir` を使って下記のように書きます。
+
+    #if: $env.windir != ""
 
 
 ## keyword タグを使った精度の高い検索

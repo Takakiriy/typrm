@@ -115,7 +115,8 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 					enabled = evaluatedContidion;
 				} else {
 					console.log('');
-					console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+					console.log('Error of if tag syntax:');
+					console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
 					console.log(`  Contents: ${condition}`);
 					enabled = true;
 				}
@@ -517,7 +518,7 @@ class  TemplateTag {
 		if (!fs.existsSync(targetFilePath)) {
 			const  templateLineNum = templateEndLineNum - this.templateLines.length;
 			console.log("");
-			console.log(`Error:`);
+			console.log(`Error of not found the target file:`);
 			console.log(`  ${translate('NotFound')}: ${targetFilePath}`);
 			console.log(`  Template: ${inputFilePath}:${templateLineNum}`);
 			return  false;
@@ -629,8 +630,9 @@ class  TemplateTag {
 				errorTemplate = this.templateLines[0];
 			}
 			console.log('');
-			console.log(`${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
-			console.log(`${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
+			console.log('Error of not same as file contents:');
+			console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
+			console.log(`  ${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
 			console.log(`  Template: ${errorTemplate}`);
 			console.log(`  Expected: ${errorExpected}`);
 			console.log(`  Contents: ${errorContents}`);

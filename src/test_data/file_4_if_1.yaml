@@ -6,6 +6,7 @@ settings:
 
 by true or false:
     true:  #if: true
+        user: 'user1'  #template: __Stage__
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
             user: 'user1'  #template: __User__
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部(2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
@@ -13,6 +14,7 @@ by true or false:
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
             Checks
     false:  #if: false
+        user: 'user1'  #template: __Stage__
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
             user: 'user1'  #template: __User__
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部(2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
@@ -63,3 +65,7 @@ by environment variable:
     not exists:  #if: $env.undefined == ""
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
             Checks if $env.undefined == ""
+
+syntax error:
+    #if: value == value
+    #if: $env.value = value

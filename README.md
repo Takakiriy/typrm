@@ -15,6 +15,8 @@ Also, there is a search function that is separated from the replace function.
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
   - [Settings tags and #template tags](#settings-tags-and-template-tags)
+  - [Checking the contents of a file using the file-template tag](#checking-the-contents-of-a-file-using-the-file-template-tag)
+  - [Disable checking using if tag](#disable-checking-using-if-tag)
   - [Highly accurate search using keyword tags](#highly-accurate-search-using-keyword-tags)
   - [How to build the development environment](#how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
@@ -286,6 +288,121 @@ The sample that an error occurs:
     settings:
         __ProjectName__: react1
     pushd  "react1"  #template: cd  "__ProjectName__"
+
+
+## Checking the contents of a file using the file-template tag
+
+You can check that the contents of another file match the settings.
+
+For example, if you write the following,
+it will check that the setting value in the `my.json` file is the same as
+the setting value written in the `setting:` tag.
+If they are not the same, an error will be displayed
+when you run the check command.
+
+__Project__/root.yaml file:
+
+    settings:
+        __Stage__: develop
+    a part of ./my.json:  #file-template: ./my.json
+        "stage": "develop"  #template: "__Stage__"
+
+__Project__/my.json file:
+
+    {
+        "stage": "develop"
+    }
+
+If you change the settings as below, an error will occur.
+
+__Project__/root.yaml file:
+
+    settings:
+        __Stage__: product
+    a part of ./my.json:  #file-template: ./my.json
+        "stage": "product"  #template: "__Stage__"
+
+When checking the content,
+compare it with the content without the `#template:` tag.
+
+If the path written to the right of `#file-template:`
+is not written to the left of the `#file-template:` tag,
+an error will occur.
+
+Compares only some of the files to check.
+In the above example, the line has { and the line has } are unchecked.
+In other words, it searches in the target file for what you want to check.
+If it is not found, an error will occur.
+
+You can also check multiple lines.
+The range of lines covered by the `#file-template:` tag is
+before the line with the same or shallower indentation
+as the line with the `#file-template:` tag.
+
+    a part of ./my.json:  #file-template: ./my.json
+        check
+        check
+        check
+    not check
+
+If the path to the right of `#file-template:` is a relative path,
+the base path is the folder containing the file with the
+`#file-template:` tag.
+
+If you write the `# file-template-any-lines:` tag
+in the part of the checked content,
+that line (0 or more lines) will not be compared with
+the content of the target file.
+
+    a part of ./my.json:  #file-template: ./my.json
+        check
+        #file-template-any-lines:
+        check
+    not check
+
+The first line of the check contents searches the target file.
+The second and subsequent lines of the check contents are
+compared from the line immediately below the line found by the search.
+When the check content is `# file-template-any-lines:`,
+the check content written on the next line is searched in the target file.
+
+
+## Disable checking using if tag
+
+If you write a `#if:` tag,
+it will check whether the contents of the `#template:` tag and the
+`#file-template:` tag match only when the conditions are met.
+
+    settings:
+        __Stage__: develop
+    command:
+        when release:  #if: $settings.__Stage__ != develop
+            cp  build  stage  #template: __Stage__
+
+In the above case, only if the value of `__Stage__` is other than develop,
+it checks if the `#template:` tag matches the content to the left of it.
+
+The range of the `#template:` tag and the `#file-template:` tag
+that are the target of the `#if:` tag is
+the same as or shallower than the indent depth of the line
+where the `#if:` tag is written. Until before the line.
+
+To the right of `#if:`, you can write only the conditions
+that meet the following format.
+
+    #if: $settings.__SettingsName__ == __Value__
+    #if: $settings.__SettingsName__ != __Value__
+    #if: $env.__EnvName__ == __Value__
+    #if: $env.__EnvName__ != __Value__
+
+`__SettingsName__` is the variable name written in `Settings:`.
+`__EnvName__` is the name of the environment variable.
+If no environment variable is defined, it will be "".
+For example, the condition that it is Windows is written as follows
+using the environment variable `windir`,
+which is defined by default in Windows and not defined outside of Windows.
+
+    #if: $env.windir != ""
 
 
 ## Highly accurate search using keyword tags
