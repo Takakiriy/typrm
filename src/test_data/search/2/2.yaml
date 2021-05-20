@@ -3,3 +3,5 @@
 #keyword: bbb aaa xxx
 #keyword: frame set
 #keyword: frameset
+test_of_disable-tag-tool: |
+    echo "#keyword: abc" > text.txt  #disable-tag-tool:

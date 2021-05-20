@@ -345,6 +345,12 @@ typrm では上位にヒットしたテキストが下側に表示されます�
     .../text.txt:1: #keyword: CSV, comma separated value
 
 
+CSV の部分が文法的に問題があるときに表示される警告を抑制するには、
+`#disable-tag-tool:` を書いてください。
+
+    #keyword: abc"   #disable-tag-tool:
+
+
 ## 開発環境の構築手順
 
 ### Windows の場合

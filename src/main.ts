@@ -687,9 +687,13 @@ async function  search() {
 			lineNum += 1;
 
 			// keyword tag
-			if (line.indexOf(keywordLabel) !== notFound) {
+			if (line.indexOf(keywordLabel) !== notFound  &&  line.indexOf(disableLabel) === notFound) {
 				const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
-				const  columns = await parseCSVColumns(csv);
+				const  columns = await parseCSVColumns(csv)
+					.catch((e: Error) => {
+						console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
+						return [];
+					});
 				const  matchedScore = getKeywordMatchedScore(columns, keywordDoubleQuoted);
 				if (matchedScore >= 1) {
 
@@ -1056,20 +1060,23 @@ function  parseTemplateTag(line: string): TemplateTag {
 
 // parseCSVColumns
 async function  parseCSVColumns(columns: string): Promise<string[]> {
-    return new Promise((resolveFunction, rejectFunction) => {
-        let  columnArray: string[] = [];
+	return new Promise((resolveFunction, rejectFunction) => {
+		let  columnArray: string[] = [];
 
-        stream.Readable.from(columns)
-            .pipe(
-                csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
-            )
-            .on('data', (columns) => {
-                columnArray = columns;
-            })
-            .on('end', () => {
-                resolveFunction(columnArray);
-            });
-    });
+		stream.Readable.from(columns)
+			.pipe(
+				csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
+			)
+			.on('data', (columns) => {
+				columnArray = columns;
+			})
+			.on('end', () => {
+				resolveFunction(columnArray);
+			})
+			.on('error', (e: Error) => {
+				rejectFunction(e);
+			});
+	});
 }
 
 // escapeRegularExpression
@@ -1441,6 +1448,7 @@ const  fileTemplateLabel = "#file-template:";
 const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
+const  disableLabel = "#disable-tag-tool:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";

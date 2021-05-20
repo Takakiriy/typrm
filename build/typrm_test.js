@@ -47,7 +47,7 @@ function main() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!false) return [3 /*break*/, 2];
+                    if (!true) return [3 /*break*/, 2];
                     return [4 /*yield*/, DoCustomDebug()];
                 case 1:
                     _a.sent();
@@ -67,7 +67,7 @@ function DoCustomDebug() {
         var returns;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callChildProccess("node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
+                case 0: return [4 /*yield*/, callChildProccess("node ../build/typrm.js search typrm --folder /Users/totadashi/Documents/typrm", {})];
                 case 1:
                     returns = _a.sent();
                     console.log(returns.stdout);

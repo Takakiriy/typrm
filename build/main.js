@@ -897,7 +897,7 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keywordOfDoubleQuotedLowerCase, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _b, fileFullPaths_1, inputFileFullPath, reader, lineNum, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1, _c, foundScores_1, found;
+        var startIndex, keyword, keywordOfDoubleQuotedLowerCase, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _loop_2, lineNum, _b, fileFullPaths_1, inputFileFullPath, _c, foundScores_1, found;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -945,88 +945,104 @@ function search() {
                     indentAtStart = '';
                     inGlossary = false;
                     foundScores = [];
+                    _loop_2 = function (inputFileFullPath) {
+                        var reader, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1;
+                        return __generator(this, function (_f) {
+                            switch (_f.label) {
+                                case 0:
+                                    reader = readline.createInterface({
+                                        input: fs.createReadStream(inputFileFullPath),
+                                        crlfDelay: Infinity
+                                    });
+                                    lineNum = 0;
+                                    _f.label = 1;
+                                case 1:
+                                    _f.trys.push([1, 8, 9, 14]);
+                                    reader_4 = (e_5 = void 0, __asyncValues(reader));
+                                    _f.label = 2;
+                                case 2: return [4 /*yield*/, reader_4.next()];
+                                case 3:
+                                    if (!(reader_4_1 = _f.sent(), !reader_4_1.done)) return [3 /*break*/, 7];
+                                    line1 = reader_4_1.value;
+                                    line = line1;
+                                    lineNum += 1;
+                                    if (!(line.indexOf(keywordLabel) !== notFound && line.indexOf(disableLabel) === notFound)) return [3 /*break*/, 5];
+                                    csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                                    return [4 /*yield*/, parseCSVColumns(csv)["catch"](function (e) {
+                                            console.log("Error: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
+                                            return [];
+                                        })];
+                                case 4:
+                                    columns = _f.sent();
+                                    matchedScore = getKeywordMatchedScore(columns, keywordDoubleQuoted);
+                                    if (matchedScore >= 1) {
+                                        found = new FoundScore();
+                                        found.path = getTestablePath(inputFileFullPath);
+                                        found.lineNum = lineNum;
+                                        found.line = line;
+                                        found.score = matchedScore;
+                                        foundScores.push(found);
+                                    }
+                                    _f.label = 5;
+                                case 5:
+                                    // glossary tag
+                                    if (line.indexOf(glossaryLabel) !== notFound) {
+                                        inGlossary = true;
+                                        indentAtStart = indentRegularExpression.exec(line)[0];
+                                    }
+                                    else if (inGlossary) {
+                                        currentIndent = indentRegularExpression.exec(line)[0];
+                                        colonPosition = line.indexOf(':', currentIndent.length);
+                                        wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                                        matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
+                                        if (matchedScore >= 1) {
+                                            found = new FoundScore();
+                                            found.path = getTestablePath(inputFileFullPath);
+                                            found.lineNum = lineNum;
+                                            found.line = line;
+                                            found.score = matchedScore;
+                                            foundScores.push(found);
+                                        }
+                                        if (currentIndent.length <= indentAtStart.length) {
+                                            inGlossary = false;
+                                        }
+                                    }
+                                    _f.label = 6;
+                                case 6: return [3 /*break*/, 2];
+                                case 7: return [3 /*break*/, 14];
+                                case 8:
+                                    e_5_1 = _f.sent();
+                                    e_5 = { error: e_5_1 };
+                                    return [3 /*break*/, 14];
+                                case 9:
+                                    _f.trys.push([9, , 12, 13]);
+                                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 11];
+                                    return [4 /*yield*/, _a.call(reader_4)];
+                                case 10:
+                                    _f.sent();
+                                    _f.label = 11;
+                                case 11: return [3 /*break*/, 13];
+                                case 12:
+                                    if (e_5) throw e_5.error;
+                                    return [7 /*endfinally*/];
+                                case 13: return [7 /*endfinally*/];
+                                case 14: return [2 /*return*/];
+                            }
+                        });
+                    };
                     _b = 0, fileFullPaths_1 = fileFullPaths;
                     _d.label = 6;
                 case 6:
-                    if (!(_b < fileFullPaths_1.length)) return [3 /*break*/, 21];
+                    if (!(_b < fileFullPaths_1.length)) return [3 /*break*/, 9];
                     inputFileFullPath = fileFullPaths_1[_b];
-                    reader = readline.createInterface({
-                        input: fs.createReadStream(inputFileFullPath),
-                        crlfDelay: Infinity
-                    });
-                    lineNum = 0;
-                    _d.label = 7;
+                    return [5 /*yield**/, _loop_2(inputFileFullPath)];
                 case 7:
-                    _d.trys.push([7, 14, 15, 20]);
-                    reader_4 = (e_5 = void 0, __asyncValues(reader));
-                    _d.label = 8;
-                case 8: return [4 /*yield*/, reader_4.next()];
-                case 9:
-                    if (!(reader_4_1 = _d.sent(), !reader_4_1.done)) return [3 /*break*/, 13];
-                    line1 = reader_4_1.value;
-                    line = line1;
-                    lineNum += 1;
-                    if (!(line.indexOf(keywordLabel) !== notFound)) return [3 /*break*/, 11];
-                    csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
-                    return [4 /*yield*/, parseCSVColumns(csv)];
-                case 10:
-                    columns = _d.sent();
-                    matchedScore = getKeywordMatchedScore(columns, keywordDoubleQuoted);
-                    if (matchedScore >= 1) {
-                        found = new FoundScore();
-                        found.path = getTestablePath(inputFileFullPath);
-                        found.lineNum = lineNum;
-                        found.line = line;
-                        found.score = matchedScore;
-                        foundScores.push(found);
-                    }
-                    _d.label = 11;
-                case 11:
-                    // glossary tag
-                    if (line.indexOf(glossaryLabel) !== notFound) {
-                        inGlossary = true;
-                        indentAtStart = indentRegularExpression.exec(line)[0];
-                    }
-                    else if (inGlossary) {
-                        currentIndent = indentRegularExpression.exec(line)[0];
-                        colonPosition = line.indexOf(':', currentIndent.length);
-                        wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                        matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
-                        if (matchedScore >= 1) {
-                            found = new FoundScore();
-                            found.path = getTestablePath(inputFileFullPath);
-                            found.lineNum = lineNum;
-                            found.line = line;
-                            found.score = matchedScore;
-                            foundScores.push(found);
-                        }
-                        if (currentIndent.length <= indentAtStart.length) {
-                            inGlossary = false;
-                        }
-                    }
-                    _d.label = 12;
-                case 12: return [3 /*break*/, 8];
-                case 13: return [3 /*break*/, 20];
-                case 14:
-                    e_5_1 = _d.sent();
-                    e_5 = { error: e_5_1 };
-                    return [3 /*break*/, 20];
-                case 15:
-                    _d.trys.push([15, , 18, 19]);
-                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 17];
-                    return [4 /*yield*/, _a.call(reader_4)];
-                case 16:
                     _d.sent();
-                    _d.label = 17;
-                case 17: return [3 /*break*/, 19];
-                case 18:
-                    if (e_5) throw e_5.error;
-                    return [7 /*endfinally*/];
-                case 19: return [7 /*endfinally*/];
-                case 20:
+                    _d.label = 8;
+                case 8:
                     _b++;
                     return [3 /*break*/, 6];
-                case 21:
+                case 9:
                     foundScores.sort(function (a, b) {
                         var different = a.score - b.score;
                         if (different === 0) {
@@ -1054,8 +1070,6 @@ function search() {
 // getKeywordMatchedScore
 function getKeywordMatchedScore(testingStrings, keyphrase) {
     var lowerKeyphrase = keyphrase.toLowerCase();
-    cc();
-    pp('getKeywordMatchedScore');
     function subMain() {
         var score = testingStrings.reduce(function (score, aTestingString) {
             var keywords = keyphrase.split(' ');
@@ -1071,7 +1085,6 @@ function getKeywordMatchedScore(testingStrings, keyphrase) {
                     if (keyword === '') {
                         continue;
                     }
-                    pp(keyword);
                     var result_1 = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase());
                     if (result_1.position > previousPosition) {
                         thisScore += result_1.score * orderMatchScoreWeight;
@@ -1082,7 +1095,6 @@ function getKeywordMatchedScore(testingStrings, keyphrase) {
                     if (result_1.position !== notFound) {
                         previousPosition = result_1.position;
                     }
-                    pp(thisScore);
                 }
             }
             return score + thisScore;
@@ -1111,9 +1123,6 @@ function getKeywordMatchedScore(testingStrings, keyphrase) {
         return { score: score, position: position };
     }
     var score = subMain();
-    pp(testingStrings);
-    pp(keyphrase);
-    pp(score);
     return score;
 }
 // varidateUpdateCommandArguments
@@ -1388,6 +1397,9 @@ function parseCSVColumns(columns) {
                     })
                         .on('end', function () {
                         resolveFunction(columnArray);
+                    })
+                        .on('error', function (e) {
+                        rejectFunction(e);
                     });
                 })];
         });
@@ -1756,7 +1768,7 @@ function callMainFromJest(parameters, options) {
                 case 3:
                     d = pp('');
                     s = getStdOut();
-                    d = []; // Set break point here and watch the variable dd
+                    d = []; // Set break point here and watch the variable d
                     return [7 /*endfinally*/];
                 case 4: return [2 /*return*/];
             }
@@ -1773,6 +1785,7 @@ var fileTemplateLabel = "#file-template:";
 var fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
+var disableLabel = "#disable-tag-tool:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";

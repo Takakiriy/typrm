@@ -181,7 +181,7 @@ describe("replaces settings", function () {
     }); });
 });
 describe("searches keyword tag", function () {
-    test.only.each([
+    test.each([
         [
             "1st",
             ["search", "ABC"],
@@ -251,10 +251,10 @@ describe("searches keyword tag", function () {
                 '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: aaa bbb ccc\n',
         ], [
             "compound word",
-            ["search", "ソース ファイル"],
+            ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: ソースファイル\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: ソース ファイル\n',
+            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: frameset\n' +
+                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: frame set\n',
         ], [
             "output order (1)",
             ["search", "a,b"],

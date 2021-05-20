@@ -342,6 +342,12 @@ In typrm, the text that hits the top is displayed at the bottom.
     .../text.txt:1: #keyword: CSV, comma separated value
 
 
+If you want to suppress the warning of the CSV part that has syntax problem,
+write `#disable-tag-tool:`.
+
+    #keyword: abc"   #disable-tag-tool:
+
+
 ## How to build the development environment
 
 ### For Windows
