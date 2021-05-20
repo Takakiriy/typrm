@@ -13,7 +13,7 @@ export async function  main() {
 	}
 
 	if (programArguments.length === 0) {
-		await oldMain(true, '');
+		await checkRoutine(true, '');
 
 		if (programOptions.test) {  // Scan last input command line for the test
 			await new Promise(resolve => setTimeout(resolve, 500));
@@ -45,8 +45,8 @@ export async function  main() {
 	}
 }
 
-// oldMain
-async function  oldMain(isModal: boolean, inputFilePath: string) {
+// checkRoutine
+async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 	if (isModal) {
 		var  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
 	}
@@ -64,6 +64,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 		let  lineNum = 0;
 		let  templateCount = 0;
 		let  fileTemplateTag: TemplateTag | null = null;
+		let  enabled = true;
 		let  errorCount = 0;
 		let  warningCount = 0;
 		let  secretLabelCount = 0;
@@ -104,6 +105,18 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 				}
 			}
 
+			// Set condition by "#if:" tag.
+			if (line.indexOf(ifLabel) != notFound) {
+				const  condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+				enabled = (condition === 'true' ||
+					condition == '$settings.__Stage__ == develop' ||
+					condition == '$settings.__Stage__ != product' ||
+					condition == '$env.typrm_aaa == aaa' ||
+					condition == '$env.typrm_aaa != bbb' ||
+					condition == '$env.typrm_aaa != ""' ||
+					condition == '$env.undefined == ""');
+			}
+
 			// Check if previous line has "template" replaced contents.
 			const  templateTag = parseTemplateTag(line);
 			if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
@@ -120,7 +133,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 				const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
 				const  expected = getExpectedLine(setting, templateTag.template);
 
-				if (checkingLine.indexOf(expected) === notFound) {
+				if (checkingLine.indexOf(expected) === notFound  &&  enabled) {
 					console.log("");
 					console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
 					console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
@@ -144,13 +157,13 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 					fileTemplateTag = null;
 				}
 			}
-			if (templateTag.label === fileTemplateLabel) {
+			if (templateTag.label === fileTemplateLabel  &&  enabled) {
 				fileTemplateTag = templateTag;
 			}
 
 			// Check if there is not "#★Now:".
 			for (let temporaryLabel of temporaryLabels) {
-				if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound) {
+				if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound  &&  enabled) {
 					console.log("");
 					console.log(`${translate('WarningLine')}: ${lineNum}`);
 					console.log(`  ${translate('Contents')}: ${line.trim()}`);
@@ -202,7 +215,7 @@ async function  oldMain(isModal: boolean, inputFilePath: string) {
 			fileTemplateTag.onReadLine('');  // Cut indent
 
 			const  checkPassed = await fileTemplateTag.checkTargetFileContents(
-				setting, inputFilePath, lineNum);
+				setting, inputFilePath, lineNum + 1);
 			if (!checkPassed) {
 				errorCount += 1;
 			}
@@ -600,7 +613,7 @@ class  TemplateTag {
 				templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
 			}
 			if (result === Result.skipped) {
-				templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex + 1;
+				templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex;
 				errorContents = skipFrom;
 				errorExpected = skipTo;
 				errorTemplate = skipToTemplate;
@@ -647,7 +660,7 @@ async function  check(checkingFilePath?: string) {
 	for (const inputFilePath of filePaths) {
 		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
 
-		await oldMain(false, inputFileFullPath);
+		await checkRoutine(false, inputFileFullPath);
 	}
 }
 
@@ -1150,6 +1163,8 @@ class  WriteBuffer {
 }
 
 // getStdOut
+// Example:
+//    var d = getStdOut();  // Set break point here and watch the variable d
 function  getStdOut(): string[] {
 	return  stdout.split('\n');
 }
@@ -1449,6 +1464,7 @@ const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
+const  ifLabel = "#if:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";

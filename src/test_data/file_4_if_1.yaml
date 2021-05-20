@@ -1,0 +1,65 @@
+#// Test of if tag
+
+settings:
+    __Stage__: develop  #// develop, staging, product
+    __User__: user1
+
+by true or false:
+    true:  #if: true
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __User__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部(2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __Stage__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks
+    false:  #if: false
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __User__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部(2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __Stage__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml: | #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            does not check
+
+by settings value:
+    Case of develop:  #if: $settings.__Stage__ == develop
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if develop  #template: __Stage__
+    Case of not develop:  #if: $settings.__Stage__ != develop
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    Case of product:  #if: $settings.__Stage__ == product
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    Case of not product:  #if: $settings.__Stage__ != product
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml (1):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if not product
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml (2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if not product
+    ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+        Checks else part
+
+by environment variable:
+    equal aaa:  #if: $env.typrm_aaa == aaa
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.typrm_aaa == aaa
+    not equal aaa:  #if: $env.typrm_aaa != aaa
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    equal bbb:  #if: $env.typrm_aaa == bbb
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    not equal bbb:  #if: $env.typrm_aaa != bbb
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.typrm_aaa != bbb
+    exists aaa:  #if: $env.typrm_aaa != ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.typrm_aaa != ""
+    not exists aaa:  #if: $env.typrm_aaa == ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    exists:  #if: $env.undefined != ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    not exists:  #if: $env.undefined == ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.undefined == ""

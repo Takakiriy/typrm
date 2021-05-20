@@ -60,7 +60,6 @@ function callMain() {
                     }
                     Object.assign(main.programOptions, commander.program.opts());
                     return [4 /*yield*/, main.main()["catch"](function (e) {
-                            console.log('000c');
                             if (main.programOptions.test) {
                                 throw e;
                             }

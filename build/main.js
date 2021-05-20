@@ -66,7 +66,7 @@ function main() {
                         locale = exports.programOptions.locale;
                     }
                     if (!(exports.programArguments.length === 0)) return [3 /*break*/, 4];
-                    return [4 /*yield*/, oldMain(true, '')];
+                    return [4 /*yield*/, checkRoutine(true, '')];
                 case 1:
                     _a.sent();
                     if (!exports.programOptions.test) return [3 /*break*/, 3];
@@ -111,12 +111,12 @@ function main() {
     });
 }
 exports.main = main;
-// oldMain
-function oldMain(isModal, inputFilePath) {
+// checkRoutine
+function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, condition, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -141,6 +141,7 @@ function oldMain(isModal, inputFilePath) {
                     lineNum = 0;
                     templateCount = 0;
                     fileTemplateTag = null;
+                    enabled = true;
                     errorCount = 0;
                     warningCount = 0;
                     secretLabelCount = 0;
@@ -186,6 +187,17 @@ function oldMain(isModal, inputFilePath) {
                             }
                         }
                     }
+                    // Set condition by "#if:" tag.
+                    if (line.indexOf(ifLabel) != notFound) {
+                        condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+                        enabled = (condition === 'true' ||
+                            condition == '$settings.__Stage__ == develop' ||
+                            condition == '$settings.__Stage__ != product' ||
+                            condition == '$env.typrm_aaa == aaa' ||
+                            condition == '$env.typrm_aaa != bbb' ||
+                            condition == '$env.typrm_aaa != ""' ||
+                            condition == '$env.undefined == ""');
+                    }
                     templateTag = parseTemplateTag(line);
                     if (templateTag.lineNumOffset >= 1 && templateTag.isFound) {
                         console.log("");
@@ -200,7 +212,7 @@ function oldMain(isModal, inputFilePath) {
                         templateCount += 1;
                         checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                         expected = getExpectedLine(setting, templateTag.template);
-                        if (checkingLine.indexOf(expected) === notFound) {
+                        if (checkingLine.indexOf(expected) === notFound && enabled) {
                             console.log("");
                             console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
                             console.log("  " + translate('Contents') + ": " + checkingLine.trim());
@@ -222,13 +234,13 @@ function oldMain(isModal, inputFilePath) {
                     fileTemplateTag = null;
                     _h.label = 8;
                 case 8:
-                    if (templateTag.label === fileTemplateLabel) {
+                    if (templateTag.label === fileTemplateLabel && enabled) {
                         fileTemplateTag = templateTag;
                     }
                     // Check if there is not "#★Now:".
                     for (_i = 0, temporaryLabels_1 = temporaryLabels; _i < temporaryLabels_1.length; _i++) {
                         temporaryLabel = temporaryLabels_1[_i];
-                        if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound) {
+                        if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound && enabled) {
                             console.log("");
                             console.log(translate('WarningLine') + ": " + lineNum);
                             console.log("  " + translate('Contents') + ": " + line.trim());
@@ -292,7 +304,7 @@ function oldMain(isModal, inputFilePath) {
                     }
                     if (!fileTemplateTag) return [3 /*break*/, 19];
                     fileTemplateTag.onReadLine(''); // Cut indent
-                    return [4 /*yield*/, fileTemplateTag.checkTargetFileContents(setting, inputFilePath, lineNum)];
+                    return [4 /*yield*/, fileTemplateTag.checkTargetFileContents(setting, inputFilePath, lineNum + 1)];
                 case 18:
                     checkPassed = _h.sent();
                     if (!checkPassed) {
@@ -822,7 +834,7 @@ var TemplateTag = /** @class */ (function () {
                                 templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
                             }
                             if (result === Result.skipped) {
-                                templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex + 1;
+                                templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex;
                                 errorContents = skipFrom;
                                 errorExpected = skipTo;
                                 errorTemplate = skipToTemplate;
@@ -881,7 +893,7 @@ function check(checkingFilePath) {
                     if (!(_i < filePaths_1.length)) return [3 /*break*/, 7];
                     inputFilePath = filePaths_1[_i];
                     inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
-                    return [4 /*yield*/, oldMain(false, inputFileFullPath)];
+                    return [4 /*yield*/, checkRoutine(false, inputFileFullPath)];
                 case 5:
                     _a.sent();
                     _a.label = 6;
@@ -969,7 +981,7 @@ function search() {
                                     if (!(line.indexOf(keywordLabel) !== notFound && line.indexOf(disableLabel) === notFound)) return [3 /*break*/, 5];
                                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
                                     return [4 /*yield*/, parseCSVColumns(csv)["catch"](function (e) {
-                                            console.log("Error: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
+                                            console.log("Warning: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
                                             return [];
                                         })];
                                 case 4:
@@ -1471,6 +1483,8 @@ var WriteBuffer = /** @class */ (function () {
     return WriteBuffer;
 }());
 // getStdOut
+// Example:
+//    var d = getStdOut();  // Set break point here and watch the variable d
 function getStdOut() {
     return exports.stdout.split('\n');
 }
@@ -1786,6 +1800,7 @@ var fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
 var disableLabel = "#disable-tag-tool:";
+var ifLabel = "#if:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";

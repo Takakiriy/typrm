@@ -14,7 +14,7 @@ ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_
   Expected: login user2
   Contents: (Not found)
 
-typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:11
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:12
 ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
   Template: login user2  #template: __User__
   Expected: login user2
@@ -42,6 +42,73 @@ ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_8_others_2_ta
 
 Warning: 0, Error: 1
 template count = 4
+"
+`;
+
+exports[`checks file contents if in file_4_if, file/1 : stdout 1`] = `
+"
+ErrorLine: 12
+  Contents: user: 'user1'  #template: __Stage__
+  Expected: develop
+  Template: __Stage__
+  SettingIndex: 1
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:14
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks
+  Expected: Checks
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:26
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if develop  #template: __Stage__
+  Expected: Checks if develop
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:35
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if not product
+  Expected: Checks if not product
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:37
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if not product
+  Expected: Checks if not product
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:39
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks else part
+  Expected: Checks else part
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:44
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if $env.typrm_aaa == aaa
+  Expected: Checks if $env.typrm_aaa == aaa
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:53
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if $env.typrm_aaa != bbb
+  Expected: Checks if $env.typrm_aaa != bbb
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:56
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if $env.typrm_aaa != \\"\\"
+  Expected: Checks if $env.typrm_aaa != \\"\\"
+  Contents: (Not found)
+
+typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:65
+ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  Template: Checks if $env.undefined == \\"\\"
+  Expected: Checks if $env.undefined == \\"\\"
+  Contents: (Not found)
+
+Warning: 0, Error: 10
+template count = 25
 "
 `;
 

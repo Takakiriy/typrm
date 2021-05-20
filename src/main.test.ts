@@ -44,13 +44,16 @@ describe("checks file contents", () => {
     test.skip('file_3_file_name',()=>{});
     test.each([
         [
-			"OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
+            "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
         ],[
-			"NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+            "NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
         ],[
-			"any_lines", "file_8_others", "file/1", "", 0, 0, "",
+            "if", "file_4_if", "file/1", "", 0, 0, "",
+        ],[
+            "any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
     ])("%s in %s, %s %s", async (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
+//if (caseName !== 'if') {return;}
         const  sourceFilePath   = 'test_data/' + fileNameHead + "_1.yaml";
         const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
         const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
@@ -70,6 +73,7 @@ describe("checks file contents", () => {
 
         expect(main.stdout).toMatchSnapshot('stdout');
         fs.rmdirSync('test_data/_checking', {recursive: true});
+//expect('test code').toBe('deleted skip code.');
     });
 });
 
