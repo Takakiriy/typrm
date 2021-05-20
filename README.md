@@ -24,7 +24,7 @@ Also, there is a search function that is separated from the replace function.
     - [For Windows host OS and CentOS 7 guest OS](#for-windows-host-os-and-centos-7-guest-os)
   - [Test](#test)
     - [Test using Jest](#test-using-jest)
-    - [Tst without Jest](#tst-without-jest)
+    - [Test without Jest](#test-without-jest)
 
 <!-- /TOC -->
 
@@ -127,7 +127,7 @@ To use typrm, you must install Node.js.
                 ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
                 ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
-                echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
+                echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
                 echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
@@ -412,12 +412,12 @@ after the #keyword tag in a text file. It makes to reduce search noise.
 
 Sample text file content:
 
-    Shows all files:  #keyword: ls -a
+    Shows all files:  #keyword: ls
     Example: ls -a sub_folder
 
 typrm command:
 
-    $ typrm ls -a
+    $ typrm ls
     .../text.txt:1: Shows all files:  #keyword: ls -a
 
 In the case of the above example, the Example line will not be hit.
@@ -626,6 +626,6 @@ There are the test using Jest and the test without Jest.
 - Visual Studio Code >> New Terminal >> Terminal >> (1:__shell__ at the left of +) >> Create JavaScript Debug Terminal
 - npm test
 
-### Tst without Jest
+### Test without Jest
 
 - Visual Studio Code >> F5 key

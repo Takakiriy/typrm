@@ -131,7 +131,7 @@ typrm を使うには Node.js のインストールが必要です。
                 ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
                 ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
-                echo  "`${env:NODE_PATH} = `"${env:USERPROFILE}\AppData\Roaming\npm\node_modules`"" > ${script}
+                echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
                 echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
@@ -404,12 +404,12 @@ typrm の検索機能は、テキスト ファイルの中の
 
 テキスト ファイル の内容のサンプル:
 
-    Shows all files:  #keyword: ls -a
+    Shows all files:  #keyword: ls
     Example: ls -a sub_folder
 
 typrm コマンド:
 
-    $ typrm ls -a
+    $ typrm ls
     .../text.txt:1: Shows all files:  #keyword: ls -a
 
 上記の例の場合、Example の行にはヒットしません。
