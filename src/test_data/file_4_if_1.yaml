@@ -22,6 +22,24 @@ by true or false:
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml: | #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
             does not check
 
+nested if:
+    true: #if: true
+        case of true:  #if: true
+            - check: 'yes'  #template: __Stage__
+        case of false:  #if: false
+            - check: 'no'  #template: __Stage__
+        common case:  #// else
+            - check: 'yes'  #template: __Stage__
+    false: #if: false
+        case of true:  #if: true
+            - check: 'no'  #template: __Stage__
+        case of false:  #if: false
+            - check: 'no'  #template: __Stage__
+        common case:  #// else
+            - check: 'no'  #template: __Stage__
+    common case:  #// else
+        - check: 'yes'  #template: __Stage__
+
 by settings value:
     Case of develop:  #if: $settings.__Stage__ == develop
         ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml

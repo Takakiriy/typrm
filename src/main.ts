@@ -71,6 +71,9 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 		let  secretLabelCount = 0;
 		const  lines = [];
 		const  keywords: SearchKeyword[] = [];
+		const  indentLengthsOfIfTag: IfTag[] = [
+			{indentLength: -1, resultOfIf: true, enabled: true}
+		];
 
 		for await (const line1 of reader) {
 			const  line: string = line1;
@@ -107,19 +110,29 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 			}
 
 			// Set condition by "#if:" tag.
+			const  indentLength = indentRegularExpression.exec(line)![0].length;
+			while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
+
+				indentLengthsOfIfTag.pop();
+				enabled = lastOf(indentLengthsOfIfTag).enabled;
+			}
 			if (line.indexOf(ifLabel) != notFound) {
 				const  condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
 
 				const  evaluatedContidion = evaluateIfCondition(condition, setting);
 				if (typeof evaluatedContidion === 'boolean') {
-					enabled = evaluatedContidion;
+					var  resultOfIf = evaluatedContidion;
 				} else {
 					console.log('');
 					console.log('Error of if tag syntax:');
 					console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
 					console.log(`  Contents: ${condition}`);
-					enabled = true;
+					var  resultOfIf = true;
 				}
+				if (enabled && !resultOfIf) {
+					enabled = false;
+				}
+				indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled});
 			}
 
 			// Check if previous line has "template" replaced contents.
@@ -1210,6 +1223,13 @@ enum Direction {
 	Following = +1,
 }
 
+//
+interface  IfTag {
+	indentLength: number;
+	resultOfIf: boolean;
+	enabled: boolean;
+}
+
 // WriteBuffer
 class  WriteBuffer {
 	stream: fs.WriteStream;
@@ -1310,6 +1330,11 @@ function  println(message: any, delayedExpanding: boolean = false) {
 }
 const  consoleLog = console.log;
 console.log = println;
+
+// lastOf
+function  lastOf<T>(array: Array<T>): T {
+    return  array[array.length - 1];
+}
 
 // StandardInputBuffer
 class  StandardInputBuffer {

@@ -117,7 +117,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, condition, evaluatedContidion, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, indentLengthsOfIfTag, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, indentLength, condition, evaluatedContidion, resultOfIf, resultOfIf, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -148,6 +148,9 @@ function checkRoutine(isModal, inputFilePath) {
                     secretLabelCount = 0;
                     lines = [];
                     keywords = [];
+                    indentLengthsOfIfTag = [
+                        { indentLength: -1, resultOfIf: true, enabled: true }
+                    ];
                     _h.label = 4;
                 case 4:
                     _h.trys.push([4, 11, 12, 17]);
@@ -188,20 +191,28 @@ function checkRoutine(isModal, inputFilePath) {
                             }
                         }
                     }
-                    // Set condition by "#if:" tag.
+                    indentLength = indentRegularExpression.exec(line)[0].length;
+                    while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
+                        indentLengthsOfIfTag.pop();
+                        enabled = lastOf(indentLengthsOfIfTag).enabled;
+                    }
                     if (line.indexOf(ifLabel) != notFound) {
                         condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
                         evaluatedContidion = evaluateIfCondition(condition, setting);
                         if (typeof evaluatedContidion === 'boolean') {
-                            enabled = evaluatedContidion;
+                            resultOfIf = evaluatedContidion;
                         }
                         else {
                             console.log('');
                             console.log('Error of if tag syntax:');
                             console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
                             console.log("  Contents: " + condition);
-                            enabled = true;
+                            resultOfIf = true;
                         }
+                        if (enabled && !resultOfIf) {
+                            enabled = false;
+                        }
+                        indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: enabled });
                     }
                     templateTag = parseTemplateTag(line);
                     if (templateTag.lineNumOffset >= 1 && templateTag.isFound) {
@@ -1651,6 +1662,10 @@ function println(message, delayedExpanding) {
 }
 var consoleLog = console.log;
 console.log = println;
+// lastOf
+function lastOf(array) {
+    return array[array.length - 1];
+}
 // StandardInputBuffer
 var StandardInputBuffer = /** @class */ (function () {
     function StandardInputBuffer() {
