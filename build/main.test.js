@@ -46,7 +46,7 @@ if (path.basename(process.cwd()) !== "src") {
 }
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-describe("checks template value", function () {
+describe("checks template value >>", function () {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -85,7 +85,7 @@ describe("checks template value", function () {
         });
     }); });
 });
-describe("checks file contents", function () {
+describe("checks file contents >>", function () {
     test.skip('file_2_tab', function () { });
     test.skip('file_3_file_name', function () { });
     test.each([
@@ -129,8 +129,38 @@ describe("checks file contents", function () {
             }
         });
     }); });
+    test.each([
+        [
+            "all", ["check"],
+        ], [
+            "file in 1st folder", ["check", "file_1.yaml"],
+        ], [
+            "file in 2nd folder", ["check", "file_2.yaml"],
+        ], [
+            "full path", ["check", getFullPath("test_data/_checking/2/file_2.yaml", process.cwd())],
+        ]
+    ])("Multi folder >> %s", function (caseName, parameters) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    copyFileSync("test_data/file_0_one_error_1.yaml", "test_data/_checking/1/file_1.yaml");
+                    copyFileSync("test_data/file_0_one_error_1.yaml", "test_data/_checking/2/file_2.yaml");
+                    // Test Main
+                    return [4 /*yield*/, callMain(parameters, {
+                            folder: 'test_data/_checking/1, test_data/_checking/2', test: "", locale: "en-US"
+                        })];
+                case 1:
+                    // Test Main
+                    _a.sent();
+                    expect(main.stdout).toMatchSnapshot('stdout');
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
-describe("replaces settings", function () {
+describe("replaces settings >>", function () {
     test.skip('2_replace_5_setting_name', function () { });
     test.each([
         [
@@ -182,7 +212,7 @@ describe("replaces settings", function () {
         });
     }); });
 });
-describe("searches keyword tag", function () {
+describe("searches keyword tag >>", function () {
     test.each([
         [
             "1st",
@@ -301,7 +331,7 @@ describe("searches keyword tag", function () {
         });
     }); });
 });
-describe("searches glossary tag", function () {
+describe("searches glossary tag >>", function () {
     test.each([
         [
             "1st",
@@ -349,7 +379,7 @@ describe("searches glossary tag", function () {
         });
     }); });
 });
-describe("test of test", function () {
+describe("test of test >>", function () {
     test("checks snapshots files are confirmed", function () {
         var activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
         var backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();

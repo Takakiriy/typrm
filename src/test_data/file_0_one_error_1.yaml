@@ -1,0 +1,2 @@
+../../file_target/1/file_0_one_error_2_target.yaml : |  #file-template: ../../file_target/1/file_0_one_error_2_target.yaml
+    correct contents

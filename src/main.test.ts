@@ -1,5 +1,6 @@
 ﻿import * as fs from "fs";
 import * as path from "path";
+import { ppid } from "process";
 import * as main from "./main";
 const callMain = main.callMainFromJest;
 
@@ -10,7 +11,7 @@ if (path.basename(process.cwd()) !== "src") {
 const scriptPath = `../build/typrm.js`;
 const testFolderPath = `test_data` + path.sep;
 
-describe("checks template value", () => {
+describe("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -39,7 +40,7 @@ describe("checks template value", () => {
     });
 });
 
-describe("checks file contents", () => {
+describe("checks file contents >>", () => {
     test.skip('file_2_tab',()=>{});
     test.skip('file_3_file_name',()=>{});
     test.each([
@@ -73,9 +74,33 @@ describe("checks file contents", () => {
         expect(main.stdout).toMatchSnapshot('stdout');
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
+
+    test.each([
+        [
+            "all", ["check"],
+        ],[
+            "file in 1st folder", ["check", "file_1.yaml"],
+        ],[
+            "file in 2nd folder", ["check", "file_2.yaml"],
+        ],[
+            "full path", ["check", getFullPath("test_data/_checking/2/file_2.yaml", process.cwd())],
+        ]
+    ])("Multi folder >> %s", async (caseName, parameters) => {
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+        copyFileSync(`test_data/file_0_one_error_1.yaml`, `test_data/_checking/1/file_1.yaml`);
+        copyFileSync(`test_data/file_0_one_error_1.yaml`, `test_data/_checking/2/file_2.yaml`);
+
+        // Test Main
+        await callMain(parameters, {
+            folder: 'test_data/_checking/1, test_data/_checking/2', test: "", locale: "en-US",
+        });
+
+        expect(main.stdout).toMatchSnapshot('stdout');
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+    });
 });
 
-describe("replaces settings", () => {
+describe("replaces settings >>", () => {
     test.skip('2_replace_5_setting_name',()=>{});
     test.each([
         [
@@ -122,7 +147,7 @@ Key3: value3changed  #コメント`,
     });
 });
 
-describe("searches keyword tag", () => {
+describe("searches keyword tag >>", () => {
     test.each([
         [
             "1st",
@@ -233,7 +258,7 @@ describe("searches keyword tag", () => {
     });
 });
 
-describe("searches glossary tag", () => {
+describe("searches glossary tag >>", () => {
   test.each([
     [
         "1st",
@@ -275,7 +300,7 @@ describe("searches glossary tag", () => {
     });
 });
 
-describe("test of test", () => {
+describe("test of test >>", () => {
     test("checks snapshots files are confirmed", () => {
         const  activeSnapshots    = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
         const  backUpSnapshots    = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();

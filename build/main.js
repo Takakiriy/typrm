@@ -868,45 +868,83 @@ var TemplateTag = /** @class */ (function () {
 // check
 function check(checkingFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var targetFolder, targetFolderFullPath, inputFileFullPath, filePaths, oldCurrentFoldderPath, filePaths, _i, filePaths_1, inputFilePath, inputFileFullPath;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    targetFolder = exports.programOptions.folder;
-                    targetFolderFullPath = getFullPath(targetFolder, process.cwd());
-                    if (!checkingFilePath) return [3 /*break*/, 1];
-                    inputFileFullPath = targetFolderFullPath + path.sep + checkingFilePath;
-                    if (!fs.existsSync(inputFileFullPath)) {
-                        throw new Error("Not found specified target file at \"" + inputFileFullPath + "\".");
+        var targetFolders, currentFolder, inputFileFullPaths, notFoundPaths, _i, targetFolders_1, folder, targetFolderFullPath, inputFileFullPath, filePaths, _loop_1, _a, targetFolders_2, folder, _b, inputFileFullPaths_1, inputFileFullPath;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
+                case 1:
+                    targetFolders = _c.sent();
+                    currentFolder = process.cwd();
+                    inputFileFullPaths = [];
+                    notFoundPaths = [];
+                    if (!checkingFilePath) return [3 /*break*/, 2];
+                    for (_i = 0, targetFolders_1 = targetFolders; _i < targetFolders_1.length; _i++) {
+                        folder = targetFolders_1[_i];
+                        targetFolderFullPath = getFullPath(folder, currentFolder);
+                        inputFileFullPath = getFullPath(checkingFilePath, targetFolderFullPath);
+                        if (fs.existsSync(inputFileFullPath)) {
+                            inputFileFullPaths.push(inputFileFullPath);
+                            break;
+                        }
+                        else {
+                            notFoundPaths.push(inputFileFullPath);
+                        }
+                    }
+                    if (inputFileFullPaths.length === 0) {
+                        throw new Error("Not found specified target file at \"" + JSON.stringify(notFoundPaths) + "\".");
                     }
                     filePaths = [checkingFilePath];
-                    return [3 /*break*/, 3];
-                case 1:
-                    oldCurrentFoldderPath = process.cwd();
-                    if (!fs.existsSync(targetFolderFullPath)) {
-                        throw new Error("Not found target folder at \"" + targetFolderFullPath + "\".");
-                    }
-                    process.chdir(targetFolderFullPath);
-                    return [4 /*yield*/, globby(['**/*'])];
+                    return [3 /*break*/, 7];
                 case 2:
-                    filePaths = _a.sent();
-                    process.chdir(oldCurrentFoldderPath);
-                    _a.label = 3;
+                    _loop_1 = function (folder) {
+                        var targetFolderFullPath, scanedPaths;
+                        return __generator(this, function (_d) {
+                            switch (_d.label) {
+                                case 0:
+                                    targetFolderFullPath = getFullPath(folder, currentFolder);
+                                    if (!fs.existsSync(targetFolderFullPath)) {
+                                        throw new Error("Not found target folder at \"" + targetFolderFullPath + "\".");
+                                    }
+                                    process.chdir(targetFolderFullPath);
+                                    return [4 /*yield*/, globby(['**/*'])];
+                                case 1:
+                                    scanedPaths = _d.sent();
+                                    scanedPaths.forEach(function (scanedPath) {
+                                        inputFileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath));
+                                    });
+                                    return [2 /*return*/];
+                            }
+                        });
+                    };
+                    _a = 0, targetFolders_2 = targetFolders;
+                    _c.label = 3;
                 case 3:
-                    _i = 0, filePaths_1 = filePaths;
-                    _a.label = 4;
+                    if (!(_a < targetFolders_2.length)) return [3 /*break*/, 6];
+                    folder = targetFolders_2[_a];
+                    return [5 /*yield**/, _loop_1(folder)];
                 case 4:
-                    if (!(_i < filePaths_1.length)) return [3 /*break*/, 7];
-                    inputFilePath = filePaths_1[_i];
-                    inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
-                    return [4 /*yield*/, checkRoutine(false, inputFileFullPath)];
+                    _c.sent();
+                    _c.label = 5;
                 case 5:
-                    _a.sent();
-                    _a.label = 6;
+                    _a++;
+                    return [3 /*break*/, 3];
                 case 6:
-                    _i++;
-                    return [3 /*break*/, 4];
-                case 7: return [2 /*return*/];
+                    process.chdir(currentFolder);
+                    _c.label = 7;
+                case 7:
+                    _b = 0, inputFileFullPaths_1 = inputFileFullPaths;
+                    _c.label = 8;
+                case 8:
+                    if (!(_b < inputFileFullPaths_1.length)) return [3 /*break*/, 11];
+                    inputFileFullPath = inputFileFullPaths_1[_b];
+                    return [4 /*yield*/, checkRoutine(false, inputFileFullPath)];
+                case 9:
+                    _c.sent();
+                    _c.label = 10;
+                case 10:
+                    _b++;
+                    return [3 /*break*/, 8];
+                case 11: return [2 /*return*/];
             }
         });
     });
@@ -915,13 +953,12 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keywordOfDoubleQuotedLowerCase, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_1, _i, targetFolders_1, folder, indentAtStart, inGlossary, foundScores, _loop_2, lineNum, _b, fileFullPaths_1, inputFileFullPath, _c, foundScores_1, found;
+        var startIndex, keyword, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_2, _i, targetFolders_3, folder, indentAtStart, inGlossary, foundScores, _loop_3, lineNum, _b, fileFullPaths_1, inputFileFullPath, _c, foundScores_1, found;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
                     startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
                     keyword = exports.programArguments.slice(startIndex).join(' ');
-                    keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
                     keywordDoubleQuoted = keyword.replace('"', '""');
                     targetFolder = exports.programOptions.folder;
                     currentFolder = process.cwd();
@@ -929,7 +966,7 @@ function search() {
                     return [4 /*yield*/, parseCSVColumns(targetFolder)];
                 case 1:
                     targetFolders = _d.sent();
-                    _loop_1 = function (folder) {
+                    _loop_2 = function (folder) {
                         var targetFolderFullPath, scanedPaths;
                         return __generator(this, function (_e) {
                             switch (_e.label) {
@@ -946,12 +983,12 @@ function search() {
                             }
                         });
                     };
-                    _i = 0, targetFolders_1 = targetFolders;
+                    _i = 0, targetFolders_3 = targetFolders;
                     _d.label = 2;
                 case 2:
-                    if (!(_i < targetFolders_1.length)) return [3 /*break*/, 5];
-                    folder = targetFolders_1[_i];
-                    return [5 /*yield**/, _loop_1(folder)];
+                    if (!(_i < targetFolders_3.length)) return [3 /*break*/, 5];
+                    folder = targetFolders_3[_i];
+                    return [5 /*yield**/, _loop_2(folder)];
                 case 3:
                     _d.sent();
                     _d.label = 4;
@@ -963,7 +1000,7 @@ function search() {
                     indentAtStart = '';
                     inGlossary = false;
                     foundScores = [];
-                    _loop_2 = function (inputFileFullPath) {
+                    _loop_3 = function (inputFileFullPath) {
                         var reader, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1;
                         return __generator(this, function (_f) {
                             switch (_f.label) {
@@ -1053,7 +1090,7 @@ function search() {
                 case 6:
                     if (!(_b < fileFullPaths_1.length)) return [3 /*break*/, 9];
                     inputFileFullPath = fileFullPaths_1[_b];
-                    return [5 /*yield**/, _loop_2(inputFileFullPath)];
+                    return [5 /*yield**/, _loop_3(inputFileFullPath)];
                 case 7:
                     _d.sent();
                     _d.label = 8;

@@ -643,28 +643,44 @@ class  TemplateTag {
 
 // check
 async function  check(checkingFilePath?: string) {
-	const  targetFolder = programOptions.folder;
-	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
+	const  targetFolders = await parseCSVColumns(programOptions.folder);
+	const  currentFolder = process.cwd();
+	const  inputFileFullPaths: string[] = [];
+	const  notFoundPaths: string[] = [];
 	if (checkingFilePath) {
-		const  inputFileFullPath = targetFolderFullPath + path.sep + checkingFilePath;
-		if (!fs.existsSync(inputFileFullPath)) {
-			throw new Error(`Not found specified target file at "${inputFileFullPath}".`);
+		for (const folder of targetFolders) {
+			const  targetFolderFullPath = getFullPath(folder, currentFolder);
+
+			const  inputFileFullPath = getFullPath(checkingFilePath, targetFolderFullPath);
+			if (fs.existsSync(inputFileFullPath)) {
+				inputFileFullPaths.push(inputFileFullPath);
+				break;
+			} else {
+				notFoundPaths.push(inputFileFullPath);
+			}
+		}
+		if (inputFileFullPaths.length === 0) {
+			throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
 		}
 
 		var  filePaths = [checkingFilePath];
 	} else {
-		const  oldCurrentFoldderPath = process.cwd();
-		if (!fs.existsSync(targetFolderFullPath)) {
-			throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
-		}
-		process.chdir(targetFolderFullPath);
+		for (const folder of targetFolders) {
+			const  targetFolderFullPath = getFullPath(folder, currentFolder);
+			if (!fs.existsSync(targetFolderFullPath)) {
+				throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
+			}
+			process.chdir(targetFolderFullPath);
+			const scanedPaths = await globby(['**/*']);
+			scanedPaths.forEach((scanedPath) => {
 
-		var  filePaths: string[] = await globby(['**/*']);
-		process.chdir(oldCurrentFoldderPath);
+				inputFileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath))
+			});
+		}
+		process.chdir(currentFolder);
 	}
 
-	for (const inputFilePath of filePaths) {
-		const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
+	for (const inputFileFullPath of inputFileFullPaths) {
 
 		await checkRoutine(false, inputFileFullPath);
 	}
@@ -674,7 +690,6 @@ async function  check(checkingFilePath?: string) {
 async function  search() {
 	const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
 	const  keyword = programArguments.slice(startIndex).join(' ');
-	const  keywordOfDoubleQuotedLowerCase = keyword.replace('"', '""').toLowerCase();
 	const  keywordDoubleQuoted = keyword.replace('"', '""');
 	const  targetFolder = programOptions.folder;
 	const  currentFolder = process.cwd();

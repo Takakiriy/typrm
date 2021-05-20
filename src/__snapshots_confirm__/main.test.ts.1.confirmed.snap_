@@ -1,6 +1,72 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`checks file contents NG in file_1_ok_and_bad, file/1 replace: stdout 1`] = `
+exports[`checks file contents >> Multi folder >> all: stdout 1`] = `
+"
+Error of not same as file contents:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1/file_1.yaml:2
+  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  Template: correct contents
+  Expected: correct contents
+  Contents: (Not found)
+
+Warning: 0, Error: 1
+template count = 1
+
+Error of not same as file contents:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/2/file_2.yaml:2
+  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  Template: correct contents
+  Expected: correct contents
+  Contents: (Not found)
+
+Warning: 0, Error: 1
+template count = 1
+"
+`;
+
+exports[`checks file contents >> Multi folder >> file in 1st folder: stdout 1`] = `
+"
+Error of not same as file contents:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1/file_1.yaml:2
+  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  Template: correct contents
+  Expected: correct contents
+  Contents: (Not found)
+
+Warning: 0, Error: 1
+template count = 1
+"
+`;
+
+exports[`checks file contents >> Multi folder >> file in 2nd folder: stdout 1`] = `
+"
+Error of not same as file contents:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/2/file_2.yaml:2
+  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  Template: correct contents
+  Expected: correct contents
+  Contents: (Not found)
+
+Warning: 0, Error: 1
+template count = 1
+"
+`;
+
+exports[`checks file contents >> Multi folder >> full path: stdout 1`] = `
+"
+Error of not same as file contents:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/2/file_2.yaml:2
+  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  Template: correct contents
+  Expected: correct contents
+  Contents: (Not found)
+
+Warning: 0, Error: 1
+template count = 1
+"
+`;
+
+exports[`checks file contents >> NG in file_1_ok_and_bad, file/1 replace: stdout 1`] = `
 "
 Error of not same as file contents:
   typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:7
@@ -28,14 +94,14 @@ template count = 6
 "
 `;
 
-exports[`checks file contents OK in file_1_ok_and_bad, file/1 : stdout 1`] = `
+exports[`checks file contents >> OK in file_1_ok_and_bad, file/1 : stdout 1`] = `
 "
 Warning: 0, Error: 0
 template count = 6
 "
 `;
 
-exports[`checks file contents any_lines in file_8_others, file/1 : stdout 1`] = `
+exports[`checks file contents >> any_lines in file_8_others, file/1 : stdout 1`] = `
 "
 Error of not same as file contents:
   typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_8_others_1_changing.yaml:16
@@ -49,7 +115,7 @@ template count = 4
 "
 `;
 
-exports[`checks file contents if in file_4_if, file/1 : stdout 1`] = `
+exports[`checks file contents >> if in file_4_if, file/1 : stdout 1`] = `
 "
 ErrorLine: 9
   Contents: user: 'user1'  #template: __Stage__
@@ -139,14 +205,14 @@ template count = 27
 "
 `;
 
-exports[`checks template value 1_template_1_ok 1`] = `
+exports[`checks template value >> 1_template_1_ok 1`] = `
 "
 Warning: 0, Error: 0
 template count = 8
 "
 `;
 
-exports[`checks template value 1_template_2_error 1`] = `
+exports[`checks template value >> 1_template_2_error 1`] = `
 "
 ErrorLine: 12
   Contents: - echo  \\"value  2\\"
@@ -221,21 +287,21 @@ template count = 12
 "
 `;
 
-exports[`checks template value check one file only 1`] = `
+exports[`checks template value >> check one file only 1`] = `
 "
 Warning: 0, Error: 0
 template count = 8
 "
 `;
 
-exports[`checks template value refer_1_ok 1`] = `
+exports[`checks template value >> refer_1_ok 1`] = `
 "
 Warning: 0, Error: 0
 template count = 0
 "
 `;
 
-exports[`checks template value refer_2_error 1`] = `
+exports[`checks template value >> refer_2_error 1`] = `
 "
 ErrorLine: 5
   Not found \\"タイトル１\\" above
@@ -257,7 +323,7 @@ template count = 0
 "
 `;
 
-exports[`checks template value secret_1_error 1`] = `
+exports[`checks template value >> secret_1_error 1`] = `
 "
 WarningLine: 4
   This is a secret value.
@@ -274,7 +340,7 @@ template count = 0
 "
 `;
 
-exports[`checks template value var_not_ref_1_error 1`] = `
+exports[`checks template value >> var_not_ref_1_error 1`] = `
 "Not referenced: key1 in line 2
 Not referenced: Key3 in line 5
 Not referenced: key1 in line 12
@@ -285,13 +351,13 @@ template count = 2
 "
 `;
 
-exports[`replaces settings in 2_replace_1_ok(10) setting 1: stdout 1`] = `
+exports[`replaces settings >> in 2_replace_1_ok(10) setting 1: stdout 1`] = `
 "
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings in 2_replace_1_ok(10) setting 1: updatedFileContents 1`] = `
+exports[`replaces settings >> in 2_replace_1_ok(10) setting 1: updatedFileContents 1`] = `
 "# 設定値を変更する。設定のセットは行番号で指定 >> パスするケース
 
 手順A:
@@ -340,13 +406,13 @@ exports[`replaces settings in 2_replace_1_ok(10) setting 1: updatedFileContents 
 "
 `;
 
-exports[`replaces settings in 2_replace_1_ok(29) setting 2: stdout 1`] = `
+exports[`replaces settings >> in 2_replace_1_ok(29) setting 2: stdout 1`] = `
 "
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings in 2_replace_1_ok(29) setting 2: updatedFileContents 1`] = `
+exports[`replaces settings >> in 2_replace_1_ok(29) setting 2: updatedFileContents 1`] = `
 "# 設定値を変更する。設定のセットは行番号で指定 >> パスするケース
 
 手順A:
@@ -395,7 +461,7 @@ exports[`replaces settings in 2_replace_1_ok(29) setting 2: updatedFileContents 
 "
 `;
 
-exports[`replaces settings in 2_replace_2_error(4) setting 1: stdout 1`] = `
+exports[`replaces settings >> in 2_replace_2_error(4) setting 1: stdout 1`] = `
 "
 ErrorLine: 19
   Error: Not found any replacing target
@@ -409,7 +475,7 @@ Warning: 0, Error: 1
 "
 `;
 
-exports[`replaces settings in 2_replace_2_error(4) setting 1: updatedFileContents 1`] = `
+exports[`replaces settings >> in 2_replace_2_error(4) setting 1: updatedFileContents 1`] = `
 "# 設定値を変更する >> エラーになるケース
 
 手順A:
@@ -442,7 +508,7 @@ exports[`replaces settings in 2_replace_2_error(4) setting 1: updatedFileContent
 "
 `;
 
-exports[`replaces settings in 2_replace_3_English(10) setting 1: stdout 1`] = `
+exports[`replaces settings >> in 2_replace_3_English(10) setting 1: stdout 1`] = `
 "
 ErrorLine: 21
   Error: Not found any replacing target
@@ -456,7 +522,7 @@ Warning: 0, Error: 1
 "
 `;
 
-exports[`replaces settings in 2_replace_3_English(10) setting 1: updatedFileContents 1`] = `
+exports[`replaces settings >> in 2_replace_3_English(10) setting 1: updatedFileContents 1`] = `
 "# Case of that setting tag is English
 
 Process A:
@@ -505,7 +571,7 @@ Process B:
 "
 `;
 
-exports[`replaces settings in 2_replace_4_Japanese(10) setting 1: stdout 1`] = `
+exports[`replaces settings >> in 2_replace_4_Japanese(10) setting 1: stdout 1`] = `
 "
 エラー行: 19
   エラー: 置き換える対象が見つかりません
@@ -519,7 +585,7 @@ exports[`replaces settings in 2_replace_4_Japanese(10) setting 1: stdout 1`] = `
 "
 `;
 
-exports[`replaces settings in 2_replace_4_Japanese(10) setting 1: updatedFileContents 1`] = `
+exports[`replaces settings >> in 2_replace_4_Japanese(10) setting 1: updatedFileContents 1`] = `
 "# 設定タグが日本語のケース
 
 手順A:
