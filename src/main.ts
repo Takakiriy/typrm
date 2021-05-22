@@ -1297,7 +1297,9 @@ export const  debugOut: string[] = [];
 // Through counter.
 // #keyword: cc
 // Example:
-//   cc(9999);
+//   cc();
+// Example:
+//   var c = cc().debugOut;  // Set break point here and watch the variable c
 // Example:
 //   if ( cc(2).isTarget )
 //   var d = pp('');  // Set break point here and watch the variable d

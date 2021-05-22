@@ -26,7 +26,7 @@ async function  callMain() {
 
 				console.log( `ERROR: ${e.message}` );
 				const  timeOver = new Date();
-				timeOver.setSeconds( timeOver.getSeconds() + 5 );
+				timeOver.setSeconds( timeOver.getSeconds() + 2 );
 
 				while ((new Date()).getTime() < timeOver.getTime()) {
 				}

@@ -1,4 +1,4 @@
-﻿import * as fs from 'fs';
+import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as path from 'path';
 
@@ -10,8 +10,9 @@ const  debug = true;
 async function  main() {
 	if (false) {
 		await DoCustomDebug();
+	} else {
+		await TestOfCommandLine();
 	}
-	await TestOfCommandLine();
 	console.log('Pass');
 }
 
