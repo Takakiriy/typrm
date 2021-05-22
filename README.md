@@ -58,7 +58,7 @@ new_folder.yaml
         - cd    work1  #template: __Name__
 
 Write "variable_name: value" at `settings:` for the part you want to change to.
-Write the #template: tag at the end of the same line as the part you want to change.
+Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
 For Windows, double click typrm.bat file and type:
@@ -245,8 +245,8 @@ About the text you want to replace, you must write `variable name: value` below 
         __ProjectName__: react1
         __npxOption__: --template typescript
 
-Also, write #template tag at the right of the same line as the text that replaces,
-or write #template tag to the entire next line.
+Also, write `#template:` tag at the right of the same line as the text that replaces,
+or write `#template:` tag to the entire next line.
 
 Sample to the right of the same line as the text to replace:
 
@@ -258,13 +258,13 @@ Sample next line of text to replace
         #template: "__ProjectName__"
 
 If you want to write #template tag in the lower line,
-write how many line of text you want to replace with the parameters of the #template-at tag.
+write how many line of text you want to replace with the parameters of the `#template-at:` tag.
 
     cd  "react1"
     node
         #template-at(-2): "__ProjectName__"
 
-The right of #template tag, you can write not only the variable name of the part you want to replace,
+The right of `#template:` tag, you can write not only the variable name of the part you want to replace,
 but also the text that you do not want to replace.
 
 Replaces only when it matches the text that you replaced with the value before you replaced it.
@@ -408,7 +408,7 @@ which is defined by default in Windows and not defined outside of Windows.
 ## Highly accurate search using keyword tags
 
 The search function of typrm only searches for keywords written
-after the #keyword tag in a text file. It makes to reduce search noise.
+after the `#keyword:` tag in a text file. It makes to reduce search noise.
 
 Sample text file content:
 
@@ -421,8 +421,8 @@ typrm command:
     .../text.txt:1: Shows all files:  #keyword: ls -a
 
 In the case of the above example, the Example line will not be hit.
-Because there is no #keyword tag.
-If you want to search for text that does not have the #keyword tag,
+Because there is no `#keyword:` tag.
+If you want to search for text that does not have the `#keyword:` tag,
 use a common full-text search tool such as grep.
 
 The typrm search command name (search) can be omitted.
@@ -444,7 +444,7 @@ If the search keyword was the same as the command name of typrm,
 the command name (search or s) cannot be omitted.
 
 You can specify multiple keywords to be written
-by CSV format (comma separated values) after the #keyword tag
+by CSV format (comma separated values) after the `#keyword:` tag
 in the text file.
 
     #keyword: CSV, comma separated value, "a,b"
@@ -499,23 +499,7 @@ Install Visual Studio Code:
 
 Double click `cmd menu.bat` and select `1. open_VisualStudioCode`:
 
-Test the `typrm_test_1.ts` file:
-
-    - To set the break point, click at the left of line number of the source file
-    - Press F5 key, then the test runs
-    - (When you finish,) Terminal tab (bottom) >> Recycle box icon (right)
-
-Test the `typrm.test.ts` file (Jest):
-
-    - To set the break point, click at the left of line number of the source file
-    - Start Jest watch mode:
-        - Menu: Visual Studio Code >> Terminal >> New Terminal >> 1: (shell) >> Create JavaScript Debug Terminal
-        npm test --watch
-            #// If you end the debugger, press Ctrl + C and restart by `npm test --watch`
-    - Restart the test:
-        - Continue button:  #// Run to the end of program
-        - Press `f` key in the terminal running `npm test --watch`
-    - (When you finish,) Terminal tab (bottom) >> Recycle box icon (right)
+To run the first test, press F5 key:
 
 
 ### For mac
@@ -546,7 +530,7 @@ Add `cmd menu.command` file executable permission:
 
 Double click `cmd menu.command` file and select `1. open_VisualStudioCode`:
 
-To run the test, press fn + F5 key:
+To run the first test, press fn + F5 key:
 
 
 ### For Windows host OS and CentOS 7 guest OS
@@ -614,17 +598,22 @@ Restore the node_modules folder:
 
     VSCode >> Terminal >> New Terminal >> npm ci
 
-To run the test, press F5 key:
+To run the first test, press F5 key:
 
 
 ## Test
 
 There are the test using Jest and the test without Jest.
+You can set the break point, click at the left of line number of the source file.
 
 ### Test using Jest
 
-- Visual Studio Code >> New Terminal >> Terminal >> (1:__shell__ at the left of +) >> Create JavaScript Debug Terminal
+- Visual Studio Code >> Terminal >> New Terminal >> (1:__shell__ at the left of +) >> Create JavaScript Debug Terminal
 - npm test
+- Restart the test:
+    - Continue button:  #// Run to the end of program
+    - Press `f` key in the terminal running `npm test`
+- (When you finish,) Terminal tab (bottom) >> Recycle box icon (right)
 
 ### Test without Jest
 

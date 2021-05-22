@@ -60,7 +60,7 @@ new_folder.yaml
         - cd    work1  #template: __Name__
 
 `設定:` に変更する部分に関する 変数名: 値 を書きます。
-変更する部分と同じ行の末尾に #template: タグを書きます。
+変更する部分と同じ行の末尾に `#template:` タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
 Windows の場合、typrm.bat をダブルクリックして、下記のように入力します。
@@ -250,7 +250,7 @@ typrm を使うには Node.js のインストールが必要です。
         __ProjectName__: react1
         __npxOption__: --template typescript
 
-また、#template タグを置き換えるテキストと同じ行の右、または、次の行全体に書きます。
+また、`#template:` タグを置き換えるテキストと同じ行の右、または、次の行全体に書きます。
 
 置き換えるテキストと同じ行の右のサンプル：
 
@@ -261,14 +261,14 @@ typrm を使うには Node.js のインストールが必要です。
     cd  "react1"
         #template: "__ProjectName__"
 
-もっと下の行に書くときは、#template-at タグのパラメーターに
+もっと下の行に書くときは、`#template-at:` タグのパラメーターに
 何行上のテキストを置き換えるのかを書きます。
 
     cd  "react1"
     node
         #template-at(-2): "__ProjectName__"
 
-#template タグの右には、置き換える部分の変数名だけでなく、
+`#template:` タグの右には、置き換える部分の変数名だけでなく、
 その前後にある置き換えないテキストを書くことができます。
 
 置き換える前の値に置き換えたテキストにマッチしたときだけ、置き換えます。
@@ -399,7 +399,7 @@ Windows 以外では定義しない環境変数 `windir` を使って下記の�
 ## keyword タグを使った精度の高い検索
 
 typrm の検索機能は、テキスト ファイルの中の
-#keyword タグに続いて書かれたキーワードだけが検索対象であり、
+`#keyword:` タグに続いて書かれたキーワードだけが検索対象であり、
 検索ノイズが小さくなります。
 
 テキスト ファイル の内容のサンプル:
@@ -413,7 +413,7 @@ typrm コマンド:
     .../text.txt:1: Shows all files:  #keyword: ls -a
 
 上記の例の場合、Example の行にはヒットしません。
-なぜなら #keyword タグがないからです。 #keyword タグがないテキストを
+なぜなら `#keyword:` タグがないからです。 `#keyword:` タグがないテキストを
 検索するときは、grep など一般的な全文検索ツールを使ってください。
 
 typrm search コマンドのコマンド名（search）は省略できます。
@@ -435,7 +435,7 @@ typrm search コマンドの書式:
 コマンド名（search または s）を省略できません。
 
 テキスト ファイルに書くキーワードは、
-#keyword タグに続けて CSV 形式（コンマ区切り）で
+`#keyword:` タグに続けて CSV 形式（コンマ区切り）で
 複数指定することができます。
 
     #keyword: CSV, comma separated value, "a,b"
@@ -488,23 +488,7 @@ Visual Studio Code をインストールします:
 
 `cmd menu.bat` をダブルクリックして、`1. open_VisualStudioCode` を選びます:
 
-`typrm_test_1.ts` ファイルのテストを実行します:
-
-    - ソース ファイルの行番号の左をクリックして、ブレーク ポイントを設定します
-    - F5 キーを押します
-    - （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
-
-`typrm.test.ts` ファイルのテスト(Jest)を実行します:
-
-    - ソース ファイルの行番号の左をクリックして、ブレークポイントを設定します:
-    - Jest のウォッチモードを起動します:
-        メニュー: Visual Studio Code >> Terminal >> New Terminal >> 1: (shell) >> Create JavaScript Debug Terminal
-        npm test --watch
-            #// デバッガーを終了させてしまったら、Ctrl + C と npm test --watch で再起動してください
-    - テストを再起動します:
-        - Continue ボタン:  #// 最後まで実行します
-        - npm test --watch が動いている Terminal で f キーを押します
-    - （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
+F5 キーを押すと、最初のテストが動きます:
 
 
 ### mac の場合
@@ -535,7 +519,7 @@ Visual Studio Code をインストールします:
 
 `cmd menu.command` ファイルをダブルクリックして、`1. open_VisualStudioCode` を選びます:
 
-fn + F5 キーを押すと、テストが動きます:
+fn + F5 キーを押すと、最初のテストが動きます:
 
 
 ### ホストOSが Windows、ゲストOSが CentOS 7 の場合
@@ -602,17 +586,22 @@ node_modules フォルダーを復帰します:
 
     VSCode >> Terminal >> New Terminal >> npm ci
 
-F5 キーを押すと、テストが動きます:
+F5 キーを押すと、最初のテストが動きます:
 
 
 ## テスト
 
 Jest を使うテストと Jest を使わないテストがあります。
+ソース ファイルの行番号の左をクリックして、ブレークポイントを設定できます。
 
 ### Jest を使うテスト
 
-- Visual Studio Code >> New Terminal >> Terminal >>（＋の左の 1:__shell__）>> Create JavaScript Debug Terminal
+- Visual Studio Code >> Terminal >> New Terminal >>（＋の左の 1:__shell__）>> Create JavaScript Debug Terminal
 - npm test
+- テストを再起動します:
+    - Continue ボタン:  #// 最後まで実行します
+    - npm test が動いている Terminal で f キーを押します
+- （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
 
 ### Jest を使わないテスト
 
