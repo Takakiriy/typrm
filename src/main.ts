@@ -914,7 +914,11 @@ function   evaluateIfCondition(condition: string, setting: Settings): boolean | 
 		const  operator = match[2];
 		let    rightValue = match[3];
 		if (parent === settingsDot) {
-			var  leftValue = setting[name].value;
+			if (name in setting) {
+				var  leftValue = setting[name].value;
+			} else {
+				return  new Error(`not found ${name} in the settings`);
+			}
 		} else if (parent === envDot) {
 			const  envValue = process.env[name];
 			if (envValue) {
