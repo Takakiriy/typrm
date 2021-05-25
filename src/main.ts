@@ -1065,7 +1065,13 @@ function  getValue(line: string, separatorIndex: number) {
 
 // getExpectedLine
 function  getExpectedLine(setting: Settings, template: string): string {
+	return  getExpectedLineAndReplaceLog(setting, template, false).expected;
+}
+
+// getExpectedLineAndEvaluationLog
+function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean): {expected: string, log: EvaluationLog[]} {
 	let  expected = template;
+	const  log: EvaluationLog[] = [];
 
 	for (const key of Object.keys(setting)) {
 		const  re = new RegExp( escapeRegularExpression(key), "gi" );
@@ -1073,10 +1079,11 @@ function  getExpectedLine(setting: Settings, template: string): string {
 		const  expectedAfter = expected.replace(re, setting[key].value);
 		if (expectedAfter !== expected) {
 			setting[key].isReferenced = true;
+			log.push({before: key, after: setting[key].value});
 		}
 		expected = expectedAfter;
 	}
-	return  expected;
+	return  {expected, log};
 }
 
 // getExpectedLineInFileTemplate
@@ -1229,11 +1236,17 @@ enum Direction {
 	Following = +1,
 }
 
-//
+// IfTag
 interface  IfTag {
 	indentLength: number;
 	resultOfIf: boolean;
 	enabled: boolean;
+}
+
+// EvaluationLog
+interface  EvaluationLog {
+	before: string;
+	after: string;
 }
 
 // WriteBuffer
@@ -1251,7 +1264,7 @@ class  WriteBuffer {
 			this.stream.write(line);
 		}
 		this.stream.end();
-    }
+	}
 
 	on(event: string, callback: () => void) {
 		this.stream.on(event, callback);
@@ -1283,7 +1296,7 @@ function  getStdOut(): string[] {
 // Example:
 //    try {
 //
-//		  await main();
+//        await main();
 //    } catch (e) {
 //        var d = pp(e);  // Set break point here and watch the variable d
 //        throw e;
@@ -1313,13 +1326,13 @@ function  cc( targetCount: number = 9999999, label: string = '0' ) {
 	}
 
 	gCount[label] += 1;
-    pp( `${label}:countThrough[${label}] = ${gCount[label]}` );
+	pp( `${label}:countThrough[${label}] = ${gCount[label]}` );
 	const isTarget = ( gCount[label] === targetCount );
 
 	if (isTarget) {
-        pp( '    **** It is before the target! ****' );
-    }
-    return  { isTarget, debugOut };
+		pp( '    **** It is before the target! ****' );
+	}
+	return  { isTarget, debugOut };
 }
 const  gCount: {[name: string]: number} = {};
 
@@ -1341,7 +1354,7 @@ console.log = println;
 
 // lastOf
 function  lastOf<T>(array: Array<T>): T {
-    return  array[array.length - 1];
+	return  array[array.length - 1];
 }
 
 // StandardInputBuffer
