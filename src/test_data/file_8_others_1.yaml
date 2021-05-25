@@ -14,3 +14,9 @@ file-template-any-lines:
             first
             #file-template-any-lines:
             not fourth  #template: __Fourth__
+
+file template must not match a part of line:
+    OK:
+        ../../file_target/1/file_8_others_2_target.yaml : |  #_________file-template: __Base__/file_8_others_2_target.yaml
+            full
+            end

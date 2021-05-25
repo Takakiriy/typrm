@@ -3,3 +3,7 @@ Target of template file any lines tag:
     second
     third
     fourth
+Target of file template must not match a part of line:
+    This is not full of lines
+    full
+    end
