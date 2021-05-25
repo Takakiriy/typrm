@@ -812,7 +812,7 @@ function  getKeywordMatchedScore(testingStrings: string[], keyphrase: string): n
 
 				const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase);
 				if (result.score !== 0) {
-					thisScore = result.score + keywords.length * phraseMatchScoreWeight;
+					thisScore = result.score * keywords.length * phraseMatchScoreWeight;
 				} else {
 					let  previousPosition = -1;
 

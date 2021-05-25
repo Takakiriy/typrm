@@ -1144,7 +1144,7 @@ function getKeywordMatchedScore(testingStrings, keyphrase) {
             var thisScore = 0;
             var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase);
             if (result.score !== 0) {
-                thisScore = result.score + keywords.length * phraseMatchScoreWeight;
+                thisScore = result.score * keywords.length * phraseMatchScoreWeight;
             }
             else {
                 var previousPosition = -1;
@@ -1239,7 +1239,12 @@ function evaluateIfCondition(condition, setting) {
         var operator = match[2];
         var rightValue = match[3];
         if (parent === settingsDot) {
-            var leftValue = setting[name_1].value;
+            if (name_1 in setting) {
+                var leftValue = setting[name_1].value;
+            }
+            else {
+                return new Error("not found " + name_1 + " in the settings");
+            }
         }
         else if (parent === envDot) {
             var envValue = process.env[name_1];
@@ -1628,7 +1633,9 @@ exports.debugOut = [];
 // Through counter.
 // #keyword: cc
 // Example:
-//   cc(9999);
+//   cc();
+// Example:
+//   var c = cc().debugOut;  // Set break point here and watch the variable c
 // Example:
 //   if ( cc(2).isTarget )
 //   var d = pp('');  // Set break point here and watch the variable d

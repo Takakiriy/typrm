@@ -66,7 +66,7 @@ function callMain() {
                             else {
                                 console.log("ERROR: " + e.message);
                                 var timeOver = new Date();
-                                timeOver.setSeconds(timeOver.getSeconds() + 5);
+                                timeOver.setSeconds(timeOver.getSeconds() + 2);
                                 while ((new Date()).getTime() < timeOver.getTime()) {
                                 }
                             }

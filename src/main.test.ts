@@ -217,6 +217,12 @@ describe("searches keyword tag >>", () => {
             '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: aaa bbb xxx\n' +
             '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: aaa bbb ccc\n',
         ],[
+            "words order score (2)",
+            ["search", "user", "interface"],
+            { folder: "test_data/search/2", test: "" },
+            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: user\n' +
+            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:9:     #keyword: user interface\n',
+        ],[
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },

@@ -5,3 +5,6 @@
 #keyword: frameset
 test_of_disable-tag-tool: |
     echo "#keyword: abc" > text.txt  #disable-tag-tool:
+test_of_idiom_and_word_score:
+    #keyword: user interface
+    #keyword: user

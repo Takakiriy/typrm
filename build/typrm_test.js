@@ -51,10 +51,12 @@ function main() {
                     return [4 /*yield*/, DoCustomDebug()];
                 case 1:
                     _a.sent();
-                    _a.label = 2;
+                    return [3 /*break*/, 4];
                 case 2: return [4 /*yield*/, TestOfCommandLine()];
                 case 3:
                     _a.sent();
+                    _a.label = 4;
+                case 4:
                     console.log('Pass');
                     return [2 /*return*/];
             }
