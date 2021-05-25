@@ -1065,7 +1065,7 @@ function  getValue(line: string, separatorIndex: number) {
 
 // getExpectedLine
 function  getExpectedLine(setting: Settings, template: string): string {
-	return  getExpectedLineAndReplaceLog(setting, template, false).expected;
+	return  getExpectedLineAndEvaluationLog(setting, template, false).expected;
 }
 
 // getExpectedLineAndEvaluationLog

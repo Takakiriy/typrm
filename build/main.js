@@ -1426,17 +1426,23 @@ function getValue(line, separatorIndex) {
 }
 // getExpectedLine
 function getExpectedLine(setting, template) {
+    return getExpectedLineAndEvaluationLog(setting, template, false).expected;
+}
+// getExpectedLineAndEvaluationLog
+function getExpectedLineAndEvaluationLog(setting, template, withLog) {
     var expected = template;
+    var log = [];
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         var re = new RegExp(escapeRegularExpression(key), "gi");
         var expectedAfter = expected.replace(re, setting[key].value);
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
+            log.push({ before: key, after: setting[key].value });
         }
         expected = expectedAfter;
     }
-    return expected;
+    return { expected: expected, log: log };
 }
 // getExpectedLineInFileTemplate
 function getExpectedLineInFileTemplate(setting, template) {
@@ -1616,7 +1622,7 @@ function getStdOut() {
 // Example:
 //    try {
 //
-//		  await main();
+//        await main();
 //    } catch (e) {
 //        var d = pp(e);  // Set break point here and watch the variable d
 //        throw e;
