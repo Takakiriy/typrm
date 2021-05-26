@@ -555,7 +555,7 @@ class  TemplateTag {
 		let  errorTemplate = '';
 		let  indent = '';
 		enum Result { same, different, skipped };
-		let  result: Result | undefined;
+		let  result = Result.same;
 		let  skipTo = '';
 		let  skipToTemplate = '';
 		let  skipFrom = '';
@@ -571,13 +571,13 @@ class  TemplateTag {
 				if (templateLineIndex === 0) {
 
 					const  indentLength = targetLine.indexOf(expectedFirstLine);
-					if (indentLength === notFound) {
-						result = Result.different;
-					} else {
+					if (indentLength !== notFound  &&  targetLine.trim() === expectedFirstLine) {
 						result = Result.same;
 						indent = targetLine.substr(0, indentLength);
+					} else {
+						result = Result.different;
 					}
-				} else if (skipTo === '') { // lineIndex >= 1
+				} else if (skipTo === '') { // lineIndex >= 1, not skipping
 					const  expected = getExpectedLineInFileTemplate(
 						setting, this.templateLines[templateLineIndex]);
 
@@ -601,10 +601,16 @@ class  TemplateTag {
 					}
 				} else { // skipTo
 					if (targetLine === indent + skipTo) {
-						skipTo = '';
 						result = Result.same;
-					} else {
+					} else if (targetLine.startsWith(indent)) {
 						result = Result.skipped;
+					} else {
+						result = Result.different;
+						errorTemplateLineIndex = templateLineIndex;
+						errorTargetLineNum = skipStartLineNum;
+						errorContents = skipFrom;
+						errorExpected = skipTo;
+						errorTemplate = skipToTemplate;
 					}
 				}
 
@@ -614,10 +620,12 @@ class  TemplateTag {
 						loop = false;  // return or break must not be written.
 						// https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
 					}
+					skipTo = '';
 				} else if (result === Result.skipped) {
 					// Do nothing
-				} else {
+				} else {  // Result.different
 					templateLineIndex = 0;
+					skipTo = '';
 				}
 			} catch (e) {
 				exception = e;
@@ -645,7 +653,7 @@ class  TemplateTag {
 				errorTemplate = this.templateLines[0];
 			}
 			console.log('');
-			console.log('Error of not same as file contents:');
+			console.log(`${translate('Error of not same as file contents:')}`);
 			console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
 			console.log(`  ${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
 			console.log(`  Template: ${errorTemplate}`);
@@ -1292,16 +1300,17 @@ function  getStdOut(): string[] {
 // Example:
 //    pp(var);
 // Example:
-//    var d = pp(var);  // Set break point here and watch the variable d
+//    var d = pp(var);
+//    d = d;  // Set break point here and watch the variable d
 // Example:
 //    try {
 //
 //        await main();
 //    } catch (e) {
-//        var d = pp(e);  // Set break point here and watch the variable d
-//        throw e;
+//        var d = pp(e);
+//        throw e;  // Set break point here and watch the variable d
 //    }
-function  pp(message: any) {
+function  pp(message: any = '') {
 	if (typeof message === 'object') {
 		message = JSON.stringify(message);
 	}
@@ -1509,6 +1518,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 
 	if (locale === 'ja-JP') {
 		dictionary = {
+			"Error not same as file contents": "ファイルの内容と異なります",
 			"YAML UTF-8 file path>": "YAML UTF-8 ファイル パス>",
 			"This is a secret value.": "これは秘密の値です。",
 			"Change \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に変更してください。",

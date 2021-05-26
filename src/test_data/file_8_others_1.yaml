@@ -17,6 +17,6 @@ file-template-any-lines:
 
 file template must not match a part of line:
     OK:
-        ../../file_target/1/file_8_others_2_target.yaml : |  #_________file-template: __Base__/file_8_others_2_target.yaml
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
             full
             end

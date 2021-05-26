@@ -708,7 +708,7 @@ var TemplateTag = /** @class */ (function () {
     TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_4, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_4_1, templateLineNum;
+            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, d, indentLength, expected, e_4_1, templateLineNum, d;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -744,11 +744,14 @@ var TemplateTag = /** @class */ (function () {
                             Result[Result["skipped"] = 2] = "skipped";
                         })(Result || (Result = {}));
                         ;
+                        result = Result.same;
                         skipTo = '';
                         skipToTemplate = '';
                         skipFrom = '';
                         skipStartLineNum = 0;
                         loop = true;
+                        pp('checkTargetFileContents -----------------------------------------------------');
+                        pp(expectedFirstLine);
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 6, 7, 12]);
@@ -764,17 +767,21 @@ var TemplateTag = /** @class */ (function () {
                         try {
                             targetLine = line1;
                             targetLineNum += 1;
+                            pp('for loop');
+                            if (cc(21).isTarget)
+                                d = pp(''); // Set break point here and watch the variable d
+                            pp(targetLineNum + " " + targetLine);
                             if (templateLineIndex === 0) {
                                 indentLength = targetLine.indexOf(expectedFirstLine);
-                                if (indentLength === notFound) {
-                                    result = Result.different;
-                                }
-                                else {
+                                if (indentLength !== notFound && targetLine.trim() === expectedFirstLine) {
                                     result = Result.same;
                                     indent = targetLine.substr(0, indentLength);
                                 }
+                                else {
+                                    result = Result.different;
+                                }
                             }
-                            else if (skipTo === '') { // lineIndex >= 1
+                            else if (skipTo === '') { // lineIndex >= 1, not skipping
                                 expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
                                 if (targetLine === indent + expected) {
                                     result = Result.same;
@@ -798,25 +805,35 @@ var TemplateTag = /** @class */ (function () {
                             }
                             else { // skipTo
                                 if (targetLine === indent + skipTo) {
-                                    skipTo = '';
                                     result = Result.same;
                                 }
-                                else {
+                                else if (targetLine.startsWith(indent)) {
                                     result = Result.skipped;
                                 }
+                                else {
+                                    result = Result.different;
+                                    errorTemplateLineIndex = templateLineIndex;
+                                    errorTargetLineNum = skipStartLineNum;
+                                    errorContents = skipFrom;
+                                    errorExpected = skipTo;
+                                    errorTemplate = skipToTemplate;
+                                }
                             }
+                            pp("" + result);
                             if (result === Result.same) {
                                 templateLineIndex += 1;
                                 if (templateLineIndex >= this.templateLines.length) {
                                     loop = false; // return or break must not be written.
                                     // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
                                 }
+                                skipTo = '';
                             }
                             else if (result === Result.skipped) {
                                 // Do nothing
                             }
-                            else {
+                            else { // Result.different
                                 templateLineIndex = 0;
+                                skipTo = '';
                             }
                         }
                         catch (e) {
@@ -864,12 +881,16 @@ var TemplateTag = /** @class */ (function () {
                                 errorTemplate = this.templateLines[0];
                             }
                             console.log('');
-                            console.log('Error of not same as file contents:');
+                            console.log("" + translate('Error of not same as file contents:'));
                             console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + templateLineNum);
                             console.log("  " + translate('ErrorFile') + ": " + getTestablePath(targetFilePath) + ":" + errorTargetLineNum);
                             console.log("  Template: " + errorTemplate);
                             console.log("  Expected: " + errorExpected);
                             console.log("  Contents: " + errorContents);
+                            if (errorTargetLineNum >= 8) {
+                                d = pp();
+                                d = d;
+                            }
                         }
                         return [2 /*return*/, result === Result.same];
                 }
@@ -1618,16 +1639,18 @@ function getStdOut() {
 // Example:
 //    pp(var);
 // Example:
-//    var d = pp(var);  // Set break point here and watch the variable d
+//    var d = pp(var);
+//    d = d;  // Set break point here and watch the variable d
 // Example:
 //    try {
 //
 //        await main();
 //    } catch (e) {
-//        var d = pp(e);  // Set break point here and watch the variable d
-//        throw e;
+//        var d = pp(e);
+//        throw e;  // Set break point here and watch the variable d
 //    }
 function pp(message) {
+    if (message === void 0) { message = ''; }
     if (typeof message === 'object') {
         message = JSON.stringify(message);
     }
@@ -1838,6 +1861,7 @@ function translate(englishLiterals) {
     }
     if (locale === 'ja-JP') {
         dictionary = {
+            "Error not same as file contents": "ファイルの内容と異なります",
             "YAML UTF-8 file path>": "YAML UTF-8 ファイル パス>",
             "This is a secret value.": "これは秘密の値です。",
             "Change \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に変更してください。",

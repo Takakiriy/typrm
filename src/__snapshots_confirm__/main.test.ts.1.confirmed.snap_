@@ -111,7 +111,7 @@ Error of not same as file contents:
   Contents:     second
 
 Warning: 0, Error: 1
-template count = 4
+template count = 5
 "
 `;
 

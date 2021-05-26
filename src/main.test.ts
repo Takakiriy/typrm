@@ -308,13 +308,11 @@ describe("searches glossary tag >>", () => {
 
 describe("test of test >>", () => {
     test("checks snapshots files are confirmed", () => {
-        const  activeSnapshots    = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
-        const  backUpSnapshots    = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();
-        const  confirmedSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.2.new_back_up.snap_').toString();
+        const  activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
+        const  backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();
             // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
 
         expect(activeSnapshots).toBe(backUpSnapshots);
-        expect(backUpSnapshots).toBe(confirmedSnapshots);
     });
 });
 
