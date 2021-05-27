@@ -198,7 +198,7 @@ function checkRoutine(isModal, inputFilePath) {
                             enabled = lastOf(indentLengthsOfIfTag).enabled;
                         }
                     }
-                    if (line.indexOf(ifLabel) != notFound) {
+                    if (line.includes(ifLabel)) {
                         condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
                         evaluatedContidion = evaluateIfCondition(condition, setting);
                         if (typeof evaluatedContidion === 'boolean') {
@@ -230,7 +230,7 @@ function checkRoutine(isModal, inputFilePath) {
                         templateCount += 1;
                         checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                         expected = getExpectedLine(setting, templateTag.template);
-                        if (checkingLine.indexOf(expected) === notFound && enabled) {
+                        if (!checkingLine.includes(expected) && enabled) {
                             console.log("");
                             console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
                             console.log("  " + translate('Contents') + ": " + checkingLine.trim());
@@ -258,7 +258,7 @@ function checkRoutine(isModal, inputFilePath) {
                     // Check if there is not "#★Now:".
                     for (_i = 0, temporaryLabels_1 = temporaryLabels; _i < temporaryLabels_1.length; _i++) {
                         temporaryLabel = temporaryLabels_1[_i];
-                        if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound && enabled) {
+                        if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && enabled) {
                             console.log("");
                             console.log(translate('WarningLine') + ": " + lineNum);
                             console.log("  " + translate('Contents') + ": " + line.trim());
@@ -267,8 +267,8 @@ function checkRoutine(isModal, inputFilePath) {
                         }
                     }
                     // Check if there is not secret tag.
-                    if (line.indexOf(secretLabel) !== notFound || line.indexOf(secretLabelEn) !== notFound) {
-                        if (line.indexOf(secretExamleLabel) === notFound && line.indexOf(secretExamleLabelEn) === notFound) {
+                    if (line.includes(secretLabel) || line.includes(secretLabelEn)) {
+                        if (!line.includes(secretExamleLabel) && !line.includes(secretExamleLabelEn)) {
                             if (secretLabelCount === 0) { // Because there will be many secret data.
                                 console.log("");
                                 console.log(translate('WarningLine') + ": " + lineNum);
@@ -351,14 +351,14 @@ function checkRoutine(isModal, inputFilePath) {
                         keyword = keywords_1[_c];
                         if (keyword.direction === Direction.Above) {
                             if (lineNum <= keyword.startLineNum) {
-                                if (line.indexOf(keyword.keyword) !== notFound) {
+                                if (line.includes(keyword.keyword)) {
                                     keyword.startLineNum = foundForAbove;
                                 }
                             }
                         }
                         else if (keyword.direction === Direction.Following) {
                             if (lineNum >= keyword.startLineNum) {
-                                if (line.indexOf(keyword.keyword) !== notFound) {
+                                if (line.includes(keyword.keyword)) {
                                     keyword.startLineNum = foundForFollowing;
                                 }
                             }
@@ -613,7 +613,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                                 if (key === changingKey) {
                                     commentIndex = line.indexOf('#', separator);
                                     comment = '';
-                                    if (commentIndex !== notFound && changedValueAndComment.indexOf('#') === notFound) {
+                                    if (commentIndex !== notFound && !changedValueAndComment.includes('#')) {
                                         comment = '  ' + line.substr(commentIndex);
                                     }
                                     writer.write(line.substr(0, separator + 1) + ' ' + changedValueAndComment + comment + "\n");
@@ -624,11 +624,11 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                         }
                         else {
                             templateTag = parseTemplateTag(line);
-                            if (templateTag.isFound && templateTag.template.indexOf(changingKey) !== notFound) {
+                            if (templateTag.isFound && templateTag.template.includes(changingKey)) {
                                 checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                                 expected = getExpectedLine(setting, templateTag.template);
                                 changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
-                                if (checkingLine.indexOf(expected) !== notFound) {
+                                if (checkingLine.includes(expected)) {
                                     before = expected;
                                     after = changed;
                                     if (templateTag.lineNumOffset <= -1) {
@@ -640,7 +640,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                                         output = true;
                                     }
                                 }
-                                else if (checkingLine.indexOf(changed) !== notFound) {
+                                else if (checkingLine.includes(changed)) {
                                     // Do nothing
                                 }
                                 else {
@@ -1069,7 +1069,7 @@ function search() {
                                     line1 = reader_4_1.value;
                                     line = line1;
                                     lineNum += 1;
-                                    if (!(line.indexOf(keywordLabel) !== notFound && line.indexOf(disableLabel) === notFound)) return [3 /*break*/, 5];
+                                    if (!(line.includes(keywordLabel) && !line.includes(disableLabel))) return [3 /*break*/, 5];
                                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
                                     return [4 /*yield*/, parseCSVColumns(csv)["catch"](function (e) {
                                             console.log("Warning: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
@@ -1089,7 +1089,7 @@ function search() {
                                     _f.label = 5;
                                 case 5:
                                     // glossary tag
-                                    if (line.indexOf(glossaryLabel) !== notFound) {
+                                    if (line.includes(glossaryLabel)) {
                                         inGlossary = true;
                                         indentAtTag = indentRegularExpression.exec(line)[0];
                                         indentAtFirstContents = '';
@@ -1400,7 +1400,7 @@ function isEndOfSetting(line, isReadingSetting) {
         else {
             leftOfComment = line.trim();
         }
-        if (leftOfComment.indexOf(':') === notFound && leftOfComment !== '') {
+        if (!leftOfComment.includes(':') && leftOfComment !== '') {
             returnValue = true;
         }
         else if (leftOfComment.substr(-1) === '|') {

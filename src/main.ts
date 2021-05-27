@@ -118,7 +118,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 					enabled = lastOf(indentLengthsOfIfTag).enabled;
 				}
 			}
-			if (line.indexOf(ifLabel) != notFound) {
+			if (line.includes(ifLabel)) {
 				const  condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
 
 				const  evaluatedContidion = evaluateIfCondition(condition, setting);
@@ -153,7 +153,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 				const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
 				const  expected = getExpectedLine(setting, templateTag.template);
 
-				if (checkingLine.indexOf(expected) === notFound  &&  enabled) {
+				if ( ! checkingLine.includes(expected)  &&  enabled) {
 					console.log("");
 					console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
 					console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
@@ -183,7 +183,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
 			// Check if there is not "#★Now:".
 			for (let temporaryLabel of temporaryLabels) {
-				if (line.toLowerCase().indexOf(temporaryLabel.toLowerCase()) !== notFound  &&  enabled) {
+				if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  enabled) {
 					console.log("");
 					console.log(`${translate('WarningLine')}: ${lineNum}`);
 					console.log(`  ${translate('Contents')}: ${line.trim()}`);
@@ -193,8 +193,8 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 			}
 
 			// Check if there is not secret tag.
-			if (line.indexOf( secretLabel ) !== notFound  ||  line.indexOf( secretLabelEn ) !== notFound) {
-				if (line.indexOf( secretExamleLabel ) === notFound  &&  line.indexOf( secretExamleLabelEn ) === notFound) {
+			if (line.includes( secretLabel )  ||  line.includes( secretLabelEn )) {
+				if ( ! line.includes( secretExamleLabel )  &&  ! line.includes( secretExamleLabelEn )) {
 					if (secretLabelCount === 0) {  // Because there will be many secret data.
 						console.log("");
 						console.log(`${translate('WarningLine')}: ${lineNum}`);
@@ -256,14 +256,14 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 				if (keyword.direction === Direction.Above) {
 					if (lineNum <= keyword.startLineNum) {
 
-						if (line.indexOf(keyword.keyword) !== notFound) {
+						if (line.includes(keyword.keyword)) {
 							keyword.startLineNum = foundForAbove;
 						}
 					}
 				} else if (keyword.direction === Direction.Following) {
 					if (lineNum >= keyword.startLineNum) {
 
-						if (line.indexOf(keyword.keyword) !== notFound) {
+						if (line.includes(keyword.keyword)) {
 							keyword.startLineNum = foundForFollowing;
 						}
 					}
@@ -448,7 +448,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 					if (key === changingKey) {
 						const  commentIndex = line.indexOf('#', separator);
 						let  comment= '';
-						if (commentIndex !== notFound  &&  changedValueAndComment.indexOf('#') === notFound) {
+						if (commentIndex !== notFound  &&  ! changedValueAndComment.includes('#')) {
 							comment = '  ' + line.substr(commentIndex);
 						}
 
@@ -460,12 +460,12 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 			// Out of settings
 			} else {
 				const  templateTag = parseTemplateTag(line);
-				if (templateTag.isFound  &&  templateTag.template.indexOf(changingKey) !== notFound) {
+				if (templateTag.isFound  &&  templateTag.template.includes(changingKey)) {
 					const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
 					const  expected = getExpectedLine(setting, templateTag.template);
 					const  changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
 
-					if (checkingLine.indexOf(expected) !== notFound) {
+					if (checkingLine.includes(expected)) {
 						const  before = expected;
 						const  after = changed;
 						if (templateTag.lineNumOffset <= -1) {
@@ -477,7 +477,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 							writer.write(line.replace(before, after) +"\n");
 							output = true;
 						}
-					} else if (checkingLine.indexOf(changed) !== notFound) {
+					} else if (checkingLine.includes(changed)) {
 						// Do nothing
 					} else {
 						if (errorCount === 0) { // Since only one old value can be replaced at a time
@@ -765,7 +765,7 @@ async function  search() {
 			lineNum += 1;
 
 			// keyword tag
-			if (line.indexOf(keywordLabel) !== notFound  &&  line.indexOf(disableLabel) === notFound) {
+			if (line.includes(keywordLabel)  &&  ! line.includes(disableLabel)) {
 				const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
 				const  columns = await parseCSVColumns(csv)
 					.catch((e: Error) => {
@@ -785,7 +785,7 @@ async function  search() {
 			}
 
 			// glossary tag
-			if (line.indexOf(glossaryLabel) !== notFound) {
+			if (line.includes(glossaryLabel)) {
 				inGlossary = true;
 				indentAtTag = indentRegularExpression.exec(line)![0];
 				indentAtFirstContents = '';
@@ -1033,7 +1033,7 @@ function  isEndOfSetting(line: string, isReadingSetting: boolean): boolean {
 			leftOfComment = line.trim();
 		}
 
-		if (leftOfComment.indexOf(':') === notFound  &&  leftOfComment !== '') {
+		if ( ! leftOfComment.includes(':')  &&  leftOfComment !== '') {
 			returnValue = true;
 		} else if (leftOfComment.substr(-1) === '|') {
 			returnValue = true;
