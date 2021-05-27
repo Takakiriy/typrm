@@ -1,0 +1,7 @@
+# Test of glossary
+
+Nested tag must not be matched:  #glossary:
+    ABC: abc
+    Type:
+        ABC: This is not match.
+    ABCD: abcd

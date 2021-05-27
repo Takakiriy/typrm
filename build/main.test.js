@@ -355,6 +355,12 @@ describe("searches glossary tag >>", function () {
             { folder: "test_data/search/glossary/1", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
         ], [
+            "nested indent",
+            ["search", "ABC"],
+            { folder: "test_data/search/glossary/2", test: "" },
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:7:     ABCD: abcd\n" +
+                "${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:4:     ABC: abc\n",
+        ], [
             "output order (1)",
             ["search", "de"],
             { folder: "test_data/search/glossary/1", test: "" },

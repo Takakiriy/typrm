@@ -728,7 +728,9 @@ async function  search() {
 		});
 	}
 	process.chdir(currentFolder);
-	var  indentAtStart = '';
+	var  indentAtTag = '';
+	var  indentPosition = -1;
+	var  indentAtFirstContents = '';
 	var  inGlossary = false;
 	const  foundScores: FoundScore[] = [];
 
@@ -766,23 +768,36 @@ async function  search() {
 			// glossary tag
 			if (line.indexOf(glossaryLabel) !== notFound) {
 				inGlossary = true;
-				indentAtStart = indentRegularExpression.exec(line)![0];
-			}
-			else if (inGlossary) {
+				indentAtTag = indentRegularExpression.exec(line)![0];
+				indentAtFirstContents = '';
+			} else if (inGlossary) {
 				const  currentIndent = indentRegularExpression.exec(line)![0];
-				const  colonPosition = line.indexOf(':', currentIndent.length);
-				const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-				const  matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
-				if (matchedScore >= 1) {
-
-					const  found = new FoundScore();
-					found.path = getTestablePath(inputFileFullPath);
-					found.lineNum = lineNum;
-					found.line = line;
-					found.score = matchedScore;
-					foundScores.push(found);
+				if (indentAtFirstContents === '') {
+					indentAtFirstContents = currentIndent;
+					indentPosition = indentAtFirstContents.length;
 				}
-				if (currentIndent.length <= indentAtStart.length) {
+				const  characterAtIndent = line[indentPosition];
+				if (
+					characterAtIndent === ' '  ||
+					characterAtIndent === '\t'  ||
+					characterAtIndent === undefined)
+				{
+					// Skip this line
+				} else {
+					const  colonPosition = line.indexOf(':', currentIndent.length);
+					const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+					const  matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
+					if (matchedScore >= 1  &&  colonPosition !== notFound) {
+
+						const  found = new FoundScore();
+						found.path = getTestablePath(inputFileFullPath);
+						found.lineNum = lineNum;
+						found.line = line;
+						found.score = matchedScore;
+						foundScores.push(found);
+					}
+				}
+				if (currentIndent.length <= indentAtTag.length) {
 					inGlossary = false;
 				}
 			}

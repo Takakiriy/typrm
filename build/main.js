@@ -708,7 +708,7 @@ var TemplateTag = /** @class */ (function () {
     TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_4, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, d, indentLength, expected, e_4_1, templateLineNum, d;
+            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_4_1, templateLineNum;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -750,8 +750,6 @@ var TemplateTag = /** @class */ (function () {
                         skipFrom = '';
                         skipStartLineNum = 0;
                         loop = true;
-                        pp('checkTargetFileContents -----------------------------------------------------');
-                        pp(expectedFirstLine);
                         _b.label = 1;
                     case 1:
                         _b.trys.push([1, 6, 7, 12]);
@@ -767,10 +765,6 @@ var TemplateTag = /** @class */ (function () {
                         try {
                             targetLine = line1;
                             targetLineNum += 1;
-                            pp('for loop');
-                            if (cc(21).isTarget)
-                                d = pp(''); // Set break point here and watch the variable d
-                            pp(targetLineNum + " " + targetLine);
                             if (templateLineIndex === 0) {
                                 indentLength = targetLine.indexOf(expectedFirstLine);
                                 if (indentLength !== notFound && targetLine.trim() === expectedFirstLine) {
@@ -819,7 +813,6 @@ var TemplateTag = /** @class */ (function () {
                                     errorTemplate = skipToTemplate;
                                 }
                             }
-                            pp("" + result);
                             if (result === Result.same) {
                                 templateLineIndex += 1;
                                 if (templateLineIndex >= this.templateLines.length) {
@@ -887,10 +880,6 @@ var TemplateTag = /** @class */ (function () {
                             console.log("  Template: " + errorTemplate);
                             console.log("  Expected: " + errorExpected);
                             console.log("  Contents: " + errorContents);
-                            if (errorTargetLineNum >= 8) {
-                                d = pp();
-                                d = d;
-                            }
                         }
                         return [2 /*return*/, result === Result.same];
                 }
@@ -987,7 +976,7 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_2, _i, targetFolders_3, folder, indentAtStart, inGlossary, foundScores, _loop_3, lineNum, _b, fileFullPaths_1, inputFileFullPath, _c, foundScores_1, found;
+        var startIndex, keyword, keywordDoubleQuoted, targetFolder, currentFolder, fileFullPaths, targetFolders, _loop_2, _i, targetFolders_3, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundScores, _loop_3, lineNum, _b, fileFullPaths_1, inputFileFullPath, _c, foundScores_1, found;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -1031,11 +1020,13 @@ function search() {
                     return [3 /*break*/, 2];
                 case 5:
                     process.chdir(currentFolder);
-                    indentAtStart = '';
+                    indentAtTag = '';
+                    indentPosition = -1;
+                    indentAtFirstContents = '';
                     inGlossary = false;
                     foundScores = [];
                     _loop_3 = function (inputFileFullPath) {
-                        var reader, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1;
+                        var reader, reader_4, reader_4_1, line1, line, csv, columns, matchedScore, found, currentIndent, characterAtIndent, colonPosition, wordInGlossary, matchedScore, found, e_5_1;
                         return __generator(this, function (_f) {
                             switch (_f.label) {
                                 case 0:
@@ -1077,22 +1068,35 @@ function search() {
                                     // glossary tag
                                     if (line.indexOf(glossaryLabel) !== notFound) {
                                         inGlossary = true;
-                                        indentAtStart = indentRegularExpression.exec(line)[0];
+                                        indentAtTag = indentRegularExpression.exec(line)[0];
+                                        indentAtFirstContents = '';
                                     }
                                     else if (inGlossary) {
                                         currentIndent = indentRegularExpression.exec(line)[0];
-                                        colonPosition = line.indexOf(':', currentIndent.length);
-                                        wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                                        matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
-                                        if (matchedScore >= 1) {
-                                            found = new FoundScore();
-                                            found.path = getTestablePath(inputFileFullPath);
-                                            found.lineNum = lineNum;
-                                            found.line = line;
-                                            found.score = matchedScore;
-                                            foundScores.push(found);
+                                        if (indentAtFirstContents === '') {
+                                            indentAtFirstContents = currentIndent;
+                                            indentPosition = indentAtFirstContents.length;
                                         }
-                                        if (currentIndent.length <= indentAtStart.length) {
+                                        characterAtIndent = line[indentPosition];
+                                        if (characterAtIndent === ' ' ||
+                                            characterAtIndent === '\t' ||
+                                            characterAtIndent === undefined) {
+                                            // Skip this line
+                                        }
+                                        else {
+                                            colonPosition = line.indexOf(':', currentIndent.length);
+                                            wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                                            matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
+                                            if (matchedScore >= 1 && colonPosition !== notFound) {
+                                                found = new FoundScore();
+                                                found.path = getTestablePath(inputFileFullPath);
+                                                found.lineNum = lineNum;
+                                                found.line = line;
+                                                found.score = matchedScore;
+                                                foundScores.push(found);
+                                            }
+                                        }
+                                        if (currentIndent.length <= indentAtTag.length) {
                                             inGlossary = false;
                                         }
                                     }
