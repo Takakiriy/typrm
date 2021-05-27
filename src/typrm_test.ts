@@ -19,6 +19,7 @@ async function  main() {
 // DoCustomDebug
 async function  DoCustomDebug() {
 	const  returns = await callChildProccess(`node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+	// const  returns = await callChildProccess(`node ../build/typrm.js s DSL --folder /Users/totadashi/Documents/typrm`, {});
 	console.log(returns.stdout);
 	console.log('Done');
 }

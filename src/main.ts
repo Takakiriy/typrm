@@ -4,6 +4,7 @@ import * as globby from 'globby';
 import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
+import * as chalk from 'chalk';
 process.env['typrm_aaa'] = 'aaa';
 
 // main
@@ -751,7 +752,7 @@ async function  search() {
 	var  indentPosition = -1;
 	var  indentAtFirstContents = '';
 	var  inGlossary = false;
-	const  foundScores: FoundScore[] = [];
+	const  foundLines: FoundLine[] = [];
 
 	for (const inputFileFullPath of fileFullPaths) {
 		const  reader = readline.createInterface({
@@ -772,15 +773,19 @@ async function  search() {
 						console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
 						return [];
 					});
-				const  matchedScore = getKeywordMatchedScore(columns, keywordDoubleQuoted);
-				if (matchedScore >= 1) {
 
-					const  found = new FoundScore();
+				const  found = getKeywordMatchingScore(columns, keywordDoubleQuoted);
+				if (found.score >= 1) {
+					const  positionOfCSV = line.length - csv.length;
+					const  columnPositions = parseCSVColumnPositions(csv, columns);
+
 					found.path = getTestablePath(inputFileFullPath);
 					found.lineNum = lineNum;
 					found.line = line;
-					found.score = matchedScore;
-					foundScores.push(found);
+					for (const match of found.matches) {
+						match.position += positionOfCSV + columnPositions[match.testTargetIndex];
+					}
+					foundLines.push(found);
 				}
 			}
 
@@ -805,15 +810,17 @@ async function  search() {
 				} else {
 					const  colonPosition = line.indexOf(':', currentIndent.length);
 					const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-					const  matchedScore = getKeywordMatchedScore([wordInGlossary], keywordDoubleQuoted);
-					if (matchedScore >= 1  &&  colonPosition !== notFound) {
 
-						const  found = new FoundScore();
+					const  found = getKeywordMatchingScore([wordInGlossary], keywordDoubleQuoted);
+					if (found.score >= 1  &&  colonPosition !== notFound) {
+
 						found.path = getTestablePath(inputFileFullPath);
 						found.lineNum = lineNum;
 						found.line = line;
-						found.score = matchedScore;
-						foundScores.push(found);
+						for (const match of found.matches) {
+							match.position += indentPosition;
+						}
+						foundLines.push(found);
 					}
 				}
 				if (currentIndent.length <= indentAtTag.length) {
@@ -823,7 +830,7 @@ async function  search() {
 		}
 	}
 
-	foundScores.sort( (a, b) => {
+	foundLines.sort( (a, b) => {
 		var  different = a.score - b.score;
 		if (different === 0) {
 			if (a.path < b.path) {
@@ -836,23 +843,24 @@ async function  search() {
 		}
 		return  different;
 	});
-	for (const found of foundScores) {
+	for (const foundLineInformation of foundLines) {
 
-		console.log(found.toString());
+		console.log(foundLineInformation.toString());
 	}
 }
 
-// getKeywordMatchedScore
-function  getKeywordMatchedScore(testingStrings: string[], keyphrase: string): number {
+// getKeywordMatchingScore
+function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): FoundLine {
 	const  lowerKeyphrase = keyphrase.toLowerCase();
+	const  found = new FoundLine();
 
 	function  subMain() {
 		const  score = testingStrings.reduce(
-			(score: number, aTestingString: string) => {
+			(score: number, aTestingString: string, stringIndex: number) => {
 				const  keywords = keyphrase.split(' ');
 				let  thisScore = 0;
 
-				const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase);
+				const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
 				if (result.score !== 0) {
 					thisScore = result.score * keywords.length * phraseMatchScoreWeight;
 				} else {
@@ -861,7 +869,7 @@ function  getKeywordMatchedScore(testingStrings: string[], keyphrase: string): n
 					for (const keyword of keywords) {
 						if (keyword === '') {continue;}
 
-						const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase());
+						const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex);
 						if (result.position > previousPosition) {
 							thisScore += result.score * orderMatchScoreWeight;
 						} else {
@@ -883,28 +891,36 @@ function  getKeywordMatchedScore(testingStrings: string[], keyphrase: string): n
 		position: number;
 	}
 
-	function  getSubMatchedScore(testingString: string, keyword: string, lowerKeyword: string): Result {
+	function  getSubMatchedScore(testingString: string, keyword: string, lowerKeyword: string, stringIndex: number): Result {
 		let  score = 0;
 		let  position = notFound;
 
 		if ((position = testingString.indexOf(keyword)) !== notFound) {
 			if (testingString.length === keyword.length) {
-				score += fullMatchScore;
+				score = fullMatchScore;
 			} else {
-				score += partMatchScore;
+				score = partMatchScore;
 			}
 		} else if ((position = testingString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
 			if (testingString.length === lowerKeyword.length) {
-				score += caseIgnoredFullMatchScore;
+				score = caseIgnoredFullMatchScore;
 			} else {
-				score += caseIgnoredPartMatchScore;
+				score = caseIgnoredPartMatchScore;
 			}
+		}
+		if (position !== notFound) {
+			const  matched = new MatchedPart();
+			matched.position = position;
+			matched.length = keyword.length;
+			matched.testTargetIndex = stringIndex;
+			found.matches.push(matched);
 		}
 		return { score, position };
 	}
 
 	const  score = subMain();
-	return  score;
+	found.score = score;
+	return  found;
 }
 
 // varidateUpdateCommandArguments
@@ -1238,6 +1254,19 @@ async function  parseCSVColumns(columns: string): Promise<string[]> {
 	});
 }
 
+// parseCSVColumnPositions
+function  parseCSVColumnPositions(csv: string, columns: string[]): number[] {
+	const  positions: number[] = [];
+	var  searchPosition = 0;
+	for (const column of columns) {
+		const  columnPosition = csv.indexOf(column, searchPosition);
+
+		positions.push(columnPosition);
+		searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
+	}
+	return  positions;
+}
+
 // escapeRegularExpression
 function  escapeRegularExpression(expression: string) {
 	return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
@@ -1253,16 +1282,53 @@ class Setting {
 	isReferenced: boolean = false;
 }
 
-// FoundScore
-class FoundScore {
+// FoundLine
+// Found the keyword and matched part in the line
+class FoundLine {
 	path: string = '';
 	lineNum: number = 0;
 	line: string = '';
+	matches: MatchedPart[] = [];
 	score: number = 0;
 
 	toString(): string {
-		return `${this.path}:${this.lineNum}: ${this.line}`;
+
+		// colorParts = sort matched positions and merge overrlapping parts.
+		const  colorParts: MatchedPart[] = [];
+		const  sortedParts: MatchedPart[] = this.matches.sort((a, b) => (a.position - b.position));
+		let  previousPart = new MatchedPart();
+		previousPart.position = -1;
+		previousPart.length = 0;
+		for (const part of sortedParts) {
+			if (part.position === previousPart.position) {
+			} else {
+				colorParts.push(part);
+			}
+		}
+
+		// coloredLine = ...
+		let    coloredLine = '';
+		const  matchedColor = chalk.green.bold;
+		const  line = this.line;
+		let    previousPosition = 0;
+		for (const match of colorParts) {
+
+			coloredLine +=
+				line.substr(previousPosition, match.position - previousPosition) +
+				matchedColor( line.substr(match.position, match.length) );
+			previousPosition = match.position + match.length;
+		}
+		coloredLine += line.substr(previousPosition);
+
+		return `${this.path}:${this.lineNum}: ${line}`;  // coloredLine
 	}
+}
+
+// MatchedPart
+class MatchedPart {
+	position: number = 0;
+	length: number = 0;
+	testTargetIndex: number = -1;
 }
 
 // SearchKeyword

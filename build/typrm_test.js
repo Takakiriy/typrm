@@ -72,6 +72,7 @@ function DoCustomDebug() {
                 case 0: return [4 /*yield*/, callChildProccess("node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
                 case 1:
                     returns = _a.sent();
+                    // const  returns = await callChildProccess(`node ../build/typrm.js s DSL --folder /Users/totadashi/Documents/typrm`, {});
                     console.log(returns.stdout);
                     console.log('Done');
                     return [2 /*return*/];

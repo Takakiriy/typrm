@@ -39,6 +39,7 @@ exports.__esModule = true;
 var fs = require("fs");
 var path = require("path");
 var main = require("./main");
+var chalk = require("chalk");
 var callMain = main.callMainFromJest;
 if (path.basename(process.cwd()) !== "src") {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
@@ -46,6 +47,7 @@ if (path.basename(process.cwd()) !== "src") {
 }
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
+var matchedColor = chalk.green.bold;
 describe("checks template value >>", function () {
     test.each([
         ["1_template_1_ok"],
@@ -274,6 +276,7 @@ describe("searches keyword tag >>", function () {
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            // '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: ' + `#keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ], [
             "not found",
             ["search", "notFound"],

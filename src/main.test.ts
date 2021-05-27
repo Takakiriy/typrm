@@ -2,6 +2,7 @@
 import * as path from "path";
 import { ppid } from "process";
 import * as main from "./main";
+import * as chalk from "chalk";
 const callMain = main.callMainFromJest;
 
 if (path.basename(process.cwd()) !== "src") {
@@ -10,6 +11,7 @@ if (path.basename(process.cwd()) !== "src") {
 }
 const scriptPath = `../build/typrm.js`;
 const testFolderPath = `test_data` + path.sep;
+const matchedColor = chalk.green.bold;
 
 describe("checks template value >>", () => {
     test.each([
@@ -200,6 +202,7 @@ describe("searches keyword tag >>", () => {
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
             '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            // '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: ' + `#keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],[
             "not found",
             ["search", "notFound"],
