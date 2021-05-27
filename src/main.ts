@@ -393,13 +393,6 @@ async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIn
 async function  changeSetting(inputFilePath: string, changingSettingIndex: number,
 		changingKey: string, changedValueAndComment: string): Promise<number>/*errorCount*/ {
 
-	if (false) {
-		const  backUpFilePath = inputFilePath +".backup";
-		if (!fs.existsSync(backUpFilePath)) {
-			fs.copyFileSync(inputFilePath, backUpFilePath);
-		}
-	}
-
 	const  oldFilePath = inputFilePath;
 	const  newFilePath = inputFilePath +".new";
 	const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
@@ -412,6 +405,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 	let  isReadingSetting = false;
 	let  setting: Settings = {};
 	let  settingCount = 0;
+	let  settingLineNum = -1;
 	let  changedValue = getChangedValue(changedValueAndComment);
 	let  lineNum = 0;
 	let  errorCount = 0;
@@ -428,6 +422,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 			isReadingSetting = true;
 			setting = {};
 			settingCount += 1;
+			settingLineNum = lineNum;
 			if (changingSettingIndex === allSetting) {
 				isChanging = true;
 			} else {
@@ -493,7 +488,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 							console.log(`  ${translate('Contents')}: ${line.trim()}`);
 							console.log(`  ${translate('Expected')}: ${expected.trim()}`);
 							console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
-							console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
+							console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
 							errorCount += 1;
 						}
 					}
@@ -1576,6 +1571,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
 			"Template": "雛形",
 			"WarningLine": "警告行",
 			"Found": "見つかったもの",
+			"Setting": "設定",
 			"SettingIndex": "設定番号",
 			"Not found any replacing target": "置き換える対象が見つかりません",
 			"Set old value at settings in the replacing file": "置き換えるファイルの中の設定に古い値を設定してください",

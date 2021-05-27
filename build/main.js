@@ -526,40 +526,6 @@ function replaceSettings(inputFilePath, changingLineNum, keyValues) {
         });
     });
 }
-function replaceSettingsOld(inputFilePath, changingLineNum, keyValues) {
-    return __awaiter(this, void 0, void 0, function () {
-        var targetFolder, targetFolderFullPath, inputFileFullPath, errorCount, changingSettingIndex, _i, _a, keyValue, _b;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    targetFolder = exports.programOptions.folder;
-                    targetFolderFullPath = getFullPath(targetFolder, process.cwd());
-                    inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
-                    errorCount = 0;
-                    return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, changingLineNum)];
-                case 1:
-                    changingSettingIndex = _c.sent();
-                    _i = 0, _a = keyValues.split('\n');
-                    _c.label = 2;
-                case 2:
-                    if (!(_i < _a.length)) return [3 /*break*/, 5];
-                    keyValue = _a[_i];
-                    _b = errorCount;
-                    return [4 /*yield*/, changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue)];
-                case 3:
-                    errorCount = _b + _c.sent();
-                    _c.label = 4;
-                case 4:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 5:
-                    console.log('');
-                    console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
 // changeSettingByKeyValue
 function changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue) {
     return __awaiter(this, void 0, void 0, function () {
@@ -582,16 +548,10 @@ function changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue) 
 function changeSetting(inputFilePath, changingSettingIndex, changingKey, changedValueAndComment) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var backUpFilePath, oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, commentIndex, comment, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
+        var oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingLineNum, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, commentIndex, comment, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    if (false) {
-                        backUpFilePath = inputFilePath + ".backup";
-                        if (!fs.existsSync(backUpFilePath)) {
-                            fs.copyFileSync(inputFilePath, backUpFilePath);
-                        }
-                    }
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
                     writer = new WriteBuffer(fs.createWriteStream(newFilePath));
@@ -604,6 +564,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     isReadingSetting = false;
                     setting = {};
                     settingCount = 0;
+                    settingLineNum = -1;
                     changedValue = getChangedValue(changedValueAndComment);
                     lineNum = 0;
                     errorCount = 0;
@@ -626,6 +587,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                         isReadingSetting = true;
                         setting = {};
                         settingCount += 1;
+                        settingLineNum = lineNum;
                         if (changingSettingIndex === allSetting) {
                             isChanging = true;
                         }
@@ -690,7 +652,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                                         console.log("  " + translate('Contents') + ": " + line.trim());
                                         console.log("  " + translate('Expected') + ": " + expected.trim());
                                         console.log("  " + translate('Template') + ": " + templateTag.template.trim());
-                                        console.log("  " + translate('SettingIndex') + ": " + settingCount);
+                                        console.log("  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum);
                                         errorCount += 1;
                                     }
                                 }
@@ -1945,6 +1907,7 @@ function translate(englishLiterals) {
             "Template": "雛形",
             "WarningLine": "警告行",
             "Found": "見つかったもの",
+            "Setting": "設定",
             "SettingIndex": "設定番号",
             "Not found any replacing target": "置き換える対象が見つかりません",
             "Set old value at settings in the replacing file": "置き換えるファイルの中の設定に古い値を設定してください",

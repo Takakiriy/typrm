@@ -497,7 +497,7 @@ ErrorLine: 19
   Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  SettingIndex: 1
+  Setting: \${HOME}/Desktop/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -544,7 +544,7 @@ ErrorLine: 21
   Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  SettingIndex: 1
+  Setting: \${HOME}/Desktop/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -607,7 +607,7 @@ exports[`replaces settings >> in 2_replace_4_Japanese(10) setting 1: stdout 1`] 
   内容: - \\"value3_bad\\"  #template: - \\"Key3\\"
   期待: - \\"value3\\"
   雛形: - \\"Key3\\"
-  設定番号: 1
+  設定: \${HOME}/Desktop/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4
 
 警告: 0, エラー: 1
 "
