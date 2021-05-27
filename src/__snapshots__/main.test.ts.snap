@@ -369,6 +369,16 @@ template count = 2
 "
 `;
 
+exports[`replaces settings >> Multi folder >> same name error: stdout 1`] = `
+"
+Error of same file name exists.
+    FileName: 2_replace_1_ok_same_name.yaml
+    Folder: test_data/_changing/1, test_data/_changing/2
+
+Warning: 0, Error: 1
+"
+`;
+
 exports[`replaces settings >> in 2_replace_1_ok(10) setting 1: stdout 1`] = `
 "
 Warning: 0, Error: 0

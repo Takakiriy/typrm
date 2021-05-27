@@ -193,7 +193,7 @@ describe("replaces settings >>", function () {
                     changingFolderPath = testFolderPath + '_changing';
                     changingFileName = fileNameHead + "_1_changing.yaml";
                     changingFilePath = changingFolderPath + '/' + changingFileName;
-                    fs.rmdirSync('_changing', { recursive: true });
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                     copyFileSync(sourceFilePath, changingFilePath);
                     // Test Main
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
@@ -206,11 +206,66 @@ describe("replaces settings >>", function () {
                     updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
                     expect(main.stdout).toMatchSnapshot('stdout');
                     expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-                    fs.rmdirSync('_changing', { recursive: true });
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                     return [2 /*return*/];
             }
         });
     }); });
+    describe("Multi folder", function () {
+        var fileNameHead = '2_replace_1_ok';
+        var sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+        var changingFolderPath = testFolderPath + '_changing';
+        var changingFile1Path = changingFolderPath + '/1/' + fileNameHead + "_1_changing.yaml";
+        var changingFile2Path = changingFolderPath + '/2/' + fileNameHead + "_2_changing.yaml";
+        var changingFile1APath = changingFolderPath + '/1/' + fileNameHead + "_same_name.yaml";
+        var changingFile2APath = changingFolderPath + '/2/' + fileNameHead + "_same_name.yaml";
+        var lineNum = 29;
+        var keyValues = "key1: value1changed";
+        test.each([
+            ["replace 1", fileNameHead + "_1_changing.yaml", changingFile1Path],
+            ["replace 2", fileNameHead + "_2_changing.yaml", changingFile2Path],
+            ["same name error", fileNameHead + "_same_name.yaml", undefined],
+        ])(">> %s", function (caseName, changingFileName, changingFilePath) { return __awaiter(void 0, void 0, void 0, function () {
+            var fileContentsBefore, fileContentsAfter, fileContentsBefore, fileContents1, fileContents2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                        copyFileSync(sourceFilePath, changingFile1Path);
+                        copyFileSync(sourceFilePath, changingFile2Path);
+                        copyFileSync(sourceFilePath, changingFile1APath);
+                        copyFileSync(sourceFilePath, changingFile2APath);
+                        // Test Main
+                        return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                                folder: changingFolderPath + "/1, " + changingFolderPath + "/2",
+                                test: "", locale: "en-US"
+                            })];
+                    case 1:
+                        // Test Main
+                        _a.sent();
+                        // Check
+                        if (caseName !== "same name error") { // Case of relace 1, replace 2
+                            if (!changingFilePath) {
+                                throw new Error('unexpected');
+                            }
+                            fileContentsBefore = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
+                            fileContentsAfter = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                            expect(fileContentsAfter).not.toBe(fileContentsBefore);
+                        }
+                        else { // Case of same name error
+                            fileContentsBefore = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
+                            fileContents1 = fs.readFileSync(changingFile1APath).toString().substr(cutBOM);
+                            fileContents2 = fs.readFileSync(changingFile2APath).toString().substr(cutBOM);
+                            expect(fileContents1).toBe(fileContentsBefore);
+                            expect(fileContents2).toBe(fileContentsBefore);
+                            expect(main.stdout).toMatchSnapshot('stdout');
+                        }
+                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
 });
 describe("searches keyword tag >>", function () {
     test.each([

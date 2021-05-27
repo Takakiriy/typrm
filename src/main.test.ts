@@ -128,11 +128,11 @@ Key3: value3changed  #コメント`,
         ],
 
     ])("in %s(%i) setting %i", async (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) => {
-        const  sourceFilePath   = testFolderPath + fileNameHead + "_1.yaml";
+        const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-        fs.rmdirSync('_changing', {recursive: true});
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         copyFileSync(sourceFilePath, changingFilePath);
 
         // Test Main
@@ -143,7 +143,53 @@ Key3: value3changed  #コメント`,
 
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-        fs.rmdirSync('_changing', {recursive: true});
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+    });
+
+    describe("Multi folder", () => {
+        const  fileNameHead = '2_replace_1_ok';
+        const  sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFile1Path  = changingFolderPath +'/1/'+ fileNameHead + "_1_changing.yaml";
+        const  changingFile2Path  = changingFolderPath +'/2/'+ fileNameHead + "_2_changing.yaml";
+        const  changingFile1APath = changingFolderPath +'/1/'+ fileNameHead + "_same_name.yaml";
+        const  changingFile2APath = changingFolderPath +'/2/'+ fileNameHead + "_same_name.yaml";
+        const  lineNum = 29;
+        const  keyValues = `key1: value1changed`;
+        test.each([
+            ["replace 1",        fileNameHead + "_1_changing.yaml",  changingFile1Path],
+            ["replace 2",        fileNameHead + "_2_changing.yaml",  changingFile2Path],
+            ["same name error",  fileNameHead + "_same_name.yaml",   undefined],
+        ])(">> %s", async (caseName, changingFileName, changingFilePath) => {
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+            copyFileSync(sourceFilePath, changingFile1Path);
+            copyFileSync(sourceFilePath, changingFile2Path);
+            copyFileSync(sourceFilePath, changingFile1APath);
+            copyFileSync(sourceFilePath, changingFile2APath);
+
+            // Test Main
+            await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                folder: `${changingFolderPath}/1, ${changingFolderPath}/2`, test: "", locale: "en-US"
+            });
+
+            // Check
+            if (caseName !== "same name error") {  // Case of relace 1, replace 2
+                if (!changingFilePath) { throw new Error('unexpected');} 
+                const  fileContentsBefore = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
+                const  fileContentsAfter  = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+
+                expect(fileContentsAfter).not.toBe(fileContentsBefore);
+            } else {  // Case of same name error
+                const  fileContentsBefore = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
+                const  fileContents1 = fs.readFileSync(changingFile1APath).toString().substr(cutBOM);
+                const  fileContents2 = fs.readFileSync(changingFile2APath).toString().substr(cutBOM);
+
+                expect(fileContents1).toBe(fileContentsBefore);
+                expect(fileContents2).toBe(fileContentsBefore);
+                expect(main.stdout).toMatchSnapshot('stdout');
+            }
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        });
     });
 });
 

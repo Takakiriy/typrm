@@ -319,7 +319,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 					if (keyValue === '') {
 						break;
 					}
-					errorCount += await changeSettingByKeyValueOld(inputFilePath, changingSettingIndex, keyValue);
+					errorCount += await changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue);
 				}
 			}
 			loop = (errorCount >= 1);
@@ -334,23 +334,48 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 	}
 }
 
-// updateParameters
+// replaceSettings
 async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValues: string) {
 	const  targetFolder = programOptions.folder;
-	const  targetFolderFullPath = getFullPath(targetFolder, process.cwd());
-	const  inputFileFullPath = targetFolderFullPath + path.sep + inputFilePath;
-	var    errorCount = 0;
-	const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
-	for (const keyValue of keyValues.split('\n')) {
+	const  currentFolder = process.cwd();
+	const  targetFolders = await parseCSVColumns(programOptions.folder);
+	const  fileFullPaths: string[] = [];
+	var  errorCount = 0;
+	for (const folder of targetFolders) {
+		const  targetFolderFullPath = getFullPath(folder, currentFolder);
+		const  inputFileFullPath = getFullPath(inputFilePath, targetFolderFullPath);
+		if (fs.existsSync(inputFileFullPath)) {
+			fileFullPaths.push(inputFileFullPath);
+		}
+	}
+	if (fileFullPaths.length === 0) {
+		console.log('');
+		console.log(`${translate('Error of not found the specified file.')}`);
+		console.log(`    FileName: ${inputFilePath}`);
+		console.log(`    Folder: ${programOptions.folder}`);
+		errorCount += 1;
+	} else if (fileFullPaths.length >= 2) {
+		console.log('');
+		console.log(`${translate('Error of same file name exists.')}`);
+		console.log(`    FileName: ${inputFilePath}`);
+		console.log(`    Folder: ${programOptions.folder}`);
+		errorCount += 1;
+	}
+	else {
+		const  inputFileFullPath = fileFullPaths[0];
+		const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
 
-		errorCount += await changeSettingByKeyValueOld(inputFileFullPath, changingSettingIndex, keyValue);
+		for (const keyValue of keyValues.split('\n')) {
+
+			errorCount += await changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue);
+		}
 	}
 	console.log('');
 	console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
 }
 
 // changeSettingByKeyValue
-async function  changeSettingByKeyValueOld(inputFilePath: string, changingSettingIndex: number,
+async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIndex: number,
 		keyValue: string): Promise<number>/*errorCount*/ {
 
 	const  separator = keyValue.indexOf(':');
@@ -714,10 +739,9 @@ async function  search() {
 	const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
 	const  keyword = programArguments.slice(startIndex).join(' ');
 	const  keywordDoubleQuoted = keyword.replace('"', '""');
-	const  targetFolder = programOptions.folder;
 	const  currentFolder = process.cwd();
 	const  fileFullPaths: string[] = [];
-	const  targetFolders = await parseCSVColumns(targetFolder);
+	const  targetFolders = await parseCSVColumns(programOptions.folder);
 	for (const folder of targetFolders) {
 		const  targetFolderFullPath = getFullPath(folder, currentFolder);
 		process.chdir(targetFolderFullPath);
