@@ -213,7 +213,7 @@ describe("replaces settings >>", function () {
             }
         });
     }); });
-    describe("Multi folder", function () {
+    describe("Multi folder >>", function () {
         var fileNameHead = '2_replace_1_ok';
         var sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
         var changingFolderPath = testFolderPath + '_changing';
@@ -227,7 +227,7 @@ describe("replaces settings >>", function () {
             ["replace 1", fileNameHead + "_1_changing.yaml", changingFile1Path],
             ["replace 2", fileNameHead + "_2_changing.yaml", changingFile2Path],
             ["same name error", fileNameHead + "_same_name.yaml", undefined],
-        ])(">> %s", function (caseName, changingFileName, changingFilePath) { return __awaiter(void 0, void 0, void 0, function () {
+        ])("%s", function (caseName, changingFileName, changingFilePath) { return __awaiter(void 0, void 0, void 0, function () {
             var fileContentsBefore, fileContentsAfter, fileContentsBefore, fileContents1, fileContents2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -275,106 +275,106 @@ describe("searches keyword tag >>", function () {
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
-            // '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: ' + `#keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
-        ], [
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n",
+        ],
+        [
             "not found",
             ["search", "notFound"],
             { folder: "test_data/search/1", test: "" },
             "",
-        ], [
+        ],
+        [
             "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"
         ], [
             "ommit command name (1)",
             ["ABC"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"
         ], [
             "ommit command name (2)",
             ["do", "it"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n"),
         ], [
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n"),
         ], [
             "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "A,B"\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: \"" + matchedColor('A,B') + "\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n"),
         ], [
             "double quotation",
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('double quotation is "".') + "\"\n",
         ], [
             "ignore case",
             ["search", "DO It"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n"),
         ], [
             "word(1)",
             ["search", "AB"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n",
         ], [
             "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "double quotation is ""."\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n"),
         ], [
             "words order score",
             ["search", "aaa bbb ccc"],
             { folder: "test_data/search/2", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: bbb aaa xxx\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: aaa bbb xxx\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: aaa bbb ccc\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + " xxx\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: " + matchedColor('aaa') + " " + matchedColor('bbb') + " xxx\n") +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: " + matchedColor('aaa bbb ccc') + "\n"),
         ], [
             "words order score (2)",
             ["search", "user", "interface"],
             { folder: "test_data/search/2", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: user\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:9:     #keyword: user interface\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: " + matchedColor('user') + "\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:9:     #keyword: " + matchedColor('user interface') + "\n"),
         ], [
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: frameset\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: frame set\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: " + matchedColor('frame') + matchedColor('set') + "\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: " + matchedColor('frame set') + "\n"),
         ], [
             "output order (1)",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "A,B"\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: \"" + matchedColor('A,B') + "\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n"),
         ], [
             "output order (2)",
             ["search", "A,B"],
             { folder: "test_data/search/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "A,B"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: \"" + matchedColor('A,B') + "\"\n"),
         ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n',
-        ],
-        [
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     " + matchedColor('ABC') + ": abc\n"),
+        ], [
             "Windows typrm folder path",
             ["search", "ABC"],
             { folder: process.cwd() + "\\test_data\\search\\1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n",
         ],
     ])("%s", function (caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         var isWindowsEnvironment, isWindowsCase;
@@ -401,41 +401,41 @@ describe("searches glossary tag >>", function () {
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/glossary/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     " + matchedColor('ABC') + ": abc\n",
         ], [
             "ignore case",
             ["search", "abc"],
             { folder: "test_data/search/glossary/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     " + matchedColor('ABC') + ": abc\n",
         ], [
             "word",
             ["search", "AB"],
             { folder: "test_data/search/glossary/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     " + matchedColor('AB') + "C: abc\n",
         ], [
             "nested indent",
             ["search", "ABC"],
             { folder: "test_data/search/glossary/2", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:7:     ABCD: abcd\n" +
-                "${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:4:     ABC: abc\n",
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:7:     " + matchedColor('ABC') + "D: abcd\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:4:     " + matchedColor('ABC') + ": abc\n"),
         ], [
             "output order (1)",
             ["search", "de"],
             { folder: "test_data/search/glossary/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     DE: de\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     de: de\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     " + matchedColor('DE') + ": de\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     " + matchedColor('de') + ": de\n"),
         ], [
             "output order (2)",
             ["search", "DE"],
             { folder: "test_data/search/glossary/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     de: de\n' +
-                '${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     DE: de\n',
+            "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     " + matchedColor('de') + ": de\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     " + matchedColor('DE') + ": de\n"),
         ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            '${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"\n' +
-                "${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ABC: abc\n",
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     " + matchedColor('ABC') + ": abc\n"),
         ],
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {

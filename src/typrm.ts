@@ -11,6 +11,7 @@ async function  callMain() {
 		.option("-l, --locale <s>")
 		.option("-t, --test")
 		.option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
+		.option("--color")
 		.parse(process.argv);
 	
 	for (const arg of commander.program.args) {

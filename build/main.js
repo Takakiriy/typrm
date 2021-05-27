@@ -1007,7 +1007,7 @@ function search() {
                 case 0:
                     startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
                     keyword = exports.programArguments.slice(startIndex).join(' ');
-                    keywordDoubleQuoted = keyword.replace('"', '""');
+                    keywordDoubleQuoted = keyword.replace(/"/g, '""');
                     currentFolder = process.cwd();
                     fileFullPaths = [];
                     return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
@@ -1078,7 +1078,7 @@ function search() {
                                         })];
                                 case 4:
                                     columns = _k.sent();
-                                    found = getKeywordMatchingScore(columns, keywordDoubleQuoted);
+                                    found = getKeywordMatchingScore(columns, keyword);
                                     if (found.score >= 1) {
                                         positionOfCSV = line.length - csv.length;
                                         columnPositions = parseCSVColumnPositions(csv, columns);
@@ -1114,7 +1114,7 @@ function search() {
                                         else {
                                             colonPosition = line.indexOf(':', currentIndent.length);
                                             wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                                            found = getKeywordMatchingScore([wordInGlossary], keywordDoubleQuoted);
+                                            found = getKeywordMatchingScore([wordInGlossary], keyword);
                                             if (found.score >= 1 && colonPosition !== notFound) {
                                                 found.path = getTestablePath(inputFileFullPath);
                                                 found.lineNum = lineNum;
@@ -1247,7 +1247,7 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
         if (position !== notFound) {
             var matched = new MatchedPart();
             matched.position = position;
-            matched.length = keyword.length;
+            matched.length = keyword.replace(/"/g, '""').length;
             matched.testTargetIndex = stringIndex;
             found.matches.push(matched);
         }
@@ -1428,7 +1428,7 @@ function isEndOfSetting(line, isReadingSetting) {
 // getFullPath
 function getFullPath(relativePath, basePath) {
     var fullPath = '';
-    var slashRelativePath = relativePath.replace('\\', '/');
+    var slashRelativePath = relativePath.replace(/\\/g, '/');
     var colonSlashIndex = slashRelativePath.indexOf(':/');
     var slashFirstIndex = slashRelativePath.indexOf('/');
     var withProtocol = (colonSlashIndex + 1 === slashFirstIndex); // e.g.) C:/, http://
@@ -1611,7 +1611,7 @@ function parseCSVColumnPositions(csv, columns) {
     var searchPosition = 0;
     for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
         var column = columns_1[_i];
-        var columnPosition = csv.indexOf(column, searchPosition);
+        var columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
         positions.push(columnPosition);
         searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
     }
@@ -1668,7 +1668,7 @@ var FoundLine = /** @class */ (function () {
             previousPosition = match.position + match.length;
         }
         coloredLine += line.substr(previousPosition);
-        return this.path + ":" + this.lineNum + ": " + line;
+        return this.path + ":" + this.lineNum + ": " + coloredLine;
     };
     return FoundLine;
 }());

@@ -734,7 +734,7 @@ async function  check(checkingFilePath?: string) {
 async function  search() {
 	const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
 	const  keyword = programArguments.slice(startIndex).join(' ');
-	const  keywordDoubleQuoted = keyword.replace('"', '""');
+	const  keywordDoubleQuoted = keyword.replace(/"/g, '""');
 	const  currentFolder = process.cwd();
 	const  fileFullPaths: string[] = [];
 	const  targetFolders = await parseCSVColumns(programOptions.folder);
@@ -774,7 +774,7 @@ async function  search() {
 						return [];
 					});
 
-				const  found = getKeywordMatchingScore(columns, keywordDoubleQuoted);
+				const  found = getKeywordMatchingScore(columns, keyword);
 				if (found.score >= 1) {
 					const  positionOfCSV = line.length - csv.length;
 					const  columnPositions = parseCSVColumnPositions(csv, columns);
@@ -811,7 +811,7 @@ async function  search() {
 					const  colonPosition = line.indexOf(':', currentIndent.length);
 					const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
 
-					const  found = getKeywordMatchingScore([wordInGlossary], keywordDoubleQuoted);
+					const  found = getKeywordMatchingScore([wordInGlossary], keyword);
 					if (found.score >= 1  &&  colonPosition !== notFound) {
 
 						found.path = getTestablePath(inputFileFullPath);
@@ -911,7 +911,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 		if (position !== notFound) {
 			const  matched = new MatchedPart();
 			matched.position = position;
-			matched.length = keyword.length;
+			matched.length = keyword.replace(/"/g, '""').length;
 			matched.testTargetIndex = stringIndex;
 			found.matches.push(matched);
 		}
@@ -1061,7 +1061,7 @@ function  isEndOfSetting(line: string, isReadingSetting: boolean): boolean {
 // getFullPath
 function  getFullPath(relativePath: string, basePath: string): string {
 	var    fullPath = '';
-	const  slashRelativePath = relativePath.replace('\\','/');
+	const  slashRelativePath = relativePath.replace(/\\/g,'/');
 	const  colonSlashIndex = slashRelativePath.indexOf(':/');
 	const  slashFirstIndex = slashRelativePath.indexOf('/');
 	const  withProtocol = (colonSlashIndex + 1 === slashFirstIndex);  // e.g.) C:/, http://
@@ -1259,7 +1259,7 @@ function  parseCSVColumnPositions(csv: string, columns: string[]): number[] {
 	const  positions: number[] = [];
 	var  searchPosition = 0;
 	for (const column of columns) {
-		const  columnPosition = csv.indexOf(column, searchPosition);
+		const  columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
 
 		positions.push(columnPosition);
 		searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
@@ -1320,7 +1320,7 @@ class FoundLine {
 		}
 		coloredLine += line.substr(previousPosition);
 
-		return `${this.path}:${this.lineNum}: ${line}`;  // coloredLine
+		return `${this.path}:${this.lineNum}: ${coloredLine}`;
 	}
 }
 
