@@ -1,6 +1,6 @@
 # typrm
 
-typrm replaces the parameters of what you type manually from the keyboard you write in a text file.
+typrm replaces parameters of what you type manually from the keyboard you write in a text file.
 It replaces the text that should be the same in the same way, resulting in fewer typos.
 Also, there is a search function that is separated from the replace function.
 
@@ -44,6 +44,7 @@ But if the work1 folder already exists and you don't want to delete it, you woul
     cd    work2
 
 In this case, you cannot copy and paste from the manual.
+Because the manual says `work1`.
 
 The typrm command thus rewrites multiple parts at once so that you can copy and paste.
 
@@ -61,13 +62,8 @@ Write "variable_name: value" at `settings:` for the part you want to change to.
 Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
-For Windows, double click typrm.bat file and type:
-
-    YAML UTF-8 file path> new_folder.yaml
-    The line number to change the variable value > 4
-    key: new_value> __Name__: work2
-
-In bash case, type the following commands.
+Install typrm and
+type the following `replace` command from bash or PowerShell. The short command name is `r`.
 
     cp  "typrm/example/new_folder.yaml"  "."  #// Temporary copy to change from the original file
 
@@ -75,7 +71,7 @@ In bash case, type the following commands.
 
 You can drag and drop a file to enter the file without having to type it from the keyboard.
 
-The line number is below the line where `settings:` is written,
+4 is an example of the line number. It is below the line where `settings:` is written,
 and above the line where the next `settings:` is written.
 
 new_folder.yaml file will be chaned to the following contents.
@@ -209,7 +205,7 @@ To use typrm, you must install Node.js.
     Download and expand typrm, and install the commander package used by typrm:
         cd  ~/Downloads
         wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        (When you updated,) rm -rf  typrm-old  &&  mv  typrm  typrm-old
+        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you updated
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// The folder extracted from the Zip file
         cd  typrm
@@ -266,6 +262,7 @@ write how many line of text you want to replace with the parameters of the `#tem
 
 The right of `#template:` tag, you can write not only the variable name of the part you want to replace,
 but also the text that you do not want to replace.
+In the above case, " " is the text that is not replaced.
 
 Replaces only when it matches the text that you replaced with the value before you replaced it.
 It does nothing when it matches the text after replacing it.
@@ -275,24 +272,40 @@ The sample to match before replacing, when replacing __ProjectName__ with react2
 
     settings:
         __ProjectName__: react1
-    cd  "react1"  #template: cd  "__ProjectName__"
+    cd  "react1"  #template: "__ProjectName__"
 
 The sample that match after replacement, when replacing __ProjectName__ with react2:
 
     settings:
         __ProjectName__: react1
-    cd  "react2"  #template: cd  "__ProjectName__"
+    cd  "react2"  #template: "__ProjectName__"
 
-The sample that an error occurs:
+The sample that an error occurs, because `"react1"` is not matched:
 
     settings:
         __ProjectName__: react1
-    pushd  "react1"  #template: cd  "__ProjectName__"
+    cd  "react11"  #template: "__ProjectName__"
+
+In the above case, if you do not enclose the value of the `#template:` tag in " ", the error will not occur, but if you can visually judge that it is correct, you do not need to enclose it.
+
+    settings:
+        __ProjectName__: react1
+    cd  "react1"  #template: __ProjectName__
+
+To check for a match without replacement,
+use the `check` command. The short command name is `c`.
+
+    typrm check __FileName__
 
 
 ## Checking the contents of a file using the file-template tag
 
 You can check that the contents of another file match the settings.
+
+To check for a match,
+use the `check` command. The short command name is `c`.
+
+    typrm check __FileName__
 
 For example, if you write the following,
 it will check that the setting value in the `my.json` file is the same as

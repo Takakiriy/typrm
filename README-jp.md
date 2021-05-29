@@ -45,6 +45,7 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
     cd    work2
 
 この場合、マニュアルからコピー＆ペーストできません。
+なぜなら、マニュアルには `work1` と書かれているからです。
 
 typrm コマンドはこのように複数の箇所を一度に書き換えて、
 コピー＆ペーストできるようにします。
@@ -63,13 +64,8 @@ new_folder.yaml
 変更する部分と同じ行の末尾に `#template:` タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
-Windows の場合、typrm.bat をダブルクリックして、下記のように入力します。
-
-    YAML UTF-8 ファイル パス> new_folder.yaml
-    変更する変数値がある行番号 > 4
-    変数名: 新しい変数値> __Name__: work2
-
-bash の場合、以下のように入力します。
+typrm をインストールして、
+bash や PowerShell から以下のように `replace` コマンドを入力します。短いコマンド名は `r` です。
 
     cp  "typrm/example/new_folder.yaml"  "."  #// 変更するので一時的にコピーします
 
@@ -78,7 +74,7 @@ bash の場合、以下のように入力します。
 ファイル パス は、キーボードから入力しなくても、
 ファイルをドラッグ＆ドロップして入力できます。
 
-行番号は `設定:` が書いてある部分より下、
+4 は行番号の例です。`設定:` が書いてある部分より下、
 次の `設定:` が書いてある行より上であれば、
 どの行番号を入力しても構いません。
 
@@ -214,7 +210,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
         cd  ~/Downloads
         wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        （更新するときは） rm -rf  typrm-old  &&  mv  typrm  typrm-old
+        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// 更新するとき
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
         cd  typrm
@@ -270,6 +266,7 @@ typrm を使うには Node.js のインストールが必要です。
 
 `#template:` タグの右には、置き換える部分の変数名だけでなく、
 その前後にある置き換えないテキストを書くことができます。
+上記の場合、" " が置き換えないテキストです。
 
 置き換える前の値に置き換えたテキストにマッチしたときだけ、置き換えます。
 置き換える後のテキストにマッチしたときは何もしません。
@@ -279,24 +276,40 @@ __ProjectName__ を react2 に置き換えるときに、置き換える前に�
 
     設定:
         __ProjectName__: react1
-    cd  "react1"  #template: cd  "__ProjectName__"
+    cd  "react1"  #template: "__ProjectName__"
 
 __ProjectName__ を react2 に置き換えるときに、置き換えた後にマッチするサンプル:
 
     設定:
         __ProjectName__: react1
-    cd  "react2"  #template: cd  "__ProjectName__"
+    cd  "react2"  #template: "__ProjectName__"
 
-エラーになるサンプル:
+`"react1"` にマッチしないために、エラーになるサンプル:
 
     設定:
         __ProjectName__: react1
-    pushd  "react1"  #template: cd  "__ProjectName__"
+    cd  "react11"  #template: "__ProjectName__"
+
+なお、上記の場合、`#template:` タグの値を " " で囲まないとエラーになりませんが、目視で正しいと判断できれば囲む必要はありません。
+
+    設定:
+        __ProjectName__: react1
+    cd  "react1"  #template: __ProjectName__
+
+置き換えないで、マッチすることをチェックするときは、
+`check` コマンドを使います。短いコマンド名は `c` です。
+
+    typrm check __FileName__
 
 
 ## file-template タグを使ったファイルの内容のチェック
 
 別のファイルの内容が設定値に合っていることをチェックすることができます。
+
+チェックするときは、
+`check` コマンドを使います。短いコマンド名は `c` です。
+
+    typrm check __FileName__
 
 たとえば、下記にように書くと、`my.json` ファイルの中の設定値が、
 `設定:` タグに書かれた設定値と同じことをチェックするようになります。
