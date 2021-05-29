@@ -199,8 +199,7 @@ describe("replaces settings >>", function () {
                     copyFileSync(sourceFilePath, changingFilePath);
                     // Test Main
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale
+                            folder: changingFolderPath, test: "", locale: locale
                         })];
                 case 1:
                     // Test Main
@@ -239,8 +238,7 @@ describe("replaces settings >>", function () {
                         copyFileSync(sourceFilePath, changingFile2APath);
                         // Test Main
                         return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                                folder: changingFolderPath + "/1, " + changingFolderPath + "/2",
-                                test: "", locale: "en-US"
+                                folder: changingFolderPath + "/1, " + changingFolderPath + "/2", test: "", locale: "en-US"
                             })];
                     case 1:
                         // Test Main
@@ -276,14 +274,12 @@ describe("searches keyword tag >>", function () {
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n",
-        ],
-        [
+        ], [
             "not found",
             ["search", "notFound"],
             { folder: "test_data/search/1", test: "" },
             "",
-        ],
-        [
+        ], [
             "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", test: "" },
