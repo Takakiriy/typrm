@@ -91,6 +91,9 @@ If the `#original:` tag already exists, it will not be added.
 When you enter multiple variable names: new variable values,
 you can copy and paste multiple linees and enter them continuously.
 
+    typrm replace  new_folder.yaml  4  "__Name1__: work1
+        __Name2__: work2"
+
 
 ## Install
 

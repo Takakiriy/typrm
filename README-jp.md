@@ -95,6 +95,9 @@ new_folder.yaml ファイルは次のような内容に変わります。
 「変数名: 新しい変数値」を複数入力するときは、
 複数行をコピー＆ペーストして連続入力することができます。
 
+    typrm replace  new_folder.yaml  4  "__Name1__: work1
+        __Name2__: work2"
+
 
 ## インストール
 
