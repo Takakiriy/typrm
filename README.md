@@ -77,13 +77,16 @@ and above the line where the next `settings:` is written.
 new_folder.yaml file will be chaned to the following contents.
 
     settings:
-        __Name__: work2
+        __Name__: work2  #original: work1
     shell:
         - mkdir work2  #template: __Name__
         - cd    work2  #template: __Name__
 
 You can paste the text with the comment as it is. # is
 treated as a comment in many shells.
+
+`#original:` tag with the value before replacement is added to the same line.
+If the `#original:` tag already exists, it will not be added.
 
 When you enter multiple variable names: new variable values,
 you can copy and paste multiple linees and enter them continuously.

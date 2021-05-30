@@ -81,13 +81,16 @@ bash や PowerShell から以下のように `replace` コマンドを入力し�
 new_folder.yaml ファイルは次のような内容に変わります。
 
     設定:
-        __Name__: work2
+        __Name__: work2  #original: work1
     shell:
         - mkdir work2  #template: __Name__
         - cd    work2  #template: __Name__
 
 コメントの付いたテキストはそのまま貼り付けることができます。 # は
 多くのシェルでコメントとして扱われます。
+
+置き換える前の値が書かれた `#original:` タグが同じ行に追加されます。
+`#original:` タグがすでにあるときは追加されません。
 
 「変数名: 新しい変数値」を複数入力するときは、
 複数行をコピー＆ペーストして連続入力することができます。

@@ -549,7 +549,7 @@ function changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue) 
 function changeSetting(inputFilePath, changingSettingIndex, changingKey, changedValueAndComment) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingLineNum, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, commentIndex, comment, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
+        var oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingLineNum, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, original, commentIndex, comment, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -612,12 +612,16 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                                     isReadingSetting = false;
                                 }
                                 if (key === changingKey) {
+                                    original = '';
+                                    if (!line.includes(originalLabel)) {
+                                        original = "  " + originalLabel + " " + value;
+                                    }
                                     commentIndex = line.indexOf('#', separator);
                                     comment = '';
                                     if (commentIndex !== notFound && !changedValueAndComment.includes('#')) {
                                         comment = '  ' + line.substr(commentIndex);
                                     }
-                                    writer.write(line.substr(0, separator + 1) + ' ' + changedValueAndComment + comment + "\n");
+                                    writer.write(line.substr(0, separator + 1) + ' ' + changedValueAndComment + original + comment + "\n");
                                     output = true;
                                 }
                             }
@@ -2040,6 +2044,7 @@ function callMainFromJest(parameters, options) {
 exports.callMainFromJest = callMainFromJest;
 var settingStartLabel = /^設定(\(|（[^\)]*\)|）)?:$/;
 var settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
+var originalLabel = "#original:";
 var templateLabel = "#template:";
 var templateAtStartLabel = "#template-at(";
 var templateAtEndLabel = "):";

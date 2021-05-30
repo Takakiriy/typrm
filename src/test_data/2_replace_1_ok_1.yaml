@@ -5,7 +5,7 @@
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3  #コメント
+        Key3: value3  #original: oldValue3  #コメント
 
     手順:
         - cd ".."

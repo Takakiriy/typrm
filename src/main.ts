@@ -447,13 +447,17 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 					}
 
 					if (key === changingKey) {
+						let  original = '';
+						if ( ! line.includes(originalLabel)) {
+							original = `  ${originalLabel} ${value}`;
+						}
 						const  commentIndex = line.indexOf('#', separator);
 						let  comment= '';
 						if (commentIndex !== notFound  &&  ! changedValueAndComment.includes('#')) {
 							comment = '  ' + line.substr(commentIndex);
 						}
 
-						writer.write(line.substr(0, separator + 1) +' '+ changedValueAndComment + comment + "\n");
+						writer.write(line.substr(0, separator + 1) +' '+ changedValueAndComment + original + comment + "\n");
 						output = true;
 					}
 				}
@@ -1691,6 +1695,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
 
 const  settingStartLabel = /^設定(\(|（[^\)]*\)|）)?:$/;
 const  settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
+const  originalLabel = "#original:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";

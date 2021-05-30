@@ -390,10 +390,10 @@ exports[`replaces settings >> in 2_replace_1_ok(10) setting 1: updatedFileConten
 
 手順A:
     設定:
-        key1: value1changed
-        __Key2__: value2changed  #コメント
+        key1: value1changed  #original: value1
+        __Key2__: value2changed  #original: value2  #コメント
             #コメント
-        Key3: value3changed  #コメント
+        Key3: value3changed  #original: oldValue3  #コメント
 
     手順:
         - cd \\"..\\"
@@ -448,7 +448,7 @@ exports[`replaces settings >> in 2_replace_1_ok(29) setting 2: updatedFileConten
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3  #コメント
+        Key3: value3  #original: oldValue3  #コメント
 
     手順:
         - cd \\"..\\"
@@ -467,7 +467,7 @@ exports[`replaces settings >> in 2_replace_1_ok(29) setting 2: updatedFileConten
 
 手順B:
     設定:
-        key1: value1changed
+        key1: value1changed  #original: value11
 
     手順:
         - value1changed
@@ -511,7 +511,7 @@ exports[`replaces settings >> in 2_replace_2_error(4) setting 1: updatedFileCont
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3changed
+        Key3: value3changed  #original: value3
 
     手順:
         - cd \\"..\\"
@@ -558,7 +558,7 @@ Process A:
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3changed  #コメント
+        Key3: value3changed  #original: value3  #コメント
 
     steps:
         - cd \\"..\\"
@@ -621,7 +621,7 @@ exports[`replaces settings >> in 2_replace_4_Japanese(10) setting 1: updatedFile
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3changed
+        Key3: value3changed  #original: value3
 
     手順:
         - cd \\"..\\"
