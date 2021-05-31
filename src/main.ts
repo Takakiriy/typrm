@@ -863,7 +863,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 
 	function  subMain() {
 		const  score = testingStrings.reduce(
-			(score: number, aTestingString: string, stringIndex: number) => {
+			(maxScore: number, aTestingString: string, stringIndex: number) => {
 				const  keywords = keyphrase.split(' ');
 				let  thisScore = 0;
 
@@ -891,7 +891,8 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 						}
 					}
 				}
-				return score + thisScore;
+				maxScore = Math.max(maxScore, thisScore);
+				return maxScore;
 			}, 0);
 
 		return  score;

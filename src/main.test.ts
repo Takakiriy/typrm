@@ -263,10 +263,23 @@ describe("searches keyword tag >>", () => {
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: ${matchedColor('aaa bbb')} xxx\n` +
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: ${matchedColor('aaa bbb')}\n`,
         ],[
-            "words order score (2)",
+            "words order score (2)",  // It does not show small number of matched words
             ["search", "user", "interface"],
-            { folder: "test_data/search/2", test: "" },
+            { folder: "test_data/search/2", test: "" },  // section: test_of_idiom_and_word_score
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: ${matchedColor('user interface')}\n`,
+        ],[
+            "1 word search score",  // keyword: 1 word： 1 word match > 1 word match in 2 words > 1 word partial match
+            ["search", "second"],
+            { folder: "test_data/search/2", test: "" },  // section: test_of_1_word_search_score
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:14:     #keyword: ${matchedColor('second')}ary\n` +
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:15:     #keyword: ${matchedColor('second')} screen\n` +
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:13:     #keyword: ${matchedColor('second')}\n`,
+        ],[
+            "word match is better than same case",  // word match and not same case > many partial match and same case
+            ["search", "ipad"],
+            { folder: "test_data/search/2", test: "" },  // section: test_of_word_match_is_better_than_same_case
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:18:     #keyword: ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:17:     #keyword: ${matchedColor('iPad')}\n`,
         ],[
             "compound word",
             ["search", "frame set"],

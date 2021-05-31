@@ -340,6 +340,19 @@ describe("searches keyword tag >>", function () {
             { folder: "test_data/search/2", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: " + matchedColor('user interface') + "\n",
         ], [
+            "1 word search score",
+            ["search", "second"],
+            { folder: "test_data/search/2", test: "" },
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:14:     #keyword: " + matchedColor('second') + "ary\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:15:     #keyword: " + matchedColor('second') + " screen\n") +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:13:     #keyword: " + matchedColor('second') + "\n"),
+        ], [
+            "word match is better than same case",
+            ["search", "ipad"],
+            { folder: "test_data/search/2", test: "" },
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:18:     #keyword: " + matchedColor('ipad') + " pro, " + matchedColor('ipad') + " nano\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:17:     #keyword: " + matchedColor('iPad') + "\n"),
+        ], [
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },

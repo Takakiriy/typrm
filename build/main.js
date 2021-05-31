@@ -1201,7 +1201,7 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
     var lowerKeyphrase = keyphrase.toLowerCase();
     var found = new FoundLine();
     function subMain() {
-        var score = testingStrings.reduce(function (score, aTestingString, stringIndex) {
+        var score = testingStrings.reduce(function (maxScore, aTestingString, stringIndex) {
             var keywords = keyphrase.split(' ');
             var thisScore = 0;
             var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
@@ -1231,7 +1231,8 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                     }
                 }
             }
-            return score + thisScore;
+            maxScore = Math.max(maxScore, thisScore);
+            return maxScore;
         }, 0);
         return score;
     }
