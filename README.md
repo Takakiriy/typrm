@@ -74,7 +74,9 @@ You can drag and drop a file to enter the file without having to type it from th
 4 is an example of the line number. It is below the line where `settings:` is written,
 and above the line where the next `settings:` is written.
 
-new_folder.yaml file will be chaned to the following contents.
+new_folder.yaml file will be chaned to the following contents and you can copy and paste.
+You can paste the text with the comment as it is,
+because  # is treated as a comment in many shells.
 
     settings:
         __Name__: work2  #original: work1
@@ -82,8 +84,7 @@ new_folder.yaml file will be chaned to the following contents.
         - mkdir work2  #template: __Name__
         - cd    work2  #template: __Name__
 
-You can paste the text with the comment as it is. # is
-treated as a comment in many shells.
+It replaces `work1` in the settings and document body to `work2`.
 
 `#original:` tag with the value before replacement is added to the same line.
 If the `#original:` tag already exists, it will not be added.
@@ -160,17 +161,17 @@ To use typrm, you must install Node.js.
 
 ### For mac
 
-    Download and expand typrm:
-        - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
-
     Install Node.js:
         - https://nodejs.org/ja/download/ >> macOS Installer (.pkg) >> 64-bit
         - Open the downloaded file (e.g. node-v14.16.0.pkg)
         - Installation options are defaults
 
-    Install Node.js packages used by typrm:
+    Download and expand typrm and install Node.js packages used by typrm:
+        https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
+
         #// Launchpad >> Terminal
-        cd typrm  #// The folder extracted from the Zip file
+        cd ~/Downloads/typrm-master  #// The folder extracted from the Zip file
+
         npm install --only=production
 
     Make the script file in the PATH folder to start typrm:
@@ -208,7 +209,7 @@ To use typrm, you must install Node.js.
         npm config -g set proxy "http://___.___.___.___:____"
         npm config -g set https-proxy "http://___.___.___.___:____"
 
-    Download and expand typrm, and install the commander package used by typrm:
+    Download and expand typrm and install Node.js packages used by typrm:
         cd  ~/Downloads
         wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
         rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you updated
@@ -274,13 +275,13 @@ Replaces only when it matches the text that you replaced with the value before y
 It does nothing when it matches the text after replacing it.
 If neither match is matched, an error occurs.
 
-The sample to match before replacing, when replacing __ProjectName__ with react2:
+The sample to match before replacing, when replacing `__ProjectName__` with react2:
 
     settings:
         __ProjectName__: react1
     cd  "react1"  #template: "__ProjectName__"
 
-The sample that match after replacement, when replacing __ProjectName__ with react2:
+The sample that match after replacement, when replacing `__ProjectName__` with react2:
 
     settings:
         __ProjectName__: react1
@@ -319,14 +320,14 @@ the setting value written in the `setting:` tag.
 If they are not the same, an error will be displayed
 when you run the check command.
 
-__Project__/root.yaml file:
+`__Project__/root.yaml file`:
 
     settings:
         __Stage__: develop
     a part of ./my.json:  #file-template: ./my.json
         "stage": "develop"  #template: "__Stage__"
 
-__Project__/my.json file:
+`__Project__/my.json file`:
 
     {
         "stage": "develop"

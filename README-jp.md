@@ -78,7 +78,9 @@ bash や PowerShell から以下のように `replace` コマンドを入力し�
 次の `設定:` が書いてある行より上であれば、
 どの行番号を入力しても構いません。
 
-new_folder.yaml ファイルは次のような内容に変わります。
+new_folder.yaml ファイルは次のような内容に変わり、コピー＆ペーストできるようになります。
+コメントの付いたテキストはそのまま貼り付けることができます。# は
+多くのシェルでコメントとして扱われるからです。
 
     設定:
         __Name__: work2  #original: work1
@@ -86,8 +88,7 @@ new_folder.yaml ファイルは次のような内容に変わります。
         - mkdir work2  #template: __Name__
         - cd    work2  #template: __Name__
 
-コメントの付いたテキストはそのまま貼り付けることができます。 # は
-多くのシェルでコメントとして扱われます。
+設定の `work1` と本文の `work1` が、`work2` に置き換わります。
 
 置き換える前の値が書かれた `#original:` タグが同じ行に追加されます。
 `#original:` タグがすでにあるときは追加されません。
@@ -164,18 +165,17 @@ typrm を使うには Node.js のインストールが必要です。
 
 ### mac の場合
 
-    typrm をダウンロードして展開します:
-        - https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
-        - （必要なら）Zip ファイルを展開したフォルダーを格納する場所に移動します
-
     Node.js をインストールします:
         - https://nodejs.org/ja/download/ >> macOS Installer (.pkg) >> 64-bit
         - ダウンロードしたファイル（例：node-v14.16.0.pkg）を開きます
         - インストール オプションはデフォルトを使用
 
-    typrm が使う Node.js パッケージをインストールします:
+    typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
+        https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
+
         #// Launchpad >> Terminal
-        cd typrm  #// Zip ファイルを展開したフォルダー
+        cd cd ~/Downloads/typrm-master  #// Zip ファイルを展開したフォルダー
+
         npm install --only=production
 
     PATH が通ったフォルダーに typrm を起動する スクリプト ファイル を作ります:
@@ -278,13 +278,13 @@ typrm を使うには Node.js のインストールが必要です。
 置き換える後のテキストにマッチしたときは何もしません。
 そのどちらにもマッチしなかったときは、エラーになります。
 
-__ProjectName__ を react2 に置き換えるときに、置き換える前にマッチするサンプル:
+`__ProjectName__` を react2 に置き換えるときに、置き換える前にマッチするサンプル:
 
     設定:
         __ProjectName__: react1
     cd  "react1"  #template: "__ProjectName__"
 
-__ProjectName__ を react2 に置き換えるときに、置き換えた後にマッチするサンプル:
+`__ProjectName__` を react2 に置き換えるときに、置き換えた後にマッチするサンプル:
 
     設定:
         __ProjectName__: react1
@@ -321,14 +321,14 @@ __ProjectName__ を react2 に置き換えるときに、置き換えた後に�
 `設定:` タグに書かれた設定値と同じことをチェックするようになります。
 同じでなければ check コマンドを実行したときにエラーが表示されます。
 
-__Project__/root.yaml ファイル:
+`__Project__/root.yaml` ファイル:
 
     設定:
         __Stage__: develop
     ./my.json の一部:  #file-template: ./my.json
         "stage": "develop"  #template: "__Stage__"
 
-__Project__/my.json ファイル:
+`__Project__`/my.json ファイル:
 
     {
         "stage": "develop"
@@ -336,7 +336,7 @@ __Project__/my.json ファイル:
 
 もし、設定を下記のように変更したら、エラーになります。
 
-__Project__/root.yaml ファイル:
+`__Project__/root.yaml` ファイル:
 
     設定:
         __Stage__: product
