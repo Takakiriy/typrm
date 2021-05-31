@@ -756,7 +756,7 @@ async function  search() {
 	var  indentPosition = -1;
 	var  indentAtFirstContents = '';
 	var  inGlossary = false;
-	const  foundLines: FoundLine[] = [];
+	var  foundLines: FoundLine[] = [];
 
 	for (const inputFileFullPath of fileFullPaths) {
 		const  reader = readline.createInterface({
@@ -833,6 +833,9 @@ async function  search() {
 			}
 		}
 	}
+	const  keyphraseWordCount = keyword.split(' ').length;
+
+	foundLines = foundLines.filter((found) => (found.matchedWordCount >= keyphraseWordCount));
 
 	foundLines.sort( (a, b) => {
 		var  different = a.score - b.score;
@@ -867,6 +870,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 				const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
 				if (result.score !== 0) {
 					thisScore = result.score * keywords.length * phraseMatchScoreWeight;
+					found.matchedWordCount = keywords.length;
 				} else {
 					let  previousPosition = -1;
 
@@ -878,6 +882,9 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 							thisScore += result.score * orderMatchScoreWeight;
 						} else {
 							thisScore += result.score;
+						}
+						if (result.score !== 0) {
+							found.matchedWordCount += 1;
 						}
 						if (result.position !== notFound) {
 							previousPosition = result.position;
@@ -1293,6 +1300,7 @@ class FoundLine {
 	lineNum: number = 0;
 	line: string = '';
 	matches: MatchedPart[] = [];
+	matchedWordCount: number = 0;
 	score: number = 0;
 
 	toString(): string {

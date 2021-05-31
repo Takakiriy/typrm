@@ -1,6 +1,7 @@
-#keyword: aaa bbb ccc
 #keyword: aaa bbb xxx
 #keyword: bbb aaa xxx
+#keyword: aaa bbb
+#keyword: bbb aaa
 #keyword: frame set
 #keyword: frameset
 test_of_disable-tag-tool: |

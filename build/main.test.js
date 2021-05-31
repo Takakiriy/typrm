@@ -293,14 +293,12 @@ describe("searches keyword tag >>", function () {
             "ommit command name (2)",
             ["do", "it"],
             { folder: "test_data/search/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n",
         ], [
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n",
         ], [
             "comma",
             ["search", "a,b"],
@@ -316,8 +314,7 @@ describe("searches keyword tag >>", function () {
             "ignore case",
             ["search", "DO It"],
             { folder: "test_data/search/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do it') + "\", \"a,b\"\n",
         ], [
             "word(1)",
             ["search", "AB"],
@@ -331,23 +328,23 @@ describe("searches keyword tag >>", function () {
                 ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n"),
         ], [
             "words order score",
-            ["search", "aaa bbb ccc"],
+            ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + " xxx\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: " + matchedColor('aaa') + " " + matchedColor('bbb') + " xxx\n") +
-                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: " + matchedColor('aaa bbb ccc') + "\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + " xxx\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + "\n") +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: " + matchedColor('aaa bbb') + " xxx\n") +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: " + matchedColor('aaa bbb') + "\n"),
         ], [
             "words order score (2)",
             ["search", "user", "interface"],
             { folder: "test_data/search/2", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: " + matchedColor('user') + "\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:9:     #keyword: " + matchedColor('user interface') + "\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: " + matchedColor('user interface') + "\n",
         ], [
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: " + matchedColor('frame') + matchedColor('set') + "\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: " + matchedColor('frame set') + "\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:6: #keyword: " + matchedColor('frame') + matchedColor('set') + "\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: " + matchedColor('frame set') + "\n"),
         ], [
             "output order (1)",
             ["search", "a,b"],

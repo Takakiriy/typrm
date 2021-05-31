@@ -1005,7 +1005,7 @@ function check(checkingFilePath) {
 function search() {
     var e_5, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keywordDoubleQuoted, currentFolder, fileFullPaths, targetFolders, _loop_2, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_3, lineNum, _b, fileFullPaths_1, inputFileFullPath, _c, foundLines_1, foundLineInformation;
+        var startIndex, keyword, keywordDoubleQuoted, currentFolder, fileFullPaths, targetFolders, _loop_2, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_3, lineNum, _b, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _c, foundLines_1, foundLineInformation;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -1170,6 +1170,8 @@ function search() {
                     _b++;
                     return [3 /*break*/, 6];
                 case 9:
+                    keyphraseWordCount = keyword.split(' ').length;
+                    foundLines = foundLines.filter(function (found) { return (found.matchedWordCount >= keyphraseWordCount); });
                     foundLines.sort(function (a, b) {
                         var different = a.score - b.score;
                         if (different === 0) {
@@ -1205,6 +1207,7 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
             var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
             if (result.score !== 0) {
                 thisScore = result.score * keywords.length * phraseMatchScoreWeight;
+                found.matchedWordCount = keywords.length;
             }
             else {
                 var previousPosition = -1;
@@ -1219,6 +1222,9 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                     }
                     else {
                         thisScore += result_1.score;
+                    }
+                    if (result_1.score !== 0) {
+                        found.matchedWordCount += 1;
                     }
                     if (result_1.position !== notFound) {
                         previousPosition = result_1.position;
@@ -1642,6 +1648,7 @@ var FoundLine = /** @class */ (function () {
         this.lineNum = 0;
         this.line = '';
         this.matches = [];
+        this.matchedWordCount = 0;
         this.score = 0;
     }
     FoundLine.prototype.toString = function () {
