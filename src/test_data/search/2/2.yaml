@@ -16,3 +16,7 @@ test_of_1_word_search_score:
 test_of_word_match_is_better_than_same_case:
     #keyword: iPad
     #keyword: ipad pro, ipad nano
+test_of_target_word_count:
+    #keyword: new tasks
+    #keyword: new tasks only
+    #keyword: new tasks

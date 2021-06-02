@@ -252,8 +252,8 @@ describe("searches keyword tag >>", () => {
             "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "${matchedColor('do')} it", "a,b"\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "${matchedColor('do')}uble quotation is ""."\n`,
+            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
+            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
         ],[
             "words order score",
             ["search", "aaa bbb"],
@@ -268,18 +268,25 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/2", test: "" },  // section: test_of_idiom_and_word_score
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: ${matchedColor('user interface')}\n`,
         ],[
-            "1 word search score",  // keyword: 1 word： 1 word match > 1 word match in 2 words > 1 word partial match
+            "1 word search score",  // keyword: 1 word： 1 word match > 1 word match in 2 words > 1 word partial match.  '>' means grater than.
             ["search", "second"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_1_word_search_score
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:14:     #keyword: ${matchedColor('second')}ary\n` +
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:15:     #keyword: ${matchedColor('second')} screen\n` +
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:13:     #keyword: ${matchedColor('second')}\n`,
         ],[
-            "word match is better than same case",  // word match and not same case > many partial match and same case
+            "word match is better than same case",  // word match and not same case > many partial match and same case.  '>' means grater than.
             ["search", "ipad"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_word_match_is_better_than_same_case
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:18:     #keyword: ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +
             `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:17:     #keyword: ${matchedColor('iPad')}\n`,
+        ],[
+            "target word count",
+            ["search", "new task"],
+            { folder: "test_data/search/2", test: "" },  // section: test_of_target_word_count
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:21:     #keyword: ${matchedColor('new task')}s only\n` +
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:20:     #keyword: ${matchedColor('new task')}s\n` +
+            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:22:     #keyword: ${matchedColor('new task')}s\n`,
         ],[
             "compound word",
             ["search", "frame set"],
@@ -299,7 +306,7 @@ describe("searches keyword tag >>", () => {
             `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "${matchedColor('a,b')}"\n` +
             `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "${matchedColor('A,B')}"\n`,
         ],[
-            "Multi folder",
+            "Multi folder",  // and test of long path length > short path length
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
             `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n` +

@@ -1171,9 +1171,15 @@ function search() {
                     return [3 /*break*/, 6];
                 case 9:
                     keyphraseWordCount = keyword.split(' ').length;
-                    foundLines = foundLines.filter(function (found) { return (found.matchedWordCount >= keyphraseWordCount); });
+                    foundLines = foundLines.filter(function (found) { return (found.matchedKeywordCount >= keyphraseWordCount); });
                     foundLines.sort(function (a, b) {
+                        // score
                         var different = a.score - b.score;
+                        // testedWordCount
+                        if (different === 0) {
+                            different = b.testedWordCount - a.testedWordCount;
+                        }
+                        // path
                         if (different === 0) {
                             if (a.path < b.path) {
                                 different = -1;
@@ -1181,9 +1187,10 @@ function search() {
                             else if (a.path > b.path) {
                                 different = +1;
                             }
-                            else {
-                                different = a.lineNum - b.lineNum;
-                            }
+                        }
+                        // lineNum
+                        if (different === 0) {
+                            different = a.lineNum - b.lineNum;
                         }
                         return different;
                     });
@@ -1207,7 +1214,8 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
             var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
             if (result.score !== 0) {
                 thisScore = result.score * keywords.length * phraseMatchScoreWeight;
-                found.matchedWordCount = keywords.length;
+                found.matchedKeywordCount = keywords.length;
+                found.testedWordCount = aTestingString.split(' ').length;
             }
             else {
                 var previousPosition = -1;
@@ -1224,7 +1232,7 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                         thisScore += result_1.score;
                     }
                     if (result_1.score !== 0) {
-                        found.matchedWordCount += 1;
+                        found.matchedKeywordCount += 1;
                     }
                     if (result_1.position !== notFound) {
                         previousPosition = result_1.position;
@@ -1244,7 +1252,12 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                 score = fullMatchScore;
             }
             else {
-                score = partMatchScore;
+                if (testingString[position - 1] === ' ' || testingString[keyword.length] === ' ') {
+                    score = wordsMatchScore;
+                }
+                else {
+                    score = partMatchScore;
+                }
             }
         }
         else if ((position = testingString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
@@ -1649,7 +1662,8 @@ var FoundLine = /** @class */ (function () {
         this.lineNum = 0;
         this.line = '';
         this.matches = [];
-        this.matchedWordCount = 0;
+        this.matchedKeywordCount = 0;
+        this.testedWordCount = 0;
         this.score = 0;
     }
     FoundLine.prototype.toString = function () {
@@ -2071,6 +2085,7 @@ var referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 var indentRegularExpression = /^( |¥t)*/;
 var fullMatchScore = 100;
 var caseIgnoredFullMatchScore = 8;
+var wordsMatchScore = 7;
 var partMatchScore = 5;
 var caseIgnoredPartMatchScore = 3;
 var phraseMatchScoreWeight = 4;

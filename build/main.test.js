@@ -324,8 +324,8 @@ describe("searches keyword tag >>", function () {
             "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
-            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n" +
-                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n"),
+            "${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n"),
         ], [
             "words order score",
             ["search", "aaa bbb"],
@@ -352,6 +352,13 @@ describe("searches keyword tag >>", function () {
             { folder: "test_data/search/2", test: "" },
             "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:18:     #keyword: " + matchedColor('ipad') + " pro, " + matchedColor('ipad') + " nano\n" +
                 ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:17:     #keyword: " + matchedColor('iPad') + "\n"),
+        ], [
+            "target word count",
+            ["search", "new task"],
+            { folder: "test_data/search/2", test: "" },
+            "${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:21:     #keyword: " + matchedColor('new task') + "s only\n" +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:20:     #keyword: " + matchedColor('new task') + "s\n") +
+                ("${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:22:     #keyword: " + matchedColor('new task') + "s\n"),
         ], [
             "compound word",
             ["search", "frame set"],
