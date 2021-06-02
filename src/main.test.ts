@@ -12,6 +12,8 @@ if (path.basename(process.cwd()) !== "src") {
 const scriptPath = `../build/typrm.js`;
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
+const pathColor = chalk.cyan;
+const lineNumColor = chalk.keyword('gray');
 
 describe("checks template value >>", () => {
     test.each([
@@ -201,7 +203,7 @@ describe("searches keyword tag >>", () => {
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],[
             "not found",
             ["search", "notFound"],
@@ -211,111 +213,111 @@ describe("searches keyword tag >>", () => {
             "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`
         ],[
             "ommit command name (1)",
             ["ABC"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`
         ],[
             "ommit command name (2)",
             ["do", "it"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "${matchedColor('do it')}", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do it')}", "a,b"\n`,
         ],[
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "${matchedColor('do it')}", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do it')}", "a,b"\n`,
         ],[
             "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "${matchedColor('A,B')}"\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "${matchedColor('a,b')}"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n`,
         ],[
             "double quotation",
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "${matchedColor('double quotation is "".')}"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('double quotation is "".')}"\n`,
         ],[
             "ignore case",
             ["search", "DO It"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "${matchedColor('do it')}", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do it')}", "a,b"\n`,
         ],[
             "word(1)",
             ["search", "AB"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('AB')}C, "do it", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('AB')}C, "do it", "a,b"\n`,
         ],[
             "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:4: #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
         ],[
             "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:2: #keyword: ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:4: #keyword: ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:1: #keyword: ${matchedColor('aaa bbb')} xxx\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:3: #keyword: ${matchedColor('aaa bbb')}\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':2:') + ` #keyword: ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':4:') + ` #keyword: ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('aaa bbb')} xxx\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('aaa bbb')}\n`,
         ],[
             "words order score (2)",  // It does not show small number of matched words
             ["search", "user", "interface"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_idiom_and_word_score
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:10:     #keyword: ${matchedColor('user interface')}\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':10:') + `     #keyword: ${matchedColor('user interface')}\n`,
         ],[
             "1 word search score",  // keyword: 1 word： 1 word match > 1 word match in 2 words > 1 word partial match.  '>' means grater than.
             ["search", "second"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_1_word_search_score
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:14:     #keyword: ${matchedColor('second')}ary\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:15:     #keyword: ${matchedColor('second')} screen\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:13:     #keyword: ${matchedColor('second')}\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':14:') + `     #keyword: ${matchedColor('second')}ary\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':15:') + `     #keyword: ${matchedColor('second')} screen\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':13:') + `     #keyword: ${matchedColor('second')}\n`,
         ],[
             "word match is better than same case",  // word match and not same case > many partial match and same case.  '>' means grater than.
             ["search", "ipad"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_word_match_is_better_than_same_case
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:18:     #keyword: ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:17:     #keyword: ${matchedColor('iPad')}\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':18:') + `     #keyword: ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':17:') + `     #keyword: ${matchedColor('iPad')}\n`,
         ],[
             "target word count",
             ["search", "new task"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_target_word_count
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:21:     #keyword: ${matchedColor('new task')}s only\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:20:     #keyword: ${matchedColor('new task')}s\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:22:     #keyword: ${matchedColor('new task')}s\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':21:') + `     #keyword: ${matchedColor('new task')}s only\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':20:') + `     #keyword: ${matchedColor('new task')}s\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':22:') + `     #keyword: ${matchedColor('new task')}s\n`,
         ],[
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:6: #keyword: ${matchedColor('frame')}${matchedColor('set')}\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml:5: #keyword: ${matchedColor('frame set')}\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':6:') + ` #keyword: ${matchedColor('frame')}${matchedColor('set')}\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':5:') + ` #keyword: ${matchedColor('frame set')}\n`,
         ],[
             "output order (1)",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "${matchedColor('A,B')}"\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "${matchedColor('a,b')}"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n`,
         ],[
             "output order (2)",
             ["search", "A,B"],
             { folder: "test_data/search/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "${matchedColor('a,b')}"\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:5: #keyword: "${matchedColor('A,B')}"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n`,
         ],[
             "Multi folder",  // and test of long path length > short path length
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n` +
-            `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ${matchedColor('ABC')}: abc\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n`,
         ],[
             "Windows typrm folder path",
             ["search", "ABC"],
             { folder: `${process.cwd()}\\test_data\\search\\1`, test: "" },
-            `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
         const  isWindowsEnvironment = (path.sep === '\\');
@@ -335,41 +337,41 @@ describe("searches glossary tag >>", () => {
         "1st",
         ["search", "ABC"],
         { folder: "test_data/search/glossary/1", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n`,
     ],[
         "ignore case",
         ["search", "abc"],
         { folder: "test_data/search/glossary/1", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n`,
     ],[
         "word",
         ["search", "AB"],
         { folder: "test_data/search/glossary/1", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ${matchedColor('AB')}C: abc\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('AB')}C: abc\n`,
     ],[
         "nested indent",
         ["search", "ABC"],
         { folder: "test_data/search/glossary/2", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:7:     ${matchedColor('ABC')}D: abcd\n` +
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml:4:     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}D: abcd\n` +
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':4:') + `     ${matchedColor('ABC')}: abc\n`,
     ],[
         "output order (1)",
         ["search", "de"],
         { folder: "test_data/search/glossary/1", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     ${matchedColor('DE')}: de\n` +
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     ${matchedColor('de')}: de\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + `     ${matchedColor('DE')}: de\n` +
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + `     ${matchedColor('de')}: de\n`,
     ],[
         "output order (2)",
         ["search", "DE"],
         { folder: "test_data/search/glossary/1", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:9:     ${matchedColor('de')}: de\n` +
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:8:     ${matchedColor('DE')}: de\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + `     ${matchedColor('de')}: de\n` +
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + `     ${matchedColor('DE')}: de\n`,
     ],[
         "Multi folder",
         ["search", "ABC"],
         { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-        `\${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml:3: #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n` +
-        `\${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml:7:     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n` +
+        pathColor('${HOME}/Desktop/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n`,
     ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
         await callMain(arguments_, options);

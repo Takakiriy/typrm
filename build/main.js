@@ -1694,7 +1694,7 @@ var FoundLine = /** @class */ (function () {
             previousPosition = match.position + match.length;
         }
         coloredLine += line.substr(previousPosition);
-        return this.path + ":" + this.lineNum + ": " + coloredLine;
+        return "" + chalk.cyan(this.path) + chalk.keyword('gray')(":" + this.lineNum + ":") + " " + coloredLine;
     };
     return FoundLine;
 }());

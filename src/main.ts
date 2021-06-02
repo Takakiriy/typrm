@@ -1352,7 +1352,7 @@ class FoundLine {
 		}
 		coloredLine += line.substr(previousPosition);
 
-		return `${this.path}:${this.lineNum}: ${coloredLine}`;
+		return `${chalk.cyan(this.path)}${chalk.keyword('gray')(`:${this.lineNum}:`)} ${coloredLine}`;
 	}
 }
 
