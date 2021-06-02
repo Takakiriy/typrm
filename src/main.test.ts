@@ -277,7 +277,7 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':15:') + `     #keyword: ${matchedColor('second')} screen\n` +
             pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':13:') + `     #keyword: ${matchedColor('second')}\n`,
         ],[
-            "word match is better than same case",  // word match and not same case > many partial match and same case.  '>' means grater than.
+            "word match is better than same case",  // word match and not same case > same case and many partial match.  '>' means grater than.
             ["search", "ipad"],
             { folder: "test_data/search/2", test: "" },  // section: test_of_word_match_is_better_than_same_case
             pathColor('${HOME}/Desktop/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':18:') + `     #keyword: ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +

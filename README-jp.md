@@ -120,7 +120,7 @@ typrm を使うには Node.js のインストールが必要です。
         Windows スタート >> PowerShell（と入力）:
             cd  ${env:USERPROFILE}\Downloads
             Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
-            rm -r -fo  "typrm-master"
+            rm -r -fo  "typrm-master"  #// 更新するとき
             Expand-Archive -Path typrm.zip -DestinationPath "."
             cd  "typrm-master"
 
@@ -181,7 +181,7 @@ typrm を使うには Node.js のインストールが必要です。
     PATH が通ったフォルダーに typrm を起動する スクリプト ファイル を作ります:
         cd typrm  #// Zip ファイルを展開したフォルダー
         script="$HOME/bin/typrm"
-        rm -f "${script}"
+        rm -f "${script}"  #// 更新するとき
         echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
         echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
         echo "node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"

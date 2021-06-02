@@ -116,7 +116,7 @@ To use typrm, you must install Node.js.
         Windows Start >> (Input) PowerShell :
             cd  ${env:USERPROFILE}\Downloads
             Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
-            rm -r -fo  "typrm-master"
+            rm -r -fo  "typrm-master"  #// When you are updating
             Expand-Archive -Path typrm.zip -DestinationPath "."
             cd  "typrm-master"
 
@@ -177,7 +177,7 @@ To use typrm, you must install Node.js.
     Make the script file in the PATH folder to start typrm:
         cd typrm  #// The folder extracted from the Zip file
         script="$HOME/bin/typrm"
-        rm -f "${script}"
+        rm -f "${script}"  #// When you are updating
         echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
         echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
         echo "node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
@@ -212,7 +212,7 @@ To use typrm, you must install Node.js.
     Download and expand typrm and install Node.js packages used by typrm:
         cd  ~/Downloads
         wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you updated
+        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you are updating
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// The folder extracted from the Zip file
         cd  typrm
