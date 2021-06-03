@@ -69,6 +69,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         let  isReadingSetting = false;
         let  setting: Settings = {};
         let  settingCount = 0;
+        let  settingIndentLength = 0;
         let  lineNum = 0;
         let  templateCount = 0;
         let  fileTemplateTag: TemplateTag | null = null;
@@ -97,9 +98,10 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
                 setting = {};
                 settingCount += 1;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
                 // const  match = settingStartLabel.exec(line.trim());
                 // settingName = match[1];
-            } else if (isEndOfSetting(line, isReadingSetting)) {
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
             }
             if (isReadingSetting) {
@@ -108,10 +110,14 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     const  key = line.substr(0, separator).trim();
                     const  value = getValue(line, separator);
                     if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
+                        if (key in setting) {
+                            console.log('');
+                            console.log('Error of duplicated variable name:');
+                            console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                            console.log(`  Contents: ${key}: ${value}`);
+                        }
 
                         setting[key] = {value, isReferenced: false, lineNum};
-                    } else if (!settingStartLabel.test(key + ':')  &&  !settingStartLabelEn.test(key + ':')) {
-                        isReadingSetting = false;
                     }
                 }
             }
@@ -182,8 +188,13 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 templateCount += 1;
                 const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                 const  expected = getExpectedLine(setting, templateTag.template);
+                if (templateTag.lineNumOffset === 0) {
+                    var  checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
+                } else {
+                    var  checkingLineWithoutTemplate = checkingLine;
+                }
 
-                if ( ! checkingLine.includes(expected)  &&  enabled) {
+                if ( ! checkingLineWithoutTemplate.includes(expected)  &&  enabled) {
                     console.log("");
                     console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
                     console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
@@ -460,6 +471,7 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
     let  isReadingSetting = false;
     let  setting: Settings = {};
     let  settingCount = 0;
+    let  settingIndentLength = 0;
     let  settingLineNum = -1;
     let  changedValue = getChangedValue(changedValueAndComment);
     let  lineNum = 0;
@@ -477,13 +489,14 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
             isReadingSetting = true;
             setting = {};
             settingCount += 1;
+            settingIndentLength = indentRegularExpression.exec(line)![0].length;
             settingLineNum = lineNum;
             if (changingSettingIndex === allSetting) {
                 isChanging = true;
             } else {
                 isChanging = (settingCount === changingSettingIndex);
             }
-        } else if (isEndOfSetting(line, isReadingSetting)) {
+        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
         }
         if (isChanging) {
@@ -585,6 +598,7 @@ async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: 
     let  isReadingSetting = false;
     let  revertSetting: string[] = [];
     let  settingCount = 0;
+    let  settingIndentLength = 0;
     let  lineNum = 0;
     let  isReadingOriginal = false;
 
@@ -596,12 +610,13 @@ async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: 
         if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
             isReadingSetting = true;
             settingCount += 1;
+            settingIndentLength = indentRegularExpression.exec(line)![0].length;
             if (changingSettingIndex === allSetting) {
                 isReadingOriginal = true;
             } else {
                 isReadingOriginal = (settingCount === changingSettingIndex);
             }
-        } else if (isEndOfSetting(line, isReadingSetting)) {
+        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
             isReadingOriginal = false;
         }
@@ -1174,28 +1189,6 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
         throw exception;
     }
     return  settingCount;
-}
-
-// isEndOfSetting
-function  isEndOfSetting(line: string, isReadingSetting: boolean): boolean {
-    let  returnValue = false;
-    if (isReadingSetting) {
-        const comment = line.indexOf('#');
-        let leftOfComment: string;
-        if (comment !== notFound) {
-            leftOfComment = line.substr(0, line.indexOf('#')).trim();
-        }
-        else {
-            leftOfComment = line.trim();
-        }
-
-        if ( ! leftOfComment.includes(':')  &&  leftOfComment !== '') {
-            returnValue = true;
-        } else if (leftOfComment.substr(-1) === '|') {
-            returnValue = true;
-        }
-    }
-    return  returnValue;
 }
 
 // getFullPath

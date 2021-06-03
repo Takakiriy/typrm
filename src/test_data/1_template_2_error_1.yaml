@@ -40,3 +40,4 @@
             #template-at(1): "key1"
         - サポート外の at の値：
             #template-at(2): "key1"
+        - value  #template: __Undefined__

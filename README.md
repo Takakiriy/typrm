@@ -250,8 +250,8 @@ To use typrm, you must install Node.js.
 
 ## Settings tag and #template tag: replaces settings values
 
-About the text you want to replace, you must write `variable name: value` below `settings:`.
-Variable names cannot contain #.
+About the text you want to replace, write `variable name: value`
+with deeper indentation below `settings:`.
 
     settings:
         __ProjectName__: react1
@@ -307,6 +307,30 @@ In the above case, if you do not enclose the value of the `#template:` tag in " 
     settings:
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
+
+The details of the setting:
+
+- You can indent any line deeper than another it, but it is not an object
+- Variables for which no value is specified cannot be defined.
+  Lines with only `variable name:` do not define any variables
+- Variable names and values cannot contain #
+
+Example:
+
+    settings:
+        __Name__: project1
+        main:
+            __MainID__: 123      #// Define __MainID__ not main.__MainID__
+            __MainValue__: 500
+        sub:
+            __SubID__: 123
+            __SubValue__: 500
+            #__Option__: -f      #// Variable names and values cannot contain #
+    body:  #// Since the indent is the same as the settings:, the lines after this are out of the setting range.
+        __Page__: 1
+
+List of variables defined in the above settings:
+`__Name__`, `__MainID__`, `__MainValue__`, `__SubID__`, `__SubValue__`
 
 To check for a match without replacement,
 use the `check` command. The short command name is `c`.

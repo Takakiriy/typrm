@@ -300,13 +300,43 @@ ErrorLine: 42
   Contents: #template-at(2): \\"key1\\"
   Error: The parameter must be less than 0
 
-Warning: 0, Error: 12
-template count = 12
+ErrorLine: 43
+  Contents: - value  #template: __Undefined__
+  Expected: __Undefined__
+  Template: __Undefined__
+  SettingIndex: 2
+
+Warning: 0, Error: 13
+template count = 13
 "
 `;
 
 exports[`checks template value >> 1_template_3_if 1`] = `
 "
+ErrorLine: 27
+  Contents: - no  #template: __Setting1__
+  Expected: yes
+  Template: __Setting1__
+  SettingIndex: 1
+
+ErrorLine: 28
+  Contents: - no  #template: __Setting2__
+  Expected: yes
+  Template: __Setting2__
+  SettingIndex: 1
+
+ErrorLine: 29
+  Contents: - no  #template: __Env1__
+  Expected: yes
+  Template: __Env1__
+  SettingIndex: 1
+
+ErrorLine: 30
+  Contents: - no  #template: __Env2__
+  Expected: yes
+  Template: __Env2__
+  SettingIndex: 1
+
 Error of not expected condition:
   typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:38
   Contents: $settings.color1 == black

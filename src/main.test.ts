@@ -16,16 +16,18 @@ const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 
 describe("checks template value >>", () => {
+    test.skip('1_template_3_if', ()=>{});
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
-        ["1_template_3_if"],
+        // ["1_template_3_if"],
         ["refer_1_ok"],
         ["refer_2_error"],
         ["secret_1_error"],
         ["var_not_ref_1_error"],
 
     ])("%s", async (fileNameHead) => {
+//if (fileNameHead !== '1_template_3_if') {return;}
         fs.rmdirSync('test_data/_checking', {recursive: true});
         copyFileSync(`test_data/${fileNameHead}_1.yaml`, `test_data/_checking/${fileNameHead}_1.yaml`);
 
@@ -35,6 +37,7 @@ describe("checks template value >>", () => {
 
         expect(main.stdout).toMatchSnapshot();
         fs.rmdirSync('test_data/_checking', {recursive: true});
+//expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {

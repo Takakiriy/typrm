@@ -56,3 +56,9 @@ test_of_expect_tag:
             # false  #expect: $settings.color1 == black
         #// not banana:  #if: $settings.target1 != banana
             # true   #expect: $settings.color1 == black
+
+test_of_duplicated_variable_name_error:
+    設定:
+        target1: banana
+        nest:
+            target1: yellow
