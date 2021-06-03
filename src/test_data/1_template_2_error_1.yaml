@@ -13,9 +13,9 @@
             #template: - echo  "__Key2__"
         - v1
             #template: - key1
-        - ? "value3"
+        - __ "value3"
             #template: - "Key3"
-        - ? "value3"  #template: - "Key3"
+        - __ "value3"  #template: - "Key3"
 
 手順B:
     設定:

@@ -107,7 +107,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 if (separator !== notFound) {
                     const  key = line.substr(0, separator).trim();
                     const  value = getValue(line, separator);
-                    if (value !== '') {
+                    if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
 
                         setting[key] = {value, isReferenced: false, lineNum};
                     } else if (!settingStartLabel.test(key + ':')  &&  !settingStartLabelEn.test(key + ':')) {
@@ -143,6 +143,28 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     enabled = false;
                 }
                 indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled});
+            }
+
+            // Check the condition by "#expect:" tag.
+            if (line.includes(expectLabel)  &&  enabled) {
+                const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
+
+                const  evaluatedContidion = evaluateIfCondition(condition, setting);
+                if (typeof evaluatedContidion === 'boolean') {
+                    if ( ! evaluatedContidion) {
+                        console.log('');
+                        console.log('Error of not expected condition:');
+                        console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                        console.log(`  Contents: ${condition}`);
+                        errorCount += 1;
+                    }
+                } else {
+                    console.log('');
+                    console.log('Error of expect tag syntax:');
+                    console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                    console.log(`  Contents: ${condition}`);
+                    errorCount += 1;
+                }
             }
 
             // Check if previous line has "template" replaced contents.
@@ -1088,13 +1110,16 @@ function   evaluateIfCondition(condition: string, setting: Settings): boolean | 
         let    rightValue = match[3];
         if (parent === settingsDot) {
             if (name in setting) {
+
                 var  leftValue = setting[name].value;
+                setting[name].isReferenced = true;
             } else {
                 return  new Error(`not found ${name} in the settings`);
             }
         } else if (parent === envDot) {
             const  envValue = process.env[name];
             if (envValue) {
+
                 var  leftValue = envValue;
             } else {
                 var  leftValue = '';
@@ -1818,6 +1843,7 @@ const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
 const  ifLabel = "#if:";
+const  expectLabel = "#expect:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";

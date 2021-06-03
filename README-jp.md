@@ -13,10 +13,11 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
     - [Windows の場合](#windows-の場合)
     - [mac の場合](#mac-の場合)
     - [CentOS 7 の場合](#centos-7-の場合)
-  - [設定タグと #template タグ](#設定タグと-template-タグ)
-  - [file-template タグを使ったファイルの内容のチェック](#file-template-タグを使ったファイルの内容のチェック)
-  - [if タグを使ったチェックの無効化](#if-タグを使ったチェックの無効化)
-  - [keyword タグを使った精度の高い検索](#keyword-タグを使った精度の高い検索)
+  - [設定タグと #template タグを使って設定値を置き換えます](#設定タグと-template-タグを使って設定値を置き換えます)
+  - [file-template タグを使ってファイルの内容をチェックします](#file-template-タグを使ってファイルの内容をチェックします)
+  - [if タグを使って条件を設定します](#if-タグを使って条件を設定します)
+  - [expect タグを使って設定値をチェックします](#expect-タグを使って設定値をチェックします)
+  - [keyword タグを使って精度よく検索します](#keyword-タグを使って精度よく検索します)
   - [開発環境の構築手順](#開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
@@ -92,6 +93,13 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
 置き換える前の値が書かれた `#original:` タグが同じ行に追加されます。
 `#original:` タグがすでにあるときは追加されません。
+
+`#original:` タグに書かれた値に戻すときは、revert コマンドを使います。
+また、revert コマンドを使うと `#original:` タグは削除されます。
+
+    typrm revert  new_folder.yaml  4
+
+4 は　replace コマンドと同様に、行番号です。
 
 「変数名: 新しい変数値」を複数入力するときは、
 複数行をコピー＆ペーストして連続入力することができます。
@@ -244,9 +252,10 @@ typrm を使うには Node.js のインストールが必要です。
         - rm -rf ~/Downloads/typrm/
 
 
-## 設定タグと #template タグ
+## 設定タグと #template タグを使って設定値を置き換えます
 
-置き換えるテキストは、`設定:` または `setting:` が書かれた行の下に 変数名: 値 を書きます。
+置き換えるテキストは、`設定:` または `setting:` が書かれた行の下に `変数名: 値` を書きます。
+変数名に # を含めることはできません。
 
     設定:
         __ProjectName__: react1
@@ -308,7 +317,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm check __FileName__
 
 
-## file-template タグを使ったファイルの内容のチェック
+## file-template タグを使ってファイルの内容をチェックします
 
 別のファイルの内容が設定値に合っていることをチェックすることができます。
 
@@ -381,22 +390,22 @@ typrm を使うには Node.js のインストールが必要です。
 その次の行に書かれているチェック内容で対象のファイルの中を検索します。
 
 
-## if タグを使ったチェックの無効化
+## if タグを使って条件を設定します
 
-`#if:` タグを書くと、条件を満たしたときだけ、
-`#template:` タグや `#file-template:` タグによる内容が
-合っているかどうかのチェックをするようになります。
+ある設定値と別の設定値の間に関連があるときは、
+`設定:` または `settings:` の中に `#if:` タグを書いて、
+条件に応じた値を設定することができます。
 
     設定:
-        __Stage__: develop
-    コマンド:
-        リリース時:  #if: $settings.__Stage__ != develop
-            cp  build  stage  #template: __Stage__
+        target: banana
+        banana:  #if: $settings.target == banana
+            __Color__:  yellow
+            __Type__:   fruit
+        crow:  #if: $settings.target == crow
+            __Color__:  black
+            __Type__:   bird
 
-上記の場合、`__Stage__` の値が develop 以外のときだけ、
-`#template:` タグとその左側の内容が合っているかどうかをチェックします。
-
-`#if:` タグの対象となる `#template:` タグや `#file-template:` タグの範囲は、
+`#if:` タグに指定した条件の対象となる範囲は、
 `#if:` タグが書かれている行のインデントの深さと同じか浅いインデントの行の前までです。
 
 `#if:` の右は、以下の書式に合う条件のみ書くことができます。
@@ -416,12 +425,50 @@ Windows 以外では定義しない環境変数 `windir` を使って下記の�
 
     #if: $env.windir != ""
 
+設定の外に `#if:` タグを書くと、条件を満たしたときだけ、
+`#template:` タグや `#file-template:` タグによる内容が
+合っているかどうかのチェックをするようになります。
 
-## keyword タグを使った精度の高い検索
+    設定:
+        __Stage__: develop
+    コマンド:
+        リリース時:  #if: $settings.__Stage__ != develop
+            cp  build  stage  #template: __Stage__
+
+上記の場合、`__Stage__` の値が develop 以外のときだけ、
+`#template:` タグとその左側の内容が合っているかどうかをチェックします。
+
+`#if:` タグの対象となる `#template:` タグや `#file-template:` タグの範囲は、
+`#if:` タグが書かれている行のインデントの深さと同じか浅いインデントの行の前までです。
+
+
+## expect タグを使って設定値をチェックします
+
+`#expect:` タグに続いて条件を指定すると、その条件を満たさないときにエラーになります。
+通常、`#if:` タグと同時に使います。
+
+    #if: $settings.__Write__ == yes
+        #expect: $settings.__BackUp__ == yes
+
+サンプル:
+
+    設定:
+        __Write__: yes    #// yes or no
+        __BackUp__: yes   #// yes or no
+    write メソッド:  #if: $settings.__Write__ == yes
+        必要性: yes  #template: __Write__
+        方法: ファイルを開いて書き込みます
+        関連: バックアップも行ってください  #expect: $settings.__BackUp__ == yes
+    back up メソッド:
+        必要性: yes  #template: __BackUp__
+        方法: バックアップ ツールをダウンロードします
+
+
+## keyword タグを使って精度よく検索します
 
 typrm の検索機能は、テキスト ファイルの中の
 `#keyword:` タグに続いて書かれたキーワードだけが検索対象であり、
-検索ノイズが小さくなります。
+全文検索に比べて検索ノイズが小さくなります。
 
 テキスト ファイル の内容のサンプル:
 
@@ -461,7 +508,7 @@ typrm search コマンドの書式:
 
     #keyword: CSV, comma separated value, "a,b"
 
-複数の単語からなる検索キーワードを指定するとき、" " で囲む必要はありません。
+複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
 また、大文字小文字が違っていてもヒットしますが、
 大文字小文字が同じテキストが上位に表示されます。
 typrm では上位にヒットしたテキストが下側に表示されます。
@@ -469,8 +516,7 @@ typrm では上位にヒットしたテキストが下側に表示されます�
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated value
 
-
-CSV の部分が文法的に問題があるときに表示される警告を抑制するには、
+CSV の部分に文法の問題があるときに表示される警告を抑制するには、
 `#disable-tag-tool:` を書いてください。
 
     #keyword: abc"   #disable-tag-tool:

@@ -126,7 +126,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, indentLengthsOfIfTag, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, indentLength, condition, evaluatedContidion, resultOfIf, resultOfIf, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, indentLengthsOfIfTag, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, indentLength, condition, evaluatedContidion, resultOfIf, resultOfIf, condition, evaluatedContidion, templateTag, checkingLine, expected, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -192,7 +192,7 @@ function checkRoutine(isModal, inputFilePath) {
                         if (separator !== notFound) {
                             key = line.substr(0, separator).trim();
                             value = getValue(line, separator);
-                            if (value !== '') {
+                            if (value !== '' && key.length >= 1 && key[0] !== '#') {
                                 setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
                             }
                             else if (!settingStartLabel.test(key + ':') && !settingStartLabelEn.test(key + ':')) {
@@ -225,6 +225,27 @@ function checkRoutine(isModal, inputFilePath) {
                             enabled = false;
                         }
                         indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: enabled });
+                    }
+                    // Check the condition by "#expect:" tag.
+                    if (line.includes(expectLabel) && enabled) {
+                        condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
+                        evaluatedContidion = evaluateIfCondition(condition, setting);
+                        if (typeof evaluatedContidion === 'boolean') {
+                            if (!evaluatedContidion) {
+                                console.log('');
+                                console.log('Error of not expected condition:');
+                                console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
+                                console.log("  Contents: " + condition);
+                                errorCount += 1;
+                            }
+                        }
+                        else {
+                            console.log('');
+                            console.log('Error of expect tag syntax:');
+                            console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
+                            console.log("  Contents: " + condition);
+                            errorCount += 1;
+                        }
                     }
                     templateTag = parseTemplateTag(line);
                     if (templateTag.lineNumOffset >= 1 && templateTag.isFound) {
@@ -1476,6 +1497,7 @@ function evaluateIfCondition(condition, setting) {
         if (parent === settingsDot) {
             if (name_1 in setting) {
                 var leftValue = setting[name_1].value;
+                setting[name_1].isReferenced = true;
             }
             else {
                 return new Error("not found " + name_1 + " in the settings");
@@ -2223,6 +2245,7 @@ var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
 var disableLabel = "#disable-tag-tool:";
 var ifLabel = "#if:";
+var expectLabel = "#expect:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";

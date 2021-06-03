@@ -1,0 +1,58 @@
+test_of_if_tag_in_settings:
+    設定:
+        fruit: banana
+        bird: swan
+        バナナ:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        バナナ以外:  #if: $settings.fruit != banana
+            __Setting1__: no
+        カラス:  #if: $settings.bird == crow
+            __Setting2__: no
+        カラス以外:  #if: $settings.bird != crow
+            __Setting2__: yes
+        aaa:  #if: $env.typrm_aaa == aaa
+            __Env1__: yes
+        bbb:  #if: $env.typrm_aaa == bbb
+            __Env1__: no
+        not aaa:  #if: $env.typrm_aaa != aaa
+            __Env2__: no
+        not bbb:  #if: $env.typrm_aaa != bbb
+            __Env2__: yes
+    チェックOK:
+        - yes  #template: __Setting1__
+        - yes  #template: __Setting2__
+        - yes  #template: __Env1__
+        - yes  #template: __Env2__
+    チェックNG:
+        - no  #template: __Setting1__
+        - no  #template: __Setting2__
+        - no  #template: __Env1__
+        - no  #template: __Env2__
+
+test_of_expect_tag:
+    設定:
+        target1: banana
+        color1: yellow
+        #if: $settings.target1 == banana
+            # true   #expect: $settings.color1 == yellow
+            # false  #expect: $settings.color1 == black
+            # false  #expect: $settings.color1 != yellow
+            # true   #expect: $settings.color1 != black
+            #expect: true
+            #expect: false
+        not banana:  #if: $settings.target1 != banana
+            # skip   #expect: $settings.color1 == black
+        #// not banana:  #if: $settings.target1 != banana
+            # skip   #expect: $settings.color1 == black
+    設定外:
+        #if: $settings.target1 == banana
+            # true   #expect: $settings.color1 == yellow
+            # false  #expect: $settings.color1 == black
+            # false  #expect: $settings.color1 != yellow
+            # true   #expect: $settings.color1 != black
+            #expect: true
+            #expect: false
+        not banana:  #if: $settings.target1 != banana
+            # false  #expect: $settings.color1 == black
+        #// not banana:  #if: $settings.target1 != banana
+            # true   #expect: $settings.color1 == black

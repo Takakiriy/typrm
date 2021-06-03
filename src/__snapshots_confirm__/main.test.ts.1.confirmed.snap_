@@ -245,13 +245,13 @@ ErrorLine: 14
   SettingIndex: 1
 
 ErrorLine: 16
-  Contents: - ? \\"value3\\"
+  Contents: - __ \\"value3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
   SettingIndex: 1
 
 ErrorLine: 18
-  Contents: - ? \\"value3\\"  #template: - \\"Key3\\"
+  Contents: - __ \\"value3\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
   SettingIndex: 1
@@ -302,6 +302,37 @@ ErrorLine: 42
 
 Warning: 0, Error: 12
 template count = 12
+"
+`;
+
+exports[`checks template value >> 1_template_3_if 1`] = `
+"
+Error of not expected condition:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:38
+  Contents: $settings.color1 == black
+
+Error of not expected condition:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:39
+  Contents: $settings.color1 != yellow
+
+Error of not expected condition:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:42
+  Contents: false
+
+Error of not expected condition:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50
+  Contents: $settings.color1 == black
+
+Error of not expected condition:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:51
+  Contents: $settings.color1 != yellow
+
+Error of not expected condition:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:54
+  Contents: false
+
+Warning: 0, Error: 6
+template count = 8
 "
 `;
 

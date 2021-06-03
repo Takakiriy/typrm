@@ -14,10 +14,11 @@ Also, there is a search function that is separated from the replace function.
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
-  - [Settings tags and #template tags](#settings-tags-and-template-tags)
-  - [Checking the contents of a file using the file-template tag](#checking-the-contents-of-a-file-using-the-file-template-tag)
-  - [Disable checking using if tag](#disable-checking-using-if-tag)
-  - [Highly accurate search using keyword tags](#highly-accurate-search-using-keyword-tags)
+  - [Settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
+  - [file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
+  - [if tag: set conditions](#if-tag-set-conditions)
+  - [expect tag: checks settings values](#expect-tag-checks-settings-values)
+  - [keyword tags: highly accurate search](#keyword-tags-highly-accurate-search)
   - [How to build the development environment](#how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -88,6 +89,13 @@ It replaces `work1` in the settings and document body to `work2`.
 
 `#original:` tag with the value before replacement is added to the same line.
 If the `#original:` tag already exists, it will not be added.
+
+To return to the value written in the `#original:` tag, use the revert command.
+Also, the revert command removes the `#original:` tag.
+
+    typrm revert  new_folder.yaml  4
+
+4 is the line number, similar to the replace command.
 
 When you enter multiple variable names: new variable values,
 you can copy and paste multiple linees and enter them continuously.
@@ -240,9 +248,10 @@ To use typrm, you must install Node.js.
         - rm -rf ~/Downloads/typrm/
 
 
-## Settings tags and #template tags
+## Settings tag and #template tag: replaces settings values
 
 About the text you want to replace, you must write `variable name: value` below `settings:`.
+Variable names cannot contain #.
 
     settings:
         __ProjectName__: react1
@@ -305,7 +314,7 @@ use the `check` command. The short command name is `c`.
     typrm check __FileName__
 
 
-## Checking the contents of a file using the file-template tag
+## file-template tag: checks the contents of the file
 
 You can check that the contents of another file match the settings.
 
@@ -369,7 +378,7 @@ If the path to the right of `#file-template:` is a relative path,
 the base path is the folder containing the file with the
 `#file-template:` tag.
 
-If you write the `# file-template-any-lines:` tag
+If you write the `#file-template-any-lines:` tag
 in the part of the checked content,
 that line (0 or more lines) will not be compared with
 the content of the target file.
@@ -383,29 +392,28 @@ the content of the target file.
 The first line of the check contents searches the target file.
 The second and subsequent lines of the check contents are
 compared from the line immediately below the line found by the search.
-When the check content is `# file-template-any-lines:`,
+When the check content is `#file-template-any-lines:`,
 the check content written on the next line is searched in the target file.
 
 
-## Disable checking using if tag
+## if tag: set conditions
 
-If you write a `#if:` tag,
-it will check whether the contents of the `#template:` tag and the
-`#file-template:` tag match only when the conditions are met.
+When there is a relationship between one setting and another,
+write the `#if:` tag inside the `settings:`.
+You can set the value according to the conditions.
 
     settings:
-        __Stage__: develop
-    command:
-        when release:  #if: $settings.__Stage__ != develop
-            cp  build  stage  #template: __Stage__
+        target: banana
+        banana:  #if: $settings.target == banana
+            __Color__:  yellow
+            __Type__:   fruit
+        crow:  #if: $settings.target == crow
+            __Color__:  black
+            __Type__:   bird
 
-In the above case, only if the value of `__Stage__` is other than develop,
-it checks if the `#template:` tag matches the content to the left of it.
-
-The range of the `#template:` tag and the `#file-template:` tag
-that are the target of the `#if:` tag is
-the same as or shallower than the indent depth of the line
-where the `#if:` tag is written. Until before the line.
+The scope of the condition specified in the `#if:` tag
+is the same as or before the indentation depth of the line
+where the `#if:` tag is written.
 
 To the right of `#if:`, you can write only the conditions
 that meet the following format.
@@ -426,11 +434,53 @@ which is defined by default in Windows and not defined outside of Windows.
 
     #if: $env.windir != ""
 
+If you write a `#if:` tag out of setting,
+it will check whether the contents of the `#template:` tag and the
+`#file-template:` tag match only when the conditions are met.
 
-## Highly accurate search using keyword tags
+    settings:
+        __Stage__: develop
+    command:
+        when release:  #if: $settings.__Stage__ != develop
+            cp  build  stage  #template: __Stage__
+
+In the above case, only if the value of `__Stage__` is other than develop,
+it checks if the `#template:` tag matches the content to the left of it.
+
+The range of the `#template:` tag and the `#file-template:` tag
+that are the target of the `#if:` tag is
+the same as or shallower than the indent depth of the line
+where the `#if:` tag is written. Until before the line.
+
+
+## expect tag: checks settings values
+
+If you specify a condition after the `#expect:` tag,
+the error will occur if the condition is not met.
+Usually used at the same time as the `#if:` tag.
+
+    #if: $settings.__Write__ == yes
+        #expect: $settings.__BackUp__ == yes
+
+Example:
+
+    settings:
+        __Write__: yes    #// yes or no
+        __BackUp__: yes   #// yes or no
+    write method:  #if: $settings.__Write__ == yes
+        necessity: yes  #template: __Write__
+        How to: Open the file and write
+        Related: also back up  #expect: $settings.__BackUp__ == yes
+    back up method:
+        necessity: yes  #template: __BackUp__
+        How to: Download Backup Tool
+
+
+## keyword tags: highly accurate search
 
 The search function of typrm only searches for keywords written
-after the `#keyword:` tag in a text file. It makes to reduce search noise.
+after the `#keyword:` tag in a text file.
+It makes to be reducer search noise than full text search.
 
 Sample text file content:
 
@@ -472,7 +522,7 @@ in the text file.
     #keyword: CSV, comma separated value, "a,b"
 
 If specifying a search keyword consisting of multiple words,
-it is not necessary to enclose it in "".
+it is not necessary to enclose it in " ".
 Also, even if the case is different, it will be hit,
 but the text with the same case will be displayed at the top.
 In typrm, the text that hits the top is displayed at the bottom.

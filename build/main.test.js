@@ -54,6 +54,7 @@ describe("checks template value >>", function () {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
+        ["1_template_3_if"],
         ["refer_1_ok"],
         ["refer_2_error"],
         ["secret_1_error"],
