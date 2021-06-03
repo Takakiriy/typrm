@@ -136,12 +136,35 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 					console.log('Error of if tag syntax:');
 					console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
 					console.log(`  Contents: ${condition}`);
+					errorCount += 1;
 					var  resultOfIf = true;
 				}
 				if (enabled && !resultOfIf) {
 					enabled = false;
 				}
 				indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled});
+			}
+
+			// Check the condition by "#expect:" tag.
+			if (line.includes(expectLabel)) {
+				const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
+
+				const  evaluatedContidion = evaluateIfCondition(condition, setting);
+				if (typeof evaluatedContidion === 'boolean') {
+					if ( ! evaluatedContidion) {
+						console.log('');
+						console.log('Error of not expected condition:');
+						console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+						console.log(`  Contents: ${condition}`);
+						errorCount += 1;
+					}
+				} else {
+					console.log('');
+					console.log('Error of expect tag syntax:');
+					console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+					console.log(`  Contents: ${condition}`);
+					errorCount += 1;
+				}
 			}
 
 			// Check if previous line has "template" replaced contents.
@@ -478,16 +501,19 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 					}
 
 					if (key === changingKey) {
-						let  original = '';
-						if (addOriginalTag) {
-							if ( ! line.includes(originalLabel)) {
-								original = `  ${originalLabel} ${value}`;
-							}
-						}
 						const  commentIndex = line.indexOf('#', separator);
-						let  comment= '';
+						let    comment= '';
 						if (commentIndex !== notFound  &&  ! changedValueAndComment.includes('#')) {
 							comment = '  ' + line.substr(commentIndex);
+						}
+						let  original = '';
+						if ( ! line.includes(originalLabel)) {
+							if (addOriginalTag) {
+								original = `  ${originalLabel} ${value}`;
+							} else {
+								comment = comment.replace(new RegExp(escapeRegularExpression(
+									` *${originalLabel} *${value}`)), '');
+							}
 						}
 
 						writer.write(line.substr(0, separator + 1) +' '+ changedValueAndComment + original + comment + "\n");
