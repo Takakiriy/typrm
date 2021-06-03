@@ -414,6 +414,8 @@ that meet the following format.
     #if: $settings.__SettingsName__ != __Value__
     #if: $env.__EnvName__ == __Value__
     #if: $env.__EnvName__ != __Value__
+    #if: true
+    #if: false
 
 `__SettingsName__` is the variable name written in `Settings:`.
 `__EnvName__` is the name of the environment variable.

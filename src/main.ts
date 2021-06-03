@@ -145,28 +145,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 				indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled});
 			}
 
-			// Check the condition by "#expect:" tag.
-			if (line.includes(expectLabel)) {
-				const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
-
-				const  evaluatedContidion = evaluateIfCondition(condition, setting);
-				if (typeof evaluatedContidion === 'boolean') {
-					if ( ! evaluatedContidion) {
-						console.log('');
-						console.log('Error of not expected condition:');
-						console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-						console.log(`  Contents: ${condition}`);
-						errorCount += 1;
-					}
-				} else {
-					console.log('');
-					console.log('Error of expect tag syntax:');
-					console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-					console.log(`  Contents: ${condition}`);
-					errorCount += 1;
-				}
-			}
-
 			// Check if previous line has "template" replaced contents.
 			const  templateTag = parseTemplateTag(line);
 			if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
@@ -510,9 +488,11 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 						if ( ! line.includes(originalLabel)) {
 							if (addOriginalTag) {
 								original = `  ${originalLabel} ${value}`;
-							} else {
-								comment = comment.replace(new RegExp(escapeRegularExpression(
-									` *${originalLabel} *${value}`)), '');
+							}
+						} else {
+							if ( ! addOriginalTag) {
+								comment = comment.replace(new RegExp(
+									` *${originalLabel} *${escapeRegularExpression(changedValueAndComment)}`), '');
 							}
 						}
 

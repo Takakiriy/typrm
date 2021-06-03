@@ -268,6 +268,40 @@ describe("replaces settings >>", function () {
             });
         }); });
     });
+    test("revert >>", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var fileNameHead, sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    fileNameHead = "2_replace_1_ok";
+                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+                    changingFolderPath = testFolderPath + '_changing';
+                    changingFileName = fileNameHead + "_1_changing.yaml";
+                    changingFilePath = changingFolderPath + '/' + changingFileName;
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                    copyFileSync(sourceFilePath, changingFilePath);
+                    return [4 /*yield*/, callMain(["replace", changingFileName, '29', 'key1: value1changed'], {
+                            folder: changingFolderPath, test: "", locale: "en-US"
+                        })];
+                case 1:
+                    _a.sent();
+                    sourceFileContents = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
+                    updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                    expect(updatedFileContents).not.toBe(sourceFileContents);
+                    // Test Main
+                    return [4 /*yield*/, callMain(["revert", changingFileName, '29'], {
+                            folder: changingFolderPath, test: "", locale: "en-US"
+                        })];
+                case 2:
+                    // Test Main
+                    _a.sent();
+                    revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                    expect(revertedFileContents).toBe(sourceFileContents);
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
 describe("searches keyword tag >>", function () {
     test.each([

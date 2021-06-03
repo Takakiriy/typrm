@@ -405,6 +405,8 @@ typrm を使うには Node.js のインストールが必要です。
     #if: $settings.__SettingsName__ != __Value__
     #if: $env.__EnvName__ == __Value__
     #if: $env.__EnvName__ != __Value__
+    #if: true
+    #if: false
 
 `__SettingsName__` は、`設定:` に書かれている変数名です。
 `__EnvName__` は、環境変数名です。

@@ -196,7 +196,7 @@ Key3: value3changed  #コメント`,
         });
     });
 
-    test.skip("revert >>", async () => {
+    test("revert >>", async () => {
         const  fileNameHead = "2_replace_1_ok";
         const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';

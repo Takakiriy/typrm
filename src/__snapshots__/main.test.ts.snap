@@ -218,7 +218,7 @@ Error of if tag syntax:
   typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
   Contents: $env.value = value
 
-Warning: 0, Error: 14
+Warning: 0, Error: 16
 template count = 34
 "
 `;

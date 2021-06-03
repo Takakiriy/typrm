@@ -33,12 +33,3 @@
             #// comment
             #// comment
             #template-at(-3): "key1"
-
-test_of_expect_tag:
-    設定:
-        key1: not same
-        key2: value0
-        # == true  #if: $settings.key1 == same
-            # == true  #expect: $settings.key2 == value2
-        #if: $settings.key1 !== same
-            # == true  #expect: $settings.key2 == value0
