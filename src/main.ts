@@ -41,6 +41,12 @@ export async function  main() {
 
 			await replaceSettings(inputFilePath, changingLineNum, keyValues);
 		}
+		else if (programArguments[0] === 'revert') {
+			const  inputFilePath = programArguments[1];
+			const  changingLineNum = parseInt(programArguments[2]);
+
+			await revertSettings(inputFilePath, changingLineNum);
+		}
 		else {
 			await search();
 		}
@@ -320,7 +326,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 					if (keyValue === '') {
 						break;
 					}
-					errorCount += await changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue);
+					errorCount += await changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue, true);
 				}
 			}
 			loop = (errorCount >= 1);
@@ -337,11 +343,45 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
 // replaceSettings
 async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValues: string) {
-	const  targetFolder = programOptions.folder;
+	const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
+	var  errorCount = 0;
+	if (inputFileFullPath === '') {
+		errorCount += 1;
+	} else {
+		const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
+
+		for (const keyValue of keyValues.split('\n')) {
+
+			errorCount += await changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue, true);
+		}
+	}
+	console.log('');
+	console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
+}
+
+// revertSettings
+async function  revertSettings(inputFilePath: string, changingLineNum: number) {
+	const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
+	var  errorCount = 0;
+	if (inputFileFullPath === '') {
+		errorCount += 1;
+	} else {
+		const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
+		const  keyValues: string[] = await makeRevertSettings(inputFileFullPath, changingSettingIndex);
+		for (const keyValue of keyValues) {
+
+			errorCount += await changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue, false);
+		}
+	}
+	console.log('');
+	console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
+}
+
+// getInputFileFullPath
+async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 	const  currentFolder = process.cwd();
 	const  targetFolders = await parseCSVColumns(programOptions.folder);
 	const  fileFullPaths: string[] = [];
-	var  errorCount = 0;
 	for (const folder of targetFolders) {
 		const  targetFolderFullPath = getFullPath(folder, currentFolder);
 		const  inputFileFullPath = getFullPath(inputFilePath, targetFolderFullPath);
@@ -354,37 +394,28 @@ async function  replaceSettings(inputFilePath: string, changingLineNum: number, 
 		console.log(`${translate('Error of not found the specified file.')}`);
 		console.log(`    FileName: ${inputFilePath}`);
 		console.log(`    Folder: ${programOptions.folder}`);
-		errorCount += 1;
+		return  '';
 	} else if (fileFullPaths.length >= 2) {
 		console.log('');
 		console.log(`${translate('Error of same file name exists.')}`);
 		console.log(`    FileName: ${inputFilePath}`);
 		console.log(`    Folder: ${programOptions.folder}`);
-		errorCount += 1;
+		return  '';
 	}
-	else {
-		const  inputFileFullPath = fileFullPaths[0];
-		const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
 
-		for (const keyValue of keyValues.split('\n')) {
-
-			errorCount += await changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue);
-		}
-	}
-	console.log('');
-	console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
+	return  fileFullPaths[0];
 }
 
 // changeSettingByKeyValue
 async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIndex: number,
-		keyValue: string): Promise<number>/*errorCount*/ {
+		keyValue: string, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
 
 	const  separator = keyValue.indexOf(':');
 	if (separator !== notFound) {
 		const  key = keyValue.substr(0, separator).trim();
 		const  value = getValue(keyValue, separator);
 
-		return  changeSetting(inputFilePath, changingSettingIndex, key, value);
+		return  changeSetting(inputFilePath, changingSettingIndex, key, value, addOriginalTag);
 	} else {
 		return  1;
 	}
@@ -392,7 +423,7 @@ async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIn
 
 // changeSetting
 async function  changeSetting(inputFilePath: string, changingSettingIndex: number,
-		changingKey: string, changedValueAndComment: string): Promise<number>/*errorCount*/ {
+		changingKey: string, changedValueAndComment: string, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
 
 	const  oldFilePath = inputFilePath;
 	const  newFilePath = inputFilePath +".new";
@@ -448,8 +479,10 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 
 					if (key === changingKey) {
 						let  original = '';
-						if ( ! line.includes(originalLabel)) {
-							original = `  ${originalLabel} ${value}`;
+						if (addOriginalTag) {
+							if ( ! line.includes(originalLabel)) {
+								original = `  ${originalLabel} ${value}`;
+							}
 						}
 						const  commentIndex = line.indexOf('#', separator);
 						let  comment= '';
@@ -512,6 +545,52 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
 			resolve(errorCount);
 		});
 	});
+}
+
+// makeRevertSettings
+async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: number): Promise<string[]> /* "key: value" */ {
+	const  readStream = fs.createReadStream(inputFilePath);
+	const  reader = readline.createInterface({
+		input: readStream,
+		crlfDelay: Infinity
+	});
+	let  isReadingSetting = false;
+	let  revertSetting: string[] = [];
+	let  settingCount = 0;
+	let  lineNum = 0;
+	let  isReadingOriginal = false;
+
+	for await (const line1 of reader) {
+		const  line: string = line1;
+		lineNum += 1;
+
+		// setting = ...
+		if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
+			isReadingSetting = true;
+			settingCount += 1;
+			if (changingSettingIndex === allSetting) {
+				isReadingOriginal = true;
+			} else {
+				isReadingOriginal = (settingCount === changingSettingIndex);
+			}
+		} else if (isEndOfSetting(line, isReadingSetting)) {
+			isReadingSetting = false;
+			isReadingOriginal = false;
+		}
+
+		// Parse #original tag
+		if (isReadingOriginal  &&  line.includes(originalLabel)) {
+			const  separator = line.indexOf(':');
+			if (separator !== notFound) {
+				const  key = line.substr(0, separator).trim();
+				const  originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
+				const  originalValue = getValue(line, originalLabelSeparator);
+
+				revertSetting.push(`${key}: ${originalValue}`);
+			}
+		}
+	}
+	return  revertSetting;
 }
 
 // TemplateTag

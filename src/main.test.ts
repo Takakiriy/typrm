@@ -195,6 +195,31 @@ Key3: value3changed  #コメント`,
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
     });
+
+    test.skip("revert >>", async () => {
+        const  fileNameHead = "2_replace_1_ok";
+        const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFileName = fileNameHead + "_1_changing.yaml";
+        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        copyFileSync(sourceFilePath, changingFilePath);
+        await callMain(["replace", changingFileName, '29', 'key1: value1changed'], {
+            folder: changingFolderPath, test: "", locale: "en-US"
+        });
+        const  sourceFileContents  = fs.readFileSync(sourceFilePath  ).toString().substr(cutBOM);
+        const  updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+        expect(updatedFileContents).not.toBe(sourceFileContents);
+
+        // Test Main
+        await callMain(["revert", changingFileName, '29'], {
+            folder: changingFolderPath, test: "", locale: "en-US"
+        });
+        const  revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+
+        expect(revertedFileContents).toBe(sourceFileContents);
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+    });
 });
 
 describe("searches keyword tag >>", () => {
