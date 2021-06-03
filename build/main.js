@@ -189,7 +189,7 @@ function checkRoutine(isModal, inputFilePath) {
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                         isReadingSetting = false;
                     }
-                    if (isReadingSetting) {
+                    if (isReadingSetting && enabled) {
                         separator = line.indexOf(':');
                         if (separator !== notFound) {
                             key = line.substr(0, separator).trim();
@@ -200,6 +200,7 @@ function checkRoutine(isModal, inputFilePath) {
                                     console.log('Error of duplicated variable name:');
                                     console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
                                     console.log("  Contents: " + key + ": " + value);
+                                    errorCount += 1;
                                 }
                                 setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
                             }

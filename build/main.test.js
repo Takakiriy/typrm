@@ -51,11 +51,10 @@ var matchedColor = chalk.green.bold;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 describe("checks template value >>", function () {
-    test.skip('1_template_3_if', function () { });
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
-        // ["1_template_3_if"],
+        ["1_template_3_if"],
         ["refer_1_ok"],
         ["refer_2_error"],
         ["secret_1_error"],
@@ -64,7 +63,6 @@ describe("checks template value >>", function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    //if (fileNameHead !== '1_template_3_if') {return;}
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/_checking/" + fileNameHead + "_1.yaml");
                     return [4 /*yield*/, callMain(["check"], {

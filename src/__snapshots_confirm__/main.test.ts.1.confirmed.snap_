@@ -361,7 +361,12 @@ Error of not expected condition:
   typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:54
   Contents: false
 
-Warning: 0, Error: 6
+Error of duplicated variable name:
+  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:64
+  Contents: target1: yellow
+Not referenced: target1 in line 64
+
+Warning: 0, Error: 11
 template count = 8
 "
 `;
