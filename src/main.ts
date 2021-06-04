@@ -73,15 +73,12 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         let  lineNum = 0;
         let  templateCount = 0;
         let  fileTemplateTag: TemplateTag | null = null;
-        let  enabled = true;
         let  errorCount = 0;
         let  warningCount = 0;
         let  secretLabelCount = 0;
         const  lines = [];
         const  keywords: SearchKeyword[] = [];
-        const  indentLengthsOfIfTag: IfTag[] = [
-            {indentLength: -1, resultOfIf: true, enabled: true}
-        ];
+        const  ifTagParser = new IfTagParser();
 
         for await (const line1 of reader) {
             const  line: string = line1;
@@ -104,7 +101,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
             }
-            if (isReadingSetting  &&  enabled) {
+            if (isReadingSetting  &&  ifTagParser.isInFalseBlock) {
                 const  separator = line.indexOf(':');
                 if (separator !== notFound) {
                     const  key = line.substr(0, separator).trim();
@@ -124,36 +121,17 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
 
             // Set condition by "#if:" tag.
-            const  indentLength = indentRegularExpression.exec(line)![0].length;
-            if (line.trim() !== '') {
-                while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
-
-                    indentLengthsOfIfTag.pop();
-                    enabled = lastOf(indentLengthsOfIfTag).enabled;
-                }
-            }
-            if (line.includes(ifLabel)) {
-                const  condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-
-                const  evaluatedContidion = evaluateIfCondition(condition, setting);
-                if (typeof evaluatedContidion === 'boolean') {
-                    var  resultOfIf = evaluatedContidion;
-                } else {
-                    console.log('');
-                    console.log('Error of if tag syntax:');
-                    console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                    console.log(`  Contents: ${condition}`);
-                    errorCount += 1;
-                    var  resultOfIf = true;
-                }
-                if (enabled && !resultOfIf) {
-                    enabled = false;
-                }
-                indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled});
+            const  parsed = ifTagParser.parse(line, setting);
+            if (parsed.errorCount >= 1) {
+                console.log('');
+                console.log('Error of if tag syntax:');
+                console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                console.log(`  Contents: ${parsed.condition}`);
+                errorCount += parsed.errorCount;
             }
 
             // Check the condition by "#expect:" tag.
-            if (line.includes(expectLabel)  &&  enabled) {
+            if (line.includes(expectLabel)  &&  ifTagParser.isInFalseBlock) {
                 const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
 
                 const  evaluatedContidion = evaluateIfCondition(condition, setting);
@@ -195,7 +173,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     var  checkingLineWithoutTemplate = checkingLine;
                 }
 
-                if ( ! checkingLineWithoutTemplate.includes(expected)  &&  enabled) {
+                if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.isInFalseBlock) {
                     console.log("");
                     console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
                     console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
@@ -219,13 +197,13 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     fileTemplateTag = null;
                 }
             }
-            if (templateTag.label === fileTemplateLabel  &&  enabled) {
+            if (templateTag.label === fileTemplateLabel  &&  ifTagParser.isInFalseBlock) {
                 fileTemplateTag = templateTag;
             }
 
             // Check if there is not "#★Now:".
             for (let temporaryLabel of temporaryLabels) {
-                if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  enabled) {
+                if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  ifTagParser.isInFalseBlock) {
                     console.log("");
                     console.log(`${translate('WarningLine')}: ${lineNum}`);
                     console.log(`  ${translate('Contents')}: ${line.trim()}`);
@@ -484,6 +462,13 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
         lines.push(line);
         lineNum += 1;
         let  output = false;
+var d = pp(`{$lineNum} ${line}`)
+pp(isReadingSetting)
+pp(settingIndentLength)
+pp(indentRegularExpression.exec(line)![0].length)
+if (lineNum === 7) {
+pp('')
+}
 
         // setting = ...
         if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
@@ -510,11 +495,12 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
                     if (value !== '') {
 
                         setting[key] = {value, isReferenced: false, lineNum};
-                    } else if (!settingStartLabel.test(key + ':')  &&  !settingStartLabelEn.test(key + ':')) {
-                        isReadingSetting = false;
                     }
 
                     if (key === changingKey) {
+if (lineNum === 5) {
+pp('')
+}
                         const  commentIndex = line.indexOf('#', separator);
                         let    comment= '';
                         if (commentIndex !== notFound  &&  ! changedValueAndComment.includes('#')) {
@@ -731,7 +717,7 @@ class  TemplateTag {
 
                     if (targetLine === indent + expected) {
                         result = Result.same;
-                    } else if (expected === fileTemplateAnyLinesLabel) {
+                    } else if (expected.trim() === fileTemplateAnyLinesLabel) {
                         result = Result.skipped;
                         templateLineIndex += 1;
                         skipToTemplate = this.templateLines[templateLineIndex];
@@ -810,6 +796,49 @@ class  TemplateTag {
         }
         return  result === Result.same;
     }
+}
+
+// IfTagParser
+class  IfTagParser {
+    isInFalseBlock: boolean = true;
+    indentLengthsOfIfTag: IfTag[] = [
+        {indentLength: -1, resultOfIf: true, enabled: true}
+    ];
+
+    parse(line: string, setting: Settings): IfTagParserResult {
+        var  condition = '';
+        var  errorCount = 0;
+        const  indentLength = indentRegularExpression.exec(line)![0].length;
+        if (line.trim() !== '') {
+            while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
+
+                this.indentLengthsOfIfTag.pop();
+                this.isInFalseBlock = lastOf(this.indentLengthsOfIfTag).enabled;
+            }
+        }
+        if (line.includes(ifLabel)) {
+            condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+
+            const  evaluatedContidion = evaluateIfCondition(condition, setting);
+            if (typeof evaluatedContidion === 'boolean') {
+                var  resultOfIf = evaluatedContidion;
+            } else {
+                errorCount += 1;
+                var  resultOfIf = true;
+            }
+            if (this.isInFalseBlock && !resultOfIf) {
+                this.isInFalseBlock = false;
+            }
+            this.indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled: this.isInFalseBlock});
+        }
+        return  { condition, errorCount };
+    }
+}
+
+// IfTagParserResult
+interface  IfTagParserResult {
+    condition: string;
+    errorCount: number;
 }
 
 // check

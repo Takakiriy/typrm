@@ -130,9 +130,19 @@ Key3: value3changed  #コメント`,
             '2_replace_4_Japanese', 10, 1, 'ja-JP',
             `Key3: value3changed`,
             false,
-        ],
+/*        ],[
+            '2_replace_6_if', 9, 1, 'en-US',
+            `__Setting1__: replaced`,
+            false,
+        ],[
+            '2_replace_6_if', 9, 1, 'en-US',
+            `fruit: melon
+            __Setting1__: replaced`,
+            false,
+*/        ],
 
     ])("in %s(%i) setting %i", async (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) => {
+//if (fileNameHead !== '2_replace_6_if') {return;}
         const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
@@ -149,6 +159,7 @@ Key3: value3changed  #コメント`,
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+//expect('test code').toBe('deleted skip code.');
     });
 
     describe("Multi folder >>", () => {

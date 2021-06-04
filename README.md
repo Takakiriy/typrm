@@ -14,11 +14,11 @@ Also, there is a search function that is separated from the replace function.
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
-  - [Settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
-  - [file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
-  - [if tag: set conditions](#if-tag-set-conditions)
-  - [expect tag: checks settings values](#expect-tag-checks-settings-values)
-  - [keyword tags: highly accurate search](#keyword-tags-highly-accurate-search)
+  - [settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
+  - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
+  - [#if tag: set conditions](#if-tag-set-conditions)
+  - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
+  - [#keyword tag: highly accurate search](#keyword-tag-highly-accurate-search)
   - [How to build the development environment](#how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -248,7 +248,7 @@ To use typrm, you must install Node.js.
         - rm -rf ~/Downloads/typrm/
 
 
-## Settings tag and #template tag: replaces settings values
+## settings tag and #template tag: replaces settings values
 
 About the text you want to replace, write `variable name: value`
 with deeper indentation below `settings:`.
@@ -338,7 +338,7 @@ use the `check` command. The short command name is `c`.
     typrm check __FileName__
 
 
-## file-template tag: checks the contents of the file
+## #file-template tag: checks the contents of the file
 
 You can check that the contents of another file match the settings.
 
@@ -420,7 +420,7 @@ When the check content is `#file-template-any-lines:`,
 the check content written on the next line is searched in the target file.
 
 
-## if tag: set conditions
+## #if tag: set conditions
 
 When there is a relationship between one setting and another,
 write the `#if:` tag inside the `settings:`.
@@ -477,7 +477,7 @@ the same as or shallower than the indent depth of the line
 where the `#if:` tag is written. Until before the line.
 
 
-## expect tag: checks settings values
+## #expect tag: checks settings values
 
 If you specify a condition after the `#expect:` tag,
 the error will occur if the condition is not met.
@@ -500,7 +500,7 @@ Example:
         How to: Download Backup Tool
 
 
-## keyword tags: highly accurate search
+## #keyword tag: highly accurate search
 
 The search function of typrm only searches for keywords written
 after the `#keyword:` tag in a text file.
@@ -539,12 +539,6 @@ or
 If the search keyword was the same as the command name of typrm,
 the command name (search or s) cannot be omitted.
 
-You can specify multiple keywords to be written
-by CSV format (comma separated values) after the `#keyword:` tag
-in the text file.
-
-    #keyword: CSV, comma separated value, "a,b"
-
 If specifying a search keyword consisting of multiple words,
 it is not necessary to enclose it in " ".
 Also, even if the case is different, it will be hit,
@@ -554,6 +548,11 @@ In typrm, the text that hits the top is displayed at the bottom.
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated value
 
+You can specify multiple keywords to be written
+by CSV format (comma separated values) after the `#keyword:` tag
+in the text file.
+
+    #keyword: CSV, comma separated value, "a,b"
 
 If you want to suppress the warning of the CSV part that has syntax problem,
 write `#disable-tag-tool:`.
@@ -631,11 +630,11 @@ To run the first test, press fn + F5 key:
 
 ### For Windows host OS and CentOS 7 guest OS
 
-Install typrm
+Install typrm to the guest OS
 
     See above
 
-Install Visual Studio Code:
+Install Visual Studio Code to the host OS:
 
     - https://code.visualstudio.com/
     - Open the downloaded file (e.g. VSCodeUserSetup-x64-1.54.3.exe)

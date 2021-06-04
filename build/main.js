@@ -126,7 +126,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, enabled, errorCount, warningCount, secretLabelCount, lines, keywords, indentLengthsOfIfTag, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, indentLength, condition, evaluatedContidion, resultOfIf, resultOfIf, condition, evaluatedContidion, templateTag, checkingLine, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, changingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -152,15 +152,12 @@ function checkRoutine(isModal, inputFilePath) {
                     lineNum = 0;
                     templateCount = 0;
                     fileTemplateTag = null;
-                    enabled = true;
                     errorCount = 0;
                     warningCount = 0;
                     secretLabelCount = 0;
                     lines = [];
                     keywords = [];
-                    indentLengthsOfIfTag = [
-                        { indentLength: -1, resultOfIf: true, enabled: true }
-                    ];
+                    ifTagParser = new IfTagParser();
                     _h.label = 4;
                 case 4:
                     _h.trys.push([4, 11, 12, 17]);
@@ -189,7 +186,7 @@ function checkRoutine(isModal, inputFilePath) {
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                         isReadingSetting = false;
                     }
-                    if (isReadingSetting && enabled) {
+                    if (isReadingSetting && ifTagParser.isInFalseBlock) {
                         separator = line.indexOf(':');
                         if (separator !== notFound) {
                             key = line.substr(0, separator).trim();
@@ -206,34 +203,16 @@ function checkRoutine(isModal, inputFilePath) {
                             }
                         }
                     }
-                    indentLength = indentRegularExpression.exec(line)[0].length;
-                    if (line.trim() !== '') {
-                        while (indentLength <= lastOf(indentLengthsOfIfTag).indentLength) {
-                            indentLengthsOfIfTag.pop();
-                            enabled = lastOf(indentLengthsOfIfTag).enabled;
-                        }
-                    }
-                    if (line.includes(ifLabel)) {
-                        condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-                        evaluatedContidion = evaluateIfCondition(condition, setting);
-                        if (typeof evaluatedContidion === 'boolean') {
-                            resultOfIf = evaluatedContidion;
-                        }
-                        else {
-                            console.log('');
-                            console.log('Error of if tag syntax:');
-                            console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
-                            console.log("  Contents: " + condition);
-                            errorCount += 1;
-                            resultOfIf = true;
-                        }
-                        if (enabled && !resultOfIf) {
-                            enabled = false;
-                        }
-                        indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: enabled });
+                    parsed = ifTagParser.parse(line, setting);
+                    if (parsed.errorCount >= 1) {
+                        console.log('');
+                        console.log('Error of if tag syntax:');
+                        console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
+                        console.log("  Contents: " + parsed.condition);
+                        errorCount += parsed.errorCount;
                     }
                     // Check the condition by "#expect:" tag.
-                    if (line.includes(expectLabel) && enabled) {
+                    if (line.includes(expectLabel) && ifTagParser.isInFalseBlock) {
                         condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
                         evaluatedContidion = evaluateIfCondition(condition, setting);
                         if (typeof evaluatedContidion === 'boolean') {
@@ -273,7 +252,7 @@ function checkRoutine(isModal, inputFilePath) {
                         else {
                             checkingLineWithoutTemplate = checkingLine;
                         }
-                        if (!checkingLineWithoutTemplate.includes(expected) && enabled) {
+                        if (!checkingLineWithoutTemplate.includes(expected) && ifTagParser.isInFalseBlock) {
                             console.log("");
                             console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
                             console.log("  " + translate('Contents') + ": " + checkingLine.trim());
@@ -295,13 +274,13 @@ function checkRoutine(isModal, inputFilePath) {
                     fileTemplateTag = null;
                     _h.label = 8;
                 case 8:
-                    if (templateTag.label === fileTemplateLabel && enabled) {
+                    if (templateTag.label === fileTemplateLabel && ifTagParser.isInFalseBlock) {
                         fileTemplateTag = templateTag;
                     }
                     // Check if there is not "#★Now:".
                     for (_i = 0, temporaryLabels_1 = temporaryLabels; _i < temporaryLabels_1.length; _i++) {
                         temporaryLabel = temporaryLabels_1[_i];
-                        if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && enabled) {
+                        if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && ifTagParser.isInFalseBlock) {
                             console.log("");
                             console.log(translate('WarningLine') + ": " + lineNum);
                             console.log("  " + translate('Contents') + ": " + line.trim());
@@ -644,7 +623,7 @@ function changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue, 
 function changeSetting(inputFilePath, changingSettingIndex, changingKey, changedValueAndComment, addOriginalTag) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, separator, key, value, commentIndex, comment, original, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
+        var oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, d, separator, key, value, commentIndex, comment, original, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -679,6 +658,13 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     lines.push(line);
                     lineNum += 1;
                     output = false;
+                    d = pp("{$lineNum} " + line);
+                    pp(isReadingSetting);
+                    pp(settingIndentLength);
+                    pp(indentRegularExpression.exec(line)[0].length);
+                    if (lineNum === 7) {
+                        pp('');
+                    }
                     // setting = ...
                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                         isReadingSetting = true;
@@ -705,10 +691,10 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                                 if (value !== '') {
                                     setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
                                 }
-                                else if (!settingStartLabel.test(key + ':') && !settingStartLabelEn.test(key + ':')) {
-                                    isReadingSetting = false;
-                                }
                                 if (key === changingKey) {
+                                    if (lineNum === 5) {
+                                        pp('');
+                                    }
                                     commentIndex = line.indexOf('#', separator);
                                     comment = '';
                                     if (commentIndex !== notFound && !changedValueAndComment.includes('#')) {
@@ -993,7 +979,7 @@ var TemplateTag = /** @class */ (function () {
                                 if (targetLine === indent + expected) {
                                     result = Result.same;
                                 }
-                                else if (expected === fileTemplateAnyLinesLabel) {
+                                else if (expected.trim() === fileTemplateAnyLinesLabel) {
                                     result = Result.skipped;
                                     templateLineIndex += 1;
                                     skipToTemplate = this.templateLines[templateLineIndex];
@@ -1100,6 +1086,43 @@ var TemplateTag = /** @class */ (function () {
         });
     };
     return TemplateTag;
+}());
+// IfTagParser
+var IfTagParser = /** @class */ (function () {
+    function IfTagParser() {
+        this.isInFalseBlock = true;
+        this.indentLengthsOfIfTag = [
+            { indentLength: -1, resultOfIf: true, enabled: true }
+        ];
+    }
+    IfTagParser.prototype.parse = function (line, setting) {
+        var condition = '';
+        var errorCount = 0;
+        var indentLength = indentRegularExpression.exec(line)[0].length;
+        if (line.trim() !== '') {
+            while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
+                this.indentLengthsOfIfTag.pop();
+                this.isInFalseBlock = lastOf(this.indentLengthsOfIfTag).enabled;
+            }
+        }
+        if (line.includes(ifLabel)) {
+            condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+            var evaluatedContidion = evaluateIfCondition(condition, setting);
+            if (typeof evaluatedContidion === 'boolean') {
+                var resultOfIf = evaluatedContidion;
+            }
+            else {
+                errorCount += 1;
+                var resultOfIf = true;
+            }
+            if (this.isInFalseBlock && !resultOfIf) {
+                this.isInFalseBlock = false;
+            }
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.isInFalseBlock });
+        }
+        return { condition: condition, errorCount: errorCount };
+    };
+    return IfTagParser;
 }());
 // check
 function check(checkingFilePath) {

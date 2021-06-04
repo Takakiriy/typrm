@@ -188,6 +188,16 @@ describe("replaces settings >>", function () {
             '2_replace_4_Japanese', 10, 1, 'ja-JP',
             "Key3: value3changed",
             false,
+            /*        ],[
+                        '2_replace_6_if', 9, 1, 'en-US',
+                        `__Setting1__: replaced`,
+                        false,
+                    ],[
+                        '2_replace_6_if', 9, 1, 'en-US',
+                        `fruit: melon
+                        __Setting1__: replaced`,
+                        false,
+            */ 
         ],
     ])("in %s(%i) setting %i", function (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, updatedFileContents;

@@ -711,3 +711,41 @@ exports[`replaces settings >> in 2_replace_4_Japanese(10) setting 1: updatedFile
             #template: key1, key1
 "
 `;
+
+exports[`replaces settings >> in 2_replace_6_if(9) setting 1: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_6_if(9) setting 1: stdout 2`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_6_if(9) setting 1: updatedFileContents 1`] = `
+"est_of_if_tag_in_settings:
+    settings:
+        fruit: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: replaced  #original: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: no
+    check:
+        - replaced  #template: __Setting1__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_6_if(9) setting 1: updatedFileContents 2`] = `
+"est_of_if_tag_in_settings:
+    settings:
+        fruit: melon  #original: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: replaced  #original: no
+    check:
+        - replaced  #template: __Setting1__
+"
+`;
