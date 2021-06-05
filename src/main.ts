@@ -101,7 +101,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
             }
-            if (isReadingSetting  &&  ifTagParser.isInFalseBlock) {
+            if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
                 const  separator = line.indexOf(':');
                 if (separator !== notFound) {
                     const  key = line.substr(0, separator).trim();
@@ -131,7 +131,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
 
             // Check the condition by "#expect:" tag.
-            if (line.includes(expectLabel)  &&  ifTagParser.isInFalseBlock) {
+            if (line.includes(expectLabel)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                 const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
 
                 const  evaluatedContidion = evaluateIfCondition(condition, setting);
@@ -173,7 +173,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     var  checkingLineWithoutTemplate = checkingLine;
                 }
 
-                if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.isInFalseBlock) {
+                if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     console.log("");
                     console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
                     console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
@@ -197,13 +197,13 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     fileTemplateTag = null;
                 }
             }
-            if (templateTag.label === fileTemplateLabel  &&  ifTagParser.isInFalseBlock) {
+            if (templateTag.label === fileTemplateLabel  &&  ifTagParser.thisIsOutOfFalseBlock) {
                 fileTemplateTag = templateTag;
             }
 
             // Check if there is not "#★Now:".
             for (let temporaryLabel of temporaryLabels) {
-                if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  ifTagParser.isInFalseBlock) {
+                if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     console.log("");
                     console.log(`${translate('WarningLine')}: ${lineNum}`);
                     console.log(`  ${translate('Contents')}: ${line.trim()}`);
@@ -339,7 +339,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     if (keyValue === '') {
                         break;
                     }
-                    errorCount += await changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue, true);
+                    errorCount += await replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, {}, true);
                 }
             }
             loop = (errorCount >= 1);
@@ -355,7 +355,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 }
 
 // replaceSettings
-async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValues: string) {
+async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValueLines: string) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
@@ -363,10 +363,7 @@ async function  replaceSettings(inputFilePath: string, changingLineNum: number, 
     } else {
         const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
 
-        for (const keyValue of keyValues.split('\n')) {
-
-            errorCount += await changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue, true);
-        }
+        errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, 'dymmy: 0', parseKeyValueLines(keyValueLines), true);
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
@@ -383,7 +380,7 @@ async function  revertSettings(inputFilePath: string, changingLineNum: number) {
         const  keyValues: string[] = await makeRevertSettings(inputFileFullPath, changingSettingIndex);
         for (const keyValue of keyValues) {
 
-            errorCount += await changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue, false);
+            errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, keyValue, {}, false);
         }
     }
     console.log('');
@@ -419,25 +416,22 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
     return  fileFullPaths[0];
 }
 
-// changeSettingByKeyValue
-async function  changeSettingByKeyValue(inputFilePath: string, changingSettingIndex: number,
-        keyValue: string, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
+// replaceSettingsSub
+async function  replaceSettingsSub(inputFilePath: string, changingSettingIndex: number,
+        keyValue: string, keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
 
+    let  errorCount = 0;
     const  separator = keyValue.indexOf(':');
-    if (separator !== notFound) {
-        const  key = keyValue.substr(0, separator).trim();
-        const  value = getValue(keyValue, separator);
-
-        return  changeSetting(inputFilePath, changingSettingIndex, key, value, addOriginalTag);
-    } else {
-        return  1;
+    if (separator === notFound) {
+        return  errorCount;  // 0
     }
-}
-
-// changeSetting
-async function  changeSetting(inputFilePath: string, changingSettingIndex: number,
-        changingKey: string, changedValueAndComment: string, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
-
+    const  changingKey = keyValue.substr(0, separator).trim();
+    const  changedValue__ = getValue(keyValue, separator);
+    var    replacedValues: {[key:string]: string} = {};  replacedValues[changingKey] = changedValue__;
+    if (Object.keys(keyValues).length !== 0) {
+        replacedValues = keyValues;
+    }
+pp(replacedValues)
     const  oldFilePath = inputFilePath;
     const  newFilePath = inputFilePath +".new";
     const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
@@ -452,31 +446,26 @@ async function  changeSetting(inputFilePath: string, changingSettingIndex: numbe
     let  settingCount = 0;
     let  settingIndentLength = 0;
     let  settingLineNum = -1;
-    let  changedValue = getChangedValue(changedValueAndComment);
+    let  oldSetting: Settings = {};
     let  lineNum = 0;
-    let  errorCount = 0;
     let  isChanging = false;
-    
+    const  ifTagParser = new IfTagParser();
+    const  oldIfTagParser = new IfTagParser();
+
     for await (const line1 of reader) {
         const  line: string = line1;
         lines.push(line);
         lineNum += 1;
         let  output = false;
-var d = pp(`{$lineNum} ${line}`)
-pp(isReadingSetting)
-pp(settingIndentLength)
-pp(indentRegularExpression.exec(line)![0].length)
-if (lineNum === 7) {
-pp('')
-}
 
-        // setting = ...
+        // isReadingSetting = ...
         if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
             isReadingSetting = true;
             setting = {};
             settingCount += 1;
             settingIndentLength = indentRegularExpression.exec(line)![0].length;
             settingLineNum = lineNum;
+            oldSetting = {};
             if (changingSettingIndex === allSetting) {
                 isChanging = true;
             } else {
@@ -485,65 +474,75 @@ pp('')
         } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
         }
+        ifTagParser.parse(line, setting);
+        oldIfTagParser.parse(line, oldSetting);
+
         if (isChanging) {
 
+            // In settings tag
             if (isReadingSetting) {
                 const  separator = line.indexOf(':');
                 if (separator !== notFound) {
                     const  key = line.substr(0, separator).trim();
-                    const  value = getValue(line, separator);
-                    if (value !== '') {
+                    const  oldValue = getValue(line, separator);
+                    if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
 
-                        setting[key] = {value, isReferenced: false, lineNum};
+                        oldSetting[key] = {value: oldValue, isReferenced: false, lineNum};
                     }
-
-                    if (key === changingKey) {
-if (lineNum === 5) {
-pp('')
-}
-                        const  commentIndex = line.indexOf('#', separator);
-                        let    comment= '';
-                        if (commentIndex !== notFound  &&  ! changedValueAndComment.includes('#')) {
-                            comment = '  ' + line.substr(commentIndex);
-                        }
-                        let  original = '';
-                        if ( ! line.includes(originalLabel)) {
-                            if (addOriginalTag) {
-                                original = `  ${originalLabel} ${value}`;
+                    if (ifTagParser.thisIsOutOfFalseBlock) {
+                        const  replacingKeys = Object.keys(replacedValues);
+                    
+                        if (replacingKeys.includes(key)) {
+                            const  changedValue = replacedValues[key];
+                            const  commentIndex = line.indexOf('#', separator);
+                            let    comment= '';
+                            if (commentIndex !== notFound  &&  ! changedValue.includes('#')) {
+                                comment = '  ' + line.substr(commentIndex);
                             }
-                        } else {
-                            if ( ! addOriginalTag) {
-                                comment = comment.replace(new RegExp(
-                                    ` *${originalLabel} *${escapeRegularExpression(changedValueAndComment)}`), '');
+                            let  original = '';
+                            if ( ! line.includes(originalLabel)) {
+                                if (addOriginalTag) {
+                                    original = `  ${originalLabel} ${oldValue}`;
+                                }
+                            } else {
+                                if ( ! addOriginalTag) {
+                                    comment = comment.replace(new RegExp(
+                                        ` *${originalLabel} *${escapeRegularExpression(changedValue)}`), '');
+                                }
+                            }
+
+                            writer.write(line.substr(0, separator + 1) +' '+ changedValue + original + comment + "\n");
+                            output = true;
+                            setting[key] = {value: changedValue, isReferenced: false, lineNum};
+                        }
+                        else {
+                            if (oldValue !== '') {
+                                setting[key] = {value: oldValue, isReferenced: false, lineNum};
                             }
                         }
-
-                        writer.write(line.substr(0, separator + 1) +' '+ changedValueAndComment + original + comment + "\n");
-                        output = true;
                     }
                 }
 
             // Out of settings
             } else {
                 const  templateTag = parseTemplateTag(line);
-                if (templateTag.isFound  &&  templateTag.template.includes(changingKey)) {
-                    const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                    const  expected = getExpectedLine(setting, templateTag.template);
-                    const  changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
+                if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(replacedValues))  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                    const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+                    const  expected = getExpectedLine(oldSetting, templateTag.template);
+                    const  changed = getReplacedLine(setting, templateTag.template, replacedValues);
 
-                    if (checkingLine.includes(expected)) {
+                    if (replacingLine.includes(expected)) {
                         const  before = expected;
                         const  after = changed;
                         if (templateTag.lineNumOffset <= -1) {
-                            const  aboveLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                             writer.replaceAboveLine(templateTag.lineNumOffset,
-                                aboveLine.replace(before, after)+"\n");
+                                replacingLine.replace(before, after)+"\n");
                         } else {
 
                             writer.write(line.replace(before, after) +"\n");
                             output = true;
                         }
-                    } else if (checkingLine.includes(changed)) {
+                    } else if (replacingLine.includes(changed)) {
                         // Do nothing
                     } else {
                         if (errorCount === 0) { // Since only one old value can be replaced at a time
@@ -660,6 +659,14 @@ class  TemplateTag {
             readingNext = false;
         }
         return  readingNext;
+    }
+    includesKey(keys: string[]): boolean {
+        for (const key of keys) {
+            if (this.template.includes(key)) {
+                return  true;
+            }
+        }
+        return  false;
     }
     async  checkTargetFileContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
         const  parentPath = path.dirname(inputFilePath);
@@ -800,8 +807,9 @@ class  TemplateTag {
 
 // IfTagParser
 class  IfTagParser {
-    isInFalseBlock: boolean = true;
-    indentLengthsOfIfTag: IfTag[] = [
+    get       thisIsOutOfFalseBlock() {return this.itIsOutOfFalseBlock_;}
+    private   itIsOutOfFalseBlock_: boolean = true;
+    readonly  indentLengthsOfIfTag: IfTag[] = [
         {indentLength: -1, resultOfIf: true, enabled: true}
     ];
 
@@ -813,7 +821,7 @@ class  IfTagParser {
             while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
 
                 this.indentLengthsOfIfTag.pop();
-                this.isInFalseBlock = lastOf(this.indentLengthsOfIfTag).enabled;
+                this.itIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
             }
         }
         if (line.includes(ifLabel)) {
@@ -826,10 +834,10 @@ class  IfTagParser {
                 errorCount += 1;
                 var  resultOfIf = true;
             }
-            if (this.isInFalseBlock && !resultOfIf) {
-                this.isInFalseBlock = false;
+            if (this.thisIsOutOfFalseBlock && !resultOfIf) {
+                this.itIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled: this.isInFalseBlock});
+            this.indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled: this.thisIsOutOfFalseBlock});
         }
         return  { condition, errorCount };
     }
@@ -1274,16 +1282,6 @@ function  deleteFileSync(path: string) {
     }
 }
 
-// getValue
-function  getValue(line: string, separatorIndex: number) {
-    let    value = line.substr(separatorIndex + 1).trim();
-    const  comment = value.indexOf('#');
-    if (comment !== notFound) {
-        value = value.substr(0, comment).trim();
-    }
-    return  value;
-}
-
 // getExpectedLine
 function  getExpectedLine(setting: Settings, template: string): string {
     return  getExpectedLineAndEvaluationLog(setting, template, false).expected;
@@ -1320,33 +1318,43 @@ function  getExpectedLineInFileTemplate(setting: Settings, template: string) {
     return  expected;
 }
 
-// getChangedLine
-function  getChangedLine(setting: Settings, template: string, changingKey: string, changedValue: string) {
-    let  changedLine = '';
-    if (changingKey in setting) {
-        const  changingValue = setting[changingKey].value;
+// getReplacedLine
+function  getReplacedLine(setting: Settings, template: string, replacedValues: {[key:string]: string}) {
+    const  replacedSetting: Settings = {};
+    for (const key of Object.keys(setting)) {
+        if (key in replacedValues) {
 
-        setting[changingKey].value = changedValue;
-
-        changedLine = getExpectedLine(setting, template);
-        setting[changingKey].value = changingValue;
-    } else {
-        changedLine = getExpectedLine(setting, template);
+            var  value = replacedValues[key];
+        } else {
+            var  value = setting[key].value;
+        }
+        replacedSetting[key] = { value, lineNum: 0 /*dummy*/,  isReferenced: true /*dummy*/ };
     }
-    return  changedLine;
+
+    return  getExpectedLine(replacedSetting, template);
 }
 
-// getChangedValue
-function  getChangedValue(changedValueAndComment: string): string {
-    const  commentIndex = changedValueAndComment.indexOf('#');
-    let  changedValue: string;
-    if (commentIndex !== notFound) {
+// parseKeyValues
+function  parseKeyValueLines(keyValueLines: string): {[key:string]: string} {
+    const  keyValues: {[key:string]: string} = {};
+    for (const keyValueString of keyValueLines.split('\n')) {
+        const  separator = keyValueString.indexOf(':');
+        const  key = keyValueString.substr(0, separator).trim();
+        const  value = getValue(keyValueString, separator);
 
-        changedValue = changedValueAndComment.substr(0, commentIndex).trim();
-    } else {
-        changedValue = changedValueAndComment;
+        keyValues[key] = value;
     }
-    return  changedValue;
+    return  keyValues;
+}
+
+// getValue
+function  getValue(line: string, separatorIndex: number) {
+    let    value = line.substr(separatorIndex + 1).trim();
+    const  comment = value.indexOf('#');
+    if (comment !== notFound) {
+        value = value.substr(0, comment).trim();
+    }
+    return  value;
 }
 
 // parseTemplateTag

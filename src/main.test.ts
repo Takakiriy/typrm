@@ -111,8 +111,8 @@ describe("replaces settings >>", () => {
         [
             '2_replace_1_ok', 10, 1, 'en-US',
             `key1: value1changed
-   __Key2__: value2changed  #コメント
-Key3: value3changed  #コメント`,
+   __Key2__: value2changed  #ここは置き換え後に入らないコメント
+Key3: value3changed  #ここは置き換え後に入らないコメント`,
             true,
         ],[
             '2_replace_1_ok', 29, 2, 'en-US',
@@ -142,7 +142,7 @@ Key3: value3changed  #コメント`,
 */        ],
 
     ])("in %s(%i) setting %i", async (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) => {
-//if (fileNameHead !== '2_replace_6_if') {return;}
+//if (fileNameHead !== '2_replace_6_if'  ||  ! keyValues.includes('fruit')) {return;}
         const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";

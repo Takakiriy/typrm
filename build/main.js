@@ -46,7 +46,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.InputObject = exports.debugOut = exports.main = void 0;
 var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
@@ -186,7 +186,7 @@ function checkRoutine(isModal, inputFilePath) {
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                         isReadingSetting = false;
                     }
-                    if (isReadingSetting && ifTagParser.isInFalseBlock) {
+                    if (isReadingSetting && ifTagParser.thisIsOutOfFalseBlock) {
                         separator = line.indexOf(':');
                         if (separator !== notFound) {
                             key = line.substr(0, separator).trim();
@@ -212,7 +212,7 @@ function checkRoutine(isModal, inputFilePath) {
                         errorCount += parsed.errorCount;
                     }
                     // Check the condition by "#expect:" tag.
-                    if (line.includes(expectLabel) && ifTagParser.isInFalseBlock) {
+                    if (line.includes(expectLabel) && ifTagParser.thisIsOutOfFalseBlock) {
                         condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
                         evaluatedContidion = evaluateIfCondition(condition, setting);
                         if (typeof evaluatedContidion === 'boolean') {
@@ -252,7 +252,7 @@ function checkRoutine(isModal, inputFilePath) {
                         else {
                             checkingLineWithoutTemplate = checkingLine;
                         }
-                        if (!checkingLineWithoutTemplate.includes(expected) && ifTagParser.isInFalseBlock) {
+                        if (!checkingLineWithoutTemplate.includes(expected) && ifTagParser.thisIsOutOfFalseBlock) {
                             console.log("");
                             console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
                             console.log("  " + translate('Contents') + ": " + checkingLine.trim());
@@ -274,13 +274,13 @@ function checkRoutine(isModal, inputFilePath) {
                     fileTemplateTag = null;
                     _h.label = 8;
                 case 8:
-                    if (templateTag.label === fileTemplateLabel && ifTagParser.isInFalseBlock) {
+                    if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock) {
                         fileTemplateTag = templateTag;
                     }
                     // Check if there is not "#★Now:".
                     for (_i = 0, temporaryLabels_1 = temporaryLabels; _i < temporaryLabels_1.length; _i++) {
                         temporaryLabel = temporaryLabels_1[_i];
-                        if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && ifTagParser.isInFalseBlock) {
+                        if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && ifTagParser.thisIsOutOfFalseBlock) {
                             console.log("");
                             console.log(translate('WarningLine') + ": " + lineNum);
                             console.log("  " + translate('Contents') + ": " + line.trim());
@@ -328,7 +328,7 @@ function checkRoutine(isModal, inputFilePath) {
                     return [3 /*break*/, 17];
                 case 12:
                     _h.trys.push([12, , 15, 16]);
-                    if (!(reader_1_1 && !reader_1_1.done && (_a = reader_1["return"]))) return [3 /*break*/, 14];
+                    if (!(reader_1_1 && !reader_1_1.done && (_a = reader_1.return))) return [3 /*break*/, 14];
                     return [4 /*yield*/, _a.call(reader_1)];
                 case 13:
                     _h.sent();
@@ -395,7 +395,7 @@ function checkRoutine(isModal, inputFilePath) {
                     return [3 /*break*/, 31];
                 case 26:
                     _h.trys.push([26, , 29, 30]);
-                    if (!(reader_2_1 && !reader_2_1.done && (_b = reader_2["return"]))) return [3 /*break*/, 28];
+                    if (!(reader_2_1 && !reader_2_1.done && (_b = reader_2.return))) return [3 /*break*/, 28];
                     return [4 /*yield*/, _b.call(reader_2)];
                 case 27:
                     _h.sent();
@@ -462,7 +462,7 @@ function checkRoutine(isModal, inputFilePath) {
                         return [3 /*break*/, 40];
                     }
                     _e = errorCount;
-                    return [4 /*yield*/, changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue, true)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, {}, true)];
                 case 38:
                     errorCount = _e + _h.sent();
                     _h.label = 39;
@@ -486,35 +486,27 @@ function checkRoutine(isModal, inputFilePath) {
     });
 }
 // replaceSettings
-function replaceSettings(inputFilePath, changingLineNum, keyValues) {
+function replaceSettings(inputFilePath, changingLineNum, keyValueLines) {
     return __awaiter(this, void 0, void 0, function () {
-        var inputFileFullPath, errorCount, changingSettingIndex, _i, _a, keyValue, _b;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var inputFileFullPath, errorCount, changingSettingIndex, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, getInputFileFullPath(inputFilePath)];
                 case 1:
-                    inputFileFullPath = _c.sent();
+                    inputFileFullPath = _b.sent();
                     errorCount = 0;
                     if (!(inputFileFullPath === '')) return [3 /*break*/, 2];
                     errorCount += 1;
-                    return [3 /*break*/, 7];
+                    return [3 /*break*/, 5];
                 case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, changingLineNum)];
                 case 3:
-                    changingSettingIndex = _c.sent();
-                    _i = 0, _a = keyValues.split('\n');
-                    _c.label = 4;
+                    changingSettingIndex = _b.sent();
+                    _a = errorCount;
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, changingSettingIndex, 'dymmy: 0', parseKeyValueLines(keyValueLines), true)];
                 case 4:
-                    if (!(_i < _a.length)) return [3 /*break*/, 7];
-                    keyValue = _a[_i];
-                    _b = errorCount;
-                    return [4 /*yield*/, changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue, true)];
+                    errorCount = _a + _b.sent();
+                    _b.label = 5;
                 case 5:
-                    errorCount = _b + _c.sent();
-                    _c.label = 6;
-                case 6:
-                    _i++;
-                    return [3 /*break*/, 4];
-                case 7:
                     console.log('');
                     console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
                     return [2 /*return*/];
@@ -547,7 +539,7 @@ function revertSettings(inputFilePath, changingLineNum) {
                     if (!(_i < keyValues_1.length)) return [3 /*break*/, 8];
                     keyValue = keyValues_1[_i];
                     _a = errorCount;
-                    return [4 /*yield*/, changeSettingByKeyValue(inputFileFullPath, changingSettingIndex, keyValue, false)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, changingSettingIndex, keyValue, {}, false)];
                 case 6:
                     errorCount = _a + _b.sent();
                     _b.label = 7;
@@ -601,32 +593,27 @@ function getInputFileFullPath(inputFilePath) {
         });
     });
 }
-// changeSettingByKeyValue
-function changeSettingByKeyValue(inputFilePath, changingSettingIndex, keyValue, addOriginalTag) {
-    return __awaiter(this, void 0, void 0, function () {
-        var separator, key, value;
-        return __generator(this, function (_a) {
-            separator = keyValue.indexOf(':');
-            if (separator !== notFound) {
-                key = keyValue.substr(0, separator).trim();
-                value = getValue(keyValue, separator);
-                return [2 /*return*/, changeSetting(inputFilePath, changingSettingIndex, key, value, addOriginalTag)];
-            }
-            else {
-                return [2 /*return*/, 1];
-            }
-            return [2 /*return*/];
-        });
-    });
-}
-// changeSetting
-function changeSetting(inputFilePath, changingSettingIndex, changingKey, changedValueAndComment, addOriginalTag) {
+// replaceSettingsSub
+function replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, keyValues, addOriginalTag) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, changedValue, lineNum, errorCount, isChanging, reader_3, reader_3_1, line1, line, output, d, separator, key, value, commentIndex, comment, original, templateTag, checkingLine, expected, changed, before, after, aboveLine, e_3_1;
+        var errorCount, separator, changingKey, changedValue__, replacedValues, oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isChanging, ifTagParser, oldIfTagParser, reader_3, reader_3_1, line1, line, output, separator_1, key, oldValue, replacingKeys, changedValue, commentIndex, comment, original, templateTag, replacingLine, expected, changed, before, after, e_3_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
+                    errorCount = 0;
+                    separator = keyValue.indexOf(':');
+                    if (separator === notFound) {
+                        return [2 /*return*/, errorCount]; // 0
+                    }
+                    changingKey = keyValue.substr(0, separator).trim();
+                    changedValue__ = getValue(keyValue, separator);
+                    replacedValues = {};
+                    replacedValues[changingKey] = changedValue__;
+                    if (Object.keys(keyValues).length !== 0) {
+                        replacedValues = keyValues;
+                    }
+                    pp(replacedValues);
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
                     writer = new WriteBuffer(fs.createWriteStream(newFilePath));
@@ -641,10 +628,11 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     settingCount = 0;
                     settingIndentLength = 0;
                     settingLineNum = -1;
-                    changedValue = getChangedValue(changedValueAndComment);
+                    oldSetting = {};
                     lineNum = 0;
-                    errorCount = 0;
                     isChanging = false;
+                    ifTagParser = new IfTagParser();
+                    oldIfTagParser = new IfTagParser();
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 6, 7, 12]);
@@ -658,20 +646,14 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     lines.push(line);
                     lineNum += 1;
                     output = false;
-                    d = pp("{$lineNum} " + line);
-                    pp(isReadingSetting);
-                    pp(settingIndentLength);
-                    pp(indentRegularExpression.exec(line)[0].length);
-                    if (lineNum === 7) {
-                        pp('');
-                    }
-                    // setting = ...
+                    // isReadingSetting = ...
                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                         isReadingSetting = true;
                         setting = {};
                         settingCount += 1;
                         settingIndentLength = indentRegularExpression.exec(line)[0].length;
                         settingLineNum = lineNum;
+                        oldSetting = {};
                         if (changingSettingIndex === allSetting) {
                             isChanging = true;
                         }
@@ -682,60 +664,69 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                         isReadingSetting = false;
                     }
+                    ifTagParser.parse(line, setting);
+                    oldIfTagParser.parse(line, oldSetting);
                     if (isChanging) {
+                        // In settings tag
                         if (isReadingSetting) {
-                            separator = line.indexOf(':');
-                            if (separator !== notFound) {
-                                key = line.substr(0, separator).trim();
-                                value = getValue(line, separator);
-                                if (value !== '') {
-                                    setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
+                            separator_1 = line.indexOf(':');
+                            if (separator_1 !== notFound) {
+                                key = line.substr(0, separator_1).trim();
+                                oldValue = getValue(line, separator_1);
+                                if (oldValue !== '' && oldIfTagParser.thisIsOutOfFalseBlock) {
+                                    oldSetting[key] = { value: oldValue, isReferenced: false, lineNum: lineNum };
                                 }
-                                if (key === changingKey) {
-                                    if (lineNum === 5) {
-                                        pp('');
-                                    }
-                                    commentIndex = line.indexOf('#', separator);
-                                    comment = '';
-                                    if (commentIndex !== notFound && !changedValueAndComment.includes('#')) {
-                                        comment = '  ' + line.substr(commentIndex);
-                                    }
-                                    original = '';
-                                    if (!line.includes(originalLabel)) {
-                                        if (addOriginalTag) {
-                                            original = "  " + originalLabel + " " + value;
+                                if (ifTagParser.thisIsOutOfFalseBlock) {
+                                    replacingKeys = Object.keys(replacedValues);
+                                    if (replacingKeys.includes(key)) {
+                                        changedValue = replacedValues[key];
+                                        commentIndex = line.indexOf('#', separator_1);
+                                        comment = '';
+                                        if (commentIndex !== notFound && !changedValue.includes('#')) {
+                                            comment = '  ' + line.substr(commentIndex);
                                         }
+                                        original = '';
+                                        if (!line.includes(originalLabel)) {
+                                            if (addOriginalTag) {
+                                                original = "  " + originalLabel + " " + oldValue;
+                                            }
+                                        }
+                                        else {
+                                            if (!addOriginalTag) {
+                                                comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(changedValue)), '');
+                                            }
+                                        }
+                                        writer.write(line.substr(0, separator_1 + 1) + ' ' + changedValue + original + comment + "\n");
+                                        output = true;
+                                        setting[key] = { value: changedValue, isReferenced: false, lineNum: lineNum };
                                     }
                                     else {
-                                        if (!addOriginalTag) {
-                                            comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(changedValueAndComment)), '');
+                                        if (oldValue !== '') {
+                                            setting[key] = { value: oldValue, isReferenced: false, lineNum: lineNum };
                                         }
                                     }
-                                    writer.write(line.substr(0, separator + 1) + ' ' + changedValueAndComment + original + comment + "\n");
-                                    output = true;
                                 }
                             }
                             // Out of settings
                         }
                         else {
                             templateTag = parseTemplateTag(line);
-                            if (templateTag.isFound && templateTag.template.includes(changingKey)) {
-                                checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                                expected = getExpectedLine(setting, templateTag.template);
-                                changed = getChangedLine(setting, templateTag.template, changingKey, changedValue);
-                                if (checkingLine.includes(expected)) {
+                            if (templateTag.isFound && templateTag.includesKey(Object.keys(replacedValues)) && ifTagParser.thisIsOutOfFalseBlock) {
+                                replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+                                expected = getExpectedLine(oldSetting, templateTag.template);
+                                changed = getReplacedLine(setting, templateTag.template, replacedValues);
+                                if (replacingLine.includes(expected)) {
                                     before = expected;
                                     after = changed;
                                     if (templateTag.lineNumOffset <= -1) {
-                                        aboveLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                                        writer.replaceAboveLine(templateTag.lineNumOffset, aboveLine.replace(before, after) + "\n");
+                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine.replace(before, after) + "\n");
                                     }
                                     else {
                                         writer.write(line.replace(before, after) + "\n");
                                         output = true;
                                     }
                                 }
-                                else if (checkingLine.includes(changed)) {
+                                else if (replacingLine.includes(changed)) {
                                     // Do nothing
                                 }
                                 else {
@@ -766,7 +757,7 @@ function changeSetting(inputFilePath, changingSettingIndex, changingKey, changed
                     return [3 /*break*/, 12];
                 case 7:
                     _b.trys.push([7, , 10, 11]);
-                    if (!(reader_3_1 && !reader_3_1.done && (_a = reader_3["return"]))) return [3 /*break*/, 9];
+                    if (!(reader_3_1 && !reader_3_1.done && (_a = reader_3.return))) return [3 /*break*/, 9];
                     return [4 /*yield*/, _a.call(reader_3)];
                 case 8:
                     _b.sent();
@@ -854,7 +845,7 @@ function makeRevertSettings(inputFilePath, changingSettingIndex) {
                     return [3 /*break*/, 12];
                 case 7:
                     _b.trys.push([7, , 10, 11]);
-                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4["return"]))) return [3 /*break*/, 9];
+                    if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4.return))) return [3 /*break*/, 9];
                     return [4 /*yield*/, _a.call(reader_4)];
                 case 8:
                     _b.sent();
@@ -903,6 +894,15 @@ var TemplateTag = /** @class */ (function () {
             readingNext = false;
         }
         return readingNext;
+    };
+    TemplateTag.prototype.includesKey = function (keys) {
+        for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+            var key = keys_1[_i];
+            if (this.template.includes(key)) {
+                return true;
+            }
+        }
+        return false;
     };
     TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_5, _a;
@@ -1041,7 +1041,7 @@ var TemplateTag = /** @class */ (function () {
                         return [3 /*break*/, 12];
                     case 7:
                         _b.trys.push([7, , 10, 11]);
-                        if (!(targetFileReader_1_1 && !targetFileReader_1_1.done && (_a = targetFileReader_1["return"]))) return [3 /*break*/, 9];
+                        if (!(targetFileReader_1_1 && !targetFileReader_1_1.done && (_a = targetFileReader_1.return))) return [3 /*break*/, 9];
                         return [4 /*yield*/, _a.call(targetFileReader_1)];
                     case 8:
                         _b.sent();
@@ -1090,11 +1090,16 @@ var TemplateTag = /** @class */ (function () {
 // IfTagParser
 var IfTagParser = /** @class */ (function () {
     function IfTagParser() {
-        this.isInFalseBlock = true;
+        this.itIsOutOfFalseBlock_ = true;
         this.indentLengthsOfIfTag = [
             { indentLength: -1, resultOfIf: true, enabled: true }
         ];
     }
+    Object.defineProperty(IfTagParser.prototype, "thisIsOutOfFalseBlock", {
+        get: function () { return this.itIsOutOfFalseBlock_; },
+        enumerable: false,
+        configurable: true
+    });
     IfTagParser.prototype.parse = function (line, setting) {
         var condition = '';
         var errorCount = 0;
@@ -1102,7 +1107,7 @@ var IfTagParser = /** @class */ (function () {
         if (line.trim() !== '') {
             while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
                 this.indentLengthsOfIfTag.pop();
-                this.isInFalseBlock = lastOf(this.indentLengthsOfIfTag).enabled;
+                this.itIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
             }
         }
         if (line.includes(ifLabel)) {
@@ -1115,10 +1120,10 @@ var IfTagParser = /** @class */ (function () {
                 errorCount += 1;
                 var resultOfIf = true;
             }
-            if (this.isInFalseBlock && !resultOfIf) {
-                this.isInFalseBlock = false;
+            if (this.thisIsOutOfFalseBlock && !resultOfIf) {
+                this.itIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.isInFalseBlock });
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.thisIsOutOfFalseBlock });
         }
         return { condition: condition, errorCount: errorCount };
     };
@@ -1283,7 +1288,8 @@ function search() {
                                     lineNum += 1;
                                     if (!(line.includes(keywordLabel) && !line.includes(disableLabel))) return [3 /*break*/, 5];
                                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
-                                    return [4 /*yield*/, parseCSVColumns(csv)["catch"](function (e) {
+                                    return [4 /*yield*/, parseCSVColumns(csv)
+                                            .catch(function (e) {
                                             console.log("Warning: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
                                             return [];
                                         })];
@@ -1350,7 +1356,7 @@ function search() {
                                     return [3 /*break*/, 14];
                                 case 9:
                                     _k.trys.push([9, , 12, 13]);
-                                    if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5["return"]))) return [3 /*break*/, 11];
+                                    if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5.return))) return [3 /*break*/, 11];
                                     return [4 /*yield*/, _a.call(reader_5)];
                                 case 10:
                                     _k.sent();
@@ -1617,7 +1623,7 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                     return [3 /*break*/, 12];
                 case 7:
                     _b.trys.push([7, , 10, 11]);
-                    if (!(reader_6_1 && !reader_6_1.done && (_a = reader_6["return"]))) return [3 /*break*/, 9];
+                    if (!(reader_6_1 && !reader_6_1.done && (_a = reader_6.return))) return [3 /*break*/, 9];
                     return [4 /*yield*/, _a.call(reader_6)];
                 case 8:
                     _b.sent();
@@ -1690,15 +1696,6 @@ function deleteFileSync(path) {
         fs.unlinkSync(path);
     }
 }
-// getValue
-function getValue(line, separatorIndex) {
-    var value = line.substr(separatorIndex + 1).trim();
-    var comment = value.indexOf('#');
-    if (comment !== notFound) {
-        value = value.substr(0, comment).trim();
-    }
-    return value;
-}
 // getExpectedLine
 function getExpectedLine(setting, template) {
     return getExpectedLineAndEvaluationLog(setting, template, false).expected;
@@ -1729,31 +1726,41 @@ function getExpectedLineInFileTemplate(setting, template) {
     }
     return expected;
 }
-// getChangedLine
-function getChangedLine(setting, template, changingKey, changedValue) {
-    var changedLine = '';
-    if (changingKey in setting) {
-        var changingValue = setting[changingKey].value;
-        setting[changingKey].value = changedValue;
-        changedLine = getExpectedLine(setting, template);
-        setting[changingKey].value = changingValue;
+// getReplacedLine
+function getReplacedLine(setting, template, replacedValues) {
+    var replacedSetting = {};
+    for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
+        var key = _a[_i];
+        if (key in replacedValues) {
+            var value = replacedValues[key];
+        }
+        else {
+            var value = setting[key].value;
+        }
+        replacedSetting[key] = { value: value, lineNum: 0 /*dummy*/, isReferenced: true /*dummy*/ };
     }
-    else {
-        changedLine = getExpectedLine(setting, template);
-    }
-    return changedLine;
+    return getExpectedLine(replacedSetting, template);
 }
-// getChangedValue
-function getChangedValue(changedValueAndComment) {
-    var commentIndex = changedValueAndComment.indexOf('#');
-    var changedValue;
-    if (commentIndex !== notFound) {
-        changedValue = changedValueAndComment.substr(0, commentIndex).trim();
+// parseKeyValues
+function parseKeyValueLines(keyValueLines) {
+    var keyValues = {};
+    for (var _i = 0, _a = keyValueLines.split('\n'); _i < _a.length; _i++) {
+        var keyValueString = _a[_i];
+        var separator = keyValueString.indexOf(':');
+        var key = keyValueString.substr(0, separator).trim();
+        var value = getValue(keyValueString, separator);
+        keyValues[key] = value;
     }
-    else {
-        changedValue = changedValueAndComment;
+    return keyValues;
+}
+// getValue
+function getValue(line, separatorIndex) {
+    var value = line.substr(separatorIndex + 1).trim();
+    var comment = value.indexOf('#');
+    if (comment !== notFound) {
+        value = value.substr(0, comment).trim();
     }
-    return changedValue;
+    return value;
 }
 // parseTemplateTag
 function parseTemplateTag(line) {
@@ -2193,7 +2200,7 @@ function translate(englishLiterals) {
             "The parameter must be less than 0": "パラメーターは 0 より小さくしてください",
             "Not found \"${0}\" above": "上方向に「${0}」が見つかりません",
             "Not found \"${0}\" following": "下方向に「${0}」が見つかりません",
-            "Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）"
+            "Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）",
         };
     }
     var translated = english;

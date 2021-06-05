@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var child_process = require("child_process");
 var path = require("path");
@@ -91,18 +91,18 @@ function TestOfCommandLine() {
                         cases = [{
                                 "name": "version",
                                 "parameters": "--version",
-                                "expected": "(not check)"
+                                "expected": "(not check)",
                             }, {
                                 "name": "locale",
                                 "parameters": "search ABC --folder test_data/search/1",
-                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\""
+                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
                             }];
                     }
                     else {
                         cases = [{
                                 "name": "locale",
                                 "parameters": "search ABC --folder test_data/search/1",
-                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\""
+                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
                             }];
                     }
                     _i = 0, cases_1 = cases;

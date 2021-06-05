@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var commander = require("commander");
 var main = require("./main");
 function exitFromCommander(e) {
@@ -61,7 +61,8 @@ function callMain() {
                         main.programArguments.push(arg);
                     }
                     Object.assign(main.programOptions, commander.program.opts());
-                    return [4 /*yield*/, main.main()["catch"](function (e) {
+                    return [4 /*yield*/, main.main()
+                            .catch(function (e) {
                             if (main.programOptions.test) {
                                 throw e;
                             }
@@ -72,7 +73,8 @@ function callMain() {
                                 while ((new Date()).getTime() < timeOver.getTime()) {
                                 }
                             }
-                        })["finally"](function () {
+                        })
+                            .finally(function () {
                             main.InputObject.close();
                         })];
                 case 1:

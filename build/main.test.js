@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var path = require("path");
 var main = require("./main");
@@ -66,7 +66,7 @@ describe("checks template value >>", function () {
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/_checking/" + fileNameHead + "_1.yaml");
                     return [4 /*yield*/, callMain(["check"], {
-                            folder: 'test_data/_checking', test: "", locale: "en-US"
+                            folder: 'test_data/_checking', test: "", locale: "en-US",
                         })];
                 case 1:
                     _a.sent();
@@ -80,7 +80,7 @@ describe("checks template value >>", function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, callMain(["check", "1_template_1_ok_1.yaml"], {
-                        folder: 'test_data', test: "", locale: "en-US"
+                        folder: 'test_data', test: "", locale: "en-US",
                     })];
                 case 1:
                     _a.sent();
@@ -115,7 +115,7 @@ describe("checks file contents >>", function () {
                     copyFileSync(sourceFilePath, changingFilePath);
                     if (!(optionOperation === 'replace')) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileRelativePath, String(lineNum), keyValues], {
-                            folder: 'test_data', test: "", locale: "en-US"
+                            folder: 'test_data', test: "", locale: "en-US",
                         })];
                 case 1:
                     _a.sent();
@@ -123,7 +123,7 @@ describe("checks file contents >>", function () {
                 case 2: 
                 // Test Main
                 return [4 /*yield*/, callMain(["check"], {
-                        folder: 'test_data/_checking/document', test: "", locale: "en-US"
+                        folder: 'test_data/_checking/document', test: "", locale: "en-US",
                     })];
                 case 3:
                     // Test Main
@@ -153,7 +153,7 @@ describe("checks file contents >>", function () {
                     copyFileSync("test_data/file_0_one_error_1.yaml", "test_data/_checking/2/file_2.yaml");
                     // Test Main
                     return [4 /*yield*/, callMain(parameters, {
-                            folder: 'test_data/_checking/1, test_data/_checking/2', test: "", locale: "en-US"
+                            folder: 'test_data/_checking/1, test_data/_checking/2', test: "", locale: "en-US",
                         })];
                 case 1:
                     // Test Main
@@ -170,7 +170,7 @@ describe("replaces settings >>", function () {
     test.each([
         [
             '2_replace_1_ok', 10, 1, 'en-US',
-            "key1: value1changed\n   __Key2__: value2changed  #\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u30B3\u30E1\u30F3\u30C8",
+            "key1: value1changed\n   __Key2__: value2changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8",
             true,
         ], [
             '2_replace_1_ok', 29, 2, 'en-US',
@@ -212,7 +212,7 @@ describe("replaces settings >>", function () {
                     copyFileSync(sourceFilePath, changingFilePath);
                     // Test Main
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 1:
                     // Test Main
@@ -558,9 +558,9 @@ expect.extend({
     because: function (isPassed, errorMessage) {
         return {
             pass: isPassed,
-            message: function () { return errorMessage; }
+            message: function () { return errorMessage; },
         };
-    }
+    },
 });
 var cutBOM = 1;
 var notFound = -1;
