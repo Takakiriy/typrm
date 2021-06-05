@@ -169,37 +169,37 @@ describe("replaces settings >>", function () {
     test.skip('2_replace_5_setting_name', function () { });
     test.each([
         [
-            '2_replace_1_ok', 10, 1, 'en-US',
+            '2_replace_1_ok', ' setting 1', 10, 1, 'en-US',
             "key1: value1changed\n   __Key2__: value2changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8",
             true,
         ], [
-            '2_replace_1_ok', 29, 2, 'en-US',
+            '2_replace_1_ok', ' setting 2', 29, 2, 'en-US',
             "key1: value1changed",
             true,
         ], [
-            '2_replace_2_error', 4, 1, 'en-US',
+            '2_replace_2_error', '', 4, 1, 'en-US',
             "Key3: value3changed",
             false,
         ], [
-            '2_replace_3_English', 10, 1, 'en-US',
+            '2_replace_3_English', '', 10, 1, 'en-US',
             "Key3: value3changed",
             true,
         ], [
-            '2_replace_4_Japanese', 10, 1, 'ja-JP',
+            '2_replace_4_Japanese', '', 10, 1, 'ja-JP',
             "Key3: value3changed",
             false,
+        ], [
+            '2_replace_6_if', ' in if block', 9, 1, 'en-US',
+            "__Setting1__: replaced",
+            false,
             /*        ],[
-                        '2_replace_6_if', 9, 1, 'en-US',
-                        `__Setting1__: replaced`,
-                        false,
-                    ],[
-                        '2_replace_6_if', 9, 1, 'en-US',
+                        '2_replace_6_if', ' both', 9, 1, 'en-US',
                         `fruit: melon
                         __Setting1__: replaced`,
                         false,
             */ 
         ],
-    ])("in %s(%i) setting %i", function (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
+    ])("in %s%s", function (fileNameHead, subCaseName, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, updatedFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {

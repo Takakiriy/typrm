@@ -462,7 +462,7 @@ function checkRoutine(isModal, inputFilePath) {
                         return [3 /*break*/, 40];
                     }
                     _e = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, {}, true)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, changingSettingIndex, parseKeyValueLines(keyValue), true)];
                 case 38:
                     errorCount = _e + _h.sent();
                     _h.label = 39;
@@ -502,7 +502,7 @@ function replaceSettings(inputFilePath, changingLineNum, keyValueLines) {
                 case 3:
                     changingSettingIndex = _b.sent();
                     _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, changingSettingIndex, 'dymmy: 0', parseKeyValueLines(keyValueLines), true)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, changingSettingIndex, parseKeyValueLines(keyValueLines), true)];
                 case 4:
                     errorCount = _a + _b.sent();
                     _b.label = 5;
@@ -517,7 +517,7 @@ function replaceSettings(inputFilePath, changingLineNum, keyValueLines) {
 // revertSettings
 function revertSettings(inputFilePath, changingLineNum) {
     return __awaiter(this, void 0, void 0, function () {
-        var inputFileFullPath, errorCount, changingSettingIndex, keyValues, _i, keyValues_1, keyValue, _a;
+        var inputFileFullPath, errorCount, changingSettingIndex, keyValues, _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0: return [4 /*yield*/, getInputFileFullPath(inputFilePath)];
@@ -526,27 +526,19 @@ function revertSettings(inputFilePath, changingLineNum) {
                     errorCount = 0;
                     if (!(inputFileFullPath === '')) return [3 /*break*/, 2];
                     errorCount += 1;
-                    return [3 /*break*/, 8];
+                    return [3 /*break*/, 6];
                 case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, changingLineNum)];
                 case 3:
                     changingSettingIndex = _b.sent();
                     return [4 /*yield*/, makeRevertSettings(inputFileFullPath, changingSettingIndex)];
                 case 4:
                     keyValues = _b.sent();
-                    _i = 0, keyValues_1 = keyValues;
-                    _b.label = 5;
-                case 5:
-                    if (!(_i < keyValues_1.length)) return [3 /*break*/, 8];
-                    keyValue = keyValues_1[_i];
                     _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, changingSettingIndex, keyValue, {}, false)];
-                case 6:
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, changingSettingIndex, parseKeyValueLines(keyValues), false)];
+                case 5:
                     errorCount = _a + _b.sent();
-                    _b.label = 7;
-                case 7:
-                    _i++;
-                    return [3 /*break*/, 5];
-                case 8:
+                    _b.label = 6;
+                case 6:
                     console.log('');
                     console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
                     return [2 /*return*/];
@@ -594,26 +586,15 @@ function getInputFileFullPath(inputFilePath) {
     });
 }
 // replaceSettingsSub
-function replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, keyValues, addOriginalTag) {
+function replaceSettingsSub(inputFilePath, changingSettingIndex, keyValues, addOriginalTag) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, separator, changingKey, changedValue__, replacedValues, oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isChanging, ifTagParser, oldIfTagParser, reader_3, reader_3_1, line1, line, output, separator_1, key, oldValue, replacingKeys, changedValue, commentIndex, comment, original, templateTag, replacingLine, expected, changed, before, after, e_3_1;
+        var errorCount, replacedKeyValues, oldFilePath, newFilePath, writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isChanging, ifTagParser, oldIfTagParser, reader_3, reader_3_1, line1, line, output, separator, key, oldValue, replacingKeys, changedValue, commentIndex, comment, original, templateTag, replacingLine, expected, changed, before, after, e_3_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     errorCount = 0;
-                    separator = keyValue.indexOf(':');
-                    if (separator === notFound) {
-                        return [2 /*return*/, errorCount]; // 0
-                    }
-                    changingKey = keyValue.substr(0, separator).trim();
-                    changedValue__ = getValue(keyValue, separator);
-                    replacedValues = {};
-                    replacedValues[changingKey] = changedValue__;
-                    if (Object.keys(keyValues).length !== 0) {
-                        replacedValues = keyValues;
-                    }
-                    pp(replacedValues);
+                    replacedKeyValues = keyValues;
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
                     writer = new WriteBuffer(fs.createWriteStream(newFilePath));
@@ -669,18 +650,18 @@ function replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, keyVa
                     if (isChanging) {
                         // In settings tag
                         if (isReadingSetting) {
-                            separator_1 = line.indexOf(':');
-                            if (separator_1 !== notFound) {
-                                key = line.substr(0, separator_1).trim();
-                                oldValue = getValue(line, separator_1);
+                            separator = line.indexOf(':');
+                            if (separator !== notFound) {
+                                key = line.substr(0, separator).trim();
+                                oldValue = getValue(line, separator);
                                 if (oldValue !== '' && oldIfTagParser.thisIsOutOfFalseBlock) {
                                     oldSetting[key] = { value: oldValue, isReferenced: false, lineNum: lineNum };
                                 }
                                 if (ifTagParser.thisIsOutOfFalseBlock) {
-                                    replacingKeys = Object.keys(replacedValues);
+                                    replacingKeys = Object.keys(replacedKeyValues);
                                     if (replacingKeys.includes(key)) {
-                                        changedValue = replacedValues[key];
-                                        commentIndex = line.indexOf('#', separator_1);
+                                        changedValue = replacedKeyValues[key];
+                                        commentIndex = line.indexOf('#', separator);
                                         comment = '';
                                         if (commentIndex !== notFound && !changedValue.includes('#')) {
                                             comment = '  ' + line.substr(commentIndex);
@@ -696,7 +677,7 @@ function replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, keyVa
                                                 comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(changedValue)), '');
                                             }
                                         }
-                                        writer.write(line.substr(0, separator_1 + 1) + ' ' + changedValue + original + comment + "\n");
+                                        writer.write(line.substr(0, separator + 1) + ' ' + changedValue + original + comment + "\n");
                                         output = true;
                                         setting[key] = { value: changedValue, isReferenced: false, lineNum: lineNum };
                                     }
@@ -711,10 +692,10 @@ function replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, keyVa
                         }
                         else {
                             templateTag = parseTemplateTag(line);
-                            if (templateTag.isFound && templateTag.includesKey(Object.keys(replacedValues)) && ifTagParser.thisIsOutOfFalseBlock) {
+                            if (templateTag.isFound && templateTag.includesKey(Object.keys(replacedKeyValues)) && ifTagParser.thisIsOutOfFalseBlock) {
                                 replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                                 expected = getExpectedLine(oldSetting, templateTag.template);
-                                changed = getReplacedLine(setting, templateTag.template, replacedValues);
+                                changed = getReplacedLine(setting, templateTag.template, replacedKeyValues);
                                 if (replacingLine.includes(expected)) {
                                     before = expected;
                                     after = changed;
@@ -794,7 +775,7 @@ function makeRevertSettings(inputFilePath, changingSettingIndex) {
                         crlfDelay: Infinity
                     });
                     isReadingSetting = false;
-                    revertSetting = [];
+                    revertSetting = '';
                     settingCount = 0;
                     settingIndentLength = 0;
                     lineNum = 0;
@@ -833,7 +814,7 @@ function makeRevertSettings(inputFilePath, changingSettingIndex) {
                             key = line.substr(0, separator).trim();
                             originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
                             originalValue = getValue(line, originalLabelSeparator);
-                            revertSetting.push(key + ": " + originalValue);
+                            revertSetting += key + ": " + originalValue + '\n';
                         }
                     }
                     _b.label = 4;

@@ -109,40 +109,40 @@ describe("replaces settings >>", () => {
     test.skip('2_replace_5_setting_name',()=>{});
     test.each([
         [
-            '2_replace_1_ok', 10, 1, 'en-US',
+            '2_replace_1_ok', ' setting 1', 10, 1, 'en-US',
             `key1: value1changed
    __Key2__: value2changed  #ここは置き換え後に入らないコメント
 Key3: value3changed  #ここは置き換え後に入らないコメント`,
             true,
         ],[
-            '2_replace_1_ok', 29, 2, 'en-US',
+            '2_replace_1_ok', ' setting 2', 29, 2, 'en-US',
             `key1: value1changed`,
             true,
         ],[
-            '2_replace_2_error', 4, 1, 'en-US',
+            '2_replace_2_error', '', 4, 1, 'en-US',
             `Key3: value3changed`,
             false,
         ],[
-            '2_replace_3_English', 10, 1, 'en-US',
+            '2_replace_3_English', '', 10, 1, 'en-US',
             `Key3: value3changed`,
             true,
         ],[
-            '2_replace_4_Japanese', 10, 1, 'ja-JP',
+            '2_replace_4_Japanese', '', 10, 1, 'ja-JP',
             `Key3: value3changed`,
             false,
-/*        ],[
-            '2_replace_6_if', 9, 1, 'en-US',
+        ],[
+            '2_replace_6_if', ' in if block', 9, 1, 'en-US',
             `__Setting1__: replaced`,
             false,
-        ],[
-            '2_replace_6_if', 9, 1, 'en-US',
+/*        ],[
+            '2_replace_6_if', ' both', 9, 1, 'en-US',
             `fruit: melon
             __Setting1__: replaced`,
             false,
 */        ],
 
-    ])("in %s(%i) setting %i", async (fileNameHead, lineNum, settingNum, locale, keyValues, isSuccess) => {
-//if (fileNameHead !== '2_replace_6_if'  ||  ! keyValues.includes('fruit')) {return;}
+    ])("in %s%s", async (fileNameHead, subCaseName, lineNum, settingNum, locale, keyValues, isSuccess) => {
+//if (fileNameHead !== '2_replace_6_if'  ||  subCaseName !== ' both') {return;}
         const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";

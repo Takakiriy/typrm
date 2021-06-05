@@ -8,6 +8,6 @@ test_of_if_tag_in_settings:
     check:
         yes:  #template: __Setting1__
         banana:  #if: $settings.fruit == banana
-            __Setting1__: yes
+            yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
-            __Setting1__: no
+            no  #template: __Setting1__

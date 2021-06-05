@@ -339,7 +339,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     if (keyValue === '') {
                         break;
                     }
-                    errorCount += await replaceSettingsSub(inputFilePath, changingSettingIndex, keyValue, {}, true);
+                    errorCount += await replaceSettingsSub(inputFilePath, changingSettingIndex, parseKeyValueLines(keyValue), true);
                 }
             }
             loop = (errorCount >= 1);
@@ -363,7 +363,7 @@ async function  replaceSettings(inputFilePath: string, changingLineNum: number, 
     } else {
         const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
 
-        errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, 'dymmy: 0', parseKeyValueLines(keyValueLines), true);
+        errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, parseKeyValueLines(keyValueLines), true);
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
@@ -377,11 +377,9 @@ async function  revertSettings(inputFilePath: string, changingLineNum: number) {
         errorCount += 1;
     } else {
         const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
-        const  keyValues: string[] = await makeRevertSettings(inputFileFullPath, changingSettingIndex);
-        for (const keyValue of keyValues) {
-
-            errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, keyValue, {}, false);
-        }
+        const  keyValues = await makeRevertSettings(inputFileFullPath, changingSettingIndex);
+        
+        errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, parseKeyValueLines(keyValues), false);
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
@@ -418,20 +416,10 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 
 // replaceSettingsSub
 async function  replaceSettingsSub(inputFilePath: string, changingSettingIndex: number,
-        keyValue: string, keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
+        keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
 
-    let  errorCount = 0;
-    const  separator = keyValue.indexOf(':');
-    if (separator === notFound) {
-        return  errorCount;  // 0
-    }
-    const  changingKey = keyValue.substr(0, separator).trim();
-    const  changedValue__ = getValue(keyValue, separator);
-    var    replacedValues: {[key:string]: string} = {};  replacedValues[changingKey] = changedValue__;
-    if (Object.keys(keyValues).length !== 0) {
-        replacedValues = keyValues;
-    }
-pp(replacedValues)
+    var    errorCount = 0;
+    var    replacedKeyValues = keyValues;
     const  oldFilePath = inputFilePath;
     const  newFilePath = inputFilePath +".new";
     const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
@@ -490,10 +478,10 @@ pp(replacedValues)
                         oldSetting[key] = {value: oldValue, isReferenced: false, lineNum};
                     }
                     if (ifTagParser.thisIsOutOfFalseBlock) {
-                        const  replacingKeys = Object.keys(replacedValues);
+                        const  replacingKeys = Object.keys(replacedKeyValues);
                     
                         if (replacingKeys.includes(key)) {
-                            const  changedValue = replacedValues[key];
+                            const  changedValue = replacedKeyValues[key];
                             const  commentIndex = line.indexOf('#', separator);
                             let    comment= '';
                             if (commentIndex !== notFound  &&  ! changedValue.includes('#')) {
@@ -526,10 +514,10 @@ pp(replacedValues)
             // Out of settings
             } else {
                 const  templateTag = parseTemplateTag(line);
-                if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(replacedValues))  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(replacedKeyValues))  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                     const  expected = getExpectedLine(oldSetting, templateTag.template);
-                    const  changed = getReplacedLine(setting, templateTag.template, replacedValues);
+                    const  changed = getReplacedLine(setting, templateTag.template, replacedKeyValues);
 
                     if (replacingLine.includes(expected)) {
                         const  before = expected;
@@ -575,14 +563,14 @@ pp(replacedValues)
 }
 
 // makeRevertSettings
-async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: number): Promise<string[]> /* "key: value" */ {
+async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: number): Promise<string> /* "key: value\n" */ {
     const  readStream = fs.createReadStream(inputFilePath);
     const  reader = readline.createInterface({
         input: readStream,
         crlfDelay: Infinity
     });
     let  isReadingSetting = false;
-    let  revertSetting: string[] = [];
+    let  revertSetting = '';
     let  settingCount = 0;
     let  settingIndentLength = 0;
     let  lineNum = 0;
@@ -615,7 +603,7 @@ async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: 
                 const  originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
                 const  originalValue = getValue(line, originalLabelSeparator);
 
-                revertSetting.push(`${key}: ${originalValue}`);
+                revertSetting += `${key}: ${originalValue}` + '\n';
             }
         }
     }
