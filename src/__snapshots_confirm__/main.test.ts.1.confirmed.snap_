@@ -712,6 +712,23 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
 "
 `;
 
+exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
+test_of_if_tag_in_settings_reverse:
+    settings:
+        fruit: banana
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: no
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+    check:
+        yes:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit != banana
+            no  #template: __Setting1__
+"
+`;
+
 exports[`replaces settings >> in 2_replace_6_if both: stdout 1`] = `
 "
 Warning: 0, Error: 0

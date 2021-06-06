@@ -3,6 +3,7 @@ import * as path from "path";
 import { ppid } from "process";
 import * as main from "./main";
 import * as chalk from "chalk";
+const snapshot = require("./__snapshots__/main.test.ts.snap");
 const callMain = main.callMainFromJest;
 
 if (path.basename(process.cwd()) !== "src") {
@@ -109,43 +110,35 @@ describe("replaces settings >>", () => {
     test.skip('2_replace_5_setting_name',()=>{});
     test.each([
         [
-            '2_replace_1_ok', ' setting 1', 10, 1, 'en-US',
+            '2_replace_1_ok', ' setting 1', 10, 'en-US',
             `key1: value1changed
    __Key2__: value2changed  #ここは置き換え後に入らないコメント
 Key3: value3changed  #ここは置き換え後に入らないコメント`,
-            true,
         ],[
-            '2_replace_1_ok', ' setting 2', 29, 2, 'en-US',
+            '2_replace_1_ok', ' setting 2', 29, 'en-US',
             `key1: value1changed`,
-            true,
         ],[
-            '2_replace_2_error', '', 4, 1, 'en-US',
+            '2_replace_2_error', '', 4, 'en-US',
             `Key3: value3changed`,
-            false,
         ],[
-            '2_replace_3_English', '', 10, 1, 'en-US',
+            '2_replace_3_English', '', 10, 'en-US',
             `Key3: value3changed`,
-            true,
         ],[
-            '2_replace_4_Japanese', '', 10, 1, 'ja-JP',
+            '2_replace_4_Japanese', '', 10, 'ja-JP',
             `Key3: value3changed`,
-            false,
         ],[
-            '2_replace_6_if', ' in if block', 9, 1, 'en-US',
+            '2_replace_6_if', ' in if block', 9, 'en-US',
             `__Setting1__: replaced`,
-            false,
         ],[
-            '2_replace_6_if', ' in if variable', 9, 1, 'en-US',
+            '2_replace_6_if', ' in if variable', 9, 'en-US',
             `fruit: melon`,
-            false,
         ],[
-            '2_replace_6_if', ' both', 9, 1, 'en-US',
+            '2_replace_6_if', ' both', 9, 'en-US',
             `fruit: melon
             __Setting1__: replaced`,
-            false,
         ],
 
-    ])("in %s%s", async (fileNameHead, subCaseName, lineNum, settingNum, locale, keyValues, isSuccess) => {
+    ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
         const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
@@ -210,29 +203,47 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         });
     });
 
-    test("revert >>", async () => {
-        const  fileNameHead = "2_replace_1_ok";
-        const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
-        const  changingFolderPath = testFolderPath + '_changing';
-        const  changingFileName = fileNameHead + "_1_changing.yaml";
-        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-        copyFileSync(sourceFilePath, changingFilePath);
-        await callMain(["replace", changingFileName, '29', 'key1: value1changed'], {
-            folder: changingFolderPath, test: "", locale: "en-US"
-        });
-        const  sourceFileContents  = fs.readFileSync(sourceFilePath  ).toString().substr(cutBOM);
-        const  updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-        expect(updatedFileContents).not.toBe(sourceFileContents);
+    describe("revert", () => {
+        test.skip("2_replace_6_if both", () => {});
+        test.each([
+            [
+/*              '2_replace_6_if', ' both', 9, 'en-US',
+                `fruit: melon
+                __Setting1__: replaced`,
+            ],[
+*/              '2_replace_1_ok', ' setting 2', 29, 'en-US',
+                `key1: value1changed`,
+            ],[
+                '2_replace_6_if', ' in if block', 9, 'en-US',
+                `__Setting1__: replaced`,
+            ],[
+                '2_replace_6_if', ' in if variable', 9, 'en-US',
+                `fruit: melon`,
+            ],
 
-        // Test Main
-        await callMain(["revert", changingFileName, '29'], {
-            folder: changingFolderPath, test: "", locale: "en-US"
-        });
-        const  revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+        ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
+            const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
+            const  changingFolderPath = testFolderPath + '_changing';
+            const  changingFileName = fileNameHead + "_1_changing.yaml";
+            const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+            copyFileSync(sourceFilePath, changingFilePath);
+            await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
+                folder: changingFolderPath, test: "", locale
+            });
+            const  sourceFileContents  = fs.readFileSync(sourceFilePath  ).toString().substr(cutBOM);
+            const  updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+            expect(updatedFileContents).not.toBe(sourceFileContents);
 
-        expect(revertedFileContents).toBe(sourceFileContents);
-        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+            // Test Main
+            await callMain(["revert", changingFileName, lineNum.toString()], {
+                folder: changingFolderPath, test: "", locale
+            });
+            const  revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+
+            expect(revertedFileContents).toBe(sourceFileContents);
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        });
     });
 });
 

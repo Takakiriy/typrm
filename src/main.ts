@@ -378,7 +378,7 @@ async function  revertSettings(inputFilePath: string, replacingLineNum: number) 
     } else {
         const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum);
         const  keyValues = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
-        
+
         errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValues), false);
     }
     console.log('');
@@ -424,6 +424,13 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     const  oldFilePath = inputFilePath;
     const  newFilePath = inputFilePath +".new";
     var    loop = true;
+    const  verboseMode = false;
+    if (verboseMode) {
+        console.log(`verbose >> inputFilePath: ${inputFilePath}`);
+        console.log(`verbose >> setting index: ${replacingSettingIndex}`)
+        console.log(`verbose >> keyValues: ${JSON.stringify(keyValues)}`);
+    }
+
     while (loop) {
         const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
         const  readStream = fs.createReadStream(oldFilePath);
@@ -470,11 +477,11 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             }
             ifTagParser.parse(line, setting, Object.keys(previousEvalatedKeys));
             oldIfTagParser.parse(line, oldSetting, Object.keys(previousEvalatedKeys));
-            if ( ! ifTagParser.isReplacable) {
-                isAllReplacable = false;
-            }
 
             if (isReplacing) {
+                if ( ! ifTagParser.isReplacable) {
+                    isAllReplacable = false;
+                }
 
                 // In settings tag
                 if (isReadingSetting) {
@@ -519,6 +526,10 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + comment + "\n");
                                 output = true;
                                 setting[key] = {value: replacedValue, isReferenced: false, lineNum};
+                                if (verboseMode  &&  oldValue !== replacedValue) {
+                                    console.log(`verbose >> replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                    console.log(`verbose >>     at: ${inputFilePath}:${lineNum}:`);
+                                }
                             }
                             else {
                                 if (oldValue !== '') {
@@ -548,6 +559,12 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 writer.write(line.replace(before, after) +"\n");
                                 output = true;
                             }
+                            if (verboseMode  &&  before !== after) {
+                                console.log(`verbose >> replaced a line:`);
+                                console.log(`verbose >>     from: ${before}`);
+                                console.log(`verbose >>     to:   ${after}`);
+                                console.log(`verbose >>     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
+                            }
                         } else if (replacingLine.includes(replaced)) {
                             // Do nothing
                         } else {
@@ -574,13 +591,12 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         // previousReplacedKeys = ...
         Object.keys(evalatedKeys).forEach((key: string) => {
             previousEvalatedKeys[key] = evalatedKeys[key]; });
-        if (previousEvalatedKeysLength == Object.keys(previousEvalatedKeys).length) {
+        if (isAllReplacable) {
+            loop = false;
+        } else if (previousEvalatedKeysLength == Object.keys(previousEvalatedKeys).length) {
             console.log('')
             console.log('Error of unexpected')
             errorCount += 1;
-            loop = false;
-        }
-        if (isAllReplacable) {
             loop = false;
         }
 
@@ -835,7 +851,7 @@ class  IfTagParser {
     readonly  indentLengthsOfIfTag: IfTag[] = [
         {indentLength: -1, resultOfIf: true, enabled: true, isReplacable: true}
     ];
-    get      isReplacable(): boolean {return this.isReplacable_;}
+    get      isReplacable(): boolean {return this.isReplacable_;}  // #search: typrm replace with if tag
     private  isReplacable_: boolean = true;
 
     parse(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
@@ -1688,6 +1704,7 @@ function  println(message: any, delayedExpanding: boolean = false) {
     }
     if (withJest && !delayedExpanding) {
         stdout += message.toString() + '\n';
+        pp(message.toString());
     } else {
         consoleLog(message);
     }

@@ -40,6 +40,7 @@ var fs = require("fs");
 var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
+var snapshot = require("./__snapshots__/main.test.ts.snap");
 var callMain = main.callMainFromJest;
 if (path.basename(process.cwd()) !== "src") {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
@@ -169,39 +170,31 @@ describe("replaces settings >>", function () {
     test.skip('2_replace_5_setting_name', function () { });
     test.each([
         [
-            '2_replace_1_ok', ' setting 1', 10, 1, 'en-US',
+            '2_replace_1_ok', ' setting 1', 10, 'en-US',
             "key1: value1changed\n   __Key2__: value2changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8",
-            true,
         ], [
-            '2_replace_1_ok', ' setting 2', 29, 2, 'en-US',
+            '2_replace_1_ok', ' setting 2', 29, 'en-US',
             "key1: value1changed",
-            true,
         ], [
-            '2_replace_2_error', '', 4, 1, 'en-US',
+            '2_replace_2_error', '', 4, 'en-US',
             "Key3: value3changed",
-            false,
         ], [
-            '2_replace_3_English', '', 10, 1, 'en-US',
+            '2_replace_3_English', '', 10, 'en-US',
             "Key3: value3changed",
-            true,
         ], [
-            '2_replace_4_Japanese', '', 10, 1, 'ja-JP',
+            '2_replace_4_Japanese', '', 10, 'ja-JP',
             "Key3: value3changed",
-            false,
         ], [
-            '2_replace_6_if', ' in if block', 9, 1, 'en-US',
+            '2_replace_6_if', ' in if block', 9, 'en-US',
             "__Setting1__: replaced",
-            false,
         ], [
-            '2_replace_6_if', ' in if variable', 9, 1, 'en-US',
+            '2_replace_6_if', ' in if variable', 9, 'en-US',
             "fruit: melon",
-            false,
         ], [
-            '2_replace_6_if', ' both', 9, 1, 'en-US',
+            '2_replace_6_if', ' both', 9, 'en-US',
             "fruit: melon\n            __Setting1__: replaced",
-            false,
         ],
-    ])("in %s%s", function (fileNameHead, subCaseName, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
+    ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, updatedFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -281,40 +274,57 @@ describe("replaces settings >>", function () {
             });
         }); });
     });
-    test("revert >>", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var fileNameHead, sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    fileNameHead = "2_replace_1_ok";
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
-                    changingFolderPath = testFolderPath + '_changing';
-                    changingFileName = fileNameHead + "_1_changing.yaml";
-                    changingFilePath = changingFolderPath + '/' + changingFileName;
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    copyFileSync(sourceFilePath, changingFilePath);
-                    return [4 /*yield*/, callMain(["replace", changingFileName, '29', 'key1: value1changed'], {
-                            folder: changingFolderPath, test: "", locale: "en-US"
-                        })];
-                case 1:
-                    _a.sent();
-                    sourceFileContents = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-                    updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-                    expect(updatedFileContents).not.toBe(sourceFileContents);
-                    // Test Main
-                    return [4 /*yield*/, callMain(["revert", changingFileName, '29'], {
-                            folder: changingFolderPath, test: "", locale: "en-US"
-                        })];
-                case 2:
-                    // Test Main
-                    _a.sent();
-                    revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
-                    expect(revertedFileContents).toBe(sourceFileContents);
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    describe("revert", function () {
+        test.skip("2_replace_6_if both", function () { });
+        test.each([
+            [
+                /*              '2_replace_6_if', ' both', 9, 'en-US',
+                                `fruit: melon
+                                __Setting1__: replaced`,
+                            ],[
+                */ '2_replace_1_ok', ' setting 2', 29, 'en-US',
+                "key1: value1changed",
+            ], [
+                '2_replace_6_if', ' in if block', 9, 'en-US',
+                "__Setting1__: replaced",
+            ], [
+                '2_replace_6_if', ' in if variable', 9, 'en-US',
+                "fruit: melon",
+            ],
+        ])("%s%s >>", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
+            var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+                        changingFolderPath = testFolderPath + '_changing';
+                        changingFileName = fileNameHead + "_1_changing.yaml";
+                        changingFilePath = changingFolderPath + '/' + changingFileName;
+                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                        copyFileSync(sourceFilePath, changingFilePath);
+                        return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
+                                folder: changingFolderPath, test: "", locale: locale
+                            })];
+                    case 1:
+                        _a.sent();
+                        sourceFileContents = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
+                        updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                        expect(updatedFileContents).not.toBe(sourceFileContents);
+                        // Test Main
+                        return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
+                                folder: changingFolderPath, test: "", locale: locale
+                            })];
+                    case 2:
+                        // Test Main
+                        _a.sent();
+                        revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                        expect(revertedFileContents).toBe(sourceFileContents);
+                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
 });
 describe("searches keyword tag >>", function () {
     test.each([
