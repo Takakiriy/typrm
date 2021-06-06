@@ -192,12 +192,14 @@ describe("replaces settings >>", function () {
             '2_replace_6_if', ' in if block', 9, 1, 'en-US',
             "__Setting1__: replaced",
             false,
-            /*        ],[
-                        '2_replace_6_if', ' both', 9, 1, 'en-US',
-                        `fruit: melon
-                        __Setting1__: replaced`,
-                        false,
-            */ 
+        ], [
+            '2_replace_6_if', ' in if variable', 9, 1, 'en-US',
+            "fruit: melon",
+            false,
+        ], [
+            '2_replace_6_if', ' both', 9, 1, 'en-US',
+            "fruit: melon\n            __Setting1__: replaced",
+            false,
         ],
     ])("in %s%s", function (fileNameHead, subCaseName, lineNum, settingNum, locale, keyValues, isSuccess) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, updatedFileContents;

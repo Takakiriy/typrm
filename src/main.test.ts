@@ -134,15 +134,18 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             '2_replace_6_if', ' in if block', 9, 1, 'en-US',
             `__Setting1__: replaced`,
             false,
-/*        ],[
+        ],[
+            '2_replace_6_if', ' in if variable', 9, 1, 'en-US',
+            `fruit: melon`,
+            false,
+        ],[
             '2_replace_6_if', ' both', 9, 1, 'en-US',
             `fruit: melon
             __Setting1__: replaced`,
             false,
-*/        ],
+        ],
 
     ])("in %s%s", async (fileNameHead, subCaseName, lineNum, settingNum, locale, keyValues, isSuccess) => {
-//if (fileNameHead !== '2_replace_6_if'  ||  subCaseName !== ' both') {return;}
         const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
@@ -159,7 +162,6 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
     });
 
     describe("Multi folder >>", () => {

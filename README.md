@@ -439,6 +439,14 @@ The scope of the condition specified in the `#if:` tag
 is the same as or before the indentation depth of the line
 where the `#if:` tag is written.
 
+The replace command replaces only the values of variables
+that satisfy the condition of `#if:` are replaced.
+For example, specifying `__Color__` with replace command replaces
+`__Color__` after banana and does not replace `__Color__` after crow.
+Also, specifying `target` in the replace command replaces
+the `target` in the setting,
+`target`, `__Color__` and `__Type__` in the body.
+
 To the right of `#if:`, you can write only the conditions
 that meet the following format.
 

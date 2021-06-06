@@ -411,8 +411,8 @@ exports[`checks template value >> secret_1_error 1`] = `
 "
 WarningLine: 4
   This is a secret value.
-  Change \\"#secret\\" to \\"#secret:example\\".'
-  Change \\"#★秘密\\" to \\"#★秘密:仮\\".'
+  Replace \\"#secret\\" to \\"#secret:example\\".'
+  Replace \\"#★秘密\\" to \\"#★秘密:仮\\".'
   SettingIndex: 1
 Not referenced: key1 in line 2
 Not referenced: __Key2__ in line 3
@@ -753,6 +753,29 @@ exports[`replaces settings >> in 2_replace_6_if in if block: updatedFileContents
         replaced:  #template: __Setting1__
         banana:  #if: $settings.fruit == banana
             replaced  #template: __Setting1__
+        not banana:  #if: $settings.fruit != banana
+            no  #template: __Setting1__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_6_if in if variable: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileContents 1`] = `
+"est_of_if_tag_in_settings:
+    settings:
+        fruit: melon  #original: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: no
+    check:
+        no:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             no  #template: __Setting1__
 "

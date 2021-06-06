@@ -36,16 +36,16 @@ export async function  main() {
         else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
             varidateUpdateCommandArguments();
             const  inputFilePath = programArguments[1];
-            const  changingLineNum = parseInt(programArguments[2]);
+            const  replacingLineNum = parseInt(programArguments[2]);
             const  keyValues = programArguments[3];
 
-            await replaceSettings(inputFilePath, changingLineNum, keyValues);
+            await replaceSettings(inputFilePath, replacingLineNum, keyValues);
         }
         else if (programArguments[0] === 'revert') {
             const  inputFilePath = programArguments[1];
-            const  changingLineNum = parseInt(programArguments[2]);
+            const  replacingLineNum = parseInt(programArguments[2]);
 
-            await revertSettings(inputFilePath, changingLineNum);
+            await revertSettings(inputFilePath, replacingLineNum);
         }
         else {
             await search();
@@ -219,8 +219,8 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                         console.log("");
                         console.log(`${translate('WarningLine')}: ${lineNum}`);
                         console.log(`  ${translate('This is a secret value.')}`);
-                        console.log('  '+ translate`Change "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
-                        console.log('  '+ translate`Change "${secretLabel}" to "${secretExamleLabel}".'`);
+                        console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
+                        console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
                         console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
                         warningCount += 1;
                     }
@@ -320,26 +320,26 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             break;
         }
 
-        // Rescan or change a value
+        // Rescan or replace a value
         let  loop = true;
         while (loop) {
             console.log(translate('Press Enter key to retry checking.'));
 
-            const  key = await input(translate('The line number to change the variable value >'));
+            const  key = await input(translate('The line number to replace the variable value >'));
             errorCount = 0;
             if (key === 'exit') {
                 return;
             } else if (key !== '') {
                 const  lineNum = parseInt(key);
-                const  changingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, lineNum);
-                console.log(`${translate('SettingIndex')}: ${changingSettingIndex}`);
+                const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, lineNum);
+                console.log(`${translate('SettingIndex')}: ${replacingSettingIndex}`);
                 console.log(translate('Enter only: finish to input setting'));
                 for (;;) {
                     const  keyValue = await input(translate('key: new_value>'));
                     if (keyValue === '') {
                         break;
                     }
-                    errorCount += await replaceSettingsSub(inputFilePath, changingSettingIndex, parseKeyValueLines(keyValue), true);
+                    errorCount += await replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true);
                 }
             }
             loop = (errorCount >= 1);
@@ -355,31 +355,31 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 }
 
 // replaceSettings
-async function  replaceSettings(inputFilePath: string, changingLineNum: number, keyValueLines: string) {
+async function  replaceSettings(inputFilePath: string, replacingLineNum: number, keyValueLines: string) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
         errorCount += 1;
     } else {
-        const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
+        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum);
 
-        errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, parseKeyValueLines(keyValueLines), true);
+        errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true);
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
 }
 
 // revertSettings
-async function  revertSettings(inputFilePath: string, changingLineNum: number) {
+async function  revertSettings(inputFilePath: string, replacingLineNum: number) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
         errorCount += 1;
     } else {
-        const  changingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, changingLineNum);
-        const  keyValues = await makeRevertSettings(inputFileFullPath, changingSettingIndex);
+        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum);
+        const  keyValues = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
         
-        errorCount += await replaceSettingsSub(inputFileFullPath, changingSettingIndex, parseKeyValueLines(keyValues), false);
+        errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValues), false);
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
@@ -415,155 +415,190 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 }
 
 // replaceSettingsSub
-async function  replaceSettingsSub(inputFilePath: string, changingSettingIndex: number,
+async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex: number,
         keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
 
     var    errorCount = 0;
-    var    replacedKeyValues = keyValues;
+    var    replacingKeyValues = keyValues;
+    var    previousEvalatedKeys: {[key: string]: string} = {};
     const  oldFilePath = inputFilePath;
     const  newFilePath = inputFilePath +".new";
-    const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
-    const  readStream = fs.createReadStream(oldFilePath);
-    const  reader = readline.createInterface({
-        input: readStream,
-        crlfDelay: Infinity
-    });
-    const  lines = [];
-    let  isReadingSetting = false;
-    let  setting: Settings = {};
-    let  settingCount = 0;
-    let  settingIndentLength = 0;
-    let  settingLineNum = -1;
-    let  oldSetting: Settings = {};
-    let  lineNum = 0;
-    let  isChanging = false;
-    const  ifTagParser = new IfTagParser();
-    const  oldIfTagParser = new IfTagParser();
-
-    for await (const line1 of reader) {
-        const  line: string = line1;
-        lines.push(line);
-        lineNum += 1;
-        let  output = false;
-
-        // isReadingSetting = ...
-        if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
-            isReadingSetting = true;
-            setting = {};
-            settingCount += 1;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            settingLineNum = lineNum;
-            oldSetting = {};
-            if (changingSettingIndex === allSetting) {
-                isChanging = true;
-            } else {
-                isChanging = (settingCount === changingSettingIndex);
-            }
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-            isReadingSetting = false;
-        }
-        ifTagParser.parse(line, setting);
-        oldIfTagParser.parse(line, oldSetting);
-
-        if (isChanging) {
-
-            // In settings tag
-            if (isReadingSetting) {
-                const  separator = line.indexOf(':');
-                if (separator !== notFound) {
-                    const  key = line.substr(0, separator).trim();
-                    const  oldValue = getValue(line, separator);
-                    if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
-
-                        oldSetting[key] = {value: oldValue, isReferenced: false, lineNum};
-                    }
-                    if (ifTagParser.thisIsOutOfFalseBlock) {
-                        const  replacingKeys = Object.keys(replacedKeyValues);
-                    
-                        if (replacingKeys.includes(key)) {
-                            const  changedValue = replacedKeyValues[key];
-                            const  commentIndex = line.indexOf('#', separator);
-                            let    comment= '';
-                            if (commentIndex !== notFound  &&  ! changedValue.includes('#')) {
-                                comment = '  ' + line.substr(commentIndex);
-                            }
-                            let  original = '';
-                            if ( ! line.includes(originalLabel)) {
-                                if (addOriginalTag) {
-                                    original = `  ${originalLabel} ${oldValue}`;
-                                }
-                            } else {
-                                if ( ! addOriginalTag) {
-                                    comment = comment.replace(new RegExp(
-                                        ` *${originalLabel} *${escapeRegularExpression(changedValue)}`), '');
-                                }
-                            }
-
-                            writer.write(line.substr(0, separator + 1) +' '+ changedValue + original + comment + "\n");
-                            output = true;
-                            setting[key] = {value: changedValue, isReferenced: false, lineNum};
-                        }
-                        else {
-                            if (oldValue !== '') {
-                                setting[key] = {value: oldValue, isReferenced: false, lineNum};
-                            }
-                        }
-                    }
-                }
-
-            // Out of settings
-            } else {
-                const  templateTag = parseTemplateTag(line);
-                if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(replacedKeyValues))  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                    const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                    const  expected = getExpectedLine(oldSetting, templateTag.template);
-                    const  changed = getReplacedLine(setting, templateTag.template, replacedKeyValues);
-
-                    if (replacingLine.includes(expected)) {
-                        const  before = expected;
-                        const  after = changed;
-                        if (templateTag.lineNumOffset <= -1) {
-                            writer.replaceAboveLine(templateTag.lineNumOffset,
-                                replacingLine.replace(before, after)+"\n");
-                        } else {
-
-                            writer.write(line.replace(before, after) +"\n");
-                            output = true;
-                        }
-                    } else if (replacingLine.includes(changed)) {
-                        // Do nothing
-                    } else {
-                        if (errorCount === 0) { // Since only one old value can be replaced at a time
-                            console.log('');
-                            console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                            console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
-                            console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
-                            console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                            console.log(`  ${translate('Expected')}: ${expected.trim()}`);
-                            console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
-                            console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                            errorCount += 1;
-                        }
-                    }
-                }
-            }
-        }
-        if (!output) {
-            writer.write(line +"\n");
-        }
-    }
-    writer.end();
-    return new Promise( (resolve) => {
-        writer.on('finish', () => {
-            fs.copyFileSync(newFilePath, inputFilePath);
-            deleteFileSync(newFilePath);
-            resolve(errorCount);
+    var    loop = true;
+    while (loop) {
+        const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
+        const  readStream = fs.createReadStream(oldFilePath);
+        const  reader = readline.createInterface({
+            input: readStream,
+            crlfDelay: Infinity
         });
-    });
+        const  lines = [];
+        let  isReadingSetting = false;
+        let  setting: Settings = {};
+        let  settingCount = 0;
+        let  settingIndentLength = 0;
+        let  settingLineNum = -1;
+        let  oldSetting: Settings = {};
+        let  lineNum = 0;
+        let  isReplacing = false;
+        let  isAllReplacable = true;
+        const  evalatedKeys: {[key: string]: string} = {};
+        const  ifTagParser = new IfTagParser();
+        const  oldIfTagParser = new IfTagParser();
+        const  previousEvalatedKeysLength = Object.keys(previousEvalatedKeys).length;
+
+        for await (const line1 of reader) {
+            const  line: string = line1;
+            lines.push(line);
+            lineNum += 1;
+            let  output = false;
+
+            // isReadingSetting = ...
+            if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
+                isReadingSetting = true;
+                setting = {};
+                settingCount += 1;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
+                settingLineNum = lineNum;
+                oldSetting = {};
+                if (replacingSettingIndex === allSetting) {
+                    isReplacing = true;
+                } else {
+                    isReplacing = (settingCount === replacingSettingIndex);
+                }
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                isReadingSetting = false;
+            }
+            ifTagParser.parse(line, setting, Object.keys(previousEvalatedKeys));
+            oldIfTagParser.parse(line, oldSetting, Object.keys(previousEvalatedKeys));
+            if ( ! ifTagParser.isReplacable) {
+                isAllReplacable = false;
+            }
+
+            if (isReplacing) {
+
+                // In settings tag
+                if (isReadingSetting) {
+                    const  separator = line.indexOf(':');
+                    if (separator !== notFound) {
+                        const  key = line.substr(0, separator).trim();
+                        const  oldValue = getValue(line, separator);
+                        if (ifTagParser.isReplacable  &&  oldValue !== '') {
+                            if (key in replacingKeyValues) {
+                                evalatedKeys[key] = replacingKeyValues[key];
+                            } else {
+                                evalatedKeys[key] = oldValue;
+                            }
+                        }
+
+                        if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
+
+                            oldSetting[key] = {value: oldValue, isReferenced: false, lineNum};
+                        }
+                        if (ifTagParser.thisIsOutOfFalseBlock) {
+                            const  replacingKeys = Object.keys(replacingKeyValues);
+
+                            if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
+                                const  replacedValue = replacingKeyValues[key];
+                                const  commentIndex = line.indexOf('#', separator);
+                                let    comment= '';
+                                if (commentIndex !== notFound  &&  ! replacedValue.includes('#')) {
+                                    comment = '  ' + line.substr(commentIndex);
+                                }
+                                let  original = '';
+                                if ( ! line.includes(originalLabel)) {
+                                    if (addOriginalTag) {
+                                        original = `  ${originalLabel} ${oldValue}`;
+                                    }
+                                } else {
+                                    if ( ! addOriginalTag) {
+                                        comment = comment.replace(new RegExp(
+                                            ` *${originalLabel} *${escapeRegularExpression(replacedValue)}`), '');
+                                    }
+                                }
+
+                                writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + comment + "\n");
+                                output = true;
+                                setting[key] = {value: replacedValue, isReferenced: false, lineNum};
+                            }
+                            else {
+                                if (oldValue !== '') {
+                                    setting[key] = {value: oldValue, isReferenced: false, lineNum};
+                                }
+                            }
+                        }
+                    }
+
+                // Out of settings
+                } else {
+                    const  templateTag = parseTemplateTag(line);
+                    if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
+                            &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
+                        const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+                        const  expected = getExpectedLine(oldSetting, templateTag.template);
+                        const  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
+
+                        if (replacingLine.includes(expected)) {
+                            const  before = expected;
+                            const  after = replaced;
+                            if (templateTag.lineNumOffset <= -1) {
+                                writer.replaceAboveLine(templateTag.lineNumOffset,
+                                    replacingLine.replace(before, after)+"\n");
+                            } else {
+
+                                writer.write(line.replace(before, after) +"\n");
+                                output = true;
+                            }
+                        } else if (replacingLine.includes(replaced)) {
+                            // Do nothing
+                        } else {
+                            if (errorCount === 0) { // Since only one old value can be replaced at a time
+                                console.log('');
+                                console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
+                                console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
+                                console.log(`  ${translate('Contents')}: ${line.trim()}`);
+                                console.log(`  ${translate('Expected')}: ${expected.trim()}`);
+                                console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
+                                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                errorCount += 1;
+                            }
+                        }
+                    }
+                }
+            }
+            if (!output) {
+                writer.write(line +"\n");
+            }
+        }
+
+        // previousReplacedKeys = ...
+        Object.keys(evalatedKeys).forEach((key: string) => {
+            previousEvalatedKeys[key] = evalatedKeys[key]; });
+        if (previousEvalatedKeysLength == Object.keys(previousEvalatedKeys).length) {
+            console.log('')
+            console.log('Error of unexpected')
+            errorCount += 1;
+            loop = false;
+        }
+        if (isAllReplacable) {
+            loop = false;
+        }
+
+        // ...
+        writer.end();
+        await new Promise( (resolve) => {
+            writer.on('finish', () => {
+                fs.copyFileSync(newFilePath, inputFilePath);
+                deleteFileSync(newFilePath);
+                resolve();
+            });
+        });
+    }
+    return  errorCount;
 }
 
 // makeRevertSettings
-async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: number): Promise<string> /* "key: value\n" */ {
+async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex: number): Promise<string> /* "key: value\n" */ {
     const  readStream = fs.createReadStream(inputFilePath);
     const  reader = readline.createInterface({
         input: readStream,
@@ -585,10 +620,10 @@ async function  makeRevertSettings(inputFilePath: string, changingSettingIndex: 
             isReadingSetting = true;
             settingCount += 1;
             settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            if (changingSettingIndex === allSetting) {
+            if (replacingSettingIndex === allSetting) {
                 isReadingOriginal = true;
             } else {
-                isReadingOriginal = (settingCount === changingSettingIndex);
+                isReadingOriginal = (settingCount === replacingSettingIndex);
             }
         } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
@@ -795,37 +830,48 @@ class  TemplateTag {
 
 // IfTagParser
 class  IfTagParser {
-    get       thisIsOutOfFalseBlock() {return this.itIsOutOfFalseBlock_;}
-    private   itIsOutOfFalseBlock_: boolean = true;
+    get       thisIsOutOfFalseBlock(): boolean {return this.thisIsOutOfFalseBlock_;}
+    private   thisIsOutOfFalseBlock_: boolean = true;
     readonly  indentLengthsOfIfTag: IfTag[] = [
-        {indentLength: -1, resultOfIf: true, enabled: true}
+        {indentLength: -1, resultOfIf: true, enabled: true, isReplacable: true}
     ];
+    get      isReplacable(): boolean {return this.isReplacable_;}
+    private  isReplacable_: boolean = true;
 
-    parse(line: string, setting: Settings): IfTagParserResult {
-        var  condition = '';
-        var  errorCount = 0;
+    parse(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
+        var    condition = '';
+        var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
         if (line.trim() !== '') {
             while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
 
                 this.indentLengthsOfIfTag.pop();
-                this.itIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
+                this.thisIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
+                this.isReplacable_          = lastOf(this.indentLengthsOfIfTag).isReplacable;
             }
         }
+
         if (line.includes(ifLabel)) {
             condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
 
-            const  evaluatedContidion = evaluateIfCondition(condition, setting);
+            const  evaluatedContidion = evaluateIfCondition(condition, setting, previsousEvalatedKeys);
             if (typeof evaluatedContidion === 'boolean') {
                 var  resultOfIf = evaluatedContidion;
+                var  isReplacable = false;
+            } else if (instanceOf.EvaluatedCondition(evaluatedContidion)) {
+                var  resultOfIf = evaluatedContidion.result;
+                var  isReplacable = evaluatedContidion.isReplacable;
             } else {
                 errorCount += 1;
                 var  resultOfIf = true;
+                var  isReplacable = false;
             }
             if (this.thisIsOutOfFalseBlock && !resultOfIf) {
-                this.itIsOutOfFalseBlock_ = false;
+                this.thisIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({indentLength, resultOfIf, enabled: this.thisIsOutOfFalseBlock});
+            this.indentLengthsOfIfTag.push({indentLength, resultOfIf,
+                enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_});
+            this.isReplacable_ = isReplacable;
         }
         return  { condition, errorCount };
     }
@@ -1118,7 +1164,9 @@ function onEndOfSetting(setting: Settings) {
 }
 
 // evaluateIfCondition
-function   evaluateIfCondition(condition: string, setting: Settings): boolean | Error {
+function  evaluateIfCondition(condition: string, setting: Settings,
+        previsousEvalatedKeys: string[] = [])
+        : boolean | Error | EvaluatedCondition {
 
     if (condition === 'true') {
         return  true;
@@ -1172,13 +1220,36 @@ function   evaluateIfCondition(condition: string, setting: Settings): boolean | 
             rightValue = '';
         }
 
+        var  result: boolean | undefined;
         if (operator === '==') {
-            return  leftValue === rightValue;
+            result = (leftValue === rightValue);
         } else if (operator === '!=') {
-            return  leftValue !== rightValue;
+            result = (leftValue !== rightValue);
+        }
+        if (result !== undefined) {
+            if (previsousEvalatedKeys.length === 0) {
+
+                return  result;
+            } else　{
+                return  {
+                    result,
+                    isReplacable: previsousEvalatedKeys.includes(name),
+                };
+            }
         }
     }
     return  new Error('syntax error');
+}
+
+class  EvaluatedCondition {
+    result: boolean = false;
+    isReplacable: boolean = false;
+}
+
+namespace  instanceOf {
+    export function  EvaluatedCondition(object: any): object is EvaluatedCondition {
+        return  object.hasOwnProperty('isReplacable');
+    }
 }
 
 // getSettingIndexFromLineNum
@@ -1312,7 +1383,8 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
     for (const key of Object.keys(setting)) {
         if (key in replacedValues) {
 
-            var  value = replacedValues[key];
+            // var  value = replacedValues[key];
+            var  value = setting[key].value;
         } else {
             var  value = setting[key].value;
         }
@@ -1510,6 +1582,7 @@ interface  IfTag {
     indentLength: number;
     resultOfIf: boolean;
     enabled: boolean;
+    isReplacable: boolean;
 }
 
 // EvaluationLog
@@ -1695,10 +1768,8 @@ const  testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\typrm
 // inputOption
 const inputOption = new InputOption([
 /*
-    testBaseFolder +`change_set_.yaml`,
+    testBaseFolder +`____.yaml`,
     String.raw `file`,
-    testBaseFolder +`change_set_setting.yaml`,
-    String.raw `Changed`,
 */
 ]);
 
@@ -1752,7 +1823,7 @@ function  pathResolve(path_: string) {
         }
     }
 
-    // Change separators to OS format
+    // Replace separators to OS format
     path_ = path.resolve(path_);
 
     return path_
@@ -1782,9 +1853,9 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Error not same as file contents": "ファイルの内容と異なります",
             "YAML UTF-8 file path>": "YAML UTF-8 ファイル パス>",
             "This is a secret value.": "これは秘密の値です。",
-            "Change \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に変更してください。",
+            "Replace \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に置き換えてください。",
             "Press Enter key to retry checking.": "Enter キーを押すと再チェックします。",
-            "The line number to change the variable value >": "変更する変数値がある行番号 >",
+            "The line number to replace the variable value >": "置き換える変数値がある行番号 >",
             "Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
