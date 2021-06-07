@@ -5,6 +5,7 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 import * as chalk from 'chalk';
+import { parse } from 'commander';
 process.env['typrm_aaa'] = 'aaa';
 
 // main
@@ -121,7 +122,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
 
             // Set condition by "#if:" tag.
-            const  parsed = ifTagParser.parse(line, setting);
+            const  parsed = ifTagParser.evaluate(line, setting);
             if (parsed.errorCount >= 1) {
                 console.log('');
                 console.log('Error of if tag syntax:');
@@ -475,8 +476,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
             }
-            ifTagParser.parse(line, setting, Object.keys(previousEvalatedKeys));
-            oldIfTagParser.parse(line, oldSetting, Object.keys(previousEvalatedKeys));
+            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeys));
+            oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeys));
 
             if (isReplacing) {
                 if ( ! ifTagParser.isReplacable) {
@@ -613,8 +614,46 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     return  errorCount;
 }
 
+// scanAllConditions
+async function  scanAllConditions(inputFilePath: string, replacingSettingIndex: number): Promise<string[]> /* "key: value\n"[] */ {
+    const  allConditions: string[] = [];
+    const  readStream = fs.createReadStream(inputFilePath);
+    const  reader = readline.createInterface({
+        input: readStream,
+        crlfDelay: Infinity
+    });
+    let  isReadingSetting = false;
+    let  settingCount = 0;
+    let  settingIndentLength = 0;
+    let  lineNum = 0;
+    const  ifTrueScanner = new IfTrueConditionScanner();
+
+    for await (const line1 of reader) {
+        const  line: string = line1;
+        lineNum += 1;
+
+        // setting = ...
+        if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
+            isReadingSetting = true;
+            settingCount += 1;
+            settingIndentLength = indentRegularExpression.exec(line)![0].length;
+        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+            isReadingSetting = false;
+        }
+        if (isReadingSetting) {
+            ifTrueScanner.evaluate(line);
+            if (ifTrueScanner.isUpdated) {
+
+                allConditions.push(ifTrueScanner.condition);
+            }
+        }
+    }
+    return  allConditions;
+}
+
 // makeRevertSettings
 async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex: number): Promise<string> /* "key: value\n" */ {
+    const  allConditions = await scanAllConditions(inputFilePath, replacingSettingIndex);
     const  readStream = fs.createReadStream(inputFilePath);
     const  reader = readline.createInterface({
         input: readStream,
@@ -854,7 +893,8 @@ class  IfTagParser {
     get      isReplacable(): boolean {return this.isReplacable_;}  // #search: typrm replace with if tag
     private  isReplacable_: boolean = true;
 
-    parse(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
+    // evaluate
+    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
         var    condition = '';
         var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
@@ -897,6 +937,31 @@ class  IfTagParser {
 interface  IfTagParserResult {
     condition: string;
     errorCount: number;
+}
+
+// IfTrueConditionScanner
+class  IfTrueConditionScanner {
+    get       condition(): string {return this.condition_;}
+    private   condition_: string = '';
+    get       isUpdated(): boolean {return this.isUpdated_;}
+    private   isUpdated_: boolean = false;
+    readonly  indentLengthsOfIfTag: IfTagForConditionScanner[] = [
+        {indentLength: -1}
+    ];
+
+    // evaluate
+    evaluate(line: string) {
+        const  indentLength = indentRegularExpression.exec(line)![0].length;
+        if (line.trim() !== '') {
+            while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
+
+                this.indentLengthsOfIfTag.pop();
+            }
+        }
+        if (line.includes(ifLabel)) {
+            this.indentLengthsOfIfTag.push({indentLength});
+        }
+    }
 }
 
 // check
@@ -1599,6 +1664,11 @@ interface  IfTag {
     resultOfIf: boolean;
     enabled: boolean;
     isReplacable: boolean;
+}
+
+// IfTagForConditionScanner
+interface  IfTagForConditionScanner {
+    indentLength: number;
 }
 
 // EvaluationLog
