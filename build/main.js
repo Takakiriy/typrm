@@ -589,7 +589,7 @@ function getInputFileFullPath(inputFilePath) {
 function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeys, oldFilePath, newFilePath, loop, verboseMode, _loop_1, d;
+        var errorCount, replacingKeyValues, previousEvalatedKeys, oldFilePath, newFilePath, loop, verboseMode, _loop_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -663,8 +663,6 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     }
                                     ifTagParser.parse(line, setting, Object.keys(previousEvalatedKeys));
                                     oldIfTagParser.parse(line, oldSetting, Object.keys(previousEvalatedKeys));
-                                    d = pp(lineNum + " " + line);
-                                    pp("         " + ifTagParser.thisIsOutOfFalseBlock + " " + oldIfTagParser.thisIsOutOfFalseBlock + " " + ifTagParser.isReplacable);
                                     if (isReplacing) {
                                         if (!ifTagParser.isReplacable) {
                                             isAllReplacable = false;
