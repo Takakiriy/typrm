@@ -540,6 +540,14 @@ typrm では上位にヒットしたテキストが下側に表示されます�
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated value
 
+search コマンドにキーワードを指定しないと、検索キーワード入力モードになります。
+このモードを終了するには、Ctrl+C キーを押します。
+
+    $ typrm s
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated value
+    keyword:
+
 テキスト ファイルに書くキーワードは、
 `#keyword:` タグに続けて CSV 形式（コンマ区切り）で
 複数指定することができます。

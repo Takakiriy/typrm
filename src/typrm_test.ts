@@ -5,8 +5,6 @@ import * as path from 'path';
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
 
-const  debug = true;
-
 async function  main() {
     if (false) {
         await DoCustomDebug();
@@ -28,28 +26,28 @@ async function  DoCustomDebug() {
 async function  TestOfCommandLine() {
     let  returns: ProcessReturns;
 
-    if (debug) {
-        var cases: ({[name: string]: string})[] = [{
-            "name": "version",
-            "parameters": "--version",
-            "expected": "(not check)",
-        },{
-            "name": "locale",
-            "parameters": "search ABC --folder test_data/search/1",
-            "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
-        }];
-    } else {
-        var cases: ({[name: string]: string})[] = [{
-            "name": "locale",
-            "parameters": "search ABC --folder test_data/search/1",
-            "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
-        }];
-    }
+    var cases: ({[name: string]: string})[] = [{
+        "name": "version",
+        "parameters": "--version",
+        "expected": "(not check)",
+        "inputLines": "",
+    },{
+        "name": "locale",
+        "parameters": "search ABC --folder test_data/search/1",
+        "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+        "inputLines": "",
+    },{
+        "name": "search_mode",
+        "parameters": "search  --folder test_data/search/1",
+        "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+        "inputLines": "ABC\nexit()\n",
+    }];
     for (const case_ of cases) {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
 
         // Test Main
-        returns = await callChildProccess(`node ../build/typrm.js ${case_.parameters} --test`, {});
+        returns = await callChildProccess(`node ../build/typrm.js ${case_.parameters} --test`,
+            {inputLines: case_.inputLines.split('\n')});
 
         // Check
         if (case_.expected !== '(not check)') {
