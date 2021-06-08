@@ -175,10 +175,15 @@ To use typrm, you must install Node.js.
         - Installation options are defaults
 
     Download and expand typrm and install Node.js packages used by typrm:
-        https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
-
         #// Launchpad >> Terminal
-        cd ~/Downloads/typrm-master  #// The folder extracted from the Zip file
+        cd  ~/Downloads
+        setopt interactivecomments
+            #// enables comment symbol (#)
+        curl -o typrm.zip -kL https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip 
+        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you are updating
+        unzip -o typrm.zip
+        mv  typrm-master  typrm  #// The folder extracted from the Zip file
+        cd  typrm
 
         npm install --only=production
 

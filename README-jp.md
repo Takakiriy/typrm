@@ -179,10 +179,15 @@ typrm を使うには Node.js のインストールが必要です。
         - インストール オプションはデフォルトを使用
 
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
-        https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
-
         #// Launchpad >> Terminal
-        cd ~/Downloads/typrm-master  #// Zip ファイルを展開したフォルダー
+        cd  ~/Downloads
+        setopt interactivecomments
+            #// enables comment symbol (#)
+        curl -o typrm.zip -kL https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip 
+        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// 更新するとき
+        unzip -o typrm.zip
+        mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
+        cd  typrm
 
         npm install --only=production
 
