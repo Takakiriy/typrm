@@ -203,7 +203,7 @@ function checkRoutine(isModal, inputFilePath) {
                             }
                         }
                     }
-                    parsed = ifTagParser.parse(line, setting);
+                    parsed = ifTagParser.evaluate(line, setting);
                     if (parsed.errorCount >= 1) {
                         console.log('');
                         console.log('Error of if tag syntax:');
@@ -517,7 +517,7 @@ function replaceSettings(inputFilePath, replacingLineNum, keyValueLines) {
 // revertSettings
 function revertSettings(inputFilePath, replacingLineNum) {
     return __awaiter(this, void 0, void 0, function () {
-        var inputFileFullPath, errorCount, replacingSettingIndex, keyValues, _a;
+        var inputFileFullPath, errorCount, replacingSettingIndex, revertSettings_2, _i, revertSettings_1, revertSetting, _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0: return [4 /*yield*/, getInputFileFullPath(inputFilePath)];
@@ -526,19 +526,27 @@ function revertSettings(inputFilePath, replacingLineNum) {
                     errorCount = 0;
                     if (!(inputFileFullPath === '')) return [3 /*break*/, 2];
                     errorCount += 1;
-                    return [3 /*break*/, 6];
+                    return [3 /*break*/, 8];
                 case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum)];
                 case 3:
                     replacingSettingIndex = _b.sent();
                     return [4 /*yield*/, makeRevertSettings(inputFileFullPath, replacingSettingIndex)];
                 case 4:
-                    keyValues = _b.sent();
-                    _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValues), false)];
+                    revertSettings_2 = _b.sent();
+                    _i = 0, revertSettings_1 = revertSettings_2;
+                    _b.label = 5;
                 case 5:
-                    errorCount = _a + _b.sent();
-                    _b.label = 6;
+                    if (!(_i < revertSettings_1.length)) return [3 /*break*/, 8];
+                    revertSetting = revertSettings_1[_i];
+                    _a = errorCount;
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(revertSetting), false)];
                 case 6:
+                    errorCount = _a + _b.sent();
+                    _b.label = 7;
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 5];
+                case 8:
                     console.log('');
                     console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
                     return [2 /*return*/];
@@ -661,8 +669,8 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                                         isReadingSetting = false;
                                     }
-                                    ifTagParser.parse(line, setting, Object.keys(previousEvalatedKeys));
-                                    oldIfTagParser.parse(line, oldSetting, Object.keys(previousEvalatedKeys));
+                                    ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeys));
+                                    oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeys));
                                     if (isReplacing) {
                                         if (!ifTagParser.isReplacable) {
                                             isAllReplacable = false;
@@ -831,7 +839,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
 function makeRevertSettings(inputFilePath, replacingSettingIndex) {
     var e_4, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var readStream, reader, isReadingSetting, revertSetting, settingCount, settingIndentLength, lineNum, isReadingOriginal, reader_4, reader_4_1, line1, line, separator, key, originalLabelSeparator, originalValue, e_4_1;
+        var readStream, reader, isReadingSetting, revertSettings, settingCount, settingIndentLength, lineNum, isReadingOriginal, ifTrueScanner, reader_4, reader_4_1, line1, line, separator, key, originalLabelSeparator, originalValue, revertSetting, revertSetting, e_4_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -841,11 +849,12 @@ function makeRevertSettings(inputFilePath, replacingSettingIndex) {
                         crlfDelay: Infinity
                     });
                     isReadingSetting = false;
-                    revertSetting = '';
+                    revertSettings = [];
                     settingCount = 0;
                     settingIndentLength = 0;
                     lineNum = 0;
                     isReadingOriginal = false;
+                    ifTrueScanner = new IfTrueConditionScanner();
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 6, 7, 12]);
@@ -869,18 +878,28 @@ function makeRevertSettings(inputFilePath, replacingSettingIndex) {
                             isReadingOriginal = (settingCount === replacingSettingIndex);
                         }
                     }
-                    else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
+                    else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength
+                        && isReadingSetting) {
                         isReadingSetting = false;
                         isReadingOriginal = false;
                     }
-                    // Parse #original tag
-                    if (isReadingOriginal && line.includes(originalLabel)) {
-                        separator = line.indexOf(':');
-                        if (separator !== notFound) {
-                            key = line.substr(0, separator).trim();
-                            originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
-                            originalValue = getValue(line, originalLabelSeparator);
-                            revertSetting += key + ": " + originalValue + '\n';
+                    if (isReadingOriginal) {
+                        ifTrueScanner.evaluate(line);
+                        // Parse #original tag
+                        if (line.includes(originalLabel)) {
+                            separator = line.indexOf(':');
+                            if (separator !== notFound) {
+                                key = line.substr(0, separator).trim();
+                                originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
+                                originalValue = getValue(line, originalLabelSeparator);
+                                if (ifTrueScanner.condition === '') {
+                                    revertSetting = key + ": " + originalValue;
+                                }
+                                else {
+                                    revertSetting = ifTrueScanner.condition + '\n' + (key + ": " + originalValue);
+                                }
+                                revertSettings.push(revertSetting);
+                            }
                         }
                     }
                     _b.label = 4;
@@ -902,7 +921,7 @@ function makeRevertSettings(inputFilePath, replacingSettingIndex) {
                     if (e_4) throw e_4.error;
                     return [7 /*endfinally*/];
                 case 11: return [7 /*endfinally*/];
-                case 12: return [2 /*return*/, revertSetting];
+                case 12: return [2 /*return*/, revertSettings.reverse()];
             }
         });
     });
@@ -1154,9 +1173,10 @@ var IfTagParser = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    IfTagParser.prototype.parse = function (line, setting, previsousEvalatedKeys) {
+    // evaluate
+    IfTagParser.prototype.evaluate = function (line, setting, previsousEvalatedKeys) {
         if (previsousEvalatedKeys === void 0) { previsousEvalatedKeys = []; }
-        var condition = '';
+        var expression = '';
         var errorCount = 0;
         var indentLength = indentRegularExpression.exec(line)[0].length;
         if (line.trim() !== '') {
@@ -1167,8 +1187,8 @@ var IfTagParser = /** @class */ (function () {
             }
         }
         if (line.includes(ifLabel)) {
-            condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-            var evaluatedContidion = evaluateIfCondition(condition, setting, previsousEvalatedKeys);
+            expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+            var evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys);
             if (typeof evaluatedContidion === 'boolean') {
                 var resultOfIf = evaluatedContidion;
                 var isReplacable = false;
@@ -1189,9 +1209,55 @@ var IfTagParser = /** @class */ (function () {
                 enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
             this.isReplacable_ = isReplacable;
         }
-        return { condition: condition, errorCount: errorCount };
+        return { condition: expression, errorCount: errorCount };
     };
     return IfTagParser;
+}());
+// IfTrueConditionScanner
+var IfTrueConditionScanner = /** @class */ (function () {
+    function IfTrueConditionScanner() {
+        this.condition_ = '';
+        this.isUpdated_ = false;
+        this.indentLengthsOfIfTag = [
+            { indentLength: -1, trueCondition: '' }
+        ];
+    }
+    Object.defineProperty(IfTrueConditionScanner.prototype, "condition", {
+        get: function () { return this.condition_; },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(IfTrueConditionScanner.prototype, "isUpdated", {
+        get: function () { return this.isUpdated_; },
+        enumerable: false,
+        configurable: true
+    });
+    // evaluate
+    IfTrueConditionScanner.prototype.evaluate = function (line) {
+        var indentLength = indentRegularExpression.exec(line)[0].length;
+        this.isUpdated_ = false;
+        if (line.trim() !== '') {
+            while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
+                var previousBlock = this.indentLengthsOfIfTag.pop();
+                if (previousBlock && previousBlock.trueCondition) {
+                    this.isUpdated_ = true;
+                }
+            }
+        }
+        if (line.includes(ifLabel)) {
+            var expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+            var trueCondition = getTrueCondition(expression);
+            if (trueCondition) {
+                this.isUpdated_ = true;
+            }
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, trueCondition: trueCondition });
+        }
+        if (this.isUpdated_) {
+            this.condition_ = this.indentLengthsOfIfTag.map(function (block) { return (block.trueCondition); })
+                .filter(function (trueCondition) { return (trueCondition); }).join('\n');
+        }
+    };
+    return IfTrueConditionScanner;
 }());
 // check
 function check(checkingFilePath) {
@@ -1574,31 +1640,31 @@ function onEndOfSetting(setting) {
     }
 }
 // evaluateIfCondition
-function evaluateIfCondition(condition, setting, previsousEvalatedKeys) {
+function evaluateIfCondition(expression, setting, previsousEvalatedKeys) {
     if (previsousEvalatedKeys === void 0) { previsousEvalatedKeys = []; }
-    if (condition === 'true') {
+    if (expression === 'true') {
         return true;
     }
-    else if (condition === 'false') {
+    else if (expression === 'false') {
         return false;
     }
     var settingsDot = '$settings.';
     var envDot = '$env.';
     var match = null;
     var parent = '';
-    if (condition.startsWith(settingsDot)) {
+    if (expression.startsWith(settingsDot)) {
         parent = settingsDot;
         // e.g. $settings.__Stage__ == develop
         // e.g. $settings.__Stage__ != develop
-        match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(condition);
+        match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(expression);
     }
-    else if (condition.startsWith(envDot)) {
+    else if (expression.startsWith(envDot)) {
         parent = envDot;
         // e.g. $env.typrm_aaa == aaa
         // e.g. $env.typrm_aaa != aaa
         // e.g. $env.typrm_aaa == ""
         // e.g. $env.typrm_aaa != ""
-        match = /\$env.([^ ]*) *(==|!=) *([^ ]*)/.exec(condition);
+        match = /\$env.([^ ]*) *(==|!=) *([^ ]*)/.exec(expression);
     }
     if (match && parent) {
         var name_1 = match[1];
@@ -1663,6 +1729,33 @@ var instanceOf;
     }
     instanceOf.EvaluatedCondition = EvaluatedCondition;
 })(instanceOf || (instanceOf = {}));
+// getTrueCondition
+function getTrueCondition(expression) {
+    var settingsDot = '$settings.';
+    if (expression.startsWith(settingsDot)) {
+        // e.g. $settings.__Stage__ == develop
+        // e.g. $settings.__Stage__ != develop
+        var match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(expression);
+        if (match) {
+            var name_2 = match[1];
+            var operator = match[2];
+            var rightValue = match[3];
+            if (rightValue !== '') {
+                var trueCondition;
+                if (operator === '==') {
+                    trueCondition = name_2 + ": " + rightValue;
+                }
+                else if (operator === '!=') {
+                    trueCondition = name_2 + ": __not_" + rightValue;
+                }
+                if (trueCondition) {
+                    return trueCondition;
+                }
+            }
+        }
+    }
+    return '';
+}
 // getSettingIndexFromLineNum
 function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
     var e_7, _a;

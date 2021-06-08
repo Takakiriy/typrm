@@ -182,7 +182,7 @@ typrm を使うには Node.js のインストールが必要です。
         https://github.com/Takakiriy/typrm >> Code >> Download.ZIP
 
         #// Launchpad >> Terminal
-        cd cd ~/Downloads/typrm-master  #// Zip ファイルを展開したフォルダー
+        cd ~/Downloads/typrm-master  #// Zip ファイルを展開したフォルダー
 
         npm install --only=production
 

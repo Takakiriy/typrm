@@ -275,14 +275,9 @@ describe("replaces settings >>", function () {
         }); });
     });
     describe("revert", function () {
-        test.skip("2_replace_6_if both", function () { });
         test.each([
             [
-                /*              '2_replace_6_if', ' both', 9, 'en-US',
-                                `fruit: melon
-                                __Setting1__: replaced`,
-                            ],[
-                */ '2_replace_1_ok', ' setting 2', 29, 'en-US',
+                '2_replace_1_ok', ' setting 2', 29, 'en-US',
                 "key1: value1changed",
             ], [
                 '2_replace_6_if', ' in if block', 9, 'en-US',
@@ -290,6 +285,9 @@ describe("replaces settings >>", function () {
             ], [
                 '2_replace_6_if', ' in if variable', 9, 'en-US',
                 "fruit: melon",
+            ], [
+                '2_replace_6_if', ' both', 9, 'en-US',
+                "fruit: melon\n                __Setting1__: replaced",
             ],
         ])("%s%s >>", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
             var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;

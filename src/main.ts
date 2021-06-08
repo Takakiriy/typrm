@@ -378,9 +378,12 @@ async function  revertSettings(inputFilePath: string, replacingLineNum: number) 
         errorCount += 1;
     } else {
         const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum);
-        const  keyValues = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
+        const  revertSettings = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
+        for (const revertSetting of revertSettings) {
 
-        errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValues), false);
+            errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
+                parseKeyValueLines(revertSetting), false);
+        }
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
@@ -614,57 +617,22 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     return  errorCount;
 }
 
-// scanAllConditions
-async function  scanAllConditions(inputFilePath: string, replacingSettingIndex: number): Promise<string[]> /* "key: value\n"[] */ {
-    const  allConditions: string[] = [];
-    const  readStream = fs.createReadStream(inputFilePath);
-    const  reader = readline.createInterface({
-        input: readStream,
-        crlfDelay: Infinity
-    });
-    let  isReadingSetting = false;
-    let  settingCount = 0;
-    let  settingIndentLength = 0;
-    let  lineNum = 0;
-    const  ifTrueScanner = new IfTrueConditionScanner();
-
-    for await (const line1 of reader) {
-        const  line: string = line1;
-        lineNum += 1;
-
-        // setting = ...
-        if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
-            isReadingSetting = true;
-            settingCount += 1;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-            isReadingSetting = false;
-        }
-        if (isReadingSetting) {
-            ifTrueScanner.evaluate(line);
-            if (ifTrueScanner.isUpdated) {
-
-                allConditions.push(ifTrueScanner.condition);
-            }
-        }
-    }
-    return  allConditions;
-}
-
 // makeRevertSettings
-async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex: number): Promise<string> /* "key: value\n" */ {
-    const  allConditions = await scanAllConditions(inputFilePath, replacingSettingIndex);
+async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex: number
+        ): /* "key: value\n" */ Promise<string[]> {
+
     const  readStream = fs.createReadStream(inputFilePath);
     const  reader = readline.createInterface({
         input: readStream,
         crlfDelay: Infinity
     });
     let  isReadingSetting = false;
-    let  revertSetting = '';
+    let  revertSettings: string[] = [];
     let  settingCount = 0;
     let  settingIndentLength = 0;
     let  lineNum = 0;
     let  isReadingOriginal = false;
+    const  ifTrueScanner = new IfTrueConditionScanner();
 
     for await (const line1 of reader) {
         const  line: string = line1;
@@ -680,24 +648,35 @@ async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex:
             } else {
                 isReadingOriginal = (settingCount === replacingSettingIndex);
             }
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength
+                &&  isReadingSetting) {
             isReadingSetting = false;
             isReadingOriginal = false;
         }
 
-        // Parse #original tag
-        if (isReadingOriginal  &&  line.includes(originalLabel)) {
-            const  separator = line.indexOf(':');
-            if (separator !== notFound) {
-                const  key = line.substr(0, separator).trim();
-                const  originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
-                const  originalValue = getValue(line, originalLabelSeparator);
+        if (isReadingOriginal) {
+            ifTrueScanner.evaluate(line);
 
-                revertSetting += `${key}: ${originalValue}` + '\n';
+            // Parse #original tag
+            if (line.includes(originalLabel)) {
+                const  separator = line.indexOf(':');
+                if (separator !== notFound) {
+                    const  key = line.substr(0, separator).trim();
+                    const  originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
+                    const  originalValue = getValue(line, originalLabelSeparator);
+                    if (ifTrueScanner.condition === '') {
+
+                        var  revertSetting = `${key}: ${originalValue}`;
+                    } else {
+                        var  revertSetting = ifTrueScanner.condition + '\n' + `${key}: ${originalValue}`;
+                    }
+
+                    revertSettings.push(revertSetting);
+                }
             }
         }
     }
-    return  revertSetting;
+    return  revertSettings.reverse();
 }
 
 // TemplateTag
@@ -895,7 +874,7 @@ class  IfTagParser {
 
     // evaluate
     evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
-        var    condition = '';
+        var    expression = '';
         var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
         if (line.trim() !== '') {
@@ -908,9 +887,9 @@ class  IfTagParser {
         }
 
         if (line.includes(ifLabel)) {
-            condition = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+            expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
 
-            const  evaluatedContidion = evaluateIfCondition(condition, setting, previsousEvalatedKeys);
+            const  evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys);
             if (typeof evaluatedContidion === 'boolean') {
                 var  resultOfIf = evaluatedContidion;
                 var  isReplacable = false;
@@ -929,7 +908,7 @@ class  IfTagParser {
                 enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_});
             this.isReplacable_ = isReplacable;
         }
-        return  { condition, errorCount };
+        return  { condition: expression, errorCount };
     }
 }
 
@@ -946,20 +925,34 @@ class  IfTrueConditionScanner {
     get       isUpdated(): boolean {return this.isUpdated_;}
     private   isUpdated_: boolean = false;
     readonly  indentLengthsOfIfTag: IfTagForConditionScanner[] = [
-        {indentLength: -1}
+        {indentLength: -1, trueCondition: ''}
     ];
 
     // evaluate
     evaluate(line: string) {
         const  indentLength = indentRegularExpression.exec(line)![0].length;
+        this.isUpdated_ = false;
         if (line.trim() !== '') {
             while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
 
-                this.indentLengthsOfIfTag.pop();
+                const  previousBlock = this.indentLengthsOfIfTag.pop();
+                if (previousBlock  &&  previousBlock.trueCondition) {
+                    this.isUpdated_ = true;
+                }
             }
         }
         if (line.includes(ifLabel)) {
-            this.indentLengthsOfIfTag.push({indentLength});
+            const  expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+
+            const  trueCondition = getTrueCondition(expression);
+            if (trueCondition) {
+                this.isUpdated_ = true;
+            }
+            this.indentLengthsOfIfTag.push({indentLength, trueCondition});
+        }
+        if (this.isUpdated_) {
+            this.condition_ = this.indentLengthsOfIfTag.map((block)=>(block.trueCondition))
+                .filter((trueCondition)=>(trueCondition)).join('\n');
         }
     }
 }
@@ -1245,34 +1238,34 @@ function onEndOfSetting(setting: Settings) {
 }
 
 // evaluateIfCondition
-function  evaluateIfCondition(condition: string, setting: Settings,
+function  evaluateIfCondition(expression: string, setting: Settings,
         previsousEvalatedKeys: string[] = [])
         : boolean | Error | EvaluatedCondition {
 
-    if (condition === 'true') {
+    if (expression === 'true') {
         return  true;
-    } else if (condition === 'false') {
+    } else if (expression === 'false') {
         return  false;
     }
     const  settingsDot = '$settings.';
     const  envDot = '$env.';
     let    match: RegExpExecArray | null = null;
     let    parent = '';
-    if (condition.startsWith(settingsDot)) {
+    if (expression.startsWith(settingsDot)) {
         parent = settingsDot;
 
         // e.g. $settings.__Stage__ == develop
         // e.g. $settings.__Stage__ != develop
-        match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(condition);
+        match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(expression);
     }
-    else if (condition.startsWith(envDot)) {
+    else if (expression.startsWith(envDot)) {
         parent = envDot;
 
         // e.g. $env.typrm_aaa == aaa
         // e.g. $env.typrm_aaa != aaa
         // e.g. $env.typrm_aaa == ""
         // e.g. $env.typrm_aaa != ""
-        match = /\$env.([^ ]*) *(==|!=) *([^ ]*)/.exec(condition);
+        match = /\$env.([^ ]*) *(==|!=) *([^ ]*)/.exec(expression);
     }
     if (match && parent) {
         const  name = match[1];
@@ -1331,6 +1324,36 @@ namespace  instanceOf {
     export function  EvaluatedCondition(object: any): object is EvaluatedCondition {
         return  object.hasOwnProperty('isReplacable');
     }
+}
+
+// getTrueCondition
+function  getTrueCondition(expression: string): /* '' or 'key: value' */ string {
+    const  settingsDot = '$settings.';
+    if (expression.startsWith(settingsDot)) {
+
+        // e.g. $settings.__Stage__ == develop
+        // e.g. $settings.__Stage__ != develop
+        const  match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(expression);
+        if (match) {
+            const  name = match[1];
+            const  operator = match[2];
+            const  rightValue = match[3];
+            if (rightValue !== '') {
+                var  trueCondition: string | undefined;
+                if (operator === '==') {
+
+                    trueCondition = `${name}: ${rightValue}`;
+                } else if (operator === '!=') {
+                    trueCondition = `${name}: __not_${rightValue}`;
+                }
+                if (trueCondition) {
+
+                    return  trueCondition;
+                }
+            }
+        }
+    }
+    return  '';
 }
 
 // getSettingIndexFromLineNum
@@ -1669,6 +1692,7 @@ interface  IfTag {
 // IfTagForConditionScanner
 interface  IfTagForConditionScanner {
     indentLength: number;
+    trueCondition: string;
 }
 
 // EvaluationLog
