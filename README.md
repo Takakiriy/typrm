@@ -556,6 +556,14 @@ In typrm, the text that hits the top is displayed at the bottom.
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated value
 
+If you do not specify any keywords with the search command, search keyword input mode is started.
+Press Ctrl + C to exit this mode.
+
+    $ typrm s
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated value
+    keyword:
+
 You can specify multiple keywords to be written
 by CSV format (comma separated values) after the `#keyword:` tag
 in the text file.

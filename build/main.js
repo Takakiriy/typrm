@@ -1345,15 +1345,46 @@ function check(checkingFilePath) {
 }
 // search
 function search() {
-    var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keywordDoubleQuoted, currentFolder, fileFullPaths, targetFolders, _loop_3, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, _b, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _c, foundLines_1, foundLineInformation;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
+        var startIndex, keyword, keyword_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
                     keyword = exports.programArguments.slice(startIndex).join(' ');
-                    keywordDoubleQuoted = keyword.replace(/"/g, '""');
+                    if (!(keyword !== '')) return [3 /*break*/, 2];
+                    return [4 /*yield*/, searchSub(keyword)];
+                case 1:
+                    _a.sent();
+                    return [3 /*break*/, 8];
+                case 2:
+                    inputSkip(startIndex);
+                    _a.label = 3;
+                case 3: return [4 /*yield*/, input(chalk.yellow('keyword:') + ' ')];
+                case 4:
+                    keyword_1 = _a.sent();
+                    if (!(keyword_1 === 'exit()')) return [3 /*break*/, 5];
+                    return [3 /*break*/, 8];
+                case 5:
+                    if (!(keyword_1 !== '')) return [3 /*break*/, 7];
+                    return [4 /*yield*/, searchSub(keyword_1)];
+                case 6:
+                    _a.sent();
+                    _a.label = 7;
+                case 7: return [3 /*break*/, 3];
+                case 8: return [2 /*return*/];
+            }
+        });
+    });
+}
+// searchSub
+function searchSub(keyword) {
+    var e_6, _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var currentFolder, fileFullPaths, targetFolders, _loop_3, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, _b, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _c, foundLines_1, foundLineInformation;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
+                case 0:
                     currentFolder = process.cwd();
                     fileFullPaths = [];
                     return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
@@ -2322,6 +2353,10 @@ function inputPath(guide) {
             }
         });
     });
+}
+// inputSkip
+function inputSkip(count) {
+    inputOption.nextParameterIndex += count;
 }
 // pathResolve
 function pathResolve(path_) {

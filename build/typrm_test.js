@@ -41,7 +41,6 @@ var child_process = require("child_process");
 var path = require("path");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-var debug = true;
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -83,35 +82,33 @@ function DoCustomDebug() {
 // TestOfFileCheck
 function TestOfCommandLine() {
     return __awaiter(this, void 0, void 0, function () {
-        var returns, cases, cases, _i, cases_1, case_, answer;
+        var returns, cases, _i, cases_1, case_, answer;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (debug) {
-                        cases = [{
-                                "name": "version",
-                                "parameters": "--version",
-                                "expected": "(not check)",
-                            }, {
-                                "name": "locale",
-                                "parameters": "search ABC --folder test_data/search/1",
-                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
-                            }];
-                    }
-                    else {
-                        cases = [{
-                                "name": "locale",
-                                "parameters": "search ABC --folder test_data/search/1",
-                                "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
-                            }];
-                    }
+                    cases = [{
+                            "name": "version",
+                            "parameters": "--version",
+                            "expected": "(not check)",
+                            "inputLines": "",
+                        }, {
+                            "name": "locale",
+                            "parameters": "search ABC --folder test_data/search/1",
+                            "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+                            "inputLines": "",
+                        }, {
+                            "name": "search_mode",
+                            "parameters": "search  --folder test_data/search/1",
+                            "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+                            "inputLines": "ABC\nexit()\n",
+                        }];
                     _i = 0, cases_1 = cases;
                     _a.label = 1;
                 case 1:
                     if (!(_i < cases_1.length)) return [3 /*break*/, 4];
                     case_ = cases_1[_i];
                     console.log("TestCase: TestOfCommandLine >> " + case_.name);
-                    return [4 /*yield*/, callChildProccess("node ../build/typrm.js " + case_.parameters + " --test", {})];
+                    return [4 /*yield*/, callChildProccess("node ../build/typrm.js " + case_.parameters + " --test", { inputLines: case_.inputLines.split('\n') })];
                 case 2:
                     // Test Main
                     returns = _a.sent();

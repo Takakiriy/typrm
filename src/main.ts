@@ -1006,7 +1006,25 @@ async function  check(checkingFilePath?: string) {
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
-    const  keywordDoubleQuoted = keyword.replace(/"/g, '""');
+
+    if (keyword !== '') {
+
+        await  searchSub(keyword);
+    } else {
+        inputSkip(startIndex);
+        for (;;) {
+            const  keyword = await input(chalk.yellow('keyword:')+' ');
+            if (keyword === 'exit()') {
+                break;
+            } else if (keyword !== '') {
+                await  searchSub(keyword);
+            }
+        }
+    }
+}
+
+// searchSub
+async function  searchSub(keyword: string) {
     const  currentFolder = process.cwd();
     const  fileFullPaths: string[] = [];
     const  targetFolders = await parseCSVColumns(programOptions.folder);
@@ -1922,6 +1940,11 @@ export const  InputObject = new StandardInputBuffer();
 async function  inputPath( guide: string ) {
     const  key = await input(guide);
     return  pathResolve(key);
+}
+
+// inputSkip
+function  inputSkip(count: number) {
+    inputOption.nextParameterIndex += count;
 }
 
 // pathResolve
