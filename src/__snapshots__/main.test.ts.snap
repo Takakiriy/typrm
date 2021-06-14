@@ -577,7 +577,7 @@ exports[`replaces settings >> in 2_replace_2_error: updatedFileContents 1`] = `
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3changed  #original: value3
+        Key3: value3
 
     手順:
         - cd \\"..\\"
@@ -585,9 +585,9 @@ exports[`replaces settings >> in 2_replace_2_error: updatedFileContents 1`] = `
             #template: - echo  \\"__Key2__\\"
         - value1
             #template: - key1
-        - \\"value3changed\\"
+        - \\"value3\\"
             #template: - \\"Key3\\"
-        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
         - \\"value3_bad\\"  #template: - \\"Key3\\"
 
 手順B:
@@ -624,7 +624,7 @@ Process A:
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3changed  #original: value3  #コメント
+        Key3: value3  #コメント
 
     steps:
         - cd \\"..\\"
@@ -632,13 +632,13 @@ Process A:
             #template: - echo  \\"__Key2__\\"
         - value1
             #template: - key1
-        - \\"value3changed\\"
+        - \\"value3\\"
             #template: - \\"Key3\\"
         - \\"value3changed\\"
             #template: - \\"Key3\\"
-        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
         - \\"value3_bad\\"  #template: - \\"Key3\\"
-        - １行に２つのケース： value3changed, value3changed
+        - １行に２つのケース： value3, value3
             #template: Key3, Key3
 
 Process B:
@@ -687,7 +687,7 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3changed  #original: value3
+        Key3: value3
 
     手順:
         - cd \\"..\\"
@@ -695,9 +695,9 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
             #template: - echo  \\"__Key2__\\"
         - value1
             #template: - key1
-        - \\"value3changed\\"
+        - \\"value3\\"
             #template: - \\"Key3\\"
-        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
         - \\"value3_bad\\"  #template: - \\"Key3\\"
 
 手順B:
@@ -794,6 +794,51 @@ exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileConte
         banana:  #if: $settings.fruit == banana
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
+            no  #template: __Setting1__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_7_undefined_if: sourceFileContents 1`] = `
+"test_of_undefined_by_if_tag:
+    settings:
+        fruit: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit == melon
+            __Setting1__: no
+    check:
+        yes:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit == melon
+            no  #template: __Setting1__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_7_undefined_if: stdout 1`] = `
+"
+ErrorLine: 8
+  Error: The number of variable declarations has decreased
+  Solution: Add variable declarations
+  Variables: __Setting1__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_7_undefined_if: updatedFileContents 1`] = `
+"est_of_undefined_by_if_tag:
+    settings:
+        fruit: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit == melon
+            __Setting1__: no
+    check:
+        yes:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit == melon
             no  #template: __Setting1__
 "
 `;

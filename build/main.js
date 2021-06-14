@@ -597,7 +597,7 @@ function getInputFileFullPath(inputFilePath) {
 function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeys, oldFilePath, newFilePath, loop, verboseMode, _loop_1;
+        var errorCount, replacingKeyValues, previousEvalatedKeys, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, verboseMode, _loop_1, d;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -606,6 +606,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                     previousEvalatedKeys = {};
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
+                    reducedErrorWasOccurred = false;
                     loop = true;
                     verboseMode = false;
                     if (verboseMode) {
@@ -614,7 +615,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                         console.log("verbose >> keyValues: " + JSON.stringify(keyValues));
                     }
                     _loop_1 = function () {
-                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, evalatedKeys, ifTagParser, oldIfTagParser, previousEvalatedKeysLength, reader_3, reader_3_1, line1, line, output, separator, key, oldValue, replacingKeys, replacedValue, commentIndex, comment, original, templateTag, replacingLine, expected, replaced, before, after, e_3_1;
+                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, evalatedKeys, ifTagParser, oldIfTagParser, previousEvalatedKeysLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, commentIndex, comment, original, templateTag, replacingLine, expected, replaced, before, after, e_3_1;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
                                 case 0:
@@ -651,6 +652,9 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     lines.push(line);
                                     lineNum += 1;
                                     output = false;
+                                    if (verboseMode) {
+                                        d = pp(lineNum + " " + line);
+                                    }
                                     // isReadingSetting = ...
                                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                                         isReadingSetting = true;
@@ -668,6 +672,20 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     }
                                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                                         isReadingSetting = false;
+                                        if (!reducedErrorWasOccurred) {
+                                            settingNames_1 = Object.keys(setting);
+                                            oldSettingNames = Object.keys(oldSetting);
+                                            undefinedVariableNames = oldSettingNames.filter(function (oldName) { return (!settingNames_1.includes(oldName)); });
+                                            if (undefinedVariableNames.length >= 1) {
+                                                console.log('');
+                                                console.log(translate('ErrorLine') + ": " + lineNum);
+                                                console.log("  " + translate('Error') + ": " + translate('The number of variable declarations has decreased'));
+                                                console.log("  " + translate('Solution') + ": " + translate('Add variable declarations'));
+                                                console.log("  " + translate('Variables') + ": " + undefinedVariableNames);
+                                                reducedErrorWasOccurred = true;
+                                                errorCount += 1;
+                                            }
+                                        }
                                     }
                                     ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeys));
                                     oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeys));
@@ -812,7 +830,9 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     writer.end();
                                     return [4 /*yield*/, new Promise(function (resolve) {
                                             writer.on('finish', function () {
-                                                fs.copyFileSync(newFilePath, inputFilePath);
+                                                if (errorCount === 0) {
+                                                    fs.copyFileSync(newFilePath, inputFilePath);
+                                                }
                                                 deleteFileSync(newFilePath);
                                                 resolve();
                                             });
@@ -2156,6 +2176,13 @@ var WriteBuffer = /** @class */ (function () {
     };
     return WriteBuffer;
 }());
+// isSameArrayOf
+// T: string, nunmber
+function isSameArrayOf(log, answer) {
+    var matched = log.filter(function (item) { return answer.includes(item); });
+    var isSame = (matched.length === answer.length && log.length === answer.length);
+    return isSame;
+}
 // getStdOut
 // Example:
 //    var d = getStdOut();  // Set break point here and watch the variable d
@@ -2400,6 +2427,8 @@ function translate(englishLiterals) {
             "Press Enter key to retry checking.": "Enter キーを押すと再チェックします。",
             "The line number to replace the variable value >": "置き換える変数値がある行番号 >",
             "Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
+            "The number of variable declarations has decreased": "変数宣言の数が減りました",
+            "Add variable declarations": "変数宣言を追加してください",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",

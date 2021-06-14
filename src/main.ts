@@ -421,12 +421,12 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 // replaceSettingsSub
 async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex: number,
         keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
-
     var    errorCount = 0;
     var    replacingKeyValues = keyValues;
     var    previousEvalatedKeys: {[key: string]: string} = {};
     const  oldFilePath = inputFilePath;
     const  newFilePath = inputFilePath +".new";
+    var    reducedErrorWasOccurred = false;
     var    loop = true;
     const  verboseMode = false;
     if (verboseMode) {
@@ -462,6 +462,9 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             lines.push(line);
             lineNum += 1;
             let  output = false;
+            if (verboseMode) {
+                var d = pp(`${lineNum} ${line}`)
+            }
 
             // isReadingSetting = ...
             if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
@@ -477,7 +480,22 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     isReplacing = (settingCount === replacingSettingIndex);
                 }
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+
                 isReadingSetting = false;
+                if ( ! reducedErrorWasOccurred) {
+                    const  settingNames = Object.keys(setting);
+                    const  oldSettingNames = Object.keys(oldSetting);
+                    const  undefinedVariableNames = oldSettingNames.filter((oldName)=>( ! settingNames.includes(oldName)));
+                    if (undefinedVariableNames.length >= 1) {
+                        console.log('');
+                        console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                        console.log(`  ${translate('Error')}: ${translate('The number of variable declarations has decreased')}`);
+                        console.log(`  ${translate('Solution')}: ${translate('Add variable declarations')}`);
+                        console.log(`  ${translate('Variables')}: ${undefinedVariableNames}`);
+                        reducedErrorWasOccurred = true;
+                        errorCount += 1;
+                    }
+                }
             }
             ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeys));
             oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeys));
@@ -608,7 +626,9 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         writer.end();
         await new Promise( (resolve) => {
             writer.on('finish', () => {
-                fs.copyFileSync(newFilePath, inputFilePath);
+                if (errorCount === 0) {
+                    fs.copyFileSync(newFilePath, inputFilePath);
+                }
                 deleteFileSync(newFilePath);
                 resolve();
             });
@@ -1749,6 +1769,14 @@ class  WriteBuffer {
     }
 }
 
+// isSameArrayOf
+// T: string, nunmber
+function isSameArrayOf<T>(log: T[], answer: T[]): boolean {
+  const matched = log.filter( (item) => answer.includes( item ) );
+  const isSame = (matched.length === answer.length && log.length === answer.length);
+  return isSame;
+}
+
 // getStdOut
 // Example:
 //    var d = getStdOut();  // Set break point here and watch the variable d
@@ -1991,6 +2019,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Press Enter key to retry checking.": "Enter キーを押すと再チェックします。",
             "The line number to replace the variable value >": "置き換える変数値がある行番号 >",
             "Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
+            "The number of variable declarations has decreased": "変数宣言の数が減りました",
+            "Add variable declarations": "変数宣言を追加してください",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",

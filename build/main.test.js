@@ -40,7 +40,7 @@ var fs = require("fs");
 var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
-var snapshot = require("./__snapshots__/main.test.ts.snap");
+var snapshots = require("./__snapshots__/main.test.ts.snap");
 var callMain = main.callMainFromJest;
 if (path.basename(process.cwd()) !== "src") {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
@@ -193,9 +193,12 @@ describe("replaces settings >>", function () {
         ], [
             '2_replace_6_if', ' both', 9, 'en-US',
             "fruit: melon\n            __Setting1__: replaced",
+        ], [
+            '2_replace_7_undefined_if', '', 3, 'en-US',
+            "fruit: apple",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, updatedFileContents;
+        var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -205,6 +208,10 @@ describe("replaces settings >>", function () {
                     changingFilePath = changingFolderPath + '/' + changingFileName;
                     fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                     copyFileSync(sourceFilePath, changingFilePath);
+                    if (fileNameHead === '2_replace_7_undefined_if') {
+                        sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
+                        fs.writeFileSync(changingFilePath, sourceFileContents);
+                    }
                     // Test Main
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
                             folder: changingFolderPath, test: "", locale: locale,
@@ -325,6 +332,7 @@ describe("replaces settings >>", function () {
     });
 });
 describe("searches keyword tag >>", function () {
+    test.skip('trim', function () { });
     test.each([
         [
             "1st",
@@ -383,6 +391,13 @@ describe("searches keyword tag >>", function () {
             { folder: "test_data/search/1", test: "" },
             pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + (" #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n") +
                 pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n"),
+            /*        ],[
+                        "trim",
+                        ["search", " do "],
+                        { folder: "test_data/search/1", test: "" },
+                        pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
+                        pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
+            */ 
         ], [
             "words order score",
             ["search", "aaa bbb"],
@@ -530,6 +545,11 @@ describe("test of test >>", function () {
 afterAll(function () {
     deleteFileSync('test_data/_output.txt');
 });
+// getSnapshot
+function getSnapshot(label) {
+    var snapshot = snapshots[label];
+    return snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
+}
 // copyFileSync
 // #keyword: copyFileSync
 // This also makes the copy target folder.

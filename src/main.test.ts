@@ -3,7 +3,7 @@ import * as path from "path";
 import { ppid } from "process";
 import * as main from "./main";
 import * as chalk from "chalk";
-const snapshot = require("./__snapshots__/main.test.ts.snap");
+const snapshots = require("./__snapshots__/main.test.ts.snap");
 const callMain = main.callMainFromJest;
 
 if (path.basename(process.cwd()) !== "src") {
@@ -136,6 +136,9 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             '2_replace_6_if', ' both', 9, 'en-US',
             `fruit: melon
             __Setting1__: replaced`,
+        ],[
+            '2_replace_7_undefined_if', '', 3, 'en-US',
+            `fruit: apple`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
@@ -145,6 +148,10 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         copyFileSync(sourceFilePath, changingFilePath);
+        if (fileNameHead === '2_replace_7_undefined_if') {
+            const  sourceFileContents = getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+            fs.writeFileSync(changingFilePath, sourceFileContents);
+        }
 
         // Test Main
         await callMain(["replace", changingFileName, String(lineNum), keyValues], {
@@ -221,7 +228,6 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
-//if (fileNameHead !== '2_replace_6_if'  ||  _subCaseName !== ' both') {return;}
             const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
@@ -243,12 +249,12 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
 
             expect(revertedFileContents).toBe(sourceFileContents);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
         });
     });
 });
 
 describe("searches keyword tag >>", () => {
+    test.skip('trim',()=>{});
     test.each([
         [
             "1st",
@@ -307,7 +313,13 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/1", test: "" },
             pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
             pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
-        ],[
+/*        ],[
+            "trim",
+            ["search", " do "],
+            { folder: "test_data/search/1", test: "" },
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
+            pathColor('${HOME}/Desktop/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
+*/        ],[
             "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },
@@ -442,7 +454,13 @@ describe("test of test >>", () => {
 
 afterAll(()=>{
     deleteFileSync('test_data/_output.txt')
-})
+});
+
+// getSnapshot
+function  getSnapshot(label: string) {
+    const  snapshot = snapshots[label];
+    return  snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
+}
 
 // copyFileSync
 // #keyword: copyFileSync
