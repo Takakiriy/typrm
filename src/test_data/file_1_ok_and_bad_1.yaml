@@ -1,12 +1,12 @@
 設定:
     __Base__: ../../file_target/1
     __User__: user1
-    __Project__: ~/Desktop/typrm
+    __Project__: ~/GitProjects/GitHub/typrm
 nano ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: __Base__/file_1_ok_and_bad_2_target.yaml
     sign in:
         user: 'user1'  #template: __User__
         password: pass
 sudo nano ../../file_target/1/file_1_ok_and_bad_3_target.sh: |  #file-template: __Base__/file_1_ok_and_bad_3_target.sh
     login user1  #template: __User__
-~/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh : |  #file-template: __Project__/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh
+~/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh : |  #file-template: __Project__/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh
     login user1  #template: __User__

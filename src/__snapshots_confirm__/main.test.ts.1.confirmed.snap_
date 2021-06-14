@@ -3,8 +3,8 @@
 exports[`checks file contents >> Multi folder >> all: stdout 1`] = `
 "
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1/file_1.yaml:2
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
   Template: correct contents
   Expected: correct contents
   Contents: (Not found)
@@ -13,8 +13,8 @@ Warning: 0, Error: 1
 template count = 1
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
   Template: correct contents
   Expected: correct contents
   Contents: (Not found)
@@ -27,8 +27,8 @@ template count = 1
 exports[`checks file contents >> Multi folder >> file in 1st folder: stdout 1`] = `
 "
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1/file_1.yaml:2
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
   Template: correct contents
   Expected: correct contents
   Contents: (Not found)
@@ -41,8 +41,8 @@ template count = 1
 exports[`checks file contents >> Multi folder >> file in 2nd folder: stdout 1`] = `
 "
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
   Template: correct contents
   Expected: correct contents
   Contents: (Not found)
@@ -55,8 +55,8 @@ template count = 1
 exports[`checks file contents >> Multi folder >> full path: stdout 1`] = `
 "
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
   Template: correct contents
   Expected: correct contents
   Contents: (Not found)
@@ -69,22 +69,22 @@ template count = 1
 exports[`checks file contents >> NG in file_1_ok_and_bad, file/1 replace: stdout 1`] = `
 "
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:7
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:4
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:7
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:4
   Template:             user: 'user2'  #template: __User__
   Expected:             user: 'user2'
   Contents:             user: 'user1'
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:10
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:10
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
   Template: login user2  #template: __User__
   Expected: login user2
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:12
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_1_ok_and_bad_1_changing.yaml:12
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0
   Template: login user2  #template: __User__
   Expected: login user2
   Contents: (Not found)
@@ -104,8 +104,8 @@ template count = 6
 exports[`checks file contents >> any_lines in file_8_others, file/1 : stdout 1`] = `
 "
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_8_others_1_changing.yaml:16
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:3
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_8_others_1_changing.yaml:16
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:3
   Template: not fourth  #template: __Fourth__
   Expected: not fourth
   Contents:     second
@@ -130,8 +130,8 @@ ErrorLine: 13
   SettingIndex: 1
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:15
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:15
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks
   Expected: Checks
   Contents: (Not found)
@@ -155,67 +155,67 @@ ErrorLine: 43
   SettingIndex: 1
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:48
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:48
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if develop  #template: __Stage__
   Expected: Checks if develop
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:57
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:57
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if not product
   Expected: Checks if not product
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:59
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:59
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if not product
   Expected: Checks if not product
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:61
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:61
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks else part
   Expected: Checks else part
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:66
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:66
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if $env.typrm_aaa == aaa
   Expected: Checks if $env.typrm_aaa == aaa
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:75
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:75
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if $env.typrm_aaa != bbb
   Expected: Checks if $env.typrm_aaa != bbb
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:78
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:78
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if $env.typrm_aaa != \\"\\"
   Expected: Checks if $env.typrm_aaa != \\"\\"
   Contents: (Not found)
 
 Error of not same as file contents:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:87
-  ErrorFile: \${HOME}/Desktop/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:87
+  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0
   Template: Checks if $env.undefined == \\"\\"
   Expected: Checks if $env.undefined == \\"\\"
   Contents: (Not found)
 
 Error of if tag syntax:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:90
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:90
   Contents: value == value
 
 Error of if tag syntax:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
   Contents: $env.value = value
 
 Warning: 0, Error: 16
@@ -338,31 +338,31 @@ ErrorLine: 30
   SettingIndex: 1
 
 Error of not expected condition:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:38
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:38
   Contents: $settings.color1 == black
 
 Error of not expected condition:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:39
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:39
   Contents: $settings.color1 != yellow
 
 Error of not expected condition:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:42
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:42
   Contents: false
 
 Error of not expected condition:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50
   Contents: $settings.color1 == black
 
 Error of not expected condition:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:51
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:51
   Contents: $settings.color1 != yellow
 
 Error of not expected condition:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:54
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:54
   Contents: false
 
 Error of duplicated variable name:
-  typrmFile: \${HOME}/Desktop/typrm/src/test_data/_checking/1_template_3_if_1.yaml:64
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:64
   Contents: target1: yellow
 Not referenced: target1 in line 64
 
@@ -563,7 +563,7 @@ ErrorLine: 19
   Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  Setting: \${HOME}/Desktop/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -610,7 +610,7 @@ ErrorLine: 21
   Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  Setting: \${HOME}/Desktop/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -673,7 +673,7 @@ exports[`replaces settings >> in 2_replace_4_Japanese: stdout 1`] = `
   内容: - \\"value3_bad\\"  #template: - \\"Key3\\"
   期待: - \\"value3\\"
   雛形: - \\"Key3\\"
-  設定: \${HOME}/Desktop/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4
+  設定: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4
 
 警告: 0, エラー: 1
 "
