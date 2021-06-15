@@ -1045,6 +1045,7 @@ async function  search() {
 
 // searchSub
 async function  searchSub(keyword: string) {
+    keyword = keyword.trim();
     const  currentFolder = process.cwd();
     const  fileFullPaths: string[] = [];
     const  targetFolders = await parseCSVColumns(programOptions.folder);

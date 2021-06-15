@@ -254,7 +254,6 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
 });
 
 describe("searches keyword tag >>", () => {
-    test.skip('trim',()=>{});
     test.each([
         [
             "1st",
@@ -313,13 +312,13 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/1", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
-/*        ],[
+        ],[
             "trim",
             ["search", " do "],
             { folder: "test_data/search/1", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
-*/        ],[
+        ],[
             "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },

@@ -1405,6 +1405,7 @@ function searchSub(keyword) {
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
+                    keyword = keyword.trim();
                     currentFolder = process.cwd();
                     fileFullPaths = [];
                     return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];

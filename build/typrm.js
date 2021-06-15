@@ -49,7 +49,7 @@ function callMain() {
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    commander.program.version('0.4.2') // Do not forget to transpile and add git tag
+                    commander.program.version('0.4.2') // Do not forget to transpile, add git tag, update package.json
                         .exitOverride(exitFromCommander)
                         .option("-l, --locale <s>")
                         .option("-t, --test")
