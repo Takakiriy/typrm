@@ -139,6 +139,9 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],[
             '2_replace_7_undefined_if', '', 3, 'en-US',
             `fruit: apple`,
+        ],[
+            '2_replace_8_one_setting', ' OK', undefined, 'en-US',
+            `key1: changed1`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
@@ -154,14 +157,58 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         }
 
         // Test Main
-        await callMain(["replace", changingFileName, String(lineNum), keyValues], {
-            folder: changingFolderPath, test: "", locale,
-        });
+        if (lineNum) {
+            await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                folder: changingFolderPath, test: "", locale,
+            });
+        } else {
+            await callMain(["replace", changingFileName, keyValues], {
+                folder: changingFolderPath, test: "", locale,
+            });
+        }
         const  updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
 
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+    });
+
+    test.each([
+        [
+            '2_replace_1_ok', ' one setting', undefined, 'en-US',
+            `key1: changed1`,
+            'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
+        ],
+
+    ])("Exception case >> in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) => {
+        const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFileName = fileNameHead + "_1_changing.yaml";
+        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+        var    errorMessage = '';
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        copyFileSync(sourceFilePath, changingFilePath);
+
+        // Test Main
+        if (lineNum) {
+            try {
+                await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                    folder: changingFolderPath, test: "", locale,
+                });
+            } catch (e: any) {
+                errorMessage = e.message;
+            }
+        } else {
+            try {
+                await callMain(["replace", changingFileName, keyValues], {
+                    folder: changingFolderPath, test: "", locale,
+                });
+            } catch (e: any) {
+                errorMessage = e.message;
+            }
+        }
+
+        expect(errorMessage).toBe(expectedErrorMessage);
     });
 
     describe("Multi folder >>", () => {

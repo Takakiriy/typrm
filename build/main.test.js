@@ -196,6 +196,9 @@ describe("replaces settings >>", function () {
         ], [
             '2_replace_7_undefined_if', '', 3, 'en-US',
             "fruit: apple",
+        ], [
+            '2_replace_8_one_setting', ' OK', undefined, 'en-US',
+            "key1: changed1",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;
@@ -212,17 +215,75 @@ describe("replaces settings >>", function () {
                         sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
                         fs.writeFileSync(changingFilePath, sourceFileContents);
                     }
-                    // Test Main
+                    if (!lineNum) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
                             folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 1:
-                    // Test Main
                     _a.sent();
+                    return [3 /*break*/, 4];
+                case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
+                        folder: changingFolderPath, test: "", locale: locale,
+                    })];
+                case 3:
+                    _a.sent();
+                    _a.label = 4;
+                case 4:
                     updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
                     expect(main.stdout).toMatchSnapshot('stdout');
                     expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
                     fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test.each([
+        [
+            '2_replace_1_ok', ' one setting', undefined, 'en-US',
+            "key1: changed1",
+            'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
+        ],
+    ])("Exception case >> in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, errorMessage, e_1, e_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
+                    changingFolderPath = testFolderPath + '_changing';
+                    changingFileName = fileNameHead + "_1_changing.yaml";
+                    changingFilePath = changingFolderPath + '/' + changingFileName;
+                    errorMessage = '';
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                    copyFileSync(sourceFilePath, changingFilePath);
+                    if (!lineNum) return [3 /*break*/, 5];
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                            folder: changingFolderPath, test: "", locale: locale,
+                        })];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_1 = _a.sent();
+                    errorMessage = e_1.message;
+                    return [3 /*break*/, 4];
+                case 4: return [3 /*break*/, 8];
+                case 5:
+                    _a.trys.push([5, 7, , 8]);
+                    return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
+                            folder: changingFolderPath, test: "", locale: locale,
+                        })];
+                case 6:
+                    _a.sent();
+                    return [3 /*break*/, 8];
+                case 7:
+                    e_2 = _a.sent();
+                    errorMessage = e_2.message;
+                    return [3 /*break*/, 8];
+                case 8:
+                    expect(errorMessage).toBe(expectedErrorMessage);
                     return [2 /*return*/];
             }
         });

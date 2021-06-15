@@ -59,7 +59,7 @@ process.env['typrm_aaa'] = 'aaa';
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum;
+        var checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath_1, replacingLineNum_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -96,18 +96,25 @@ function main() {
                 case 8:
                     if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 10];
                     varidateUpdateCommandArguments();
-                    inputFilePath = exports.programArguments[1];
-                    replacingLineNum = parseInt(exports.programArguments[2]);
-                    keyValues = exports.programArguments[3];
+                    if (exports.programArguments.length === 3) {
+                        inputFilePath = exports.programArguments[1];
+                        replacingLineNum = 0;
+                        keyValues = exports.programArguments[2];
+                    }
+                    else {
+                        inputFilePath = exports.programArguments[1];
+                        replacingLineNum = parseInt(exports.programArguments[2]);
+                        keyValues = exports.programArguments[3];
+                    }
                     return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues)];
                 case 9:
                     _a.sent();
                     return [3 /*break*/, 14];
                 case 10:
                     if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 12];
-                    inputFilePath = exports.programArguments[1];
-                    replacingLineNum = parseInt(exports.programArguments[2]);
-                    return [4 /*yield*/, revertSettings(inputFilePath, replacingLineNum)];
+                    inputFilePath_1 = exports.programArguments[1];
+                    replacingLineNum_1 = parseInt(exports.programArguments[2]);
+                    return [4 /*yield*/, revertSettings(inputFilePath_1, replacingLineNum_1)];
                 case 11:
                     _a.sent();
                     return [3 /*break*/, 14];
@@ -1678,8 +1685,10 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
 }
 // varidateUpdateCommandArguments
 function varidateUpdateCommandArguments() {
-    if (exports.programArguments.length < 4) {
-        throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  "__KeyColonValue__"');
+    if (exports.programArguments.length < 3) {
+        throw new Error('Error: Too few argurments.\n' +
+            'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
+            'Parameters2: typrm replace  __FilePath__  __NearbyLineNum__  "__KeyColonValue__"');
     }
 }
 // onEndOfSetting
@@ -1812,10 +1821,11 @@ function getTrueCondition(expression) {
 function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
     var e_7, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var reader, settingCount, lineNum, loop, exception, reader_6, reader_6_1, line1, line, e_7_1;
+        var isOneSetting, reader, settingCount, lineNum, loop, exception, reader_6, reader_6_1, line1, line, e_7_1, settingIndex, settingIndex;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
+                    isOneSetting = (targetLineNum === 0);
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFilePath),
                         crlfDelay: Infinity
@@ -1873,7 +1883,17 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                     if (exception) {
                         throw exception;
                     }
-                    return [2 /*return*/, settingCount];
+                    if (!isOneSetting) {
+                        settingIndex = settingCount;
+                    }
+                    else {
+                        settingIndex = 1;
+                        if (settingCount !== 1) {
+                            throw new Error(translate('Settings cannot be identified, because the file has 2 or more settings. ' +
+                                'Add line number parameter.'));
+                        }
+                    }
+                    return [2 /*return*/, settingIndex];
             }
         });
     });
@@ -2430,6 +2450,7 @@ function translate(englishLiterals) {
             "Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
             "The number of variable declarations has decreased": "変数宣言の数が減りました",
             "Add variable declarations": "変数宣言を追加してください",
+            "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.": "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -2507,7 +2528,7 @@ function callMainFromJest(parameters, options) {
     });
 }
 exports.callMainFromJest = callMainFromJest;
-var settingStartLabel = /^設定(\(|（[^\)]*\)|）)?:$/;
+var settingStartLabel = /^設定((\(|（)[^\)]*(\)|）))?:$/;
 var settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
 var originalLabel = "#original:";
 var templateLabel = "#template:";

@@ -36,9 +36,15 @@ export async function  main() {
         }
         else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
             varidateUpdateCommandArguments();
-            const  inputFilePath = programArguments[1];
-            const  replacingLineNum = parseInt(programArguments[2]);
-            const  keyValues = programArguments[3];
+            if (programArguments.length === 3) {
+                var  inputFilePath = programArguments[1];
+                var  replacingLineNum = 0;  // isOneSetting
+                var  keyValues = programArguments[2];
+            } else {
+                var  inputFilePath = programArguments[1];
+                var  replacingLineNum = parseInt(programArguments[2]);
+                var  keyValues = programArguments[3];
+            }
 
             await replaceSettings(inputFilePath, replacingLineNum, keyValues);
         }
@@ -1262,8 +1268,10 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 
 // varidateUpdateCommandArguments
 function  varidateUpdateCommandArguments() {
-    if (programArguments.length < 4) {
-        throw new Error('Error: Too few argurments. Usage: typrm replace  __FilePath__  __LineNum__  "__KeyColonValue__"')
+    if (programArguments.length < 3) {
+        throw new Error('Error: Too few argurments.\n' +
+            'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
+            'Parameters2: typrm replace  __FilePath__  __NearbyLineNum__  "__KeyColonValue__"')
     }
 }
 
@@ -1397,6 +1405,7 @@ function  getTrueCondition(expression: string): /* '' or 'key: value' */ string 
 
 // getSettingIndexFromLineNum
 async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum: number): Promise<number> {
+    const  isOneSetting = (targetLineNum === 0);
     const  reader = readline.createInterface({
         input: fs.createReadStream(inputFilePath),
         crlfDelay: Infinity
@@ -1428,7 +1437,16 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum:
     if (exception) {
         throw exception;
     }
-    return  settingCount;
+    if ( ! isOneSetting) {
+        var  settingIndex = settingCount;
+    } else {
+        var  settingIndex = 1;
+        if (settingCount !== 1) {
+            throw  new Error(translate('Settings cannot be identified, because the file has 2 or more settings. ' +
+                'Add line number parameter.'))
+        }
+    }
+    return  settingIndex;
 }
 
 // getFullPath
@@ -2022,6 +2040,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
             "The number of variable declarations has decreased": "変数宣言の数が減りました",
             "Add variable declarations": "変数宣言を追加してください",
+            "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.":
+                "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -2086,7 +2106,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     }
 }
 
-const  settingStartLabel = /^設定(\(|（[^\)]*\)|）)?:$/;
+const  settingStartLabel = /^設定((\(|（)[^\)]*(\)|）))?:$/;
 const  settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
 const  originalLabel = "#original:";
 const  templateLabel = "#template:";

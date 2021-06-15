@@ -842,3 +842,20 @@ exports[`replaces settings >> in 2_replace_7_undefined_if: updatedFileContents 1
             no  #template: __Setting1__
 "
 `;
+
+exports[`replaces settings >> in 2_replace_8_one_setting OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_8_one_setting OK: updatedFileContents 1`] = `
+"順A:
+    設定(1st):
+        key1: changed1  #original: value1
+
+    手順:
+        - changed1
+            #template: - key1
+"
+`;

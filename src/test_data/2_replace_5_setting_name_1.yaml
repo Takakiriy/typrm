@@ -15,3 +15,11 @@
     手順:
         - value11
             #template: - key1
+
+手順C:
+    settings(3rd):  #// English
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
