@@ -1000,7 +1000,7 @@ var TemplateTag = /** @class */ (function () {
     TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_5, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_5_1, templateLineNum;
+            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, d, indentLength, expected, e_5_1, templateLineNum;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -1057,6 +1057,7 @@ var TemplateTag = /** @class */ (function () {
                         try {
                             targetLine = line1;
                             targetLineNum += 1;
+                            d = pp(targetLineNum + " " + targetLine);
                             if (templateLineIndex === 0) {
                                 indentLength = targetLine.indexOf(expectedFirstLine);
                                 if (indentLength !== notFound && targetLine.trim() === expectedFirstLine) {
@@ -1090,14 +1091,20 @@ var TemplateTag = /** @class */ (function () {
                                 }
                             }
                             else { // skipTo
+                                pp("(" + (indent + skipTo) + ")");
+                                pp("(" + targetLine + ")");
+                                pp("(" + indent + ")");
                                 if (targetLine === indent + skipTo) {
                                     result = Result.same;
+                                    pp('same');
                                 }
-                                else if (targetLine.startsWith(indent)) {
+                                else if (targetLine.trim() === '' || targetLine.startsWith(indent)) {
                                     result = Result.skipped;
+                                    pp('skipped');
                                 }
                                 else {
                                     result = Result.different;
+                                    pp('different');
                                     errorTemplateLineIndex = templateLineIndex;
                                     errorTargetLineNum = skipStartLineNum;
                                     errorContents = skipFrom;
@@ -1298,6 +1305,9 @@ function check(checkingFilePath) {
                     currentFolder = process.cwd();
                     inputFileFullPaths = [];
                     notFoundPaths = [];
+                    if (checkingFilePath) {
+                        targetFolders.push(currentFolder);
+                    }
                     if (!checkingFilePath) return [3 /*break*/, 2];
                     for (_i = 0, targetFolders_2 = targetFolders; _i < targetFolders_2.length; _i++) {
                         folder = targetFolders_2[_i];
@@ -2063,6 +2073,9 @@ function parseTemplateTag(line) {
 function parseCSVColumns(columns) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
+            if (!columns) {
+                return [2 /*return*/, []]; // stream.Readable.from(undefined) occurs an error
+            }
             return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
                     var columnArray = [];
                     stream.Readable.from(columns)

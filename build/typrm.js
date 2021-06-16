@@ -69,7 +69,7 @@ function callMain() {
                             else {
                                 console.log("ERROR: " + e.message);
                                 var timeOver = new Date();
-                                timeOver.setSeconds(timeOver.getSeconds() + 2);
+                                timeOver.setSeconds(timeOver.getSeconds() + 1);
                                 while ((new Date()).getTime() < timeOver.getTime()) {
                                 }
                             }

@@ -996,7 +996,9 @@ async function  check(checkingFilePath?: string) {
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
-    targetFolders.push(currentFolder);
+    if (checkingFilePath) {
+        targetFolders.push(currentFolder);
+    }
     if (checkingFilePath) {
         for (const folder of targetFolders) {
             const  targetFolderFullPath = getFullPath(folder, currentFolder);

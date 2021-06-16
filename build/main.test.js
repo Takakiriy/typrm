@@ -42,15 +42,21 @@ var main = require("./main");
 var chalk = require("chalk");
 var snapshots = require("./__snapshots__/main.test.ts.snap");
 var callMain = main.callMainFromJest;
-if (path.basename(process.cwd()) !== "src") {
+if (path.basename(process.cwd()) === 'empty_folder') {
+    process.chdir('..');
+}
+if (path.basename(process.cwd()) !== 'src') {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
-    process.chdir("src");
+    process.chdir('src');
 }
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
+beforeAll(function () {
+    fs.mkdirSync('empty_folder', { recursive: true });
+});
 describe("checks template value >>", function () {
     test.each([
         ["1_template_1_ok"],
@@ -61,16 +67,20 @@ describe("checks template value >>", function () {
         ["secret_1_error"],
         ["var_not_ref_1_error"],
     ])("%s", function (fileNameHead) { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    sourceFileContents = getSnapshot("checks template value >> " + fileNameHead + " 1: sourceFileContents 1");
                     fs.rmdirSync('test_data/_checking', { recursive: true });
-                    copyFileSync("test_data/" + fileNameHead + "_1.yaml", "test_data/_checking/" + fileNameHead + "_1.yaml");
+                    writeFileSync("test_data/_checking/" + fileNameHead + "_1.yaml", sourceFileContents);
+                    process.chdir('empty_folder');
                     return [4 /*yield*/, callMain(["check"], {
-                            folder: 'test_data/_checking', test: "", locale: "en-US",
+                            folder: '../test_data/_checking', test: "", locale: "en-US",
                         })];
                 case 1:
                     _a.sent();
+                    process.chdir('..');
                     expect(main.stdout).toMatchSnapshot();
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     return [2 /*return*/];
@@ -78,14 +88,22 @@ describe("checks template value >>", function () {
         });
     }); });
     test("check one file only", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(["check", "1_template_1_ok_1.yaml"], {
-                        folder: 'test_data', test: "", locale: "en-US",
-                    })];
+                case 0:
+                    sourceFileContents = getSnapshot("checks template value >> 1_template_1_ok 1: sourceFileContents 1");
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    writeFileSync("test_data/_checking/1_template_1_ok_1.yaml", sourceFileContents);
+                    process.chdir('empty_folder');
+                    return [4 /*yield*/, callMain(["check", "_checking/1_template_1_ok_1.yaml"], {
+                            folder: '../test_data', test: "", locale: "en-US",
+                        })];
                 case 1:
                     _a.sent();
+                    process.chdir('..');
                     expect(main.stdout).toMatchSnapshot();
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
                     return [2 /*return*/];
             }
         });
@@ -105,18 +123,19 @@ describe("checks file contents >>", function () {
             "any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
     ])("%s in %s, %s %s", function (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFilePath, changingFilePath, changingFileRelativePath;
+        var changingFilePath, changingFileRelativePath, sourceFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    sourceFilePath = 'test_data/' + fileNameHead + "_1.yaml";
                     changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
                     changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
+                    sourceFileContents = getSnapshot("checks file contents >> " + fileNameHead + " : sourceFileContents 1");
                     fs.rmdirSync('test_data/_checking', { recursive: true });
-                    copyFileSync(sourceFilePath, changingFilePath);
+                    writeFileSync(changingFilePath, sourceFileContents);
+                    process.chdir('empty_folder');
                     if (!(optionOperation === 'replace')) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileRelativePath, String(lineNum), keyValues], {
-                            folder: 'test_data', test: "", locale: "en-US",
+                            folder: '../test_data', test: "", locale: "en-US",
                         })];
                 case 1:
                     _a.sent();
@@ -124,11 +143,12 @@ describe("checks file contents >>", function () {
                 case 2: 
                 // Test Main
                 return [4 /*yield*/, callMain(["check"], {
-                        folder: 'test_data/_checking/document', test: "", locale: "en-US",
+                        folder: '../test_data/_checking/document', test: "", locale: "en-US",
                     })];
                 case 3:
                     // Test Main
                     _a.sent();
+                    process.chdir('..');
                     expect(main.stdout).toMatchSnapshot('stdout');
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     return [2 /*return*/];
@@ -146,19 +166,23 @@ describe("checks file contents >>", function () {
             "full path", ["check", getFullPath("test_data/_checking/2/file_2.yaml", process.cwd())],
         ]
     ])("Multi folder >> %s", function (caseName, parameters) { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    sourceFileContents = getSnapshot("checks file contents >> file_0_one_error : sourceFileContents 1");
                     fs.rmdirSync('test_data/_checking', { recursive: true });
-                    copyFileSync("test_data/file_0_one_error_1.yaml", "test_data/_checking/1/file_1.yaml");
-                    copyFileSync("test_data/file_0_one_error_1.yaml", "test_data/_checking/2/file_2.yaml");
+                    writeFileSync("test_data/_checking/1/file_1.yaml", sourceFileContents);
+                    writeFileSync("test_data/_checking/2/file_2.yaml", sourceFileContents);
+                    process.chdir('empty_folder');
                     // Test Main
                     return [4 /*yield*/, callMain(parameters, {
-                            folder: 'test_data/_checking/1, test_data/_checking/2', test: "", locale: "en-US",
+                            folder: '../test_data/_checking/1, ../test_data/_checking/2', test: "", locale: "en-US",
                         })];
                 case 1:
                     // Test Main
                     _a.sent();
+                    process.chdir('..');
                     expect(main.stdout).toMatchSnapshot('stdout');
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     return [2 /*return*/];
@@ -201,20 +225,16 @@ describe("replaces settings >>", function () {
             "key1: changed1",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;
+        var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
                     changingFolderPath = testFolderPath + '_changing';
                     changingFileName = fileNameHead + "_1_changing.yaml";
                     changingFilePath = changingFolderPath + '/' + changingFileName;
+                    sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
                     fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    copyFileSync(sourceFilePath, changingFilePath);
-                    if (fileNameHead === '2_replace_7_undefined_if') {
-                        sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
-                        fs.writeFileSync(changingFilePath, sourceFileContents);
-                    }
+                    writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
                             folder: changingFolderPath, test: "", locale: locale,
@@ -229,7 +249,7 @@ describe("replaces settings >>", function () {
                     _a.sent();
                     _a.label = 4;
                 case 4:
-                    updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                    updatedFileContents = fs.readFileSync(changingFilePath).toString();
                     expect(main.stdout).toMatchSnapshot('stdout');
                     expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
                     fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
@@ -244,17 +264,17 @@ describe("replaces settings >>", function () {
             'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
         ],
     ])("Exception case >> in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, errorMessage, e_1, e_2;
+        var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, errorMessage, e_1, e_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
                     changingFolderPath = testFolderPath + '_changing';
                     changingFileName = fileNameHead + "_1_changing.yaml";
                     changingFilePath = changingFolderPath + '/' + changingFileName;
+                    sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
                     errorMessage = '';
                     fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    copyFileSync(sourceFilePath, changingFilePath);
+                    writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 5];
                     _a.label = 1;
                 case 1:
@@ -290,7 +310,6 @@ describe("replaces settings >>", function () {
     }); });
     describe("Multi folder >>", function () {
         var fileNameHead = '2_replace_1_ok';
-        var sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
         var changingFolderPath = testFolderPath + '_changing';
         var changingFile1Path = changingFolderPath + '/1/' + fileNameHead + "_1_changing.yaml";
         var changingFile2Path = changingFolderPath + '/2/' + fileNameHead + "_2_changing.yaml";
@@ -303,15 +322,16 @@ describe("replaces settings >>", function () {
             ["replace 2", fileNameHead + "_2_changing.yaml", changingFile2Path],
             ["same name error", fileNameHead + "_same_name.yaml", undefined],
         ])("%s", function (caseName, changingFileName, changingFilePath) { return __awaiter(void 0, void 0, void 0, function () {
-            var fileContentsBefore, fileContentsAfter, fileContentsBefore, fileContents1, fileContents2;
+            var sourceFileContents, fileContentsBefore, fileContentsAfter, fileContentsBefore, fileContents1, fileContents2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        copyFileSync(sourceFilePath, changingFile1Path);
-                        copyFileSync(sourceFilePath, changingFile2Path);
-                        copyFileSync(sourceFilePath, changingFile1APath);
-                        copyFileSync(sourceFilePath, changingFile2APath);
+                        writeFileSync(changingFile1Path, sourceFileContents);
+                        writeFileSync(changingFile2Path, sourceFileContents);
+                        writeFileSync(changingFile1APath, sourceFileContents);
+                        writeFileSync(changingFile2APath, sourceFileContents);
                         // Test Main
                         return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
                                 folder: changingFolderPath + "/1, " + changingFolderPath + "/2", test: "", locale: "en-US"
@@ -324,14 +344,14 @@ describe("replaces settings >>", function () {
                             if (!changingFilePath) {
                                 throw new Error('unexpected');
                             }
-                            fileContentsBefore = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-                            fileContentsAfter = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                            fileContentsBefore = sourceFileContents;
+                            fileContentsAfter = fs.readFileSync(changingFilePath).toString();
                             expect(fileContentsAfter).not.toBe(fileContentsBefore);
                         }
                         else { // Case of same name error
-                            fileContentsBefore = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-                            fileContents1 = fs.readFileSync(changingFile1APath).toString().substr(cutBOM);
-                            fileContents2 = fs.readFileSync(changingFile2APath).toString().substr(cutBOM);
+                            fileContentsBefore = sourceFileContents;
+                            fileContents1 = fs.readFileSync(changingFile1APath).toString();
+                            fileContents2 = fs.readFileSync(changingFile2APath).toString();
                             expect(fileContents1).toBe(fileContentsBefore);
                             expect(fileContents2).toBe(fileContentsBefore);
                             expect(main.stdout).toMatchSnapshot('stdout');
@@ -366,15 +386,15 @@ describe("replaces settings >>", function () {
                         changingFolderPath = testFolderPath + '_changing';
                         changingFileName = fileNameHead + "_1_changing.yaml";
                         changingFilePath = changingFolderPath + '/' + changingFileName;
+                        sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        copyFileSync(sourceFilePath, changingFilePath);
+                        writeFileSync(changingFilePath, sourceFileContents);
                         return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
                                 folder: changingFolderPath, test: "", locale: locale
                             })];
                     case 1:
                         _a.sent();
-                        sourceFileContents = fs.readFileSync(sourceFilePath).toString().substr(cutBOM);
-                        updatedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                        updatedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(updatedFileContents).not.toBe(sourceFileContents);
                         // Test Main
                         return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
@@ -383,7 +403,7 @@ describe("replaces settings >>", function () {
                     case 2:
                         // Test Main
                         _a.sent();
-                        revertedFileContents = fs.readFileSync(changingFilePath).toString().substr(cutBOM);
+                        revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toBe(sourceFileContents);
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         return [2 /*return*/];
@@ -603,11 +623,23 @@ describe("test of test >>", function () {
 });
 afterAll(function () {
     deleteFileSync('test_data/_output.txt');
+    fs.rmdirSync('empty_folder', { recursive: true });
 });
 // getSnapshot
 function getSnapshot(label) {
     var snapshot = snapshots[label];
+    if (!snapshot) {
+        throw new Error("Not found '" + label + "' in __snapshots__/____.snap");
+    }
     return snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
+}
+// writeFileSync
+// #keyword: writeFileSync
+// This also makes the copy target folder.
+function writeFileSync(filePath, fileContents) {
+    var destinationFolderPath = path.dirname(filePath);
+    fs.mkdirSync(destinationFolderPath, { recursive: true });
+    fs.writeFileSync(filePath, fileContents);
 }
 // copyFileSync
 // #keyword: copyFileSync

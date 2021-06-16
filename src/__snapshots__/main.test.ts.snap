@@ -111,7 +111,175 @@ Error of not same as file contents:
   Contents:     second
 
 Warning: 0, Error: 1
-template count = 5
+template count = 7
+"
+`;
+
+exports[`checks file contents >> file_0_one_error : sourceFileContents 1`] = `
+"../../file_target/1/file_0_one_error_2_target.yaml : |  #file-template: ../../file_target/1/file_0_one_error_2_target.yaml
+    correct contents
+"
+`;
+
+exports[`checks file contents >> file_1_ok_and_bad : sourceFileContents 1`] = `
+"設定:
+    __Base__: ../../file_target/1
+    __User__: user1
+    __Project__: ~/GitProjects/GitHub/typrm
+nano ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: __Base__/file_1_ok_and_bad_2_target.yaml
+    sign in:
+        user: 'user1'  #template: __User__
+        password: pass
+sudo nano ../../file_target/1/file_1_ok_and_bad_3_target.sh: |  #file-template: __Base__/file_1_ok_and_bad_3_target.sh
+    login user1  #template: __User__
+~/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh : |  #file-template: __Project__/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh
+    login user1  #template: __User__
+"
+`;
+
+exports[`checks file contents >> file_2_tab: sourceFileContents 1`] = `
+"設定:
+    __User__: user1
+file_2_indent_2_target.yml:  #file-template: file_2_tab_2_target.yml
+    sign in:
+        user: 'user1'  #template: __User__
+        password: pass
+#// 対象ファイルの中のタブ幅は 2 であり上記タブ幅 4 と異なりますがチェックには成功します。
+"
+`;
+
+exports[`checks file contents >> file_3_file_name : sourceFileContents 1`] = `
+"設定:
+    __Base__: sub
+nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
+"
+`;
+
+exports[`checks file contents >> file_4_if : sourceFileContents 1`] = `
+"#// Test of if tag
+
+settings:
+    __Stage__: develop  #// develop, staging, product
+    __User__: user1
+
+by true or false:
+    true:  #if: true
+        user: 'user1'  #template: __Stage__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __User__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部(2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __Stage__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks
+    false:  #if: false
+        user: 'user1'  #template: __Stage__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __User__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml の一部(2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            user: 'user1'  #template: __Stage__
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml: | #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            does not check
+
+nested if:
+    true: #if: true
+        case of true:  #if: true
+            - check: 'yes'  #template: __Stage__
+        case of false:  #if: false
+            - check: 'no'  #template: __Stage__
+
+        common case:  #// else. The above empty line is for the test of indent.
+            - check: 'yes'  #template: __Stage__
+    false: #if: false
+        case of true:  #if: true
+            - check: 'no'  #template: __Stage__
+        case of false:  #if: false
+            - check: 'no'  #template: __Stage__
+
+        common case:  #// else. The above empty line is for the test of indent.
+            - check: 'no'  #template: __Stage__
+    common case:  #// else
+        - check: 'yes'  #template: __Stage__
+
+by settings value:
+    Case of develop:  #if: $settings.__Stage__ == develop
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if develop  #template: __Stage__
+    Case of not develop:  #if: $settings.__Stage__ != develop
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    Case of product:  #if: $settings.__Stage__ == product
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    Case of not product:  #if: $settings.__Stage__ != product
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml (1):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if not product
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml (2):  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if not product
+    ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+        Checks else part
+
+by environment variable:
+    equal aaa:  #if: $env.typrm_aaa == aaa
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.typrm_aaa == aaa
+    not equal aaa:  #if: $env.typrm_aaa != aaa
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    equal bbb:  #if: $env.typrm_aaa == bbb
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    not equal bbb:  #if: $env.typrm_aaa != bbb
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.typrm_aaa != bbb
+    exists aaa:  #if: $env.typrm_aaa != ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.typrm_aaa != ""
+    not exists aaa:  #if: $env.typrm_aaa == ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    exists:  #if: $env.undefined != ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            not checked:
+    not exists:  #if: $env.undefined == ""
+        ../../file_target/1/file_1_ok_and_bad_2_target.yaml:  #file-template: ../../file_target/1/file_1_ok_and_bad_2_target.yaml
+            Checks if $env.undefined == ""
+
+syntax error:
+    #if: value == value
+    #if: $env.value = value
+"
+`;
+
+exports[`checks file contents >> file_8_others : sourceFileContents 1`] = `
+"設定:
+    __Base__: ../../file_target/1
+    __Fourth__: fourth
+
+file-template-any-lines:
+    OK:
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
+            first
+            #file-template-any-lines:
+            fourth  #template: __Fourth__
+
+    NG:
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
+            first
+            #file-template-any-lines:
+            not fourth  #template: __Fourth__
+
+file template must not match a part of line:
+    OK:
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
+            full
+            end
+
+Target of template file >> any lines tag >> has empty line:
+    OK:
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
+            2 first
+            #file-template-any-lines:
+            2 fourth  #template: __Fourth__
 "
 `;
 
@@ -230,6 +398,45 @@ template count = 8
 "
 `;
 
+exports[`checks template value >> 1_template_1_ok 1: sourceFileContents 1`] = `
+"# #template タグに問題が無いかどうかをチェックする >> パスするケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+
+手順B:
+    設定:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1
+        - ２行上のケース： "value11"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
+"
+`;
+
 exports[`checks template value >> 1_template_2_error 1`] = `
 "
 ErrorLine: 12
@@ -311,6 +518,53 @@ template count = 13
 "
 `;
 
+exports[`checks template value >> 1_template_2_error 1: sourceFileContents 1`] = `
+"# #template タグに問題が無いかどうかをチェックする >> エラーになるケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - cd ".."
+        - echo  "value  2"
+            #template: - echo  "__Key2__"
+        - v1
+            #template: - key1
+        - __ "value3"
+            #template: - "Key3"
+        - __ "value3"  #template: - "Key3"
+
+手順B:
+    設定:
+        key1: value11
+
+    手順:
+        - value1
+            #template: - key1
+        - １行に２つのケース： value1, value11
+            #template: key1, key1
+        - １行に２つのケース： value11, value1
+            #template: key1, key1
+        - ２行上のケース： "value11x"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11x"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
+        - ０行上のケース： "value11x"  #template-at(0): "key1"
+        - サポート外の at の値：
+            #template-at(1): "key1"
+        - サポート外の at の値：
+            #template-at(2): "key1"
+        - value  #template: __Undefined__
+"
+`;
+
 exports[`checks template value >> 1_template_3_if 1`] = `
 "
 ErrorLine: 27
@@ -371,6 +625,74 @@ template count = 8
 "
 `;
 
+exports[`checks template value >> 1_template_3_if 1: sourceFileContents 1`] = `
+"test_of_if_tag_in_settings:
+    設定:
+        fruit: banana
+        bird: swan
+        バナナ:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        バナナ以外:  #if: $settings.fruit != banana
+            __Setting1__: no
+        カラス:  #if: $settings.bird == crow
+            __Setting2__: no
+        カラス以外:  #if: $settings.bird != crow
+            __Setting2__: yes
+        aaa:  #if: $env.typrm_aaa == aaa
+            __Env1__: yes
+        bbb:  #if: $env.typrm_aaa == bbb
+            __Env1__: no
+        not aaa:  #if: $env.typrm_aaa != aaa
+            __Env2__: no
+        not bbb:  #if: $env.typrm_aaa != bbb
+            __Env2__: yes
+    チェックOK:
+        - yes  #template: __Setting1__
+        - yes  #template: __Setting2__
+        - yes  #template: __Env1__
+        - yes  #template: __Env2__
+    チェックNG:
+        - no  #template: __Setting1__
+        - no  #template: __Setting2__
+        - no  #template: __Env1__
+        - no  #template: __Env2__
+
+test_of_expect_tag:
+    設定:
+        target1: banana
+        color1: yellow
+        #if: $settings.target1 == banana
+            # true   #expect: $settings.color1 == yellow
+            # false  #expect: $settings.color1 == black
+            # false  #expect: $settings.color1 != yellow
+            # true   #expect: $settings.color1 != black
+            #expect: true
+            #expect: false
+        not banana:  #if: $settings.target1 != banana
+            # skip   #expect: $settings.color1 == black
+        #// not banana:  #if: $settings.target1 != banana
+            # skip   #expect: $settings.color1 == black
+    設定外:
+        #if: $settings.target1 == banana
+            # true   #expect: $settings.color1 == yellow
+            # false  #expect: $settings.color1 == black
+            # false  #expect: $settings.color1 != yellow
+            # true   #expect: $settings.color1 != black
+            #expect: true
+            #expect: false
+        not banana:  #if: $settings.target1 != banana
+            # false  #expect: $settings.color1 == black
+        #// not banana:  #if: $settings.target1 != banana
+            # true   #expect: $settings.color1 == black
+
+test_of_duplicated_variable_name_error:
+    設定:
+        target1: banana
+        nest:
+            target1: yellow
+"
+`;
+
 exports[`checks template value >> check one file only 1`] = `
 "
 Warning: 0, Error: 0
@@ -382,6 +704,20 @@ exports[`checks template value >> refer_1_ok 1`] = `
 "
 Warning: 0, Error: 0
 template count = 0
+"
+`;
+
+exports[`checks template value >> refer_1_ok 1: sourceFileContents 1`] = `
+"パスするケース
+
+タイトル１
+
+上記「タイトル１」
+
+下記「タイトル２」
+
+（タイトル２）
+
 "
 `;
 
@@ -407,6 +743,19 @@ template count = 0
 "
 `;
 
+exports[`checks template value >> refer_2_error 1: sourceFileContents 1`] = `
+"エラーになるケース
+
+タイトル２
+
+上記「タイトル１」
+
+下記「タイトル２」と下記「タイトル３」と上記「タイトル４」と上記「タイトル５」を参照。
+
+（タイトル１）
+"
+`;
+
 exports[`checks template value >> secret_1_error 1`] = `
 "
 WarningLine: 4
@@ -424,6 +773,14 @@ template count = 0
 "
 `;
 
+exports[`checks template value >> secret_1_error 1: sourceFileContents 1`] = `
+"設定:
+    key1: value1
+    __Key2__: value2  #★秘密:仮
+    Key3: value3  #★秘密
+    Key4: value4  #★秘密:あり"
+`;
+
 exports[`checks template value >> var_not_ref_1_error 1`] = `
 "Not referenced: key1 in line 2
 Not referenced: Key3 in line 5
@@ -432,6 +789,26 @@ Not referenced: __Key2__ in line 13
 
 Warning: 0, Error: 0
 template count = 2
+"
+`;
+
+exports[`checks template value >> var_not_ref_1_error 1: sourceFileContents 1`] = `
+"設定:
+    key1: value1
+    __Key2__: value2  #コメント
+        #コメント
+    Key3: value3
+
+手順:
+    - echo  "value2"
+        #template: - echo  "__Key2__"
+
+設定:
+    key1: value11
+    __Key2__: value2
+    Key3: value3
+手順: |
+    - echo  "value3"  #template: - echo  "Key3"
 "
 `;
 
@@ -555,6 +932,88 @@ exports[`replaces settings >> in 2_replace_1_ok setting 2: updatedFileContents 1
 "
 `;
 
+exports[`replaces settings >> in 2_replace_1_ok: sourceFileContents 1`] = `
+"# 設定値を変更する。設定のセットは行番号で指定 >> パスするケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #original: oldValue3  #コメント
+
+    手順:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3changed"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+        - "value3changed"  #template: - "Key3"
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+
+手順B:
+    設定:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： "value11"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
+"
+`;
+
+exports[`replaces settings >> in 2_replace_2_error: sourceFileContents 1`] = `
+"# 設定値を変更する >> エラーになるケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+        - "value3_bad"  #template: - "Key3"
+
+手順B:
+    設定:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1
+"
+`;
+
 exports[`replaces settings >> in 2_replace_2_error: stdout 1`] = `
 "
 ErrorLine: 19
@@ -599,6 +1058,55 @@ exports[`replaces settings >> in 2_replace_2_error: updatedFileContents 1`] = `
             #template: - key1
         - １行に２つのケース： value11, value11
             #template: key1, key1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_3_English: sourceFileContents 1`] = `
+"# Case of that setting tag is English
+
+Process A:
+    settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #コメント
+
+    steps:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3changed"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+        - "value3_bad"  #template: - "Key3"
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+
+Process B:
+    settings:
+        key1: value11
+
+    steps:
+        - value11
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： "value11"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
 "
 `;
 
@@ -665,6 +1173,39 @@ Process B:
 "
 `;
 
+exports[`replaces settings >> in 2_replace_4_Japanese: sourceFileContents 1`] = `
+"# 設定タグが日本語のケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+        - "value3_bad"  #template: - "Key3"
+
+手順B:
+    設定:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1
+"
+`;
+
 exports[`replaces settings >> in 2_replace_4_Japanese: stdout 1`] = `
 "
 エラー行: 19
@@ -712,8 +1253,37 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
 "
 `;
 
+exports[`replaces settings >> in 2_replace_5_setting_name: sourceFileContents 1`] = `
+"# 設定値を変更する。設定のセットは設定名で指定
+
+手順A:
+    設定(1st):
+        key1: value1
+
+    手順:
+        - value1
+            #template: - key1
+
+手順B:
+    設定（2番目）:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順C:
+    settings(3rd):  #// English
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+"
+`;
+
 exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
-test_of_if_tag_in_settings_reverse:
+"test_of_if_tag_in_settings_reverse:
     settings:
         fruit: banana
         not banana:  #if: $settings.fruit != banana
@@ -736,7 +1306,7 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> in 2_replace_6_if both: updatedFileContents 1`] = `
-"est_of_if_tag_in_settings:
+"test_of_if_tag_in_settings:
     settings:
         fruit: melon  #original: banana
         banana:  #if: $settings.fruit == banana
@@ -759,7 +1329,7 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> in 2_replace_6_if in if block: updatedFileContents 1`] = `
-"est_of_if_tag_in_settings:
+"test_of_if_tag_in_settings:
     settings:
         fruit: banana
         banana:  #if: $settings.fruit == banana
@@ -782,7 +1352,7 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileContents 1`] = `
-"est_of_if_tag_in_settings:
+"test_of_if_tag_in_settings:
     settings:
         fruit: melon  #original: banana
         banana:  #if: $settings.fruit == banana
@@ -791,6 +1361,23 @@ exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileConte
             __Setting1__: no
     check:
         no:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit != banana
+            no  #template: __Setting1__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_6_if: sourceFileContents 1`] = `
+"test_of_if_tag_in_settings:
+    settings:
+        fruit: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: no
+    check:
+        yes:  #template: __Setting1__
         banana:  #if: $settings.fruit == banana
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
@@ -827,7 +1414,7 @@ Warning: 0, Error: 1
 `;
 
 exports[`replaces settings >> in 2_replace_7_undefined_if: updatedFileContents 1`] = `
-"est_of_undefined_by_if_tag:
+"test_of_undefined_by_if_tag:
     settings:
         fruit: banana
         banana:  #if: $settings.fruit == banana
@@ -850,12 +1437,23 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> in 2_replace_8_one_setting OK: updatedFileContents 1`] = `
-"順A:
+"手順A:
     設定(1st):
         key1: changed1  #original: value1
 
     手順:
         - changed1
+            #template: - key1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_8_one_setting: sourceFileContents 1`] = `
+"手順A:
+    設定(1st):
+        key1: value1
+
+    手順:
+        - value1
             #template: - key1
 "
 `;

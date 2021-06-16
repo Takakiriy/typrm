@@ -1,7 +1,0 @@
-手順A:
-    設定(1st):
-        key1: value1
-
-    手順:
-        - value1
-            #template: - key1
