@@ -20,3 +20,10 @@ file template must not match a part of line:
         ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
             full
             end
+
+Target of template file >> any lines tag >> has empty line:
+    OK:
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: __Base__/file_8_others_2_target.yaml
+            2 first
+            #file-template-any-lines:
+            2 fourth  #template: __Fourth__

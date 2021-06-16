@@ -1,4 +1,4 @@
-Target of template file any lines tag:
+Target of template file >> any lines tag:
     first
     second
     third
@@ -7,3 +7,9 @@ Target of file template must not match a part of line:
     This is not full of lines
     full
     end
+Target of template file >> any lines tag >> has empty line:
+    2 first
+    2 second
+
+    2 third
+    2 fourth

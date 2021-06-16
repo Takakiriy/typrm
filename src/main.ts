@@ -792,6 +792,7 @@ class  TemplateTag {
             try {
                 const  targetLine: string = line1;
                 targetLineNum += 1;
+var d = pp(`${targetLineNum} ${targetLine}`)
                 if (templateLineIndex === 0) {
 
                     const  indentLength = targetLine.indexOf(expectedFirstLine);
@@ -824,12 +825,18 @@ class  TemplateTag {
                         errorTemplate = indent + this.templateLines[templateLineIndex];
                     }
                 } else { // skipTo
+pp(`(${indent + skipTo})`)
+pp(`(${targetLine})`)
+pp(`(${indent})`)
                     if (targetLine === indent + skipTo) {
                         result = Result.same;
-                    } else if (targetLine.startsWith(indent)) {
+pp('same')
+                    } else if (targetLine.trim() === ''  ||  targetLine.startsWith(indent)) {
                         result = Result.skipped;
+pp('skipped')
                     } else {
                         result = Result.different;
+pp('different')
                         errorTemplateLineIndex = templateLineIndex;
                         errorTargetLineNum = skipStartLineNum;
                         errorContents = skipFrom;
@@ -989,6 +996,7 @@ async function  check(checkingFilePath?: string) {
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
+    targetFolders.push(currentFolder);
     if (checkingFilePath) {
         for (const folder of targetFolders) {
             const  targetFolderFullPath = getFullPath(folder, currentFolder);
@@ -1627,6 +1635,9 @@ function  parseTemplateTag(line: string): TemplateTag {
 
 // parseCSVColumns
 async function  parseCSVColumns(columns: string): Promise<string[]> {
+    if (!columns) {
+        return  [];  // stream.Readable.from(undefined) occurs an error
+    }
     return new Promise((resolveFunction, rejectFunction) => {
         let  columnArray: string[] = [];
 
