@@ -74,6 +74,7 @@ You can drag and drop a file to enter the file without having to type it from th
 
 4 is an example of the line number. It is below the line where `settings:` is written,
 and above the line where the next `settings:` is written.
+You can omit the line number if there is only one `setting:` in the file.
 
 new_folder.yaml file will be chaned to the following contents and you can copy and paste.
 You can paste the text with the comment as it is,
@@ -511,6 +512,10 @@ Example:
     back up method:
         necessity: yes  #template: __BackUp__
         How to: Download Backup Tool
+
+If there is a dependency on the value of the variable,
+write the variable definition in the block of the `# if:` tag
+instead of checking with the `# expect:` tag.
 
 
 ## #keyword tag: highly accurate search
