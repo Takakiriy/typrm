@@ -3,12 +3,14 @@
 
 typrm は テキスト ファイル に書いたキーボードから手動で入力する内容のパラメーターを置き換えます。
 同じ内容にすべきテキストを同じように置き換えるため、入力ミスが少なくなります。
-また、置き換え機能とは別の検索機能もあります。
+
+また、typrm にはキーワードタグを使った強力な検索機能もあります。
 
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
   - [最初のサンプル - replace コマンド, revert コマンド](#最初のサンプル---replace-コマンド-revert-コマンド)
+  - [強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します](#強力な検索機能---keyword-タグや-glossary-タグを使って精度よく検索します)
   - [インストール](#インストール)
     - [Windows の場合](#windows-の場合)
     - [mac の場合](#mac-の場合)
@@ -20,12 +22,11 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
   - [#file-template タグを使ってファイルの内容をチェックします](#file-template-タグを使ってファイルの内容をチェックします)
   - [#if タグを使って条件を設定します](#if-タグを使って条件を設定します)
   - [#expect タグを使って設定値をチェックします](#expect-タグを使って設定値をチェックします)
-  - [強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します](#強力な検索機能---keyword-タグや-glossary-タグを使って精度よく検索します)
-  - [開発環境の構築手順](#開発環境の構築手順)
+  - [（開発者用） 開発環境の構築手順](#開発者用-開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
     - [ホストOSが Windows、ゲストOSが CentOS 7 の場合](#ホストosが-windowsゲストosが-centos-7-の場合)
-  - [テスト](#テスト)
+  - [（開発者用） テスト](#開発者用-テスト)
     - [Jest を使うテスト](#jest-を使うテスト)
     - [Jest を使わないテスト](#jest-を使わないテスト)
 
@@ -112,6 +113,82 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
     typrm replace  new_folder.yaml  4  "__Name1__: work1
         __Name2__: work2"
+
+
+## 強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します
+
+typrm の検索機能は、全文検索(grep)よりも、精度よく検索します。
+
+`#keyword:` タグにキーワードを書きます。
+
+テキスト ファイル の内容のサンプル:
+
+    Shows all files:  #keyword: ls
+    Example: ls -a sub_folder
+
+typrm コマンド:
+
+    $ typrm ls
+    .../text.txt:1: Shows all files:  #keyword: ls -a
+
+上記の例の場合、Example の行にはヒットしません。
+なぜなら `#keyword:` タグがないからです。 `#keyword:` タグがないテキストを
+検索するときは、grep など一般的な全文検索ツールを使ってください。
+
+typrm search コマンドのコマンド名（search）は省略できます。
+search コマンドの短いコマンド名は s です。
+
+typrm search コマンドの書式:
+
+    typrm __Keyword__
+
+または
+
+    typrm search __Keyword__
+
+または
+
+    typrm s __Keyword__
+
+検索キーワードが typrm のコマンド名と同じときは、
+コマンド名（search または s）を省略できません。
+
+複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
+また、大文字小文字が違っていてもヒットしますが、
+大文字小文字が同じテキストが上位に表示されます。
+typrm では上位にヒットしたテキストが下側に表示されます。
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated values
+
+search コマンドにキーワードを指定しないと、検索キーワード入力モードになります。
+このモードを終了するには、Ctrl+C キーを押します。
+
+    $ typrm s
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+テキスト ファイルに書くキーワードは、
+`#keyword:` タグに続けて CSV 形式（コンマ区切り）で
+複数指定することができます。
+
+    #keyword: CSV, comma separated values, "a,b"
+
+CSV の部分に文法の問題があるときに表示される警告を抑制するには、
+`#disable-tag-tool:` を書いてください。
+
+    #keyword: abc"   #disable-tag-tool:
+
+`#glossary:` タグを付けると、`#glossary:` タグを付けた行のインデントより
+1段深いインデントの行に書かれたコロンまでの部分が検索対象のキーワードになります。
+
+    用語:  #glossary:
+        CSV: comma separated values
+        SSV: space separated values
+
+上記の場合、CSV と SSV を検索できるようになります。
+2段以上深いインデントの行は対象外です。
 
 
 ## インストール
@@ -539,83 +616,7 @@ Windows 以外では定義しない環境変数 `windir` を使って下記の�
 `#if:` タグのブロックの中に変数の定義を書いてください。
 
 
-## 強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します
-
-typrm の検索機能は、全文検索(grep)よりも、精度よく検索します。
-
-`#keyword:` タグにキーワードを書きます。
-
-テキスト ファイル の内容のサンプル:
-
-    Shows all files:  #keyword: ls
-    Example: ls -a sub_folder
-
-typrm コマンド:
-
-    $ typrm ls
-    .../text.txt:1: Shows all files:  #keyword: ls -a
-
-上記の例の場合、Example の行にはヒットしません。
-なぜなら `#keyword:` タグがないからです。 `#keyword:` タグがないテキストを
-検索するときは、grep など一般的な全文検索ツールを使ってください。
-
-typrm search コマンドのコマンド名（search）は省略できます。
-search コマンドの短いコマンド名は s です。
-
-typrm search コマンドの書式:
-
-    typrm __Keyword__
-
-または
-
-    typrm search __Keyword__
-
-または
-
-    typrm s __Keyword__
-
-検索キーワードが typrm のコマンド名と同じときは、
-コマンド名（search または s）を省略できません。
-
-複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
-また、大文字小文字が違っていてもヒットしますが、
-大文字小文字が同じテキストが上位に表示されます。
-typrm では上位にヒットしたテキストが下側に表示されます。
-
-    $ typrm Comma Separated Value
-    .../text.txt:1: #keyword: CSV, comma separated values
-
-search コマンドにキーワードを指定しないと、検索キーワード入力モードになります。
-このモードを終了するには、Ctrl+C キーを押します。
-
-    $ typrm s
-    keyword: csv
-    .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
-
-テキスト ファイルに書くキーワードは、
-`#keyword:` タグに続けて CSV 形式（コンマ区切り）で
-複数指定することができます。
-
-    #keyword: CSV, comma separated values, "a,b"
-
-CSV の部分に文法の問題があるときに表示される警告を抑制するには、
-`#disable-tag-tool:` を書いてください。
-
-    #keyword: abc"   #disable-tag-tool:
-
-`#glossary:` タグを付けると、`#glossary:` タグを付けた行のインデントより
-1段深いインデントの行に書かれたコロンまでの部分が検索対象のキーワードになります。
-
-    用語:  #glossary:
-        CSV: comma separated values
-        SSV: space separated values
-
-上記の場合、CSV と SSV を検索できるようになります。
-2段以上深いインデントの行は対象外です。
-
-
-## 開発環境の構築手順
+## （開発者用） 開発環境の構築手順
 
 ### Windows の場合
 
@@ -749,7 +750,7 @@ node_modules フォルダーを復帰します:
 F5 キーを押すと、最初のテストが動きます:
 
 
-## テスト
+## （開発者用） テスト
 
 Jest を使うテストと Jest を使わないテストがあります。
 ソース ファイルの行番号の左をクリックして、ブレークポイントを設定できます。

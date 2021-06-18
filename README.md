@@ -2,14 +2,16 @@
 
 typrm replaces parameters of what you type manually from the keyboard you write in a text file.
 It replaces the text that should be the same in the same way, resulting in fewer typos.
-Also, there is a search function that is separated from the replace function.
+
+Also, typrm has powerful search assisted with your specified keyword tag.
 
 [日本語 README](./README-jp.md)
 
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
-  - [First example - replace command, revert command](#first-example---replace-command-revert-command)
+  - [First replace example - replace command, revert command](#first-replace-example---replace-command-revert-command)
+  - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
   - [Install](#install)
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
@@ -21,19 +23,18 @@ Also, there is a search function that is separated from the replace function.
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
-  - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
-  - [How to build the development environment](#how-to-build-the-development-environment)
+  - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
     - [For Windows host OS and CentOS 7 guest OS](#for-windows-host-os-and-centos-7-guest-os)
-  - [Test](#test)
+  - [(for developers) Test](#for-developers-test)
     - [Test using Jest](#test-using-jest)
     - [Test without Jest](#test-without-jest)
 
 <!-- /TOC -->
 
 
-## First example - replace command, revert command
+## First replace example - replace command, revert command
 
 The manual that tells you to create a new folder and run shell commands in it will tell you to type in the shell as follows:
 
@@ -108,6 +109,86 @@ you can copy and paste multiple linees and enter them continuously.
 
     typrm replace  new_folder.yaml  4  "__Name1__: work1
         __Name2__: work2"
+
+
+## Powerful search - #keyword tag, #glossary tag make highly accurate search
+
+typrm searchs more accurately than full-text search (grep).
+
+Write the keyword at the `#keyword:` tag.
+
+Sample text file content:
+
+    Shows all files:  #keyword: ls
+    Example: ls -a sub_folder
+
+typrm command:
+
+    $ typrm ls
+    .../text.txt:1: Shows all files:  #keyword: ls -a
+
+In the case of the above example, the Example line will not be hit.
+Because there is no `#keyword:` tag.
+If you want to search for text that does not have the `#keyword:` tag,
+use a common full-text search tool such as grep.
+
+The typrm search command name (search) can be omitted.
+The short command name for the search command is s.
+
+typrm search command format:
+
+    typrm __Keyword__
+
+or
+
+    typrm search __Keyword__
+
+or
+
+    typrm s __Keyword__
+
+If the search keyword was the same as the command name of typrm,
+the command name (search or s) cannot be omitted.
+
+If specifying a search keyword consisting of multiple words,
+it is not necessary to enclose it in " ".
+Also, even if the case is different, it will be hit,
+but the text with the same case will be displayed at the top.
+In typrm, the text that hits the top is displayed at the bottom.
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated values
+
+If you do not specify any keywords with the search command, search keyword input mode is started.
+Press Ctrl + C to exit this mode.
+
+    $ typrm s
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+You can specify multiple keywords to be written
+by CSV format (comma separated values) after the `#keyword:` tag
+in the text file.
+
+    #keyword: CSV, comma separated values, "a,b"
+
+If you want to suppress the warning of the CSV part that has syntax problem,
+write `#disable-tag-tool:`.
+
+    #keyword: abc"   #disable-tag-tool:
+
+If you add the `#glossary:` tag,
+words up to the colon is searchable keywords
+that written in the indent line one step deeper than
+the indent of the line tagged with `#glossary:`.
+
+    glossary:  #glossary:
+        CSV: comma separated values
+        SSV: space separated values
+
+In the above case, you will be able to search for CSV and SSV.
+Lines with indents that are two or more steps deep are not searchable.
 
 
 ## Install
@@ -557,87 +638,7 @@ write the variable definition in the block of the `#if:` tag
 instead of checking with the `#expect:` tag.
 
 
-## Powerful search - #keyword tag, #glossary tag make highly accurate search
-
-typrm searchs more accurately than full-text search (grep).
-
-Write the keyword at the `#keyword:` tag.
-
-Sample text file content:
-
-    Shows all files:  #keyword: ls
-    Example: ls -a sub_folder
-
-typrm command:
-
-    $ typrm ls
-    .../text.txt:1: Shows all files:  #keyword: ls -a
-
-In the case of the above example, the Example line will not be hit.
-Because there is no `#keyword:` tag.
-If you want to search for text that does not have the `#keyword:` tag,
-use a common full-text search tool such as grep.
-
-The typrm search command name (search) can be omitted.
-The short command name for the search command is s.
-
-typrm search command format:
-
-    typrm __Keyword__
-
-or
-
-    typrm search __Keyword__
-
-or
-
-    typrm s __Keyword__
-
-If the search keyword was the same as the command name of typrm,
-the command name (search or s) cannot be omitted.
-
-If specifying a search keyword consisting of multiple words,
-it is not necessary to enclose it in " ".
-Also, even if the case is different, it will be hit,
-but the text with the same case will be displayed at the top.
-In typrm, the text that hits the top is displayed at the bottom.
-
-    $ typrm Comma Separated Value
-    .../text.txt:1: #keyword: CSV, comma separated values
-
-If you do not specify any keywords with the search command, search keyword input mode is started.
-Press Ctrl + C to exit this mode.
-
-    $ typrm s
-    keyword: csv
-    .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
-
-You can specify multiple keywords to be written
-by CSV format (comma separated values) after the `#keyword:` tag
-in the text file.
-
-    #keyword: CSV, comma separated values, "a,b"
-
-If you want to suppress the warning of the CSV part that has syntax problem,
-write `#disable-tag-tool:`.
-
-    #keyword: abc"   #disable-tag-tool:
-
-If you add the `#glossary:` tag,
-words up to the colon is searchable keywords
-that written in the indent line one step deeper than
-the indent of the line tagged with `#glossary:`.
-
-    glossary:  #glossary:
-        CSV: comma separated values
-        SSV: space separated values
-
-In the above case, you will be able to search for CSV and SSV.
-Lines with indents that are two or more steps deep are not searchable.
-
-
-## How to build the development environment
+## (for developers) How to build the development environment
 
 ### For Windows
 
@@ -773,7 +774,7 @@ Restore the node_modules folder:
 To run the first test, press F5 key:
 
 
-## Test
+## (for developers) Test
 
 There are the test using Jest and the test without Jest.
 You can set the break point, click at the left of line number of the source file.
