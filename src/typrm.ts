@@ -7,7 +7,7 @@ function  exitFromCommander(e: commander.CommanderError) {
     }
 }
 async function  callMain() {
-    commander.program.version('0.4.3')  // Do not forget to transpile, update package.json, add git tag
+    commander.program.version('0.4.4')  // Do not forget to transpile, update package.json, add git tag
         .exitOverride(exitFromCommander)
         .option("-l, --locale <s>")
         .option("-t, --test")

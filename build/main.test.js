@@ -194,34 +194,52 @@ describe("replaces settings >>", function () {
     test.skip('2_replace_5_setting_name', function () { });
     test.each([
         [
-            '2_replace_1_ok', ' setting 1', 10, 'en-US',
+            '2_replace_1_ok', ' setting 1', '10', 'en-US',
             "key1: value1changed\n   __Key2__: value2changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8",
         ], [
-            '2_replace_1_ok', ' setting 2', 29, 'en-US',
+            '2_replace_1_ok', ' setting 2', '29', 'en-US',
             "key1: value1changed",
         ], [
-            '2_replace_2_error', '', 4, 'en-US',
+            '2_replace_1_ok', ' setting 2 lineNum', '26', 'en-US',
+            "key1: value1changed",
+        ], [
+            '2_replace_2_error', '', '4', 'en-US',
             "Key3: value3changed",
         ], [
-            '2_replace_3_English', '', 10, 'en-US',
+            '2_replace_3_English', '', '10', 'en-US',
             "Key3: value3changed",
         ], [
-            '2_replace_4_Japanese', '', 10, 'ja-JP',
+            '2_replace_4_Japanese', '', '10', 'ja-JP',
             "Key3: value3changed",
         ], [
-            '2_replace_6_if', ' in if block', 9, 'en-US',
+            '2_replace_5_setting_name', ' setting 1', '1st', 'ja-JP',
+            "key1: value1changed",
+        ], [
+            '2_replace_5_setting_name', ' setting 2', '2番目', 'ja-JP',
+            "key1: value1changed",
+        ], [
+            '2_replace_5_setting_name', ' setting 3', '3rd', 'en-US',
+            "key1: value1changed",
+        ], [
+            '2_replace_5_setting_name', ' setting not found', 'not found', 'en-US',
+            "key1: value1changed",
+        ], [
+            '2_replace_6_if', ' in if block', '9', 'en-US',
             "__Setting1__: replaced",
         ], [
-            '2_replace_6_if', ' in if variable', 9, 'en-US',
+            '2_replace_6_if', ' in if variable', '9', 'en-US',
             "fruit: melon",
         ], [
-            '2_replace_6_if', ' both', 9, 'en-US',
+            '2_replace_6_if', ' both', '9', 'en-US',
             "fruit: melon\n            __Setting1__: replaced",
         ], [
-            '2_replace_7_undefined_if', '', 3, 'en-US',
+            '2_replace_7_undefined_if', '', '3', 'en-US',
             "fruit: apple",
         ], [
-            '2_replace_8_one_setting', ' OK', undefined, 'en-US',
+            '2_replace_8_one_setting', ' without line num', undefined, 'en-US',
+            "key1: changed1",
+        ], [
+            '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
             "key1: changed1",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
@@ -236,7 +254,7 @@ describe("replaces settings >>", function () {
                     fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                     writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 2];
-                    return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                    return [4 /*yield*/, callMain(["replace", changingFileName, lineNum, keyValues], {
                             folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 1:
@@ -376,33 +394,54 @@ describe("replaces settings >>", function () {
             ], [
                 '2_replace_6_if', ' both', 9, 'en-US',
                 "fruit: melon\n                __Setting1__: replaced",
+            ], [
+                '2_replace_6_if', ' without line num', undefined, 'en-US',
+                "__Setting1__: replaced",
+            ], [
+                '2_replace_6_if', ' setting name', 'set1', 'en-US',
+                "__Setting1__: replaced",
             ],
         ])("%s%s >>", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-            var sourceFilePath, changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
+            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        sourceFilePath = testFolderPath + fileNameHead + "_1.yaml";
                         changingFolderPath = testFolderPath + '_changing';
                         changingFileName = fileNameHead + "_1_changing.yaml";
                         changingFilePath = changingFolderPath + '/' + changingFileName;
                         sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         writeFileSync(changingFilePath, sourceFileContents);
+                        if (!lineNum) return [3 /*break*/, 2];
                         return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
                                 folder: changingFolderPath, test: "", locale: locale
                             })];
                     case 1:
                         _a.sent();
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
+                            folder: changingFolderPath, test: "", locale: locale
+                        })];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4:
                         updatedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(updatedFileContents).not.toBe(sourceFileContents);
-                        // Test Main
+                        if (!lineNum) return [3 /*break*/, 6];
                         return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
                                 folder: changingFolderPath, test: "", locale: locale
                             })];
-                    case 2:
-                        // Test Main
+                    case 5:
                         _a.sent();
+                        return [3 /*break*/, 8];
+                    case 6: return [4 /*yield*/, callMain(["revert", changingFileName], {
+                            folder: changingFolderPath, test: "", locale: locale
+                        })];
+                    case 7:
+                        _a.sent();
+                        _a.label = 8;
+                    case 8:
                         revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toBe(sourceFileContents);
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
@@ -616,8 +655,9 @@ describe("searches glossary tag >>", function () {
 describe("test of test >>", function () {
     test("checks snapshots files are confirmed", function () {
         var activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
-        var backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();
+        var backUpSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap.confirmed-ts').toString();
         // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
+        // ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです
         expect(activeSnapshots).toBe(backUpSnapshots);
     });
 });

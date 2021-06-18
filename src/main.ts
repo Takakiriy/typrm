@@ -35,22 +35,28 @@ export async function  main() {
             await check(checkingFilePath);
         }
         else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
-            varidateUpdateCommandArguments();
+            varidateReplaceCommandArguments();
             if (programArguments.length === 3) {
                 var  inputFilePath = programArguments[1];
-                var  replacingLineNum = 0;  // isOneSetting
+                var  replacingLineNum = '';  // isOneSetting
                 var  keyValues = programArguments[2];
             } else {
                 var  inputFilePath = programArguments[1];
-                var  replacingLineNum = parseInt(programArguments[2]);
+                var  replacingLineNum = programArguments[2];
                 var  keyValues = programArguments[3];
             }
 
             await replaceSettings(inputFilePath, replacingLineNum, keyValues);
         }
         else if (programArguments[0] === 'revert') {
-            const  inputFilePath = programArguments[1];
-            const  replacingLineNum = parseInt(programArguments[2]);
+            varidateRevertCommandArguments();
+            if (programArguments.length === 2) {
+                var  inputFilePath = programArguments[1];
+                var  replacingLineNum = '';  // isOneSetting
+            } else {
+                var  inputFilePath = programArguments[1];
+                var  replacingLineNum = programArguments[2];
+            }
 
             await revertSettings(inputFilePath, replacingLineNum);
         }
@@ -103,8 +109,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 setting = {};
                 settingCount += 1;
                 settingIndentLength = indentRegularExpression.exec(line)![0].length;
-                // const  match = settingStartLabel.exec(line.trim());
-                // settingName = match[1];
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
             }
@@ -337,16 +341,23 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             if (key === 'exit') {
                 return;
             } else if (key !== '') {
-                const  lineNum = parseInt(key);
-                const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, lineNum);
-                console.log(`${translate('SettingIndex')}: ${replacingSettingIndex}`);
-                console.log(translate('Enter only: finish to input setting'));
-                for (;;) {
-                    const  keyValue = await input(translate('key: new_value>'));
-                    if (keyValue === '') {
-                        break;
+                const  settingNameOrLineNum = key;
+                const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum);
+                if ( ! replacingSettingIndex) {
+                    console.log('');
+                    console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
+                    errorCount += 1;
+                } else {
+                    console.log(`${translate('SettingIndex')}: ${replacingSettingIndex}`);
+                    console.log(translate('Enter only: finish to input setting'));
+                    for (;;) {
+                        const  keyValue = await input(translate('key: new_value>'));
+                        if (keyValue === '') {
+                            break;
+                        }
+                        errorCount += await replaceSettingsSub(
+                            inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true);
                     }
-                    errorCount += await replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true);
                 }
             }
             loop = (errorCount >= 1);
@@ -362,33 +373,46 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 }
 
 // replaceSettings
-async function  replaceSettings(inputFilePath: string, replacingLineNum: number, keyValueLines: string) {
+async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: string, keyValueLines: string) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
         errorCount += 1;
     } else {
-        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum);
+        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, settingNameOrLineNum);
+        if ( ! replacingSettingIndex) {
+            console.log('');
+            console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
+            errorCount += 1;
+        } else {
 
-        errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true);
+            errorCount += await replaceSettingsSub(
+                inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true);
+        }
     }
     console.log('');
     console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
 }
 
 // revertSettings
-async function  revertSettings(inputFilePath: string, replacingLineNum: number) {
+async function  revertSettings(inputFilePath: string, settingNameOrLineNum: string) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
         errorCount += 1;
     } else {
-        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum);
-        const  revertSettings = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
-        for (const revertSetting of revertSettings) {
+        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, settingNameOrLineNum);
+        if ( ! replacingSettingIndex) {
+            console.log('');
+            console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
+            errorCount += 1;
+        } else {
+            const  revertSettings = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
+            for (const revertSetting of revertSettings) {
 
-            errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-                parseKeyValueLines(revertSetting), false);
+                errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
+                    parseKeyValueLines(revertSetting), false);
+            }
         }
     }
     console.log('');
@@ -792,7 +816,6 @@ class  TemplateTag {
             try {
                 const  targetLine: string = line1;
                 targetLineNum += 1;
-var d = pp(`${targetLineNum} ${targetLine}`)
                 if (templateLineIndex === 0) {
 
                     const  indentLength = targetLine.indexOf(expectedFirstLine);
@@ -825,18 +848,12 @@ var d = pp(`${targetLineNum} ${targetLine}`)
                         errorTemplate = indent + this.templateLines[templateLineIndex];
                     }
                 } else { // skipTo
-pp(`(${indent + skipTo})`)
-pp(`(${targetLine})`)
-pp(`(${indent})`)
                     if (targetLine === indent + skipTo) {
                         result = Result.same;
-pp('same')
                     } else if (targetLine.trim() === ''  ||  targetLine.startsWith(indent)) {
                         result = Result.skipped;
-pp('skipped')
                     } else {
                         result = Result.different;
-pp('different')
                         errorTemplateLineIndex = templateLineIndex;
                         errorTargetLineNum = skipStartLineNum;
                         errorContents = skipFrom;
@@ -1277,11 +1294,20 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 }
 
 // varidateUpdateCommandArguments
-function  varidateUpdateCommandArguments() {
+function  varidateReplaceCommandArguments() {
     if (programArguments.length < 3) {
         throw new Error('Error: Too few argurments.\n' +
             'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
-            'Parameters2: typrm replace  __FilePath__  __NearbyLineNum__  "__KeyColonValue__"')
+            'Parameters2: typrm replace  __FilePath__  __NearbyLineNumOrSettingName__  "__KeyColonValue__"')
+    }
+}
+
+// varidateRevertCommandArguments
+function  varidateRevertCommandArguments() {
+    if (programArguments.length < 2) {
+        throw new Error('Error: Too few argurments.\n' +
+            'Parameters1: typrm revert  __FilePath__\n' +
+            'Parameters2: typrm revert  __FilePath__  __NearbyLineNumOrSettingName__')
     }
 }
 
@@ -1414,46 +1440,79 @@ function  getTrueCondition(expression: string): /* '' or 'key: value' */ string 
 }
 
 // getSettingIndexFromLineNum
-async function  getSettingIndexFromLineNum(inputFilePath: string, targetLineNum: number): Promise<number> {
-    const  isOneSetting = (targetLineNum === 0);
+async function  getSettingIndexFromLineNum(inputFilePath: string, settingNameOrLineNum: string): Promise<number | null> {
     const  reader = readline.createInterface({
         input: fs.createReadStream(inputFilePath),
         crlfDelay: Infinity
     });
     let  settingCount = 0;
     let  lineNum = 0;
-    let  loop = true;
+    let  breaking = false;
+    let  isFound = false;
     let  exception: any;
+    var  targetLineNum: number | undefined;
+    var  targetSettingName: string | undefined;
+    const  isOneSetting = (settingNameOrLineNum === '');
+    if (numberRegularExpression.test(settingNameOrLineNum)) {
+        targetLineNum = parseInt(settingNameOrLineNum);
+    } else {
+        targetSettingName = (targetLineNum) ? undefined : settingNameOrLineNum;
+    }
 
     for await (const line1 of reader) {
-        if (!loop) {continue;}  // "reader" requests read all lines
+        if (breaking) {continue;}  // "reader" requests read all lines
         try {
             const  line: string = line1;
             lineNum += 1;
+            var  currentSettingName: string | undefined = undefined;
 
             if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                 settingCount += 1;
+                if (settingStartLabel.test(line.trim())) {
+                    currentSettingName = settingStartLabel.exec(line.trim())![3];
+                        // If setting name is empty, currentSettingName = undefined;
+                } else {
+                    currentSettingName = settingStartLabelEn.exec(line.trim())![3];
+                }
             }
 
             if (lineNum === targetLineNum) {
-                loop = false;  // return or break must not be written.
-                // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                breaking = true;  // return or break must not be written.
+                    // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                isFound = true;
+            }
+            if (targetSettingName  &&  currentSettingName === targetSettingName) {
+                breaking = true;  // return or break must not be written.
+                isFound = true;
             }
         } catch (e) {
             exception = e;
-            loop = false;
+            breaking = true;
         }
     }
     if (exception) {
         throw exception;
     }
-    if ( ! isOneSetting) {
-        var  settingIndex = settingCount;
-    } else {
-        var  settingIndex = 1;
+    var  settingIndex: number | null = null;
+    if (isOneSetting) {
+        settingIndex = 1;
         if (settingCount !== 1) {
             throw  new Error(translate('Settings cannot be identified, because the file has 2 or more settings. ' +
                 'Add line number parameter.'))
+        }
+    } else {
+        if (isFound) {
+            if (settingCount >= 1) {
+                settingIndex = settingCount;
+            } else {
+                settingIndex = 1;
+            }
+        } else if (targetLineNum !== undefined  &&  targetLineNum < lineNum) {
+            settingIndex = 1;
+        } else if (targetLineNum !== undefined  &&  targetLineNum >= lineNum) {
+            settingIndex = settingCount;
+        } else {
+            settingIndex = null;
         }
     }
     return  settingIndex;
@@ -2055,6 +2114,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.":
                 "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
+            "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
+
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -2119,8 +2180,8 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     }
 }
 
-const  settingStartLabel = /^設定((\(|（)[^\)]*(\)|）))?:$/;
-const  settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
+const  settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
+const  settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 const  originalLabel = "#original:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
@@ -2139,6 +2200,7 @@ const  secretExamleLabel = "#★秘密:仮";
 const  secretExamleLabelEn = "#secret:example";
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
+const  numberRegularExpression = /^[0-9]*$/;
 const  fullMatchScore = 100;
 const  caseIgnoredFullMatchScore = 8;
 const  wordsMatchScore = 7;

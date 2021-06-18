@@ -877,6 +877,61 @@ exports[`replaces settings >> in 2_replace_1_ok setting 1: updatedFileContents 1
 "
 `;
 
+exports[`replaces settings >> in 2_replace_1_ok setting 2 lineNum: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_1_ok setting 2 lineNum: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは行番号で指定 >> パスするケース
+
+手順A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #original: oldValue3  #コメント
+
+    手順:
+        - cd \\"..\\"
+        - echo  \\"value2\\"
+            #template: - echo  \\"__Key2__\\"
+        - value1
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+        - \\"value3changed\\"
+            #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
+        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+
+手順B:
+    設定:
+        key1: value1changed  #original: value11
+
+    手順:
+        - value1changed
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： \\"value1changed\\"
+            #// comment
+            #template-at(-2): \\"key1\\"
+        - ３行上のケース： \\"value1changed\\"
+            #// comment
+            #// comment
+            #template-at(-3): \\"key1\\"
+"
+`;
+
 exports[`replaces settings >> in 2_replace_1_ok setting 2: stdout 1`] = `
 "
 Warning: 0, Error: 0
@@ -1253,15 +1308,157 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
 "
 `;
 
+exports[`replaces settings >> in 2_replace_5_setting_name setting 1: stdout 1`] = `
+"
+警告: 0, エラー: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting 1: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは設定名で指定
+
+手順A:
+    設定(1st):
+        key1: value1changed  #original: value11
+
+    手順:
+        - value1changed
+            #template: - key1
+
+手順B:
+    設定（2番目）:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順C:
+    settings(3rd):  #// English
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting 2: stdout 1`] = `
+"
+警告: 0, エラー: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting 2: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは設定名で指定
+
+手順A:
+    設定(1st):
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順B:
+    設定（2番目）:
+        key1: value1changed  #original: value11
+
+    手順:
+        - value1changed
+            #template: - key1
+
+手順C:
+    settings(3rd):  #// English
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting 3: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting 3: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは設定名で指定
+
+手順A:
+    設定(1st):
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順B:
+    設定（2番目）:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順C:
+    settings(3rd):  #// English
+        key1: value1changed  #original: value11
+
+    手順:
+        - value1changed
+            #template: - key1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting not found: stdout 1`] = `
+"
+Error of not found specified setting name: not found
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_5_setting_name setting not found: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは設定名で指定
+
+手順A:
+    設定(1st):
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順B:
+    設定（2番目）:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+
+手順C:
+    settings(3rd):  #// English
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+"
+`;
+
 exports[`replaces settings >> in 2_replace_5_setting_name: sourceFileContents 1`] = `
 "# 設定値を変更する。設定のセットは設定名で指定
 
 手順A:
     設定(1st):
-        key1: value1
+        key1: value11
 
     手順:
-        - value1
+        - value11
             #template: - key1
 
 手順B:
@@ -1284,7 +1481,7 @@ exports[`replaces settings >> in 2_replace_5_setting_name: sourceFileContents 1`
 
 exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
 "test_of_if_tag_in_settings_reverse:
-    settings:
+    settings(set1):
         fruit: banana
         not banana:  #if: $settings.fruit != banana
             __Setting1__: no
@@ -1307,7 +1504,7 @@ Warning: 0, Error: 0
 
 exports[`replaces settings >> in 2_replace_6_if both: updatedFileContents 1`] = `
 "test_of_if_tag_in_settings:
-    settings:
+    settings(set1):
         fruit: melon  #original: banana
         banana:  #if: $settings.fruit == banana
             __Setting1__: yes
@@ -1330,7 +1527,7 @@ Warning: 0, Error: 0
 
 exports[`replaces settings >> in 2_replace_6_if in if block: updatedFileContents 1`] = `
 "test_of_if_tag_in_settings:
-    settings:
+    settings(set1):
         fruit: banana
         banana:  #if: $settings.fruit == banana
             __Setting1__: replaced  #original: yes
@@ -1353,7 +1550,7 @@ Warning: 0, Error: 0
 
 exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileContents 1`] = `
 "test_of_if_tag_in_settings:
-    settings:
+    settings(set1):
         fruit: melon  #original: banana
         banana:  #if: $settings.fruit == banana
             __Setting1__: yes
@@ -1370,7 +1567,7 @@ exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileConte
 
 exports[`replaces settings >> in 2_replace_6_if: sourceFileContents 1`] = `
 "test_of_if_tag_in_settings:
-    settings:
+    settings(set1):
         fruit: banana
         banana:  #if: $settings.fruit == banana
             __Setting1__: yes
@@ -1430,13 +1627,30 @@ exports[`replaces settings >> in 2_replace_7_undefined_if: updatedFileContents 1
 "
 `;
 
-exports[`replaces settings >> in 2_replace_8_one_setting OK: stdout 1`] = `
+exports[`replaces settings >> in 2_replace_8_one_setting line num 1: stdout 1`] = `
 "
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> in 2_replace_8_one_setting OK: updatedFileContents 1`] = `
+exports[`replaces settings >> in 2_replace_8_one_setting line num 1: updatedFileContents 1`] = `
+"手順A:
+    設定(1st):
+        key1: changed1  #original: value1
+
+    手順:
+        - changed1
+            #template: - key1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_8_one_setting without line num: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_8_one_setting without line num: updatedFileContents 1`] = `
 "手順A:
     設定(1st):
         key1: changed1  #original: value1

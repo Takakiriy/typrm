@@ -9,16 +9,19 @@ Also, there is a search function that is separated from the replace function.
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
-  - [First example](#first-example)
+  - [First example - replace command, revert command](#first-example---replace-command-revert-command)
   - [Install](#install)
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
   - [settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
+    - [The details of settings](#the-details-of-settings)
+    - [Setting name](#setting-name)
+  - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
-  - [#keyword tag: highly accurate search](#keyword-tag-highly-accurate-search)
+  - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
   - [How to build the development environment](#how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -30,7 +33,7 @@ Also, there is a search function that is separated from the replace function.
 <!-- /TOC -->
 
 
-## First example
+## First example - replace command, revert command
 
 The manual that tells you to create a new folder and run shell commands in it will tell you to type in the shell as follows:
 
@@ -72,9 +75,10 @@ type the following `replace` command from bash or PowerShell. The short command 
 
 You can drag and drop a file to enter the file without having to type it from the keyboard.
 
-4 is an example of the line number. It is below the line where `settings:` is written,
-and above the line where the next `settings:` is written.
+4 is an example of the line number. It is same or below the line where `settings:` is written,
+or above the line where the next `settings:` is written.
 You can omit the line number if there is only one `setting:` in the file.
+See the below about the way of specify the setting name instead of the line number.
 
 new_folder.yaml file will be chaned to the following contents and you can copy and paste.
 You can paste the text with the comment as it is,
@@ -97,6 +101,7 @@ Also, the revert command removes the `#original:` tag.
     typrm revert  new_folder.yaml  4
 
 4 is the line number, similar to the replace command.
+You can also specify the setting name.
 
 When you enter multiple variable names: new variable values,
 you can copy and paste multiple linees and enter them continuously.
@@ -314,7 +319,7 @@ In the above case, if you do not enclose the value of the `#template:` tag in " 
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
 
-The details of the setting:
+### The details of settings
 
 - You can indent any line deeper than another it, but it is not an object
 - Variables for which no value is specified cannot be defined.
@@ -338,10 +343,44 @@ Example:
 List of variables defined in the above settings:
 `__Name__`, `__MainID__`, `__MainValue__`, `__SubID__`, `__SubValue__`
 
-To check for a match without replacement,
+
+### Setting name
+
+If you wrote a setting name, you can specify the setting name
+instead of the line number to be replaced
+by the replace command or revert command.
+You must write the setting name in parentheses
+before the colon of `settings:` in the text you will be replacing.
+
+example.yaml
+
+    settings(project1):
+        __Name__: image1
+    body:
+        This is image1.  #template: __Name__
+
+    settings(project2):
+        __Name__: image2
+    body:
+        This is image2.  #template: __Name__
+
+Command:
+
+    typrm replace  example.yaml  "project1"  "__Name__: Image1"
+
+- The setting name cannot be written numbers only
+
+
+## check command - test that it can be replaced
+
+
+To check that typrm can replace the settings correctly,
 use the `check` command. The short command name is `c`.
 
     typrm check __FileName__
+
+In order to correctly determine the range to replace the setting value,
+typrm checks that the text with the setting value exists before replacing.
 
 
 ## #file-template tag: checks the contents of the file
@@ -514,15 +553,15 @@ Example:
         How to: Download Backup Tool
 
 If there is a dependency on the value of the variable,
-write the variable definition in the block of the `# if:` tag
-instead of checking with the `# expect:` tag.
+write the variable definition in the block of the `#if:` tag
+instead of checking with the `#expect:` tag.
 
 
-## #keyword tag: highly accurate search
+## Powerful search - #keyword tag, #glossary tag make highly accurate search
 
-The search function of typrm only searches for keywords written
-after the `#keyword:` tag in a text file.
-It makes to be reducer search noise than full text search.
+typrm searchs more accurately than full-text search (grep).
+
+Write the keyword at the `#keyword:` tag.
 
 Sample text file content:
 
@@ -564,26 +603,38 @@ but the text with the same case will be displayed at the top.
 In typrm, the text that hits the top is displayed at the bottom.
 
     $ typrm Comma Separated Value
-    .../text.txt:1: #keyword: CSV, comma separated value
+    .../text.txt:1: #keyword: CSV, comma separated values
 
 If you do not specify any keywords with the search command, search keyword input mode is started.
 Press Ctrl + C to exit this mode.
 
     $ typrm s
     keyword: csv
-    .../text.txt:1: #keyword: CSV, comma separated value
+    .../text.txt:1: #keyword: CSV, comma separated values
     keyword:
 
 You can specify multiple keywords to be written
 by CSV format (comma separated values) after the `#keyword:` tag
 in the text file.
 
-    #keyword: CSV, comma separated value, "a,b"
+    #keyword: CSV, comma separated values, "a,b"
 
 If you want to suppress the warning of the CSV part that has syntax problem,
 write `#disable-tag-tool:`.
 
     #keyword: abc"   #disable-tag-tool:
+
+If you add the `#glossary:` tag,
+words up to the colon is searchable keywords
+that written in the indent line one step deeper than
+the indent of the line tagged with `#glossary:`.
+
+    glossary:  #glossary:
+        CSV: comma separated values
+        SSV: space separated values
+
+In the above case, you will be able to search for CSV and SSV.
+Lines with indents that are two or more steps deep are not searchable.
 
 
 ## How to build the development environment

@@ -132,37 +132,55 @@ describe("replaces settings >>", () => {
     test.skip('2_replace_5_setting_name',()=>{});
     test.each([
         [
-            '2_replace_1_ok', ' setting 1', 10, 'en-US',
+            '2_replace_1_ok', ' setting 1', '10', 'en-US',
             `key1: value1changed
    __Key2__: value2changed  #ここは置き換え後に入らないコメント
 Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],[
-            '2_replace_1_ok', ' setting 2', 29, 'en-US',
+            '2_replace_1_ok', ' setting 2', '29', 'en-US',
             `key1: value1changed`,
         ],[
-            '2_replace_2_error', '', 4, 'en-US',
+            '2_replace_1_ok', ' setting 2 lineNum', '26', 'en-US',  // lineNum on settings
+            `key1: value1changed`,
+        ],[
+            '2_replace_2_error', '', '4', 'en-US',
             `Key3: value3changed`,
         ],[
-            '2_replace_3_English', '', 10, 'en-US',
+            '2_replace_3_English', '', '10', 'en-US',
             `Key3: value3changed`,
         ],[
-            '2_replace_4_Japanese', '', 10, 'ja-JP',
+            '2_replace_4_Japanese', '', '10', 'ja-JP',
             `Key3: value3changed`,
         ],[
-            '2_replace_6_if', ' in if block', 9, 'en-US',
+            '2_replace_5_setting_name', ' setting 1', '1st', 'ja-JP',
+            `key1: value1changed`,
+        ],[
+            '2_replace_5_setting_name', ' setting 2', '2番目', 'ja-JP',
+            `key1: value1changed`,
+        ],[
+            '2_replace_5_setting_name', ' setting 3', '3rd', 'en-US',
+            `key1: value1changed`,
+        ],[
+            '2_replace_5_setting_name', ' setting not found', 'not found', 'en-US',
+            `key1: value1changed`,
+        ],[
+            '2_replace_6_if', ' in if block', '9', 'en-US',
             `__Setting1__: replaced`,
         ],[
-            '2_replace_6_if', ' in if variable', 9, 'en-US',
+            '2_replace_6_if', ' in if variable', '9', 'en-US',
             `fruit: melon`,
         ],[
-            '2_replace_6_if', ' both', 9, 'en-US',
+            '2_replace_6_if', ' both', '9', 'en-US',
             `fruit: melon
             __Setting1__: replaced`,
         ],[
-            '2_replace_7_undefined_if', '', 3, 'en-US',
+            '2_replace_7_undefined_if', '', '3', 'en-US',
             `fruit: apple`,
         ],[
-            '2_replace_8_one_setting', ' OK', undefined, 'en-US',
+            '2_replace_8_one_setting', ' without line num', undefined, 'en-US',
+            `key1: changed1`,
+        ],[
+            '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
             `key1: changed1`,
         ],
 
@@ -176,7 +194,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
 
         // Test Main
         if (lineNum) {
-            await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+            await callMain(["replace", changingFileName, lineNum, keyValues], {
                 folder: changingFolderPath, test: "", locale,
             });
         } else {
@@ -290,26 +308,43 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
                 '2_replace_6_if', ' both', 9, 'en-US',
                 `fruit: melon
                 __Setting1__: replaced`,
+            ],[
+                '2_replace_6_if', ' without line num', undefined, 'en-US',
+                `__Setting1__: replaced`,
+            ],[
+                '2_replace_6_if', ' setting name', 'set1', 'en-US',
+                `__Setting1__: replaced`,
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
-            const  sourceFilePath     = testFolderPath + fileNameHead + "_1.yaml";
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
             const  sourceFileContents = getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFilePath, sourceFileContents);
-            await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                folder: changingFolderPath, test: "", locale
-            });
+            if (lineNum) {
+                await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
+                    folder: changingFolderPath, test: "", locale
+                });
+            } else {
+                await callMain(["replace", changingFileName, keyValues], {
+                    folder: changingFolderPath, test: "", locale
+                });
+            }
             const  updatedFileContents = fs.readFileSync(changingFilePath).toString();
             expect(updatedFileContents).not.toBe(sourceFileContents);
 
             // Test Main
-            await callMain(["revert", changingFileName, lineNum.toString()], {
-                folder: changingFolderPath, test: "", locale
-            });
+            if (lineNum) {
+                await callMain(["revert", changingFileName, lineNum.toString()], {
+                    folder: changingFolderPath, test: "", locale
+                });
+            } else {
+                await callMain(["revert", changingFileName], {
+                    folder: changingFolderPath, test: "", locale
+                });
+            }
             const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
             expect(revertedFileContents).toBe(sourceFileContents);
@@ -476,7 +511,7 @@ describe("searches glossary tag >>", () => {
         { folder: "test_data/search/glossary/1", test: "" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('AB')}C: abc\n`,
     ],[
-        "nested indent",
+        "nested indent",  // 2段以上深いインデントは対象外です
         ["search", "ABC"],
         { folder: "test_data/search/glossary/2", test: "" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}D: abcd\n` +
@@ -509,8 +544,9 @@ describe("searches glossary tag >>", () => {
 describe("test of test >>", () => {
     test("checks snapshots files are confirmed", () => {
         const  activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
-        const  backUpSnapshots = fs.readFileSync('__snapshots_confirm__/main.test.ts.1.confirmed.snap_').toString();
+        const  backUpSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap.confirmed-ts').toString();
             // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
+            // ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです
 
         expect(activeSnapshots).toBe(backUpSnapshots);
     });

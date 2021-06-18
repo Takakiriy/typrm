@@ -59,7 +59,7 @@ process.env['typrm_aaa'] = 'aaa';
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath_1, replacingLineNum_1;
+        var checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, inputFilePath, replacingLineNum;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -95,15 +95,15 @@ function main() {
                     return [3 /*break*/, 14];
                 case 8:
                     if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 10];
-                    varidateUpdateCommandArguments();
+                    varidateReplaceCommandArguments();
                     if (exports.programArguments.length === 3) {
                         inputFilePath = exports.programArguments[1];
-                        replacingLineNum = 0;
+                        replacingLineNum = '';
                         keyValues = exports.programArguments[2];
                     }
                     else {
                         inputFilePath = exports.programArguments[1];
-                        replacingLineNum = parseInt(exports.programArguments[2]);
+                        replacingLineNum = exports.programArguments[2];
                         keyValues = exports.programArguments[3];
                     }
                     return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues)];
@@ -112,9 +112,16 @@ function main() {
                     return [3 /*break*/, 14];
                 case 10:
                     if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 12];
-                    inputFilePath_1 = exports.programArguments[1];
-                    replacingLineNum_1 = parseInt(exports.programArguments[2]);
-                    return [4 /*yield*/, revertSettings(inputFilePath_1, replacingLineNum_1)];
+                    varidateRevertCommandArguments();
+                    if (exports.programArguments.length === 2) {
+                        inputFilePath = exports.programArguments[1];
+                        replacingLineNum = '';
+                    }
+                    else {
+                        inputFilePath = exports.programArguments[1];
+                        replacingLineNum = exports.programArguments[2];
+                    }
+                    return [4 /*yield*/, revertSettings(inputFilePath, replacingLineNum)];
                 case 11:
                     _a.sent();
                     return [3 /*break*/, 14];
@@ -133,7 +140,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, lineNum_1, replacingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -187,8 +194,6 @@ function checkRoutine(isModal, inputFilePath) {
                         setting = {};
                         settingCount += 1;
                         settingIndentLength = indentRegularExpression.exec(line)[0].length;
-                        // const  match = settingStartLabel.exec(line.trim());
-                        // settingName = match[1];
                     }
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                         isReadingSetting = false;
@@ -440,12 +445,12 @@ function checkRoutine(isModal, inputFilePath) {
                     }
                     console.log(translate('template count') + " = " + templateCount);
                     if (!isModal) {
-                        return [3 /*break*/, 43];
+                        return [3 /*break*/, 44];
                     }
                     loop = true;
                     _h.label = 32;
                 case 32:
-                    if (!loop) return [3 /*break*/, 41];
+                    if (!loop) return [3 /*break*/, 42];
                     console.log(translate('Press Enter key to retry checking.'));
                     return [4 /*yield*/, input(translate('The line number to replace the variable value >'))];
                 case 33:
@@ -454,30 +459,36 @@ function checkRoutine(isModal, inputFilePath) {
                     if (!(key === 'exit')) return [3 /*break*/, 34];
                     return [2 /*return*/];
                 case 34:
-                    if (!(key !== '')) return [3 /*break*/, 40];
-                    lineNum_1 = parseInt(key);
-                    return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, lineNum_1)];
+                    if (!(key !== '')) return [3 /*break*/, 41];
+                    settingNameOrLineNum = key;
+                    return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum)];
                 case 35:
                     replacingSettingIndex = _h.sent();
+                    if (!!replacingSettingIndex) return [3 /*break*/, 36];
+                    console.log('');
+                    console.log(translate("Error of not found specified setting name") + ": " + settingNameOrLineNum);
+                    errorCount += 1;
+                    return [3 /*break*/, 41];
+                case 36:
                     console.log(translate('SettingIndex') + ": " + replacingSettingIndex);
                     console.log(translate('Enter only: finish to input setting'));
-                    _h.label = 36;
-                case 36: return [4 /*yield*/, input(translate('key: new_value>'))];
-                case 37:
+                    _h.label = 37;
+                case 37: return [4 /*yield*/, input(translate('key: new_value>'))];
+                case 38:
                     keyValue = _h.sent();
                     if (keyValue === '') {
-                        return [3 /*break*/, 40];
+                        return [3 /*break*/, 41];
                     }
                     _e = errorCount;
                     return [4 /*yield*/, replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true)];
-                case 38:
+                case 39:
                     errorCount = _e + _h.sent();
-                    _h.label = 39;
-                case 39: return [3 /*break*/, 36];
-                case 40:
+                    _h.label = 40;
+                case 40: return [3 /*break*/, 37];
+                case 41:
                     loop = (errorCount >= 1);
                     return [3 /*break*/, 32];
-                case 41:
+                case 42:
                     // Rescan
                     console.log('========================================');
                     previousTemplateCount = templateCount;
@@ -485,15 +496,15 @@ function checkRoutine(isModal, inputFilePath) {
                         key = _g[_f];
                         setting[key].isReferenced = false;
                     }
-                    _h.label = 42;
-                case 42: return [3 /*break*/, 3];
-                case 43: return [2 /*return*/];
+                    _h.label = 43;
+                case 43: return [3 /*break*/, 3];
+                case 44: return [2 /*return*/];
             }
         });
     });
 }
 // replaceSettings
-function replaceSettings(inputFilePath, replacingLineNum, keyValueLines) {
+function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines) {
     return __awaiter(this, void 0, void 0, function () {
         var inputFileFullPath, errorCount, replacingSettingIndex, _a;
         return __generator(this, function (_b) {
@@ -504,16 +515,22 @@ function replaceSettings(inputFilePath, replacingLineNum, keyValueLines) {
                     errorCount = 0;
                     if (!(inputFileFullPath === '')) return [3 /*break*/, 2];
                     errorCount += 1;
-                    return [3 /*break*/, 5];
-                case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum)];
+                    return [3 /*break*/, 6];
+                case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, settingNameOrLineNum)];
                 case 3:
                     replacingSettingIndex = _b.sent();
+                    if (!!replacingSettingIndex) return [3 /*break*/, 4];
+                    console.log('');
+                    console.log(translate("Error of not found specified setting name") + ": " + settingNameOrLineNum);
+                    errorCount += 1;
+                    return [3 /*break*/, 6];
+                case 4:
                     _a = errorCount;
                     return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true)];
-                case 4:
-                    errorCount = _a + _b.sent();
-                    _b.label = 5;
                 case 5:
+                    errorCount = _a + _b.sent();
+                    _b.label = 6;
+                case 6:
                     console.log('');
                     console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
                     return [2 /*return*/];
@@ -522,7 +539,7 @@ function replaceSettings(inputFilePath, replacingLineNum, keyValueLines) {
     });
 }
 // revertSettings
-function revertSettings(inputFilePath, replacingLineNum) {
+function revertSettings(inputFilePath, settingNameOrLineNum) {
     return __awaiter(this, void 0, void 0, function () {
         var inputFileFullPath, errorCount, replacingSettingIndex, revertSettings_2, _i, revertSettings_1, revertSetting, _a;
         return __generator(this, function (_b) {
@@ -533,27 +550,32 @@ function revertSettings(inputFilePath, replacingLineNum) {
                     errorCount = 0;
                     if (!(inputFileFullPath === '')) return [3 /*break*/, 2];
                     errorCount += 1;
-                    return [3 /*break*/, 8];
-                case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, replacingLineNum)];
+                    return [3 /*break*/, 9];
+                case 2: return [4 /*yield*/, getSettingIndexFromLineNum(inputFileFullPath, settingNameOrLineNum)];
                 case 3:
                     replacingSettingIndex = _b.sent();
-                    return [4 /*yield*/, makeRevertSettings(inputFileFullPath, replacingSettingIndex)];
-                case 4:
+                    if (!!replacingSettingIndex) return [3 /*break*/, 4];
+                    console.log('');
+                    console.log(translate("Error of not found specified setting name") + ": " + settingNameOrLineNum);
+                    errorCount += 1;
+                    return [3 /*break*/, 9];
+                case 4: return [4 /*yield*/, makeRevertSettings(inputFileFullPath, replacingSettingIndex)];
+                case 5:
                     revertSettings_2 = _b.sent();
                     _i = 0, revertSettings_1 = revertSettings_2;
-                    _b.label = 5;
-                case 5:
-                    if (!(_i < revertSettings_1.length)) return [3 /*break*/, 8];
+                    _b.label = 6;
+                case 6:
+                    if (!(_i < revertSettings_1.length)) return [3 /*break*/, 9];
                     revertSetting = revertSettings_1[_i];
                     _a = errorCount;
                     return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(revertSetting), false)];
-                case 6:
-                    errorCount = _a + _b.sent();
-                    _b.label = 7;
                 case 7:
-                    _i++;
-                    return [3 /*break*/, 5];
+                    errorCount = _a + _b.sent();
+                    _b.label = 8;
                 case 8:
+                    _i++;
+                    return [3 /*break*/, 6];
+                case 9:
                     console.log('');
                     console.log(translate('Warning') + ": 0, " + translate('Error') + ": " + errorCount);
                     return [2 /*return*/];
@@ -1000,7 +1022,7 @@ var TemplateTag = /** @class */ (function () {
     TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_5, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, d, indentLength, expected, e_5_1, templateLineNum;
+            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_5_1, templateLineNum;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -1057,7 +1079,6 @@ var TemplateTag = /** @class */ (function () {
                         try {
                             targetLine = line1;
                             targetLineNum += 1;
-                            d = pp(targetLineNum + " " + targetLine);
                             if (templateLineIndex === 0) {
                                 indentLength = targetLine.indexOf(expectedFirstLine);
                                 if (indentLength !== notFound && targetLine.trim() === expectedFirstLine) {
@@ -1091,20 +1112,14 @@ var TemplateTag = /** @class */ (function () {
                                 }
                             }
                             else { // skipTo
-                                pp("(" + (indent + skipTo) + ")");
-                                pp("(" + targetLine + ")");
-                                pp("(" + indent + ")");
                                 if (targetLine === indent + skipTo) {
                                     result = Result.same;
-                                    pp('same');
                                 }
                                 else if (targetLine.trim() === '' || targetLine.startsWith(indent)) {
                                     result = Result.skipped;
-                                    pp('skipped');
                                 }
                                 else {
                                     result = Result.different;
-                                    pp('different');
                                     errorTemplateLineIndex = templateLineIndex;
                                     errorTargetLineNum = skipStartLineNum;
                                     errorContents = skipFrom;
@@ -1694,11 +1709,19 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
     return found;
 }
 // varidateUpdateCommandArguments
-function varidateUpdateCommandArguments() {
+function varidateReplaceCommandArguments() {
     if (exports.programArguments.length < 3) {
         throw new Error('Error: Too few argurments.\n' +
             'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
-            'Parameters2: typrm replace  __FilePath__  __NearbyLineNum__  "__KeyColonValue__"');
+            'Parameters2: typrm replace  __FilePath__  __NearbyLineNumOrSettingName__  "__KeyColonValue__"');
+    }
+}
+// varidateRevertCommandArguments
+function varidateRevertCommandArguments() {
+    if (exports.programArguments.length < 2) {
+        throw new Error('Error: Too few argurments.\n' +
+            'Parameters1: typrm revert  __FilePath__\n' +
+            'Parameters2: typrm revert  __FilePath__  __NearbyLineNumOrSettingName__');
     }
 }
 // onEndOfSetting
@@ -1828,21 +1851,28 @@ function getTrueCondition(expression) {
     return '';
 }
 // getSettingIndexFromLineNum
-function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
+function getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum) {
     var e_7, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var isOneSetting, reader, settingCount, lineNum, loop, exception, reader_6, reader_6_1, line1, line, e_7_1, settingIndex, settingIndex;
+        var reader, settingCount, lineNum, breaking, isFound, exception, targetLineNum, targetSettingName, isOneSetting, reader_6, reader_6_1, line1, line, currentSettingName, e_7_1, settingIndex;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    isOneSetting = (targetLineNum === 0);
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFilePath),
                         crlfDelay: Infinity
                     });
                     settingCount = 0;
                     lineNum = 0;
-                    loop = true;
+                    breaking = false;
+                    isFound = false;
+                    isOneSetting = (settingNameOrLineNum === '');
+                    if (numberRegularExpression.test(settingNameOrLineNum)) {
+                        targetLineNum = parseInt(settingNameOrLineNum);
+                    }
+                    else {
+                        targetSettingName = (targetLineNum) ? undefined : settingNameOrLineNum;
+                    }
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 6, 7, 12]);
@@ -1852,23 +1882,36 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                 case 3:
                     if (!(reader_6_1 = _b.sent(), !reader_6_1.done)) return [3 /*break*/, 5];
                     line1 = reader_6_1.value;
-                    if (!loop) {
+                    if (breaking) {
                         return [3 /*break*/, 4];
                     } // "reader" requests read all lines
                     try {
                         line = line1;
                         lineNum += 1;
+                        currentSettingName = undefined;
                         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                             settingCount += 1;
+                            if (settingStartLabel.test(line.trim())) {
+                                currentSettingName = settingStartLabel.exec(line.trim())[3];
+                                // If setting name is empty, currentSettingName = undefined;
+                            }
+                            else {
+                                currentSettingName = settingStartLabelEn.exec(line.trim())[3];
+                            }
                         }
                         if (lineNum === targetLineNum) {
-                            loop = false; // return or break must not be written.
+                            breaking = true; // return or break must not be written.
                             // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                            isFound = true;
+                        }
+                        if (targetSettingName && currentSettingName === targetSettingName) {
+                            breaking = true; // return or break must not be written.
+                            isFound = true;
                         }
                     }
                     catch (e) {
                         exception = e;
-                        loop = false;
+                        breaking = true;
                     }
                     _b.label = 4;
                 case 4: return [3 /*break*/, 2];
@@ -1893,14 +1936,31 @@ function getSettingIndexFromLineNum(inputFilePath, targetLineNum) {
                     if (exception) {
                         throw exception;
                     }
-                    if (!isOneSetting) {
-                        settingIndex = settingCount;
-                    }
-                    else {
+                    settingIndex = null;
+                    if (isOneSetting) {
                         settingIndex = 1;
                         if (settingCount !== 1) {
                             throw new Error(translate('Settings cannot be identified, because the file has 2 or more settings. ' +
                                 'Add line number parameter.'));
+                        }
+                    }
+                    else {
+                        if (isFound) {
+                            if (settingCount >= 1) {
+                                settingIndex = settingCount;
+                            }
+                            else {
+                                settingIndex = 1;
+                            }
+                        }
+                        else if (targetLineNum !== undefined && targetLineNum < lineNum) {
+                            settingIndex = 1;
+                        }
+                        else if (targetLineNum !== undefined && targetLineNum >= lineNum) {
+                            settingIndex = settingCount;
+                        }
+                        else {
+                            settingIndex = null;
                         }
                     }
                     return [2 /*return*/, settingIndex];
@@ -2464,6 +2524,7 @@ function translate(englishLiterals) {
             "The number of variable declarations has decreased": "変数宣言の数が減りました",
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.": "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
+            "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -2541,8 +2602,8 @@ function callMainFromJest(parameters, options) {
     });
 }
 exports.callMainFromJest = callMainFromJest;
-var settingStartLabel = /^設定((\(|（)[^\)]*(\)|）))?:$/;
-var settingStartLabelEn = /^settings(\([^\)]*\))?:$/;
+var settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
+var settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 var originalLabel = "#original:";
 var templateLabel = "#template:";
 var templateAtStartLabel = "#template-at(";
@@ -2561,6 +2622,7 @@ var secretExamleLabel = "#★秘密:仮";
 var secretExamleLabelEn = "#secret:example";
 var referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 var indentRegularExpression = /^( |¥t)*/;
+var numberRegularExpression = /^[0-9]*$/;
 var fullMatchScore = 100;
 var caseIgnoredFullMatchScore = 8;
 var wordsMatchScore = 7;
