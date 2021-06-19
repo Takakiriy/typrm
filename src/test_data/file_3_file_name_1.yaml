@@ -1,3 +1,0 @@
-設定:
-    __Base__: sub
-nano bad/dummy.txt:  #file-template: __Base__/dummy.txt

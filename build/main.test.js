@@ -111,12 +111,13 @@ describe("checks template value >>", function () {
 });
 describe("checks file contents >>", function () {
     test.skip('file_2_tab', function () { });
-    test.skip('file_3_file_name', function () { });
     test.each([
         [
             "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
         ], [
             "NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+        ], [
+            "file name", "file_3_file_name", "", "", 1, 1, "",
         ], [
             "if", "file_4_if", "file/1", "", 0, 0, "",
         ], [
@@ -191,7 +192,6 @@ describe("checks file contents >>", function () {
     }); });
 });
 describe("replaces settings >>", function () {
-    test.skip('2_replace_5_setting_name', function () { });
     test.each([
         [
             '2_replace_1_ok', ' setting 1', '10', 'en-US',
@@ -563,6 +563,12 @@ describe("searches keyword tag >>", function () {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n"),
         ], [
             "output order (2)",
+            ["search", "A,B"],
+            { folder: "test_data/search/1", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
+        ], [
+            "without tag parameter",
             ["search", "A,B"],
             { folder: "test_data/search/1", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +

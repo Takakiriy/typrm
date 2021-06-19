@@ -65,12 +65,13 @@ describe("checks template value >>", () => {
 
 describe("checks file contents >>", () => {
     test.skip('file_2_tab',()=>{});
-    test.skip('file_3_file_name',()=>{});
     test.each([
         [
             "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
         ],[
             "NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+        ],[
+            "file name", "file_3_file_name", "", "", 1, 1, "",
         ],[
             "if", "file_4_if", "file/1", "", 0, 0, "",
         ],[
@@ -129,7 +130,6 @@ describe("checks file contents >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.skip('2_replace_5_setting_name',()=>{});
     test.each([
         [
             '2_replace_1_ok', ' setting 1', '10', 'en-US',

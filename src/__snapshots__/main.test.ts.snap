@@ -115,6 +115,23 @@ template count = 7
 "
 `;
 
+exports[`checks file contents >> file name in file_3_file_name,  : stdout 1`] = `
+"
+ErrorLine: 3
+  Contents: nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
+  Expected: sub/dummy.txt
+  Template: __Base__/dummy.txt
+  SettingIndex: 1
+
+Error of not found the target file:
+  NotFound: /Users/totadashi/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
+  Template: /Users/totadashi/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_3_file_name_1_changing.yaml:4
+
+Warning: 0, Error: 2
+template count = 1
+"
+`;
+
 exports[`checks file contents >> file_0_one_error : sourceFileContents 1`] = `
 "../../file_target/1/file_0_one_error_2_target.yaml : |  #file-template: ../../file_target/1/file_0_one_error_2_target.yaml
     correct contents
