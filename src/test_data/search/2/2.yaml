@@ -20,3 +20,8 @@ test_of_target_word_count:
     #keyword: new tasks
     #keyword: new tasks only
     #keyword: new tasks
+test_of_without_tag_parameter:
+    specular:  #// the mirror-like reflection  #keyword:
+    metaric:  #keyword:
+    hyphen:
+        - specular reflection:  #keyword:

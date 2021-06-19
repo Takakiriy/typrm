@@ -1433,7 +1433,7 @@ function search() {
 function searchSub(keyword) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var currentFolder, fileFullPaths, targetFolders, _loop_3, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, _b, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _c, foundLines_1, foundLineInformation;
+        var currentFolder, fileFullPaths, targetFolders, _loop_3, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, _b, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _c, foundLines_1, foundLineInformation;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -1480,7 +1480,7 @@ function searchSub(keyword) {
                     inGlossary = false;
                     foundLines = [];
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, reader_5, reader_5_1, line1, line, csv, columns, found, positionOfCSV, columnPositions, _f, _g, match, currentIndent, characterAtIndent, colonPosition, wordInGlossary, found, _h, _j, match, e_6_1;
+                        var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _f, _g, match, currentIndent, characterAtIndent, colonPosition, wordInGlossary, found, _h, _j, match, e_6_1;
                         return __generator(this, function (_k) {
                             switch (_k.label) {
                                 case 0:
@@ -1502,6 +1502,13 @@ function searchSub(keyword) {
                                     lineNum += 1;
                                     if (!(line.includes(keywordLabel) && !line.includes(disableLabel))) return [3 /*break*/, 5];
                                     csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                                    if (csv !== '') {
+                                        withParameter = true;
+                                    }
+                                    else {
+                                        withParameter = false;
+                                        csv = parseKeyName(line);
+                                    }
                                     return [4 /*yield*/, parseCSVColumns(csv)
                                             .catch(function (e) {
                                             console.log("Warning: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
@@ -1511,7 +1518,12 @@ function searchSub(keyword) {
                                     columns = _k.sent();
                                     found = getKeywordMatchingScore(columns, keyword);
                                     if (found.score >= 1) {
-                                        positionOfCSV = line.length - csv.length;
+                                        if (withParameter) {
+                                            positionOfCSV = line.length - csv.length;
+                                        }
+                                        else {
+                                            positionOfCSV = line.indexOf(csv);
+                                        }
                                         columnPositions = parseCSVColumnPositions(csv, columns);
                                         found.path = getTestablePath(inputFileFullPath);
                                         found.lineNum = lineNum;
@@ -2164,6 +2176,21 @@ function parseCSVColumnPositions(csv, columns) {
         searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
     }
     return positions;
+}
+// parseKeyName
+function parseKeyName(line) {
+    var colon = line.indexOf(':');
+    if (colon === notFound) {
+        return '';
+    }
+    var lineHead = line.substr(0, colon).trim();
+    if (lineHead[0] === '-') {
+        var csv = lineHead.substr(1).trim(); // cut '-'
+    }
+    else {
+        var csv = lineHead;
+    }
+    return csv;
 }
 // escapeRegularExpression
 function escapeRegularExpression(expression) {

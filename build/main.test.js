@@ -569,10 +569,10 @@ describe("searches keyword tag >>", function () {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
         ], [
             "without tag parameter",
-            ["search", "A,B"],
-            { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
+            ["search", "specular"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + ("         - " + matchedColor('specular') + " reflection:  #keyword:\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + ("     " + matchedColor('specular') + ":  #// the mirror-like reflection  #keyword:\n"),
         ], [
             "Multi folder",
             ["search", "ABC"],

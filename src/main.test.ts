@@ -470,6 +470,12 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n`,
         ],[
+            "without tag parameter",  // test_of_without_tag_parameter
+            ["search", "specular"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  #keyword:\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  #keyword:\n`,
+        ],[
             "Multi folder",  // and test of long path length > short path length
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },

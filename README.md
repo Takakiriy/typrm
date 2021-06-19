@@ -127,10 +127,26 @@ typrm command:
     $ typrm ls
     .../text.txt:1: Shows all files:  #keyword: ls -a
 
-In the case of the above example, the Example line will not be hit.
+In the case of the above example,
+`ls` with `#keyword:` tag will be found.
+Depending on the terminal,
+you can jump to the file contents by clicking the displayed path and line number.
+Although, the Example line will not be hit.
 Because there is no `#keyword:` tag.
 If you want to search for text that does not have the `#keyword:` tag,
 use a common full-text search tool such as grep.
+
+You can omit the parameter in the `#keyword:` tag
+if the keyword was written up to the colon.
+In the following cases, the searchable keyword is ls.
+
+    ls:  #keyword:
+
+If there is a hyphen at the beginning of the line,
+the keyword does not include the hyphen.
+In the following cases, the searchable keyword is ls.
+
+    - ls:  #keyword:
 
 The typrm search command name (search) can be omitted.
 The short command name for the search command is s.

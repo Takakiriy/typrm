@@ -1111,7 +1111,13 @@ async function  searchSub(keyword: string) {
 
             // keyword tag
             if (line.includes(keywordLabel)  &&  ! line.includes(disableLabel)) {
-                const  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                var  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                if (csv !== '') {
+                    var  withParameter = true;
+                } else {
+                    var  withParameter = false;
+                    csv = parseKeyName(line);
+                }
                 const  columns = await parseCSVColumns(csv)
                     .catch((e: Error) => {
                         console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
@@ -1120,7 +1126,11 @@ async function  searchSub(keyword: string) {
 
                 const  found = getKeywordMatchingScore(columns, keyword);
                 if (found.score >= 1) {
-                    const  positionOfCSV = line.length - csv.length;
+                    if (withParameter) {
+                        var  positionOfCSV = line.length - csv.length;
+                    } else {
+                        var  positionOfCSV = line.indexOf(csv);
+                    }
                     const  columnPositions = parseCSVColumnPositions(csv, columns);
 
                     found.path = getTestablePath(inputFileFullPath);
@@ -1729,6 +1739,23 @@ function  parseCSVColumnPositions(csv: string, columns: string[]): number[] {
         searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
     }
     return  positions;
+}
+
+// parseKeyName
+function  parseKeyName(line: string): string {
+
+    const  colon = line.indexOf(':');
+    if (colon === notFound) {
+        return  '';
+    }
+    const  lineHead = line.substr(0, colon).trim();
+    if (lineHead[0] === '-') {
+        var  csv = lineHead.substr(1).trim();  // cut '-'
+    } else {
+        var  csv = lineHead;
+    }
+
+    return  csv;
 }
 
 // escapeRegularExpression
