@@ -125,7 +125,7 @@ Sample text file content:
 typrm command:
 
     $ typrm ls
-    .../text.txt:1: Shows all files:  #keyword: ls -a
+    .../text.txt:1: Shows all files:  #keyword: ls
 
 In the case of the above example,
 `ls` with `#keyword:` tag will be found.

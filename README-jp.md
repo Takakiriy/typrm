@@ -129,7 +129,7 @@ typrm の検索機能は、全文検索(grep)よりも、精度よく検索し�
 typrm コマンド:
 
     $ typrm ls
-    .../text.txt:1: Shows all files:  #keyword: ls -a
+    .../text.txt:1: Shows all files:  #keyword: ls
 
 上記の場合、`#keyword:` タグがある行の `ls` が見つかります。
 ターミナルによっては表示されたパスと行番号をクリックするとファイルの内容にジャンプします。

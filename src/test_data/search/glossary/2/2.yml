@@ -5,3 +5,10 @@ Nested tag must not be matched:  #glossary:
     Type:
         ABC: This is not match.
     ABCD: abcd
+
+glossary is less score than keyword:
+    glossary1:  #glossary:
+        grape:
+    keyword:  #keyword: grape
+    glossary2:  #glossary:
+        grape:

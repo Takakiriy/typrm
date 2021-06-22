@@ -1133,6 +1133,7 @@ async function  searchSub(keyword: string) {
                     }
                     const  columnPositions = parseCSVColumnPositions(csv, columns);
 
+                    found.score += keywordMatchScore;
                     found.path = getTestablePath(inputFileFullPath);
                     found.lineNum = lineNum;
                     found.line = line;
@@ -1168,6 +1169,7 @@ async function  searchSub(keyword: string) {
                     const  found = getKeywordMatchingScore([wordInGlossary], keyword);
                     if (found.score >= 1  &&  colonPosition !== notFound) {
 
+                        found.score += glossaryMatchScore;
                         found.path = getTestablePath(inputFileFullPath);
                         found.lineNum = lineNum;
                         found.line = line;
@@ -2229,6 +2231,8 @@ const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]*$/;
 const  fullMatchScore = 100;
+const  keywordMatchScore = 7;
+const  glossaryMatchScore = 1;
 const  caseIgnoredFullMatchScore = 8;
 const  wordsMatchScore = 7;
 const  partMatchScore = 5;

@@ -577,8 +577,8 @@ describe("searches keyword tag >>", function () {
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"),
         ], [
             "Windows typrm folder path",
             ["search", "ABC"],
@@ -640,11 +640,18 @@ describe("searches glossary tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ("     " + matchedColor('de') + ": de\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ("     " + matchedColor('DE') + ": de\n"),
         ], [
+            "glossary is less score than keyword",
+            ["search", "grape"],
+            { folder: "test_data/search/glossary/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ("         " + matchedColor('grape') + ":\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ("         " + matchedColor('grape') + ":\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + ("     keyword:  #keyword: " + matchedColor('grape') + "\n"),
+        ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"),
         ],
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
