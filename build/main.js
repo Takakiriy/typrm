@@ -637,7 +637,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                     newFilePath = inputFilePath + ".new";
                     reducedErrorWasOccurred = false;
                     loop = true;
-                    verboseMode = false;
+                    verboseMode = 'verbose' in exports.programOptions;
                     if (verboseMode) {
                         console.log("verbose >> inputFilePath: " + inputFilePath);
                         console.log("verbose >> setting index: " + replacingSettingIndex);
@@ -1693,7 +1693,8 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                 score = fullMatchScore;
             }
             else {
-                if (testingString[position - 1] === ' ' || testingString[keyword.length] === ' ') {
+                if ((position === 0 || testingString[position - 1] === ' ') &&
+                    (position + keyword.length === testingString.length || testingString[position + keyword.length] === ' ')) {
                     score = wordsMatchScore;
                 }
                 else {
@@ -1706,7 +1707,13 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                 score = caseIgnoredFullMatchScore;
             }
             else {
-                score = caseIgnoredPartMatchScore;
+                if ((position === 0 || testingString[position - 1] === ' ') &&
+                    (position + keyword.length === testingString.length || testingString[position + keyword.length] === ' ')) {
+                    score = caseIgnoredWordMatchScore;
+                }
+                else {
+                    score = caseIgnoredPartMatchScore;
+                }
             }
         }
         if (position !== notFound) {
@@ -2247,7 +2254,13 @@ var FoundLine = /** @class */ (function () {
             previousPosition = match.position + match.length;
         }
         coloredLine += line.substr(previousPosition);
-        return "" + chalk.cyan(this.path) + chalk.keyword('gray')(":" + this.lineNum + ":") + " " + coloredLine;
+        if (false) {
+            var debugString = " (score: " + this.score + ", wordCount: " + this.testedWordCount + ")";
+        }
+        else {
+            var debugString = "";
+        }
+        return "" + chalk.cyan(this.path) + chalk.keyword('gray')(":" + this.lineNum + ":") + " " + coloredLine + debugString;
     };
     return FoundLine;
 }());
@@ -2658,6 +2671,7 @@ var glossaryMatchScore = 1;
 var caseIgnoredFullMatchScore = 8;
 var wordsMatchScore = 7;
 var partMatchScore = 5;
+var caseIgnoredWordMatchScore = 6;
 var caseIgnoredPartMatchScore = 3;
 var phraseMatchScoreWeight = 4;
 var orderMatchScoreWeight = 2;

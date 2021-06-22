@@ -568,6 +568,30 @@ describe("searches keyword tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
         ], [
+            "output order (3)",
+            ["search", "grape"],
+            { folder: "test_data/search/2", test: "", verbose: "1" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + ("     #keyword: pink " + matchedColor('GRAPE') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':43:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + ("     #keyword: " + matchedColor('grape') + "fruit juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':31:') + ("     #keyword: pink " + matchedColor('grape') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':32:') + ("     #keyword: " + matchedColor('grape') + "fruit juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':33:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':45:') + ("     #keyword: " + matchedColor('GRAPE') + " juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':46:') + ("     #keyword: pink " + matchedColor('GRAPE') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':47:') + ("     #keyword: " + matchedColor('GRAPE') + " juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':35:') + ("     #keyword: " + matchedColor('grape') + " juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':36:') + ("     #keyword: pink " + matchedColor('grape') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':37:') + ("     #keyword: " + matchedColor('grape') + " juice\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':44:') + ("     #keyword: " + matchedColor('GRAPE') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':48:') + ("     #keyword: " + matchedColor('GRAPE') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':34:') + ("     #keyword: " + matchedColor('grape') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':38:') + ("     #keyword: " + matchedColor('grape') + "\n"),
+        ], [
             "without tag parameter",
             ["search", "specular"],
             { folder: "test_data/search/2", test: "" },

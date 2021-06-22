@@ -458,7 +458,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     const  newFilePath = inputFilePath +".new";
     var    reducedErrorWasOccurred = false;
     var    loop = true;
-    const  verboseMode = false;
+    const  verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
         console.log(`verbose >> inputFilePath: ${inputFilePath}`);
         console.log(`verbose >> setting index: ${replacingSettingIndex}`)
@@ -1277,7 +1277,10 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
             if (testingString.length === keyword.length) {
                 score = fullMatchScore;
             } else {
-                if (testingString[position - 1] === ' '  ||  testingString[keyword.length] === ' ') {
+                if (
+                    (position === 0  ||  testingString[position - 1] === ' ' ) &&
+                    (position + keyword.length === testingString.length  ||  testingString[position + keyword.length] === ' ')
+                ) {
                     score = wordsMatchScore;
                 } else {
                     score = partMatchScore;
@@ -1287,7 +1290,14 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
             if (testingString.length === lowerKeyword.length) {
                 score = caseIgnoredFullMatchScore;
             } else {
-                score = caseIgnoredPartMatchScore;
+                if (
+                    (position === 0  ||  testingString[position - 1] === ' ' ) &&
+                    (position + keyword.length === testingString.length  ||  testingString[position + keyword.length] === ' ')
+                ) {
+                    score = caseIgnoredWordMatchScore;
+                } else {
+                    score = caseIgnoredPartMatchScore;
+                }
             }
         }
         if (position !== notFound) {
@@ -1814,8 +1824,13 @@ class FoundLine {
             previousPosition = match.position + match.length;
         }
         coloredLine += line.substr(previousPosition);
+        if (false) {
+            var  debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount})`;
+        } else {
+            var  debugString = ``;
+        }
 
-        return `${chalk.cyan(this.path)}${chalk.keyword('gray')(`:${this.lineNum}:`)} ${coloredLine}`;
+        return `${chalk.cyan(this.path)}${chalk.keyword('gray')(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
     }
 }
 
@@ -2236,6 +2251,7 @@ const  glossaryMatchScore = 1;
 const  caseIgnoredFullMatchScore = 8;
 const  wordsMatchScore = 7;
 const  partMatchScore = 5;
+const  caseIgnoredWordMatchScore = 6;
 const  caseIgnoredPartMatchScore = 3;
 const  phraseMatchScoreWeight = 4;
 const  orderMatchScoreWeight = 2;

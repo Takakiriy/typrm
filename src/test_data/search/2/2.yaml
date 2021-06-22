@@ -25,3 +25,24 @@ test_of_without_tag_parameter:
     metaric:  #keyword:
     hyphen:
         - specular reflection:  #keyword:
+output order (3):
+    #keyword: grapefruit
+    #keyword: grapefruit juice
+    #keyword: pink grapefruit
+    #keyword: grapefruit juice
+    #keyword: grapefruit
+    #keyword: grape
+    #keyword: grape juice
+    #keyword: pink grape
+    #keyword: grape juice
+    #keyword: grape
+    #keyword: GRAPEfruit
+    #keyword: GRAPEfruit juice
+    #keyword: pink GRAPEfruit
+    #keyword: GRAPEfruit juice
+    #keyword: GRAPEfruit
+    #keyword: GRAPE
+    #keyword: GRAPE juice
+    #keyword: pink GRAPE
+    #keyword: GRAPE juice
+    #keyword: GRAPE
