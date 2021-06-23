@@ -1182,7 +1182,7 @@ async function  searchSub(keyword: string) {
                         foundLines.push(found);
                     }
                 }
-                if (currentIndent.length <= indentAtTag.length) {
+                if (currentIndent.length <= indentAtTag.length  &&  line.trim() !== '') {
                     inGlossary = false;
                 }
             }

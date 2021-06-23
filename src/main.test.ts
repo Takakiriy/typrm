@@ -571,6 +571,12 @@ describe("searches glossary tag >>", () => {
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + `         ${matchedColor('grape')}:\n` +
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + `     keyword:  #keyword: ${matchedColor('grape')}\n`,
     ],[
+        "glossary with empty line",
+        ["search", "space"],
+        { folder: "test_data/search/glossary/2", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + `     ${matchedColor('space')}1:\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + `     ${matchedColor('space')}2:\n`,
+    ],[
         "Multi folder",
         ["search", "ABC"],
         { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },

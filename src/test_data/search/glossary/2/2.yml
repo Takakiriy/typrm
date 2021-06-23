@@ -12,3 +12,8 @@ glossary is less score than keyword:
     keyword:  #keyword: grape
     glossary2:  #glossary:
         grape:
+
+glossary with empty line: #glossary:
+    space1:
+
+    space2:
