@@ -1521,7 +1521,7 @@ function searchSub(keyword) {
                                 case 4:
                                     columns = _l.sent();
                                     found = getKeywordMatchingScore(columns, keyword);
-                                    if (found.score >= 1) {
+                                    if (found.matchedKeywordCount >= 1) {
                                         if (withParameter) {
                                             positionOfCSV = line.length - csv.length;
                                         }
@@ -1563,7 +1563,7 @@ function searchSub(keyword) {
                                             colonPosition = line.indexOf(':', currentIndent.length);
                                             wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
                                             found = getKeywordMatchingScore([wordInGlossary], keyword);
-                                            if (found.score >= 1 && colonPosition !== notFound) {
+                                            if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
                                                 found.score += glossaryMatchScore;
                                                 found.path = getTestablePath(inputFileFullPath);
                                                 found.lineNum = lineNum;
@@ -1658,7 +1658,8 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
             var thisScore = 0;
             var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
             if (result.score !== 0) {
-                thisScore = result.score * keywords.length * phraseMatchScoreWeight;
+                thisScore = result.score * keywords.length * phraseMatchScoreWeight +
+                    keyphrase.length - aTestingString.length;
                 found.matchedKeywordCount = keywords.length;
                 found.testedWordCount = aTestingString.split(' ').length;
             }
@@ -1670,18 +1671,22 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                         continue;
                     }
                     var result_1 = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex);
-                    if (result_1.position > previousPosition) {
-                        thisScore += result_1.score * orderMatchScoreWeight;
-                    }
-                    else {
-                        thisScore += result_1.score;
-                    }
                     if (result_1.score !== 0) {
+                        if (result_1.position > previousPosition) {
+                            thisScore += result_1.score * orderMatchScoreWeight;
+                        }
+                        else {
+                            thisScore += result_1.score;
+                        }
                         found.matchedKeywordCount += 1;
                     }
                     if (result_1.position !== notFound) {
                         previousPosition = result_1.position;
                     }
+                }
+                if (thisScore !== 0) {
+                    thisScore += keyphrase.length - aTestingString.length;
+                    found.testedWordCount = aTestingString.split(' ').length;
                 }
             }
             maxScore = Math.max(maxScore, thisScore);

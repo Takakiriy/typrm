@@ -1128,7 +1128,7 @@ async function  searchSub(keyword: string) {
                     });
 
                 const  found = getKeywordMatchingScore(columns, keyword);
-                if (found.score >= 1) {
+                if (found.matchedKeywordCount >= 1) {
                     if (withParameter) {
                         var  positionOfCSV = line.length - csv.length;
                     } else {
@@ -1170,7 +1170,7 @@ async function  searchSub(keyword: string) {
                     const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
 
                     const  found = getKeywordMatchingScore([wordInGlossary], keyword);
-                    if (found.score >= 1  &&  colonPosition !== notFound) {
+                    if (found.matchedKeywordCount >= 1  &&  colonPosition !== notFound) {
 
                         found.score += glossaryMatchScore;
                         found.path = getTestablePath(inputFileFullPath);
@@ -1237,7 +1237,8 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
 
                 const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
                 if (result.score !== 0) {
-                    thisScore = result.score * keywords.length * phraseMatchScoreWeight;
+                    thisScore = result.score * keywords.length * phraseMatchScoreWeight +
+                        keyphrase.length - aTestingString.length;
                     found.matchedKeywordCount = keywords.length;
                     found.testedWordCount = aTestingString.split(' ').length;
                 } else {
@@ -1247,17 +1248,21 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
                         if (keyword === '') {continue;}
 
                         const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex);
-                        if (result.position > previousPosition) {
-                            thisScore += result.score * orderMatchScoreWeight;
-                        } else {
-                            thisScore += result.score;
-                        }
                         if (result.score !== 0) {
+                            if (result.position > previousPosition) {
+                                thisScore += result.score * orderMatchScoreWeight;
+                            } else {
+                                thisScore += result.score;
+                            }
                             found.matchedKeywordCount += 1;
                         }
                         if (result.position !== notFound) {
                             previousPosition = result.position;
                         }
+                    }
+                    if (thisScore !== 0) {
+                        thisScore += keyphrase.length - aTestingString.length;
+                        found.testedWordCount = aTestingString.split(' ').length;
                     }
                 }
                 maxScore = Math.max(maxScore, thisScore);
