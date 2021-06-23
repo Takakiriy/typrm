@@ -517,6 +517,11 @@ describe("searches keyword tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + (" #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n"),
         ], [
+            "ignored keyword",
+            ["search", "#search: #keyword: AB"],
+            { folder: "test_data/search/1", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n"),
+        ], [
             "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },

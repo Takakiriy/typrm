@@ -1433,26 +1433,30 @@ function search() {
 function searchSub(keyword) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var currentFolder, fileFullPaths, targetFolders, _loop_3, _i, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, _b, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _c, foundLines_1, foundLineInformation;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
+        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0:
+                    for (_i = 0, ignoredKeywords_1 = ignoredKeywords; _i < ignoredKeywords_1.length; _i++) {
+                        ignoredKeyword = ignoredKeywords_1[_i];
+                        keyword = keyword.replace(ignoredKeyword, '');
+                    }
                     keyword = keyword.trim();
                     currentFolder = process.cwd();
                     fileFullPaths = [];
                     return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
                 case 1:
-                    targetFolders = _d.sent();
+                    targetFolders = _e.sent();
                     _loop_3 = function (folder) {
                         var targetFolderFullPath, scanedPaths;
-                        return __generator(this, function (_e) {
-                            switch (_e.label) {
+                        return __generator(this, function (_f) {
+                            switch (_f.label) {
                                 case 0:
                                     targetFolderFullPath = getFullPath(folder, currentFolder);
                                     process.chdir(targetFolderFullPath);
                                     return [4 /*yield*/, globby(['**/*'])];
                                 case 1:
-                                    scanedPaths = _e.sent();
+                                    scanedPaths = _f.sent();
                                     scanedPaths.forEach(function (scanedPath) {
                                         fileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath));
                                     });
@@ -1460,17 +1464,17 @@ function searchSub(keyword) {
                             }
                         });
                     };
-                    _i = 0, targetFolders_4 = targetFolders;
-                    _d.label = 2;
+                    _b = 0, targetFolders_4 = targetFolders;
+                    _e.label = 2;
                 case 2:
-                    if (!(_i < targetFolders_4.length)) return [3 /*break*/, 5];
-                    folder = targetFolders_4[_i];
+                    if (!(_b < targetFolders_4.length)) return [3 /*break*/, 5];
+                    folder = targetFolders_4[_b];
                     return [5 /*yield**/, _loop_3(folder)];
                 case 3:
-                    _d.sent();
-                    _d.label = 4;
+                    _e.sent();
+                    _e.label = 4;
                 case 4:
-                    _i++;
+                    _b++;
                     return [3 /*break*/, 2];
                 case 5:
                     process.chdir(currentFolder);
@@ -1480,23 +1484,23 @@ function searchSub(keyword) {
                     inGlossary = false;
                     foundLines = [];
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _f, _g, match, currentIndent, characterAtIndent, colonPosition, wordInGlossary, found, _h, _j, match, e_6_1;
-                        return __generator(this, function (_k) {
-                            switch (_k.label) {
+                        var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _g, _h, match, currentIndent, characterAtIndent, colonPosition, wordInGlossary, found, _j, _k, match, e_6_1;
+                        return __generator(this, function (_l) {
+                            switch (_l.label) {
                                 case 0:
                                     reader = readline.createInterface({
                                         input: fs.createReadStream(inputFileFullPath),
                                         crlfDelay: Infinity
                                     });
                                     lineNum = 0;
-                                    _k.label = 1;
+                                    _l.label = 1;
                                 case 1:
-                                    _k.trys.push([1, 8, 9, 14]);
+                                    _l.trys.push([1, 8, 9, 14]);
                                     reader_5 = (e_6 = void 0, __asyncValues(reader));
-                                    _k.label = 2;
+                                    _l.label = 2;
                                 case 2: return [4 /*yield*/, reader_5.next()];
                                 case 3:
-                                    if (!(reader_5_1 = _k.sent(), !reader_5_1.done)) return [3 /*break*/, 7];
+                                    if (!(reader_5_1 = _l.sent(), !reader_5_1.done)) return [3 /*break*/, 7];
                                     line1 = reader_5_1.value;
                                     line = line1;
                                     lineNum += 1;
@@ -1515,7 +1519,7 @@ function searchSub(keyword) {
                                             return [];
                                         })];
                                 case 4:
-                                    columns = _k.sent();
+                                    columns = _l.sent();
                                     found = getKeywordMatchingScore(columns, keyword);
                                     if (found.score >= 1) {
                                         if (withParameter) {
@@ -1529,13 +1533,13 @@ function searchSub(keyword) {
                                         found.path = getTestablePath(inputFileFullPath);
                                         found.lineNum = lineNum;
                                         found.line = line;
-                                        for (_f = 0, _g = found.matches; _f < _g.length; _f++) {
-                                            match = _g[_f];
+                                        for (_g = 0, _h = found.matches; _g < _h.length; _g++) {
+                                            match = _h[_g];
                                             match.position += positionOfCSV + columnPositions[match.testTargetIndex];
                                         }
                                         foundLines.push(found);
                                     }
-                                    _k.label = 5;
+                                    _l.label = 5;
                                 case 5:
                                     // glossary tag
                                     if (line.includes(glossaryLabel)) {
@@ -1564,8 +1568,8 @@ function searchSub(keyword) {
                                                 found.path = getTestablePath(inputFileFullPath);
                                                 found.lineNum = lineNum;
                                                 found.line = line;
-                                                for (_h = 0, _j = found.matches; _h < _j.length; _h++) {
-                                                    match = _j[_h];
+                                                for (_j = 0, _k = found.matches; _j < _k.length; _j++) {
+                                                    match = _k[_j];
                                                     match.position += indentPosition;
                                                 }
                                                 foundLines.push(found);
@@ -1575,20 +1579,20 @@ function searchSub(keyword) {
                                             inGlossary = false;
                                         }
                                     }
-                                    _k.label = 6;
+                                    _l.label = 6;
                                 case 6: return [3 /*break*/, 2];
                                 case 7: return [3 /*break*/, 14];
                                 case 8:
-                                    e_6_1 = _k.sent();
+                                    e_6_1 = _l.sent();
                                     e_6 = { error: e_6_1 };
                                     return [3 /*break*/, 14];
                                 case 9:
-                                    _k.trys.push([9, , 12, 13]);
+                                    _l.trys.push([9, , 12, 13]);
                                     if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5.return))) return [3 /*break*/, 11];
                                     return [4 /*yield*/, _a.call(reader_5)];
                                 case 10:
-                                    _k.sent();
-                                    _k.label = 11;
+                                    _l.sent();
+                                    _l.label = 11;
                                 case 11: return [3 /*break*/, 13];
                                 case 12:
                                     if (e_6) throw e_6.error;
@@ -1598,17 +1602,17 @@ function searchSub(keyword) {
                             }
                         });
                     };
-                    _b = 0, fileFullPaths_1 = fileFullPaths;
-                    _d.label = 6;
+                    _c = 0, fileFullPaths_1 = fileFullPaths;
+                    _e.label = 6;
                 case 6:
-                    if (!(_b < fileFullPaths_1.length)) return [3 /*break*/, 9];
-                    inputFileFullPath = fileFullPaths_1[_b];
+                    if (!(_c < fileFullPaths_1.length)) return [3 /*break*/, 9];
+                    inputFileFullPath = fileFullPaths_1[_c];
                     return [5 /*yield**/, _loop_4(inputFileFullPath)];
                 case 7:
-                    _d.sent();
-                    _d.label = 8;
+                    _e.sent();
+                    _e.label = 8;
                 case 8:
-                    _b++;
+                    _c++;
                     return [3 /*break*/, 6];
                 case 9:
                     keyphraseWordCount = keyword.split(' ').length;
@@ -1635,8 +1639,8 @@ function searchSub(keyword) {
                         }
                         return different;
                     });
-                    for (_c = 0, foundLines_1 = foundLines; _c < foundLines_1.length; _c++) {
-                        foundLineInformation = foundLines_1[_c];
+                    for (_d = 0, foundLines_1 = foundLines; _d < foundLines_1.length; _d++) {
+                        foundLineInformation = foundLines_1[_d];
                         console.log(foundLineInformation.toString());
                     }
                     return [2 /*return*/];
@@ -2657,6 +2661,7 @@ var glossaryLabel = "#glossary:";
 var disableLabel = "#disable-tag-tool:";
 var ifLabel = "#if:";
 var expectLabel = "#expect:";
+var ignoredKeywords = [/#keyword:/g, /#search:/g];
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";

@@ -165,13 +165,8 @@ typrm search コマンドの書式:
 検索キーワードが typrm のコマンド名と同じときは、
 コマンド名（search または s）を省略できません。
 
-複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
-また、大文字小文字が違っていてもヒットしますが、
-大文字小文字が同じテキストが上位に表示されます。
-typrm では上位にヒットしたテキストが下側に表示されます。
-
-    $ typrm Comma Separated Value
-    .../text.txt:1: #keyword: CSV, comma separated values
+検索キーワードに `#keyword:` または `#search:` を入力しても無視されます。
+検索するときは、grep など一般的な全文検索ツールを使ってください。
 
 search コマンドにキーワードを指定しないと、検索キーワード入力モードになります。
 このモードを終了するには、Ctrl+C キーを押します。
@@ -180,6 +175,14 @@ search コマンドにキーワードを指定しないと、検索キーワー�
     keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
     keyword:
+
+複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
+また、大文字小文字が違っていてもヒットしますが、
+大文字小文字が同じテキストが上位に表示されます。
+typrm では上位にヒットしたテキストが下側に表示されます。
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated values
 
 テキスト ファイルに書くキーワードは、
 `#keyword:` タグに続けて CSV 形式（コンマ区切り）で

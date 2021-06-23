@@ -166,6 +166,17 @@ or
 If the search keyword was the same as the command name of typrm,
 the command name (search or s) cannot be omitted.
 
+If you do not specify any keywords with the search command, search keyword input mode is started.
+Press Ctrl + C to exit this mode.
+
+    $ typrm s
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+Entering `#keyword:` or `#search:` in the search keyword will be ignored.
+When searching, use a common full-text search tool such as grep.
+
 If specifying a search keyword consisting of multiple words,
 it is not necessary to enclose it in " ".
 Also, even if the case is different, it will be hit,
@@ -174,14 +185,6 @@ In typrm, the text that hits the top is displayed at the bottom.
 
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values
-
-If you do not specify any keywords with the search command, search keyword input mode is started.
-Press Ctrl + C to exit this mode.
-
-    $ typrm s
-    keyword: csv
-    .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
 
 You can specify multiple keywords to be written
 by CSV format (comma separated values) after the `#keyword:` tag

@@ -1078,6 +1078,9 @@ async function  search() {
 
 // searchSub
 async function  searchSub(keyword: string) {
+    for (const ignoredKeyword of ignoredKeywords) {
+        keyword = keyword.replace(ignoredKeyword, '')
+    }
     keyword = keyword.trim();
     const  currentFolder = process.cwd();
     const  fileFullPaths: string[] = [];
@@ -2237,6 +2240,7 @@ const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
 const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
+const  ignoredKeywords = [ /#keyword:/g, /#search:/g ];
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";
