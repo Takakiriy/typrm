@@ -1688,3 +1688,96 @@ exports[`replaces settings >> in 2_replace_8_one_setting: sourceFileContents 1`]
             #template: - key1
 "
 `;
+
+exports[`replaces settings >> in 2_replace_9_template_if_1_OK: sourceFileContents 1`] = `
+"設定(1st):
+    __Stage__: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+    💤 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product  #comment
+    🌟 case product:  #template-if: $settings.__Stage__ == develop  #comment
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_1_OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_1_OK: updatedFileContents 1`] = `
+"設定(1st):
+    __Stage__: develop  #original: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product  #comment
+    🌟 case product:  #template-if: $settings.__Stage__ == develop  #comment
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_2_NG: sourceFileContents 1`] = `
+"設定(1st):
+    __Stage__: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    case product:  #template-if: $settings.__Stage__ == product
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_2_NG: stdout 1`] = `
+"
+ErrorLine: 6
+  Error: Not found any replacing target
+  Solution: Set old value at settings in the replacing file
+  Contents: case product:  #template-if: $settings.__Stage__ == product
+  Expected: 🌟
+  Template: $settings.__Stage__ == product
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:1
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_2_NG: updatedFileContents 1`] = `
+"設定(1st):
+    __Stage__: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    case product:  #template-if: $settings.__Stage__ == product
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_3_not_set: sourceFileContents 1`] = `
+"設定(1st):
+    __Stage__: product
+手順:
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_3_not_set: stdout 1`] = `
+"
+ErrorLine: 4
+  Error: template-if tag related settings are not defined
+  Solution: Set the variable template-if(yes) and template-if(no)
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_3_not_set_1_changing.yaml:1
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_3_not_set: updatedFileContents 1`] = `
+"設定(1st):
+    __Stage__: product
+手順:
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+"
+`;

@@ -182,6 +182,15 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],[
             '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
             `key1: changed1`,
+        ],[
+            '2_replace_9_template_if_1_OK', '', '1', 'en-US',
+            `__Stage__: develop`,
+        ],[
+            '2_replace_9_template_if_2_NG', '', '1', 'en-US',
+            `__Stage__: develop`,
+        ],[
+            '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
+            `__Stage__: develop`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {

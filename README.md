@@ -19,6 +19,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
     - [The details of settings](#the-details-of-settings)
     - [Setting name](#setting-name)
+    - [#template-if tag - replaces the sign of whether the condition is met](#template-if-tag---replaces-the-sign-of-whether-the-condition-is-met)
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
@@ -469,6 +470,45 @@ Command:
     typrm replace  example.yaml  "project1"  "__Name__: Image1"
 
 - The setting name cannot be written numbers only
+
+### #template-if tag - replaces the sign of whether the condition is met
+
+Many manuals may be skipped to read depending on the conditions.
+For example, it is a manual that describes how to operate on Windows
+and how to operate on mac.
+You should read only one phrase or the other in such manual.
+
+You can judge that the phrase should be read or not read
+by seeing the symbol or other words only, if you use the `#template-if:` tag.
+Also, set the symbol or other word to the value of `template-if(yes)` variable
+and `template-if(no)` variable.
+
+    settings:
+        OS: Windows  #// Windows or mac
+        template-if(yes): 🌟
+        template-if(no):  💤
+    Copy operation:
+        🌟 for Windows:  #template-if: $settings.OS == Windows
+            Ctrl + C
+        💤 for mac:      #template-if: $settings.OS == mac
+            command + C
+
+To replace it, type the below command with the replace command.
+
+    typrm replace  __FileName__  "OS: mac"
+
+Replacing the value of OS variable from Windows to mac for the above file,
+symbols that guide to read or not read the phrase will be replaced.
+
+    settings:
+        OS: mac  #// Windows or mac
+        template-if(yes): 🌟
+        template-if(no):  💤
+    Copy operation:
+        💤 for Windows:  #template-if: $settings.OS == Windows
+            Ctrl + C
+        🌟 for mac:      #template-if: $settings.OS == mac
+            command + C
 
 
 ## check command - test that it can be replaced

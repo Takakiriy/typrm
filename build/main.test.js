@@ -241,6 +241,15 @@ describe("replaces settings >>", function () {
         ], [
             '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
             "key1: changed1",
+        ], [
+            '2_replace_9_template_if_1_OK', '', '1', 'en-US',
+            "__Stage__: develop",
+        ], [
+            '2_replace_9_template_if_2_NG', '', '1', 'en-US',
+            "__Stage__: develop",
+        ], [
+            '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
+            "__Stage__: develop",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
         var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;

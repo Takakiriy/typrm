@@ -18,6 +18,7 @@ typrm は テキスト ファイル に書いたキーボードから手動で�
   - [設定タグと #template タグを使って設定値を置き換えます](#設定タグと-template-タグを使って設定値を置き換えます)
     - [設定の詳細](#設定の詳細)
     - [設定名](#設定名)
+    - [#template-if タグ - 条件を満たしているかどうかの記号を置き換えます](#template-if-タグ---条件を満たしているかどうかの記号を置き換えます)
   - [check コマンド - 置き換えることができることをテストします](#check-コマンド---置き換えることができることをテストします)
   - [#file-template タグを使ってファイルの内容をチェックします](#file-template-タグを使ってファイルの内容をチェックします)
   - [#if タグを使って条件を設定します](#if-タグを使って条件を設定します)
@@ -461,6 +462,44 @@ typrm を使うには Node.js のインストールが必要です。
     typrm replace  サンプル.yaml  "プロジェクト1"  "__Name__: Image1"
 
 - 設定名は、数字だけにすることはできません
+
+### #template-if タグ - 条件を満たしているかどうかの記号を置き換えます
+
+多くのマニュアルは、条件によって読み飛ばす部分があります。
+たとえば、Windows で操作するときの説明文と mac で操作するときの説明文が
+書いてあるマニュアルです。
+そういったマニュアルの場合、読むべき説明文は、どちらか一方だけです。
+
+`#template-if:` タグを使えば、読むべき文節か読まなくてもよい文節かを
+記号を見るだけで判断できるようになります。
+その記号などは `template-if(yes)` 変数の値と `template-if(no)` 変数の値に設定します。
+
+    設定:
+        OS: Windows  #// Windows または mac
+        template-if(yes): 🌟
+        template-if(no):  💤
+    コピー操作:
+        🌟 Windows の場合:  #template-if: $settings.OS == Windows
+            Ctrl + C
+        💤 mac の場合:      #template-if: $settings.OS == mac
+            command + C
+
+置き換えるときは、replace コマンドを使って次のように入力します。
+
+    typrm replace  __FileName__  "OS: mac"
+
+OS 変数の値を Windows から mac に置き換えると、
+読むべきかどうかを表す記号も置き変わります。
+
+    設定:
+        OS: mac  #original: Windows  #// Windows または mac
+        template-if(yes): 🌟
+        template-if(no):  💤
+    コピー操作:
+        💤 Windows の場合:  #template-if: $settings.OS == Windows
+            Ctrl + C
+        🌟 mac の場合:      #template-if: $settings.OS == mac
+            command + C
 
 
 ## check コマンド - 置き換えることができることをテストします

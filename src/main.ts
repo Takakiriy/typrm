@@ -5,7 +5,6 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 import * as chalk from 'chalk';
-import { parse } from 'commander';
 process.env['typrm_aaa'] = 'aaa';
 
 // main
@@ -482,6 +481,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         let  lineNum = 0;
         let  isReplacing = false;
         let  isAllReplacable = true;
+        let  isCheckingTemplateIfKey = false;
+        let  templateIfKeyError = false;
         const  evalatedKeys: {[key: string]: string} = {};
         const  ifTagParser = new IfTagParser();
         const  oldIfTagParser = new IfTagParser();
@@ -508,6 +509,9 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     isReplacing = true;
                 } else {
                     isReplacing = (settingCount === replacingSettingIndex);
+                }
+                if ( ! templateIfKeyError) {
+                    isCheckingTemplateIfKey = true;
                 }
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
 
@@ -597,8 +601,15 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
                             &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
                         const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                        const  expected = getExpectedLine(oldSetting, templateTag.template);
-                        const  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
+                        const  commonCase = (templateTag.label !== templateIfLabel);
+                        if (commonCase) {
+                            var  expected = getExpectedLine(oldSetting, templateTag.template);
+                            var  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
+                        } else { // if (templateTag.label === templateIfLabel)
+                            templateTag.evaluate(setting);
+                            var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
+                            var  replaced = getReplacedLine(setting, templateTag.newTemplate, replacingKeyValues);
+                        }
 
                         if (replacingLine.includes(expected)) {
                             const  before = expected;
@@ -630,6 +641,20 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
                                 console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                                 errorCount += 1;
+                            }
+                        }
+                    } else {
+                        if (isCheckingTemplateIfKey  &&  templateTag.label === templateIfLabel) {
+                            isCheckingTemplateIfKey = false;
+                            const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
+                            if (necessaryVariableNames !== '') {
+                                console.log('');
+                                console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
+                                console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
+                                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                errorCount += 1;
+                                templateIfKeyError = true;
                             }
                         }
                     }
@@ -744,11 +769,68 @@ class  TemplateTag {
     startIndexInLine = notFound;
     endIndexInLine = notFound;
 
+    // template-at tag
+    oldTemplate = '';
+    newTemplate = '';
+
     // for file-template tag
     templateLines: string[] = [];
     indentAtTag = '';
     minIndentLength = 0;
 
+    // parseLine
+    parseLine(line: string) {
+
+        this.label = templateLabel;
+        this.indexInLine = line.indexOf(templateLabel);
+        if (this.indexInLine === notFound) {
+
+            this.label = fileTemplateLabel;
+            this.indexInLine = line.indexOf(fileTemplateLabel);
+        }
+        if (this.indexInLine === notFound) {
+
+            this.label = templateIfLabel;
+            this.indexInLine = line.indexOf(templateIfLabel);
+        }
+        if (this.indexInLine !== notFound) {
+            this.isFound = true;
+            const  leftOfTemplate = line.substr(0, this.indexInLine).trim();
+            if (this.label === fileTemplateLabel) {
+                this.onFileTemplateTagReading(line);
+            }
+
+            this.template = line.substr(this.indexInLine + this.label.length).trim();
+            if (this.label == templateIfLabel) {
+                this.template = getValue(this.template);
+            }
+            if (leftOfTemplate === '') {
+                this.lineNumOffset = -1;
+            } else {
+                this.lineNumOffset = 0;
+            }
+            return;
+        }
+
+        this.label = templateAtStartLabel;
+        this.startIndexInLine = line.indexOf(templateAtStartLabel);
+        if (this.startIndexInLine !== notFound) {
+            this.isFound = true;
+            this.endIndexInLine =  line.indexOf(templateAtEndLabel, this.startIndexInLine);
+            if (this.endIndexInLine !== notFound) {
+
+                this.template = line.substr(this.endIndexInLine + templateAtEndLabel.length).trim();
+                this.lineNumOffset = parseInt(line.substring(
+                    this.startIndexInLine + templateAtStartLabel.length,
+                    this.endIndexInLine ));
+                return;
+            }
+        }
+
+        this.label = '';
+        this.template = '';
+        this.lineNumOffset = 0;
+    }
     onFileTemplateTagReading(line: string) {
         this.indentAtTag = indentRegularExpression.exec(line)![0];
         this.minIndentLength = maxNumber;
@@ -767,14 +849,47 @@ class  TemplateTag {
         }
         return  readingNext;
     }
+
+    // includesKey
     includesKey(keys: string[]): boolean {
-        for (const key of keys) {
-            if (this.template.includes(key)) {
-                return  true;
+        const  commonCase = (this.label !== templateIfLabel);
+        if (commonCase) {
+            for (const key of keys) {
+                if (this.template.includes(key)) {
+                    return  true;
+                }
             }
+            return  false;
+        } else { // if (this.label === templateIfLabel)
+            return  keys.includes(templateIfYesKey) && keys.includes(templateIfNoKey);
         }
-        return  false;
     }
+
+    // evaluate
+    evaluate(setting: Settings): boolean | Error {
+        if (this.label !== templateIfLabel) {
+            return new Error();
+        }
+        const  expression = this.template;
+
+        const  evaluatedContidion = evaluateIfCondition(expression, setting);
+        if (typeof evaluatedContidion === 'boolean') {
+            if (evaluatedContidion) {
+                this.oldTemplate = templateIfNoKey;
+                this.newTemplate = templateIfYesKey;
+            } else {
+                this.oldTemplate = templateIfYesKey;
+                this.newTemplate = templateIfNoKey;
+            }
+            return  evaluatedContidion;
+        } else if (instanceOf.EvaluatedCondition(evaluatedContidion)) {
+            return new Error();
+        } else {
+            return  evaluatedContidion;
+        }
+    }
+
+    // checkTargetFileContents
     async  checkTargetFileContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
         const  parentPath = path.dirname(inputFilePath);
         const  targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
@@ -1654,7 +1769,8 @@ function  getExpectedLine(setting: Settings, template: string): string {
 }
 
 // getExpectedLineAndEvaluationLog
-function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean): {expected: string, log: EvaluationLog[]} {
+function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean
+        ): {expected: string, log: EvaluationLog[]} {
     let  expected = template;
     const  log: EvaluationLog[] = [];
 
@@ -1685,7 +1801,7 @@ function  getExpectedLineInFileTemplate(setting: Settings, template: string) {
 }
 
 // getReplacedLine
-function  getReplacedLine(setting: Settings, template: string, replacedValues: {[key:string]: string}) {
+function  getReplacedLine(setting: Settings, template: string, replacedValues: {[key:string]: string}): string {
     const  replacedSetting: Settings = {};
     for (const key of Object.keys(setting)) {
         if (key in replacedValues) {
@@ -1715,7 +1831,7 @@ function  parseKeyValueLines(keyValueLines: string): {[key:string]: string} {
 }
 
 // getValue
-function  getValue(line: string, separatorIndex: number) {
+function  getValue(line: string, separatorIndex: number = -1) {
     let    value = line.substr(separatorIndex + 1).trim();
     const  comment = value.indexOf('#');
     if (comment !== notFound) {
@@ -1724,50 +1840,28 @@ function  getValue(line: string, separatorIndex: number) {
     return  value;
 }
 
+// getNotSetTemplateIfTagVariableNames
+function  getNotSetTemplateIfTagVariableNames(settingKeys: string[]) {
+    if (settingKeys.includes(templateIfYesKey)) {
+        if (settingKeys.includes(templateIfNoKey)) {
+            var  notSetNames = '';
+        } else {
+            var  notSetNames = templateIfNoKey;
+        }
+    } else {
+        if (settingKeys.includes(templateIfNoKey)) {
+            var  notSetNames = templateIfYesKey;
+        } else {
+            var  notSetNames = `${templateIfYesKey} ${translate('and')} ${templateIfNoKey}`;
+        }
+    }
+    return  notSetNames;
+}
+
 // parseTemplateTag
 function  parseTemplateTag(line: string): TemplateTag {
     const  tag = new TemplateTag();
-
-    tag.label = templateLabel;
-    tag.indexInLine = line.indexOf(templateLabel);
-    if (tag.indexInLine === notFound) {
-        tag.label = fileTemplateLabel;
-        tag.indexInLine = line.indexOf(fileTemplateLabel);
-    }
-    if (tag.indexInLine !== notFound) {
-        tag.isFound = true;
-        const  leftOfTemplate = line.substr(0, tag.indexInLine).trim();
-        if (tag.label === fileTemplateLabel) {
-            tag.onFileTemplateTagReading(line);
-        }
-
-        tag.template = line.substr(tag.indexInLine + tag.label.length).trim();
-        if (leftOfTemplate === '') {
-            tag.lineNumOffset = -1;
-        } else {
-            tag.lineNumOffset = 0;
-        }
-        return  tag;
-    }
-
-    tag.label = templateAtStartLabel;
-    tag.startIndexInLine = line.indexOf(templateAtStartLabel);
-    if (tag.startIndexInLine !== notFound) {
-        tag.isFound = true;
-        tag.endIndexInLine =  line.indexOf(templateAtEndLabel, tag.startIndexInLine);
-        if (tag.endIndexInLine !== notFound) {
-
-            tag.template = line.substr(tag.endIndexInLine + templateAtEndLabel.length).trim();
-            tag.lineNumOffset = parseInt(line.substring(
-                tag.startIndexInLine + templateAtStartLabel.length,
-                tag.endIndexInLine ));
-            return  tag;
-        }
-    }
-
-    tag.label = '';
-    tag.template = '';
-    tag.lineNumOffset = 0;
+    tag.parseLine(line);
     return  tag;
 }
 
@@ -2286,6 +2380,9 @@ const  originalLabel = "#original:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
+const  templateIfLabel = "#template-if:";
+const  templateIfYesKey = "template-if(yes)";
+const  templateIfNoKey  = "template-if(no)";
 const  fileTemplateLabel = "#file-template:";
 const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
