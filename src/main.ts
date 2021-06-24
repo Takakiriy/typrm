@@ -1007,6 +1007,39 @@ class  IfTrueConditionScanner {
     }
 }
 
+// WordPositions
+class  WordPositions {
+    wordPositions: number[] = [];
+    get  length() { return this.wordPositions.length; }
+
+    setPhrase(phrase: string) {
+        const  words = phrase.split(' ');
+        var  wordIndex = 0;
+        var  position = 0;
+        for (const word of words) {
+
+            this.wordPositions.push(position);
+            wordIndex += 1;
+            position += word.length + 1;
+        }
+    }
+
+    getWordIndex(phrasePosition: number) {
+        var  wordIndex = 0;
+        for (const wordPosition of this.wordPositions) {
+
+            if (phrasePosition >= wordPosition) {
+                break;  // wordIndex = .
+            }
+            wordIndex += 1;
+        }
+        if (wordIndex >= this.wordPositions.length) {
+            wordIndex = this.wordPositions.length - 1;
+        }
+        return  wordIndex;
+    }
+}
+
 // check
 async function  check(checkingFilePath?: string) {
     const  targetFolders = await parseCSVColumns(programOptions.folder);
@@ -1193,13 +1226,21 @@ async function  searchSub(keyword: string) {
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
 
     foundLines.sort( (a, b) => {
+        var  different = 0;
 
-        // score
-        var  different = a.score - b.score;
+        // matchedTargetKeywordCount
+        if (different === 0) {
+            different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
+        }
 
         // testedWordCount
         if (different === 0) {
             different = b.testedWordCount - a.testedWordCount;
+        }
+
+        // score
+        if (different === 0) {
+            var  different = a.score - b.score;
         }
 
         // path
@@ -1240,9 +1281,13 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
                     thisScore = result.score * keywords.length * phraseMatchScoreWeight +
                         keyphrase.length - aTestingString.length;
                     found.matchedKeywordCount = keywords.length;
+                    found.matchedTargetKeywordCount = keywords.length;
                     found.testedWordCount = aTestingString.split(' ').length;
                 } else {
-                    let  previousPosition = -1;
+                    let    previousPosition = -1;
+                    const  wordPositions = new WordPositions();
+                    wordPositions.setPhrase(aTestingString);
+                    const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length).fill( 0 )
 
                     for (const keyword of keywords) {
                         if (keyword === '') {continue;}
@@ -1257,12 +1302,14 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
                             found.matchedKeywordCount += 1;
                         }
                         if (result.position !== notFound) {
+                            matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
                             previousPosition = result.position;
                         }
                     }
                     if (thisScore !== 0) {
                         thisScore += keyphrase.length - aTestingString.length;
                         found.testedWordCount = aTestingString.split(' ').length;
+                        found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
                     }
                 }
                 maxScore = Math.max(maxScore, thisScore);
@@ -1801,6 +1848,7 @@ class FoundLine {
     line: string = '';
     matches: MatchedPart[] = [];
     matchedKeywordCount: number = 0;
+    matchedTargetKeywordCount: number = 0;
     testedWordCount: number = 0;
     score: number = 0;
 

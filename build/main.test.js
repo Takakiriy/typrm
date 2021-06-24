@@ -538,8 +538,8 @@ describe("searches keyword tag >>", function () {
             "1 word search score",
             ["search", "second"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':14:') + ("     #keyword: " + matchedColor('second') + "ary\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':15:') + ("     #keyword: " + matchedColor('second') + " screen\n") +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':15:') + ("     #keyword: " + matchedColor('second') + " screen\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':14:') + ("     #keyword: " + matchedColor('second') + "ary\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':13:') + ("     #keyword: " + matchedColor('second') + "\n"),
         ], [
             "word match is better than same case",
@@ -579,19 +579,19 @@ describe("searches keyword tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + ("     #keyword: pink " + matchedColor('GRAPE') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':43:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + ("     #keyword: " + matchedColor('grape') + "fruit juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':32:') + ("     #keyword: " + matchedColor('grape') + "fruit juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':31:') + ("     #keyword: pink " + matchedColor('grape') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':33:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':45:') + ("     #keyword: " + matchedColor('GRAPE') + " juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':47:') + ("     #keyword: " + matchedColor('GRAPE') + " juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':46:') + ("     #keyword: pink " + matchedColor('GRAPE') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':35:') + ("     #keyword: " + matchedColor('grape') + " juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':37:') + ("     #keyword: " + matchedColor('grape') + " juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':36:') + ("     #keyword: pink " + matchedColor('grape') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':43:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':33:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':44:') + ("     #keyword: " + matchedColor('GRAPE') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':48:') + ("     #keyword: " + matchedColor('GRAPE') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':34:') + ("     #keyword: " + matchedColor('grape') + "\n") +
@@ -603,6 +603,13 @@ describe("searches keyword tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':51:') + ("     #keyword: " + matchedColor('main') + "ly " + matchedColor('stage') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':50:') + ("     #keyword: " + matchedColor('Main stage') + "s\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':52:') + ("     #keyword: " + matchedColor('Main stage') + "s\n"),
+        ], [
+            "output order (5)",
+            ["search", "silver", "arrow"],
+            { folder: "test_data/search/2", test: "", verbose: "1" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + ("     #keyword: add " + matchedColor('SILVER arrow') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + ("     #keyword: add " + matchedColor('SILVER arrow') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + ("     #keyword: [" + matchedColor('silver') + "/super-system], " + matchedColor('SILVER Arrow') + "s\n"),
         ], [
             "without tag parameter",
             ["search", "specular"],

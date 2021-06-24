@@ -1308,6 +1308,43 @@ var IfTrueConditionScanner = /** @class */ (function () {
     };
     return IfTrueConditionScanner;
 }());
+// WordPositions
+var WordPositions = /** @class */ (function () {
+    function WordPositions() {
+        this.wordPositions = [];
+    }
+    Object.defineProperty(WordPositions.prototype, "length", {
+        get: function () { return this.wordPositions.length; },
+        enumerable: false,
+        configurable: true
+    });
+    WordPositions.prototype.setPhrase = function (phrase) {
+        var words = phrase.split(' ');
+        var wordIndex = 0;
+        var position = 0;
+        for (var _i = 0, words_1 = words; _i < words_1.length; _i++) {
+            var word = words_1[_i];
+            this.wordPositions.push(position);
+            wordIndex += 1;
+            position += word.length + 1;
+        }
+    };
+    WordPositions.prototype.getWordIndex = function (phrasePosition) {
+        var wordIndex = 0;
+        for (var _i = 0, _a = this.wordPositions; _i < _a.length; _i++) {
+            var wordPosition = _a[_i];
+            if (phrasePosition >= wordPosition) {
+                break; // wordIndex = .
+            }
+            wordIndex += 1;
+        }
+        if (wordIndex >= this.wordPositions.length) {
+            wordIndex = this.wordPositions.length - 1;
+        }
+        return wordIndex;
+    };
+    return WordPositions;
+}());
 // check
 function check(checkingFilePath) {
     return __awaiter(this, void 0, void 0, function () {
@@ -1618,11 +1655,18 @@ function searchSub(keyword) {
                     keyphraseWordCount = keyword.split(' ').length;
                     foundLines = foundLines.filter(function (found) { return (found.matchedKeywordCount >= keyphraseWordCount); });
                     foundLines.sort(function (a, b) {
-                        // score
-                        var different = a.score - b.score;
+                        var different = 0;
+                        // matchedTargetKeywordCount
+                        if (different === 0) {
+                            different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
+                        }
                         // testedWordCount
                         if (different === 0) {
                             different = b.testedWordCount - a.testedWordCount;
+                        }
+                        // score
+                        if (different === 0) {
+                            var different = a.score - b.score;
                         }
                         // path
                         if (different === 0) {
@@ -1661,10 +1705,14 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                 thisScore = result.score * keywords.length * phraseMatchScoreWeight +
                     keyphrase.length - aTestingString.length;
                 found.matchedKeywordCount = keywords.length;
+                found.matchedTargetKeywordCount = keywords.length;
                 found.testedWordCount = aTestingString.split(' ').length;
             }
             else {
                 var previousPosition = -1;
+                var wordPositions = new WordPositions();
+                wordPositions.setPhrase(aTestingString);
+                var matchedCountsByWord = new Array(wordPositions.length).fill(0);
                 for (var _i = 0, keywords_3 = keywords; _i < keywords_3.length; _i++) {
                     var keyword = keywords_3[_i];
                     if (keyword === '') {
@@ -1681,12 +1729,14 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                         found.matchedKeywordCount += 1;
                     }
                     if (result_1.position !== notFound) {
+                        matchedCountsByWord[wordPositions.getWordIndex(result_1.position)] += 1;
                         previousPosition = result_1.position;
                     }
                 }
                 if (thisScore !== 0) {
                     thisScore += keyphrase.length - aTestingString.length;
                     found.testedWordCount = aTestingString.split(' ').length;
+                    found.matchedTargetKeywordCount = matchedCountsByWord.filter(function (count) { return (count >= 1); }).length;
                 }
             }
             maxScore = Math.max(maxScore, thisScore);
@@ -2232,6 +2282,7 @@ var FoundLine = /** @class */ (function () {
         this.line = '';
         this.matches = [];
         this.matchedKeywordCount = 0;
+        this.matchedTargetKeywordCount = 0;
         this.testedWordCount = 0;
         this.score = 0;
     }
