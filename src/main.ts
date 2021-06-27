@@ -433,14 +433,14 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
     if (fileFullPaths.length === 0) {
         console.log('');
         console.log(`${translate('Error of not found the specified file.')}`);
-        console.log(`    FileName: ${inputFilePath}`);
-        console.log(`    Folder: ${programOptions.folder}`);
+        console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
+        console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
         return  '';
     } else if (fileFullPaths.length >= 2) {
         console.log('');
         console.log(`${translate('Error of same file name exists.')}`);
-        console.log(`    FileName: ${inputFilePath}`);
-        console.log(`    Folder: ${programOptions.folder}`);
+        console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
+        console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
         return  '';
     }
 
@@ -897,8 +897,8 @@ class  TemplateTag {
             const  templateLineNum = templateEndLineNum - this.templateLines.length;
             console.log("");
             console.log(`Error of not found the target file:`);
-            console.log(`  ${translate('NotFound')}: ${targetFilePath}`);
-            console.log(`  Template: ${inputFilePath}:${templateLineNum}`);
+            console.log(`  ${translate('NotFound')}: ${getTestablePath(targetFilePath)}`);
+            console.log(`  Template: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
             return  false;
         }
         const  targetFileReader = readline.createInterface({
@@ -1749,7 +1749,7 @@ function  getTestablePath(path_: string) {
         } else if (path_.startsWith(inputFileParentPath + path.sep)) {
             return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
         } else {
-            return  path_;
+            return  path_.replace(/\\/g, '/');
         }
     } else {
         return  path_;

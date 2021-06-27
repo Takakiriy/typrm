@@ -124,8 +124,8 @@ ErrorLine: 3
   SettingIndex: 1
 
 Error of not found the target file:
-  NotFound: /Users/totadashi/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
-  Template: /Users/totadashi/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_3_file_name_1_changing.yaml:4
+  NotFound: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
+  Template: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_3_file_name_1_changing.yaml:4
 
 Warning: 0, Error: 2
 template count = 1
