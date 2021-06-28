@@ -1591,7 +1591,7 @@ function search() {
 function searchSub(keyword) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
+        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, glossaryWords, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -1640,25 +1640,26 @@ function searchSub(keyword) {
                     indentPosition = -1;
                     indentAtFirstContents = '';
                     inGlossary = false;
+                    glossaryWords = '';
                     foundLines = [];
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _g, _h, match, currentIndent, characterAtIndent, colonPosition, wordInGlossary, found, _j, _k, match, e_6_1;
-                        return __generator(this, function (_l) {
-                            switch (_l.label) {
+                        var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _g, _h, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _j, _k, match, _l, _m, match, e_6_1;
+                        return __generator(this, function (_o) {
+                            switch (_o.label) {
                                 case 0:
                                     reader = readline.createInterface({
                                         input: fs.createReadStream(inputFileFullPath),
                                         crlfDelay: Infinity
                                     });
                                     lineNum = 0;
-                                    _l.label = 1;
+                                    _o.label = 1;
                                 case 1:
-                                    _l.trys.push([1, 8, 9, 14]);
+                                    _o.trys.push([1, 8, 9, 14]);
                                     reader_5 = (e_6 = void 0, __asyncValues(reader));
-                                    _l.label = 2;
+                                    _o.label = 2;
                                 case 2: return [4 /*yield*/, reader_5.next()];
                                 case 3:
-                                    if (!(reader_5_1 = _l.sent(), !reader_5_1.done)) return [3 /*break*/, 7];
+                                    if (!(reader_5_1 = _o.sent(), !reader_5_1.done)) return [3 /*break*/, 7];
                                     line1 = reader_5_1.value;
                                     line = line1;
                                     lineNum += 1;
@@ -1677,7 +1678,7 @@ function searchSub(keyword) {
                                             return [];
                                         })];
                                 case 4:
-                                    columns = _l.sent();
+                                    columns = _o.sent();
                                     found = getKeywordMatchingScore(columns, keyword);
                                     if (found.matchedKeywordCount >= 1) {
                                         if (withParameter) {
@@ -1697,11 +1698,15 @@ function searchSub(keyword) {
                                         }
                                         foundLines.push(found);
                                     }
-                                    _l.label = 5;
+                                    _o.label = 5;
                                 case 5:
                                     // glossary tag
                                     if (line.includes(glossaryLabel)) {
                                         inGlossary = true;
+                                        glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
+                                        if (glossaryWords !== '') {
+                                            glossaryWords += ':'; // ':' is not included in the word in glossary
+                                        }
                                         indentAtTag = indentRegularExpression.exec(line)[0];
                                         indentAtFirstContents = '';
                                     }
@@ -1712,23 +1717,36 @@ function searchSub(keyword) {
                                             indentPosition = indentAtFirstContents.length;
                                         }
                                         characterAtIndent = line[indentPosition];
-                                        if (characterAtIndent === ' ' ||
-                                            characterAtIndent === '\t' ||
-                                            characterAtIndent === undefined) {
+                                        isGlossaryIndentLevel = (characterAtIndent !== ' ' &&
+                                            characterAtIndent !== '\t' &&
+                                            characterAtIndent !== undefined);
+                                        isComment = (characterAtIndent === '#');
+                                        if (!isGlossaryIndentLevel || isComment) {
                                             // Skip this line
                                         }
                                         else {
                                             colonPosition = line.indexOf(':', currentIndent.length);
-                                            wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                                            wordInGlossary = glossaryWords + line.substr(currentIndent.length, colonPosition - currentIndent.length);
                                             found = getKeywordMatchingScore([wordInGlossary], keyword);
                                             if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
                                                 found.score += glossaryMatchScore;
                                                 found.path = getTestablePath(inputFileFullPath);
                                                 found.lineNum = lineNum;
-                                                found.line = line;
-                                                for (_j = 0, _k = found.matches; _j < _k.length; _j++) {
-                                                    match = _k[_j];
-                                                    match.position += indentPosition;
+                                                if (glossaryWords === '') {
+                                                    found.line = line;
+                                                    for (_j = 0, _k = found.matches; _j < _k.length; _j++) {
+                                                        match = _k[_j];
+                                                        match.position += indentPosition;
+                                                    }
+                                                }
+                                                else {
+                                                    found.line = glossaryWords + line;
+                                                    for (_l = 0, _m = found.matches; _l < _m.length; _l++) {
+                                                        match = _m[_l];
+                                                        if (match.position >= glossaryWords.length) {
+                                                            match.position += indentPosition;
+                                                        }
+                                                    }
                                                 }
                                                 foundLines.push(found);
                                             }
@@ -1737,20 +1755,20 @@ function searchSub(keyword) {
                                             inGlossary = false;
                                         }
                                     }
-                                    _l.label = 6;
+                                    _o.label = 6;
                                 case 6: return [3 /*break*/, 2];
                                 case 7: return [3 /*break*/, 14];
                                 case 8:
-                                    e_6_1 = _l.sent();
+                                    e_6_1 = _o.sent();
                                     e_6 = { error: e_6_1 };
                                     return [3 /*break*/, 14];
                                 case 9:
-                                    _l.trys.push([9, , 12, 13]);
+                                    _o.trys.push([9, , 12, 13]);
                                     if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5.return))) return [3 /*break*/, 11];
                                     return [4 /*yield*/, _a.call(reader_5)];
                                 case 10:
-                                    _l.sent();
-                                    _l.label = 11;
+                                    _o.sent();
+                                    _o.label = 11;
                                 case 11: return [3 /*break*/, 13];
                                 case 12:
                                     if (e_6) throw e_6.error;

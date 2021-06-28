@@ -1257,6 +1257,7 @@ async function  searchSub(keyword: string) {
     var  indentPosition = -1;
     var  indentAtFirstContents = '';
     var  inGlossary = false;
+    var  glossaryWords = '';
     var  foundLines: FoundLine[] = [];
 
     for (const inputFileFullPath of fileFullPaths) {
@@ -1308,8 +1309,13 @@ async function  searchSub(keyword: string) {
             // glossary tag
             if (line.includes(glossaryLabel)) {
                 inGlossary = true;
+                glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
+                if (glossaryWords !== '') {
+                    glossaryWords += ':';  // ':' is not included in the word in glossary
+                }
                 indentAtTag = indentRegularExpression.exec(line)![0];
                 indentAtFirstContents = '';
+
             } else if (inGlossary) {
                 const  currentIndent = indentRegularExpression.exec(line)![0];
                 if (indentAtFirstContents === '') {
@@ -1317,15 +1323,18 @@ async function  searchSub(keyword: string) {
                     indentPosition = indentAtFirstContents.length;
                 }
                 const  characterAtIndent = line[indentPosition];
-                if (
-                    characterAtIndent === ' '  ||
-                    characterAtIndent === '\t'  ||
-                    characterAtIndent === undefined)
-                {
+                const  isGlossaryIndentLevel = (
+                    characterAtIndent !== ' '  &&
+                    characterAtIndent !== '\t'  &&
+                    characterAtIndent !== undefined
+                );
+                const  isComment = (characterAtIndent === '#');
+
+                if ( ! isGlossaryIndentLevel  ||  isComment) {
                     // Skip this line
                 } else {
                     const  colonPosition = line.indexOf(':', currentIndent.length);
-                    const  wordInGlossary = line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                    const  wordInGlossary = glossaryWords + line.substr(currentIndent.length, colonPosition - currentIndent.length);
 
                     const  found = getKeywordMatchingScore([wordInGlossary], keyword);
                     if (found.matchedKeywordCount >= 1  &&  colonPosition !== notFound) {
@@ -1333,9 +1342,18 @@ async function  searchSub(keyword: string) {
                         found.score += glossaryMatchScore;
                         found.path = getTestablePath(inputFileFullPath);
                         found.lineNum = lineNum;
-                        found.line = line;
-                        for (const match of found.matches) {
-                            match.position += indentPosition;
+                        if (glossaryWords === '') {
+                            found.line = line;
+                            for (const match of found.matches) {
+                                match.position += indentPosition;
+                            }
+                        } else {
+                            found.line = glossaryWords + line;
+                            for (const match of found.matches) {
+                                if (match.position >= glossaryWords.length) {
+                                    match.position += indentPosition;
+                                }
+                            }
                         }
                         foundLines.push(found);
                     }

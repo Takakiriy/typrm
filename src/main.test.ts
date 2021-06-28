@@ -586,6 +586,11 @@ describe("searches glossary tag >>", () => {
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}D: abcd\n` +
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':4:') + `     ${matchedColor('ABC')}: abc\n`,
     ],[
+        "skip comment",
+        ["search", "comment"],
+        { folder: "test_data/search/glossary/2", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':26:') + `     ${matchedColor('comment')}: hit\n`,
+    ],[
         "output order (1)",
         ["search", "de"],
         { folder: "test_data/search/glossary/1", test: "" },
@@ -610,6 +615,16 @@ describe("searches glossary tag >>", () => {
         { folder: "test_data/search/glossary/2", test: "" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + `     ${matchedColor('space')}1:\n` +
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + `     ${matchedColor('space')}2:\n`,
+    ],[
+        "glossary with parameters (1)",
+        ["search", "category1 apple"],
+        { folder: "test_data/search/glossary/2", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
+    ],[
+        "glossary with parameters (2)",
+        ["search", "apple category1"],
+        { folder: "test_data/search/glossary/2", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
     ],[
         "Multi folder",
         ["search", "ABC"],

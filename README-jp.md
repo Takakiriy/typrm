@@ -196,15 +196,29 @@ CSV の部分に文法の問題があるときに表示される警告を抑制�
 
     #keyword: abc"   #disable-tag-tool:
 
-`#glossary:` タグを付けると、`#glossary:` タグを付けた行のインデントより
+`#glossary:` （用語）タグを付けると、`#glossary:` タグを付けた行のインデントより
 1段深いインデントの行に書かれたコロンまでの部分が検索対象のキーワードになります。
 
     用語:  #glossary:
         CSV: comma separated values
         SSV: space separated values
+        #comment: ここは検索されません
 
 上記の場合、CSV と SSV を検索できるようになります。
 2段以上深いインデントの行は対象外です。
+
+`#glossary:` タグにパラメーターをつけると、
+パラメーターとラベルからなるキーフレーズが検索対象になり、
+組み合わせ検索ができるようになります。
+
+    C++ 用語:  #glossary: C++
+        TLS: Thread Local Storage. スレッドごとに存在するメモリー領域
+
+    セキュリティ用語:  #glossary: security
+        TLS: Transport Layer Security. SSL の次のバージョン
+
+上記の場合、TLS で検索すると両方とも見つかります。
+C++ TLS で検索すると C++ 用語の TLS だけが見つかります。
 
 
 ## インストール

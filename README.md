@@ -206,9 +206,23 @@ the indent of the line tagged with `#glossary:`.
     glossary:  #glossary:
         CSV: comma separated values
         SSV: space separated values
+        #comment: This is not search target. 
 
 In the above case, you will be able to search for CSV and SSV.
 Lines with indents that are two or more steps deep are not searchable.
+
+If you add parameters to the `#glossary:` tag,
+the key phrase consisting of the parameter and label will be searched,
+and you will be able to perform a combination search.
+
+    C++ glossary:  #glossary: C++
+        TLS: Thread Local Storage. Memory area that exists for each thread
+
+    security glossary:  #glossary: security
+        TLS: Transport Layer Security. The next version of SSL
+
+In the above case, if your input keyword was TLS, typrm shows both TLS.
+If your input keyword was C++ TLS, typrm shows only TLS in C++ glossary.
 
 
 ## Install
