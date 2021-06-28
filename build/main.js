@@ -140,7 +140,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -257,14 +257,7 @@ function checkRoutine(isModal, inputFilePath) {
                     if (templateTag.isFound) {
                         templateCount += 1;
                         checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                        commonCase = (templateTag.label !== templateIfLabel);
-                        if (commonCase) {
-                            expected = getExpectedLine(setting, templateTag.template);
-                        }
-                        else { // if (templateTag.label === templateIfLabel)
-                            templateTag.evaluate(setting);
-                            expected = getExpectedLine(setting, templateTag.newTemplate);
-                        }
+                        expected = getExpectedLine(setting, templateTag.template);
                         if (templateTag.lineNumOffset === 0) {
                             checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
                         }
@@ -276,12 +269,7 @@ function checkRoutine(isModal, inputFilePath) {
                             console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
                             console.log("  " + translate('Contents') + ": " + checkingLine.trim());
                             console.log("  " + translate('Expected') + ": " + expected);
-                            if (commonCase) {
-                                console.log("  " + translate('Template') + ": " + templateTag.template);
-                            }
-                            else { // if (templateTag.label === templateIfLabel)
-                                console.log("  " + translate('Expression') + ": " + templateTag.template);
-                            }
+                            console.log("  " + translate('Template') + ": " + templateTag.template);
                             console.log("  " + translate('SettingIndex') + ": " + settingCount);
                             errorCount += 1;
                         }
@@ -618,15 +606,15 @@ function getInputFileFullPath(inputFilePath) {
                     if (fileFullPaths.length === 0) {
                         console.log('');
                         console.log("" + translate('Error of not found the specified file.'));
-                        console.log("    FileName: " + inputFilePath);
-                        console.log("    Folder: " + exports.programOptions.folder);
+                        console.log("    FileName: " + getTestablePath(inputFilePath));
+                        console.log("    Folder: " + getTestablePath(exports.programOptions.folder));
                         return [2 /*return*/, ''];
                     }
                     else if (fileFullPaths.length >= 2) {
                         console.log('');
                         console.log("" + translate('Error of same file name exists.'));
-                        console.log("    FileName: " + inputFilePath);
-                        console.log("    Folder: " + exports.programOptions.folder);
+                        console.log("    FileName: " + getTestablePath(inputFilePath));
+                        console.log("    Folder: " + getTestablePath(exports.programOptions.folder));
                         return [2 /*return*/, ''];
                     }
                     return [2 /*return*/, fileFullPaths[0]];
@@ -1153,8 +1141,8 @@ var TemplateTag = /** @class */ (function () {
                             templateLineNum = templateEndLineNum - this.templateLines.length;
                             console.log("");
                             console.log("Error of not found the target file:");
-                            console.log("  " + translate('NotFound') + ": " + targetFilePath);
-                            console.log("  Template: " + inputFilePath + ":" + templateLineNum);
+                            console.log("  " + translate('NotFound') + ": " + getTestablePath(targetFilePath));
+                            console.log("  Template: " + getTestablePath(inputFilePath) + ":" + templateLineNum);
                             return [2 /*return*/, false];
                         }
                         targetFileReader = readline.createInterface({
@@ -2210,7 +2198,7 @@ function getTestablePath(path_) {
             return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
         }
         else {
-            return path_;
+            return path_.replace(/\\/g, '/');
         }
     }
     else {
