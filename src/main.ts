@@ -1350,40 +1350,7 @@ async function  searchSub(keyword: string) {
 
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
 
-    foundLines.sort( (a, b) => {
-        var  different = 0;
-
-        // matchedTargetKeywordCount
-        if (different === 0) {
-            different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
-        }
-
-        // testedWordCount
-        if (different === 0) {
-            different = b.testedWordCount - a.testedWordCount;
-        }
-
-        // score
-        if (different === 0) {
-            var  different = a.score - b.score;
-        }
-
-        // path
-        if (different === 0) {
-            if (a.path < b.path) {
-                different = -1;
-            } else if (a.path > b.path) {
-                different = +1;
-            }
-        }
-
-        // lineNum
-        if (different === 0) {
-            different = a.lineNum - b.lineNum;
-        }
-
-        return  different;
-    });
+    foundLines.sort(compareScore);
     for (const foundLineInformation of foundLines) {
 
         console.log(foundLineInformation.toString());
@@ -1393,17 +1360,16 @@ async function  searchSub(keyword: string) {
 // getKeywordMatchingScore
 function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): FoundLine {
     const  lowerKeyphrase = keyphrase.toLowerCase();
-    const  found = new FoundLine();
 
     function  subMain() {
-        const  score = testingStrings.reduce(
-            (maxScore: number, aTestingString: string, stringIndex: number) => {
+        const  bestFound = testingStrings.reduce(
+            (bestFound: FoundLine, aTestingString: string, stringIndex: number) => {
                 const  keywords = keyphrase.split(' ');
-                let  thisScore = 0;
+                const  found = new FoundLine();
 
-                const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
+                const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex, found);
                 if (result.score !== 0) {
-                    thisScore = result.score * keywords.length * phraseMatchScoreWeight +
+                    found.score = result.score * keywords.length * phraseMatchScoreWeight +
                         keyphrase.length - aTestingString.length;
                     found.matchedKeywordCount = keywords.length;
                     found.matchedTargetKeywordCount = keywords.length;
@@ -1417,12 +1383,12 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
                     for (const keyword of keywords) {
                         if (keyword === '') {continue;}
 
-                        const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex);
+                        const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
                         if (result.score !== 0) {
                             if (result.position > previousPosition) {
-                                thisScore += result.score * orderMatchScoreWeight;
+                                found.score += result.score * orderMatchScoreWeight;
                             } else {
-                                thisScore += result.score;
+                                found.score += result.score;
                             }
                             found.matchedKeywordCount += 1;
                         }
@@ -1431,17 +1397,22 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
                             previousPosition = result.position;
                         }
                     }
-                    if (thisScore !== 0) {
-                        thisScore += keyphrase.length - aTestingString.length;
+                    if (found.score !== 0) {
+                        found.score += keyphrase.length - aTestingString.length;
                         found.testedWordCount = aTestingString.split(' ').length;
                         found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
                     }
                 }
-                maxScore = Math.max(maxScore, thisScore);
-                return maxScore;
-            }, 0);
+                const  matches = bestFound.matches.concat(found.matches);
+                if (compareScore(bestFound, found) < 0) {
 
-        return  score;
+                    bestFound = found;
+                }
+                bestFound.matches = matches;
+                return bestFound;
+            }, new FoundLine());
+
+        return  bestFound;
     }
 
     interface  Result {
@@ -1449,7 +1420,8 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
         position: number;
     }
 
-    function  getSubMatchedScore(testingString: string, keyword: string, lowerKeyword: string, stringIndex: number): Result {
+    function  getSubMatchedScore(testingString: string, keyword: string,
+            lowerKeyword: string, stringIndex: number, found: FoundLine): Result {
         let  score = 0;
         let  position = notFound;
 
@@ -1490,9 +1462,44 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
         return { score, position };
     }
 
-    const  score = subMain();
-    found.score = score;
+    const  found = subMain();
     return  found;
+}
+
+// compareScore
+function  compareScore(a: FoundLine, b: FoundLine) {
+    var  different = 0;
+
+    // matchedTargetKeywordCount
+    if (different === 0) {
+        different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
+    }
+
+    // testedWordCount
+    if (different === 0) {
+        different = b.testedWordCount - a.testedWordCount;
+    }
+
+    // score
+    if (different === 0) {
+        var  different = a.score - b.score;
+    }
+
+    // path
+    if (different === 0) {
+        if (a.path < b.path) {
+            different = -1;
+        } else if (a.path > b.path) {
+            different = +1;
+        }
+    }
+
+    // lineNum
+    if (different === 0) {
+        different = a.lineNum - b.lineNum;
+    }
+
+    return  different;
 }
 
 // varidateUpdateCommandArguments
@@ -1985,7 +1992,7 @@ class FoundLine {
         }
         coloredLine += line.substr(previousPosition);
         if (false) {
-            var  debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount})`;
+            var  debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
         } else {
             var  debugString = ``;
         }

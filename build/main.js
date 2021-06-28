@@ -1775,35 +1775,7 @@ function searchSub(keyword) {
                 case 9:
                     keyphraseWordCount = keyword.split(' ').length;
                     foundLines = foundLines.filter(function (found) { return (found.matchedKeywordCount >= keyphraseWordCount); });
-                    foundLines.sort(function (a, b) {
-                        var different = 0;
-                        // matchedTargetKeywordCount
-                        if (different === 0) {
-                            different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
-                        }
-                        // testedWordCount
-                        if (different === 0) {
-                            different = b.testedWordCount - a.testedWordCount;
-                        }
-                        // score
-                        if (different === 0) {
-                            var different = a.score - b.score;
-                        }
-                        // path
-                        if (different === 0) {
-                            if (a.path < b.path) {
-                                different = -1;
-                            }
-                            else if (a.path > b.path) {
-                                different = +1;
-                            }
-                        }
-                        // lineNum
-                        if (different === 0) {
-                            different = a.lineNum - b.lineNum;
-                        }
-                        return different;
-                    });
+                    foundLines.sort(compareScore);
                     for (_d = 0, foundLines_1 = foundLines; _d < foundLines_1.length; _d++) {
                         foundLineInformation = foundLines_1[_d];
                         console.log(foundLineInformation.toString());
@@ -1816,14 +1788,13 @@ function searchSub(keyword) {
 // getKeywordMatchingScore
 function getKeywordMatchingScore(testingStrings, keyphrase) {
     var lowerKeyphrase = keyphrase.toLowerCase();
-    var found = new FoundLine();
     function subMain() {
-        var score = testingStrings.reduce(function (maxScore, aTestingString, stringIndex) {
+        var bestFound = testingStrings.reduce(function (bestFound, aTestingString, stringIndex) {
             var keywords = keyphrase.split(' ');
-            var thisScore = 0;
-            var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex);
+            var found = new FoundLine();
+            var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex, found);
             if (result.score !== 0) {
-                thisScore = result.score * keywords.length * phraseMatchScoreWeight +
+                found.score = result.score * keywords.length * phraseMatchScoreWeight +
                     keyphrase.length - aTestingString.length;
                 found.matchedKeywordCount = keywords.length;
                 found.matchedTargetKeywordCount = keywords.length;
@@ -1839,13 +1810,13 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                     if (keyword === '') {
                         continue;
                     }
-                    var result_1 = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex);
+                    var result_1 = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
                     if (result_1.score !== 0) {
                         if (result_1.position > previousPosition) {
-                            thisScore += result_1.score * orderMatchScoreWeight;
+                            found.score += result_1.score * orderMatchScoreWeight;
                         }
                         else {
-                            thisScore += result_1.score;
+                            found.score += result_1.score;
                         }
                         found.matchedKeywordCount += 1;
                     }
@@ -1854,18 +1825,22 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                         previousPosition = result_1.position;
                     }
                 }
-                if (thisScore !== 0) {
-                    thisScore += keyphrase.length - aTestingString.length;
+                if (found.score !== 0) {
+                    found.score += keyphrase.length - aTestingString.length;
                     found.testedWordCount = aTestingString.split(' ').length;
                     found.matchedTargetKeywordCount = matchedCountsByWord.filter(function (count) { return (count >= 1); }).length;
                 }
             }
-            maxScore = Math.max(maxScore, thisScore);
-            return maxScore;
-        }, 0);
-        return score;
+            var matches = bestFound.matches.concat(found.matches);
+            if (compareScore(bestFound, found) < 0) {
+                bestFound = found;
+            }
+            bestFound.matches = matches;
+            return bestFound;
+        }, new FoundLine());
+        return bestFound;
     }
-    function getSubMatchedScore(testingString, keyword, lowerKeyword, stringIndex) {
+    function getSubMatchedScore(testingString, keyword, lowerKeyword, stringIndex, found) {
         var score = 0;
         var position = notFound;
         if ((position = testingString.indexOf(keyword)) !== notFound) {
@@ -1905,9 +1880,38 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
         }
         return { score: score, position: position };
     }
-    var score = subMain();
-    found.score = score;
+    var found = subMain();
     return found;
+}
+// compareScore
+function compareScore(a, b) {
+    var different = 0;
+    // matchedTargetKeywordCount
+    if (different === 0) {
+        different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
+    }
+    // testedWordCount
+    if (different === 0) {
+        different = b.testedWordCount - a.testedWordCount;
+    }
+    // score
+    if (different === 0) {
+        var different = a.score - b.score;
+    }
+    // path
+    if (different === 0) {
+        if (a.path < b.path) {
+            different = -1;
+        }
+        else if (a.path > b.path) {
+            different = +1;
+        }
+    }
+    // lineNum
+    if (different === 0) {
+        different = a.lineNum - b.lineNum;
+    }
+    return different;
 }
 // varidateUpdateCommandArguments
 function varidateReplaceCommandArguments() {
@@ -2423,7 +2427,7 @@ var FoundLine = /** @class */ (function () {
         }
         coloredLine += line.substr(previousPosition);
         if (false) {
-            var debugString = " (score: " + this.score + ", wordCount: " + this.testedWordCount + ")";
+            var debugString = " (score: " + this.score + ", wordCount: " + this.testedWordCount + ", matchedCount: " + this.matchedTargetKeywordCount + ")";
         }
         else {
             var debugString = "";

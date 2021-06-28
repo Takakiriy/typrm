@@ -526,6 +526,13 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + `     #keyword: add ${matchedColor('SILVER arrow')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + `     #keyword: [${matchedColor('silver')}/super-system], ${matchedColor('SILVER Arrow')}s\n`,
         ],[
+            "output order (6)",
+            ["search", "tool", "release"],
+            { folder: "test_data/search/2", test: "", verbose: "1" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + `     #keyword: ${matchedColor('Tool release')} now\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + `     #keyword: ${matchedColor('Tool release')}, ${matchedColor('Tool')} deploy\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + `     #keyword: ${matchedColor('Tool release')}, ${matchedColor('Tool')} deploy\n`,
+        ],[
             "without tag parameter",  // test_of_without_tag_parameter
             ["search", "specular"],
             { folder: "test_data/search/2", test: "" },
