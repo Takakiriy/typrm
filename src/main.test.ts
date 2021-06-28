@@ -32,6 +32,7 @@ describe("checks template value >>", () => {
         ["refer_2_error"],
         ["secret_1_error"],
         ["var_not_ref_1_error"],
+        ["template_if_1_error"],
 
     ])("%s", async (fileNameHead) => {
         const  sourceFileContents = getSnapshot(`checks template value >> ${fileNameHead} 1: sourceFileContents 1`);
@@ -190,6 +191,9 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             `__Stage__: develop`,
         ],[
             '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
+            `__Stage__: develop`,
+        ],[
+            '2_replace_9_template_if_4_operators', '', '1', 'en-US',
             `__Stage__: develop`,
         ],
 

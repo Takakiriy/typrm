@@ -798,6 +798,38 @@ exports[`checks template value >> secret_1_error 1: sourceFileContents 1`] = `
     Key4: value4  #★秘密:あり"
 `;
 
+exports[`checks template value >> template_if_1_error 1`] = `
+"
+ErrorLine: 6
+  Contents: 🌟 case product:  #template-if: $settings.__Stage__ == product
+  Expected: 💤
+  Expression: $settings.__Stage__ == product
+  SettingIndex: 1
+
+ErrorLine: 7
+  Contents: 💤 case product:  #template-if: $settings.__Stage__ == develop
+  Expected: 🌟
+  Expression: $settings.__Stage__ == develop
+  SettingIndex: 1
+
+Warning: 0, Error: 2
+template count = 4
+"
+`;
+
+exports[`checks template value >> template_if_1_error 1: sourceFileContents 1`] = `
+"設定(1st):
+    __Stage__: develop
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+    💤 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product  #comment
+    🌟 case product:  #template-if: $settings.__Stage__ == develop  #comment
+"
+`;
+
 exports[`checks template value >> var_not_ref_1_error 1`] = `
 "Not referenced: key1 in line 2
 Not referenced: Key3 in line 5
@@ -1779,5 +1811,45 @@ exports[`replaces settings >> in 2_replace_9_template_if_3_not_set: updatedFileC
     __Stage__: product
 手順:
     🌟 case product:  #template-if: $settings.__Stage__ == product
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_4_operators: sourceFileContents 1`] = `
+"設定:
+    __Stage__: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+    💤 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ != product
+    🌟 case product:  #template-if: $settings.__Stage__ != develop
+    🌟 case product:  #template-if: $settings.__Stage__ != product
+    💤 case product:  #template-if: $settings.__Stage__ != develop
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_4_operators: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_9_template_if_4_operators: updatedFileContents 1`] = `
+"設定:
+    __Stage__: develop  #original: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    🌟 case product:  #template-if: $settings.__Stage__ != product
+    💤 case product:  #template-if: $settings.__Stage__ != develop
+    🌟 case product:  #template-if: $settings.__Stage__ != product
+    💤 case product:  #template-if: $settings.__Stage__ != develop
 "
 `;

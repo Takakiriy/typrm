@@ -176,7 +176,13 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             if (templateTag.isFound) {
                 templateCount += 1;
                 const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                const  expected = getExpectedLine(setting, templateTag.template);
+                const  commonCase = (templateTag.label !== templateIfLabel);
+                if (commonCase) {
+                    var  expected = getExpectedLine(setting, templateTag.template);
+                } else { // if (templateTag.label === templateIfLabel)
+                    templateTag.evaluate(setting);
+                    var  expected = getExpectedLine(setting, templateTag.newTemplate);
+                }
                 if (templateTag.lineNumOffset === 0) {
                     var  checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
                 } else {
@@ -188,7 +194,11 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
                     console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
                     console.log(`  ${translate('Expected')}: ${expected}`);
-                    console.log(`  ${translate('Template')}: ${templateTag.template}`);
+                    if (commonCase) {
+                        console.log(`  ${translate('Template')}: ${templateTag.template}`);
+                    } else { // if (templateTag.label === templateIfLabel)
+                        console.log(`  ${translate('Expression')}: ${templateTag.template}`);
+                    }
                     console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
                     errorCount += 1;
                 }
