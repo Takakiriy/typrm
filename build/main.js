@@ -140,7 +140,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -257,7 +257,14 @@ function checkRoutine(isModal, inputFilePath) {
                     if (templateTag.isFound) {
                         templateCount += 1;
                         checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                        expected = getExpectedLine(setting, templateTag.template);
+                        commonCase = (templateTag.label !== templateIfLabel);
+                        if (commonCase) {
+                            expected = getExpectedLine(setting, templateTag.template);
+                        }
+                        else { // if (templateTag.label === templateIfLabel)
+                            templateTag.evaluate(setting);
+                            expected = getExpectedLine(setting, templateTag.newTemplate);
+                        }
                         if (templateTag.lineNumOffset === 0) {
                             checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
                         }
@@ -269,7 +276,12 @@ function checkRoutine(isModal, inputFilePath) {
                             console.log(translate('ErrorLine') + ": " + (lineNum + templateTag.lineNumOffset));
                             console.log("  " + translate('Contents') + ": " + checkingLine.trim());
                             console.log("  " + translate('Expected') + ": " + expected);
-                            console.log("  " + translate('Template') + ": " + templateTag.template);
+                            if (commonCase) {
+                                console.log("  " + translate('Template') + ": " + templateTag.template);
+                            }
+                            else { // if (templateTag.label === templateIfLabel)
+                                console.log("  " + translate('Expression') + ": " + templateTag.template);
+                            }
                             console.log("  " + translate('SettingIndex') + ": " + settingCount);
                             errorCount += 1;
                         }

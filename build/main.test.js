@@ -66,6 +66,7 @@ describe("checks template value >>", function () {
         ["refer_2_error"],
         ["secret_1_error"],
         ["var_not_ref_1_error"],
+        ["template_if_1_error"],
     ])("%s", function (fileNameHead) { return __awaiter(void 0, void 0, void 0, function () {
         var sourceFileContents;
         return __generator(this, function (_a) {
@@ -249,6 +250,9 @@ describe("replaces settings >>", function () {
             "__Stage__: develop",
         ], [
             '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
+            "__Stage__: develop",
+        ], [
+            '2_replace_9_template_if_4_operators', '', '1', 'en-US',
             "__Stage__: develop",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
