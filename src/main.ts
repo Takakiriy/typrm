@@ -1219,8 +1219,12 @@ async function  search() {
     const  keyword = programArguments.slice(startIndex).join(' ');
 
     if (keyword !== '') {
+        if ( ! hasRefTag(keyword)) {
 
-        await  searchSub(keyword);
+            await  searchSub(keyword);
+        } else {
+            printRef(keyword);
+        }
     } else {
         inputSkip(startIndex);
         for (;;) {
@@ -1228,7 +1232,11 @@ async function  search() {
             if (keyword === 'exit()') {
                 break;
             } else if (keyword !== '') {
-                await  searchSub(keyword);
+                if ( ! hasRefTag(keyword)) {
+                    await  searchSub(keyword);
+                } else {
+                    printRef(keyword);
+                }
             }
         }
     }
@@ -1518,6 +1526,11 @@ function  compareScore(a: FoundLine, b: FoundLine) {
     }
 
     return  different;
+}
+
+// printRef(keyword);
+function  printRef(keyword: string) {
+    const  valueBefore = keyword.substr(refLabel.length).trim();
 }
 
 // varidateUpdateCommandArguments
@@ -1873,6 +1886,11 @@ function  getValue(line: string, separatorIndex: number = -1) {
         value = value.substr(0, comment).trim();
     }
     return  value;
+}
+
+// hasRefTag
+function  hasRefTag(keywords: string) {
+    return  keywords.startsWith(refLabel);
 }
 
 // getNotSetTemplateIfTagVariableNames
@@ -2422,6 +2440,7 @@ const  fileTemplateLabel = "#file-template:";
 const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
+const  refLabel = "#ref:";
 const  disableLabel = "#disable-tag-tool:";
 const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
