@@ -1562,27 +1562,36 @@ function search() {
                 case 0:
                     startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
                     keyword = exports.programArguments.slice(startIndex).join(' ');
-                    if (!(keyword !== '')) return [3 /*break*/, 2];
+                    if (!(keyword !== '')) return [3 /*break*/, 4];
+                    if (!!hasRefTag(keyword)) return [3 /*break*/, 2];
                     return [4 /*yield*/, searchSub(keyword)];
                 case 1:
                     _a.sent();
-                    return [3 /*break*/, 8];
+                    return [3 /*break*/, 3];
                 case 2:
-                    inputSkip(startIndex);
+                    printRef(keyword);
                     _a.label = 3;
-                case 3: return [4 /*yield*/, input(chalk.yellow('keyword:') + ' ')];
+                case 3: return [3 /*break*/, 11];
                 case 4:
-                    keyword_1 = _a.sent();
-                    if (!(keyword_1 === 'exit()')) return [3 /*break*/, 5];
-                    return [3 /*break*/, 8];
-                case 5:
-                    if (!(keyword_1 !== '')) return [3 /*break*/, 7];
-                    return [4 /*yield*/, searchSub(keyword_1)];
+                    inputSkip(startIndex);
+                    _a.label = 5;
+                case 5: return [4 /*yield*/, input(chalk.yellow('keyword:') + ' ')];
                 case 6:
+                    keyword_1 = _a.sent();
+                    if (!(keyword_1 === 'exit()')) return [3 /*break*/, 7];
+                    return [3 /*break*/, 11];
+                case 7:
+                    if (!(keyword_1 !== '')) return [3 /*break*/, 10];
+                    if (!!hasRefTag(keyword_1)) return [3 /*break*/, 9];
+                    return [4 /*yield*/, searchSub(keyword_1)];
+                case 8:
                     _a.sent();
-                    _a.label = 7;
-                case 7: return [3 /*break*/, 3];
-                case 8: return [2 /*return*/];
+                    return [3 /*break*/, 10];
+                case 9:
+                    printRef(keyword_1);
+                    _a.label = 10;
+                case 10: return [3 /*break*/, 5];
+                case 11: return [2 /*return*/];
             }
         });
     });
@@ -1930,6 +1939,33 @@ function compareScore(a, b) {
         different = a.lineNum - b.lineNum;
     }
     return different;
+}
+// printRef
+function printRef(refTagAndAddress) {
+    var addressBefore = refTagAndAddress.substr(refLabel.length).trim();
+    var variableRe = new RegExp(variablePattern, 'g'); // variableRegularExpression
+    var variables = [];
+    variableRe.lastIndex = 0;
+    for (;;) {
+        var variable = variableRe.exec(addressBefore);
+        if (variable === null) {
+            break;
+        }
+        variables.push(variable[2]);
+    }
+    var address = addressBefore;
+    if (variables) {
+        for (var _i = 0, variables_1 = variables; _i < variables_1.length; _i++) {
+            var variable = variables_1[_i];
+            var variableName = variable.substr('${'.length, variable.length - '${}'.length);
+            var value = process.env[variableName];
+            if (value) {
+                var variableRegExp = new RegExp(escapeRegularExpression(variable), "g");
+                address = address.replace(variableRegExp, value);
+            }
+        }
+    }
+    console.log(address);
 }
 // varidateUpdateCommandArguments
 function varidateReplaceCommandArguments() {
@@ -2312,6 +2348,10 @@ function getValue(line, separatorIndex) {
         value = value.substr(0, comment).trim();
     }
     return value;
+}
+// hasRefTag
+function hasRefTag(keywords) {
+    return keywords.startsWith(refLabel);
 }
 // getNotSetTemplateIfTagVariableNames
 function getNotSetTemplateIfTagVariableNames(settingKeys) {
@@ -2847,6 +2887,7 @@ var fileTemplateLabel = "#file-template:";
 var fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
+var refLabel = "#ref:";
 var disableLabel = "#disable-tag-tool:";
 var ifLabel = "#if:";
 var expectLabel = "#expect:";
@@ -2859,6 +2900,7 @@ var secretExamleLabelEn = "#secret:example";
 var referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 var indentRegularExpression = /^( |¥t)*/;
 var numberRegularExpression = /^[0-9]*$/;
+var variablePattern = "(^|[^\\\\])(\\$\\{[^\\}]+\\})"; // ${__Name__}
 var fullMatchScore = 100;
 var keywordMatchScore = 7;
 var glossaryMatchScore = 1;

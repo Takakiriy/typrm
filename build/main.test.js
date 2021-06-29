@@ -49,11 +49,11 @@ if (path.basename(process.cwd()) !== 'src') {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
     process.chdir('src');
 }
-var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
+process.env.TEST_ENV = 'testEnv';
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
@@ -741,6 +741,35 @@ describe("searches glossary tag >>", function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                case 1:
+                    _a.sent();
+                    expect(main.stdout).toBe(answer);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
+describe("print reference >>", function () {
+    test.skip('escape', function () { });
+    test.each([
+        [
+            "1st",
+            ["search", "#ref:", "${TEST_ENV}/file.txt"],
+            "testEnv/file.txt\n",
+        ], [
+            "multi parameters",
+            ["search", "#ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
+            "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
+            /*      ],[
+                        "escape",
+                        ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}"],
+                        "${TEST_ENV} ---${TEST_ENV}--- testEnv\n",
+            */
+        ],
+    ])("%s", function (_caseName, arguments_, answer) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, callMain(arguments_, {})];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);

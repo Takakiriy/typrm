@@ -1528,9 +1528,34 @@ function  compareScore(a: FoundLine, b: FoundLine) {
     return  different;
 }
 
-// printRef(keyword);
-function  printRef(keyword: string) {
-    const  valueBefore = keyword.substr(refLabel.length).trim();
+// printRef
+function  printRef(refTagAndAddress: string) {
+    const  addressBefore = refTagAndAddress.substr(refLabel.length).trim();
+    const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
+    const  variables: string[] = [];
+    variableRe.lastIndex = 0;
+    for (;;) {
+        const  variable = variableRe.exec(addressBefore);
+        if (variable === null) {
+            break;
+        }
+        variables.push(variable[2]);
+    }
+
+    var    address = addressBefore;
+    if (variables) {
+        for (const variable of variables) {
+            const  variableName = variable.substr('${'.length, variable.length - '${}'.length);
+            const  value = process.env[variableName];
+            if (value) {
+                const  variableRegExp = new RegExp(escapeRegularExpression( variable ), "g");
+
+                address = address.replace(variableRegExp, value);
+            }
+        }
+    }
+
+    console.log(address);
 }
 
 // varidateUpdateCommandArguments
@@ -1823,7 +1848,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
     const  log: EvaluationLog[] = [];
 
     for (const key of Object.keys(setting)) {
-        const  re = new RegExp( escapeRegularExpression(key), "gi" );
+        const  re = new RegExp(escapeRegularExpression( key ), "gi" );
 
         const  expectedAfter = expected.replace(re, setting[key].value);
         if (expectedAfter !== expected) {
@@ -2453,6 +2478,7 @@ const  secretExamleLabelEn = "#secret:example";
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]*$/;
+const  variablePattern = "(^|[^\\\\])(\\$\\{[^\\}]+\\})";  // ${__Name__}
 const  fullMatchScore = 100;
 const  keywordMatchScore = 7;
 const  glossaryMatchScore = 1;
