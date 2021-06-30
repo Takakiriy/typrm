@@ -54,6 +54,7 @@ var matchedColor = chalk.green.bold;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TEST_ENV = 'testEnv';
+process.env.TEST_PATH = 'C:\\Windows';
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
@@ -750,7 +751,6 @@ describe("searches glossary tag >>", function () {
     }); });
 });
 describe("print reference >>", function () {
-    test.skip('escape', function () { });
     test.each([
         [
             "1st",
@@ -758,13 +758,12 @@ describe("print reference >>", function () {
             "testEnv/file.txt\n",
         ], [
             "multi parameters",
-            ["search", "#ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
+            ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
             "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
-            /*      ],[
-                        "escape",
-                        ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}"],
-                        "${TEST_ENV} ---${TEST_ENV}--- testEnv\n",
-            */
+        ], [
+            "escape",
+            ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}", "\\\\\\${TEST_ENV}", "${TEST_PATH}"],
+            "${TEST_ENV} ---${TEST_ENV}--- \\testEnv \\${TEST_ENV} C:\\Windows\n",
         ],
     ])("%s", function (_caseName, arguments_, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {

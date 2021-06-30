@@ -773,7 +773,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                         }
                                                         else {
                                                             if (!addOriginalTag) {
-                                                                comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(replacedValue)), '');
+                                                                comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(replacedValue).replace('$', '$$')), '');
                                                             }
                                                         }
                                                         writer.write(line.substr(0, separator + 1) + ' ' + replacedValue + original + comment + "\n");
@@ -812,10 +812,10 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                     before = expected;
                                                     after = replaced;
                                                     if (templateTag.lineNumOffset <= -1) {
-                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine.replace(before, after) + "\n");
+                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine.replace(before, after.replace('$', '$$')) + "\n");
                                                     }
                                                     else {
-                                                        writer.write(line.replace(before, after) + "\n");
+                                                        writer.write(line.replace(before, after.replace('$', '$$')) + "\n");
                                                         output = true;
                                                     }
                                                     if (verboseMode && before !== after) {
@@ -1942,28 +1942,53 @@ function compareScore(a, b) {
 }
 // printRef
 function printRef(refTagAndAddress) {
-    var addressBefore = refTagAndAddress.substr(refLabel.length).trim();
+    var addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
     var variableRe = new RegExp(variablePattern, 'g'); // variableRegularExpression
-    var variables = [];
+    var variables = {};
     variableRe.lastIndex = 0;
     for (;;) {
         var variable = variableRe.exec(addressBefore);
         if (variable === null) {
             break;
         }
-        variables.push(variable[2]);
+        variables[variable[0]] = undefined;
     }
     var address = addressBefore;
     if (variables) {
-        for (var _i = 0, variables_1 = variables; _i < variables_1.length; _i++) {
-            var variable = variables_1[_i];
+        var _loop_5 = function (variable) {
             var variableName = variable.substr('${'.length, variable.length - '${}'.length);
             var value = process.env[variableName];
             if (value) {
-                var variableRegExp = new RegExp(escapeRegularExpression(variable), "g");
-                address = address.replace(variableRegExp, value);
+                var variableRegExp = new RegExp('\\\\?' + escapeRegularExpression(variable), 'g');
+                address = address.replace(variableRegExp, function (match, offset) {
+                    var startsBackSlash = (match.substr(0, 1) === '\\');
+                    if (startsBackSlash) {
+                        var dollarOffset = offset + 1;
+                    }
+                    else {
+                        var dollarOffset = offset;
+                    }
+                    var replacing = !isBackSlashParameter(address, dollarOffset);
+                    if (replacing) {
+                        if (startsBackSlash) {
+                            return '\\' + value.replace('$', '$$').replace('\\', '\\\\');
+                        }
+                        else {
+                            return value.replace('$', '$$').replace('\\', '\\\\');
+                        }
+                    }
+                    else {
+                        return variable.replace('$', '$$');
+                        // If startsBackSlash === true, cut \ character.
+                    }
+                });
             }
+        };
+        for (var _i = 0, _a = Object.keys(variables); _i < _a.length; _i++) {
+            var variable = _a[_i];
+            _loop_5(variable);
         }
+        address = address.replace(/\\\\/g, '\\');
     }
     console.log(address);
 }
@@ -2292,7 +2317,7 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         var re = new RegExp(escapeRegularExpression(key), "gi");
-        var expectedAfter = expected.replace(re, setting[key].value);
+        var expectedAfter = expected.replace(re, setting[key].value.replace('$', '$$'));
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
             log.push({ before: key, after: setting[key].value });
@@ -2351,7 +2376,7 @@ function getValue(line, separatorIndex) {
 }
 // hasRefTag
 function hasRefTag(keywords) {
-    return keywords.startsWith(refLabel);
+    return keywords.trim().startsWith(refLabel);
 }
 // getNotSetTemplateIfTagVariableNames
 function getNotSetTemplateIfTagVariableNames(settingKeys) {
@@ -2433,6 +2458,23 @@ function parseKeyName(line) {
 // escapeRegularExpression
 function escapeRegularExpression(expression) {
     return expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+}
+// isBackSlashParameter
+// Example:
+//    ( '\na', 0 ) === false
+//    ( '\na', 1 ) === true
+//    ( '\na', 2 ) === false
+// #keyword: isBackSlashParameter
+function isBackSlashParameter(checkingString, index) {
+    var startIndex = index;
+    do {
+        index -= 1;
+        if (index < 0) {
+            break;
+        }
+    } while (checkingString[index] === '\\');
+    var backSlashCount = startIndex - index - 1;
+    return (backSlashCount % 2 === 1);
 }
 // Setting
 var Setting = /** @class */ (function () {
@@ -2827,7 +2869,7 @@ function translate(englishLiterals) {
     }
     if (taggedTemplate) {
         for (var i = 0; i < englishLiterals.length; i += 1) {
-            translated = translated.replace('${' + String(i) + '}', String(values[i]));
+            translated = translated.replace('${' + String(i) + '}', String(values[i]).replace('$', '$$'));
         }
         translated = translated.replace('$\\{', '${');
         // Replace the escape of ${n}
@@ -2900,7 +2942,7 @@ var secretExamleLabelEn = "#secret:example";
 var referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 var indentRegularExpression = /^( |¥t)*/;
 var numberRegularExpression = /^[0-9]*$/;
-var variablePattern = "(^|[^\\\\])(\\$\\{[^\\}]+\\})"; // ${__Name__}
+var variablePattern = "\\$\\{[^\\}]+\\}"; // ${__Name__}
 var fullMatchScore = 100;
 var keywordMatchScore = 7;
 var glossaryMatchScore = 1;

@@ -18,6 +18,7 @@ const matchedColor = chalk.green.bold;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 process.env.TEST_ENV = 'testEnv';
+process.env.TEST_PATH = 'C:\\Windows';
 
 beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
@@ -639,7 +640,6 @@ describe("searches glossary tag >>", () => {
 });
 
 describe("print reference >>", () => {
-    test.skip('escape',()=>{});
     test.each([
         [
             "1st",
@@ -647,13 +647,12 @@ describe("print reference >>", () => {
             "testEnv/file.txt\n",
         ],[
             "multi parameters",
-            ["search", "#ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
+            ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
             "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
-/*      ],[
+      ],[
             "escape",
-            ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}"],
-            "${TEST_ENV} ---${TEST_ENV}--- testEnv\n",
-*/
+            ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}", "\\\\\\${TEST_ENV}", "${TEST_PATH}"],
+            "${TEST_ENV} ---${TEST_ENV}--- \\testEnv \\${TEST_ENV} C:\\Windows\n",
         ],
     ])("%s", async (_caseName, arguments_, answer) => {
         await callMain(arguments_, {});

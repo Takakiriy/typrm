@@ -585,7 +585,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 } else {
                                     if ( ! addOriginalTag) {
                                         comment = comment.replace(new RegExp(
-                                            ` *${originalLabel} *${escapeRegularExpression(replacedValue)}`), '');
+                                            ` *${originalLabel} *${escapeRegularExpression(replacedValue).replace('$','$$')}`), '');
                                     }
                                 }
 
@@ -626,10 +626,10 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             const  after = replaced;
                             if (templateTag.lineNumOffset <= -1) {
                                 writer.replaceAboveLine(templateTag.lineNumOffset,
-                                    replacingLine.replace(before, after)+"\n");
+                                    replacingLine.replace(before, after.replace('$','$$'))+"\n");
                             } else {
 
-                                writer.write(line.replace(before, after) +"\n");
+                                writer.write(line.replace(before, after.replace('$','$$')) +"\n");
                                 output = true;
                             }
                             if (verboseMode  &&  before !== after) {
@@ -1530,32 +1530,49 @@ function  compareScore(a: FoundLine, b: FoundLine) {
 
 // printRef
 function  printRef(refTagAndAddress: string) {
-    const  addressBefore = refTagAndAddress.substr(refLabel.length).trim();
+    const  addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
     const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
-    const  variables: string[] = [];
+    const  variables: {[key: string]: undefined} = {};
     variableRe.lastIndex = 0;
     for (;;) {
         const  variable = variableRe.exec(addressBefore);
         if (variable === null) {
             break;
         }
-        if ( ! isBackSlashEscapePosition(addressBefore, variable.index)) {
-
-            variables.push(variable[2]);
-        }
+        variables[variable[0]] = undefined;
     }
 
     var  address = addressBefore;
     if (variables) {
-        for (const variable of variables) {
+        for (const variable of Object.keys(variables)) {
             const  variableName = variable.substr('${'.length, variable.length - '${}'.length);
             const  value = process.env[variableName];
             if (value) {
-                const  variableRegExp = new RegExp(escapeRegularExpression( variable ), "g");
+                const  variableRegExp = new RegExp('\\\\?'+ escapeRegularExpression( variable ), 'g');
 
-                address = address.replace(variableRegExp, value);
+                address = address.replace(variableRegExp, (match, offset) => {
+                    const  startsBackSlash = (match.substr(0,1) === '\\');
+                    if (startsBackSlash) {
+                        var  dollarOffset = offset + 1;
+                    } else {
+                        var  dollarOffset = offset;
+                    }
+                    const  replacing = ! isBackSlashParameter(address, dollarOffset);
+
+                    if (replacing) {
+                        if (startsBackSlash) {
+                            return  '\\' + value.replace('$','$$').replace('\\','\\\\');
+                        } else {
+                            return  value.replace('$','$$').replace('\\','\\\\');
+                        }
+                    } else {
+                        return  variable.replace('$','$$');
+                            // If startsBackSlash === true, cut \ character.
+                    }
+                });
             }
         }
+        address = address.replace(/\\\\/g,'\\');
     }
 
     console.log(address);
@@ -1853,7 +1870,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
     for (const key of Object.keys(setting)) {
         const  re = new RegExp(escapeRegularExpression( key ), "gi" );
 
-        const  expectedAfter = expected.replace(re, setting[key].value);
+        const  expectedAfter = expected.replace(re, setting[key].value.replace('$','$$'));
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
             log.push({before: key, after: setting[key].value});
@@ -1918,7 +1935,7 @@ function  getValue(line: string, separatorIndex: number = -1) {
 
 // hasRefTag
 function  hasRefTag(keywords: string) {
-    return  keywords.startsWith(refLabel);
+    return  keywords.trim().startsWith(refLabel);
 }
 
 // getNotSetTemplateIfTagVariableNames
@@ -2003,6 +2020,25 @@ function  parseKeyName(line: string): string {
 // escapeRegularExpression
 function  escapeRegularExpression(expression: string) {
     return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+}
+
+// isBackSlashParameter
+// Example:
+//    ( '\na', 0 ) === false
+//    ( '\na', 1 ) === true
+//    ( '\na', 2 ) === false
+// #keyword: isBackSlashParameter
+function  isBackSlashParameter(checkingString: string, index: number): boolean {
+    const  startIndex = index;
+    do {
+        index -= 1;
+        if (index < 0) {
+            break;
+        }
+    } while (checkingString[index] === '\\');
+    const  backSlashCount = startIndex - index - 1;
+
+    return  (backSlashCount % 2 === 1);
 }
 
 // Setting
@@ -2422,7 +2458,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
     }
     if (taggedTemplate) {
         for (let i=0; i<englishLiterals.length; i+=1) {
-            translated = translated.replace( '${'+String(i)+'}', String(values[i]) );
+            translated = translated.replace( '${'+String(i)+'}', String(values[i]).replace('$','$$') );
         }
         translated = translated.replace( '$\\{', '${' );
             // Replace the escape of ${n}
