@@ -1,7 +1,8 @@
 # typrm
 
-typrm replaces parameters of what you type manually from the keyboard you write in a text file.
-It replaces the text that should be the same in the same way, resulting in fewer typos.
+typrm replaces parameters of the command in the text file format manual
+depending on your situations so that you can run commands only
+by the copy and paste.
 
 Also, typrm has powerful search assisted with your specified keyword tag.
 
@@ -23,6 +24,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
+  - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
@@ -682,6 +684,88 @@ The range of the `#template:` tag and the `#file-template:` tag
 that are the target of the `#if:` tag is
 the same as or shallower than the indent depth of the line
 where the `#if:` tag is written. Until before the line.
+
+
+## #ref tag: expands file path that contains environment variables
+
+If the referenced file such as an image file or PDF file is installed
+on the PC, to open the file by doing copy and paste the path written
+in the manual to a browser and so on is faster than
+to go into the folder in order to open the referenced file.
+
+    reference: Red Book 2021  C:\Users\user1\Documents\books\manual\red_book_2021.pdf
+
+However, the path written in many manuals cannot be copied,
+because the path may contain the user name and
+the location of the file may be changed.
+
+    reference: Red Book 2021  #ref: ${books}/manual/red_book_2021.pdf
+
+Above `${books}` part is an example of the replacement part.
+If the path or drive of the folder where the file is placed differs
+depending on the PC or OS, you can absorb the part to be replaced
+by using environment variable. But the format of the part
+to expand the environment variable is different depending on the OS.
+Also, folders separated by \ can only be used on Windows.
+
+The example of path on Linux or mac:
+
+    ${books}/manual/red_book.pdf  or
+    $books/manual/red_book.pdf
+
+The example of path on Windows:
+    %books%\manual\red_book.pdf  or
+    %books%/manual/red_book.pdf  or
+    ${env:books}/manual/red_book.pdf  ... in PowerShell
+
+By using the `#ref:` tag typrm function, you can write unifiedly the path
+in the manual by `${____}` format that expands the environment variables
+and `/` format that separates the folder names.
+
+    reference: Red Book 2021  #ref: ${books}/manual/red_book_2021.pdf
+
+If you entered `#ref:` and the path containing the environment variable
+to the parameters of the search command of typrm
+or to the searching keyword input mode prompt,
+the path is displayed that you can copy and paste.
+
+    $ typrm s '#ref: ${books}/manual/red_book_2021.pdf'
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+
+    $ typrm s
+    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+
+The value of the environment variable is set when you start typrm.
+Note, you must add the prefix `TYPRM_` to the environment variable name
+when you set the define of the environment variable.
+The definition of the environment variable is usually written in the script file
+that starts typrm.
+
+Case of Windows PS1 script file:
+${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
+
+    ${env:TYPRM_books} = "C:\Users\____\Documents\books"
+    node  ____\build\typrm.js $PsBoundParameters.Values $args
+
+Case of Linux bash or mac zsh script file:
+${HOME}/bin/typrm:
+
+    export TYPRM_books="/home/____/Documents/books"
+    node  ____/build/typrm.js "$@"
+
+If you specify the `#ref:` tag and a path without environment variables
+in the search command, typrm displays the parameters of the `#ref:` tag
+that should be written in the manual.
+
+    $ typrm s "#ref:" /home/user1/Documents/books/manual/red_book_2021.pdf
+    Recommend: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+
+    > typrm s
+    keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
+    Recommend: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
 
 
 ## #expect tag: checks settings values
