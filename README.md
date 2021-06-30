@@ -24,8 +24,8 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
-  - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
+  - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -686,6 +686,33 @@ the same as or shallower than the indent depth of the line
 where the `#if:` tag is written. Until before the line.
 
 
+## #expect tag: checks settings values
+
+If you specify a condition after the `#expect:` tag,
+the error will occur if the condition is not met.
+Usually used at the same time as the `#if:` tag.
+
+    #if: $settings.__Write__ == yes
+        #expect: $settings.__BackUp__ == yes
+
+Example:
+
+    settings:
+        __Write__: yes    #// yes or no
+        __BackUp__: yes   #// yes or no
+    write method:  #if: $settings.__Write__ == yes
+        necessity: yes  #template: __Write__
+        How to: Open the file and write
+        Related: also back up  #expect: $settings.__BackUp__ == yes
+    back up method:
+        necessity: yes  #template: __BackUp__
+        How to: Download Backup Tool
+
+If there is a dependency on the value of the variable,
+write the variable definition in the block of the `#if:` tag
+instead of checking with the `#expect:` tag.
+
+
 ## #ref tag: expands file path that contains environment variables
 
 If the referenced file such as an image file or PDF file is installed
@@ -714,11 +741,12 @@ The example of path on Linux or mac:
     $books/manual/red_book.pdf
 
 The example of path on Windows:
+
     %books%\manual\red_book.pdf  or
     %books%/manual/red_book.pdf  or
     ${env:books}/manual/red_book.pdf  ... in PowerShell
 
-By using the `#ref:` tag typrm function, you can write unifiedly the path
+By using the `#ref:` tag typrm function, you can write the path unifiedly
 in the manual by `${____}` format that expands the environment variables
 and `/` format that separates the folder names.
 
@@ -766,33 +794,6 @@ that should be written in the manual.
     keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
     Recommend: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
-
-
-## #expect tag: checks settings values
-
-If you specify a condition after the `#expect:` tag,
-the error will occur if the condition is not met.
-Usually used at the same time as the `#if:` tag.
-
-    #if: $settings.__Write__ == yes
-        #expect: $settings.__BackUp__ == yes
-
-Example:
-
-    settings:
-        __Write__: yes    #// yes or no
-        __BackUp__: yes   #// yes or no
-    write method:  #if: $settings.__Write__ == yes
-        necessity: yes  #template: __Write__
-        How to: Open the file and write
-        Related: also back up  #expect: $settings.__BackUp__ == yes
-    back up method:
-        necessity: yes  #template: __BackUp__
-        How to: Download Backup Tool
-
-If there is a dependency on the value of the variable,
-write the variable definition in the block of the `#if:` tag
-instead of checking with the `#expect:` tag.
 
 
 ## (for developers) How to build the development environment
