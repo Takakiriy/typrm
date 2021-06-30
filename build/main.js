@@ -773,7 +773,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                         }
                                                         else {
                                                             if (!addOriginalTag) {
-                                                                comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(replacedValue).replace('$', '$$')), '');
+                                                                comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(replacedValue).replace(/\$/g, '$$')), '');
                                                             }
                                                         }
                                                         writer.write(line.substr(0, separator + 1) + ' ' + replacedValue + original + comment + "\n");
@@ -812,10 +812,10 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                     before = expected;
                                                     after = replaced;
                                                     if (templateTag.lineNumOffset <= -1) {
-                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine.replace(before, after.replace('$', '$$')) + "\n");
+                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine.replace(before, after.replace(/\$/g, '$$')) + "\n");
                                                     }
                                                     else {
-                                                        writer.write(line.replace(before, after.replace('$', '$$')) + "\n");
+                                                        writer.write(line.replace(before, after.replace(/\$/g, '$$')) + "\n");
                                                         output = true;
                                                     }
                                                     if (verboseMode && before !== after) {
@@ -1953,11 +1953,15 @@ function printRef(refTagAndAddress) {
         }
         variables[variable[0]] = undefined;
     }
+    // address = ...
     var address = addressBefore;
+    address = address.replace(/(\\+)([^\$\\ ]|$)/g, function (match, backSlashes, nextCharacter, offset) {
+        return backSlashes.replace(/\\/g, '/') + nextCharacter; // replace \\ to /
+    });
     if (variables) {
         var _loop_5 = function (variable) {
             var variableName = variable.substr('${'.length, variable.length - '${}'.length);
-            var value = process.env[variableName];
+            var value = process.env["" + typrmEnvPrefix + variableName];
             if (value) {
                 var variableRegExp = new RegExp('\\\\?' + escapeRegularExpression(variable), 'g');
                 address = address.replace(variableRegExp, function (match, offset) {
@@ -1971,14 +1975,14 @@ function printRef(refTagAndAddress) {
                     var replacing = !isBackSlashParameter(address, dollarOffset);
                     if (replacing) {
                         if (startsBackSlash) {
-                            return '\\' + value.replace('$', '$$').replace('\\', '\\\\');
+                            return '\\' + value.replace(/\$/g, '$$').replace('\\', '/');
                         }
                         else {
-                            return value.replace('$', '$$').replace('\\', '\\\\');
+                            return value.replace(/\$/g, '$$').replace('\\', '/');
                         }
                     }
                     else {
-                        return variable.replace('$', '$$');
+                        return variable.replace(/\$/g, '$$');
                         // If startsBackSlash === true, cut \ character.
                     }
                 });
@@ -1989,6 +1993,28 @@ function printRef(refTagAndAddress) {
             _loop_5(variable);
         }
         address = address.replace(/\\\\/g, '\\');
+    }
+    // recommended = ...
+    var recommended = address;
+    var sortedEnvronmentVariables = [];
+    for (var _b = 0, _c = Object.entries(process.env); _b < _c.length; _b++) {
+        var _d = _c[_b], envName = _d[0], envValue = _d[1];
+        if (envName.startsWith(typrmEnvPrefix) && envValue) {
+            var variableName = envName.substr(typrmEnvPrefix.length);
+            sortedEnvronmentVariables.push({ key: variableName, value: envValue.replace(/\\/g, '/') });
+        }
+    }
+    sortedEnvronmentVariables.sort(function (a, b) {
+        return b.value.length - a.value.length; // descending order
+    });
+    recommended = recommended.replace(/\$/g, '\\$');
+    for (var _e = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _e < sortedEnvronmentVariables_1.length; _e++) {
+        var variable = sortedEnvronmentVariables_1[_e];
+        recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
+    }
+    // print
+    if (recommended !== addressBefore) {
+        console.log('Recommend: #ref: ' + recommended);
     }
     console.log(address);
 }
@@ -2317,7 +2343,7 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         var re = new RegExp(escapeRegularExpression(key), "gi");
-        var expectedAfter = expected.replace(re, setting[key].value.replace('$', '$$'));
+        var expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g, '$$'));
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
             log.push({ before: key, after: setting[key].value });
@@ -2553,6 +2579,14 @@ var SearchKeyword = /** @class */ (function () {
         this.direction = Direction.Following;
     }
     return SearchKeyword;
+}());
+// KeyValue
+var KeyValue = /** @class */ (function () {
+    function KeyValue() {
+        this.key = '';
+        this.value = '';
+    }
+    return KeyValue;
 }());
 // Direction
 var Direction;
@@ -2869,7 +2903,7 @@ function translate(englishLiterals) {
     }
     if (taggedTemplate) {
         for (var i = 0; i < englishLiterals.length; i += 1) {
-            translated = translated.replace('${' + String(i) + '}', String(values[i]).replace('$', '$$'));
+            translated = translated.replace('${' + String(i) + '}', String(values[i]).replace(/\$/g, '$$'));
         }
         translated = translated.replace('$\\{', '${');
         // Replace the escape of ${n}
@@ -2935,6 +2969,7 @@ var ifLabel = "#if:";
 var expectLabel = "#expect:";
 var ignoredKeywords = [/#keyword:/g, /#search:/g];
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
+var typrmEnvPrefix = 'TYPRM_';
 var secretLabel = "#★秘密";
 var secretLabelEn = "#secret";
 var secretExamleLabel = "#★秘密:仮";

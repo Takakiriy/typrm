@@ -53,8 +53,8 @@ var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
-process.env.TEST_ENV = 'testEnv';
-process.env.TEST_PATH = 'C:\\Windows';
+process.env.TYPRM_TEST_ENV = 'testEnv';
+process.env.TYPRM_TEST_PATH = 'C:\\Users';
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
@@ -762,14 +762,26 @@ describe("print reference >>", function () {
             "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
         ], [
             "escape",
-            ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}", "\\\\\\${TEST_ENV}", "${TEST_PATH}"],
-            "${TEST_ENV} ---${TEST_ENV}--- \\testEnv \\${TEST_ENV} C:\\Windows\n",
+            ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
+            "${TEST_ENV} -${TEST_ENV}- /testEnv\n",
+        ], [
+            "path",
+            ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
+            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n", // TYPRM_TEST_PATH has \ but print replaced to /
+        ], [
+            "recommend",
+            ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  \\root  \\\\pc  last\\"],
+            "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  /root  //pc  last/\n" +
+                "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  /root  //pc  last/\n",
         ],
     ])("%s", function (_caseName, arguments_, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, {})];
+                case 0: 
+                //if (_caseName !== 'path') {return;}  // || subCase !== '____'
+                return [4 /*yield*/, callMain(arguments_, {})];
                 case 1:
+                    //if (_caseName !== 'path') {return;}  // || subCase !== '____'
                     _a.sent();
                     expect(main.stdout).toBe(answer);
                     return [2 /*return*/];

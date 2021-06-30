@@ -17,8 +17,8 @@ const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
-process.env.TEST_ENV = 'testEnv';
-process.env.TEST_PATH = 'C:\\Windows';
+process.env.TYPRM_TEST_ENV = 'testEnv';
+process.env.TYPRM_TEST_PATH = 'C:\\Users';
 
 beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
@@ -649,10 +649,19 @@ describe("print reference >>", () => {
             "multi parameters",
             ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
             "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
-      ],[
+        ],[
             "escape",
-            ["search", "#ref:", "\\${TEST_ENV}", "---\\${TEST_ENV}---", "\\\\${TEST_ENV}", "\\\\\\${TEST_ENV}", "${TEST_PATH}"],
-            "${TEST_ENV} ---${TEST_ENV}--- \\testEnv \\${TEST_ENV} C:\\Windows\n",
+            ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
+            "${TEST_ENV} -${TEST_ENV}- /testEnv\n",
+        ],[
+            "path",
+            ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
+            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n",  // TYPRM_TEST_PATH has \ but print replaced to /
+        ],[
+            "recommend",
+            ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  \\root  \\\\pc  last\\"],
+            "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  /root  //pc  last/\n" +
+            "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  /root  //pc  last/\n",
         ],
     ])("%s", async (_caseName, arguments_, answer) => {
         await callMain(arguments_, {});

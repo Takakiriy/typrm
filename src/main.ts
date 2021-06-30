@@ -585,7 +585,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 } else {
                                     if ( ! addOriginalTag) {
                                         comment = comment.replace(new RegExp(
-                                            ` *${originalLabel} *${escapeRegularExpression(replacedValue).replace('$','$$')}`), '');
+                                            ` *${originalLabel} *${escapeRegularExpression(replacedValue).replace(/\$/g,'$$')}`), '');
                                     }
                                 }
 
@@ -626,10 +626,10 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             const  after = replaced;
                             if (templateTag.lineNumOffset <= -1) {
                                 writer.replaceAboveLine(templateTag.lineNumOffset,
-                                    replacingLine.replace(before, after.replace('$','$$'))+"\n");
+                                    replacingLine.replace(before, after.replace(/\$/g,'$$'))+"\n");
                             } else {
 
-                                writer.write(line.replace(before, after.replace('$','$$')) +"\n");
+                                writer.write(line.replace(before, after.replace(/\$/g,'$$')) +"\n");
                                 output = true;
                             }
                             if (verboseMode  &&  before !== after) {
@@ -1542,11 +1542,16 @@ function  printRef(refTagAndAddress: string) {
         variables[variable[0]] = undefined;
     }
 
+    // address = ...
     var  address = addressBefore;
+    address = address.replace(/(\\+)([^\$\\ ]|$)/g, (match, backSlashes, nextCharacter, offset) => {
+
+        return  backSlashes.replace(/\\/g,'/') + nextCharacter;  // replace \\ to /
+    });
     if (variables) {
         for (const variable of Object.keys(variables)) {
             const  variableName = variable.substr('${'.length, variable.length - '${}'.length);
-            const  value = process.env[variableName];
+            const  value = process.env[`${typrmEnvPrefix}${variableName}`];
             if (value) {
                 const  variableRegExp = new RegExp('\\\\?'+ escapeRegularExpression( variable ), 'g');
 
@@ -1561,12 +1566,12 @@ function  printRef(refTagAndAddress: string) {
 
                     if (replacing) {
                         if (startsBackSlash) {
-                            return  '\\' + value.replace('$','$$').replace('\\','\\\\');
+                            return  '\\' + value.replace(/\$/g,'$$').replace('\\','/');
                         } else {
-                            return  value.replace('$','$$').replace('\\','\\\\');
+                            return  value.replace(/\$/g,'$$').replace('\\','/');
                         }
                     } else {
-                        return  variable.replace('$','$$');
+                        return  variable.replace(/\$/g,'$$');
                             // If startsBackSlash === true, cut \ character.
                     }
                 });
@@ -1575,6 +1580,30 @@ function  printRef(refTagAndAddress: string) {
         address = address.replace(/\\\\/g,'\\');
     }
 
+    // recommended = ...
+    var  recommended = address;
+    const  sortedEnvronmentVariables: KeyValue[] = [];
+    for (const [envName, envValue] of Object.entries(process.env)) {
+        if (envName.startsWith(typrmEnvPrefix)  &&  envValue) {
+            const  variableName = envName.substr(typrmEnvPrefix.length);
+            sortedEnvronmentVariables.push({key: variableName, value: envValue!.replace(/\\/g,'/')});
+        }
+    }
+    sortedEnvronmentVariables.sort((a: KeyValue, b: KeyValue) => {
+        return  b.value.length - a.value.length;  // descending order
+    });
+
+    recommended = recommended.replace(/\$/g,'\\$');
+    for (const variable of sortedEnvronmentVariables) {
+        recommended = recommended.replace(
+            new RegExp(escapeRegularExpression( variable.value.replace('\\','\\\\')), 'g'),
+            '${'+ variable.key +'}');  // Change the address to an address with variables
+    }
+
+    // print
+    if (recommended !== addressBefore) {
+        console.log('Recommend: #ref: ' + recommended);
+    }
     console.log(address);
 }
 
@@ -1870,7 +1899,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
     for (const key of Object.keys(setting)) {
         const  re = new RegExp(escapeRegularExpression( key ), "gi" );
 
-        const  expectedAfter = expected.replace(re, setting[key].value.replace('$','$$'));
+        const  expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g,'$$'));
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
             log.push({before: key, after: setting[key].value});
@@ -2113,6 +2142,12 @@ class SearchKeyword {
     keyword: string = '';
     startLineNum: number = 0;
     direction: Direction = Direction.Following;
+}
+
+// KeyValue
+class KeyValue {
+    key: string = '';
+    value: string = '';
 }
 
 // Direction
@@ -2458,7 +2493,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
     }
     if (taggedTemplate) {
         for (let i=0; i<englishLiterals.length; i+=1) {
-            translated = translated.replace( '${'+String(i)+'}', String(values[i]).replace('$','$$') );
+            translated = translated.replace( '${'+String(i)+'}', String(values[i]).replace(/\$/g,'$$') );
         }
         translated = translated.replace( '$\\{', '${' );
             // Replace the escape of ${n}
@@ -2510,6 +2545,7 @@ const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#keyword:/g, /#search:/g ];
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
+const  typrmEnvPrefix = 'TYPRM_';
 const  secretLabel = "#★秘密";
 const  secretLabelEn = "#secret";
 const  secretExamleLabel = "#★秘密:仮";
