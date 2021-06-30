@@ -1539,10 +1539,13 @@ function  printRef(refTagAndAddress: string) {
         if (variable === null) {
             break;
         }
-        variables.push(variable[2]);
+        if ( ! isBackSlashEscapePosition(addressBefore, variable.index)) {
+
+            variables.push(variable[2]);
+        }
     }
 
-    var    address = addressBefore;
+    var  address = addressBefore;
     if (variables) {
         for (const variable of variables) {
             const  variableName = variable.substr('${'.length, variable.length - '${}'.length);
@@ -2478,7 +2481,7 @@ const  secretExamleLabelEn = "#secret:example";
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]*$/;
-const  variablePattern = "(^|[^\\\\])(\\$\\{[^\\}]+\\})";  // ${__Name__}
+const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
 const  fullMatchScore = 100;
 const  keywordMatchScore = 7;
 const  glossaryMatchScore = 1;
