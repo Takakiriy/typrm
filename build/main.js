@@ -2026,6 +2026,17 @@ function printRef(refTagAndAddress) {
         console.log('Recommend: #ref: ' + recommended);
     }
     console.log(address);
+    /*    if (process.env.TYPRM_VERB) {
+            const  verbs = yaml.load(process.env.TYPRM_VERB);
+            if (typeof verbs === 'object'  &&  verbs) {
+                const  verbsArray: any = verbs;
+                address = '/Users/totadashi/Documents/MyDoc/programming/スクリプト/JavaScrpt/JavaScript.svg#string';
+                const  command = verbsArray[1].command.replace('$1', address);
+                child_process.exec(command, function(err, stdout, stderr){
+                });
+            }
+        }
+    */
 }
 // varidateUpdateCommandArguments
 function varidateReplaceCommandArguments() {

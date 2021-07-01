@@ -5,6 +5,8 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 import * as chalk from 'chalk';
+import * as yaml from 'js-yaml';
+import * as child_process from 'child_process';
 process.env['typrm_aaa'] = 'aaa';
 
 // main
@@ -1616,6 +1618,18 @@ function  printRef(refTagAndAddress: string) {
         console.log('Recommend: #ref: ' + recommended);
     }
     console.log(address);
+
+/*    if (process.env.TYPRM_VERB) {
+        const  verbs = yaml.load(process.env.TYPRM_VERB);
+        if (typeof verbs === 'object'  &&  verbs) {
+            const  verbsArray: any = verbs;
+            address = '/Users/totadashi/Documents/MyDoc/programming/スクリプト/JavaScrpt/JavaScript.svg#string';
+            const  command = verbsArray[1].command.replace('$1', address);
+            child_process.exec(command, function(err, stdout, stderr){
+            });
+        }
+    }
+*/
 }
 
 // varidateUpdateCommandArguments

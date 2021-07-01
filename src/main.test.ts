@@ -21,7 +21,16 @@ const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
-
+process.env.TYPRM_VERB = `
+    - #
+        label: open
+        regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
+        command: '"C:\\Program Files (x86)\\Snap Note\\Snap Note.exe" "\$1"'
+    - #
+        label: view
+        regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
+        command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\$1"'
+`;
 beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
 });
@@ -674,7 +683,11 @@ describe("print reference >>", () => {
             ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
             "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
             "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n",
-        ],
+/*        ],[
+            "verb",
+            ["search", "#ref:", "../README.md"],
+            "${HOME}/GitProjects/GitHub/typrm/README.md\n",
+*/        ],
     ])("%s", async (_caseName, arguments_, answer) => {
         await callMain(arguments_, {});
         expect(main.stdout).toBe(answer);

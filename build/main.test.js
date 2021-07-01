@@ -57,6 +57,7 @@ var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
+process.env.TYPRM_VERB = "\n    - #\n        label: open\n        regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n        command: '\"C:\\Program Files (x86)\\Snap Note\\Snap Note.exe\" \"$1\"'\n    - #\n        label: view\n        regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n        command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://$1\"'\n";
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
@@ -785,6 +786,11 @@ describe("print reference >>", function () {
             ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
             "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
                 "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n",
+            /*        ],[
+                        "verb",
+                        ["search", "#ref:", "../README.md"],
+                        "${HOME}/GitProjects/GitHub/typrm/README.md\n",
+            */ 
         ],
     ])("%s", function (_caseName, arguments_, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
