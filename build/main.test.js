@@ -742,7 +742,7 @@ describe("searches glossary tag >>", function () {
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path') + "  #search: " + searchColor('keyword') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path#hash') + "  #search: " + searchColor('keyword') + "\n"),
         ], [
             "Multi folder",
             ["search", "ABC"],

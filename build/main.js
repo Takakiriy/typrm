@@ -2564,7 +2564,7 @@ var FoundLine = /** @class */ (function () {
         var refColor = chalk.yellow;
         var refIndex = coloredLine.indexOf(refLabel);
         if (refIndex !== notFound) {
-            var commentIndex = coloredLine.indexOf('#', refIndex + refLabel.length);
+            var commentIndex = coloredLine.indexOf(' #', refIndex + refLabel.length);
             if (commentIndex === notFound) {
                 var refTagAndParameter = coloredLine.substr(refIndex).trim();
             }
@@ -2581,7 +2581,7 @@ var FoundLine = /** @class */ (function () {
         if (searchIndex !== notFound) {
             var spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))[0].length;
             var parameterIndex = searchIndex + searchLabel.length + spaceCount;
-            var commentIndex = coloredLine.indexOf('#', parameterIndex);
+            var commentIndex = coloredLine.indexOf(' #', parameterIndex);
             if (commentIndex === notFound) {
                 var searchKeyword = coloredLine.substr(parameterIndex).trim();
             }

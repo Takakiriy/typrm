@@ -2135,7 +2135,7 @@ class FoundLine {
         const  refColor = chalk.yellow;
         const  refIndex = coloredLine.indexOf(refLabel);
         if (refIndex !== notFound) {
-            const  commentIndex = coloredLine.indexOf('#', refIndex + refLabel.length);
+            const  commentIndex = coloredLine.indexOf(' #', refIndex + refLabel.length);
             if (commentIndex === notFound) {
                 var  refTagAndParameter = coloredLine.substr(refIndex).trim();
             } else {
@@ -2152,7 +2152,7 @@ class FoundLine {
         if (searchIndex !== notFound) {
             const  spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))![0].length;
             const  parameterIndex = searchIndex + searchLabel.length + spaceCount;
-            const  commentIndex = coloredLine.indexOf('#', parameterIndex);
+            const  commentIndex = coloredLine.indexOf(' #', parameterIndex);
             if (commentIndex === notFound) {
                 var  searchKeyword = coloredLine.substr(parameterIndex).trim();
             } else {
