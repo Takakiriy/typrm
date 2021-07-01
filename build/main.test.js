@@ -51,6 +51,8 @@ if (path.basename(process.cwd()) !== 'src') {
 }
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
+var refColor = chalk.yellow;
+var searchColor = chalk.yellow;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
@@ -638,6 +640,11 @@ describe("searches keyword tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + ("         - " + matchedColor('specular') + " reflection:  #keyword:\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + ("     " + matchedColor('specular') + ":  #// the mirror-like reflection  #keyword:\n"),
         ], [
+            "emphasize search and ref tag",
+            ["search", "picture"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + ("     #keyword: " + matchedColor('picture') + "  " + refColor('#ref: path') + "  #search: " + searchColor('keyword') + "\n"),
+        ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
@@ -731,6 +738,11 @@ describe("searches glossary tag >>", function () {
             ["search", "apple category1"],
             { folder: "test_data/search/glossary/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + (" " + matchedColor('category1') + ":    " + matchedColor('apple') + ": juice\n"),
+        ], [
+            "emphasize search and ref tag",
+            ["search", "picture"],
+            { folder: "test_data/search/glossary/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path') + "  #search: " + searchColor('keyword') + "\n"),
         ], [
             "Multi folder",
             ["search", "ABC"],

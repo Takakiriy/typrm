@@ -2126,17 +2126,50 @@ class FoundLine {
         for (const match of colorParts) {
 
             coloredLine +=
-                line.substr(previousPosition, match.position - previousPosition) +
+                line.substr(previousPosition,  match.position - previousPosition) +
                 matchedColor( line.substr(match.position, match.length) );
             previousPosition = match.position + match.length;
         }
         coloredLine += line.substr(previousPosition);
+
+        const  refColor = chalk.yellow;
+        const  refIndex = coloredLine.indexOf(refLabel);
+        if (refIndex !== notFound) {
+            const  commentIndex = coloredLine.indexOf('#', refIndex + refLabel.length);
+            if (commentIndex === notFound) {
+                var  refTagAndParameter = coloredLine.substr(refIndex).trim();
+            } else {
+                var  refTagAndParameter = coloredLine.substr(refIndex,  commentIndex - refIndex).trim();
+            }
+            coloredLine =
+                coloredLine.substr(0, refIndex) +
+                refColor( refTagAndParameter ) +
+                coloredLine.substr(refIndex + refTagAndParameter.length);
+        }
+
+        const  searchColor = chalk.yellow;
+        const  searchIndex = coloredLine.indexOf(searchLabel);
+        if (searchIndex !== notFound) {
+            const  spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))![0].length;
+            const  parameterIndex = searchIndex + searchLabel.length + spaceCount;
+            const  commentIndex = coloredLine.indexOf('#', parameterIndex);
+            if (commentIndex === notFound) {
+                var  searchKeyword = coloredLine.substr(parameterIndex).trim();
+            } else {
+                var  searchKeyword = coloredLine.substr(parameterIndex,  commentIndex - parameterIndex).trim();
+            }
+            coloredLine =
+                coloredLine.substr(0, parameterIndex) +
+                searchColor( searchKeyword ) +
+                coloredLine.substr(parameterIndex + searchKeyword.length);
+        }
         if (false) {
             var  debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
         } else {
             var  debugString = ``;
         }
 
+        // colored string
         return `${chalk.cyan(this.path)}${chalk.keyword('gray')(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
     }
 }
@@ -2550,11 +2583,12 @@ const  fileTemplateLabel = "#file-template:";
 const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
-const  refLabel = "#ref:";
 const  disableLabel = "#disable-tag-tool:";
 const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#keyword:/g, /#search:/g ];
+const  searchLabel = "#search:";
+const  refLabel = "#ref:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  typrmEnvPrefix = 'TYPRM_';
 const  secretLabel = "#★秘密";

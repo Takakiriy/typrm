@@ -24,3 +24,5 @@ glossary with parameters: #glossary: category1  #// comment
 comment in glossary:  #glossary:
     #comment: not hit
     comment: hit
+emphasize search and ref tag:  #glossary:
+    picture:  #ref: path  #search: keyword

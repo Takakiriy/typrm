@@ -15,6 +15,8 @@ if (path.basename(process.cwd()) !== 'src') {
 }
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
+const refColor = chalk.yellow;
+const searchColor = chalk.yellow;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
@@ -540,6 +542,11 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  #keyword:\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  #keyword:\n`,
         ],[
+            "emphasize search and ref tag",
+            ["search", "picture"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + `     #keyword: ${matchedColor('picture')}  ${refColor('#ref: path')}  #search: ${searchColor('keyword')}\n`,
+        ],[
             "Multi folder",  // and test of long path length > short path length
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
@@ -626,6 +633,11 @@ describe("searches glossary tag >>", () => {
         ["search", "apple category1"],
         { folder: "test_data/search/glossary/2", test: "" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
+    ],[
+        "emphasize search and ref tag",
+        ["search", "picture"],
+        { folder: "test_data/search/glossary/2", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + `     ${matchedColor('picture')}:  ${refColor('#ref: path')}  #search: ${searchColor('keyword')}\n`,
     ],[
         "Multi folder",
         ["search", "ABC"],

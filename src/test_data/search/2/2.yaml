@@ -58,3 +58,5 @@ output order (6):
     #keyword: Tool release, Tool deploy
     #keyword: Tool release now
     #keyword: Tool release, Tool deploy
+emphasize search and ref tag:
+    #keyword: picture  #ref: path  #search: keyword
