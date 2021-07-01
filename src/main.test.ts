@@ -659,9 +659,9 @@ describe("print reference >>", () => {
             "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n",  // TYPRM_TEST_PATH has \ but print replaced to /
         ],[
             "recommend",
-            ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  \\root  \\\\pc  last\\"],
-            "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  /root  //pc  last/\n" +
-            "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  /root  //pc  last/\n",
+            ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
+            "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
+            "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n",
         ],
     ])("%s", async (_caseName, arguments_, answer) => {
         await callMain(arguments_, {});

@@ -1582,18 +1582,29 @@ function  printRef(refTagAndAddress: string) {
 
     // recommended = ...
     var  recommended = address;
+    recommended = recommended.replace(/\$/g,'\\$');
+    const  lowerCaseDriveRegExp = /^[a-z]:/;
+    const  upperCaseDriveRegExp = /^[A-Z]:/;
     const  sortedEnvronmentVariables: KeyValue[] = [];
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith(typrmEnvPrefix)  &&  envValue) {
             const  variableName = envName.substr(typrmEnvPrefix.length);
-            sortedEnvronmentVariables.push({key: variableName, value: envValue!.replace(/\\/g,'/')});
+            const  value = envValue!.replace(/\\/g,'/');
+
+            sortedEnvronmentVariables.push({key: variableName, value});
+            if (lowerCaseDriveRegExp.test(value)) {
+                sortedEnvronmentVariables.push({key: variableName, value:
+                    value.substr(0,1).toUpperCase() + value.substr(1)});
+            } else if (upperCaseDriveRegExp.test(value)) {
+                sortedEnvronmentVariables.push({key: variableName, value:
+                    value.substr(0,1).toLowerCase() + value.substr(1)});
+            }
         }
     }
     sortedEnvronmentVariables.sort((a: KeyValue, b: KeyValue) => {
         return  b.value.length - a.value.length;  // descending order
     });
 
-    recommended = recommended.replace(/\$/g,'\\$');
     for (const variable of sortedEnvronmentVariables) {
         recommended = recommended.replace(
             new RegExp(escapeRegularExpression( variable.value.replace('\\','\\\\')), 'g'),

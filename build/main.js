@@ -1996,18 +1996,27 @@ function printRef(refTagAndAddress) {
     }
     // recommended = ...
     var recommended = address;
+    recommended = recommended.replace(/\$/g, '\\$');
+    var lowerCaseDriveRegExp = /^[a-z]:/;
+    var upperCaseDriveRegExp = /^[A-Z]:/;
     var sortedEnvronmentVariables = [];
     for (var _b = 0, _c = Object.entries(process.env); _b < _c.length; _b++) {
         var _d = _c[_b], envName = _d[0], envValue = _d[1];
         if (envName.startsWith(typrmEnvPrefix) && envValue) {
             var variableName = envName.substr(typrmEnvPrefix.length);
-            sortedEnvronmentVariables.push({ key: variableName, value: envValue.replace(/\\/g, '/') });
+            var value = envValue.replace(/\\/g, '/');
+            sortedEnvronmentVariables.push({ key: variableName, value: value });
+            if (lowerCaseDriveRegExp.test(value)) {
+                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toUpperCase() + value.substr(1) });
+            }
+            else if (upperCaseDriveRegExp.test(value)) {
+                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toLowerCase() + value.substr(1) });
+            }
         }
     }
     sortedEnvronmentVariables.sort(function (a, b) {
         return b.value.length - a.value.length; // descending order
     });
-    recommended = recommended.replace(/\$/g, '\\$');
     for (var _e = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _e < sortedEnvronmentVariables_1.length; _e++) {
         var variable = sortedEnvronmentVariables_1[_e];
         recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
