@@ -1613,23 +1613,36 @@ function  printRef(refTagAndAddress: string) {
             '${'+ variable.key +'}');  // Change the address to an address with variables
     }
 
-    // print
+    // print the address
     if (recommended !== addressBefore) {
         console.log('Recommend: #ref: ' + recommended);
     }
     console.log(address);
 
-/*    if (process.env.TYPRM_VERB) {
-        const  verbs = yaml.load(process.env.TYPRM_VERB);
-        if (typeof verbs === 'object'  &&  verbs) {
-            const  verbsArray: any = verbs;
-            address = '/Users/totadashi/Documents/MyDoc/programming/スクリプト/JavaScrpt/JavaScript.svg#string';
-            const  command = verbsArray[1].command.replace('$1', address);
-            child_process.exec(command, function(err, stdout, stderr){
-            });
+    // print the verb menu
+    var  verbMenu = getRelatedVerbs(address).map((verb) => (verb.label)).join(', ');
+    if (verbMenu !== '') {
+        console.log('    ' + verbMenu);
+    }
+}
+
+// getRelatedVerbs
+function  getRelatedVerbs(address: string): Verb[] {
+    if (process.env.TYPRM_VERB) {
+        const  verbConfig = yaml.load(process.env.TYPRM_VERB);
+        if (typeof verbConfig === 'object'  &&  verbConfig) {
+            const  verbsArray: Verb[] = verbConfig;
         }
     }
-*/
+    return  [];
+}
+
+// runVerb
+function  runVerb(verbs: Verb[], address: string, verbNum: string) {
+            //address = '/Users/totadashi/Documents/MyDoc/programming/スクリプト/JavaScrpt/JavaScript.svg#string';
+            const  command = verbsArray[1].command.replace(verbVar.file, address);
+            child_process.exec(command, function(err, stdout, stderr){
+            });
 }
 
 // varidateUpdateCommandArguments
@@ -2201,6 +2214,20 @@ class SearchKeyword {
     startLineNum: number = 0;
     direction: Direction = Direction.Following;
 }
+
+// Verb
+interface Verb {
+    label: string;
+    number: string;
+    regularExpression: string;
+    command: string;  // This can contain "verbVar"
+}
+
+// verbVar
+namespace VerbVariable {
+    export const  file = '${file}';
+}
+const  verbVar = VerbVariable;
 
 // KeyValue
 class KeyValue {

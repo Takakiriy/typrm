@@ -23,13 +23,15 @@ process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
 process.env.TYPRM_VERB = `
     - #
-        label: open
+        label: 1.open
+        number: 1
         regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
         command: '"C:\\Program Files (x86)\\Snap Note\\Snap Note.exe" "\$1"'
     - #
-        label: view
+        label: 2.view
+        number: 2
         regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
-        command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\$1"'
+        command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\${file}"'
 `;
 beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
