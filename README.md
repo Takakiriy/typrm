@@ -757,8 +757,9 @@ If you entered `#ref:` and the path containing the environment variable
 to the parameters of the search command of typrm
 or to the searching keyword input mode prompt,
 the path is displayed that you can copy and paste.
+Note that the `#` and `$` specified on the command line must be escaped with `\`.
 
-    $ typrm s '#ref: ${books}/manual/red_book_2021.pdf'
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
@@ -771,6 +772,9 @@ the path is displayed that you can copy and paste.
 The value of the environment variable is set when you start typrm.
 Note, you must add the prefix `TYPRM_` to the environment variable name
 when you set the define of the environment variable.
+If you do not add the prefix, you can refer to it with `$`
+which is not escaped with `\` on the command line,
+but you cannot refer to it in the search keyword input mode.
 The definition of the environment variable is usually written in the script file
 that starts typrm.
 
@@ -807,7 +811,7 @@ that should be written in the manual.
 The search (s) command with the `#ref:` tag displays the file path
 and the list of commands that specify the file path as a parameter.
 
-    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
@@ -816,7 +820,7 @@ displayed path.
 The command is executed when the number of the command is
 additionally specified in the parameter of the search command.
 
-    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf　0  #// Folder command
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf　0  #// Folder command
 
 When you enter search keyword input mode and display the file path
 with the `#ref:` tag, the prompt changes to `keyword or number:`.
@@ -832,7 +836,7 @@ when the prompt is `keyword:`.
 
 You can add your defined commands to the list of commands.
 
-    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         1.View, 7.Echo, 0.Folder
 

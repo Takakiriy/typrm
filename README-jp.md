@@ -725,8 +725,9 @@ typrm の `#ref:` タグの機能を使うことで、
 
 typrm の search コマンドのパラメーターや、検索キーワード入力モードのプロンプトに、
 `#ref:` と環境変数を含むパスを入力すると、コピー＆ペーストできるパスが表示されます。
+なお、コマンドラインに指定する `#` と `$` は `\` でエスケープする必要があります。
 
-    $ typrm s '#ref: ${books}/manual/red_book_2021.pdf'
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
@@ -738,6 +739,8 @@ typrm の search コマンドのパラメーターや、検索キーワード入
 
 環境変数の値は typrm を起動するときに設定します。
 ただし、環境変数を設定するときの環境変数名に接頭辞 `TYPRM_` を追加する必要があります。
+追加しないとコマンドラインに `\` でエスケープしない `$` で参照することはできますが、
+検索キーワード入力モードでは参照できなくなります。
 環境変数の定義は、たとえば typrm を起動する スクリプト ファイル の中に書きます。
 
 `0.Folder` は、ファイルに関連するコマンドを実行する機能のメニューです（後記）。
@@ -772,14 +775,14 @@ typrm の search コマンドに `#ref:` タグと環境変数のないパスを
 search (s) コマンドに `#ref:` タグを付けてファイルのパスを表示すると、
 ファイルのパスをパラメーターに指定するコマンドの一覧が表示されます。
 
-    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
 `0.Folder` は表示されたパスのファイルがあるフォルダーを開くコマンドです。
 search コマンドのパラメーターにコマンドの数字を追加指定するとコマンドを実行します。
 
-    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf　0  #// Folder コマンド
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf　0  #// Folder コマンド
 
 検索キーワード入力モードに入って `#ref:` タグでファイルのパスを表示したら、
 プロンプトが keyword or number: に変わります。
@@ -794,7 +797,7 @@ search コマンドのパラメーターにコマンドの数字を追加指定�
 
 コマンドの一覧に独自のコマンドを追加することができます。
 
-    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         1.View, 7.Echo, 0.Folder
 
