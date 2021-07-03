@@ -26,6 +26,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [#if tag: set conditions](#if-tag-set-conditions)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
   - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
+    - [Execute commands related to files](#execute-commands-related-to-files)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -759,16 +760,21 @@ the path is displayed that you can copy and paste.
 
     $ typrm s '#ref: ${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
 
     $ typrm s
     keyword: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+    keyword or number:
 
 The value of the environment variable is set when you start typrm.
 Note, you must add the prefix `TYPRM_` to the environment variable name
 when you set the define of the environment variable.
 The definition of the environment variable is usually written in the script file
 that starts typrm.
+
+`0.Folder` is a menu of functions for executing commands related to files (see below).
 
 Case of Windows PS1 script file:
 ${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
@@ -794,6 +800,69 @@ that should be written in the manual.
     keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
     Recommend: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+
+
+### Execute commands related to files
+
+The search (s) command with the `#ref:` tag displays the file path
+and the list of commands that specify the file path as a parameter.
+
+    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+
+`0.Folder` is the command to open the folder containing the file
+displayed path.
+The command is executed when the number of the command is
+additionally specified in the parameter of the search command.
+
+    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf　0  #// Folder command
+
+When you enter search keyword input mode and display the file path
+with the `#ref:` tag, the prompt changes to `keyword or number:`.
+If you enter only numbers in this state, the command will be executed.
+If you enter a non-numeric number, you can do the same as
+when the prompt is `keyword:`.
+
+    $ typrm s
+    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+    keyword or number: 0
+
+You can add your defined commands to the list of commands.
+
+    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        1.View, 7.Echo, 0.Folder
+
+To allow you to choose commands other than `0.Folder`,
+such as` 1.View` and `7.Echo` commands,
+set the` TYPRM_VERB` environment variable in YAML format as follows:
+
+Case of mac zsh:
+
+    export  TYPRM_VERB=$(cat << EOF
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\\.(pdf|svg)(#.*)?\$
+            command: '"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" "file://\${ref}"'
+        - #
+            label: 7.Echo
+            number: 7
+            regularExpression: .*
+            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}"'
+    EOF
+    )
+
+You can write variable references in the command parameter.
+
+| Variable | Value |
+| ---- | ---- |
+| ${ref}  | the parameter of `#ref:` |
+| ${file} | left of `#ref:` parameter |
+| ${fragment} | right of `#ref:` parameter |
 
 
 ## (for developers) How to build the development environment

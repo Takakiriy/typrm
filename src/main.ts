@@ -1219,25 +1219,67 @@ async function  check(checkingFilePath?: string) {
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
+    const  cSearch = 1;
+    const  cPrintRef = 2;
+    const  cRunVerb = 3;
 
     if (keyword !== '') {
-        if ( ! hasRefTag(keyword)) {
+        const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
+        const  hasVerb = numberRegularExpression.test(lastWord);
+        var  command = cSearch;
+        if (hasRefTag(keyword)) {
+            if (hasVerb) {
+                command = cRunVerb;
+            } else {
+                command = cPrintRef;
+            }
+        }
+        if (command === cSearch) {
 
             await  searchSub(keyword);
-        } else {
+        } else if (command === cPrintRef) {
+
             printRef(keyword);
+        } else if (command === cRunVerb){
+            const  keywordWithoudVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
+            const  ref = printRef(keywordWithoudVerb, {print: false});
+
+            runVerb(ref.verbs, ref.address, lastWord);
         }
     } else {
         inputSkip(startIndex);
+        var  previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
-            const  keyword = await input(chalk.yellow('keyword:')+' ');
+            var  prompt = 'keyword:';
+            if (previousPrint.hasVerbMenu) {
+                var  prompt = 'keyword or number:';
+            }
+
+            const  keyword = await input(chalk.yellow( prompt ) + ' ');
+var d = pp(112)
+pp(keyword)
             if (keyword === 'exit()') {
                 break;
-            } else if (keyword !== '') {
-                if ( ! hasRefTag(keyword)) {
+            } else if (keyword === '') {
+                previousPrint.hasVerbMenu = false;
+            } else {
+                var  command = cSearch;
+                if (previousPrint.hasVerbMenu  &&  numberRegularExpression.test(keyword)) {
+                    command = cRunVerb;
+                } else if (hasRefTag(keyword)) {
+                    command = cPrintRef;
+                }
+                if (command === cSearch) {
+
                     await  searchSub(keyword);
-                } else {
-                    printRef(keyword);
+                    previousPrint.hasVerbMenu = false;
+                } else if (command === cPrintRef) {
+
+                    previousPrint = printRef(keyword);
+                } else if (command === cRunVerb) {
+                    const  verbNumber = keyword;
+
+                    runVerb(previousPrint.verbs, previousPrint.address, verbNumber);
                 }
             }
         }
@@ -1530,8 +1572,34 @@ function  compareScore(a: FoundLine, b: FoundLine) {
     return  different;
 }
 
+// PrintRefOption
+interface  PrintRefOption {
+    print: boolean | undefined; 
+}
+
+// printRefOptionDefault
+const  printRefOptionDefault = {
+    print: true,
+} as PrintRefOption;
+
+// PrintRefResult
+interface  PrintRefResult {
+    hasVerbMenu: boolean;
+    verbs: Verb[];
+    address: string;
+}
+
+// getEmptyOfPrintRefResult
+function  getEmptyOfPrintRefResult(): PrintRefResult {
+    return  {
+        hasVerbMenu: false,
+        verbs: [],
+        address: '',
+    }
+}
+
 // printRef
-function  printRef(refTagAndAddress: string) {
+function  printRef(refTagAndAddress: string, option = printRefOptionDefault): PrintRefResult {
     const  addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
     const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
     const  variables: {[key: string]: undefined} = {};
@@ -1614,35 +1682,72 @@ function  printRef(refTagAndAddress: string) {
     }
 
     // print the address
-    if (recommended !== addressBefore) {
-        console.log('Recommend: #ref: ' + recommended);
+    if (option.print) {
+        if (recommended !== addressBefore) {
+            console.log('Recommend: #ref: ' + recommended);
+        }
+        console.log(address);
     }
-    console.log(address);
 
     // print the verb menu
-    var  verbMenu = getRelatedVerbs(address).map((verb) => (verb.label)).join(', ');
-    if (verbMenu !== '') {
+    const  verbs = getRelatedVerbs(address);
+    var  verbMenu = verbs.map((verb) => (verb.label)).join(', ');
+    if (verbMenu !== ''  &&  option.print) {
         console.log('    ' + verbMenu);
     }
+
+    return  {
+        hasVerbMenu: (verbMenu !== ''),
+        verbs,
+        address,
+    } as PrintRefResult;
 }
 
 // getRelatedVerbs
 function  getRelatedVerbs(address: string): Verb[] {
+    const  relatedVerbs: Verb[] = [];
     if (process.env.TYPRM_VERB) {
         const  verbConfig = yaml.load(process.env.TYPRM_VERB);
         if (typeof verbConfig === 'object'  &&  verbConfig) {
-            const  verbsArray: Verb[] = verbConfig;
+            const  verbs = verbConfig as Verb[];
+            for (const verb of verbs) {
+
+                if (new RegExp(verb.regularExpression).test(address)) {
+                    relatedVerbs.push(verb);
+                }
+            }
         }
     }
-    return  [];
+    relatedVerbs.push({
+        label: '0.Folder',
+        number: '0',
+        regularExpression: '.*',
+        command: `open -R "${verbVar.file}"`,  // Open the folder by Finder and select the file
+    } as Verb);
+
+    return  relatedVerbs;
 }
 
 // runVerb
 function  runVerb(verbs: Verb[], address: string, verbNum: string) {
-            //address = '/Users/totadashi/Documents/MyDoc/programming/スクリプト/JavaScrpt/JavaScript.svg#string';
-            const  command = verbsArray[1].command.replace(verbVar.file, address);
-            child_process.exec(command, function(err, stdout, stderr){
-            });
+    var  command = '';
+    for (const verb of verbs) {
+        if (verb.number.toString() === verbNum) {
+
+            command = verb.command
+                .replace(verbVar.ref, address)
+                .replace(verbVar.file, address.substr(0, address.indexOf('#')))
+                .replace(verbVar.fragment, address.substr(address.indexOf('#') + 1));
+        }
+    }
+    if (command !== '') {
+
+        var  stdout_ = child_process.execSync( command ).toString();
+        stdout_ = stdout_.substr(0, stdout_.length - 1);  // Cut last '\n'
+        console.log(stdout_);
+    } else {
+        console.log(translate`Error that verb number ${verbNum} is not defined`);
+    }
 }
 
 // varidateUpdateCommandArguments
@@ -2225,7 +2330,9 @@ interface Verb {
 
 // verbVar
 namespace VerbVariable {
+    export const  ref = '${ref}';
     export const  file = '${file}';
+    export const  fragment = '${fragment}';
 }
 const  verbVar = VerbVariable;
 
@@ -2392,7 +2499,7 @@ class  StandardInputBuffer {
         });
         this.readlines.on('line', async (line: string) => {
             if (this.inputResolver) {
-                this.inputResolver(line);
+                this.inputResolver(line);  // inputResolver() is resolve() in input()
                 this.inputResolver = undefined;
             } else {
                 this.inputBuffer.push(line);
@@ -2567,6 +2674,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Not found \"${0}\" above": "上方向に「${0}」が見つかりません",
             "Not found \"${0}\" following": "下方向に「${0}」が見つかりません",
             "Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）",
+            "Error that verb number ${0} is not defined": "エラー：動詞番号 ${0} は定義されていません"
         };
     }
     let  translated = english;
@@ -2638,7 +2746,7 @@ const  secretExamleLabel = "#★秘密:仮";
 const  secretExamleLabelEn = "#secret:example";
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
-const  numberRegularExpression = /^[0-9]*$/;
+const  numberRegularExpression = /^[0-9]+$/;
 const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
 const  fullMatchScore = 100;
 const  keywordMatchScore = 7;

@@ -41,6 +41,7 @@ var child_process = require("child_process");
 var path = require("path");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
+process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: ^.*\\.md(#.*)?$\n        command: 'echo  \"(${ref})\"'\n";
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -89,18 +90,23 @@ function TestOfCommandLine() {
                     cases = [{
                             "name": "version",
                             "parameters": "--version",
-                            "expected": "(not check)",
+                            "check": "false",
                             "inputLines": "",
                         }, {
                             "name": "locale",
                             "parameters": "search ABC --folder test_data/search/1",
-                            "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+                            "check": "true",
                             "inputLines": "",
                         }, {
                             "name": "search_mode",
                             "parameters": "search  --folder test_data/search/1",
-                            "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+                            "check": "true",
                             "inputLines": "ABC\nexit()\n",
+                        }, {
+                            "name": "search_mode_ref_verb",
+                            "parameters": "search",
+                            "check": "true",
+                            "inputLines": "#ref: ../README.md\n7\n\n7\nexit()\n",
                         }];
                     _i = 0, cases_1 = cases;
                     _a.label = 1;
@@ -113,12 +119,12 @@ function TestOfCommandLine() {
                     // Test Main
                     returns = _a.sent();
                     // Check
-                    if (case_.expected !== '(not check)') {
+                    if (case_.check === 'true') {
                         answer = fs.readFileSync("test_data/command_line/" + case_.name + ".txt").toString();
                         if (returns.stdout !== answer) {
                             printDifferentPaths('_output.txt', '_expected.txt');
                             fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                            fs.writeFileSync(testFolderPath + "_expected.txt", returns.stdout);
+                            fs.writeFileSync(testFolderPath + "_expected.txt", answer);
                             throw new Error();
                         }
                     }

@@ -55,6 +55,8 @@ var readline = require("readline");
 var stream = require("stream");
 var csvParse = require("csv-parse");
 var chalk = require("chalk");
+var yaml = require("js-yaml");
+var child_process = require("child_process");
 process.env['typrm_aaa'] = 'aaa';
 // main
 function main() {
@@ -1556,42 +1558,88 @@ function check(checkingFilePath) {
 // search
 function search() {
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, keyword_1;
+        var startIndex, keyword, cSearch, cPrintRef, cRunVerb, lastWord, hasVerb, command, keywordWithoudVerb, ref, previousPrint, prompt, prompt, keyword_1, d, command, verbNumber;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     startIndex = (exports.programArguments[0] === 's' || exports.programArguments[0] === 'search') ? 1 : 0;
                     keyword = exports.programArguments.slice(startIndex).join(' ');
+                    cSearch = 1;
+                    cPrintRef = 2;
+                    cRunVerb = 3;
                     if (!(keyword !== '')) return [3 /*break*/, 4];
-                    if (!!hasRefTag(keyword)) return [3 /*break*/, 2];
+                    lastWord = exports.programArguments.length === 0 ? '' : exports.programArguments[exports.programArguments.length - 1];
+                    hasVerb = numberRegularExpression.test(lastWord);
+                    command = cSearch;
+                    if (hasRefTag(keyword)) {
+                        if (hasVerb) {
+                            command = cRunVerb;
+                        }
+                        else {
+                            command = cPrintRef;
+                        }
+                    }
+                    if (!(command === cSearch)) return [3 /*break*/, 2];
                     return [4 /*yield*/, searchSub(keyword)];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 3];
                 case 2:
-                    printRef(keyword);
+                    if (command === cPrintRef) {
+                        printRef(keyword);
+                    }
+                    else if (command === cRunVerb) {
+                        keywordWithoudVerb = exports.programArguments.slice(startIndex, exports.programArguments.length - 1).join(' ');
+                        ref = printRef(keywordWithoudVerb, { print: false });
+                        runVerb(ref.verbs, ref.address, lastWord);
+                    }
                     _a.label = 3;
-                case 3: return [3 /*break*/, 11];
+                case 3: return [3 /*break*/, 12];
                 case 4:
                     inputSkip(startIndex);
+                    previousPrint = getEmptyOfPrintRefResult();
                     _a.label = 5;
-                case 5: return [4 /*yield*/, input(chalk.yellow('keyword:') + ' ')];
+                case 5:
+                    prompt = 'keyword:';
+                    if (previousPrint.hasVerbMenu) {
+                        prompt = 'keyword or number:';
+                    }
+                    return [4 /*yield*/, input(chalk.yellow(prompt) + ' ')];
                 case 6:
                     keyword_1 = _a.sent();
+                    d = pp(112);
+                    pp(keyword_1);
                     if (!(keyword_1 === 'exit()')) return [3 /*break*/, 7];
-                    return [3 /*break*/, 11];
+                    return [3 /*break*/, 12];
                 case 7:
-                    if (!(keyword_1 !== '')) return [3 /*break*/, 10];
-                    if (!!hasRefTag(keyword_1)) return [3 /*break*/, 9];
-                    return [4 /*yield*/, searchSub(keyword_1)];
+                    if (!(keyword_1 === '')) return [3 /*break*/, 8];
+                    previousPrint.hasVerbMenu = false;
+                    return [3 /*break*/, 11];
                 case 8:
-                    _a.sent();
-                    return [3 /*break*/, 10];
+                    command = cSearch;
+                    if (previousPrint.hasVerbMenu && numberRegularExpression.test(keyword_1)) {
+                        command = cRunVerb;
+                    }
+                    else if (hasRefTag(keyword_1)) {
+                        command = cPrintRef;
+                    }
+                    if (!(command === cSearch)) return [3 /*break*/, 10];
+                    return [4 /*yield*/, searchSub(keyword_1)];
                 case 9:
-                    printRef(keyword_1);
-                    _a.label = 10;
-                case 10: return [3 /*break*/, 5];
-                case 11: return [2 /*return*/];
+                    _a.sent();
+                    previousPrint.hasVerbMenu = false;
+                    return [3 /*break*/, 11];
+                case 10:
+                    if (command === cPrintRef) {
+                        previousPrint = printRef(keyword_1);
+                    }
+                    else if (command === cRunVerb) {
+                        verbNumber = keyword_1;
+                        runVerb(previousPrint.verbs, previousPrint.address, verbNumber);
+                    }
+                    _a.label = 11;
+                case 11: return [3 /*break*/, 5];
+                case 12: return [2 /*return*/];
             }
         });
     });
@@ -1940,8 +1988,21 @@ function compareScore(a, b) {
     }
     return different;
 }
+// printRefOptionDefault
+var printRefOptionDefault = {
+    print: true,
+};
+// getEmptyOfPrintRefResult
+function getEmptyOfPrintRefResult() {
+    return {
+        hasVerbMenu: false,
+        verbs: [],
+        address: '',
+    };
+}
 // printRef
-function printRef(refTagAndAddress) {
+function printRef(refTagAndAddress, option) {
+    if (option === void 0) { option = printRefOptionDefault; }
     var addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
     var variableRe = new RegExp(variablePattern, 'g'); // variableRegularExpression
     var variables = {};
@@ -2021,22 +2082,68 @@ function printRef(refTagAndAddress) {
         var variable = sortedEnvronmentVariables_1[_e];
         recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
     }
-    // print
-    if (recommended !== addressBefore) {
-        console.log('Recommend: #ref: ' + recommended);
+    // print the address
+    if (option.print) {
+        if (recommended !== addressBefore) {
+            console.log('Recommend: #ref: ' + recommended);
+        }
+        console.log(address);
     }
-    console.log(address);
-    /*    if (process.env.TYPRM_VERB) {
-            const  verbs = yaml.load(process.env.TYPRM_VERB);
-            if (typeof verbs === 'object'  &&  verbs) {
-                const  verbsArray: any = verbs;
-                address = '/Users/totadashi/Documents/MyDoc/programming/スクリプト/JavaScrpt/JavaScript.svg#string';
-                const  command = verbsArray[1].command.replace('$1', address);
-                child_process.exec(command, function(err, stdout, stderr){
-                });
+    // print the verb menu
+    var verbs = getRelatedVerbs(address);
+    var verbMenu = verbs.map(function (verb) { return (verb.label); }).join(', ');
+    if (verbMenu !== '' && option.print) {
+        console.log('    ' + verbMenu);
+    }
+    return {
+        hasVerbMenu: (verbMenu !== ''),
+        verbs: verbs,
+        address: address,
+    };
+}
+// getRelatedVerbs
+function getRelatedVerbs(address) {
+    var relatedVerbs = [];
+    if (process.env.TYPRM_VERB) {
+        var verbConfig = yaml.load(process.env.TYPRM_VERB);
+        if (typeof verbConfig === 'object' && verbConfig) {
+            var verbs = verbConfig;
+            for (var _i = 0, verbs_1 = verbs; _i < verbs_1.length; _i++) {
+                var verb = verbs_1[_i];
+                if (new RegExp(verb.regularExpression).test(address)) {
+                    relatedVerbs.push(verb);
+                }
             }
         }
-    */
+    }
+    relatedVerbs.push({
+        label: '0.Folder',
+        number: '0',
+        regularExpression: '.*',
+        command: "open -R \"" + verbVar.file + "\"", // Open the folder by Finder and select the file
+    });
+    return relatedVerbs;
+}
+// runVerb
+function runVerb(verbs, address, verbNum) {
+    var command = '';
+    for (var _i = 0, verbs_2 = verbs; _i < verbs_2.length; _i++) {
+        var verb = verbs_2[_i];
+        if (verb.number.toString() === verbNum) {
+            command = verb.command
+                .replace(verbVar.ref, address)
+                .replace(verbVar.file, address.substr(0, address.indexOf('#')))
+                .replace(verbVar.fragment, address.substr(address.indexOf('#') + 1));
+        }
+    }
+    if (command !== '') {
+        var stdout_ = child_process.execSync(command).toString();
+        stdout_ = stdout_.substr(0, stdout_.length - 1); // Cut last '\n'
+        console.log(stdout_);
+    }
+    else {
+        console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error that verb number ", " is not defined"], ["Error that verb number ", " is not defined"])), verbNum));
+    }
 }
 // varidateUpdateCommandArguments
 function varidateReplaceCommandArguments() {
@@ -2059,7 +2166,7 @@ function onEndOfSetting(setting) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         if (!setting[key].isReferenced) {
-            console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
+            console.log(translate(templateObject_6 || (templateObject_6 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
         }
     }
 }
@@ -2633,6 +2740,14 @@ var SearchKeyword = /** @class */ (function () {
     }
     return SearchKeyword;
 }());
+// verbVar
+var VerbVariable;
+(function (VerbVariable) {
+    VerbVariable.ref = '${ref}';
+    VerbVariable.file = '${file}';
+    VerbVariable.fragment = '${fragment}';
+})(VerbVariable || (VerbVariable = {}));
+var verbVar = VerbVariable;
 // KeyValue
 var KeyValue = /** @class */ (function () {
     function KeyValue() {
@@ -2771,7 +2886,7 @@ var StandardInputBuffer = /** @class */ (function () {
         this.readlines.on('line', function (line) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if (this.inputResolver) {
-                    this.inputResolver(line);
+                    this.inputResolver(line); // inputResolver() is resolve() in input()
                     this.inputResolver = undefined;
                 }
                 else {
@@ -2820,7 +2935,7 @@ var InputOption = /** @class */ (function () {
     }
     return InputOption;
 }());
-var testBaseFolder = String.raw(templateObject_6 || (templateObject_6 = __makeTemplateObject(["R:homemem_cacheMyDocsrcTypeScript\typrm\test_data"], ["R:\\home\\mem_cache\\MyDoc\\src\\TypeScript\\typrm\\test_data"]))) + '\\';
+var testBaseFolder = String.raw(templateObject_7 || (templateObject_7 = __makeTemplateObject(["R:homemem_cacheMyDocsrcTypeScript\typrm\test_data"], ["R:\\home\\mem_cache\\MyDoc\\src\\TypeScript\\typrm\\test_data"]))) + '\\';
 // inputOption
 var inputOption = new InputOption([
 /*
@@ -2946,6 +3061,7 @@ function translate(englishLiterals) {
             "Not found \"${0}\" above": "上方向に「${0}」が見つかりません",
             "Not found \"${0}\" following": "下方向に「${0}」が見つかりません",
             "Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）",
+            "Error that verb number ${0} is not defined": "エラー：動詞番号 ${0} は定義されていません"
         };
     }
     var translated = english;
@@ -3030,7 +3146,7 @@ var secretExamleLabel = "#★秘密:仮";
 var secretExamleLabelEn = "#secret:example";
 var referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 var indentRegularExpression = /^( |¥t)*/;
-var numberRegularExpression = /^[0-9]*$/;
+var numberRegularExpression = /^[0-9]+$/;
 var variablePattern = "\\$\\{[^\\}]+\\}"; // ${__Name__}
 var fullMatchScore = 100;
 var keywordMatchScore = 7;
@@ -3056,5 +3172,5 @@ var withJest = false;
 exports.stdout = '';
 exports.programArguments = [];
 exports.programOptions = {};
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6;
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7;
 //# sourceMappingURL=main.js.map

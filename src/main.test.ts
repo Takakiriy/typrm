@@ -23,13 +23,13 @@ process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
 process.env.TYPRM_VERB = `
     - #
-        label: 1.open
-        number: 1
-        regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
-        command: '"C:\\Program Files (x86)\\Snap Note\\Snap Note.exe" "\$1"'
+        label: 7.Test Echo
+        number: 7
+        regularExpression: ^.*\\.md(#.*)?\$
+        command: 'echo  "{ref: \${ref}, file: \${file}, fragment: \${fragment}}"'
     - #
-        label: 2.view
-        number: 2
+        label: 1.View
+        number: 1
         regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
         command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\${file}"'
 `;
@@ -667,31 +667,40 @@ describe("print reference >>", () => {
         [
             "1st",
             ["search", "#ref:", "${TEST_ENV}/file.txt"],
-            "testEnv/file.txt\n",
+            "testEnv/file.txt\n" +
+            "    0.Folder\n",
         ],[
             "multi parameters",
             ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
-            "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
+            "testEnv/file1.txt testEnv/testEnv/file2.txt\n" +
+            "    0.Folder\n",
         ],[
             "escape",
             ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
-            "${TEST_ENV} -${TEST_ENV}- /testEnv\n",
+            "${TEST_ENV} -${TEST_ENV}- /testEnv\n" +
+            "    0.Folder\n",
         ],[
             "path",
             ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
-            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n",  // TYPRM_TEST_PATH has \ but print replaced to /
+            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" +  // TYPRM_TEST_PATH has \ but print replaced to /
+            "    0.Folder\n",
         ],[
             "recommend",
             ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
             "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
-            "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n",
-/*        ],[
+            "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
+            "    0.Folder\n",
+        ],[
             "verb",
-            ["search", "#ref:", "../README.md"],
-            "${HOME}/GitProjects/GitHub/typrm/README.md\n",
-*/        ],
+            ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
+            "{ref: ../README.md#title, file: ../README.md, fragment: title}\n",
+        ],[
+            "verb error",
+            ["search", "#ref:", "../README.md", "4"],  // 4 is unknown verb
+            "Error that verb number 4 is not defined\n",
+        ],
     ])("%s", async (_caseName, arguments_, answer) => {
-        await callMain(arguments_, {});
+        await callMain(arguments_, {locale: "en-US"});
         expect(main.stdout).toBe(answer);
     });
 });

@@ -4,6 +4,13 @@ import * as path from 'path';
 
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
+process.env.TYPRM_VERB = `
+    - #
+        label: 7.Test Echo
+        number: 7
+        regularExpression: ^.*\\.md(#.*)?\$
+        command: 'echo  "(\${ref})"'
+`;
 
 async function  main() {
     if (false) {
@@ -29,18 +36,23 @@ async function  TestOfCommandLine() {
     var cases: ({[name: string]: string})[] = [{
         "name": "version",
         "parameters": "--version",
-        "expected": "(not check)",
+        "check": "false",
         "inputLines": "",
     },{
         "name": "locale",
         "parameters": "search ABC --folder test_data/search/1",
-        "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+        "check": "true",
         "inputLines": "",
     },{
         "name": "search_mode",
         "parameters": "search  --folder test_data/search/1",
-        "expected": "____/test_data/search/1/1.yaml: #keyword: ABC, \"do it\", \"a,b\"",
+        "check": "true",
         "inputLines": "ABC\nexit()\n",
+    },{
+        "name": "search_mode_ref_verb",
+        "parameters": "search",
+        "check": "true",
+        "inputLines": "#ref: ../README.md\n7\n\n7\nexit()\n",
     }];
     for (const case_ of cases) {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
@@ -50,13 +62,13 @@ async function  TestOfCommandLine() {
             {inputLines: case_.inputLines.split('\n')});
 
         // Check
-        if (case_.expected !== '(not check)') {
+        if (case_.check === 'true') {
             const  answer = fs.readFileSync(`test_data/command_line/${case_.name}.txt`).toString(); //.substr(cutBOM);
 
             if (returns.stdout !== answer) {
                 printDifferentPaths('_output.txt', '_expected.txt');
                 fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                fs.writeFileSync(testFolderPath + "_expected.txt", returns.stdout);
+                fs.writeFileSync(testFolderPath + "_expected.txt", answer);
                 throw new Error();
             }
         }

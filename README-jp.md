@@ -24,6 +24,7 @@ typrm は テキスト ファイル 形式のマニュアルに書かれたコ�
   - [#if タグを使って条件を設定します](#if-タグを使って条件を設定します)
   - [#expect タグを使って設定値をチェックします](#expect-タグを使って設定値をチェックします)
   - [#ref タグ - 環境変数を含むファイルのパスを展開して表示します](#ref-タグ---環境変数を含むファイルのパスを展開して表示します)
+    - [ファイルに関連するコマンドを実行します](#ファイルに関連するコマンドを実行します)
   - [（開発者用） 開発環境の構築手順](#開発者用-開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
@@ -727,14 +728,19 @@ typrm の search コマンドのパラメーターや、検索キーワード入
 
     $ typrm s '#ref: ${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
 
     $ typrm s
     keyword: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+    keyword or number:
 
 環境変数の値は typrm を起動するときに設定します。
 ただし、環境変数を設定するときの環境変数名に接頭辞 `TYPRM_` を追加する必要があります。
 環境変数の定義は、たとえば typrm を起動する スクリプト ファイル の中に書きます。
+
+`0.Folder` は、ファイルに関連するコマンドを実行する機能のメニューです（後記）。
 
 Windows の PS1 スクリプト ファイル の場合:
 ${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
@@ -759,6 +765,66 @@ typrm の search コマンドに `#ref:` タグと環境変数のないパスを
     keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
     Recommend: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+
+
+### ファイルに関連するコマンドを実行します
+
+search (s) コマンドに `#ref:` タグを付けてファイルのパスを表示すると、
+ファイルのパスをパラメーターに指定するコマンドの一覧が表示されます。
+
+    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+
+`0.Folder` は表示されたパスのファイルがあるフォルダーを開くコマンドです。
+search コマンドのパラメーターにコマンドの数字を追加指定するとコマンドを実行します。
+
+    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf　0  #// Folder コマンド
+
+検索キーワード入力モードに入って `#ref:` タグでファイルのパスを表示したら、
+プロンプトが keyword or number: に変わります。
+この状態で数字だけを入力するとコマンドを実行します。
+数字以外を入力するとプロンプトが keyword: のときと同じことができます。
+
+    $ typrm s
+    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+    keyword or number: 0
+
+コマンドの一覧に独自のコマンドを追加することができます。
+
+    $ typrm s \#ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        1.View, 7.Echo, 0.Folder
+
+`0.Folder` 以外のコマンド、たとえば `1.View` コマンドと `7.Echo` コマンド
+を選べるようにするには、
+`TYPRM_VERB` 環境変数に以下のように YAML 形式で設定します。
+
+mac の zsh の場合:
+
+    export  TYPRM_VERB=$(cat << EOF
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\\.(pdf|svg)(#.*)?\$
+            command: '"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" "file://\${ref}"'
+        - #
+            label: 7.Echo
+            number: 7
+            regularExpression: .*
+            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}"'
+    EOF
+    )
+
+command には command 固有の変数参照を含めることができます。
+
+| 変数 | 値 |
+| ---- | ---- |
+| ${ref} | #ref: のパラメーター |
+| ${file} | #ref: のパラメーターの # より左 |
+| ${fragment} | #ref: のパラメーターの # より右 |
 
 
 ## （開発者用） 開発環境の構築手順

@@ -57,7 +57,7 @@ var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
-process.env.TYPRM_VERB = "\n    - #\n        label: open\n        regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n        command: '\"C:\\Program Files (x86)\\Snap Note\\Snap Note.exe\" \"$1\"'\n    - #\n        label: view\n        regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n        command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://$1\"'\n";
+process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: ^.*\\.md(#.*)?$\n        command: 'echo  \"{ref: ${ref}, file: ${file}, fragment: ${fragment}}\"'\n    - #\n        label: 1.View\n        number: 1\n        regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n        command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n";
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
@@ -768,34 +768,42 @@ describe("print reference >>", function () {
         [
             "1st",
             ["search", "#ref:", "${TEST_ENV}/file.txt"],
-            "testEnv/file.txt\n",
+            "testEnv/file.txt\n" +
+                "    0.Folder\n",
         ], [
             "multi parameters",
             ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
-            "testEnv/file1.txt testEnv/testEnv/file2.txt\n",
+            "testEnv/file1.txt testEnv/testEnv/file2.txt\n" +
+                "    0.Folder\n",
         ], [
             "escape",
             ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
-            "${TEST_ENV} -${TEST_ENV}- /testEnv\n",
+            "${TEST_ENV} -${TEST_ENV}- /testEnv\n" +
+                "    0.Folder\n",
         ], [
             "path",
             ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
-            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n", // TYPRM_TEST_PATH has \ but print replaced to /
+            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
+                "    0.Folder\n",
         ], [
             "recommend",
             ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
             "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
-                "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n",
-            /*        ],[
-                        "verb",
-                        ["search", "#ref:", "../README.md"],
-                        "${HOME}/GitProjects/GitHub/typrm/README.md\n",
-            */ 
+                "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
+                "    0.Folder\n",
+        ], [
+            "verb",
+            ["search", "#ref:", "../README.md#title", "7"],
+            "{ref: ../README.md#title, file: ../README.md, fragment: title}\n",
+        ], [
+            "verb error",
+            ["search", "#ref:", "../README.md", "4"],
+            "Error that verb number 4 is not defined\n",
         ],
     ])("%s", function (_caseName, arguments_, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, {})];
+                case 0: return [4 /*yield*/, callMain(arguments_, { locale: "en-US" })];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);
