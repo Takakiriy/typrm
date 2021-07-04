@@ -39,9 +39,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var child_process = require("child_process");
 var path = require("path");
+var currentFolder = process.cwd();
+var snapshots = require(currentFolder + "/__snapshots__/main.test.ts.snap");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
 process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: ^.*\\.md(#.*)?$\n        command: 'echo  \"(${ref})\"'\n";
+if (process.env.windir !== '') {
+    var testingOS = 'Windows';
+}
+else {
+    var testingOS = 'Linux';
+}
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -69,10 +77,10 @@ function DoCustomDebug() {
         var returns;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callChildProccess("node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
+                case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
                 case 1:
                     returns = _a.sent();
-                    // const  returns = await callChildProccess(`node ../build/typrm.js s DSL --folder /Users/totadashi/Documents/typrm`, {});
+                    // const  returns = await callChildProccess(`node ${scriptPath} s DSL --folder /Users/totadashi/Documents/typrm`, {});
                     console.log(returns.stdout);
                     console.log('Done');
                     return [2 /*return*/];
@@ -114,13 +122,13 @@ function TestOfCommandLine() {
                     if (!(_i < cases_1.length)) return [3 /*break*/, 4];
                     case_ = cases_1[_i];
                     console.log("TestCase: TestOfCommandLine >> " + case_.name);
-                    return [4 /*yield*/, callChildProccess("node ../build/typrm.js " + case_.parameters + " --test", { inputLines: case_.inputLines.split('\n') })];
+                    return [4 /*yield*/, callChildProccess("node " + scriptPath + " " + case_.parameters + " --test", { inputLines: case_.inputLines.split('\n') })];
                 case 2:
                     // Test Main
                     returns = _a.sent();
                     // Check
                     if (case_.check === 'true') {
-                        answer = fs.readFileSync("test_data/command_line/" + case_.name + ".txt").toString();
+                        answer = getSnapshot("typrm_test >> " + case_.name + " >> " + testingOS + ": stdout 1");
                         if (returns.stdout !== answer) {
                             printDifferentPaths('_output.txt', '_expected.txt');
                             fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
@@ -201,6 +209,14 @@ function callChildProccess(commandLine, option) {
                 }); })];
         });
     });
+}
+// getSnapshot
+function getSnapshot(label) {
+    var snapshot = snapshots[label];
+    if (!snapshot) {
+        throw new Error("Not found '" + label + "' in __snapshots__/____.snap");
+    }
+    return snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
 }
 // deleteFile
 function deleteFile(path) {

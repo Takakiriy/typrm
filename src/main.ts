@@ -7,13 +7,16 @@ import * as csvParse from 'csv-parse';
 import * as chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
-process.env['typrm_aaa'] = 'aaa';
 
 // main
 export async function  main() {
     locale = Intl.NumberFormat().resolvedOptions().locale;
     if ('locale' in programOptions) {
         locale = programOptions.locale;
+    }
+    const  verboseMode = 'verbose' in programOptions;
+    if (verboseMode) {
+        printConfig();
     }
 
     if (programArguments.length === 0) {
@@ -1175,8 +1178,6 @@ async function  check(checkingFilePath?: string) {
     const  notFoundPaths: string[] = [];
     if (checkingFilePath) {
         targetFolders.push(currentFolder);
-    }
-    if (checkingFilePath) {
         for (const folder of targetFolders) {
             const  targetFolderFullPath = getFullPath(folder, currentFolder);
 
@@ -1256,8 +1257,6 @@ async function  search() {
             }
 
             const  keyword = await input(chalk.yellow( prompt ) + ' ');
-var d = pp(112)
-pp(keyword)
             if (keyword === 'exit()') {
                 break;
             } else if (keyword === '') {
@@ -1718,11 +1717,18 @@ function  getRelatedVerbs(address: string): Verb[] {
             }
         }
     }
+
+    if (runningOS === 'Windows') {
+        var  command = `explorer /SELECT, "${verbVar.file}"`;
+    } else {
+        var  command = `open -R "${verbVar.file}"`;
+            // Open the folder by Finder and select the file
+    }
     relatedVerbs.push({
         label: '0.Folder',
         number: '0',
         regularExpression: '.*',
-        command: `open -R "${verbVar.file}"`,  // Open the folder by Finder and select the file
+        command,
     } as Verb);
 
     return  relatedVerbs;
@@ -1743,10 +1749,40 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
     if (command !== '') {
 
         var  stdout_ = child_process.execSync( command ).toString();
-        stdout_ = stdout_.substr(0, stdout_.length - 1);  // Cut last '\n'
+        if (runningOS === 'Windows') {
+            stdout_ = stdout_.substr(0, stdout_.length - 2);  // Cut last '\r\n'
+        } else {
+            stdout_ = stdout_.substr(0, stdout_.length - 1);  // Cut last '\n'
+        }
         console.log(stdout_);
     } else {
         console.log(translate`Error that verb number ${verbNum} is not defined`);
+    }
+}
+
+// printConfig
+function  printConfig() {
+    for (const [envName, envValue] of Object.entries(process.env)) {
+        if (envName.startsWith('TYPRM_')  &&  envName !== 'TYPRM_VERB') {
+
+            console.log(`Verbose: ${envName} = ${envValue}`);
+        }
+    }
+    if (process.env.TYPRM_VERB) {
+        const  verbConfig = yaml.load(process.env.TYPRM_VERB);
+        if (typeof verbConfig === 'object'  &&  verbConfig) {
+            const  verbs = verbConfig as Verb[];
+            var  index = 0;
+            for (const verb of verbs) {
+
+                console.log(`Verbose: Verb[${index}]:`);
+                console.log(`Verbose:     label: ${verb.label}`);
+                console.log(`Verbose:     number: ${verb.number}`);
+                console.log(`Verbose:     regularExpression: ${verb.regularExpression}`);
+                console.log(`Verbose:     command: ${verb.command}`);
+                index += 1;
+            }
+        }
     }
 }
 
@@ -2719,6 +2755,11 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     }
 }
 
+if (process.env.windir !== '') {
+    var  runningOS = 'Windows';
+} else {
+    var  runningOS = 'Linux';
+}
 const  settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
 const  settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 const  originalLabel = "#original:";

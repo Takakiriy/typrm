@@ -40,8 +40,10 @@ var fs = require("fs");
 var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
+var globby = require("globby");
 var snapshots = require("./__snapshots__/main.test.ts.snap");
 var callMain = main.callMainFromJest;
+var currentFolder = process.cwd();
 if (path.basename(process.cwd()) === 'empty_folder') {
     process.chdir('..');
 }
@@ -49,6 +51,27 @@ if (path.basename(process.cwd()) !== 'src') {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
     process.chdir('src');
 }
+function mainOfTry() {
+    return __awaiter(this, void 0, void 0, function () {
+        var scanedPaths;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    fs.rmdirSync('test_data\\_checking', { recursive: true });
+                    fs.mkdirSync('test_data\\_checking', { recursive: true });
+                    process.chdir('test_data\\_checking');
+                    return [4 /*yield*/, globby(['**/*'])];
+                case 1:
+                    scanedPaths = _a.sent();
+                    process.chdir('test_data');
+                    fs.rmdirSync('_checking', { recursive: true });
+                    console.log('A');
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+mainOfTry();
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var refColor = chalk.yellow;
@@ -57,12 +80,23 @@ var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
-process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: ^.*\\.md(#.*)?$\n        command: 'echo  \"{ref: ${ref}, file: ${file}, fragment: ${fragment}}\"'\n    - #\n        label: 1.View\n        number: 1\n        regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n        command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n";
+if (process.env.windir !== '') {
+    var testingOS = 'Windows';
+}
+else {
+    var testingOS = 'Linux';
+}
+if (testingOS === 'Windows') {
+    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, file: ${file}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
+}
+else {
+    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo  \"{ref: ${ref}, file: ${file}, fragment: ${fragment}}\"'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n    ";
+}
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
 describe("checks template value >>", function () {
-    test.each([
+    test.only.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
@@ -272,13 +306,15 @@ describe("replaces settings >>", function () {
                     writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileName, lineNum, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
+                            folder: changingFolderPath, test: "",
+                            locale: locale,
                         })];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                        folder: changingFolderPath, test: "", locale: locale,
+                        folder: changingFolderPath, test: "",
+                        locale: locale,
                     })];
                 case 3:
                     _a.sent();
@@ -315,7 +351,8 @@ describe("replaces settings >>", function () {
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
+                            folder: changingFolderPath, test: "",
+                            locale: locale,
                         })];
                 case 2:
                     _a.sent();
@@ -328,7 +365,8 @@ describe("replaces settings >>", function () {
                 case 5:
                     _a.trys.push([5, 7, , 8]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
+                            folder: changingFolderPath, test: "",
+                            locale: locale,
                         })];
                 case 6:
                     _a.sent();
@@ -431,13 +469,15 @@ describe("replaces settings >>", function () {
                         writeFileSync(changingFilePath, sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 2];
                         return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                                folder: changingFolderPath, test: "", locale: locale
+                                folder: changingFolderPath, test: "",
+                                locale: locale
                             })];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale
+                            folder: changingFolderPath, test: "",
+                            locale: locale
                         })];
                     case 3:
                         _a.sent();
@@ -447,13 +487,15 @@ describe("replaces settings >>", function () {
                         expect(updatedFileContents).not.toBe(sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 6];
                         return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
-                                folder: changingFolderPath, test: "", locale: locale
+                                folder: changingFolderPath, test: "",
+                                locale: locale
                             })];
                     case 5:
                         _a.sent();
                         return [3 /*break*/, 8];
                     case 6: return [4 /*yield*/, callMain(["revert", changingFileName], {
-                            folder: changingFolderPath, test: "", locale: locale
+                            folder: changingFolderPath, test: "",
+                            locale: locale
                         })];
                     case 7:
                         _a.sent();
@@ -768,42 +810,80 @@ describe("print reference >>", function () {
         [
             "1st",
             ["search", "#ref:", "${TEST_ENV}/file.txt"],
+            { locale: "en-US" },
             "testEnv/file.txt\n" +
                 "    0.Folder\n",
         ], [
             "multi parameters",
             ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
+            { locale: "en-US" },
             "testEnv/file1.txt testEnv/testEnv/file2.txt\n" +
                 "    0.Folder\n",
         ], [
             "escape",
             ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
+            { locale: "en-US" },
             "${TEST_ENV} -${TEST_ENV}- /testEnv\n" +
                 "    0.Folder\n",
         ], [
             "path",
             ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
+            { locale: "en-US" },
             "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
                 "    0.Folder\n",
         ], [
             "recommend",
             ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
+            { locale: "en-US" },
             "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
                 "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
                 "    0.Folder\n",
         ], [
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],
+            { locale: "en-US" },
             "{ref: ../README.md#title, file: ../README.md, fragment: title}\n",
         ], [
             "verb error",
             ["search", "#ref:", "../README.md", "4"],
+            { locale: "en-US" },
             "Error that verb number 4 is not defined\n",
+        ], [
+            "verb verbose",
+            ["search", "#ref:", "../README.md", "4"],
+            { locale: "en-US", verbose: "" },
+            (testingOS === 'Windows')
+                ? // Windows
+                    "Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                        "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
+                        "Verbose: Verb[0]:\n" +
+                        "Verbose:     label: 7.Test Echo\n" +
+                        "Verbose:     number: 7\n" +
+                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
+                        "Verbose:     command: echo {ref: \${ref}, file: \${file}, fragment: \${fragment}}\n" +
+                        "Verbose: Verb[1]:\n" +
+                        "Verbose:     label: 1.View\n" +
+                        "Verbose:     number: 1\n" +
+                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                        "Verbose:     command: msedge \"file://\${file}\"\n" +
+                        "Error that verb number 4 is not defined\n"
+                : // mac
+                    "Verbose: Verb[0]:\n" +
+                        "Verbose:     label: 7.Test Echo\n" +
+                        "Verbose:     number: 7\n" +
+                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
+                        "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, fragment: \${fragment}}\"\n" +
+                        "Verbose: Verb[1]:\n" +
+                        "Verbose:     label: 1.View\n" +
+                        "Verbose:     number: 1\n" +
+                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                        "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                        "Error that verb number 4 is not defined\n",
         ],
-    ])("%s", function (_caseName, arguments_, answer) { return __awaiter(void 0, void 0, void 0, function () {
+    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, { locale: "en-US" })];
+                case 0: return [4 /*yield*/, callMain(arguments_, options)];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);

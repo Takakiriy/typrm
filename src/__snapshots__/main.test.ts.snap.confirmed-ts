@@ -1853,3 +1853,42 @@ exports[`replaces settings >> in 2_replace_9_template_if_4_operators: updatedFil
     💤 case product:  #template-if: $settings.__Stage__ != develop
 "
 `;
+
+exports[`typrm_test >> locale >> Windows: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+"
+`;
+
+exports[`typrm_test >> locale >> mac: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+"
+`;
+
+exports[`typrm_test >> search_mode >> Windows: stdout 1`] = `
+"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+keyword: exit()
+"
+`;
+
+exports[`typrm_test >> search_mode >> mac: stdout 1`] = `
+"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+keyword: 
+"
+`;
+
+exports[`typrm_test >> search_mode_ref_verb >> Windows: stdout 1`] = `
+"keyword: ../README.md
+    7.Test Echo, 0.Folder
+keyword or number: 7
+ "(../README.md)"
+keyword or number:  "(../README.md)"
+keyword or number: "
+`;
+
+exports[`typrm_test >> search_mode_ref_verb >> mac: stdout 1`] = `
+"keyword: ../README.md
+    7.Test Echo, 0.Folder
+keyword or number: (../README.md)
+keyword or number: keyword: keyword: 
+"
+`;

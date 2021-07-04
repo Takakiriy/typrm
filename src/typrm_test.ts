@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as path from 'path';
+const currentFolder = process.cwd();
+const snapshots = require(currentFolder +"/__snapshots__/main.test.ts.snap");
 
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
@@ -11,6 +13,11 @@ process.env.TYPRM_VERB = `
         regularExpression: ^.*\\.md(#.*)?\$
         command: 'echo  "(\${ref})"'
 `;
+if (process.env.windir !== '') {
+    var  testingOS = 'Windows';
+} else {
+    var  testingOS = 'Linux';
+}
 
 async function  main() {
     if (false) {
@@ -23,8 +30,8 @@ async function  main() {
 
 // DoCustomDebug
 async function  DoCustomDebug() {
-    const  returns = await callChildProccess(`node ../build/typrm.js r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
-    // const  returns = await callChildProccess(`node ../build/typrm.js s DSL --folder /Users/totadashi/Documents/typrm`, {});
+    const  returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+    // const  returns = await callChildProccess(`node ${scriptPath} s DSL --folder /Users/totadashi/Documents/typrm`, {});
     console.log(returns.stdout);
     console.log('Done');
 }
@@ -58,12 +65,12 @@ async function  TestOfCommandLine() {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
 
         // Test Main
-        returns = await callChildProccess(`node ../build/typrm.js ${case_.parameters} --test`,
+        returns = await callChildProccess(`node ${scriptPath} ${case_.parameters} --test`,
             {inputLines: case_.inputLines.split('\n')});
 
         // Check
         if (case_.check === 'true') {
-            const  answer = fs.readFileSync(`test_data/command_line/${case_.name}.txt`).toString(); //.substr(cutBOM);
+            const  answer = getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
 
             if (returns.stdout !== answer) {
                 printDifferentPaths('_output.txt', '_expected.txt');
@@ -115,6 +122,15 @@ async function  callChildProccess(commandLine: string,  option?: ProcessOption):
             throw Error(`Error in the command line ${commandLine}`);
         }
     });
+}
+
+// getSnapshot
+function  getSnapshot(label: string) {
+    const  snapshot = snapshots[label];
+    if ( ! snapshot) {
+        throw  new Error(`Not found '${label}' in __snapshots__/____.snap`);
+    }
+    return  snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
 }
 
 // deleteFile

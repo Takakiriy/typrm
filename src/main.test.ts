@@ -1,9 +1,10 @@
 ﻿import * as fs from "fs";
 import * as path from "path";
-import { ppid } from "process";
 import * as main from "./main";
 import * as chalk from "chalk";
+import * as globby from 'globby';
 const snapshots = require("./__snapshots__/main.test.ts.snap");
+const startInFolder = process.cwd();
 const callMain = main.callMainFromJest;
 
 if (path.basename(process.cwd()) === 'empty_folder') {
@@ -13,6 +14,7 @@ if (path.basename(process.cwd()) !== 'src') {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
     process.chdir('src');
 }
+
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
 const refColor = chalk.yellow;
@@ -21,20 +23,50 @@ const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
-process.env.TYPRM_VERB = `
-    - #
-        label: 7.Test Echo
-        number: 7
-        regularExpression: ^.*\\.md(#.*)?\$
-        command: 'echo  "{ref: \${ref}, file: \${file}, fragment: \${fragment}}"'
-    - #
-        label: 1.View
-        number: 1
-        regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
-        command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\${file}"'
-`;
+if (process.env.windir !== '') {
+    var  testingOS = 'Windows';
+} else {
+    var  testingOS = 'Linux';
+}
+if (testingOS === 'Windows') {
+    process.env.TYPRM_VERB = `
+        - #
+            label: 7.Test Echo
+            number: 7
+            regularExpression: ^.*\\.md(#.*)?\$
+            command: 'echo {ref: \${ref}, file: \${file}, fragment: \${fragment}}'
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
+            command: 'msedge "file://\${file}"'
+    `;
+} else {
+    process.env.TYPRM_VERB = `
+        - #
+            label: 7.Test Echo
+            number: 7
+            regularExpression: ^.*\\.md(#.*)?\$
+            command: 'echo  "{ref: \${ref}, file: \${file}, fragment: \${fragment}}"'
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
+            command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\${file}"'
+    `;
+}
 beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
+});
+test.only('a',async()=>{
+const current = process.cwd();
+fs.rmdirSync('test_data\\_checking', {recursive: true});
+fs.mkdirSync('test_data\\_checking', {recursive: true});
+process.chdir('test_data\\_checking');
+const scanedPaths = await globby(['**/*']);
+process.chdir('..');
+fs.rmdirSync('_checking', {recursive: true});
+console.log('A')
 });
 
 describe("checks template value >>", () => {
@@ -667,40 +699,78 @@ describe("print reference >>", () => {
         [
             "1st",
             ["search", "#ref:", "${TEST_ENV}/file.txt"],
+            {locale: "en-US"},
             "testEnv/file.txt\n" +
             "    0.Folder\n",
         ],[
             "multi parameters",
             ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
+            {locale: "en-US"},
             "testEnv/file1.txt testEnv/testEnv/file2.txt\n" +
             "    0.Folder\n",
         ],[
             "escape",
             ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
+            {locale: "en-US"},
             "${TEST_ENV} -${TEST_ENV}- /testEnv\n" +
             "    0.Folder\n",
         ],[
             "path",
             ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
+            {locale: "en-US"},
             "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" +  // TYPRM_TEST_PATH has \ but print replaced to /
             "    0.Folder\n",
         ],[
             "recommend",
             ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
+            {locale: "en-US"},
             "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
             "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
             "    0.Folder\n",
         ],[
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
+            {locale: "en-US"},
             "{ref: ../README.md#title, file: ../README.md, fragment: title}\n",
         ],[
             "verb error",
             ["search", "#ref:", "../README.md", "4"],  // 4 is unknown verb
+            {locale: "en-US"},
             "Error that verb number 4 is not defined\n",
+        ],[
+            "verb verbose",
+            ["search", "#ref:", "../README.md", "4"],
+            {locale: "en-US", verbose: ""},
+            (testingOS === 'Windows')
+            ? // Windows
+                "Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
+                "Verbose: Verb[0]:\n" +
+                "Verbose:     label: 7.Test Echo\n" +
+                "Verbose:     number: 7\n" +
+                "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
+                "Verbose:     command: echo {ref: \${ref}, file: \${file}, fragment: \${fragment}}\n" +
+                "Verbose: Verb[1]:\n" +
+                "Verbose:     label: 1.View\n" +
+                "Verbose:     number: 1\n" +
+                "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                "Verbose:     command: msedge \"file://\${file}\"\n" +
+                "Error that verb number 4 is not defined\n"
+            : // mac
+                "Verbose: Verb[0]:\n" +
+                "Verbose:     label: 7.Test Echo\n" +
+                "Verbose:     number: 7\n" +
+                "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
+                "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, fragment: \${fragment}}\"\n" +
+                "Verbose: Verb[1]:\n" +
+                "Verbose:     label: 1.View\n" +
+                "Verbose:     number: 1\n" +
+                "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                "Error that verb number 4 is not defined\n",
         ],
-    ])("%s", async (_caseName, arguments_, answer) => {
-        await callMain(arguments_, {locale: "en-US"});
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        await callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
     });
 });
@@ -719,6 +789,7 @@ describe("test of test >>", () => {
 afterAll(()=>{
     deleteFileSync('test_data/_output.txt')
     fs.rmdirSync('empty_folder', {recursive: true});
+    process.chdir(startInFolder);
 });
 
 // getSnapshot

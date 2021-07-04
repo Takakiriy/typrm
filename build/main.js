@@ -57,17 +57,20 @@ var csvParse = require("csv-parse");
 var chalk = require("chalk");
 var yaml = require("js-yaml");
 var child_process = require("child_process");
-process.env['typrm_aaa'] = 'aaa';
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, inputFilePath, replacingLineNum;
+        var verboseMode, checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, inputFilePath, replacingLineNum;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     locale = Intl.NumberFormat().resolvedOptions().locale;
                     if ('locale' in exports.programOptions) {
                         locale = exports.programOptions.locale;
+                    }
+                    verboseMode = 'verbose' in exports.programOptions;
+                    if (verboseMode) {
+                        printConfig();
                     }
                     if (!(exports.programArguments.length === 0)) return [3 /*break*/, 4];
                     return [4 /*yield*/, checkRoutine(true, '')];
@@ -1377,8 +1380,7 @@ var IfTagParser = /** @class */ (function () {
             if (this.thisIsOutOfFalseBlock && !resultOfIf) {
                 this.thisIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf,
-                enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
             this.isReplacable_ = isReplacable;
         }
         return { condition: expression, errorCount: errorCount };
@@ -1480,10 +1482,8 @@ function check(checkingFilePath) {
                     currentFolder = process.cwd();
                     inputFileFullPaths = [];
                     notFoundPaths = [];
-                    if (checkingFilePath) {
-                        targetFolders.push(currentFolder);
-                    }
                     if (!checkingFilePath) return [3 /*break*/, 2];
+                    targetFolders.push(currentFolder);
                     for (_i = 0, targetFolders_2 = targetFolders; _i < targetFolders_2.length; _i++) {
                         folder = targetFolders_2[_i];
                         targetFolderFullPath = getFullPath(folder, currentFolder);
@@ -1558,7 +1558,7 @@ function check(checkingFilePath) {
 // search
 function search() {
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, cSearch, cPrintRef, cRunVerb, lastWord, hasVerb, command, keywordWithoudVerb, ref, previousPrint, prompt, prompt, keyword_1, d, command, verbNumber;
+        var startIndex, keyword, cSearch, cPrintRef, cRunVerb, lastWord, hasVerb, command, keywordWithoudVerb, ref, previousPrint, prompt, prompt, keyword_1, command, verbNumber;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1607,8 +1607,6 @@ function search() {
                     return [4 /*yield*/, input(chalk.yellow(prompt) + ' ')];
                 case 6:
                     keyword_1 = _a.sent();
-                    d = pp(112);
-                    pp(keyword_1);
                     if (!(keyword_1 === 'exit()')) return [3 /*break*/, 7];
                     return [3 /*break*/, 12];
                 case 7:
@@ -2116,11 +2114,18 @@ function getRelatedVerbs(address) {
             }
         }
     }
+    if (runningOS === 'Windows') {
+        var command = "explorer /SELECT, \"" + verbVar.file + "\"";
+    }
+    else {
+        var command = "open -R \"" + verbVar.file + "\"";
+        // Open the folder by Finder and select the file
+    }
     relatedVerbs.push({
         label: '0.Folder',
         number: '0',
         regularExpression: '.*',
-        command: "open -R \"" + verbVar.file + "\"", // Open the folder by Finder and select the file
+        command: command,
     });
     return relatedVerbs;
 }
@@ -2138,11 +2143,41 @@ function runVerb(verbs, address, verbNum) {
     }
     if (command !== '') {
         var stdout_ = child_process.execSync(command).toString();
-        stdout_ = stdout_.substr(0, stdout_.length - 1); // Cut last '\n'
+        if (runningOS === 'Windows') {
+            stdout_ = stdout_.substr(0, stdout_.length - 2); // Cut last '\r\n'
+        }
+        else {
+            stdout_ = stdout_.substr(0, stdout_.length - 1); // Cut last '\n'
+        }
         console.log(stdout_);
     }
     else {
         console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error that verb number ", " is not defined"], ["Error that verb number ", " is not defined"])), verbNum));
+    }
+}
+// printConfig
+function printConfig() {
+    for (var _i = 0, _a = Object.entries(process.env); _i < _a.length; _i++) {
+        var _b = _a[_i], envName = _b[0], envValue = _b[1];
+        if (envName.startsWith('TYPRM_') && envName !== 'TYPRM_VERB') {
+            console.log("Verbose: " + envName + " = " + envValue);
+        }
+    }
+    if (process.env.TYPRM_VERB) {
+        var verbConfig = yaml.load(process.env.TYPRM_VERB);
+        if (typeof verbConfig === 'object' && verbConfig) {
+            var verbs = verbConfig;
+            var index = 0;
+            for (var _c = 0, verbs_3 = verbs; _c < verbs_3.length; _c++) {
+                var verb = verbs_3[_c];
+                console.log("Verbose: Verb[" + index + "]:");
+                console.log("Verbose:     label: " + verb.label);
+                console.log("Verbose:     number: " + verb.number);
+                console.log("Verbose:     regularExpression: " + verb.regularExpression);
+                console.log("Verbose:     command: " + verb.command);
+                index += 1;
+            }
+        }
     }
 }
 // varidateUpdateCommandArguments
@@ -3119,6 +3154,12 @@ function callMainFromJest(parameters, options) {
     });
 }
 exports.callMainFromJest = callMainFromJest;
+if (process.env.windir !== '') {
+    var runningOS = 'Windows';
+}
+else {
+    var runningOS = 'Linux';
+}
 var settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
 var settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 var originalLabel = "#original:";
