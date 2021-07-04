@@ -6,6 +6,7 @@ import * as globby from 'globby';
 const snapshots = require("./__snapshots__/main.test.ts.snap");
 const startInFolder = process.cwd();
 const callMain = main.callMainFromJest;
+process.env['typrm_aaa'] = 'aaa';
 
 if (path.basename(process.cwd()) === 'empty_folder') {
     process.chdir('..');
@@ -34,7 +35,7 @@ if (testingOS === 'Windows') {
             label: 7.Test Echo
             number: 7
             regularExpression: ^.*\\.md(#.*)?\$
-            command: 'echo {ref: \${ref}, file: \${file}, fragment: \${fragment}}'
+            command: 'echo {ref: \${ref}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}'
         - #
             label: 1.View
             number: 1
@@ -47,7 +48,7 @@ if (testingOS === 'Windows') {
             label: 7.Test Echo
             number: 7
             regularExpression: ^.*\\.md(#.*)?\$
-            command: 'echo  "{ref: \${ref}, file: \${file}, fragment: \${fragment}}"'
+            command: 'echo  "{ref: \${ref}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}"'
         - #
             label: 1.View
             number: 1
@@ -57,16 +58,6 @@ if (testingOS === 'Windows') {
 }
 beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
-});
-test.only('a',async()=>{
-const current = process.cwd();
-fs.rmdirSync('test_data\\_checking', {recursive: true});
-fs.mkdirSync('test_data\\_checking', {recursive: true});
-process.chdir('test_data\\_checking');
-const scanedPaths = await globby(['**/*']);
-process.chdir('..');
-fs.rmdirSync('_checking', {recursive: true});
-console.log('A')
 });
 
 describe("checks template value >>", () => {
@@ -536,7 +527,7 @@ describe("searches keyword tag >>", () => {
         ],[
             "output order (3)",
             ["search", "grape"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + `     #keyword: ${matchedColor('GRAPE')}fruit juice\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + `     #keyword: ${matchedColor('GRAPE')}fruit juice\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + `     #keyword: pink ${matchedColor('GRAPE')}fruit\n` +
@@ -560,21 +551,21 @@ describe("searches keyword tag >>", () => {
         ],[
             "output order (4)",
             ["search", "main", "stage"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':51:') + `     #keyword: ${matchedColor('main')}ly ${matchedColor('stage')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':50:') + `     #keyword: ${matchedColor('Main stage')}s\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':52:') + `     #keyword: ${matchedColor('Main stage')}s\n`,
         ],[
             "output order (5)",
             ["search", "silver", "arrow"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + `     #keyword: add ${matchedColor('SILVER arrow')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + `     #keyword: add ${matchedColor('SILVER arrow')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + `     #keyword: [${matchedColor('silver')}/super-system], ${matchedColor('SILVER Arrow')}s\n`,
         ],[
             "output order (6)",
             ["search", "tool", "release"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + `     #keyword: ${matchedColor('Tool release')} now\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + `     #keyword: ${matchedColor('Tool release')}, ${matchedColor('Tool')} deploy\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + `     #keyword: ${matchedColor('Tool release')}, ${matchedColor('Tool')} deploy\n`,
@@ -731,7 +722,7 @@ describe("print reference >>", () => {
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
             {locale: "en-US"},
-            "{ref: ../README.md#title, file: ../README.md, fragment: title}\n",
+            "{ref: ../README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
         ],[
             "verb error",
             ["search", "#ref:", "../README.md", "4"],  // 4 is unknown verb
@@ -749,7 +740,7 @@ describe("print reference >>", () => {
                 "Verbose:     label: 7.Test Echo\n" +
                 "Verbose:     number: 7\n" +
                 "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                "Verbose:     command: echo {ref: \${ref}, file: \${file}, fragment: \${fragment}}\n" +
+                "Verbose:     command: echo {ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
                 "Verbose: Verb[1]:\n" +
                 "Verbose:     label: 1.View\n" +
                 "Verbose:     number: 1\n" +
@@ -761,7 +752,7 @@ describe("print reference >>", () => {
                 "Verbose:     label: 7.Test Echo\n" +
                 "Verbose:     number: 7\n" +
                 "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, fragment: \${fragment}}\"\n" +
+                "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\"\n" +
                 "Verbose: Verb[1]:\n" +
                 "Verbose:     label: 1.View\n" +
                 "Verbose:     number: 1\n" +

@@ -128,6 +128,9 @@ function TestOfCommandLine() {
                     returns = _a.sent();
                     // Check
                     if (case_.check === 'true') {
+                        if (testingOS === 'Windows') {
+                            testingOS = 'Windows2';
+                        }
                         answer = getSnapshot("typrm_test >> " + case_.name + " >> " + testingOS + ": stdout 1");
                         if (returns.stdout !== answer) {
                             printDifferentPaths('_output.txt', '_expected.txt');

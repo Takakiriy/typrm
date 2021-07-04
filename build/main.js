@@ -1380,7 +1380,8 @@ var IfTagParser = /** @class */ (function () {
             if (this.thisIsOutOfFalseBlock && !resultOfIf) {
                 this.thisIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf,
+                enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
             this.isReplacable_ = isReplacable;
         }
         return { condition: expression, errorCount: errorCount };
@@ -2115,7 +2116,7 @@ function getRelatedVerbs(address) {
         }
     }
     if (runningOS === 'Windows') {
-        var command = "explorer /SELECT, \"" + verbVar.file + "\"";
+        var command = "explorer /select, \"" + verbVar.windowsFile + "\"";
     }
     else {
         var command = "open -R \"" + verbVar.file + "\"";
@@ -2135,19 +2136,36 @@ function runVerb(verbs, address, verbNum) {
     for (var _i = 0, verbs_2 = verbs; _i < verbs_2.length; _i++) {
         var verb = verbs_2[_i];
         if (verb.number.toString() === verbNum) {
-            command = verb.command
-                .replace(verbVar.ref, address)
-                .replace(verbVar.file, address.substr(0, address.indexOf('#')))
-                .replace(verbVar.fragment, address.substr(address.indexOf('#') + 1));
+            var fragmentIndex = address.indexOf('#');
+            if (fragmentIndex === notFound) {
+                command = verb.command
+                    .replace(verbVar.ref, address)
+                    .replace(verbVar.file, address)
+                    .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
+                    .replace(verbVar.fragment, '');
+            }
+            else {
+                command = verb.command
+                    .replace(verbVar.ref, address)
+                    .replace(verbVar.file, address.substr(0, fragmentIndex))
+                    .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
+                    .replace(verbVar.fragment, address.substr(fragmentIndex + 1));
+            }
         }
     }
     if (command !== '') {
-        var stdout_ = child_process.execSync(command).toString();
-        if (runningOS === 'Windows') {
-            stdout_ = stdout_.substr(0, stdout_.length - 2); // Cut last '\r\n'
+        var stdout_ = '';
+        try {
+            stdout_ = child_process.execSync(command).toString();
+            if (runningOS === 'Windows') {
+                stdout_ = stdout_.substr(0, stdout_.length - 2); // Cut last '\r\n'
+            }
+            else {
+                stdout_ = stdout_.substr(0, stdout_.length - 1); // Cut last '\n'
+            }
         }
-        else {
-            stdout_ = stdout_.substr(0, stdout_.length - 1); // Cut last '\n'
+        catch (e) {
+            stdout_ = e.toString();
         }
         console.log(stdout_);
     }
@@ -2780,6 +2798,7 @@ var VerbVariable;
 (function (VerbVariable) {
     VerbVariable.ref = '${ref}';
     VerbVariable.file = '${file}';
+    VerbVariable.windowsFile = '${windowsFile}';
     VerbVariable.fragment = '${fragment}';
 })(VerbVariable || (VerbVariable = {}));
 var verbVar = VerbVariable;

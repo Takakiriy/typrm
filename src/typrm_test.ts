@@ -70,6 +70,9 @@ async function  TestOfCommandLine() {
 
         // Check
         if (case_.check === 'true') {
+            if (testingOS === 'Windows') {
+                testingOS = 'Windows2';
+            }
             const  answer = getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
 
             if (returns.stdout !== answer) {

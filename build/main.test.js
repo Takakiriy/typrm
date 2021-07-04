@@ -40,10 +40,10 @@ var fs = require("fs");
 var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
-var globby = require("globby");
 var snapshots = require("./__snapshots__/main.test.ts.snap");
+var startInFolder = process.cwd();
 var callMain = main.callMainFromJest;
-var currentFolder = process.cwd();
+process.env['typrm_aaa'] = 'aaa';
 if (path.basename(process.cwd()) === 'empty_folder') {
     process.chdir('..');
 }
@@ -51,27 +51,6 @@ if (path.basename(process.cwd()) !== 'src') {
     // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
     process.chdir('src');
 }
-function mainOfTry() {
-    return __awaiter(this, void 0, void 0, function () {
-        var scanedPaths;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    fs.rmdirSync('test_data\\_checking', { recursive: true });
-                    fs.mkdirSync('test_data\\_checking', { recursive: true });
-                    process.chdir('test_data\\_checking');
-                    return [4 /*yield*/, globby(['**/*'])];
-                case 1:
-                    scanedPaths = _a.sent();
-                    process.chdir('test_data');
-                    fs.rmdirSync('_checking', { recursive: true });
-                    console.log('A');
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-mainOfTry();
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var refColor = chalk.yellow;
@@ -87,16 +66,16 @@ else {
     var testingOS = 'Linux';
 }
 if (testingOS === 'Windows') {
-    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, file: ${file}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
+    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
 }
 else {
-    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo  \"{ref: ${ref}, file: ${file}, fragment: ${fragment}}\"'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n    ";
+    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo  \"{ref: ${ref}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}\"'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n    ";
 }
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
 describe("checks template value >>", function () {
-    test.only.each([
+    test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
@@ -306,15 +285,13 @@ describe("replaces settings >>", function () {
                     writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileName, lineNum, keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale,
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                        folder: changingFolderPath, test: "",
-                        locale: locale,
+                        folder: changingFolderPath, test: "", locale: locale,
                     })];
                 case 3:
                     _a.sent();
@@ -351,8 +328,7 @@ describe("replaces settings >>", function () {
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale,
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 2:
                     _a.sent();
@@ -365,8 +341,7 @@ describe("replaces settings >>", function () {
                 case 5:
                     _a.trys.push([5, 7, , 8]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale,
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 6:
                     _a.sent();
@@ -469,15 +444,13 @@ describe("replaces settings >>", function () {
                         writeFileSync(changingFilePath, sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 2];
                         return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                                folder: changingFolderPath, test: "",
-                                locale: locale
+                                folder: changingFolderPath, test: "", locale: locale
                             })];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale
+                            folder: changingFolderPath, test: "", locale: locale
                         })];
                     case 3:
                         _a.sent();
@@ -487,15 +460,13 @@ describe("replaces settings >>", function () {
                         expect(updatedFileContents).not.toBe(sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 6];
                         return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
-                                folder: changingFolderPath, test: "",
-                                locale: locale
+                                folder: changingFolderPath, test: "", locale: locale
                             })];
                     case 5:
                         _a.sent();
                         return [3 /*break*/, 8];
                     case 6: return [4 /*yield*/, callMain(["revert", changingFileName], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale
+                            folder: changingFolderPath, test: "", locale: locale
                         })];
                     case 7:
                         _a.sent();
@@ -634,7 +605,7 @@ describe("searches keyword tag >>", function () {
         ], [
             "output order (3)",
             ["search", "grape"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + ("     #keyword: pink " + matchedColor('GRAPE') + "fruit\n") +
@@ -658,21 +629,21 @@ describe("searches keyword tag >>", function () {
         ], [
             "output order (4)",
             ["search", "main", "stage"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':51:') + ("     #keyword: " + matchedColor('main') + "ly " + matchedColor('stage') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':50:') + ("     #keyword: " + matchedColor('Main stage') + "s\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':52:') + ("     #keyword: " + matchedColor('Main stage') + "s\n"),
         ], [
             "output order (5)",
             ["search", "silver", "arrow"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + ("     #keyword: add " + matchedColor('SILVER arrow') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + ("     #keyword: add " + matchedColor('SILVER arrow') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + ("     #keyword: [" + matchedColor('silver') + "/super-system], " + matchedColor('SILVER Arrow') + "s\n"),
         ], [
             "output order (6)",
             ["search", "tool", "release"],
-            { folder: "test_data/search/2", test: "", verbose: "1" },
+            { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + ("     #keyword: " + matchedColor('Tool release') + " now\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + ("     #keyword: " + matchedColor('Tool release') + ", " + matchedColor('Tool') + " deploy\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + ("     #keyword: " + matchedColor('Tool release') + ", " + matchedColor('Tool') + " deploy\n"),
@@ -842,7 +813,7 @@ describe("print reference >>", function () {
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],
             { locale: "en-US" },
-            "{ref: ../README.md#title, file: ../README.md, fragment: title}\n",
+            "{ref: ../README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
         ], [
             "verb error",
             ["search", "#ref:", "../README.md", "4"],
@@ -860,7 +831,7 @@ describe("print reference >>", function () {
                         "Verbose:     label: 7.Test Echo\n" +
                         "Verbose:     number: 7\n" +
                         "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                        "Verbose:     command: echo {ref: \${ref}, file: \${file}, fragment: \${fragment}}\n" +
+                        "Verbose:     command: echo {ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
                         "Verbose: Verb[1]:\n" +
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
@@ -872,7 +843,7 @@ describe("print reference >>", function () {
                         "Verbose:     label: 7.Test Echo\n" +
                         "Verbose:     number: 7\n" +
                         "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                        "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, fragment: \${fragment}}\"\n" +
+                        "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\"\n" +
                         "Verbose: Verb[1]:\n" +
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
@@ -904,6 +875,7 @@ describe("test of test >>", function () {
 afterAll(function () {
     deleteFileSync('test_data/_output.txt');
     fs.rmdirSync('empty_folder', { recursive: true });
+    process.chdir(startInFolder);
 });
 // getSnapshot
 function getSnapshot(label) {

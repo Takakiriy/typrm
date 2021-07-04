@@ -844,6 +844,22 @@ To allow you to choose commands other than `0.Folder`,
 such as` 1.View` and `7.Echo` commands,
 set the` TYPRM_VERB` environment variable in YAML format as follows:
 
+Case of Windows PowerShell:
+
+    ${env:TYPRM_VERB} = @"
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\.(pdf|svg)(#.*)?$
+            command: 'start msedge file:///`${ref}'
+        - #
+            label: 7.Echo
+            number: 7
+            regularExpression: .*
+            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
+    "@
+    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+
 Case of mac zsh:
 
     export  TYPRM_VERB=$(cat << EOF
@@ -856,9 +872,10 @@ Case of mac zsh:
             label: 7.Echo
             number: 7
             regularExpression: .*
-            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}"'
+            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
     EOF
     )
+    node  $(pwd)/build/typrm.js "$@"
 
 You can write variable references in the command parameter.
 
@@ -866,7 +883,10 @@ You can write variable references in the command parameter.
 | ---- | ---- |
 | ${ref}  | the parameter of `#ref:` |
 | ${file} | left of `#ref:` parameter |
+| ${windowsFile} | the path with backslash |
 | ${fragment} | right of `#ref:` parameter |
+
+You can check the setting value by adding the --verbose option to typrm.
 
 
 ## (for developers) How to build the development environment

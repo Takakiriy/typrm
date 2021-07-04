@@ -805,6 +805,22 @@ search コマンドのパラメーターにコマンドの数字を追加指定�
 を選べるようにするには、
 `TYPRM_VERB` 環境変数に以下のように YAML 形式で設定します。
 
+Windows の PowerShell の場合:
+
+    ${env:TYPRM_VERB} = @"
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\.(pdf|svg)(#.*)?$
+            command: 'start msedge file:///`${ref}'
+        - #
+            label: 7.Echo
+            number: 7
+            regularExpression: .*
+            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
+    "@
+    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+
 mac の zsh の場合:
 
     export  TYPRM_VERB=$(cat << EOF
@@ -817,9 +833,10 @@ mac の zsh の場合:
             label: 7.Echo
             number: 7
             regularExpression: .*
-            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}"'
+            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
     EOF
     )
+    node  $(pwd)/build/typrm.js "$@"
 
 command には command 固有の変数参照を含めることができます。
 
@@ -827,7 +844,10 @@ command には command 固有の変数参照を含めることができます。
 | ---- | ---- |
 | ${ref} | #ref: のパラメーター |
 | ${file} | #ref: のパラメーターの # より左 |
+| ${windowsFile} | バックスラッシュを使ったパス |
 | ${fragment} | #ref: のパラメーターの # より右 |
+
+typrm に --verbose オプションを付けると、設定値を確認できます。
 
 
 ## （開発者用） 開発環境の構築手順

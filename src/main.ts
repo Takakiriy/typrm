@@ -1719,7 +1719,7 @@ function  getRelatedVerbs(address: string): Verb[] {
     }
 
     if (runningOS === 'Windows') {
-        var  command = `explorer /SELECT, "${verbVar.file}"`;
+        var  command = `explorer /select, "${verbVar.windowsFile}"`;
     } else {
         var  command = `open -R "${verbVar.file}"`;
             // Open the folder by Finder and select the file
@@ -1739,20 +1739,35 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
     var  command = '';
     for (const verb of verbs) {
         if (verb.number.toString() === verbNum) {
+            const  fragmentIndex = address.indexOf('#');
+            if (fragmentIndex === notFound) {
 
-            command = verb.command
-                .replace(verbVar.ref, address)
-                .replace(verbVar.file, address.substr(0, address.indexOf('#')))
-                .replace(verbVar.fragment, address.substr(address.indexOf('#') + 1));
+                command = verb.command
+                    .replace(verbVar.ref, address)
+                    .replace(verbVar.file, address)
+                    .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
+                    .replace(verbVar.fragment, '');
+            } else {
+                command = verb.command
+                    .replace(verbVar.ref, address)
+                    .replace(verbVar.file,        address.substr(0, fragmentIndex))
+                    .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
+                    .replace(verbVar.fragment,    address.substr(fragmentIndex + 1));
+            }
         }
     }
     if (command !== '') {
+        var stdout_ = '';
+        try {
 
-        var  stdout_ = child_process.execSync( command ).toString();
-        if (runningOS === 'Windows') {
-            stdout_ = stdout_.substr(0, stdout_.length - 2);  // Cut last '\r\n'
-        } else {
-            stdout_ = stdout_.substr(0, stdout_.length - 1);  // Cut last '\n'
+            stdout_ = child_process.execSync( command ).toString();
+            if (runningOS === 'Windows') {
+                stdout_ = stdout_.substr(0, stdout_.length - 2);  // Cut last '\r\n'
+            } else {
+                stdout_ = stdout_.substr(0, stdout_.length - 1);  // Cut last '\n'
+            }
+        } catch (e: any) {
+            stdout_ = e.toString();
         }
         console.log(stdout_);
     } else {
@@ -2368,6 +2383,7 @@ interface Verb {
 namespace VerbVariable {
     export const  ref = '${ref}';
     export const  file = '${file}';
+    export const  windowsFile = '${windowsFile}';
     export const  fragment = '${fragment}';
 }
 const  verbVar = VerbVariable;
