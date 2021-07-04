@@ -875,7 +875,7 @@ Case of mac zsh:
             command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
     EOF
     )
-    node  $(pwd)/build/typrm.js "$@"
+    node  ____/build/typrm.js "$@"
 
 You can write variable references in the command parameter.
 

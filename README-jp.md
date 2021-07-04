@@ -836,7 +836,7 @@ mac の zsh の場合:
             command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
     EOF
     )
-    node  $(pwd)/build/typrm.js "$@"
+    node  ____/build/typrm.js "$@"
 
 command には command 固有の変数参照を含めることができます。
 
