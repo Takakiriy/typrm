@@ -1744,12 +1744,14 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
 
                 command = verb.command
                     .replace(verbVar.ref, address)
+                    .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
                     .replace(verbVar.file, address)
                     .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
                     .replace(verbVar.fragment, '');
             } else {
                 command = verb.command
                     .replace(verbVar.ref, address)
+                    .replace(verbVar.windowsRef,  address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
                     .replace(verbVar.file,        address.substr(0, fragmentIndex))
                     .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
                     .replace(verbVar.fragment,    address.substr(fragmentIndex + 1));
@@ -2382,6 +2384,7 @@ interface Verb {
 // verbVar
 namespace VerbVariable {
     export const  ref = '${ref}';
+    export const  windowsRef = '${windowsRef}';
     export const  file = '${file}';
     export const  windowsFile = '${windowsFile}';
     export const  fragment = '${fragment}';
@@ -2771,7 +2774,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     }
 }
 
-if (process.env.windir !== '') {
+if (process.env.windir) {
     var  runningOS = 'Windows';
 } else {
     var  runningOS = 'Linux';

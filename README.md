@@ -882,9 +882,10 @@ You can write variable references in the command parameter.
 | Variable | Value |
 | ---- | ---- |
 | ${ref}  | the parameter of `#ref:` |
-| ${file} | left of `#ref:` parameter |
+| ${windowsRef} | `#ref:` parameter replaced from `/` to `\` |
+| ${file} | left of `#` in `#ref:` parameter |
 | ${windowsFile} | the path with backslash |
-| ${fragment} | right of `#ref:` parameter |
+| ${fragment} | right of `#` in `#ref:` parameter |
 
 You can check the setting value by adding the --verbose option to typrm.
 

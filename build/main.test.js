@@ -59,17 +59,17 @@ var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
-if (process.env.windir !== '') {
+if (process.env.windir) {
     var testingOS = 'Windows';
 }
 else {
     var testingOS = 'Linux';
 }
 if (testingOS === 'Windows') {
-    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
+    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, windowsRef: ${windowsRef}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
 }
 else {
-    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo  \"{ref: ${ref}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}\"'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n    ";
+    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo  \"{ref: ${ref}, windowsRef: ${windowsRef}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}\"'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n    ";
 }
 beforeAll(function () {
     fs.mkdirSync('empty_folder', { recursive: true });
@@ -813,7 +813,7 @@ describe("print reference >>", function () {
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],
             { locale: "en-US" },
-            "{ref: ../README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
+            "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
         ], [
             "verb error",
             ["search", "#ref:", "../README.md", "4"],
@@ -831,7 +831,7 @@ describe("print reference >>", function () {
                         "Verbose:     label: 7.Test Echo\n" +
                         "Verbose:     number: 7\n" +
                         "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                        "Verbose:     command: echo {ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
+                        "Verbose:     command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
                         "Verbose: Verb[1]:\n" +
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
@@ -839,11 +839,13 @@ describe("print reference >>", function () {
                         "Verbose:     command: msedge \"file://\${file}\"\n" +
                         "Error that verb number 4 is not defined\n"
                 : // mac
-                    "Verbose: Verb[0]:\n" +
+                    "Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                        "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
+                        "Verbose: Verb[0]:\n" +
                         "Verbose:     label: 7.Test Echo\n" +
                         "Verbose:     number: 7\n" +
                         "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                        "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\"\n" +
+                        "Verbose:     command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
                         "Verbose: Verb[1]:\n" +
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +

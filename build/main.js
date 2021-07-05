@@ -2140,6 +2140,7 @@ function runVerb(verbs, address, verbNum) {
             if (fragmentIndex === notFound) {
                 command = verb.command
                     .replace(verbVar.ref, address)
+                    .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
                     .replace(verbVar.file, address)
                     .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
                     .replace(verbVar.fragment, '');
@@ -2147,6 +2148,7 @@ function runVerb(verbs, address, verbNum) {
             else {
                 command = verb.command
                     .replace(verbVar.ref, address)
+                    .replace(verbVar.windowsRef, address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
                     .replace(verbVar.file, address.substr(0, fragmentIndex))
                     .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
                     .replace(verbVar.fragment, address.substr(fragmentIndex + 1));
@@ -2797,6 +2799,7 @@ var SearchKeyword = /** @class */ (function () {
 var VerbVariable;
 (function (VerbVariable) {
     VerbVariable.ref = '${ref}';
+    VerbVariable.windowsRef = '${windowsRef}';
     VerbVariable.file = '${file}';
     VerbVariable.windowsFile = '${windowsFile}';
     VerbVariable.fragment = '${fragment}';
@@ -3173,7 +3176,7 @@ function callMainFromJest(parameters, options) {
     });
 }
 exports.callMainFromJest = callMainFromJest;
-if (process.env.windir !== '') {
+if (process.env.windir) {
     var runningOS = 'Windows';
 }
 else {

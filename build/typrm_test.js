@@ -44,11 +44,11 @@ var snapshots = require(currentFolder + "/__snapshots__/main.test.ts.snap");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
 process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: ^.*\\.md(#.*)?$\n        command: 'echo  \"(${ref})\"'\n";
-if (process.env.windir !== '') {
+if (process.env.windir) {
     var testingOS = 'Windows';
 }
 else {
-    var testingOS = 'Linux';
+    var testingOS = 'mac';
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {

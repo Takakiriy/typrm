@@ -24,7 +24,7 @@ const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Users';
-if (process.env.windir !== '') {
+if (process.env.windir) {
     var  testingOS = 'Windows';
 } else {
     var  testingOS = 'Linux';
@@ -35,7 +35,7 @@ if (testingOS === 'Windows') {
             label: 7.Test Echo
             number: 7
             regularExpression: ^.*\\.md(#.*)?\$
-            command: 'echo {ref: \${ref}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}'
+            command: 'echo {ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}'
         - #
             label: 1.View
             number: 1
@@ -48,7 +48,7 @@ if (testingOS === 'Windows') {
             label: 7.Test Echo
             number: 7
             regularExpression: ^.*\\.md(#.*)?\$
-            command: 'echo  "{ref: \${ref}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}"'
+            command: 'echo  "{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}"'
         - #
             label: 1.View
             number: 1
@@ -722,7 +722,7 @@ describe("print reference >>", () => {
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
             {locale: "en-US"},
-            "{ref: ../README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
+            "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
         ],[
             "verb error",
             ["search", "#ref:", "../README.md", "4"],  // 4 is unknown verb
@@ -740,7 +740,7 @@ describe("print reference >>", () => {
                 "Verbose:     label: 7.Test Echo\n" +
                 "Verbose:     number: 7\n" +
                 "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                "Verbose:     command: echo {ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
+                "Verbose:     command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
                 "Verbose: Verb[1]:\n" +
                 "Verbose:     label: 1.View\n" +
                 "Verbose:     number: 1\n" +
@@ -748,11 +748,13 @@ describe("print reference >>", () => {
                 "Verbose:     command: msedge \"file://\${file}\"\n" +
                 "Error that verb number 4 is not defined\n"
             : // mac
+                "Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
                 "Verbose: Verb[0]:\n" +
                 "Verbose:     label: 7.Test Echo\n" +
                 "Verbose:     number: 7\n" +
                 "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                "Verbose:     command: echo  \"{ref: \${ref}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\"\n" +
+                "Verbose:     command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
                 "Verbose: Verb[1]:\n" +
                 "Verbose:     label: 1.View\n" +
                 "Verbose:     number: 1\n" +

@@ -13,10 +13,10 @@ process.env.TYPRM_VERB = `
         regularExpression: ^.*\\.md(#.*)?\$
         command: 'echo  "(\${ref})"'
 `;
-if (process.env.windir !== '') {
+if (process.env.windir) {
     var  testingOS = 'Windows';
 } else {
-    var  testingOS = 'Linux';
+    var  testingOS = 'mac';
 }
 
 async function  main() {
