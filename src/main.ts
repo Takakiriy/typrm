@@ -795,6 +795,7 @@ class  TemplateTag {
 
     // parseLine
     parseLine(line: string) {
+        const  disabled = (line.indexOf(disableLabel) !== notFound);
 
         this.label = templateLabel;
         this.indexInLine = line.indexOf(templateLabel);
@@ -808,7 +809,7 @@ class  TemplateTag {
             this.label = templateIfLabel;
             this.indexInLine = line.indexOf(templateIfLabel);
         }
-        if (this.indexInLine !== notFound) {
+        if (this.indexInLine !== notFound  &&  ! disabled) {
             this.isFound = true;
             const  leftOfTemplate = line.substr(0, this.indexInLine).trim();
             if (this.label === fileTemplateLabel) {
@@ -829,7 +830,7 @@ class  TemplateTag {
 
         this.label = templateAtStartLabel;
         this.startIndexInLine = line.indexOf(templateAtStartLabel);
-        if (this.startIndexInLine !== notFound) {
+        if (this.startIndexInLine !== notFound  &&  ! disabled) {
             this.isFound = true;
             this.endIndexInLine =  line.indexOf(templateAtEndLabel, this.startIndexInLine);
             if (this.endIndexInLine !== notFound) {
@@ -842,6 +843,7 @@ class  TemplateTag {
             }
         }
 
+        this.isFound = false;
         this.label = '';
         this.template = '';
         this.lineNumOffset = 0;

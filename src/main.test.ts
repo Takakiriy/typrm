@@ -2,19 +2,10 @@
 import * as path from "path";
 import * as main from "./main";
 import * as chalk from "chalk";
-import * as globby from 'globby';
 const snapshots = require("./__snapshots__/main.test.ts.snap");
-const startInFolder = process.cwd();
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
-
-if (path.basename(process.cwd()) === 'empty_folder') {
-    process.chdir('..');
-}
-if (path.basename(process.cwd()) !== 'src') {
-    // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
-    process.chdir('src');
-}
+process.chdir(process.env.HOME + '/GitProjects/GitHub/typrm/src');
 
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
@@ -782,7 +773,6 @@ describe("test of test >>", () => {
 afterAll(()=>{
     deleteFileSync('test_data/_output.txt')
     fs.rmdirSync('empty_folder', {recursive: true});
-    process.chdir(startInFolder);
 });
 
 // getSnapshot
