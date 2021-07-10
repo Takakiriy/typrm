@@ -1096,7 +1096,10 @@ var TemplateTag = /** @class */ (function () {
         var currentIndent = indentRegularExpression.exec(line)[0];
         var readingNext = true;
         if (currentIndent.length > this.indentAtTag.length && line.startsWith(this.indentAtTag)) {
-            this.templateLines.push(line);
+            var skip = (this.templateLines.length === 0 && line.trim() === fileTemplateAnyLinesLabel);
+            if (!skip) {
+                this.templateLines.push(line);
+            }
             this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
         }
         else {
@@ -1209,7 +1212,7 @@ var TemplateTag = /** @class */ (function () {
                             targetLineNum += 1;
                             if (templateLineIndex === 0) {
                                 indentLength = targetLine.indexOf(expectedFirstLine);
-                                if (indentLength !== notFound && targetLine.trim() === expectedFirstLine) {
+                                if (indentLength !== notFound && targetLine.trim() === expectedFirstLine.trim()) {
                                     result = Result.same;
                                     indent = targetLine.substr(0, indentLength);
                                 }

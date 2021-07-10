@@ -135,13 +135,13 @@ describe("checks file contents >>", function () {
             "any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
     ])("%s in %s, %s %s", function (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var changingFilePath, changingFileRelativePath, sourceFileContents;
+        var sourceFileContents, changingFilePath, changingFileRelativePath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    sourceFileContents = getSnapshot("checks file contents >> " + fileNameHead + " : sourceFileContents 1");
                     changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
                     changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
-                    sourceFileContents = getSnapshot("checks file contents >> " + fileNameHead + " : sourceFileContents 1");
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     writeFileSync(changingFilePath, sourceFileContents);
                     process.chdir('empty_folder');

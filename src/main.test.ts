@@ -107,9 +107,9 @@ describe("checks file contents >>", () => {
             "any_lines", "file_8_others", "file/1", "", 0, 0, "",
         ]
     ])("%s in %s, %s %s", async (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
+        const  sourceFileContents = getSnapshot(`checks file contents >> ${fileNameHead} : sourceFileContents 1`);
         const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
         const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
-        const  sourceFileContents = getSnapshot(`checks file contents >> ${fileNameHead} : sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(changingFilePath, sourceFileContents);
         process.chdir('empty_folder');

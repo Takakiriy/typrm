@@ -13,3 +13,9 @@ Target of template file >> any lines tag >> has empty line:
 
     2 third
     2 fourth
+Target of template file >> any lines at first:
+    3 first
+        3 OK nested line
+    3 OK end
+        3 NG nested line
+    3 NG start

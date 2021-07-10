@@ -856,8 +856,11 @@ class  TemplateTag {
         const  currentIndent = indentRegularExpression.exec(line)![0];
         let  readingNext = true;
         if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
+            const  skip = (this.templateLines.length === 0  &&  line.trim() === fileTemplateAnyLinesLabel);
+            if ( ! skip ) {
 
-            this.templateLines.push(line);
+                this.templateLines.push(line);
+            }
             this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
         } else {
             this.templateLines = this.templateLines.map((line)=>(
@@ -951,7 +954,7 @@ class  TemplateTag {
                 if (templateLineIndex === 0) {
 
                     const  indentLength = targetLine.indexOf(expectedFirstLine);
-                    if (indentLength !== notFound  &&  targetLine.trim() === expectedFirstLine) {
+                    if (indentLength !== notFound  &&  targetLine.trim() === expectedFirstLine.trim()) {
                         result = Result.same;
                         indent = targetLine.substr(0, indentLength);
                     } else {
