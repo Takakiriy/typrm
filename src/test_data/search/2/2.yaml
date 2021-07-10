@@ -22,7 +22,7 @@ test_of_target_word_count:
     #keyword: new tasks
 test_of_without_tag_parameter:
     specular:  #// the mirror-like reflection  #keyword:
-    metaric:  #keyword:
+        specular reflection light:  #keyword:  #// out of keyword parameter
     hyphen:
         - specular reflection:  #keyword:
 output order (3):

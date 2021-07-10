@@ -193,6 +193,7 @@ typrm では上位にヒットしたテキストが下側に表示されます�
 
     #keyword: CSV, comma separated values, "a,b"
 
+`#` を含むキーワードは指定できません。
 CSV の部分に文法の問題があるときに表示される警告を抑制するには、
 `#disable-tag-tool:` を書いてください。
 

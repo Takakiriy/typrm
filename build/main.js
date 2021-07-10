@@ -1042,6 +1042,7 @@ var TemplateTag = /** @class */ (function () {
     }
     // parseLine
     TemplateTag.prototype.parseLine = function (line) {
+        var disabled = (line.indexOf(disableLabel) !== notFound);
         this.label = templateLabel;
         this.indexInLine = line.indexOf(templateLabel);
         if (this.indexInLine === notFound) {
@@ -1052,7 +1053,7 @@ var TemplateTag = /** @class */ (function () {
             this.label = templateIfLabel;
             this.indexInLine = line.indexOf(templateIfLabel);
         }
-        if (this.indexInLine !== notFound) {
+        if (this.indexInLine !== notFound && !disabled) {
             this.isFound = true;
             var leftOfTemplate = line.substr(0, this.indexInLine).trim();
             if (this.label === fileTemplateLabel) {
@@ -1072,7 +1073,7 @@ var TemplateTag = /** @class */ (function () {
         }
         this.label = templateAtStartLabel;
         this.startIndexInLine = line.indexOf(templateAtStartLabel);
-        if (this.startIndexInLine !== notFound) {
+        if (this.startIndexInLine !== notFound && !disabled) {
             this.isFound = true;
             this.endIndexInLine = line.indexOf(templateAtEndLabel, this.startIndexInLine);
             if (this.endIndexInLine !== notFound) {
@@ -1081,6 +1082,7 @@ var TemplateTag = /** @class */ (function () {
                 return;
             }
         }
+        this.isFound = false;
         this.label = '';
         this.template = '';
         this.lineNumOffset = 0;
@@ -1720,7 +1722,7 @@ function searchSub(keyword) {
                                     line = line1;
                                     lineNum += 1;
                                     if (!(line.includes(keywordLabel) && !line.includes(disableLabel))) return [3 /*break*/, 5];
-                                    csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                                    csv = getValue(line, line.indexOf(keywordLabel) + keywordLabel.length);
                                     if (csv !== '') {
                                         withParameter = true;
                                     }
@@ -1738,7 +1740,7 @@ function searchSub(keyword) {
                                     found = getKeywordMatchingScore(columns, keyword);
                                     if (found.matchedKeywordCount >= 1) {
                                         if (withParameter) {
-                                            positionOfCSV = line.length - csv.length;
+                                            positionOfCSV = line.indexOf(csv, line.indexOf(keywordLabel) + keywordLabel.length); // line.length - csv.length;
                                         }
                                         else {
                                             positionOfCSV = line.indexOf(csv);

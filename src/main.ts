@@ -1326,7 +1326,7 @@ async function  searchSub(keyword: string) {
 
             // keyword tag
             if (line.includes(keywordLabel)  &&  ! line.includes(disableLabel)) {
-                var  csv = line.substr(line.indexOf(keywordLabel) + keywordLabel.length);
+                var  csv = getValue(line, line.indexOf(keywordLabel) + keywordLabel.length);
                 if (csv !== '') {
                     var  withParameter = true;
                 } else {
@@ -1342,7 +1342,7 @@ async function  searchSub(keyword: string) {
                 const  found = getKeywordMatchingScore(columns, keyword);
                 if (found.matchedKeywordCount >= 1) {
                     if (withParameter) {
-                        var  positionOfCSV = line.length - csv.length;
+                        var  positionOfCSV = line.indexOf(csv, line.indexOf(keywordLabel) + keywordLabel.length);// line.length - csv.length;
                     } else {
                         var  positionOfCSV = line.indexOf(csv);
                     }

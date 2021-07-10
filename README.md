@@ -196,6 +196,7 @@ in the text file.
 
     #keyword: CSV, comma separated values, "a,b"
 
+Keywords containing `#` cannot be specified.
 If you want to suppress the warning of the CSV part that has syntax problem,
 write `#disable-tag-tool:`.
 

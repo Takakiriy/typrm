@@ -41,16 +41,9 @@ var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
 var snapshots = require("./__snapshots__/main.test.ts.snap");
-var startInFolder = process.cwd();
 var callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
-if (path.basename(process.cwd()) === 'empty_folder') {
-    process.chdir('..');
-}
-if (path.basename(process.cwd()) !== 'src') {
-    // Jest watch mode で２回目の実行をしても カレント フォルダー が引き継がれるため
-    process.chdir('src');
-}
+process.chdir(process.env.HOME + '/GitProjects/GitHub/typrm/src');
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var refColor = chalk.yellow;
@@ -651,7 +644,8 @@ describe("searches keyword tag >>", function () {
             "without tag parameter",
             ["search", "specular"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + ("         - " + matchedColor('specular') + " reflection:  #keyword:\n") +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':25:') + ("         " + matchedColor('specular') + " reflection light:  #keyword:  #// out of keyword parameter\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + ("         - " + matchedColor('specular') + " reflection:  #keyword:\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + ("     " + matchedColor('specular') + ":  #// the mirror-like reflection  #keyword:\n"),
         ], [
             "emphasize search and ref tag",
@@ -877,7 +871,6 @@ describe("test of test >>", function () {
 afterAll(function () {
     deleteFileSync('test_data/_output.txt');
     fs.rmdirSync('empty_folder', { recursive: true });
-    process.chdir(startInFolder);
 });
 // getSnapshot
 function getSnapshot(label) {
