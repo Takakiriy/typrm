@@ -40,10 +40,11 @@ var fs = require("fs");
 var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
+var lib = require("./lib");
 var snapshots = require("./__snapshots__/main.test.ts.snap");
 var callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
-process.chdir(process.env.HOME + '/GitProjects/GitHub/typrm/src');
+process.chdir(lib.getHomePath() + '/GitProjects/GitHub/typrm/src');
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var refColor = chalk.yellow;
@@ -792,16 +793,16 @@ describe("print reference >>", function () {
                 "    0.Folder\n",
         ], [
             "path",
-            ["search", "#ref:", "folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
+            ["search", "#ref:", "~/.ssh  folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
             { locale: "en-US" },
-            "folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
+            lib.getHomePath() + "/.ssh  folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
                 "    0.Folder\n",
         ], [
             "recommend",
-            ["search", "#ref:", "testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
+            ["search", "#ref:", lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
             { locale: "en-US" },
-            "Recommend: #ref: ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
-                "testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
+            "Recommend: #ref: ~/.ssh  ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
+                lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
                 "    0.Folder\n",
         ], [
             "verb",
@@ -887,14 +888,6 @@ function writeFileSync(filePath, fileContents) {
     var destinationFolderPath = path.dirname(filePath);
     fs.mkdirSync(destinationFolderPath, { recursive: true });
     fs.writeFileSync(filePath, fileContents);
-}
-// copyFileSync
-// #keyword: copyFileSync
-// This also makes the copy target folder.
-function copyFileSync(sourceFilePath, destinationFilePath) {
-    var destinationFolderPath = path.dirname(destinationFilePath);
-    fs.mkdirSync(destinationFolderPath, { recursive: true });
-    fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
 // deleteFileSync
 // #keyword: deleteFileSync, unlinkSync

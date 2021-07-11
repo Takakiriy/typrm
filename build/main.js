@@ -57,6 +57,7 @@ var csvParse = require("csv-parse");
 var chalk = require("chalk");
 var yaml = require("js-yaml");
 var child_process = require("child_process");
+var lib = require("./lib");
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
@@ -614,8 +615,8 @@ function getInputFileFullPath(inputFilePath) {
                     fileFullPaths = [];
                     for (_i = 0, targetFolders_1 = targetFolders; _i < targetFolders_1.length; _i++) {
                         folder = targetFolders_1[_i];
-                        targetFolderFullPath = getFullPath(folder, currentFolder);
-                        inputFileFullPath = getFullPath(inputFilePath, targetFolderFullPath);
+                        targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+                        inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
                         if (fs.existsSync(inputFileFullPath)) {
                             fileFullPaths.push(inputFileFullPath);
                         }
@@ -1158,7 +1159,7 @@ var TemplateTag = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         parentPath = path.dirname(inputFilePath);
-                        targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
+                        targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
                         if (!fs.existsSync(targetFilePath)) {
                             templateLineNum = templateEndLineNum - this.templateLines.length;
                             console.log("");
@@ -1492,8 +1493,8 @@ function check(checkingFilePath) {
                     targetFolders.push(currentFolder);
                     for (_i = 0, targetFolders_2 = targetFolders; _i < targetFolders_2.length; _i++) {
                         folder = targetFolders_2[_i];
-                        targetFolderFullPath = getFullPath(folder, currentFolder);
-                        inputFileFullPath = getFullPath(checkingFilePath, targetFolderFullPath);
+                        targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+                        inputFileFullPath = lib.getFullPath(checkingFilePath, targetFolderFullPath);
                         if (fs.existsSync(inputFileFullPath)) {
                             inputFileFullPaths.push(inputFileFullPath);
                             break;
@@ -1513,7 +1514,7 @@ function check(checkingFilePath) {
                         return __generator(this, function (_d) {
                             switch (_d.label) {
                                 case 0:
-                                    targetFolderFullPath = getFullPath(folder, currentFolder);
+                                    targetFolderFullPath = lib.getFullPath(folder, currentFolder);
                                     if (!fs.existsSync(targetFolderFullPath)) {
                                         throw new Error("Not found target folder at \"" + targetFolderFullPath + "\".");
                                     }
@@ -1522,7 +1523,7 @@ function check(checkingFilePath) {
                                 case 1:
                                     scanedPaths = _d.sent();
                                     scanedPaths.forEach(function (scanedPath) {
-                                        inputFileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath));
+                                        inputFileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath));
                                     });
                                     return [2 /*return*/];
                             }
@@ -1671,13 +1672,13 @@ function searchSub(keyword) {
                         return __generator(this, function (_f) {
                             switch (_f.label) {
                                 case 0:
-                                    targetFolderFullPath = getFullPath(folder, currentFolder);
+                                    targetFolderFullPath = lib.getFullPath(folder, currentFolder);
                                     process.chdir(targetFolderFullPath);
                                     return [4 /*yield*/, globby(['**/*'])];
                                 case 1:
                                     scanedPaths = _f.sent();
                                     scanedPaths.forEach(function (scanedPath) {
-                                        fileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath));
+                                        fileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath));
                                     });
                                     return [2 /*return*/];
                             }
@@ -2057,7 +2058,10 @@ function printRef(refTagAndAddress, option) {
             var variable = _a[_i];
             _loop_5(variable);
         }
-        address = address.replace(/\\\\/g, '\\');
+    }
+    address = address.replace(/\\\\/g, '\\');
+    if (address.startsWith('~')) {
+        address = lib.getHomePath() + address.substr(1);
     }
     // recommended = ...
     var recommended = address;
@@ -2085,6 +2089,9 @@ function printRef(refTagAndAddress, option) {
     for (var _e = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _e < sortedEnvronmentVariables_1.length; _e++) {
         var variable = sortedEnvronmentVariables_1[_e];
         recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
+    }
+    if (recommended.startsWith(lib.getHomePath())) {
+        recommended = '~' + recommended.substr(lib.getHomePath().length);
     }
     // print the address
     if (option.print) {
@@ -2138,31 +2145,33 @@ function getRelatedVerbs(address) {
 // runVerb
 function runVerb(verbs, address, verbNum) {
     var command = '';
-    for (var _i = 0, verbs_2 = verbs; _i < verbs_2.length; _i++) {
-        var verb = verbs_2[_i];
-        if (verb.number.toString() === verbNum) {
-            var fragmentIndex = address.indexOf('#');
-            if (fragmentIndex === notFound) {
-                command = verb.command
-                    .replace(verbVar.ref, address)
-                    .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
-                    .replace(verbVar.file, address)
-                    .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
-                    .replace(verbVar.fragment, '');
-            }
-            else {
-                command = verb.command
-                    .replace(verbVar.ref, address)
-                    .replace(verbVar.windowsRef, address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
-                    .replace(verbVar.file, address.substr(0, fragmentIndex))
-                    .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
-                    .replace(verbVar.fragment, address.substr(fragmentIndex + 1));
-            }
+    var matchesVerbs = verbs.filter(function (verb) { return (verb.number.toString() === verbNum); });
+    if (matchesVerbs.length >= 1) {
+        var verb = matchesVerbs[0];
+        var fragmentIndex = address.indexOf('#');
+        if (fragmentIndex === notFound) {
+            command = verb.command
+                .replace(verbVar.ref, address)
+                .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
+                .replace(verbVar.file, address)
+                .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
+                .replace(verbVar.fragment, '');
+        }
+        else {
+            command = verb.command
+                .replace(verbVar.ref, address)
+                .replace(verbVar.windowsRef, address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
+                .replace(verbVar.file, address.substr(0, fragmentIndex))
+                .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
+                .replace(verbVar.fragment, address.substr(fragmentIndex + 1));
         }
     }
     if (command !== '') {
         var stdout_ = '';
         try {
+            if ('verbose' in exports.programOptions) {
+                console.log("Verbose: command: " + command);
+            }
             stdout_ = child_process.execSync(command).toString();
             if (runningOS === 'Windows') {
                 stdout_ = stdout_.substr(0, stdout_.length - 2); // Cut last '\r\n'
@@ -2193,8 +2202,8 @@ function printConfig() {
         if (typeof verbConfig === 'object' && verbConfig) {
             var verbs = verbConfig;
             var index = 0;
-            for (var _c = 0, verbs_3 = verbs; _c < verbs_3.length; _c++) {
-                var verb = verbs_3[_c];
+            for (var _c = 0, verbs_2 = verbs; _c < verbs_2.length; _c++) {
+                var verb = verbs_2[_c];
                 console.log("Verbose: Verb[" + index + "]:");
                 console.log("Verbose:     label: " + verb.label);
                 console.log("Verbose:     number: " + verb.number);
@@ -2465,40 +2474,10 @@ function getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum) {
         });
     });
 }
-// getFullPath
-function getFullPath(relativePath, basePath) {
-    var fullPath = '';
-    var slashRelativePath = relativePath.replace(/\\/g, '/');
-    var colonSlashIndex = slashRelativePath.indexOf(':/');
-    var slashFirstIndex = slashRelativePath.indexOf('/');
-    var withProtocol = (colonSlashIndex + 1 === slashFirstIndex); // e.g.) C:/, http://
-    if (relativePath.substr(0, 1) === '/') {
-        fullPath = relativePath;
-    }
-    else if (relativePath.substr(0, 1) === '~') {
-        fullPath = relativePath.replace('~', getHomePath());
-    }
-    else if (withProtocol) {
-        fullPath = relativePath;
-    }
-    else {
-        fullPath = path.join(basePath, relativePath);
-    }
-    return fullPath;
-}
-// getHomePath
-function getHomePath() {
-    if (process.env.HOME) {
-        return process.env.HOME;
-    }
-    else {
-        return process.env.USERPROFILE;
-    }
-}
 // getTestablePath
 function getTestablePath(path_) {
     if ('test' in exports.programOptions) {
-        var home = getHomePath();
+        var home = lib.getHomePath();
         if (path_.startsWith(home)) {
             return '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
         }

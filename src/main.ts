@@ -7,6 +7,7 @@ import * as csvParse from 'csv-parse';
 import * as chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
+import * as lib from "./lib";
 
 // main
 export async function  main() {
@@ -439,8 +440,8 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
     const  targetFolders = await parseCSVColumns(programOptions.folder);
     const  fileFullPaths: string[] = [];
     for (const folder of targetFolders) {
-        const  targetFolderFullPath = getFullPath(folder, currentFolder);
-        const  inputFileFullPath = getFullPath(inputFilePath, targetFolderFullPath);
+        const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+        const  inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
         if (fs.existsSync(inputFileFullPath)) {
             fileFullPaths.push(inputFileFullPath);
         }
@@ -912,7 +913,7 @@ class  TemplateTag {
     // checkTargetFileContents
     async  checkTargetFileContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
         const  parentPath = path.dirname(inputFilePath);
-        const  targetFilePath = getFullPath(getExpectedLine(setting, this.template), parentPath);
+        const  targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
         if (!fs.existsSync(targetFilePath)) {
             const  templateLineNum = templateEndLineNum - this.templateLines.length;
             console.log("");
@@ -1184,9 +1185,9 @@ async function  check(checkingFilePath?: string) {
     if (checkingFilePath) {
         targetFolders.push(currentFolder);
         for (const folder of targetFolders) {
-            const  targetFolderFullPath = getFullPath(folder, currentFolder);
+            const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
 
-            const  inputFileFullPath = getFullPath(checkingFilePath, targetFolderFullPath);
+            const  inputFileFullPath = lib.getFullPath(checkingFilePath, targetFolderFullPath);
             if (fs.existsSync(inputFileFullPath)) {
                 inputFileFullPaths.push(inputFileFullPath);
                 break;
@@ -1201,7 +1202,7 @@ async function  check(checkingFilePath?: string) {
         var  filePaths = [checkingFilePath];
     } else {
         for (const folder of targetFolders) {
-            const  targetFolderFullPath = getFullPath(folder, currentFolder);
+            const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
             if (!fs.existsSync(targetFolderFullPath)) {
                 throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
             }
@@ -1209,7 +1210,7 @@ async function  check(checkingFilePath?: string) {
             const scanedPaths = await globby(['**/*']);
             scanedPaths.forEach((scanedPath) => {
 
-                inputFileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath))
+                inputFileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
             });
         }
         process.chdir(currentFolder);
@@ -1252,7 +1253,7 @@ async function  search() {
 
             runVerb(ref.verbs, ref.address, lastWord);
         }
-    } else {
+    } else {  // keyword === ''
         inputSkip(startIndex);
         var  previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
@@ -1300,12 +1301,12 @@ async function  searchSub(keyword: string) {
     const  fileFullPaths: string[] = [];
     const  targetFolders = await parseCSVColumns(programOptions.folder);
     for (const folder of targetFolders) {
-        const  targetFolderFullPath = getFullPath(folder, currentFolder);
+        const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
         process.chdir(targetFolderFullPath);
         const scanedPaths = await globby(['**/*']);
         scanedPaths.forEach((scanedPath) => {
 
-            fileFullPaths.push(getFullPath(scanedPath, targetFolderFullPath))
+            fileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
         });
     }
     process.chdir(currentFolder);
@@ -1651,7 +1652,10 @@ function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Pr
                 });
             }
         }
-        address = address.replace(/\\\\/g,'\\');
+    }
+    address = address.replace(/\\\\/g,'\\');
+    if (address.startsWith('~')) {
+        address = lib.getHomePath() + address.substr(1);
     }
 
     // recommended = ...
@@ -1683,6 +1687,9 @@ function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Pr
         recommended = recommended.replace(
             new RegExp(escapeRegularExpression( variable.value.replace('\\','\\\\')), 'g'),
             '${'+ variable.key +'}');  // Change the address to an address with variables
+    }
+    if (recommended.startsWith(lib.getHomePath())) {
+        recommended = '~' + recommended.substr(lib.getHomePath().length);
     }
 
     // print the address
@@ -1742,30 +1749,33 @@ function  getRelatedVerbs(address: string): Verb[] {
 // runVerb
 function  runVerb(verbs: Verb[], address: string, verbNum: string) {
     var  command = '';
-    for (const verb of verbs) {
-        if (verb.number.toString() === verbNum) {
-            const  fragmentIndex = address.indexOf('#');
-            if (fragmentIndex === notFound) {
+    const  matchesVerbs = verbs.filter((verb) => (verb.number.toString() === verbNum));
+    if (matchesVerbs.length >= 1) {
+        const  verb = matchesVerbs[0];
+        const  fragmentIndex = address.indexOf('#');
+        if (fragmentIndex === notFound) {
 
-                command = verb.command
-                    .replace(verbVar.ref, address)
-                    .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
-                    .replace(verbVar.file, address)
-                    .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
-                    .replace(verbVar.fragment, '');
-            } else {
-                command = verb.command
-                    .replace(verbVar.ref, address)
-                    .replace(verbVar.windowsRef,  address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
-                    .replace(verbVar.file,        address.substr(0, fragmentIndex))
-                    .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
-                    .replace(verbVar.fragment,    address.substr(fragmentIndex + 1));
-            }
+            command = verb.command
+                .replace(verbVar.ref, address)
+                .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
+                .replace(verbVar.file, address)
+                .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
+                .replace(verbVar.fragment, '');
+        } else {
+            command = verb.command
+                .replace(verbVar.ref, address)
+                .replace(verbVar.windowsRef,  address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
+                .replace(verbVar.file,        address.substr(0, fragmentIndex))
+                .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
+                .replace(verbVar.fragment,    address.substr(fragmentIndex + 1));
         }
     }
     if (command !== '') {
         var stdout_ = '';
         try {
+            if ('verbose' in programOptions) {
+                console.log(`Verbose: command: ${command}`);
+            }
 
             stdout_ = child_process.execSync( command ).toString();
             if (runningOS === 'Windows') {
@@ -2033,39 +2043,10 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, settingNameOrL
     return  settingIndex;
 }
 
-// getFullPath
-function  getFullPath(relativePath: string, basePath: string): string {
-    var    fullPath = '';
-    const  slashRelativePath = relativePath.replace(/\\/g,'/');
-    const  colonSlashIndex = slashRelativePath.indexOf(':/');
-    const  slashFirstIndex = slashRelativePath.indexOf('/');
-    const  withProtocol = (colonSlashIndex + 1 === slashFirstIndex);  // e.g.) C:/, http://
-
-    if (relativePath.substr(0,1) === '/') {
-        fullPath = relativePath;
-    } else if (relativePath.substr(0,1) === '~') {
-        fullPath = relativePath.replace('~', getHomePath() );
-    } else if (withProtocol) {
-        fullPath = relativePath;
-    } else {
-        fullPath = path.join(basePath, relativePath);
-    }
-    return  fullPath;
-}
-
-// getHomePath
-function  getHomePath(): string {
-    if (process.env.HOME) {
-        return  process.env.HOME;
-    } else {
-        return  process.env.USERPROFILE!;
-    }
-}
-
 // getTestablePath
 function  getTestablePath(path_: string) {
     if ('test' in programOptions) {
-        const  home = getHomePath();
+        const  home = lib.getHomePath();
 
         if (path_.startsWith(home)) {
             return  '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
