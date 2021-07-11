@@ -2024,6 +2024,7 @@ function printRef(refTagAndAddress, option) {
     address = address.replace(/(\\+)([^\$\\ ]|$)/g, function (match, backSlashes, nextCharacter, offset) {
         return backSlashes.replace(/\\/g, '/') + nextCharacter; // replace \\ to /
     });
+    address = cutQuotation(address);
     if (variables) {
         var _loop_5 = function (variable) {
             var variableName = variable.substr('${'.length, variable.length - '${}'.length);
@@ -2646,6 +2647,19 @@ function parseKeyName(line) {
         var csv = lineHead;
     }
     return csv;
+}
+// cutQuotation
+// Example: 'abc' ⇨ abc, "abc" ⇨ abc, 'ab'c ⇨ 'ab'c
+function cutQuotation(str) {
+    if (str.startsWith("'") && str.endsWith("'")) {
+        return str.substr(1, str.length - 2);
+    }
+    else if (str.startsWith('"') && str.endsWith('"')) {
+        return str.substr(1, str.length - 2);
+    }
+    else {
+        return str;
+    }
 }
 // escapeRegularExpression
 function escapeRegularExpression(expression) {

@@ -712,6 +712,13 @@ describe("print reference >>", () => {
             lib.getHomePath() +"/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
             "    0.Folder\n",
         ],[
+            "recommend (2)",
+            ["search", "#ref: '/User'"],
+            {locale: "en-US"},
+            "Recommend: #ref: /User\n" +
+            "/User\n" +
+            "    0.Folder\n",
+        ],[
             "verb",
             ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
             {locale: "en-US"},

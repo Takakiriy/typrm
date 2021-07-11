@@ -20,7 +20,7 @@ if (process.env.windir) {
 }
 
 async function  main() {
-    if (true) {
+    if (false) {
         await DoCustomDebug();
     } else {
         await TestOfCommandLine();

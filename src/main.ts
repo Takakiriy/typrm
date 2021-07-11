@@ -1623,6 +1623,7 @@ function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Pr
 
         return  backSlashes.replace(/\\/g,'/') + nextCharacter;  // replace \\ to /
     });
+    address = cutQuotation(address);
     if (variables) {
         for (const variable of Object.keys(variables)) {
             const  variableName = variable.substr('${'.length, variable.length - '${}'.length);
@@ -2226,6 +2227,18 @@ function  parseKeyName(line: string): string {
     }
 
     return  csv;
+}
+
+// cutQuotation
+// Example: 'abc' ⇨ abc, "abc" ⇨ abc, 'ab'c ⇨ 'ab'c
+function  cutQuotation(str: string) {
+    if (str.startsWith("'") && str.endsWith("'")) {
+        return  str.substr(1, str.length - 2);
+    } else if (str.startsWith('"') && str.endsWith('"')) {
+        return  str.substr(1, str.length - 2);
+    } else {
+        return  str;
+    }
 }
 
 // escapeRegularExpression

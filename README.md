@@ -874,6 +874,11 @@ Case of mac zsh:
             number: 7
             regularExpression: .*
             command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
+        - #
+            label: 9.VSCode
+            number: 9
+            regularExpression: .*
+            command: 'code --goto "\${ref}"'
     EOF
     )
     node  ____/build/typrm.js "$@"
