@@ -753,6 +753,14 @@ describe("searches glossary tag >>", function () {
             { folder: "test_data/search/glossary/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path#hash') + "  #search: " + searchColor('keyword') + "\n"),
         ], [
+            "nested glossary tag",
+            ["search", "turnip"],
+            { folder: "test_data/search/glossary/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':34:') + (" level-1:    " + matchedColor('turnip') + " soup:\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':33:') + (" level-2:        white " + matchedColor('turnip') + ":\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':32:') + (" level-2:        red " + matchedColor('turnip') + ":\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':31:') + (" level-1:    " + matchedColor('turnip') + ": #glossary: level-2\n"),
+        ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },

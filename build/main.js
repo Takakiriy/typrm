@@ -1653,7 +1653,7 @@ function search() {
 function searchSub(keyword) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, indentAtTag, indentPosition, indentAtFirstContents, inGlossary, glossaryWords, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
+        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, glossaryTags, foundLines, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -1698,11 +1698,7 @@ function searchSub(keyword) {
                     return [3 /*break*/, 2];
                 case 5:
                     process.chdir(currentFolder);
-                    indentAtTag = '';
-                    indentPosition = -1;
-                    indentAtFirstContents = '';
-                    inGlossary = false;
-                    glossaryWords = '';
+                    glossaryTags = [];
                     foundLines = [];
                     _loop_4 = function (inputFileFullPath) {
                         var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _g, _h, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _j, _k, match, _l, _m, match, e_6_1;
@@ -1763,58 +1759,78 @@ function searchSub(keyword) {
                                     _o.label = 5;
                                 case 5:
                                     // glossary tag
-                                    if (line.includes(glossaryLabel)) {
-                                        inGlossary = true;
-                                        glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
-                                        if (glossaryWords !== '') {
-                                            glossaryWords += ':'; // ':' is not included in the word in glossary
+                                    glossaryTag = undefined;
+                                    if (line.trim() !== '') {
+                                        if (glossaryTags.length >= 1) {
+                                            glossaryTag = glossaryTags[glossaryTags.length - 1];
                                         }
-                                        indentAtTag = indentRegularExpression.exec(line)[0];
-                                        indentAtFirstContents = '';
-                                    }
-                                    else if (inGlossary) {
                                         currentIndent = indentRegularExpression.exec(line)[0];
-                                        if (indentAtFirstContents === '') {
-                                            indentAtFirstContents = currentIndent;
-                                            indentPosition = indentAtFirstContents.length;
-                                        }
-                                        characterAtIndent = line[indentPosition];
-                                        isGlossaryIndentLevel = (characterAtIndent !== ' ' &&
-                                            characterAtIndent !== '\t' &&
-                                            characterAtIndent !== undefined);
-                                        isComment = (characterAtIndent === '#');
-                                        if (!isGlossaryIndentLevel || isComment) {
-                                            // Skip this line
-                                        }
-                                        else {
-                                            colonPosition = line.indexOf(':', currentIndent.length);
-                                            wordInGlossary = glossaryWords + line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                                            found = getKeywordMatchingScore([wordInGlossary], keyword);
-                                            if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
-                                                found.score += glossaryMatchScore;
-                                                found.path = getTestablePath(inputFileFullPath);
-                                                found.lineNum = lineNum;
-                                                if (glossaryWords === '') {
-                                                    found.line = line;
-                                                    for (_j = 0, _k = found.matches; _j < _k.length; _j++) {
-                                                        match = _k[_j];
-                                                        match.position += indentPosition;
-                                                    }
+                                        if (glossaryTag) {
+                                            if (currentIndent.length <= glossaryTag.indentAtTag.length) {
+                                                glossaryTags.pop();
+                                                if (glossaryTags.length >= 1) {
+                                                    glossaryTag = glossaryTags[glossaryTags.length - 1];
                                                 }
                                                 else {
-                                                    found.line = glossaryWords + line;
-                                                    for (_l = 0, _m = found.matches; _l < _m.length; _l++) {
-                                                        match = _m[_l];
-                                                        if (match.position >= glossaryWords.length) {
-                                                            match.position += indentPosition;
-                                                        }
-                                                    }
+                                                    glossaryTag = undefined;
                                                 }
-                                                foundLines.push(found);
+                                            }
+                                            else {
+                                                if (glossaryTag.indentAtFirstContents === '') {
+                                                    glossaryTag.indentAtFirstContents = currentIndent;
+                                                    glossaryTag.indentPosition = glossaryTag.indentAtFirstContents.length;
+                                                }
                                             }
                                         }
-                                        if (currentIndent.length <= indentAtTag.length && line.trim() !== '') {
-                                            inGlossary = false;
+                                        if (line.includes(glossaryLabel)) {
+                                            glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
+                                            if (glossaryWords !== '') {
+                                                glossaryWords += ':'; // ':' is not included in the word in glossary
+                                            }
+                                            glossaryTags.push({
+                                                indentPosition: -1,
+                                                glossaryWords: glossaryWords,
+                                                indentAtTag: indentRegularExpression.exec(line)[0],
+                                                indentAtFirstContents: '',
+                                            });
+                                        }
+                                        if (glossaryTag) {
+                                            characterAtIndent = line[glossaryTag.indentPosition];
+                                            isGlossaryIndentLevel = (characterAtIndent !== ' ' &&
+                                                characterAtIndent !== '\t' &&
+                                                characterAtIndent !== undefined);
+                                            isComment = (characterAtIndent === '#');
+                                            if (!isGlossaryIndentLevel || isComment) {
+                                                // Skip this line
+                                            }
+                                            else {
+                                                colonPosition = line.indexOf(':', currentIndent.length);
+                                                wordInGlossary = glossaryTag.glossaryWords +
+                                                    line.substr(currentIndent.length, colonPosition - currentIndent.length);
+                                                found = getKeywordMatchingScore([wordInGlossary], keyword);
+                                                if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
+                                                    found.score += glossaryMatchScore;
+                                                    found.path = getTestablePath(inputFileFullPath);
+                                                    found.lineNum = lineNum;
+                                                    if (glossaryTag.glossaryWords === '') {
+                                                        found.line = line;
+                                                        for (_j = 0, _k = found.matches; _j < _k.length; _j++) {
+                                                            match = _k[_j];
+                                                            match.position += glossaryTag.indentPosition;
+                                                        }
+                                                    }
+                                                    else {
+                                                        found.line = glossaryTag.glossaryWords + line;
+                                                        for (_l = 0, _m = found.matches; _l < _m.length; _l++) {
+                                                            match = _m[_l];
+                                                            if (match.position >= glossaryTag.glossaryWords.length) {
+                                                                match.position += glossaryTag.indentPosition;
+                                                            }
+                                                        }
+                                                    }
+                                                    foundLines.push(found);
+                                                }
+                                            }
                                         }
                                     }
                                     _o.label = 6;

@@ -213,7 +213,8 @@ the indent of the line tagged with `#glossary:`.
         #comment: This is not search target. 
 
 In the above case, you will be able to search for CSV and SSV.
-Lines with indents that are two or more steps deep are not searchable.
+Lines with indents that are two or more steps deep are not searchable,
+but if you write the `#glossary:` tag at deeper positions, they will be searchable.
 
 If you add parameters to the `#glossary:` tag,
 the key phrase consisting of the parameter and label will be searched,
