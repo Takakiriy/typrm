@@ -279,13 +279,15 @@ describe("replaces settings >>", function () {
                     writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileName, lineNum, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
+                            folder: changingFolderPath, test: "",
+                            locale: locale,
                         })];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                        folder: changingFolderPath, test: "", locale: locale,
+                        folder: changingFolderPath, test: "",
+                        locale: locale,
                     })];
                 case 3:
                     _a.sent();
@@ -322,7 +324,8 @@ describe("replaces settings >>", function () {
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
+                            folder: changingFolderPath, test: "",
+                            locale: locale,
                         })];
                 case 2:
                     _a.sent();
@@ -335,7 +338,8 @@ describe("replaces settings >>", function () {
                 case 5:
                     _a.trys.push([5, 7, , 8]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
+                            folder: changingFolderPath, test: "",
+                            locale: locale,
                         })];
                 case 6:
                     _a.sent();
@@ -438,13 +442,15 @@ describe("replaces settings >>", function () {
                         writeFileSync(changingFilePath, sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 2];
                         return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                                folder: changingFolderPath, test: "", locale: locale
+                                folder: changingFolderPath, test: "",
+                                locale: locale
                             })];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale
+                            folder: changingFolderPath, test: "",
+                            locale: locale
                         })];
                     case 3:
                         _a.sent();
@@ -454,13 +460,15 @@ describe("replaces settings >>", function () {
                         expect(updatedFileContents).not.toBe(sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 6];
                         return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
-                                folder: changingFolderPath, test: "", locale: locale
+                                folder: changingFolderPath, test: "",
+                                locale: locale
                             })];
                     case 5:
                         _a.sent();
                         return [3 /*break*/, 8];
                     case 6: return [4 /*yield*/, callMain(["revert", changingFileName], {
-                            folder: changingFolderPath, test: "", locale: locale
+                            folder: changingFolderPath, test: "",
+                            locale: locale
                         })];
                     case 7:
                         _a.sent();

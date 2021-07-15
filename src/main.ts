@@ -104,38 +104,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             lineNum += 1;
             const  previousIsReadingSetting = isReadingSetting;
 
-            // setting = ...
-            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                if (settingCount >= 1) {
-                    onEndOfSetting(setting);
-                }
-                isReadingSetting = true;
-
-                setting = {};
-                settingCount += 1;
-                settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-                isReadingSetting = false;
-            }
-            if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                const  separator = line.indexOf(':');
-                if (separator !== notFound) {
-                    const  key = line.substr(0, separator).trim();
-                    const  value = getValue(line, separator);
-                    if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
-                        if (key in setting) {
-                            console.log('');
-                            console.log('Error of duplicated variable name:');
-                            console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                            console.log(`  Contents: ${key}: ${value}`);
-                            errorCount += 1;
-                        }
-
-                        setting[key] = {value, isReferenced: false, lineNum};
-                    }
-                }
-            }
-
             // Set condition by "#if:" tag.
             const  parsed = ifTagParser.evaluate(line, setting);
             if (parsed.errorCount >= 1) {
@@ -144,6 +112,47 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                 console.log(`  Contents: ${parsed.condition}`);
                 errorCount += parsed.errorCount;
+            }
+
+            // setting = ...
+            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+                if (settingCount >= 1) {
+                    onEndOfSettingScope(setting);
+                }
+                isReadingSetting = true;
+
+                setting = {};
+                settingCount += 1;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                isReadingSetting = false;
+                if ('verbose' in programOptions) {
+                    console.log(`verbose: ${inputFilePath}: settings`);
+                    for (const [key, value] of Object.entries(setting))  {
+                        console.log(`verbose: ${inputFilePath}:${value.lineNum}:     ${key}: ${value.value}`);
+                    }
+                }
+            }
+            if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                const  separator = line.indexOf(':');
+                if (separator !== notFound) {
+                    const  key = line.substr(0, separator).trim();
+                    const  value = getValue(line, separator);
+                    if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
+                        if (key in setting) {
+                            const  previous = setting[key];
+                            console.log('');
+                            console.log('Error of duplicated variable name:');
+                            console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
+                            console.log(`  ContentsA: ${key}: ${previous.value}`);
+                            console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                            console.log(`  ContentsB: ${key}: ${value}`);
+                            errorCount += 1;
+                        }
+
+                        setting[key] = {value, isReferenced: false, lineNum};
+                    }
+                }
             }
 
             // Check the condition by "#expect:" tag.
@@ -273,7 +282,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
         }
         if (settingCount >= 1) {
-            onEndOfSetting(setting);
+            onEndOfSettingScope(setting);
         }
 
         // Check target file contents by "#file-template:" tag (2).
@@ -1856,7 +1865,7 @@ function  varidateRevertCommandArguments() {
 }
 
 // onEndOfSetting
-function onEndOfSetting(setting: Settings) {
+function onEndOfSettingScope(setting: Settings) {
     for (const key of Object.keys(setting)) {
         if (!setting[key].isReferenced) {
             console.log(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);

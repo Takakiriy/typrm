@@ -146,20 +146,20 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, separator, key, value, parsed, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
-        return __generator(this, function (_h) {
-            switch (_h.label) {
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, previousIsReadingSetting, parsed, _i, _c, _d, key, value, separator, key, value, previous, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _e, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _f, keywords_1, keyword, e_2_1, _g, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _h, _j, _k, key;
+        return __generator(this, function (_l) {
+            switch (_l.label) {
                 case 0:
                     if (!isModal) return [3 /*break*/, 2];
                     return [4 /*yield*/, inputPath(translate('YAML UTF-8 file path>'))];
                 case 1:
-                    inputFilePath = _h.sent();
-                    _h.label = 2;
+                    inputFilePath = _l.sent();
+                    _l.label = 2;
                 case 2:
                     parentPath = path.dirname(inputFilePath);
                     inputFileParentPath = parentPath;
                     previousTemplateCount = 0;
-                    _h.label = 3;
+                    _l.label = 3;
                 case 3:
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFilePath),
@@ -178,23 +178,31 @@ function checkRoutine(isModal, inputFilePath) {
                     lines = [];
                     keywords = [];
                     ifTagParser = new IfTagParser();
-                    _h.label = 4;
+                    _l.label = 4;
                 case 4:
-                    _h.trys.push([4, 11, 12, 17]);
+                    _l.trys.push([4, 11, 12, 17]);
                     reader_1 = (e_1 = void 0, __asyncValues(reader));
-                    _h.label = 5;
+                    _l.label = 5;
                 case 5: return [4 /*yield*/, reader_1.next()];
                 case 6:
-                    if (!(reader_1_1 = _h.sent(), !reader_1_1.done)) return [3 /*break*/, 10];
+                    if (!(reader_1_1 = _l.sent(), !reader_1_1.done)) return [3 /*break*/, 10];
                     line1 = reader_1_1.value;
                     line = line1;
                     lines.push(line);
                     lineNum += 1;
                     previousIsReadingSetting = isReadingSetting;
+                    parsed = ifTagParser.evaluate(line, setting);
+                    if (parsed.errorCount >= 1) {
+                        console.log('');
+                        console.log('Error of if tag syntax:');
+                        console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
+                        console.log("  Contents: " + parsed.condition);
+                        errorCount += parsed.errorCount;
+                    }
                     // setting = ...
                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                         if (settingCount >= 1) {
-                            onEndOfSetting(setting);
+                            onEndOfSettingScope(setting);
                         }
                         isReadingSetting = true;
                         setting = {};
@@ -203,6 +211,13 @@ function checkRoutine(isModal, inputFilePath) {
                     }
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
                         isReadingSetting = false;
+                        if ('verbose' in exports.programOptions) {
+                            console.log("verbose: " + inputFilePath + ": settings");
+                            for (_i = 0, _c = Object.entries(setting); _i < _c.length; _i++) {
+                                _d = _c[_i], key = _d[0], value = _d[1];
+                                console.log("verbose: " + inputFilePath + ":" + value.lineNum + ":     " + key + ": " + value.value);
+                            }
+                        }
                     }
                     if (isReadingSetting && ifTagParser.thisIsOutOfFalseBlock) {
                         separator = line.indexOf(':');
@@ -211,23 +226,18 @@ function checkRoutine(isModal, inputFilePath) {
                             value = getValue(line, separator);
                             if (value !== '' && key.length >= 1 && key[0] !== '#') {
                                 if (key in setting) {
+                                    previous = setting[key];
                                     console.log('');
                                     console.log('Error of duplicated variable name:');
-                                    console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
-                                    console.log("  Contents: " + key + ": " + value);
+                                    console.log("  " + translate('typrmFile') + "A: " + getTestablePath(inputFilePath) + ":" + previous.lineNum);
+                                    console.log("  ContentsA: " + key + ": " + previous.value);
+                                    console.log("  " + translate('typrmFile') + "B: " + getTestablePath(inputFilePath) + ":" + lineNum);
+                                    console.log("  ContentsB: " + key + ": " + value);
                                     errorCount += 1;
                                 }
                                 setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
                             }
                         }
-                    }
-                    parsed = ifTagParser.evaluate(line, setting);
-                    if (parsed.errorCount >= 1) {
-                        console.log('');
-                        console.log('Error of if tag syntax:');
-                        console.log("  " + translate('typrmFile') + ": " + getTestablePath(inputFilePath) + ":" + lineNum);
-                        console.log("  Contents: " + parsed.condition);
-                        errorCount += parsed.errorCount;
                     }
                     // Check the condition by "#expect:" tag.
                     if (line.includes(expectLabel) && ifTagParser.thisIsOutOfFalseBlock) {
@@ -297,19 +307,19 @@ function checkRoutine(isModal, inputFilePath) {
                     if (!!continue_) return [3 /*break*/, 8];
                     return [4 /*yield*/, fileTemplateTag.checkTargetFileContents(setting, inputFilePath, lineNum)];
                 case 7:
-                    checkPassed = _h.sent();
+                    checkPassed = _l.sent();
                     if (!checkPassed) {
                         errorCount += 1;
                     }
                     fileTemplateTag = null;
-                    _h.label = 8;
+                    _l.label = 8;
                 case 8:
                     if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock) {
                         fileTemplateTag = templateTag;
                     }
                     // Check if there is not "#★Now:".
-                    for (_i = 0, temporaryLabels_1 = temporaryLabels; _i < temporaryLabels_1.length; _i++) {
-                        temporaryLabel = temporaryLabels_1[_i];
+                    for (_e = 0, temporaryLabels_1 = temporaryLabels; _e < temporaryLabels_1.length; _e++) {
+                        temporaryLabel = temporaryLabels_1[_e];
                         if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && ifTagParser.thisIsOutOfFalseBlock) {
                             console.log("");
                             console.log(translate('WarningLine') + ": " + lineNum);
@@ -349,20 +359,20 @@ function checkRoutine(isModal, inputFilePath) {
                         }
                         keywords.push(keyword);
                     }
-                    _h.label = 9;
+                    _l.label = 9;
                 case 9: return [3 /*break*/, 5];
                 case 10: return [3 /*break*/, 17];
                 case 11:
-                    e_1_1 = _h.sent();
+                    e_1_1 = _l.sent();
                     e_1 = { error: e_1_1 };
                     return [3 /*break*/, 17];
                 case 12:
-                    _h.trys.push([12, , 15, 16]);
+                    _l.trys.push([12, , 15, 16]);
                     if (!(reader_1_1 && !reader_1_1.done && (_a = reader_1.return))) return [3 /*break*/, 14];
                     return [4 /*yield*/, _a.call(reader_1)];
                 case 13:
-                    _h.sent();
-                    _h.label = 14;
+                    _l.sent();
+                    _l.label = 14;
                 case 14: return [3 /*break*/, 16];
                 case 15:
                     if (e_1) throw e_1.error;
@@ -370,17 +380,17 @@ function checkRoutine(isModal, inputFilePath) {
                 case 16: return [7 /*endfinally*/];
                 case 17:
                     if (settingCount >= 1) {
-                        onEndOfSetting(setting);
+                        onEndOfSettingScope(setting);
                     }
                     if (!fileTemplateTag) return [3 /*break*/, 19];
                     fileTemplateTag.onReadLine(''); // Cut indent
                     return [4 /*yield*/, fileTemplateTag.checkTargetFileContents(setting, inputFilePath, lineNum + 1)];
                 case 18:
-                    checkPassed = _h.sent();
+                    checkPassed = _l.sent();
                     if (!checkPassed) {
                         errorCount += 1;
                     }
-                    _h.label = 19;
+                    _l.label = 19;
                 case 19:
                     // Check if there is the title above or following.
                     reader = readline.createInterface({
@@ -388,19 +398,19 @@ function checkRoutine(isModal, inputFilePath) {
                         crlfDelay: Infinity
                     });
                     lineNum = 0;
-                    _h.label = 20;
+                    _l.label = 20;
                 case 20:
-                    _h.trys.push([20, 25, 26, 31]);
+                    _l.trys.push([20, 25, 26, 31]);
                     reader_2 = (e_2 = void 0, __asyncValues(reader));
-                    _h.label = 21;
+                    _l.label = 21;
                 case 21: return [4 /*yield*/, reader_2.next()];
                 case 22:
-                    if (!(reader_2_1 = _h.sent(), !reader_2_1.done)) return [3 /*break*/, 24];
+                    if (!(reader_2_1 = _l.sent(), !reader_2_1.done)) return [3 /*break*/, 24];
                     line1 = reader_2_1.value;
                     line = line1;
                     lineNum += 1;
-                    for (_c = 0, keywords_1 = keywords; _c < keywords_1.length; _c++) {
-                        keyword = keywords_1[_c];
+                    for (_f = 0, keywords_1 = keywords; _f < keywords_1.length; _f++) {
+                        keyword = keywords_1[_f];
                         if (keyword.direction === Direction.Above) {
                             if (lineNum <= keyword.startLineNum) {
                                 if (line.includes(keyword.keyword)) {
@@ -416,28 +426,28 @@ function checkRoutine(isModal, inputFilePath) {
                             }
                         }
                     }
-                    _h.label = 23;
+                    _l.label = 23;
                 case 23: return [3 /*break*/, 21];
                 case 24: return [3 /*break*/, 31];
                 case 25:
-                    e_2_1 = _h.sent();
+                    e_2_1 = _l.sent();
                     e_2 = { error: e_2_1 };
                     return [3 /*break*/, 31];
                 case 26:
-                    _h.trys.push([26, , 29, 30]);
+                    _l.trys.push([26, , 29, 30]);
                     if (!(reader_2_1 && !reader_2_1.done && (_b = reader_2.return))) return [3 /*break*/, 28];
                     return [4 /*yield*/, _b.call(reader_2)];
                 case 27:
-                    _h.sent();
-                    _h.label = 28;
+                    _l.sent();
+                    _l.label = 28;
                 case 28: return [3 /*break*/, 30];
                 case 29:
                     if (e_2) throw e_2.error;
                     return [7 /*endfinally*/];
                 case 30: return [7 /*endfinally*/];
                 case 31:
-                    for (_d = 0, keywords_2 = keywords; _d < keywords_2.length; _d++) {
-                        keyword = keywords_2[_d];
+                    for (_g = 0, keywords_2 = keywords; _g < keywords_2.length; _g++) {
+                        keyword = keywords_2[_g];
                         if (keyword.direction === Direction.Above) {
                             if (keyword.startLineNum !== foundForAbove) {
                                 console.log('');
@@ -466,13 +476,13 @@ function checkRoutine(isModal, inputFilePath) {
                         return [3 /*break*/, 44];
                     }
                     loop = true;
-                    _h.label = 32;
+                    _l.label = 32;
                 case 32:
                     if (!loop) return [3 /*break*/, 42];
                     console.log(translate('Press Enter key to retry checking.'));
                     return [4 /*yield*/, input(translate('The line number to replace the variable value >'))];
                 case 33:
-                    key = _h.sent();
+                    key = _l.sent();
                     errorCount = 0;
                     if (!(key === 'exit')) return [3 /*break*/, 34];
                     return [2 /*return*/];
@@ -481,7 +491,7 @@ function checkRoutine(isModal, inputFilePath) {
                     settingNameOrLineNum = key;
                     return [4 /*yield*/, getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum)];
                 case 35:
-                    replacingSettingIndex = _h.sent();
+                    replacingSettingIndex = _l.sent();
                     if (!!replacingSettingIndex) return [3 /*break*/, 36];
                     console.log('');
                     console.log(translate("Error of not found specified setting name") + ": " + settingNameOrLineNum);
@@ -490,18 +500,18 @@ function checkRoutine(isModal, inputFilePath) {
                 case 36:
                     console.log(translate('SettingIndex') + ": " + replacingSettingIndex);
                     console.log(translate('Enter only: finish to input setting'));
-                    _h.label = 37;
+                    _l.label = 37;
                 case 37: return [4 /*yield*/, input(translate('key: new_value>'))];
                 case 38:
-                    keyValue = _h.sent();
+                    keyValue = _l.sent();
                     if (keyValue === '') {
                         return [3 /*break*/, 41];
                     }
-                    _e = errorCount;
+                    _h = errorCount;
                     return [4 /*yield*/, replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true)];
                 case 39:
-                    errorCount = _e + _h.sent();
-                    _h.label = 40;
+                    errorCount = _h + _l.sent();
+                    _l.label = 40;
                 case 40: return [3 /*break*/, 37];
                 case 41:
                     loop = (errorCount >= 1);
@@ -510,11 +520,11 @@ function checkRoutine(isModal, inputFilePath) {
                     // Rescan
                     console.log('========================================');
                     previousTemplateCount = templateCount;
-                    for (_f = 0, _g = Object.keys(setting); _f < _g.length; _f++) {
-                        key = _g[_f];
+                    for (_j = 0, _k = Object.keys(setting); _j < _k.length; _j++) {
+                        key = _k[_j];
                         setting[key].isReferenced = false;
                     }
-                    _h.label = 43;
+                    _l.label = 43;
                 case 43: return [3 /*break*/, 3];
                 case 44: return [2 /*return*/];
             }
@@ -1386,8 +1396,7 @@ var IfTagParser = /** @class */ (function () {
             if (this.thisIsOutOfFalseBlock && !resultOfIf) {
                 this.thisIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf,
-                enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
             this.isReplacable_ = isReplacable;
         }
         return { condition: expression, errorCount: errorCount };
@@ -2248,7 +2257,7 @@ function varidateRevertCommandArguments() {
     }
 }
 // onEndOfSetting
-function onEndOfSetting(setting) {
+function onEndOfSettingScope(setting) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         if (!setting[key].isReferenced) {

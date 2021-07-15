@@ -628,37 +628,63 @@ ErrorLine: 30
   Template: __Env2__
   SettingIndex: 1
 
+ErrorLine: 31
+  Contents: - no  #template: fruit
+  Expected: banana
+  Template: fruit
+  SettingIndex: 1
+
+ErrorLine: 32
+  Contents: - no  #template: bird
+  Expected: swan
+  Template: bird
+  SettingIndex: 1
+
+ErrorLine: 41
+  Contents: - no  #template: fish
+  Expected: yes
+  Template: fish
+  SettingIndex: 2
+
+ErrorLine: 50
+  Contents: - 💤  #template-if: $settings.fruit == banana
+  Expected: 🌟
+  Expression: $settings.fruit == banana
+  SettingIndex: 3
+
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:38
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:58
   Contents: $settings.color1 == black
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:39
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:59
   Contents: $settings.color1 != yellow
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:42
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:62
   Contents: false
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:70
   Contents: $settings.color1 == black
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:51
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:71
   Contents: $settings.color1 != yellow
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:54
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:74
   Contents: false
 
 Error of duplicated variable name:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:64
-  Contents: target1: yellow
-Not referenced: target1 in line 64
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:82
+  ContentsA: target1: banana
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:84
+  ContentsB: target1: yellow
+Not referenced: target1 in line 84
 
-Warning: 0, Error: 11
-template count = 8
+Warning: 0, Error: 15
+template count = 12
 "
 `;
 
@@ -693,6 +719,26 @@ exports[`checks template value >> 1_template_3_if 1: sourceFileContents 1`] = `
         - no  #template: __Setting2__
         - no  #template: __Env1__
         - no  #template: __Env2__
+        - no  #template: fruit
+        - no  #template: bird
+
+test_of_next_to_if_tag_in_settings:
+    設定:
+        dummy: banana
+        バナナ:  #if: $settings.dummy != banana
+            __Setting1__: no
+        fish: yes
+    チェックNG:
+        - no  #template: fish
+
+test_of_template_if_define_next_to_if_tag_in_settings:
+    設定:
+        fruit: banana
+        バナナ:  #if: $settings.fruit != banana
+            __Setting1__: yes
+        template-if(yes): 🌟
+    チェックNG:
+        - 💤  #template-if: $settings.fruit == banana
 
 test_of_expect_tag:
     設定:
