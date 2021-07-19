@@ -25,6 +25,7 @@ typrm は テキスト ファイル 形式のマニュアルに書かれたコ�
   - [#expect タグを使って設定値をチェックします](#expect-タグを使って設定値をチェックします)
   - [#ref タグ - 環境変数を含むファイルのパスを展開して表示します](#ref-タグ---環境変数を含むファイルのパスを展開して表示します)
     - [ファイルに関連するコマンドを実行します](#ファイルに関連するコマンドを実行します)
+    - [ファイルの行番号に置き換えて表示します](#ファイルの行番号に置き換えて表示します)
   - [（開発者用） 開発環境の構築手順](#開発者用-開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
@@ -845,7 +846,7 @@ mac の zsh の場合:
     )
     node  ____/build/typrm.js "$@"
 
-command には command 固有の変数参照を含めることができます。
+`command` には command 固有の変数参照を含めることができます。
 
 | 変数 | 値 |
 | ---- | ---- |
@@ -854,6 +855,70 @@ command には command 固有の変数参照を含めることができます。
 | ${file} | #ref: のパラメーターの # より左 |
 | ${windowsFile} | バックスラッシュを使ったパス |
 | ${fragment} | #ref: のパラメーターの # より右 |
+
+typrm に --verbose オプションを付けると、設定値を確認できます。
+
+
+### ファイルの行番号に置き換えて表示します
+
+search (s) コマンドに `#ref:` タグを付けてファイルのパスとパラメーターを指定すると、
+ファイルのパスと行番号に置き換えて表示します。
+
+    $ typrm s \#ref: \${projects}/project1/src/app.ts#main
+    C:/Users/user1/Projects/project1/src/app.ts:25
+        0.Folder
+
+`#` より右側は検索キーワードとしてファイルの内容を検索して行番号に置き換えて表示します。
+上記の場合、`app.ts` ファイルの内容を `main` というキーワードで検索して、
+見つかった行番号 `25` を表示します。
+
+行番号に置き換えて表示するには、
+`TYPRM_LINE_NUM_GETTER` 環境変数に以下のように YAML 形式で設定します。
+ただし、`regularExpression` の設定は環境に応じて編集してください。
+
+Windows の PowerShell の場合:
+
+    ${env:TYPRM_LINE_NUM_GETTER} = @"
+        - #
+            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            type: text
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 4
+            address: "\${file}:\${lineNum}"
+    "@
+    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+
+mac の zsh の場合:
+
+    export  TYPRM_LINE_NUM_GETTER=$(cat << EOF
+        - #
+            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            type: text
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 4
+            address: "\${file}:\${lineNum}"
+    EOF
+    )
+    node  ____/build/typrm.js "$@"
+
+`type` には、`text` を指定します。
+
+`filePathRegularExpressionIndex` には、`regularExpression`（正規表現）で
+評価した結果のうち、ファイル パス の部分に該当するカッコの番号を指定します。
+括弧の番号は、JavaScript の
+[RegExp.exec (MDN)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#description) の仕様と同じです。
+
+`keywordRegularExpressionIndex` には、
+`filePathRegularExpressionIndex` と同様に
+キーワードの部分に相当するカッコの番号を指定します。
+
+`address` には address 固有の変数参照を含めることができます。
+
+| 変数 | 値 |
+| ---- | ---- |
+| ${file} | #ref: のパラメーターの # より左 |
+| ${windowsFile} | バックスラッシュを使ったパス |
+| ${lineNum} | 行番号 |
 
 typrm に --verbose オプションを付けると、設定値を確認できます。
 

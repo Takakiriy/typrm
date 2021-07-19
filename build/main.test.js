@@ -59,6 +59,7 @@ if (process.env.windir) {
 else {
     var testingOS = 'Linux';
 }
+process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
 if (testingOS === 'Windows') {
     process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, windowsRef: ${windowsRef}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
 }
@@ -122,7 +123,6 @@ describe("checks template value >>", function () {
     }); });
 });
 describe("checks file contents >>", function () {
-    test.skip('file_2_tab', function () { });
     test.each([
         [
             "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
@@ -813,6 +813,18 @@ describe("print reference >>", function () {
             lib.getHomePath() + "/.ssh  folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
                 "    0.Folder\n",
         ], [
+            "lineNum",
+            ["search", "#ref:", "test_data/search/2/2.yaml#lineNum"],
+            { locale: "en-US" },
+            "test_data/search/2/2.yaml:69\n" +
+                "    0.Folder\n",
+        ], [
+            "lineNum not found",
+            ["search", "#ref:", "test_data/search/2/2.yaml#notFound"],
+            { locale: "en-US" },
+            "test_data/search/2/2.yaml:0\n" +
+                "    0.Folder\n",
+        ], [
             "recommend",
             ["search", "#ref:", lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
             { locale: "en-US" },
@@ -828,6 +840,11 @@ describe("print reference >>", function () {
                 "    0.Folder\n",
         ], [
             "verb",
+            ["search", "#ref:", "../README.md", "7"],
+            { locale: "en-US" },
+            "{ref: ../README.md, windowsRef: ..\\README.md, file: ../README.md, windowsFile: ..\\README.md, fragment: }\n",
+        ], [
+            "verb (2)",
             ["search", "#ref:", "../README.md#title", "7"],
             { locale: "en-US" },
             "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
@@ -844,30 +861,48 @@ describe("print reference >>", function () {
                 ? // Windows
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                         "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                        "Verbose: Verb[0]:\n" +
+                        "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                        "Verbose:     type: text\n" +
+                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                        "Verbose:     address: ${file}:${lineNum}\n" +
+                        "Verbose: TYPRM_VERB[0]:\n" +
+                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
                         "Verbose:     label: 7.Test Echo\n" +
                         "Verbose:     number: 7\n" +
-                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
                         "Verbose:     command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
-                        "Verbose: Verb[1]:\n" +
+                        "Verbose: TYPRM_VERB[1]:\n" +
+                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
-                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
                         "Verbose:     command: msedge \"file://\${file}\"\n" +
                         "Error that verb number 4 is not defined\n"
                 : // mac
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                         "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                        "Verbose: Verb[0]:\n" +
+                        "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                        "Verbose:     type: text\n" +
+                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                        "Verbose:     address: ${file}:${lineNum}\n" +
+                        "Verbose: TYPRM_VERB[0]:\n" +
+                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
                         "Verbose:     label: 7.Test Echo\n" +
                         "Verbose:     number: 7\n" +
-                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
                         "Verbose:     command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
-                        "Verbose: Verb[1]:\n" +
+                        "Verbose: TYPRM_VERB[1]:\n" +
+                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
-                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
                         "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                        "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
+                        "Verbose:     address: ../README.md\n" +
+                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                        "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
                         "Error that verb number 4 is not defined\n",
         ],
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {

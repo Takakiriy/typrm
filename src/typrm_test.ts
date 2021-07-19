@@ -6,12 +6,20 @@ const snapshots = require(currentFolder +"/__snapshots__/main.test.ts.snap");
 
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
+process.env.TYPRM_LINE_NUM_GETTER = `
+    - #
+        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+        type: text
+        filePathRegularExpressionIndex: 1
+        keywordRegularExpressionIndex: 4
+        address: "\${file}:\${lineNum}"
+`;
 process.env.TYPRM_VERB = `
     - #
         label: 7.Test Echo
         number: 7
-        regularExpression: ^.*\\.md(#.*)?\$
-        command: 'echo  "(\${ref})"'
+        regularExpression: .*
+        command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}"'
 `;
 if (process.env.windir) {
     var  testingOS = 'Windows';
@@ -31,6 +39,7 @@ async function  main() {
 // DoCustomDebug
 async function  DoCustomDebug() {
     const  returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});
     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" ~/GitProjects 0`, {});
     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
     // const  returns = await callChildProccess(`node ${scriptPath} --verbose c C:\\Users\\user1\\steps\\!Temp.yaml`, {});
@@ -62,7 +71,7 @@ async function  TestOfCommandLine() {
         "name": "search_mode_ref_verb",
         "parameters": "search",
         "check": "true",
-        "inputLines": "#ref: ../README.md\n7\n\n7\nexit()\n",
+        "inputLines": "#ref: \"(../README.md)\"\n7\n\n7\nexit()\n",
     }];
     for (const case_ of cases) {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);

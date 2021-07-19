@@ -43,7 +43,8 @@ var currentFolder = process.cwd();
 var snapshots = require(currentFolder + "/__snapshots__/main.test.ts.snap");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: ^.*\\.md(#.*)?$\n        command: 'echo  \"(${ref})\"'\n";
+process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
+process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: .*\n        command: 'echo  \"ref:  ${ref}\";  echo  \"file: ${file}\";  echo  \"fragment: ${fragment}\"'\n";
 if (process.env.windir) {
     var testingOS = 'Windows';
 }
@@ -80,6 +81,7 @@ function DoCustomDebug() {
                 case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
                 case 1:
                     returns = _a.sent();
+                    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});
                     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" ~/GitProjects 0`, {});
                     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
                     // const  returns = await callChildProccess(`node ${scriptPath} --verbose c C:\\Users\\user1\\steps\\!Temp.yaml`, {});
@@ -117,7 +119,7 @@ function TestOfCommandLine() {
                             "name": "search_mode_ref_verb",
                             "parameters": "search",
                             "check": "true",
-                            "inputLines": "#ref: ../README.md\n7\n\n7\nexit()\n",
+                            "inputLines": "#ref: \"(../README.md)\"\n7\n\n7\nexit()\n",
                         }];
                     _i = 0, cases_1 = cases;
                     _a.label = 1;

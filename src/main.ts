@@ -1255,10 +1255,10 @@ async function  search() {
             await  searchSub(keyword);
         } else if (command === cPrintRef) {
 
-            printRef(keyword);
+            await  printRef(keyword);
         } else if (command === cRunVerb){
             const  keywordWithoudVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
-            const  ref = printRef(keywordWithoudVerb, {print: false});
+            const  ref = await printRef(keywordWithoudVerb, {print: false});
 
             runVerb(ref.verbs, ref.address, lastWord);
         }
@@ -1289,7 +1289,7 @@ async function  search() {
                     previousPrint.hasVerbMenu = false;
                 } else if (command === cPrintRef) {
 
-                    previousPrint = printRef(keyword);
+                    previousPrint = await printRef(keyword);
                 } else if (command === cRunVerb) {
                     const  verbNumber = keyword;
 
@@ -1631,7 +1631,7 @@ function  getEmptyOfPrintRefResult(): PrintRefResult {
 }
 
 // printRef
-function  printRef(refTagAndAddress: string, option = printRefOptionDefault): PrintRefResult {
+async function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Promise<PrintRefResult> {
     const  addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
     const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
     const  variables: {[key: string]: undefined} = {};
@@ -1686,6 +1686,13 @@ function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Pr
         address = lib.getHomePath() + address.substr(1);
     }
 
+    // linkableAddress = ...
+    var  linkableAddress = address;
+    const  getter = getRelatedLineNumGetter(address);
+    if (getter.type === 'text') {
+        linkableAddress = await searchAsText(getter, address);
+    }
+
     // recommended = ...
     var  recommended = address;
     recommended = recommended.replace(/\$/g,'\\$');
@@ -1725,7 +1732,7 @@ function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Pr
         if (recommended !== addressBefore) {
             console.log('Recommend: #ref: ' + recommended);
         }
-        console.log(address);
+        console.log(linkableAddress);
     }
 
     // print the verb menu
@@ -1742,10 +1749,40 @@ function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Pr
     } as PrintRefResult;
 }
 
+// getRelatedLineNumGetter
+function  getRelatedLineNumGetter(address: string): LineNumGetter {
+    if (process.env.TYPRM_LINE_NUM_GETTER) {
+
+        const  searchConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+        if (typeof searchConfig === 'object'  &&  searchConfig) {
+            const  searchs = searchConfig as LineNumGetter[];
+            for (const search of searchs) {
+
+                if (new RegExp(search.regularExpression).test(address)) {
+                    return  search;
+                }
+            }
+        }
+    }
+    const  verboseMode = 'verbose' in programOptions;
+
+    if (verboseMode) {
+        console.log(`Verbose: Not matched address "${address}". Check TYPRM_LINE_NUM_GETTER environment variable.`)
+    }
+    return  {
+        regularExpression: '.*',
+        type: '',
+        filePathRegularExpressionIndex: 0,
+        keywordRegularExpressionIndex: 0,
+        address,
+    } as LineNumGetter;
+}
+
 // getRelatedVerbs
 function  getRelatedVerbs(address: string): Verb[] {
     const  relatedVerbs: Verb[] = [];
     if (process.env.TYPRM_VERB) {
+
         const  verbConfig = yaml.load(process.env.TYPRM_VERB);
         if (typeof verbConfig === 'object'  &&  verbConfig) {
             const  verbs = verbConfig as Verb[];
@@ -1765,9 +1802,10 @@ function  getRelatedVerbs(address: string): Verb[] {
             // Open the folder by Finder and select the file
     }
     relatedVerbs.push({
+        regularExpression: '.*',
         label: '0.Folder',
         number: '0',
-        regularExpression: '.*',
+        echo: '',
         command,
     } as Verb);
 
@@ -1823,9 +1861,26 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
 // printConfig
 function  printConfig() {
     for (const [envName, envValue] of Object.entries(process.env)) {
-        if (envName.startsWith('TYPRM_')  &&  envName !== 'TYPRM_VERB') {
+        if (envName.startsWith('TYPRM_')  &&  envName !== 'TYPRM_LINE_NUM_GETTER'  &&  envName !== 'TYPRM_VERB') {
 
             console.log(`Verbose: ${envName} = ${envValue}`);
+        }
+    }
+    if (process.env.TYPRM_LINE_NUM_GETTER) {
+        const  getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+        if (typeof getterConfig === 'object'  &&  getterConfig) {
+            const  getters = getterConfig as LineNumGetter[];
+            var  index = 0;
+            for (const getter of getters) {
+
+                console.log(`Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                console.log(`Verbose:     regularExpression: ${getter.regularExpression}`);
+                console.log(`Verbose:     type: ${getter.type}`);
+                console.log(`Verbose:     filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+                console.log(`Verbose:     keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
+                console.log(`Verbose:     address: ${getter.address}`);
+                index += 1;
+            }
         }
     }
     if (process.env.TYPRM_VERB) {
@@ -1835,10 +1890,10 @@ function  printConfig() {
             var  index = 0;
             for (const verb of verbs) {
 
-                console.log(`Verbose: Verb[${index}]:`);
+                console.log(`Verbose: TYPRM_VERB[${index}]:`);
+                console.log(`Verbose:     regularExpression: ${verb.regularExpression}`);
                 console.log(`Verbose:     label: ${verb.label}`);
                 console.log(`Verbose:     number: ${verb.number}`);
-                console.log(`Verbose:     regularExpression: ${verb.regularExpression}`);
                 console.log(`Verbose:     command: ${verb.command}`);
                 index += 1;
             }
@@ -2399,11 +2454,108 @@ class SearchKeyword {
     direction: Direction = Direction.Following;
 }
 
+// LineNumGetter
+interface  LineNumGetter {
+    regularExpression: string;
+    type: string;
+    filePathRegularExpressionIndex: number;
+    keywordRegularExpressionIndex: number;
+    address: string;
+}
+
+// FilePathAndKeyword
+interface  FilePathAndKeyword {
+    filePath: string;
+    keyword: string;
+}
+
+// splitFilePathAndKeyword
+function  splitFilePathAndKeyword(address: string, regularExpression: string,
+        filePathRegularExpressionIndex: number,  keywordRegularExpressionIndex: number ): FilePathAndKeyword {
+
+    const  verboseMode = 'verbose' in programOptions;
+    if (verboseMode) {
+        console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
+        console.log(`Verbose:     address: ${address}`);
+        console.log(`Verbose:     regularExpression: ${regularExpression}`);
+        console.log(`Verbose:     filePathRegularExpressionIndex: ${filePathRegularExpressionIndex}`);
+        console.log(`Verbose:     keywordRegularExpressionIndex: ${keywordRegularExpressionIndex}`);
+    }
+
+    const  parameters = (new RegExp(regularExpression)).exec(address);
+    if ( ! parameters) {
+        throw  new Error(`ERROR: regularExpression (${regularExpression}) of regularExpression ` +
+            `"${regularExpression}" in TYPRM_LINE_NUM_GETTER is not matched.` +
+            `testing string is "${address}".`);
+    }
+    if (verboseMode) {
+        console.log(`Verbose:     matched: [${parameters.join(', ')}]`);
+    }
+    if (filePathRegularExpressionIndex > parameters.length - 1) {
+        throw  new Error(`ERROR: filePathRegularExpressionIndex (${filePathRegularExpressionIndex}) of regularExpression ` +
+            `"${regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+    if (keywordRegularExpressionIndex > parameters.length - 1) {
+        throw  new Error(`ERROR: keywordRegularExpressionIndex (${keywordRegularExpressionIndex}) of regularExpression ` +
+            `"${regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+
+    return {
+        filePath: parameters[filePathRegularExpressionIndex],
+        keyword:  parameters[keywordRegularExpressionIndex],
+    } as FilePathAndKeyword;
+}
+
+// searchAsText
+async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<string> {
+    const  { filePath, keyword } = splitFilePathAndKeyword(address,  getter.regularExpression,
+        getter.filePathRegularExpressionIndex,  getter.keywordRegularExpressionIndex);
+
+    const  reader = readline.createInterface({
+        input: fs.createReadStream(filePath),
+        crlfDelay: Infinity
+    });
+    let  lineNum = 0;
+    let  breaking = false;
+    let  exception: any;
+
+    for await (const line1 of reader) {
+        if (breaking) {continue;}  // "reader" requests read all lines
+        try {
+            const  line: string = line1;
+            lineNum += 1;
+
+            if (line.includes(keyword)) {
+                breaking = true;  // return or break must not be written.
+                // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+            }
+        } catch (e) {
+            exception = e;
+            breaking = true;
+        }
+    }
+    if (exception) {
+        throw exception;
+    }
+    if ( ! breaking) {
+        lineNum = 0;
+    }
+
+    const  linkableAddress = getter.address
+        .replace(verbVar.file, filePath.replace(/\\/g, '/'))
+        .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
+        .replace(verbVar.lineNum, lineNum.toString())
+        .replace(verbVar.fragment, '');
+    return  linkableAddress;
+}
+
 // Verb
 interface Verb {
+    regularExpression: string;
     label: string;
     number: string;
-    regularExpression: string;
     command: string;  // This can contain "verbVar"
 }
 
@@ -2414,6 +2566,7 @@ namespace VerbVariable {
     export const  file = '${file}';
     export const  windowsFile = '${windowsFile}';
     export const  fragment = '${fragment}';
+    export const  lineNum = '${lineNum}';
 }
 const  verbVar = VerbVariable;
 

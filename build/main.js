@@ -1584,7 +1584,7 @@ function search() {
                     cSearch = 1;
                     cPrintRef = 2;
                     cRunVerb = 3;
-                    if (!(keyword !== '')) return [3 /*break*/, 4];
+                    if (!(keyword !== '')) return [3 /*break*/, 7];
                     lastWord = exports.programArguments.length === 0 ? '' : exports.programArguments[exports.programArguments.length - 1];
                     hasVerb = numberRegularExpression.test(lastWord);
                     command = cSearch;
@@ -1600,37 +1600,41 @@ function search() {
                     return [4 /*yield*/, searchSub(keyword)];
                 case 1:
                     _a.sent();
-                    return [3 /*break*/, 3];
+                    return [3 /*break*/, 6];
                 case 2:
-                    if (command === cPrintRef) {
-                        printRef(keyword);
-                    }
-                    else if (command === cRunVerb) {
-                        keywordWithoudVerb = exports.programArguments.slice(startIndex, exports.programArguments.length - 1).join(' ');
-                        ref = printRef(keywordWithoudVerb, { print: false });
-                        runVerb(ref.verbs, ref.address, lastWord);
-                    }
-                    _a.label = 3;
-                case 3: return [3 /*break*/, 12];
+                    if (!(command === cPrintRef)) return [3 /*break*/, 4];
+                    return [4 /*yield*/, printRef(keyword)];
+                case 3:
+                    _a.sent();
+                    return [3 /*break*/, 6];
                 case 4:
+                    if (!(command === cRunVerb)) return [3 /*break*/, 6];
+                    keywordWithoudVerb = exports.programArguments.slice(startIndex, exports.programArguments.length - 1).join(' ');
+                    return [4 /*yield*/, printRef(keywordWithoudVerb, { print: false })];
+                case 5:
+                    ref = _a.sent();
+                    runVerb(ref.verbs, ref.address, lastWord);
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 17];
+                case 7:
                     inputSkip(startIndex);
                     previousPrint = getEmptyOfPrintRefResult();
-                    _a.label = 5;
-                case 5:
+                    _a.label = 8;
+                case 8:
                     prompt = 'keyword:';
                     if (previousPrint.hasVerbMenu) {
                         prompt = 'keyword or number:';
                     }
                     return [4 /*yield*/, input(chalk.yellow(prompt) + ' ')];
-                case 6:
+                case 9:
                     keyword_1 = _a.sent();
-                    if (!(keyword_1 === 'exit()')) return [3 /*break*/, 7];
-                    return [3 /*break*/, 12];
-                case 7:
-                    if (!(keyword_1 === '')) return [3 /*break*/, 8];
+                    if (!(keyword_1 === 'exit()')) return [3 /*break*/, 10];
+                    return [3 /*break*/, 17];
+                case 10:
+                    if (!(keyword_1 === '')) return [3 /*break*/, 11];
                     previousPrint.hasVerbMenu = false;
-                    return [3 /*break*/, 11];
-                case 8:
+                    return [3 /*break*/, 16];
+                case 11:
                     command = cSearch;
                     if (previousPrint.hasVerbMenu && numberRegularExpression.test(keyword_1)) {
                         command = cRunVerb;
@@ -1638,23 +1642,26 @@ function search() {
                     else if (hasRefTag(keyword_1)) {
                         command = cPrintRef;
                     }
-                    if (!(command === cSearch)) return [3 /*break*/, 10];
+                    if (!(command === cSearch)) return [3 /*break*/, 13];
                     return [4 /*yield*/, searchSub(keyword_1)];
-                case 9:
+                case 12:
                     _a.sent();
                     previousPrint.hasVerbMenu = false;
-                    return [3 /*break*/, 11];
-                case 10:
-                    if (command === cPrintRef) {
-                        previousPrint = printRef(keyword_1);
-                    }
-                    else if (command === cRunVerb) {
+                    return [3 /*break*/, 16];
+                case 13:
+                    if (!(command === cPrintRef)) return [3 /*break*/, 15];
+                    return [4 /*yield*/, printRef(keyword_1)];
+                case 14:
+                    previousPrint = _a.sent();
+                    return [3 /*break*/, 16];
+                case 15:
+                    if (command === cRunVerb) {
                         verbNumber = keyword_1;
                         runVerb(previousPrint.verbs, previousPrint.address, verbNumber);
                     }
-                    _a.label = 11;
-                case 11: return [3 /*break*/, 5];
-                case 12: return [2 /*return*/];
+                    _a.label = 16;
+                case 16: return [3 /*break*/, 8];
+                case 17: return [2 /*return*/];
             }
         });
     });
@@ -2034,108 +2041,147 @@ function getEmptyOfPrintRefResult() {
 // printRef
 function printRef(refTagAndAddress, option) {
     if (option === void 0) { option = printRefOptionDefault; }
-    var addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
-    var variableRe = new RegExp(variablePattern, 'g'); // variableRegularExpression
-    var variables = {};
-    variableRe.lastIndex = 0;
-    for (;;) {
-        var variable = variableRe.exec(addressBefore);
-        if (variable === null) {
-            break;
-        }
-        variables[variable[0]] = undefined;
-    }
-    // address = ...
-    var address = addressBefore;
-    address = address.replace(/(\\+)([^\$\\ ]|$)/g, function (match, backSlashes, nextCharacter, offset) {
-        return backSlashes.replace(/\\/g, '/') + nextCharacter; // replace \\ to /
-    });
-    address = cutQuotation(address);
-    if (variables) {
-        var _loop_5 = function (variable) {
-            var variableName = variable.substr('${'.length, variable.length - '${}'.length);
-            var value = process.env["" + typrmEnvPrefix + variableName];
-            if (value) {
-                var variableRegExp = new RegExp('\\\\?' + escapeRegularExpression(variable), 'g');
-                address = address.replace(variableRegExp, function (match, offset) {
-                    var startsBackSlash = (match.substr(0, 1) === '\\');
-                    if (startsBackSlash) {
-                        var dollarOffset = offset + 1;
-                    }
-                    else {
-                        var dollarOffset = offset;
-                    }
-                    var replacing = !isBackSlashParameter(address, dollarOffset);
-                    if (replacing) {
-                        if (startsBackSlash) {
-                            return '\\' + value.replace(/\$/g, '$$').replace('\\', '/');
+    return __awaiter(this, void 0, void 0, function () {
+        var addressBefore, variableRe, variables, variable, address, _loop_5, _i, _a, variable, linkableAddress, getter, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, _b, _c, _d, envName, envValue, variableName, value, _e, sortedEnvronmentVariables_1, variable, verbs, verbMenu;
+        return __generator(this, function (_f) {
+            switch (_f.label) {
+                case 0:
+                    addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
+                    variableRe = new RegExp(variablePattern, 'g');
+                    variables = {};
+                    variableRe.lastIndex = 0;
+                    for (;;) {
+                        variable = variableRe.exec(addressBefore);
+                        if (variable === null) {
+                            break;
                         }
-                        else {
-                            return value.replace(/\$/g, '$$').replace('\\', '/');
+                        variables[variable[0]] = undefined;
+                    }
+                    address = addressBefore;
+                    address = address.replace(/(\\+)([^\$\\ ]|$)/g, function (match, backSlashes, nextCharacter, offset) {
+                        return backSlashes.replace(/\\/g, '/') + nextCharacter; // replace \\ to /
+                    });
+                    address = cutQuotation(address);
+                    if (variables) {
+                        _loop_5 = function (variable) {
+                            var variableName = variable.substr('${'.length, variable.length - '${}'.length);
+                            var value = process.env["" + typrmEnvPrefix + variableName];
+                            if (value) {
+                                var variableRegExp = new RegExp('\\\\?' + escapeRegularExpression(variable), 'g');
+                                address = address.replace(variableRegExp, function (match, offset) {
+                                    var startsBackSlash = (match.substr(0, 1) === '\\');
+                                    if (startsBackSlash) {
+                                        var dollarOffset = offset + 1;
+                                    }
+                                    else {
+                                        var dollarOffset = offset;
+                                    }
+                                    var replacing = !isBackSlashParameter(address, dollarOffset);
+                                    if (replacing) {
+                                        if (startsBackSlash) {
+                                            return '\\' + value.replace(/\$/g, '$$').replace('\\', '/');
+                                        }
+                                        else {
+                                            return value.replace(/\$/g, '$$').replace('\\', '/');
+                                        }
+                                    }
+                                    else {
+                                        return variable.replace(/\$/g, '$$');
+                                        // If startsBackSlash === true, cut \ character.
+                                    }
+                                });
+                            }
+                        };
+                        for (_i = 0, _a = Object.keys(variables); _i < _a.length; _i++) {
+                            variable = _a[_i];
+                            _loop_5(variable);
                         }
                     }
-                    else {
-                        return variable.replace(/\$/g, '$$');
-                        // If startsBackSlash === true, cut \ character.
+                    address = address.replace(/\\\\/g, '\\');
+                    if (address.startsWith('~')) {
+                        address = lib.getHomePath() + address.substr(1);
                     }
-                });
+                    linkableAddress = address;
+                    getter = getRelatedLineNumGetter(address);
+                    if (!(getter.type === 'text')) return [3 /*break*/, 2];
+                    return [4 /*yield*/, searchAsText(getter, address)];
+                case 1:
+                    linkableAddress = _f.sent();
+                    _f.label = 2;
+                case 2:
+                    recommended = address;
+                    recommended = recommended.replace(/\$/g, '\\$');
+                    lowerCaseDriveRegExp = /^[a-z]:/;
+                    upperCaseDriveRegExp = /^[A-Z]:/;
+                    sortedEnvronmentVariables = [];
+                    for (_b = 0, _c = Object.entries(process.env); _b < _c.length; _b++) {
+                        _d = _c[_b], envName = _d[0], envValue = _d[1];
+                        if (envName.startsWith(typrmEnvPrefix) && envValue) {
+                            variableName = envName.substr(typrmEnvPrefix.length);
+                            value = envValue.replace(/\\/g, '/');
+                            sortedEnvronmentVariables.push({ key: variableName, value: value });
+                            if (lowerCaseDriveRegExp.test(value)) {
+                                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toUpperCase() + value.substr(1) });
+                            }
+                            else if (upperCaseDriveRegExp.test(value)) {
+                                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toLowerCase() + value.substr(1) });
+                            }
+                        }
+                    }
+                    sortedEnvronmentVariables.sort(function (a, b) {
+                        return b.value.length - a.value.length; // descending order
+                    });
+                    for (_e = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _e < sortedEnvronmentVariables_1.length; _e++) {
+                        variable = sortedEnvronmentVariables_1[_e];
+                        recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
+                    }
+                    if (recommended.startsWith(lib.getHomePath())) {
+                        recommended = '~' + recommended.substr(lib.getHomePath().length);
+                    }
+                    // print the address
+                    if (option.print) {
+                        if (recommended !== addressBefore) {
+                            console.log('Recommend: #ref: ' + recommended);
+                        }
+                        console.log(linkableAddress);
+                    }
+                    verbs = getRelatedVerbs(address);
+                    verbMenu = verbs.map(function (verb) { return (verb.label); }).join(', ');
+                    if (verbMenu !== '' && option.print) {
+                        console.log('    ' + verbMenu);
+                    }
+                    return [2 /*return*/, {
+                            hasVerbMenu: (verbMenu !== ''),
+                            verbs: verbs,
+                            address: address,
+                        }];
             }
-        };
-        for (var _i = 0, _a = Object.keys(variables); _i < _a.length; _i++) {
-            var variable = _a[_i];
-            _loop_5(variable);
-        }
-    }
-    address = address.replace(/\\\\/g, '\\');
-    if (address.startsWith('~')) {
-        address = lib.getHomePath() + address.substr(1);
-    }
-    // recommended = ...
-    var recommended = address;
-    recommended = recommended.replace(/\$/g, '\\$');
-    var lowerCaseDriveRegExp = /^[a-z]:/;
-    var upperCaseDriveRegExp = /^[A-Z]:/;
-    var sortedEnvronmentVariables = [];
-    for (var _b = 0, _c = Object.entries(process.env); _b < _c.length; _b++) {
-        var _d = _c[_b], envName = _d[0], envValue = _d[1];
-        if (envName.startsWith(typrmEnvPrefix) && envValue) {
-            var variableName = envName.substr(typrmEnvPrefix.length);
-            var value = envValue.replace(/\\/g, '/');
-            sortedEnvronmentVariables.push({ key: variableName, value: value });
-            if (lowerCaseDriveRegExp.test(value)) {
-                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toUpperCase() + value.substr(1) });
-            }
-            else if (upperCaseDriveRegExp.test(value)) {
-                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toLowerCase() + value.substr(1) });
-            }
-        }
-    }
-    sortedEnvronmentVariables.sort(function (a, b) {
-        return b.value.length - a.value.length; // descending order
+        });
     });
-    for (var _e = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _e < sortedEnvronmentVariables_1.length; _e++) {
-        var variable = sortedEnvronmentVariables_1[_e];
-        recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
-    }
-    if (recommended.startsWith(lib.getHomePath())) {
-        recommended = '~' + recommended.substr(lib.getHomePath().length);
-    }
-    // print the address
-    if (option.print) {
-        if (recommended !== addressBefore) {
-            console.log('Recommend: #ref: ' + recommended);
+}
+// getRelatedLineNumGetter
+function getRelatedLineNumGetter(address) {
+    if (process.env.TYPRM_LINE_NUM_GETTER) {
+        var searchConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+        if (typeof searchConfig === 'object' && searchConfig) {
+            var searchs = searchConfig;
+            for (var _i = 0, searchs_1 = searchs; _i < searchs_1.length; _i++) {
+                var search_1 = searchs_1[_i];
+                if (new RegExp(search_1.regularExpression).test(address)) {
+                    return search_1;
+                }
+            }
         }
-        console.log(address);
     }
-    // print the verb menu
-    var verbs = getRelatedVerbs(address);
-    var verbMenu = verbs.map(function (verb) { return (verb.label); }).join(', ');
-    if (verbMenu !== '' && option.print) {
-        console.log('    ' + verbMenu);
+    var verboseMode = 'verbose' in exports.programOptions;
+    if (verboseMode) {
+        console.log("Verbose: Not matched address \"" + address + "\". Check TYPRM_LINE_NUM_GETTER environment variable.");
     }
     return {
-        hasVerbMenu: (verbMenu !== ''),
-        verbs: verbs,
+        regularExpression: '.*',
+        type: '',
+        filePathRegularExpressionIndex: 0,
+        keywordRegularExpressionIndex: 0,
         address: address,
     };
 }
@@ -2162,9 +2208,10 @@ function getRelatedVerbs(address) {
         // Open the folder by Finder and select the file
     }
     relatedVerbs.push({
+        regularExpression: '.*',
         label: '0.Folder',
         number: '0',
-        regularExpression: '.*',
+        echo: '',
         command: command,
     });
     return relatedVerbs;
@@ -2220,8 +2267,25 @@ function runVerb(verbs, address, verbNum) {
 function printConfig() {
     for (var _i = 0, _a = Object.entries(process.env); _i < _a.length; _i++) {
         var _b = _a[_i], envName = _b[0], envValue = _b[1];
-        if (envName.startsWith('TYPRM_') && envName !== 'TYPRM_VERB') {
+        if (envName.startsWith('TYPRM_') && envName !== 'TYPRM_LINE_NUM_GETTER' && envName !== 'TYPRM_VERB') {
             console.log("Verbose: " + envName + " = " + envValue);
+        }
+    }
+    if (process.env.TYPRM_LINE_NUM_GETTER) {
+        var getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+        if (typeof getterConfig === 'object' && getterConfig) {
+            var getters = getterConfig;
+            var index = 0;
+            for (var _c = 0, getters_1 = getters; _c < getters_1.length; _c++) {
+                var getter = getters_1[_c];
+                console.log("Verbose: TYPRM_LINE_NUM_GETTER[" + index + "]:");
+                console.log("Verbose:     regularExpression: " + getter.regularExpression);
+                console.log("Verbose:     type: " + getter.type);
+                console.log("Verbose:     filePathRegularExpressionIndex: " + getter.filePathRegularExpressionIndex);
+                console.log("Verbose:     keywordRegularExpressionIndex: " + getter.keywordRegularExpressionIndex);
+                console.log("Verbose:     address: " + getter.address);
+                index += 1;
+            }
         }
     }
     if (process.env.TYPRM_VERB) {
@@ -2229,12 +2293,12 @@ function printConfig() {
         if (typeof verbConfig === 'object' && verbConfig) {
             var verbs = verbConfig;
             var index = 0;
-            for (var _c = 0, verbs_2 = verbs; _c < verbs_2.length; _c++) {
-                var verb = verbs_2[_c];
-                console.log("Verbose: Verb[" + index + "]:");
+            for (var _d = 0, verbs_2 = verbs; _d < verbs_2.length; _d++) {
+                var verb = verbs_2[_d];
+                console.log("Verbose: TYPRM_VERB[" + index + "]:");
+                console.log("Verbose:     regularExpression: " + verb.regularExpression);
                 console.log("Verbose:     label: " + verb.label);
                 console.log("Verbose:     number: " + verb.number);
-                console.log("Verbose:     regularExpression: " + verb.regularExpression);
                 console.log("Verbose:     command: " + verb.command);
                 index += 1;
             }
@@ -2819,6 +2883,115 @@ var SearchKeyword = /** @class */ (function () {
     }
     return SearchKeyword;
 }());
+// splitFilePathAndKeyword
+function splitFilePathAndKeyword(address, regularExpression, filePathRegularExpressionIndex, keywordRegularExpressionIndex) {
+    var verboseMode = 'verbose' in exports.programOptions;
+    if (verboseMode) {
+        console.log("Verbose: Parsed by TYPRM_LINE_NUM_GETTER:");
+        console.log("Verbose:     address: " + address);
+        console.log("Verbose:     regularExpression: " + regularExpression);
+        console.log("Verbose:     filePathRegularExpressionIndex: " + filePathRegularExpressionIndex);
+        console.log("Verbose:     keywordRegularExpressionIndex: " + keywordRegularExpressionIndex);
+    }
+    var parameters = (new RegExp(regularExpression)).exec(address);
+    if (!parameters) {
+        throw new Error("ERROR: regularExpression (" + regularExpression + ") of regularExpression " +
+            ("\"" + regularExpression + "\" in TYPRM_LINE_NUM_GETTER is not matched.") +
+            ("testing string is \"" + address + "\"."));
+    }
+    if (verboseMode) {
+        console.log("Verbose:     matched: [" + parameters.join(', ') + "]");
+    }
+    if (filePathRegularExpressionIndex > parameters.length - 1) {
+        throw new Error("ERROR: filePathRegularExpressionIndex (" + filePathRegularExpressionIndex + ") of regularExpression " +
+            ("\"" + regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
+            ("testing string is \"" + address + "\"."));
+    }
+    if (keywordRegularExpressionIndex > parameters.length - 1) {
+        throw new Error("ERROR: keywordRegularExpressionIndex (" + keywordRegularExpressionIndex + ") of regularExpression " +
+            ("\"" + regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
+            ("testing string is \"" + address + "\"."));
+    }
+    return {
+        filePath: parameters[filePathRegularExpressionIndex],
+        keyword: parameters[keywordRegularExpressionIndex],
+    };
+}
+// searchAsText
+function searchAsText(getter, address) {
+    var e_8, _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var _b, filePath, keyword, reader, lineNum, breaking, exception, reader_7, reader_7_1, line1, line, e_8_1, linkableAddress;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _b = splitFilePathAndKeyword(address, getter.regularExpression, getter.filePathRegularExpressionIndex, getter.keywordRegularExpressionIndex), filePath = _b.filePath, keyword = _b.keyword;
+                    reader = readline.createInterface({
+                        input: fs.createReadStream(filePath),
+                        crlfDelay: Infinity
+                    });
+                    lineNum = 0;
+                    breaking = false;
+                    _c.label = 1;
+                case 1:
+                    _c.trys.push([1, 6, 7, 12]);
+                    reader_7 = __asyncValues(reader);
+                    _c.label = 2;
+                case 2: return [4 /*yield*/, reader_7.next()];
+                case 3:
+                    if (!(reader_7_1 = _c.sent(), !reader_7_1.done)) return [3 /*break*/, 5];
+                    line1 = reader_7_1.value;
+                    if (breaking) {
+                        return [3 /*break*/, 4];
+                    } // "reader" requests read all lines
+                    try {
+                        line = line1;
+                        lineNum += 1;
+                        if (line.includes(keyword)) {
+                            breaking = true; // return or break must not be written.
+                            // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                        }
+                    }
+                    catch (e) {
+                        exception = e;
+                        breaking = true;
+                    }
+                    _c.label = 4;
+                case 4: return [3 /*break*/, 2];
+                case 5: return [3 /*break*/, 12];
+                case 6:
+                    e_8_1 = _c.sent();
+                    e_8 = { error: e_8_1 };
+                    return [3 /*break*/, 12];
+                case 7:
+                    _c.trys.push([7, , 10, 11]);
+                    if (!(reader_7_1 && !reader_7_1.done && (_a = reader_7.return))) return [3 /*break*/, 9];
+                    return [4 /*yield*/, _a.call(reader_7)];
+                case 8:
+                    _c.sent();
+                    _c.label = 9;
+                case 9: return [3 /*break*/, 11];
+                case 10:
+                    if (e_8) throw e_8.error;
+                    return [7 /*endfinally*/];
+                case 11: return [7 /*endfinally*/];
+                case 12:
+                    if (exception) {
+                        throw exception;
+                    }
+                    if (!breaking) {
+                        lineNum = 0;
+                    }
+                    linkableAddress = getter.address
+                        .replace(verbVar.file, filePath.replace(/\\/g, '/'))
+                        .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
+                        .replace(verbVar.lineNum, lineNum.toString())
+                        .replace(verbVar.fragment, '');
+                    return [2 /*return*/, linkableAddress];
+            }
+        });
+    });
+}
 // verbVar
 var VerbVariable;
 (function (VerbVariable) {
@@ -2827,6 +3000,7 @@ var VerbVariable;
     VerbVariable.file = '${file}';
     VerbVariable.windowsFile = '${windowsFile}';
     VerbVariable.fragment = '${fragment}';
+    VerbVariable.lineNum = '${lineNum}';
 })(VerbVariable || (VerbVariable = {}));
 var verbVar = VerbVariable;
 // KeyValue

@@ -161,17 +161,6 @@ sudo nano ../../file_target/1/file_1_ok_and_bad_3_target.sh: |  #file-template: 
 "
 `;
 
-exports[`checks file contents >> file_2_tab: sourceFileContents 1`] = `
-"設定:
-    __User__: user1
-file_2_indent_2_target.yml:  #file-template: file_2_tab_2_target.yml
-    sign in:
-        user: 'user1'  #template: __User__
-        password: pass
-#// 対象ファイルの中のタブ幅は 2 であり上記タブ幅 4 と異なりますがチェックには成功します。
-"
-`;
-
 exports[`checks file contents >> file_3_file_name : sourceFileContents 1`] = `
 "設定:
     __Base__: sub
@@ -1968,8 +1957,11 @@ keyword or number: keyword: keyword: "
 `;
 
 exports[`typrm_test >> search_mode_ref_verb >> mac: stdout 1`] = `
-"keyword: ../README.md
+"keyword: Recommend: #ref: (../README.md)
+(../README.md)
     7.Test Echo, 0.Folder
-keyword or number: (../README.md)
+keyword or number: ref:  (../README.md)
+file: (../README.md)
+fragment: 
 keyword or number: keyword: keyword: "
 `;

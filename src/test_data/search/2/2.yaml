@@ -65,3 +65,6 @@ test of target word count 3:
     #keyword: World wide web
     #keyword: World wide web
     #keyword: web World wide, World wide
+
+lineNum:
+    #test of TYPRM_LINE_NUM_GETTER

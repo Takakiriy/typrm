@@ -27,6 +27,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
   - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
     - [Execute commands related to files](#execute-commands-related-to-files)
+    - [Replace to the line number of the file](#replace-to-the-line-number-of-the-file)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -884,7 +885,7 @@ Case of mac zsh:
     )
     node  ____/build/typrm.js "$@"
 
-You can write variable references in the command parameter.
+You can write variable references in the `command` parameter.
 
 | Variable | Value |
 | ---- | ---- |
@@ -893,6 +894,77 @@ You can write variable references in the command parameter.
 | ${file} | left of `#` in `#ref:` parameter |
 | ${windowsFile} | the path with backslash |
 | ${fragment} | right of `#` in `#ref:` parameter |
+
+You can check the setting value by adding the --verbose option to typrm.
+
+
+### Replace to the line number of the file
+
+If you specify the file path and parameters by search (s)
+command with `#ref:` tag, the file path and line number will be
+displayed.
+
+    $ typrm s \#ref: \${projects}/project1/src/app.ts#main
+    C:/Users/user1/Projects/project1/src/app.ts:25
+        0.Folder
+
+The contents of the file are searched as keywords
+at the right side of `#` and displayed by replacing them
+with line numbers.
+In the above case, search the contents in the `app.ts` file
+with the keyword `main` and display the found line number `25`.
+
+To replace to the line number and display it,
+set the `TYPRM_LINE_NUM_GETTER` environment variable in YAML format
+as follows.
+Note that you should edit the `regularExpression` setting
+according to your environment.
+
+Case of Windows PowerShell:
+
+    ${env:TYPRM_LINE_NUM_GETTER} = @"
+        - #
+            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            type: text
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 4
+            address: "\${file}:\${lineNum}"
+    "@
+    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+
+Case of mac zsh:
+
+    export  TYPRM_LINE_NUM_GETTER=$(cat << EOF
+        - #
+            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            type: text
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 4
+            address: "\${file}:\${lineNum}"
+    EOF
+    )
+    node  ____/build/typrm.js "$@"
+
+For `type`, specify `text`.
+
+For `filePathRegularExpressionIndex`, specify the number
+in parentheses that corresponds to the file path part of
+the result evaluated by `regularExpression`.
+The numbers specification in parentheses are the same as
+the JavaScript
+[RegExp.exec (MDN)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#description) specification.
+
+For `keywordRegularExpressionIndex`, specify the number
+in parentheses that corresponds to the keyword part
+like the `filePathRegularExpressionIndex`.
+
+You can write variable references in the `address` parameter.
+
+| Variable | Value |
+| ---- | ---- |
+| ${file} | left of `#` in `#ref:` parameter |
+| ${windowsFile} | the path with backslash |
+| ${lineNum} | the line number |
 
 You can check the setting value by adding the --verbose option to typrm.
 
