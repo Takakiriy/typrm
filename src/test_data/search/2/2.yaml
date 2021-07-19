@@ -60,3 +60,8 @@ output order (6):
     #keyword: Tool release, Tool deploy
 emphasize search and ref tag:
     #keyword: picture  #ref: path  #search: keyword
+
+test of target word count 3:
+    #keyword: World wide web
+    #keyword: World wide web
+    #keyword: web World wide, World wide

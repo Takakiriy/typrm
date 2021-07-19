@@ -1396,7 +1396,8 @@ var IfTagParser = /** @class */ (function () {
             if (this.thisIsOutOfFalseBlock && !resultOfIf) {
                 this.thisIsOutOfFalseBlock_ = false;
             }
-            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf, enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
+            this.indentLengthsOfIfTag.push({ indentLength: indentLength, resultOfIf: resultOfIf,
+                enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
             this.isReplacable_ = isReplacable;
         }
         return { condition: expression, errorCount: errorCount };
@@ -1471,10 +1472,10 @@ var WordPositions = /** @class */ (function () {
         }
     };
     WordPositions.prototype.getWordIndex = function (phrasePosition) {
-        var wordIndex = 0;
+        var wordIndex = -1;
         for (var _i = 0, _a = this.wordPositions; _i < _a.length; _i++) {
             var wordPosition = _a[_i];
-            if (phrasePosition >= wordPosition) {
+            if (phrasePosition < wordPosition) {
                 break; // wordIndex = .
             }
             wordIndex += 1;

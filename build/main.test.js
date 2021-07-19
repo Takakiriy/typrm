@@ -279,15 +279,13 @@ describe("replaces settings >>", function () {
                     writeFileSync(changingFilePath, sourceFileContents);
                     if (!lineNum) return [3 /*break*/, 2];
                     return [4 /*yield*/, callMain(["replace", changingFileName, lineNum, keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale,
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                        folder: changingFolderPath, test: "",
-                        locale: locale,
+                        folder: changingFolderPath, test: "", locale: locale,
                     })];
                 case 3:
                     _a.sent();
@@ -324,8 +322,7 @@ describe("replaces settings >>", function () {
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale,
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 2:
                     _a.sent();
@@ -338,8 +335,7 @@ describe("replaces settings >>", function () {
                 case 5:
                     _a.trys.push([5, 7, , 8]);
                     return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale,
+                            folder: changingFolderPath, test: "", locale: locale,
                         })];
                 case 6:
                     _a.sent();
@@ -442,15 +438,13 @@ describe("replaces settings >>", function () {
                         writeFileSync(changingFilePath, sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 2];
                         return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                                folder: changingFolderPath, test: "",
-                                locale: locale
+                                folder: changingFolderPath, test: "", locale: locale
                             })];
                     case 1:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale
+                            folder: changingFolderPath, test: "", locale: locale
                         })];
                     case 3:
                         _a.sent();
@@ -460,15 +454,13 @@ describe("replaces settings >>", function () {
                         expect(updatedFileContents).not.toBe(sourceFileContents);
                         if (!lineNum) return [3 /*break*/, 6];
                         return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
-                                folder: changingFolderPath, test: "",
-                                locale: locale
+                                folder: changingFolderPath, test: "", locale: locale
                             })];
                     case 5:
                         _a.sent();
                         return [3 /*break*/, 8];
                     case 6: return [4 /*yield*/, callMain(["revert", changingFileName], {
-                            folder: changingFolderPath, test: "",
-                            locale: locale
+                            folder: changingFolderPath, test: "", locale: locale
                         })];
                     case 7:
                         _a.sent();
@@ -558,8 +550,8 @@ describe("searches keyword tag >>", function () {
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':2:') + (" #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + " xxx\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':4:') + (" #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('aaa bbb') + " xxx\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':4:') + (" #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + "\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('aaa bbb') + "\n"),
         ], [
             "words order score (2)",
@@ -586,6 +578,13 @@ describe("searches keyword tag >>", function () {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':21:') + ("     #keyword: " + matchedColor('new task') + "s only\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':20:') + ("     #keyword: " + matchedColor('new task') + "s\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':22:') + ("     #keyword: " + matchedColor('new task') + "s\n"),
+        ], [
+            "target word count 3",
+            ["search", "world wide web"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':67:') + ("     #keyword: " + matchedColor('web') + " " + matchedColor('World') + " " + matchedColor('wide') + ", " + matchedColor('World') + " " + matchedColor('wide') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + ("     #keyword: " + matchedColor('World wide web') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + ("     #keyword: " + matchedColor('World wide web') + "\n"),
         ], [
             "compound word",
             ["search", "frame set"],

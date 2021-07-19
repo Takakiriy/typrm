@@ -1170,10 +1170,10 @@ class  WordPositions {
     }
 
     getWordIndex(phrasePosition: number) {
-        var  wordIndex = 0;
+        var  wordIndex = -1;
         for (const wordPosition of this.wordPositions) {
 
-            if (phrasePosition >= wordPosition) {
+            if (phrasePosition < wordPosition) {
                 break;  // wordIndex = .
             }
             wordIndex += 1;
