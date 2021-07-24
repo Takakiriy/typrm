@@ -787,7 +787,7 @@ describe("searches glossary tag >>", function () {
     }); });
 });
 describe("print reference >>", function () {
-    test.only.each([
+    test.each([
         [
             "1st",
             ["search", "#ref:", "${TEST_ENV}/file.txt"],
@@ -914,15 +914,10 @@ describe("print reference >>", function () {
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    if (_caseName !== 'shared folder') {
-                        return [2 /*return*/];
-                    } // || subCase !== '____'
-                    return [4 /*yield*/, callMain(arguments_, options)];
+                case 0: return [4 /*yield*/, callMain(arguments_, options)];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);
-                    expect('test code').toBe('deleted skip code.');
                     return [2 /*return*/];
             }
         });
