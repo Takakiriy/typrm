@@ -885,39 +885,11 @@ Windows の PowerShell の場合:
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
             address: "`${file}:`${lineNum}"
-        - #
-            #// shared folder
-            regularExpression: ^(\\\\\\\\.*)`$
-            type: folder
-            filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 0
-            address: "`${windowsFile}"
     "@
 
     node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
-Windows の Git bash の場合:
-
-    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
-        - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
-            type: text
-            filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 4
-            address: "${file}:${lineNum}"
-        - #
-            #// shared folder
-            regularExpression: ^(\\\\.*)$
-            type: folder
-            filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 0
-            address: "${windowsFile}"
-    __HERE_DOCUMENT__
-    )
-
-    node  ____/build/typrm.js "$@"
-
-Linux の bash, mac の zsh の場合:
+bash, zsh の場合:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #

@@ -929,39 +929,11 @@ Case of Windows PowerShell:
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
             address: "`${file}:`${lineNum}"
-        - #
-            #// shared folder
-            regularExpression: ^(\\\\\\\\.*)`$
-            type: folder
-            filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 0
-            address: "`${windowsFile}"
     "@
 
     node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
-Case of Windows Gti bash:
-
-    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
-        - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
-            type: text
-            filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 4
-            address: "${file}:${lineNum}"
-        - #
-            #// shared folder
-            regularExpression: ^(\\\\.*)$
-            type: folder
-            filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 0
-            address: "${windowsFile}"
-    __HERE_DOCUMENT__
-    )
-
-    node  ____/build/typrm.js "$@"
-
-Case of Linux bash or mac zsh:
+Case of bash or zsh:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
