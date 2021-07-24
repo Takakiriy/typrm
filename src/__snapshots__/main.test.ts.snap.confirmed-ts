@@ -1957,8 +1957,11 @@ keyword or number: keyword: keyword: "
 `;
 
 exports[`typrm_test >> search_mode_ref_verb >> mac: stdout 1`] = `
-"keyword: ../README.md
+"keyword: Recommend: #ref: (../README.md)
+(../README.md)
     7.Test Echo, 0.Folder
-keyword or number: (../README.md)
+keyword or number: ref:  (../README.md)
+file: (../README.md)
+fragment: 
 keyword or number: keyword: keyword: "
 `;

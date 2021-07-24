@@ -59,7 +59,7 @@ if (process.env.windir) {
 else {
     var testingOS = 'Linux';
 }
-process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
+process.env.TYPRM_ADDRESS_FORMAT = "\n    - #\n        regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
 if (testingOS === 'Windows') {
     process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, windowsRef: ${windowsRef}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
 }
@@ -861,7 +861,7 @@ describe("print reference >>", function () {
                 ? // Windows
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                         "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                        "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                        "Verbose: TYPRM_ADDRESS_FORMAT[0]:\n" +
                         "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                         "Verbose:     type: text\n" +
                         "Verbose:     filePathRegularExpressionIndex: 1\n" +
@@ -881,7 +881,7 @@ describe("print reference >>", function () {
                 : // mac
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                         "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                        "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                        "Verbose: TYPRM_ADDRESS_FORMAT[0]:\n" +
                         "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                         "Verbose:     type: text\n" +
                         "Verbose:     filePathRegularExpressionIndex: 1\n" +
@@ -897,7 +897,7 @@ describe("print reference >>", function () {
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
                         "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
-                        "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
+                        "Verbose: Parsed by TYPRM_ADDRESS_FORMAT:\n" +
                         "Verbose:     address: ../README.md\n" +
                         "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                         "Verbose:     filePathRegularExpressionIndex: 1\n" +

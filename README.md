@@ -853,19 +853,19 @@ Case of Windows PowerShell:
         - #
             label: 1.View
             number: 1
-            regularExpression: ^.*\.(pdf|svg)(#.*)?$
+            regularExpression: ^.*\.(pdf|svg)(#.*)?`$
             command: 'start msedge file:///`${ref}'
         - #
             label: 7.Echo
             number: 7
             regularExpression: .*
-            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
+            command: 'echo  "ref:  `${ref}";  echo  "file: `${file}";  echo  "windowsFile: `${windowsFile}";  echo  "fragment: `${fragment}"'
     "@
     node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 Case of mac zsh:
 
-    export  TYPRM_VERB=$(cat << EOF
+    export  TYPRM_VERB=$(cat <<- '__HERE_DOCUMENT__'
         - #
             label: 1.View
             number: 1
@@ -881,7 +881,7 @@ Case of mac zsh:
             number: 9
             regularExpression: .*
             command: 'code --goto "\${ref}"'
-    EOF
+    __HERE_DOCUMENT__
     )
     node  ____/build/typrm.js "$@"
 
@@ -915,34 +915,64 @@ In the above case, search the contents in the `app.ts` file
 with the keyword `main` and display the found line number `25`.
 
 To replace to the line number and display it,
-set the `TYPRM_LINE_NUM_GETTER` environment variable in YAML format
+set the `TYPRM_ADDRESS_FORMAT` environment variable in YAML format
 as follows.
 Note that you should edit the `regularExpression` setting
 according to your environment.
 
 Case of Windows PowerShell:
 
-    ${env:TYPRM_LINE_NUM_GETTER} = @"
+    ${env:TYPRM_ADDRESS_FORMAT} = @"
         - #
-            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
-            address: "\${file}:\${lineNum}"
+            address: "`${file}:`${lineNum}"
+        - #
+            #// shared folder
+            regularExpression: ^(\\\\\\\\.*)`$
+            type: folder
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 0
+            address: "`${windowsFile}"
     "@
+
     node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
-Case of mac zsh:
+Case of Windows Gti bash:
 
-    export  TYPRM_LINE_NUM_GETTER=$(cat << EOF
+    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
-            address: "\${file}:\${lineNum}"
-    EOF
+            address: "${file}:${lineNum}"
+        - #
+            #// shared folder
+            regularExpression: ^(\\\\.*)$
+            type: folder
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 0
+            address: "${windowsFile}"
+    __HERE_DOCUMENT__
     )
+
+    node  ____/build/typrm.js "$@"
+
+Case of Linux bash or mac zsh:
+
+    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
+        - #
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
+            type: text
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 4
+            address: "${file}:${lineNum}"
+    __HERE_DOCUMENT__
+    )
+
     node  ____/build/typrm.js "$@"
 
 For `type`, specify `text`.

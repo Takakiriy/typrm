@@ -21,7 +21,7 @@ if (process.env.windir) {
 } else {
     var  testingOS = 'Linux';
 }
-process.env.TYPRM_LINE_NUM_GETTER = `
+process.env.TYPRM_ADDRESS_FORMAT = `
     - #
         regularExpression: ^(.*\\.(yaml|md))(#(.*))?\$
         type: text
@@ -775,7 +775,7 @@ describe("print reference >>", () => {
             ? // Windows
                 "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                 "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                "Verbose: TYPRM_ADDRESS_FORMAT[0]:\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     type: text\n" +
                 "Verbose:     filePathRegularExpressionIndex: 1\n" +
@@ -795,7 +795,7 @@ describe("print reference >>", () => {
             : // mac
                 "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                 "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                "Verbose: TYPRM_ADDRESS_FORMAT[0]:\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     type: text\n" +
                 "Verbose:     filePathRegularExpressionIndex: 1\n" +
@@ -811,7 +811,7 @@ describe("print reference >>", () => {
                 "Verbose:     label: 1.View\n" +
                 "Verbose:     number: 1\n" +
                 "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
-                "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
+                "Verbose: Parsed by TYPRM_ADDRESS_FORMAT:\n" +
                 "Verbose:     address: ../README.md\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     filePathRegularExpressionIndex: 1\n" +

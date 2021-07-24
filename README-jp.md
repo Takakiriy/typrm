@@ -814,19 +814,19 @@ Windows の PowerShell の場合:
         - #
             label: 1.View
             number: 1
-            regularExpression: ^.*\.(pdf|svg)(#.*)?$
+            regularExpression: ^.*\.(pdf|svg)(#.*)?`$
             command: 'start msedge file:///`${ref}'
         - #
             label: 7.Echo
             number: 7
             regularExpression: .*
-            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
+            command: 'echo  "ref:  `${ref}";  echo  "file: `${file}";  echo  "windowsFile: `${windowsFile}";  echo  "fragment: `${fragment}"'
     "@
     node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 mac の zsh の場合:
 
-    export  TYPRM_VERB=$(cat << EOF
+    export  TYPRM_VERB=$(cat <<- '__HERE_DOCUMENT__'
         - #
             label: 1.View
             number: 1
@@ -842,7 +842,7 @@ mac の zsh の場合:
             number: 9
             regularExpression: .*
             command: 'code --goto "\${ref}"'
-    EOF
+    __HERE_DOCUMENT__
     )
     node  ____/build/typrm.js "$@"
 
@@ -873,32 +873,62 @@ search (s) コマンドに `#ref:` タグを付けてファイルのパスとパ
 見つかった行番号 `25` を表示します。
 
 行番号に置き換えて表示するには、
-`TYPRM_LINE_NUM_GETTER` 環境変数に以下のように YAML 形式で設定します。
+`TYPRM_ADDRESS_FORMAT` 環境変数に以下のように YAML 形式で設定します。
 ただし、`regularExpression` の設定は環境に応じて編集してください。
 
 Windows の PowerShell の場合:
 
-    ${env:TYPRM_LINE_NUM_GETTER} = @"
+    ${env:TYPRM_ADDRESS_FORMAT} = @"
         - #
-            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
-            address: "\${file}:\${lineNum}"
+            address: "`${file}:`${lineNum}"
+        - #
+            #// shared folder
+            regularExpression: ^(\\\\\\\\.*)`$
+            type: folder
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 0
+            address: "`${windowsFile}"
     "@
+
     node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
-mac の zsh の場合:
+Windows の Git bash の場合:
 
-    export  TYPRM_LINE_NUM_GETTER=$(cat << EOF
+    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
-            address: "\${file}:\${lineNum}"
-    EOF
+            address: "${file}:${lineNum}"
+        - #
+            #// shared folder
+            regularExpression: ^(\\\\.*)$
+            type: folder
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 0
+            address: "${windowsFile}"
+    __HERE_DOCUMENT__
     )
+
+    node  ____/build/typrm.js "$@"
+
+Linux の bash, mac の zsh の場合:
+
+    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
+        - #
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
+            type: text
+            filePathRegularExpressionIndex: 1
+            keywordRegularExpressionIndex: 4
+            address: "${file}:${lineNum}"
+    __HERE_DOCUMENT__
+    )
+
     node  ____/build/typrm.js "$@"
 
 `type` には、`text` を指定します。

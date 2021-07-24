@@ -1751,9 +1751,9 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
 
 // getRelatedLineNumGetter
 function  getRelatedLineNumGetter(address: string): LineNumGetter {
-    if (process.env.TYPRM_LINE_NUM_GETTER) {
+    if (process.env.TYPRM_ADDRESS_FORMAT) {
 
-        const  searchConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+        const  searchConfig = yaml.load(process.env.TYPRM_ADDRESS_FORMAT);
         if (typeof searchConfig === 'object'  &&  searchConfig) {
             const  searchs = searchConfig as LineNumGetter[];
             for (const search of searchs) {
@@ -1767,7 +1767,7 @@ function  getRelatedLineNumGetter(address: string): LineNumGetter {
     const  verboseMode = 'verbose' in programOptions;
 
     if (verboseMode) {
-        console.log(`Verbose: Not matched address "${address}". Check TYPRM_LINE_NUM_GETTER environment variable.`)
+        console.log(`Verbose: Not matched address "${address}". Check TYPRM_ADDRESS_FORMAT environment variable.`)
     }
     return  {
         regularExpression: '.*',
@@ -1861,19 +1861,19 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
 // printConfig
 function  printConfig() {
     for (const [envName, envValue] of Object.entries(process.env)) {
-        if (envName.startsWith('TYPRM_')  &&  envName !== 'TYPRM_LINE_NUM_GETTER'  &&  envName !== 'TYPRM_VERB') {
+        if (envName.startsWith('TYPRM_')  &&  envName !== 'TYPRM_ADDRESS_FORMAT'  &&  envName !== 'TYPRM_VERB') {
 
             console.log(`Verbose: ${envName} = ${envValue}`);
         }
     }
-    if (process.env.TYPRM_LINE_NUM_GETTER) {
-        const  getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+    if (process.env.TYPRM_ADDRESS_FORMAT) {
+        const  getterConfig = yaml.load(process.env.TYPRM_ADDRESS_FORMAT);
         if (typeof getterConfig === 'object'  &&  getterConfig) {
             const  getters = getterConfig as LineNumGetter[];
             var  index = 0;
             for (const getter of getters) {
 
-                console.log(`Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                console.log(`Verbose: TYPRM_ADDRESS_FORMAT[${index}]:`);
                 console.log(`Verbose:     regularExpression: ${getter.regularExpression}`);
                 console.log(`Verbose:     type: ${getter.type}`);
                 console.log(`Verbose:     filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
@@ -2475,7 +2475,7 @@ function  splitFilePathAndKeyword(address: string, regularExpression: string,
 
     const  verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
-        console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
+        console.log(`Verbose: Parsed by TYPRM_ADDRESS_FORMAT:`);
         console.log(`Verbose:     address: ${address}`);
         console.log(`Verbose:     regularExpression: ${regularExpression}`);
         console.log(`Verbose:     filePathRegularExpressionIndex: ${filePathRegularExpressionIndex}`);
@@ -2485,7 +2485,7 @@ function  splitFilePathAndKeyword(address: string, regularExpression: string,
     const  parameters = (new RegExp(regularExpression)).exec(address);
     if ( ! parameters) {
         throw  new Error(`ERROR: regularExpression (${regularExpression}) of regularExpression ` +
-            `"${regularExpression}" in TYPRM_LINE_NUM_GETTER is not matched.` +
+            `"${regularExpression}" in TYPRM_ADDRESS_FORMAT is not matched.` +
             `testing string is "${address}".`);
     }
     if (verboseMode) {
@@ -2493,12 +2493,12 @@ function  splitFilePathAndKeyword(address: string, regularExpression: string,
     }
     if (filePathRegularExpressionIndex > parameters.length - 1) {
         throw  new Error(`ERROR: filePathRegularExpressionIndex (${filePathRegularExpressionIndex}) of regularExpression ` +
-            `"${regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `"${regularExpression}" in TYPRM_ADDRESS_FORMAT is out of range.` +
             `testing string is "${address}".`);
     }
     if (keywordRegularExpressionIndex > parameters.length - 1) {
         throw  new Error(`ERROR: keywordRegularExpressionIndex (${keywordRegularExpressionIndex}) of regularExpression ` +
-            `"${regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `"${regularExpression}" in TYPRM_ADDRESS_FORMAT is out of range.` +
             `testing string is "${address}".`);
     }
 

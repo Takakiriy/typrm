@@ -67,4 +67,4 @@ test of target word count 3:
     #keyword: web World wide, World wide
 
 lineNum:
-    #test of TYPRM_LINE_NUM_GETTER
+    #test of TYPRM_ADDRESS_FORMAT
