@@ -2058,9 +2058,11 @@ function printRef(refTagAndAddress, option) {
                         variables[variable[0]] = undefined;
                     }
                     address = addressBefore;
-                    address = address.replace(/(\\+)([^\$\\ ]|$)/g, function (match, backSlashes, nextCharacter, offset) {
-                        return backSlashes.replace(/\\/g, '/') + nextCharacter; // replace \\ to /
-                    });
+                    if (!address.startsWith("\\\\")) {
+                        address = address.replace(/(\\+)([^\$\\ ]|$)/g, function (match, backSlashes, nextCharacter, offset) {
+                            return backSlashes.replace(/\\/g, '/') + nextCharacter; // replace \\ to /
+                        });
+                    }
                     address = cutQuotation(address);
                     if (variables) {
                         _loop_5 = function (variable) {
@@ -2097,7 +2099,6 @@ function printRef(refTagAndAddress, option) {
                             _loop_5(variable);
                         }
                     }
-                    address = address.replace(/\\\\/g, '\\');
                     if (address.startsWith('~')) {
                         address = lib.getHomePath() + address.substr(1);
                     }
@@ -2135,7 +2136,7 @@ function printRef(refTagAndAddress, option) {
                         variable = sortedEnvronmentVariables_1[_e];
                         recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
                     }
-                    if (recommended.startsWith(lib.getHomePath())) {
+                    if (recommended.replace(/\\/g, '/').startsWith(lib.getHomePath().replace(/\\/g, '/'))) {
                         recommended = '~' + recommended.substr(lib.getHomePath().length);
                     }
                     // print the address

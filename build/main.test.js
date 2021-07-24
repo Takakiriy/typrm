@@ -52,7 +52,7 @@ var searchColor = chalk.yellow;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
-process.env.TYPRM_TEST_PATH = 'C:\\Users';
+process.env.TYPRM_TEST_PATH = 'C:\\Test';
 if (process.env.windir) {
     var testingOS = 'Windows';
 }
@@ -787,7 +787,7 @@ describe("searches glossary tag >>", function () {
     }); });
 });
 describe("print reference >>", function () {
-    test.only.each([
+    test.each([
         [
             "1st",
             ["search", "#ref:", "${TEST_ENV}/file.txt"],
@@ -810,7 +810,7 @@ describe("print reference >>", function () {
             "path",
             ["search", "#ref:", "~/.ssh  folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
             { locale: "en-US" },
-            lib.getHomePath() + "/.ssh  folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
+            lib.getHomePath() + "/.ssh  folder/f1.txt  C:/Test  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
                 "    0.Folder\n",
         ], [
             "shared folder",
@@ -832,10 +832,10 @@ describe("print reference >>", function () {
                 "    0.Folder\n",
         ], [
             "recommend",
-            ["search", "#ref:", lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Users\\user1  c:\\Users  \\root  \\\\pc  last\\"],
+            ["search", "#ref:", lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Test\\user1  c:\\Test  \\root  \\\\pc  last\\"],
             { locale: "en-US" },
             "Recommend: #ref: ~/.ssh  ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
-                lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Users/user1  c:/Users  /root  //pc  last/\n" +
+                lib.getHomePath().replace(/\\/g, '/') + "/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Test/user1  c:/Test  /root  //pc  last/\n" +
                 "    0.Folder\n",
         ], [
             "recommend (2)",
@@ -866,7 +866,7 @@ describe("print reference >>", function () {
             (testingOS === 'Windows')
                 ? // Windows
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
-                        "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
+                        "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
                         "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
                         "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                         "Verbose:     type: text\n" +
@@ -883,6 +883,12 @@ describe("print reference >>", function () {
                         "Verbose:     label: 1.View\n" +
                         "Verbose:     number: 1\n" +
                         "Verbose:     command: msedge \"file://\${file}\"\n" +
+                        "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
+                        "Verbose:     address: ../README.md\n" +
+                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                        "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
                         "Error that verb number 4 is not defined\n"
                 : // mac
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
@@ -914,15 +920,10 @@ describe("print reference >>", function () {
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    if (_caseName !== 'shared folder') {
-                        return [2 /*return*/];
-                    } // || subCase !== '____'
-                    return [4 /*yield*/, callMain(arguments_, options)];
+                case 0: return [4 /*yield*/, callMain(arguments_, options)];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);
-                    expect('test code').toBe('deleted skip code.');
                     return [2 /*return*/];
             }
         });
