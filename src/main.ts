@@ -1719,11 +1719,12 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     });
 
     for (const variable of sortedEnvronmentVariables) {
+
         recommended = recommended.replace(
             new RegExp(escapeRegularExpression( variable.value.replace('\\','\\\\')), 'g'),
             '${'+ variable.key +'}');  // Change the address to an address with variables
     }
-    if (recommended.startsWith(lib.getHomePath())) {
+    if (recommended.replace(/\\/g,'/').startsWith(lib.getHomePath().replace(/\\/g,'/'))) {
         recommended = '~' + recommended.substr(lib.getHomePath().length);
     }
 

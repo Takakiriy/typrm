@@ -2135,7 +2135,7 @@ function printRef(refTagAndAddress, option) {
                         variable = sortedEnvronmentVariables_1[_e];
                         recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
                     }
-                    if (recommended.startsWith(lib.getHomePath())) {
+                    if (recommended.replace(/\\/g, '/').startsWith(lib.getHomePath().replace(/\\/g, '/'))) {
                         recommended = '~' + recommended.substr(lib.getHomePath().length);
                     }
                     // print the address
