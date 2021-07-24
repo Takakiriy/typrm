@@ -873,14 +873,14 @@ search (s) コマンドに `#ref:` タグを付けてファイルのパスとパ
 見つかった行番号 `25` を表示します。
 
 行番号に置き換えて表示するには、
-`TYPRM_ADDRESS_FORMAT` 環境変数に以下のように YAML 形式で設定します。
+`TYPRM_LINE_NUM_GETTER` 環境変数に以下のように YAML 形式で設定します。
 ただし、`regularExpression` の設定は環境に応じて編集してください。
 
 Windows の PowerShell の場合:
 
-    ${env:TYPRM_ADDRESS_FORMAT} = @"
+    ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
@@ -898,7 +898,7 @@ Windows の PowerShell の場合:
 
 Windows の Git bash の場合:
 
-    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
+    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
             regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
             type: text
@@ -919,7 +919,7 @@ Windows の Git bash の場合:
 
 Linux の bash, mac の zsh の場合:
 
-    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
+    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
             regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
             type: text

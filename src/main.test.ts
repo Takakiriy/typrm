@@ -21,7 +21,7 @@ if (process.env.windir) {
 } else {
     var  testingOS = 'Linux';
 }
-process.env.TYPRM_ADDRESS_FORMAT = `
+process.env.TYPRM_LINE_NUM_GETTER = `
     - #
         regularExpression: ^(.*\\.(yaml|md))(#(.*))?\$
         type: text
@@ -727,6 +727,12 @@ describe("print reference >>", () => {
             lib.getHomePath() +"/.ssh  folder/f1.txt  C:/Users  escaped\\ space  /root  //pc\n" +  // TYPRM_TEST_PATH has \ but print replaced to /
             "    0.Folder\n",
         ],[
+            "shared folder",
+            ["search", "#ref:", "\\\\pc\\folder\\file.txt"],
+            {locale: "en-US"},
+            "\\\\pc\\folder\\file.txt\n" +
+            "    0.Folder\n",
+        ],[
             "lineNum",
             ["search", "#ref:", "test_data/search/2/2.yaml#lineNum"],
             {locale: "en-US"},
@@ -775,7 +781,7 @@ describe("print reference >>", () => {
             ? // Windows
                 "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                 "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                "Verbose: TYPRM_ADDRESS_FORMAT[0]:\n" +
+                "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     type: text\n" +
                 "Verbose:     filePathRegularExpressionIndex: 1\n" +
@@ -795,7 +801,7 @@ describe("print reference >>", () => {
             : // mac
                 "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                 "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
-                "Verbose: TYPRM_ADDRESS_FORMAT[0]:\n" +
+                "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     type: text\n" +
                 "Verbose:     filePathRegularExpressionIndex: 1\n" +
@@ -811,7 +817,7 @@ describe("print reference >>", () => {
                 "Verbose:     label: 1.View\n" +
                 "Verbose:     number: 1\n" +
                 "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
-                "Verbose: Parsed by TYPRM_ADDRESS_FORMAT:\n" +
+                "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                 "Verbose:     address: ../README.md\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     filePathRegularExpressionIndex: 1\n" +

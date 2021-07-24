@@ -915,16 +915,16 @@ In the above case, search the contents in the `app.ts` file
 with the keyword `main` and display the found line number `25`.
 
 To replace to the line number and display it,
-set the `TYPRM_ADDRESS_FORMAT` environment variable in YAML format
+set the `TYPRM_LINE_NUM_GETTER` environment variable in YAML format
 as follows.
 Note that you should edit the `regularExpression` setting
 according to your environment.
 
 Case of Windows PowerShell:
 
-    ${env:TYPRM_ADDRESS_FORMAT} = @"
+    ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
@@ -942,7 +942,7 @@ Case of Windows PowerShell:
 
 Case of Windows Gti bash:
 
-    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
+    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
             regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
             type: text
@@ -963,7 +963,7 @@ Case of Windows Gti bash:
 
 Case of Linux bash or mac zsh:
 
-    export  TYPRM_ADDRESS_FORMAT=$(cat <<- '__HERE_DOCUMENT__'
+    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
             regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
             type: text

@@ -43,7 +43,7 @@ var currentFolder = process.cwd();
 var snapshots = require(currentFolder + "/__snapshots__/main.test.ts.snap");
 var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
-process.env.TYPRM_ADDRESS_FORMAT = "\n    - #\n        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
+process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
 process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: .*\n        command: 'echo  \"ref:  ${ref}\";  echo  \"file: ${file}\";  echo  \"fragment: ${fragment}\"'\n";
 if (process.env.windir) {
     var testingOS = 'Windows';
@@ -56,7 +56,7 @@ function main() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!false) return [3 /*break*/, 2];
+                    if (!true) return [3 /*break*/, 2];
                     return [4 /*yield*/, DoCustomDebug()];
                 case 1:
                     _a.sent();
@@ -78,7 +78,7 @@ function DoCustomDebug() {
         var returns;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
+                case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " s --verbose \"#ref:\" '\\\\WIN8-PC\\Users\\user1\\Desktop\\SharedInLAN'", {})];
                 case 1:
                     returns = _a.sent();
                     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});

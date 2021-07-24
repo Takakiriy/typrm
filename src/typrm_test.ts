@@ -6,7 +6,7 @@ const snapshots = require(currentFolder +"/__snapshots__/main.test.ts.snap");
 
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
-process.env.TYPRM_ADDRESS_FORMAT = `
+process.env.TYPRM_LINE_NUM_GETTER = `
     - #
         regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
         type: text
