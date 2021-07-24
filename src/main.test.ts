@@ -806,7 +806,7 @@ describe("print reference >>", () => {
                 "Error that verb number 4 is not defined\n"
             : // mac
                 "Verbose: TYPRM_TEST_ENV = testEnv\n" +
-                "Verbose: TYPRM_TEST_PATH = C:\\Users\n" +
+                "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
                 "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
                 "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
                 "Verbose:     type: text\n" +
