@@ -845,6 +845,12 @@ describe("print reference >>", function () {
                 "/User\n" +
                 "    0.Folder\n",
         ], [
+            "Do not recommend reserved variables",
+            ["search", "#ref: TYPRM_FOLDER"],
+            { locale: "en-US" },
+            "TYPRM_FOLDER\n" +
+                "    0.Folder\n",
+        ], [
             "verb",
             ["search", "#ref:", "../README.md", "7"],
             { locale: "en-US" },
@@ -920,10 +926,17 @@ describe("print reference >>", function () {
     ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                case 0:
+                    if (arguments_[1].includes('TYPRM_FOLDER')) {
+                        process.env.TYPRM_FOLDER = 'TYPRM_FOLDER';
+                    }
+                    return [4 /*yield*/, callMain(arguments_, options)];
                 case 1:
                     _a.sent();
                     expect(main.stdout).toBe(answer);
+                    if (arguments_[1].includes('TYPRM_FOLDER')) {
+                        delete process.env.TYPRM_FOLDER;
+                    }
                     return [2 /*return*/];
             }
         });

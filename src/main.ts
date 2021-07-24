@@ -1700,8 +1700,9 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     const  lowerCaseDriveRegExp = /^[a-z]:/;
     const  upperCaseDriveRegExp = /^[A-Z]:/;
     const  sortedEnvronmentVariables: KeyValue[] = [];
+    const  reservedNames = ['TYPRM_FOLDER'];
     for (const [envName, envValue] of Object.entries(process.env)) {
-        if (envName.startsWith(typrmEnvPrefix)  &&  envValue) {
+        if (envName.startsWith(typrmEnvPrefix)  &&  ! reservedNames.includes(envName)  &&  envValue) {
             const  variableName = envName.substr(typrmEnvPrefix.length);
             const  value = envValue!.replace(/\\/g,'/');
 

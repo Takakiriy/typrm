@@ -752,11 +752,17 @@ describe("print reference >>", () => {
             lib.getHomePath().replace(/\\/g,'/') +"/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Test/user1  c:/Test  /root  //pc  last/\n" +
             "    0.Folder\n",
         ],[
-            "recommend (2)",
+            "recommend (2)",  // cut ' '
             ["search", "#ref: '/User'"],
             {locale: "en-US"},
             "Recommend: #ref: /User\n" +
             "/User\n" +
+            "    0.Folder\n",
+        ],[
+            "Do not recommend reserved variables",
+            ["search", `#ref: TYPRM_FOLDER`],
+            {locale: "en-US"},
+            "TYPRM_FOLDER\n" +
             "    0.Folder\n",
         ],[
             "verb",
@@ -832,8 +838,15 @@ describe("print reference >>", () => {
                 "Error that verb number 4 is not defined\n",
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
+        if (arguments_[1].includes('TYPRM_FOLDER')) {
+            process.env.TYPRM_FOLDER = 'TYPRM_FOLDER';
+        }
+
         await callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
+        if (arguments_[1].includes('TYPRM_FOLDER')) {
+            delete  process.env.TYPRM_FOLDER;
+        }
     });
 });
 

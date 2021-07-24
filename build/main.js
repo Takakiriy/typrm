@@ -2042,7 +2042,7 @@ function getEmptyOfPrintRefResult() {
 function printRef(refTagAndAddress, option) {
     if (option === void 0) { option = printRefOptionDefault; }
     return __awaiter(this, void 0, void 0, function () {
-        var addressBefore, variableRe, variables, variable, address, _loop_5, _i, _a, variable, linkableAddress, getter, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, _b, _c, _d, envName, envValue, variableName, value, _e, sortedEnvronmentVariables_1, variable, verbs, verbMenu;
+        var addressBefore, variableRe, variables, variable, address, _loop_5, _i, _a, variable, linkableAddress, getter, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, reservedNames, _b, _c, _d, envName, envValue, variableName, value, _e, sortedEnvronmentVariables_1, variable, verbs, verbMenu;
         return __generator(this, function (_f) {
             switch (_f.label) {
                 case 0:
@@ -2115,9 +2115,10 @@ function printRef(refTagAndAddress, option) {
                     lowerCaseDriveRegExp = /^[a-z]:/;
                     upperCaseDriveRegExp = /^[A-Z]:/;
                     sortedEnvronmentVariables = [];
+                    reservedNames = ['TYPRM_FOLDER'];
                     for (_b = 0, _c = Object.entries(process.env); _b < _c.length; _b++) {
                         _d = _c[_b], envName = _d[0], envValue = _d[1];
-                        if (envName.startsWith(typrmEnvPrefix) && envValue) {
+                        if (envName.startsWith(typrmEnvPrefix) && !reservedNames.includes(envName) && envValue) {
                             variableName = envName.substr(typrmEnvPrefix.length);
                             value = envValue.replace(/\\/g, '/');
                             sortedEnvronmentVariables.push({ key: variableName, value: value });

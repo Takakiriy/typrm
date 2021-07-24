@@ -830,18 +830,18 @@ mac の zsh の場合:
         - #
             label: 1.View
             number: 1
-            regularExpression: ^.*\\.(pdf|svg)(#.*)?\$
-            command: '"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" "file://\${ref}"'
+            regularExpression: ^.*\.(pdf|svg)(#.*)?$
+            command: '"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" "file://${ref}"'
         - #
             label: 7.Echo
             number: 7
             regularExpression: .*
-            command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "windowsFile: \${windowsFile}";  echo  "fragment: \${fragment}"'
+            command: 'echo  "ref:  ${ref}";  echo  "file: ${file}";  echo  "windowsFile: ${windowsFile}";  echo  "fragment: ${fragment}"'
         - #
             label: 9.VSCode
             number: 9
             regularExpression: .*
-            command: 'code --goto "\${ref}"'
+            command: 'code --goto "${ref}"'
     __HERE_DOCUMENT__
     )
     node  ____/build/typrm.js "$@"
