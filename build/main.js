@@ -1450,6 +1450,42 @@ var IfTrueConditionScanner = /** @class */ (function () {
     };
     return IfTrueConditionScanner;
 }());
+// BlockDisableTagParser
+var BlockDisableTagParser = /** @class */ (function () {
+    function BlockDisableTagParser() {
+        this.previousLineHasTag = false;
+        this.isInBlock_ = false;
+        this.blockIndentLength = 0;
+    }
+    Object.defineProperty(BlockDisableTagParser.prototype, "isInBlock", {
+        get: function () { return this.isInBlock_; },
+        enumerable: false,
+        configurable: true
+    });
+    BlockDisableTagParser.prototype.evaluate = function (line) {
+        if (line.trim() === '') {
+            return;
+        }
+        var indentLength = indentRegularExpression.exec(line)[0].length;
+        if (this.isInBlock_) {
+            if (indentLength <= this.blockIndentLength) {
+                this.blockIndentLength = 0;
+                this.isInBlock_ = false;
+            }
+        }
+        else {
+            this.isInBlock_ = this.previousLineHasTag;
+        }
+        if (line.includes(blockDisableLabel)) {
+            this.blockIndentLength = indentLength;
+            this.previousLineHasTag = true;
+        }
+        else {
+            this.previousLineHasTag = false;
+        }
+    };
+    return BlockDisableTagParser;
+}());
 // WordPositions
 var WordPositions = /** @class */ (function () {
     function WordPositions() {
@@ -1718,7 +1754,7 @@ function searchSub(keyword) {
                     glossaryTags = [];
                     foundLines = [];
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _g, _h, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _j, _k, match, _l, _m, match, e_6_1;
+                        var reader, blockDisable, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _g, _h, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _j, _k, match, _l, _m, match, e_6_1;
                         return __generator(this, function (_o) {
                             switch (_o.label) {
                                 case 0:
@@ -1726,6 +1762,7 @@ function searchSub(keyword) {
                                         input: fs.createReadStream(inputFileFullPath),
                                         crlfDelay: Infinity
                                     });
+                                    blockDisable = new BlockDisableTagParser();
                                     lineNum = 0;
                                     _o.label = 1;
                                 case 1:
@@ -1738,7 +1775,8 @@ function searchSub(keyword) {
                                     line1 = reader_5_1.value;
                                     line = line1;
                                     lineNum += 1;
-                                    if (!(line.includes(keywordLabel) && !line.includes(disableLabel))) return [3 /*break*/, 5];
+                                    blockDisable.evaluate(line);
+                                    if (!(line.includes(keywordLabel) && !line.includes(disableLabel) && !blockDisable.isInBlock)) return [3 /*break*/, 5];
                                     csv = getValue(line, line.indexOf(keywordLabel) + keywordLabel.length);
                                     if (csv !== '') {
                                         withParameter = true;
@@ -1799,7 +1837,7 @@ function searchSub(keyword) {
                                                 }
                                             }
                                         }
-                                        if (line.includes(glossaryLabel)) {
+                                        if (line.includes(glossaryLabel) && !line.includes(disableLabel) && !blockDisable.isInBlock) {
                                             glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
                                             if (glossaryWords !== '') {
                                                 glossaryWords += ':'; // ':' is not included in the word in glossary
@@ -3396,6 +3434,7 @@ var fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
 var disableLabel = "#disable-tag-tool:";
+var blockDisableLabel = "#block-to-disable-tag-tool:";
 var ifLabel = "#if:";
 var expectLabel = "#expect:";
 var ignoredKeywords = [/#keyword:/g, /#search:/g];

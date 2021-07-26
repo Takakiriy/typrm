@@ -583,6 +583,11 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  #keyword:\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  #keyword:\n`,
         ],[
+            "block-to-disable-tag-tool tag",
+            ["search", "document_in_block"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':78:') + `         Making materials:  #keyword: ${matchedColor('document_in_block')}\n`,
+        ],[
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/2", test: "" },

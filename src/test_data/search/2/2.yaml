@@ -68,3 +68,11 @@ test of target word count 3:
 
 lineNum:
     #test of TYPRM_LINE_NUM_GETTER
+
+block-to-disable-tag-tool tag:
+    ref:  #block-to-disable-tag-tool:
+        Existing materials:  #keyword: document_in_block
+
+        Existing materials (2):  #keyword: document_in_block
+    memo: |
+        Making materials:  #keyword: document_in_block

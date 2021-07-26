@@ -35,6 +35,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [(for developers) Test](#for-developers-test)
     - [Test using Jest](#test-using-jest)
     - [Test without Jest](#test-without-jest)
+  - [Tag list](#tag-list)
 
 <!-- /TOC -->
 
@@ -200,8 +201,20 @@ in the text file.
 Keywords containing `#` cannot be specified.
 If you want to suppress the warning of the CSV part that has syntax problem,
 write `#disable-tag-tool:`.
+The `#keyword:` tag parameter is not treated as a keyword.
 
     #keyword: abc"   #disable-tag-tool:
+
+The `#keyword:` tag and the `#glossary:` tag from the next line
+that has the `#block-to-disable-tag-tool:` tag
+to the previous line that has same indent length
+are not searched.
+
+    copy:  #block-to-disable-tag-tool:
+        #keyword: abc  #// not searchable
+        #keyword: def  #// not searchable
+    original:
+        #keyword: abc  #// searchable
 
 If you add the `#glossary:` tag,
 words up to the colon is searchable keywords
@@ -1124,3 +1137,23 @@ You can set the break point, click at the left of line number of the source file
 ### Test without Jest
 
 - Visual Studio Code >> F5 key
+
+
+## Tag list
+
+- `#block-to-disable-tag-tool:`: Disables tags in child elements
+- `#disable-tag-tool:`: Disable tags on the same line
+- `#expect:`: Condition check
+- `#file-template:`: Template for checking the contents of a file
+- `#file-template-any-lines:`: Lines that do not check the contents of the file
+- `#glossary:`: Use the key in the child element as the keyword to be searched
+- `#if:`: Conditions for enabling tags
+- `#keyword:`: Search target keyword
+- `#original:`: Value before replacement
+- `#ref:`: Path of linked file
+- `#search:`: Keywords when searching for links
+- `#template:`: Template for replacing the body
+- `#template-at():`: Template for replacing the body above two or more lines
+- `#template-if:`: Conditions that determine the content to be included in the text
+
+You can find more informations of tags by searching this page.

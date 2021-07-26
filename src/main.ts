@@ -1152,6 +1152,36 @@ class  IfTrueConditionScanner {
     }
 }
 
+// BlockDisableTagParser
+class  BlockDisableTagParser {
+    previousLineHasTag: boolean = false;
+    isInBlock_: boolean = false;
+    blockIndentLength: number = 0;
+    get  isInBlock() { return this.isInBlock_; }
+
+    evaluate(line: string) {
+        if (line.trim() === '') {
+            return;
+        }
+        const  indentLength = indentRegularExpression.exec(line)![0].length;
+        if (this.isInBlock_) {
+            if (indentLength <= this.blockIndentLength) {
+                this.blockIndentLength = 0;
+                this.isInBlock_ = false;
+            }
+        } else {
+            this.isInBlock_ = this.previousLineHasTag;
+        }
+
+        if (line.includes(blockDisableLabel)) {
+            this.blockIndentLength = indentLength;
+            this.previousLineHasTag = true;
+        } else {
+            this.previousLineHasTag = false;
+        }
+    }
+}
+
 // WordPositions
 class  WordPositions {
     wordPositions: number[] = [];
@@ -1327,14 +1357,16 @@ async function  searchSub(keyword: string) {
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
         });
+        const  blockDisable = new BlockDisableTagParser();
         var  lineNum = 0;
 
         for await (const line1 of reader) {
             const  line: string = line1;
             lineNum += 1;
+            blockDisable.evaluate(line);
 
             // keyword tag
-            if (line.includes(keywordLabel)  &&  ! line.includes(disableLabel)) {
+            if (line.includes(keywordLabel)  &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
                 var  csv = getValue(line, line.indexOf(keywordLabel) + keywordLabel.length);
                 if (csv !== '') {
                     var  withParameter = true;
@@ -1392,7 +1424,7 @@ async function  searchSub(keyword: string) {
                     }
                 }
 
-                if (line.includes(glossaryLabel)) {
+                if (line.includes(glossaryLabel)  &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
                     var  glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
                     if (glossaryWords !== '') {
                         glossaryWords += ':';  // ':' is not included in the word in glossary
@@ -2983,6 +3015,7 @@ const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
+const  blockDisableLabel = "#block-to-disable-tag-tool:";
 const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#keyword:/g, /#search:/g ];
