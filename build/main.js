@@ -2270,6 +2270,7 @@ function runVerb(verbs, address, verbNum) {
                 .replace(verbVar.file, address)
                 .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
                 .replace(verbVar.fragment, '');
+            var fileOrFolderPath = address;
         }
         else {
             command = verb.command
@@ -2278,6 +2279,15 @@ function runVerb(verbs, address, verbNum) {
                 .replace(verbVar.file, address.substr(0, fragmentIndex))
                 .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
                 .replace(verbVar.fragment, address.substr(fragmentIndex + 1));
+            var fileOrFolderPath = address.substr(0, fragmentIndex);
+        }
+        if (runningOS === 'Windows') {
+            fileOrFolderPath = fileOrFolderPath.replace(/\//g, '\\');
+        }
+        fileOrFolderPath = lib.getFullPath(fileOrFolderPath, process.cwd());
+        if (!fs.existsSync(fileOrFolderPath)) {
+            console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error of not found the file or folder at \"", "\""], ["Error of not found the file or folder at \"", "\""])), getTestablePath(fileOrFolderPath)));
+            return;
         }
     }
     if (command !== '') {
@@ -2300,7 +2310,7 @@ function runVerb(verbs, address, verbNum) {
         console.log(stdout_);
     }
     else {
-        console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error that verb number ", " is not defined"], ["Error that verb number ", " is not defined"])), verbNum));
+        console.log(translate(templateObject_6 || (templateObject_6 = __makeTemplateObject(["Error that verb number ", " is not defined"], ["Error that verb number ", " is not defined"])), verbNum));
     }
 }
 // printConfig
@@ -2366,7 +2376,7 @@ function onEndOfSettingScope(setting) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         if (!setting[key].isReferenced) {
-            console.log(translate(templateObject_6 || (templateObject_6 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
+            console.log(translate(templateObject_7 || (templateObject_7 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
         }
     }
 }
@@ -3230,7 +3240,7 @@ var InputOption = /** @class */ (function () {
     }
     return InputOption;
 }());
-var testBaseFolder = String.raw(templateObject_7 || (templateObject_7 = __makeTemplateObject(["R:homemem_cacheMyDocsrcTypeScript\typrm\test_data"], ["R:\\home\\mem_cache\\MyDoc\\src\\TypeScript\\typrm\\test_data"]))) + '\\';
+var testBaseFolder = String.raw(templateObject_8 || (templateObject_8 = __makeTemplateObject(["R:homemem_cacheMyDocsrcTypeScript\typrm\test_data"], ["R:\\home\\mem_cache\\MyDoc\\src\\TypeScript\\typrm\\test_data"]))) + '\\';
 // inputOption
 var inputOption = new InputOption([
 /*
@@ -3336,6 +3346,7 @@ function translate(englishLiterals) {
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.": "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
+            "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -3474,5 +3485,5 @@ var withJest = false;
 exports.stdout = '';
 exports.programArguments = [];
 exports.programOptions = {};
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7;
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8;
 //# sourceMappingURL=main.js.map

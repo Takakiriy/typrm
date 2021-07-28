@@ -1862,6 +1862,7 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
                 .replace(verbVar.file, address)
                 .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
                 .replace(verbVar.fragment, '');
+            var  fileOrFolderPath = address;
         } else {
             command = verb.command
                 .replace(verbVar.ref, address)
@@ -1869,6 +1870,16 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
                 .replace(verbVar.file,        address.substr(0, fragmentIndex))
                 .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
                 .replace(verbVar.fragment,    address.substr(fragmentIndex + 1));
+            var  fileOrFolderPath = address.substr(0, fragmentIndex);
+        }
+        if (runningOS === 'Windows') {
+            fileOrFolderPath = fileOrFolderPath.replace(/\//g, '\\');
+        }
+        fileOrFolderPath = lib.getFullPath(fileOrFolderPath, process.cwd());
+
+        if ( ! fs.existsSync(fileOrFolderPath)) {
+            console.log(translate`Error of not found the file or folder at "${getTestablePath(fileOrFolderPath)}"`);
+            return
         }
     }
     if (command !== '') {
@@ -2930,6 +2941,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.":
                 "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
+            "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",

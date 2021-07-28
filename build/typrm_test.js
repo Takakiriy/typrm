@@ -119,7 +119,7 @@ function TestOfCommandLine() {
                             "name": "search_mode_ref_verb",
                             "parameters": "search",
                             "check": "true",
-                            "inputLines": "#ref: \"(../README.md)\"\n7\n\n7\nexit()\n",
+                            "inputLines": "#ref: \"../README.md\"\n7\n\n7\nexit()\n",
                         }];
                     _i = 0, cases_1 = cases;
                     _a.label = 1;

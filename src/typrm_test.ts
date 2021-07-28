@@ -71,7 +71,7 @@ async function  TestOfCommandLine() {
         "name": "search_mode_ref_verb",
         "parameters": "search",
         "check": "true",
-        "inputLines": "#ref: \"(../README.md)\"\n7\n\n7\nexit()\n",
+        "inputLines": "#ref: \"../README.md\"\n7\n\n7\nexit()\n",
     }];
     for (const case_ of cases) {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);

@@ -871,6 +871,13 @@ describe("print reference >>", function () {
             { locale: "en-US" },
             "Error that verb number 4 is not defined\n",
         ], [
+            "not found the folder",
+            ["search", "#ref:", "/Unknown_", "0"],
+            { locale: "en-US" },
+            (testingOS === 'Windows')
+                ? "Error of not found the file or folder at \"\\Unknown_\"\n"
+                : "Error of not found the file or folder at \"/Unknown_\"\n",
+        ], [
             "verb verbose",
             ["search", "#ref:", "../README.md", "4"],
             { locale: "en-US", verbose: "" },
