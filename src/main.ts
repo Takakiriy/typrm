@@ -8,6 +8,7 @@ import * as chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
+import { pp } from "./lib";
 
 // main
 export async function  main() {
@@ -448,11 +449,18 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
     const  currentFolder = process.cwd();
     const  targetFolders = await parseCSVColumns(programOptions.folder);
     const  fileFullPaths: string[] = [];
-    for (const folder of targetFolders) {
-        const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
-        const  inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
+    if (targetFolders.length === 0) {
+        const  inputFileFullPath = lib.getFullPath(inputFilePath, currentFolder);
         if (fs.existsSync(inputFileFullPath)) {
             fileFullPaths.push(inputFileFullPath);
+        }
+    } else {
+        for (const folder of targetFolders) {
+            const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+            const  inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
+            if (fs.existsSync(inputFileFullPath)) {
+                fileFullPaths.push(inputFileFullPath);
+            }
         }
     }
     if (fileFullPaths.length === 0) {
@@ -477,16 +485,18 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
     var    errorCount = 0;
     var    replacingKeyValues = keyValues;
-    var    previousEvalatedKeys: {[key: string]: string} = {};
+    var    previousEvalatedKeyValues: {[key: string]: string} = {};
     const  oldFilePath = inputFilePath;
     const  newFilePath = inputFilePath +".new";
     var    reducedErrorWasOccurred = false;
     var    loop = true;
+    var    loopCount = 0;
+    const  replacedKeys: string[] = [];
     const  verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
-        console.log(`verbose >> inputFilePath: ${inputFilePath}`);
-        console.log(`verbose >> setting index: ${replacingSettingIndex}`)
-        console.log(`verbose >> keyValues: ${JSON.stringify(keyValues)}`);
+        console.log(`Verbose: inputFilePath: ${inputFilePath}`);
+        console.log(`Verbose: setting index: ${replacingSettingIndex}`)
+        console.log(`Verbose: keyValues: ${JSON.stringify(keyValues)}`);
     }
 
     while (loop) {
@@ -508,19 +518,21 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         let  isAllReplacable = true;
         let  isCheckingTemplateIfKey = false;
         let  templateIfKeyError = false;
-        const  evalatedKeys: {[key: string]: string} = {};
+        const  evalatedKeyValues: {[key: string]: string} = {};
         const  ifTagParser = new IfTagParser();
         const  oldIfTagParser = new IfTagParser();
-        const  previousEvalatedKeysLength = Object.keys(previousEvalatedKeys).length;
+        const  previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
+        loopCount += 1;
+        if (verboseMode) {
+            console.log(`Verbose: loopCount: ${loopCount}`);
+            console.log(`Verbose: previousEvalatedKeyValuesLength: ${previousEvalatedKeyValuesLength}`);
+        }
 
         for await (const line1 of reader) {
             const  line: string = line1;
             lines.push(line);
             lineNum += 1;
             let  output = false;
-            if (verboseMode) {
-                var d = pp(`${lineNum} ${line}`)
-            }
 
             // isReadingSetting = ...
             if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
@@ -556,8 +568,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     }
                 }
             }
-            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeys));
-            oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeys));
+            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues), verboseMode);
+            oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues), false);
 
             if (isReplacing) {
                 if ( ! ifTagParser.isReplacable) {
@@ -572,9 +584,15 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                         const  oldValue = getValue(line, separator);
                         if (ifTagParser.isReplacable  &&  oldValue !== '') {
                             if (key in replacingKeyValues) {
-                                evalatedKeys[key] = replacingKeyValues[key];
+                                evalatedKeyValues[key] = replacingKeyValues[key];
                             } else {
-                                evalatedKeys[key] = oldValue;
+                                evalatedKeyValues[key] = oldValue;
+                            }
+                            if (verboseMode) {
+                                if ( ! replacedKeys.includes(key)) {
+                                    replacedKeys.push(key)
+                                    console.log(`Verbose: evaluated setting: ${key}`)
+                                }
                             }
                         }
 
@@ -608,8 +626,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 output = true;
                                 setting[key] = {value: replacedValue, isReferenced: false, lineNum};
                                 if (verboseMode  &&  oldValue !== replacedValue) {
-                                    console.log(`verbose >> replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                    console.log(`verbose >>     at: ${inputFilePath}:${lineNum}:`);
+                                    console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
                                 }
                             }
                             else {
@@ -648,10 +666,10 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 output = true;
                             }
                             if (verboseMode  &&  before !== after) {
-                                console.log(`verbose >> replaced a line:`);
-                                console.log(`verbose >>     from: ${before}`);
-                                console.log(`verbose >>     to:   ${after}`);
-                                console.log(`verbose >>     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
+                                console.log(`Verbose: replaced a line:`);
+                                console.log(`Verbose:     from: ${before}`);
+                                console.log(`Verbose:     to:   ${after}`);
+                                console.log(`Verbose:     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
                             }
                         } else if (replacingLine.includes(replaced)) {
                             // Do nothing
@@ -691,13 +709,14 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         }
 
         // previousReplacedKeys = ...
-        Object.keys(evalatedKeys).forEach((key: string) => {
-            previousEvalatedKeys[key] = evalatedKeys[key]; });
+        Object.keys(evalatedKeyValues).forEach((key: string) => {
+            previousEvalatedKeyValues[key] = evalatedKeyValues[key]; });
         if (isAllReplacable) {
             loop = false;
-        } else if (previousEvalatedKeysLength == Object.keys(previousEvalatedKeys).length) {
-            console.log('')
-            console.log('Error of unexpected')
+        } else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
+            console.log('');
+            console.log('Error of unexpected: The count of evalatedKeyValues is not increasing.' +
+                ' isReplacable may be not changed');
             errorCount += 1;
             loop = false;
         }
@@ -1068,7 +1087,8 @@ class  IfTagParser {
     private  isReplacable_: boolean = true;
 
     // evaluate
-    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
+    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = [],
+            verboseMode: boolean = false): IfTagParserResult {
         var    expression = '';
         var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
@@ -1084,7 +1104,7 @@ class  IfTagParser {
         if (line.includes(ifLabel)) {
             expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
 
-            const  evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys);
+            const  evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys, verboseMode);
             if (typeof evaluatedContidion === 'boolean') {
                 var  resultOfIf = evaluatedContidion;
                 var  isReplacable = false;
@@ -1976,7 +1996,8 @@ function onEndOfSettingScope(setting: Settings) {
 
 // evaluateIfCondition
 function  evaluateIfCondition(expression: string, setting: Settings,
-        previsousEvalatedKeys: string[] = [])
+        previsousEvalatedKeyValues: string[] = [],
+        verboseMode: boolean = false)
         : boolean | Error | EvaluatedCondition {
 
     if (expression === 'true') {
@@ -2038,13 +2059,23 @@ function  evaluateIfCondition(expression: string, setting: Settings,
             result = (leftValue !== rightValue);
         }
         if (result !== undefined) {
-            if (previsousEvalatedKeys.length === 0) {
+            if (previsousEvalatedKeyValues.length === 0) {
+                if (verboseMode) {
+                    console.log(`Verbose: skipped evaluation: #if: ${expression}`);
+                }
 
                 return  result;
             } else　{
+                const  isReplacable = previsousEvalatedKeyValues.includes(name);//  ||  parent !== settingsDot;
+                if (verboseMode) {
+                    if ( ! isReplacable) {
+                        console.log(`Verbose: skipped evaluation: #if: ${expression}`);
+                    }
+                }
+
                 return  {
                     result,
-                    isReplacable: previsousEvalatedKeys.includes(name),
+                    isReplacable,
                 };
             }
         }
@@ -2700,57 +2731,6 @@ function isSameArrayOf<T>(log: T[], answer: T[]): boolean {
 function  getStdOut(): string[] {
     return  stdout.split('\n');
 }
-
-// pp
-// Debug print.
-// #keyword: pp
-// Example:
-//    pp(var);
-// Example:
-//    var d = pp(var);
-//    d = d;  // Set break point here and watch the variable d
-// Example:
-//    try {
-//
-//        await main();
-//    } catch (e) {
-//        var d = pp(e);
-//        throw e;  // Set break point here and watch the variable d
-//    }
-function  pp(message: any = '') {
-    if (typeof message === 'object') {
-        message = JSON.stringify(message);
-    }
-    debugOut.push(message.toString());
-    return debugOut;
-}
-export const  debugOut: string[] = [];
-
-// cc
-// Through counter.
-// #keyword: cc
-// Example:
-//   cc();
-// Example:
-//   var c = cc().debugOut;  // Set break point here and watch the variable c
-// Example:
-//   if ( cc(2).isTarget )
-//   var d = pp('');  // Set break point here and watch the variable d
-function  cc( targetCount: number = 9999999, label: string = '0' ) {
-    if (!(label in gCount)) {
-        gCount[label] = 0;
-    }
-
-    gCount[label] += 1;
-    pp( `${label}:countThrough[${label}] = ${gCount[label]}` );
-    const isTarget = ( gCount[label] === targetCount );
-
-    if (isTarget) {
-        pp( '    **** It is before the target! ****' );
-    }
-    return  { isTarget, debugOut };
-}
-const  gCount: {[name: string]: number} = {};
 
 // println
 // #keyword: println, console.log, consoleLog

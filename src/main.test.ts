@@ -3,6 +3,7 @@ import * as path from "path";
 import * as main from "./main";
 import * as chalk from "chalk";
 import * as lib from "./lib";
+import { pp } from "./lib";
 const snapshots = require("./__snapshots__/main.test.ts.snap");
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
@@ -167,7 +168,7 @@ describe("checks file contents >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.each([
+    test.only.each([
         [
             '2_replace_1_ok', ' setting 1', '10', 'en-US',
             `key1: value1changed
@@ -234,6 +235,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
+if (fileNameHead !== '2_replace_6_if') {return;}  // || subCase !== '____'
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -256,6 +258,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+expect('test code').toBe('deleted skip code.');
     });
 
     test.each([
@@ -291,6 +294,34 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             } catch (e: any) {
                 errorMessage = e.message;
             }
+        }
+
+        expect(errorMessage).toBe(expectedErrorMessage);
+    });
+
+    test.each([
+        [
+            '2_replace_1_ok', ' without folder option', undefined, 'en-US',
+            `key1: changed1`,
+            'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
+        ],
+
+    ])("Exception case >> in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) => {
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFileName = fileNameHead + "_1_changing.yaml";
+        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+        const  sourceFileContents = getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+        var    errorMessage = '';
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        writeFileSync(changingFilePath, sourceFileContents);
+
+        // Test Main
+        try {
+            await callMain(["replace", changingFilePath, keyValues], {
+                folder: "", test: "", locale,
+            });
+        } catch (e: any) {
+            errorMessage = e.message;
         }
 
         expect(errorMessage).toBe(expectedErrorMessage);

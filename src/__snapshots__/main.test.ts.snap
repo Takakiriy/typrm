@@ -1683,6 +1683,8 @@ exports[`replaces settings >> in 2_replace_6_if: sourceFileContents 1`] = `
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             no  #template: __Setting1__
+        old_bug:  #if $env.unknown == ""
+            dummy
 "
 `;
 
