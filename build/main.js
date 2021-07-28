@@ -47,7 +47,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.InputObject = exports.debugOut = exports.main = void 0;
+exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.InputObject = exports.main = void 0;
 var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
 var globby = require("globby");
@@ -58,6 +58,7 @@ var chalk = require("chalk");
 var yaml = require("js-yaml");
 var child_process = require("child_process");
 var lib = require("./lib");
+var lib_1 = require("./lib");
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
@@ -614,7 +615,7 @@ function revertSettings(inputFilePath, settingNameOrLineNum) {
 // getInputFileFullPath
 function getInputFileFullPath(inputFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var currentFolder, targetFolders, fileFullPaths, _i, targetFolders_1, folder, targetFolderFullPath, inputFileFullPath;
+        var currentFolder, targetFolders, fileFullPaths, inputFileFullPath, _i, targetFolders_1, folder, targetFolderFullPath, inputFileFullPath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -623,12 +624,20 @@ function getInputFileFullPath(inputFilePath) {
                 case 1:
                     targetFolders = _a.sent();
                     fileFullPaths = [];
-                    for (_i = 0, targetFolders_1 = targetFolders; _i < targetFolders_1.length; _i++) {
-                        folder = targetFolders_1[_i];
-                        targetFolderFullPath = lib.getFullPath(folder, currentFolder);
-                        inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
+                    if (targetFolders.length === 0) {
+                        inputFileFullPath = lib.getFullPath(inputFilePath, currentFolder);
                         if (fs.existsSync(inputFileFullPath)) {
                             fileFullPaths.push(inputFileFullPath);
+                        }
+                    }
+                    else {
+                        for (_i = 0, targetFolders_1 = targetFolders; _i < targetFolders_1.length; _i++) {
+                            folder = targetFolders_1[_i];
+                            targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+                            inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
+                            if (fs.existsSync(inputFileFullPath)) {
+                                fileFullPaths.push(inputFileFullPath);
+                            }
                         }
                     }
                     if (fileFullPaths.length === 0) {
@@ -654,25 +663,27 @@ function getInputFileFullPath(inputFilePath) {
 function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeys, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, verboseMode, _loop_1, d, expected, replaced, expected, replaced;
+        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, replacedKeys, verboseMode, _loop_1, expected, replaced, expected, replaced;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     errorCount = 0;
                     replacingKeyValues = keyValues;
-                    previousEvalatedKeys = {};
+                    previousEvalatedKeyValues = {};
                     oldFilePath = inputFilePath;
                     newFilePath = inputFilePath + ".new";
                     reducedErrorWasOccurred = false;
                     loop = true;
+                    loopCount = 0;
+                    replacedKeys = [];
                     verboseMode = 'verbose' in exports.programOptions;
                     if (verboseMode) {
-                        console.log("verbose >> inputFilePath: " + inputFilePath);
-                        console.log("verbose >> setting index: " + replacingSettingIndex);
-                        console.log("verbose >> keyValues: " + JSON.stringify(keyValues));
+                        console.log("Verbose: inputFilePath: " + inputFilePath);
+                        console.log("Verbose: setting index: " + replacingSettingIndex);
+                        console.log("Verbose: keyValues: " + JSON.stringify(keyValues));
                     }
                     _loop_1 = function () {
-                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, evalatedKeys, ifTagParser, oldIfTagParser, previousEvalatedKeysLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, commentIndex, comment, original, templateTag, replacingLine, commonCase, before, after, necessaryVariableNames, e_3_1;
+                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, commentIndex, comment, original, templateTag, replacingLine, commonCase, before, after, necessaryVariableNames, e_3_1;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
                                 case 0:
@@ -694,10 +705,15 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     isAllReplacable = true;
                                     isCheckingTemplateIfKey = false;
                                     templateIfKeyError = false;
-                                    evalatedKeys = {};
+                                    evalatedKeyValues = {};
                                     ifTagParser = new IfTagParser();
                                     oldIfTagParser = new IfTagParser();
-                                    previousEvalatedKeysLength = Object.keys(previousEvalatedKeys).length;
+                                    previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
+                                    loopCount += 1;
+                                    if (verboseMode) {
+                                        console.log("Verbose: loopCount: " + loopCount);
+                                        console.log("Verbose: previousEvalatedKeyValuesLength: " + previousEvalatedKeyValuesLength);
+                                    }
                                     _c.label = 1;
                                 case 1:
                                     _c.trys.push([1, 6, 7, 12]);
@@ -711,9 +727,6 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     lines.push(line);
                                     lineNum += 1;
                                     output = false;
-                                    if (verboseMode) {
-                                        d = pp(lineNum + " " + line);
-                                    }
                                     // isReadingSetting = ...
                                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                                         isReadingSetting = true;
@@ -749,8 +762,8 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                             }
                                         }
                                     }
-                                    ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeys));
-                                    oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeys));
+                                    ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues), verboseMode);
+                                    oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues), false);
                                     if (isReplacing) {
                                         if (!ifTagParser.isReplacable) {
                                             isAllReplacable = false;
@@ -763,10 +776,16 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                 oldValue = getValue(line, separator);
                                                 if (ifTagParser.isReplacable && oldValue !== '') {
                                                     if (key in replacingKeyValues) {
-                                                        evalatedKeys[key] = replacingKeyValues[key];
+                                                        evalatedKeyValues[key] = replacingKeyValues[key];
                                                     }
                                                     else {
-                                                        evalatedKeys[key] = oldValue;
+                                                        evalatedKeyValues[key] = oldValue;
+                                                    }
+                                                    if (verboseMode) {
+                                                        if (!replacedKeys.includes(key)) {
+                                                            replacedKeys.push(key);
+                                                            console.log("Verbose: evaluated setting: " + key);
+                                                        }
                                                     }
                                                 }
                                                 if (oldValue !== '' && oldIfTagParser.thisIsOutOfFalseBlock) {
@@ -796,8 +815,8 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                         output = true;
                                                         setting[key] = { value: replacedValue, isReferenced: false, lineNum: lineNum };
                                                         if (verboseMode && oldValue !== replacedValue) {
-                                                            console.log("verbose >> replaced \"" + key + "\" value from \"" + oldValue + "\" to \"" + replacedValue + "\"");
-                                                            console.log("verbose >>     at: " + inputFilePath + ":" + lineNum + ":");
+                                                            console.log("Verbose: replaced \"" + key + "\" value from \"" + oldValue + "\" to \"" + replacedValue + "\"");
+                                                            console.log("Verbose:     at: " + inputFilePath + ":" + lineNum + ":");
                                                         }
                                                     }
                                                     else {
@@ -835,10 +854,10 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                         output = true;
                                                     }
                                                     if (verboseMode && before !== after) {
-                                                        console.log("verbose >> replaced a line:");
-                                                        console.log("verbose >>     from: " + before);
-                                                        console.log("verbose >>     to:   " + after);
-                                                        console.log("verbose >>     at: " + inputFilePath + ":" + (lineNum - templateTag.lineNumOffset) + ":");
+                                                        console.log("Verbose: replaced a line:");
+                                                        console.log("Verbose:     from: " + before);
+                                                        console.log("Verbose:     to:   " + after);
+                                                        console.log("Verbose:     at: " + inputFilePath + ":" + (lineNum - templateTag.lineNumOffset) + ":");
                                                     }
                                                 }
                                                 else if (replacingLine.includes(replaced)) {
@@ -899,15 +918,16 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                 case 11: return [7 /*endfinally*/];
                                 case 12:
                                     // previousReplacedKeys = ...
-                                    Object.keys(evalatedKeys).forEach(function (key) {
-                                        previousEvalatedKeys[key] = evalatedKeys[key];
+                                    Object.keys(evalatedKeyValues).forEach(function (key) {
+                                        previousEvalatedKeyValues[key] = evalatedKeyValues[key];
                                     });
                                     if (isAllReplacable) {
                                         loop = false;
                                     }
-                                    else if (previousEvalatedKeysLength == Object.keys(previousEvalatedKeys).length) {
+                                    else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
                                         console.log('');
-                                        console.log('Error of unexpected');
+                                        console.log('Error of unexpected: The count of evalatedKeyValues is not increasing.' +
+                                            ' isReplacable may be not changed');
                                         errorCount += 1;
                                         loop = false;
                                     }
@@ -1365,8 +1385,9 @@ var IfTagParser = /** @class */ (function () {
         configurable: true
     });
     // evaluate
-    IfTagParser.prototype.evaluate = function (line, setting, previsousEvalatedKeys) {
+    IfTagParser.prototype.evaluate = function (line, setting, previsousEvalatedKeys, verboseMode) {
         if (previsousEvalatedKeys === void 0) { previsousEvalatedKeys = []; }
+        if (verboseMode === void 0) { verboseMode = false; }
         var expression = '';
         var errorCount = 0;
         var indentLength = indentRegularExpression.exec(line)[0].length;
@@ -1379,7 +1400,7 @@ var IfTagParser = /** @class */ (function () {
         }
         if (line.includes(ifLabel)) {
             expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-            var evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys);
+            var evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys, verboseMode);
             if (typeof evaluatedContidion === 'boolean') {
                 var resultOfIf = evaluatedContidion;
                 var isReplacable = false;
@@ -2381,8 +2402,9 @@ function onEndOfSettingScope(setting) {
     }
 }
 // evaluateIfCondition
-function evaluateIfCondition(expression, setting, previsousEvalatedKeys) {
-    if (previsousEvalatedKeys === void 0) { previsousEvalatedKeys = []; }
+function evaluateIfCondition(expression, setting, previsousEvalatedKeyValues, verboseMode) {
+    if (previsousEvalatedKeyValues === void 0) { previsousEvalatedKeyValues = []; }
+    if (verboseMode === void 0) { verboseMode = false; }
     if (expression === 'true') {
         return true;
     }
@@ -2443,13 +2465,22 @@ function evaluateIfCondition(expression, setting, previsousEvalatedKeys) {
             result = (leftValue !== rightValue);
         }
         if (result !== undefined) {
-            if (previsousEvalatedKeys.length === 0) {
+            if (previsousEvalatedKeyValues.length === 0) {
+                if (verboseMode) {
+                    console.log("Verbose: skipped evaluation: #if: " + expression);
+                }
                 return result;
             }
             else {
+                var isReplacable = previsousEvalatedKeyValues.includes(name_1) || parent !== settingsDot;
+                if (verboseMode) {
+                    if (!isReplacable) {
+                        console.log("Verbose: skipped evaluation: #if: " + expression);
+                    }
+                }
                 return {
                     result: result,
-                    isReplacable: previsousEvalatedKeys.includes(name_1),
+                    isReplacable: isReplacable,
                 };
             }
         }
@@ -3104,56 +3135,6 @@ function isSameArrayOf(log, answer) {
 function getStdOut() {
     return exports.stdout.split('\n');
 }
-// pp
-// Debug print.
-// #keyword: pp
-// Example:
-//    pp(var);
-// Example:
-//    var d = pp(var);
-//    d = d;  // Set break point here and watch the variable d
-// Example:
-//    try {
-//
-//        await main();
-//    } catch (e) {
-//        var d = pp(e);
-//        throw e;  // Set break point here and watch the variable d
-//    }
-function pp(message) {
-    if (message === void 0) { message = ''; }
-    if (typeof message === 'object') {
-        message = JSON.stringify(message);
-    }
-    exports.debugOut.push(message.toString());
-    return exports.debugOut;
-}
-exports.debugOut = [];
-// cc
-// Through counter.
-// #keyword: cc
-// Example:
-//   cc();
-// Example:
-//   var c = cc().debugOut;  // Set break point here and watch the variable c
-// Example:
-//   if ( cc(2).isTarget )
-//   var d = pp('');  // Set break point here and watch the variable d
-function cc(targetCount, label) {
-    if (targetCount === void 0) { targetCount = 9999999; }
-    if (label === void 0) { label = '0'; }
-    if (!(label in gCount)) {
-        gCount[label] = 0;
-    }
-    gCount[label] += 1;
-    pp(label + ":countThrough[" + label + "] = " + gCount[label]);
-    var isTarget = (gCount[label] === targetCount);
-    if (isTarget) {
-        pp('    **** It is before the target! ****');
-    }
-    return { isTarget: isTarget, debugOut: exports.debugOut };
-}
-var gCount = {};
 // println
 // #keyword: println, console.log, consoleLog
 // Output any text to standard output.
@@ -3164,7 +3145,7 @@ function println(message, delayedExpanding) {
     }
     if (withJest && !delayedExpanding) {
         exports.stdout += message.toString() + '\n';
-        pp(message.toString());
+        lib_1.pp(message.toString());
     }
     else {
         consoleLog(message);
@@ -3415,7 +3396,7 @@ function callMainFromJest(parameters, options) {
                     _a.sent();
                     return [3 /*break*/, 4];
                 case 3:
-                    d = pp('');
+                    d = lib_1.pp('');
                     s = getStdOut();
                     d = []; // Set break point here and watch the variable d
                     return [7 /*endfinally*/];

@@ -1597,6 +1597,8 @@ exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             no  #template: __Setting1__
+        old_bug:  #if: $env.unknown == ""
+            An error occurred by this if parameter.
 "
 `;
 
@@ -1620,6 +1622,8 @@ exports[`replaces settings >> in 2_replace_6_if both: updatedFileContents 1`] = 
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             replaced  #template: __Setting1__
+        old_bug:  #if: $env.unknown == \\"\\"
+            An error occurred by this if parameter.
 "
 `;
 
@@ -1643,6 +1647,8 @@ exports[`replaces settings >> in 2_replace_6_if in if block: updatedFileContents
             replaced  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             no  #template: __Setting1__
+        old_bug:  #if: $env.unknown == \\"\\"
+            An error occurred by this if parameter.
 "
 `;
 
@@ -1666,6 +1672,8 @@ exports[`replaces settings >> in 2_replace_6_if in if variable: updatedFileConte
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             no  #template: __Setting1__
+        old_bug:  #if: $env.unknown == \\"\\"
+            An error occurred by this if parameter.
 "
 `;
 
@@ -1683,6 +1691,8 @@ exports[`replaces settings >> in 2_replace_6_if: sourceFileContents 1`] = `
             yes  #template: __Setting1__
         not banana:  #if: $settings.fruit != banana
             no  #template: __Setting1__
+        old_bug:  #if: $env.unknown == ""
+            An error occurred by this if parameter.
 "
 `;
 

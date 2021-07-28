@@ -2066,7 +2066,7 @@ function  evaluateIfCondition(expression: string, setting: Settings,
 
                 return  result;
             } else　{
-                const  isReplacable = previsousEvalatedKeyValues.includes(name);//  ||  parent !== settingsDot;
+                const  isReplacable = previsousEvalatedKeyValues.includes(name)  ||  parent !== settingsDot;
                 if (verboseMode) {
                     if ( ! isReplacable) {
                         console.log(`Verbose: skipped evaluation: #if: ${expression}`);

@@ -47,11 +47,16 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getHomePath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
+exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
 var fs = require("fs");
 var path = require("path");
 var globby = require("globby");
 var readline = require("readline");
+try {
+    var snapshots = require("./__snapshots__/main.test.ts.snap");
+}
+catch (e) {
+}
 // copyFolderSync
 // #keyword: copyFolderSync
 // sourceFolder/1.txt => destinationFolderPath/1.txt
@@ -141,6 +146,30 @@ function getFullPath(relativePath, basePath) {
     return fullPath;
 }
 exports.getFullPath = getFullPath;
+// isFullPath
+// #keyword: JavaScript (js) library isFullPath
+function isFullPath(path) {
+    var colonPosition = path.indexOf(':');
+    var slashPosition = path.indexOf('/');
+    var backSlashPosition = path.indexOf('\\');
+    if (slashPosition === notFound) {
+        var separatorPosition = backSlashPosition;
+    }
+    else if (backSlashPosition === notFound) {
+        var separatorPosition = slashPosition;
+    }
+    else {
+        var separatorPosition = Math.min(slashPosition, backSlashPosition);
+    }
+    if (colonPosition === notFound) {
+        var isFullPath = (separatorPosition === 0);
+    }
+    else {
+        var isFullPath = (separatorPosition === colonPosition + 1);
+    }
+    return isFullPath;
+}
+exports.isFullPath = isFullPath;
 // getHomePath
 // #keyword: getHomePath
 function getHomePath() {
@@ -334,5 +363,66 @@ function getTestWorkFolderFullPath() {
     return path_ + "/_test_of_extract_git_branches";
 }
 exports.getTestWorkFolderFullPath = getTestWorkFolderFullPath;
+// getSnapshot
+function getSnapshot(label) {
+    if (!(label in snapshots)) {
+        throw new Error("not found snapshot label \"" + label + "\" in \"__Project__/src/__snapshots__/main.test.ts.snap\" file.");
+    }
+    var snapshot = snapshots[label];
+    return snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
+}
+exports.getSnapshot = getSnapshot;
+// pp
+// Debug print.
+// #keyword: pp
+// Example:
+//    pp(var);
+// Example:
+//    var d = pp(var);
+//    d = d;  // Set break point here and watch the variable d
+// Example:
+//    try {
+//
+//        await main();
+//    } finally {
+//        var d = pp('');
+//        d = [];  // Set break point here and watch the variable d
+//    }
+function pp(message) {
+    if (typeof message === 'object') {
+        message = JSON.stringify(message);
+    }
+    exports.debugOut.push(message.toString());
+    return exports.debugOut;
+}
+exports.pp = pp;
+exports.debugOut = [];
+// cc
+// Through counter.
+// #keyword: cc
+// Example:
+//   cc();
+// Example:
+//   var c = cc().debugOut;  // Set break point here and watch the variable c
+// Example:
+//   if ( cc(2).isTarget )
+//   var d = pp('');  // Set break point here and watch the variable d
+function cc(targetCount, label) {
+    if (targetCount === void 0) { targetCount = 9999999; }
+    if (label === void 0) { label = '0'; }
+    if (!(label in gCount)) {
+        gCount[label] = 0;
+    }
+    gCount[label] += 1;
+    pp(label + ":countThrough[" + label + "] = " + gCount[label]);
+    var isTarget = (gCount[label] === targetCount);
+    if (isTarget) {
+        pp('    **** It is before the target! ****');
+    }
+    return { isTarget: isTarget, debugOut: exports.debugOut };
+}
+exports.cc = cc;
+var gCount = {};
+var notFound = -1;
 var templateObject_1;
 //# sourceMappingURL=lib.js.map

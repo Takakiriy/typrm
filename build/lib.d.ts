@@ -3,6 +3,7 @@ import * as readline from 'readline';
 export declare function copyFolderSync(sourceFolderPath: string, destinationFolderPath: string): Promise<void>;
 export declare function copyFileSync(sourceFilePath: string, destinationFilePath: string): void;
 export declare function getFullPath(relativePath: string, basePath: string): string;
+export declare function isFullPath(path: string): boolean;
 export declare function getHomePath(): string;
 declare class StandardInputBuffer {
     readlines: readline.Interface | undefined;
@@ -19,4 +20,11 @@ export declare function inputSkip(count: number): void;
 export declare function pathResolve(path_: string): string;
 export declare function checkNotInGitWorking(): void;
 export declare function getTestWorkFolderFullPath(): string;
+export declare function getSnapshot(label: string): any;
+export declare function pp(message: any): string[];
+export declare const debugOut: string[];
+export declare function cc(targetCount?: number, label?: string): {
+    isTarget: boolean;
+    debugOut: string[];
+};
 export {};

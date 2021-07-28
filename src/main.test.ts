@@ -168,7 +168,7 @@ describe("checks file contents >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.only.each([
+    test.each([
         [
             '2_replace_1_ok', ' setting 1', '10', 'en-US',
             `key1: value1changed
@@ -235,7 +235,6 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
-if (fileNameHead !== '2_replace_6_if') {return;}  // || subCase !== '____'
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -258,7 +257,6 @@ if (fileNameHead !== '2_replace_6_if') {return;}  // || subCase !== '____'
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-expect('test code').toBe('deleted skip code.');
     });
 
     test.each([

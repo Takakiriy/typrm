@@ -350,6 +350,43 @@ describe("replaces settings >>", function () {
             }
         });
     }); });
+    test.each([
+        [
+            '2_replace_1_ok', ' without folder option', undefined, 'en-US',
+            "key1: changed1",
+            'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
+        ],
+    ])("Exception case >> in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) { return __awaiter(void 0, void 0, void 0, function () {
+        var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, errorMessage, e_3;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    changingFolderPath = testFolderPath + '_changing';
+                    changingFileName = fileNameHead + "_1_changing.yaml";
+                    changingFilePath = changingFolderPath + '/' + changingFileName;
+                    sourceFileContents = getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
+                    errorMessage = '';
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                    writeFileSync(changingFilePath, sourceFileContents);
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, callMain(["replace", changingFilePath, keyValues], {
+                            folder: "", test: "", locale: locale,
+                        })];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    e_3 = _a.sent();
+                    errorMessage = e_3.message;
+                    return [3 /*break*/, 4];
+                case 4:
+                    expect(errorMessage).toBe(expectedErrorMessage);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
     describe("Multi folder >>", function () {
         var fileNameHead = '2_replace_1_ok';
         var changingFolderPath = testFolderPath + '_changing';
