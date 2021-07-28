@@ -206,11 +206,11 @@ The `#keyword:` tag parameter is not treated as a keyword.
     #keyword: abc"   #disable-tag-tool:
 
 The `#keyword:` tag and the `#glossary:` tag from the next line
-that has the `#block-to-disable-tag-tool:` tag
+that has the `#(search)if: false` tag
 to the previous line that has same indent length
 are not searched.
 
-    copy:  #block-to-disable-tag-tool:
+    copy:  #(search)if: false
         #keyword: abc  #// not searchable
         #keyword: def  #// not searchable
     original:
@@ -1141,19 +1141,19 @@ You can set the break point, click at the left of line number of the source file
 
 ## Tag list
 
-- `#block-to-disable-tag-tool:`: Disables tags in child elements
-- `#disable-tag-tool:`: Disable tags on the same line
-- `#expect:`: Condition check
-- `#file-template:`: Template for checking the contents of a file
-- `#file-template-any-lines:`: Lines that do not check the contents of the file
-- `#glossary:`: Use the key in the child element as the keyword to be searched
-- `#if:`: Conditions for enabling tags
-- `#keyword:`: Search target keyword
-- `#original:`: Value before replacement
-- `#ref:`: Path of linked file
-- `#search:`: Keywords when searching for links
-- `#template:`: Template for replacing the body
-- `#template-at():`: Template for replacing the body above two or more lines
-- `#template-if:`: Conditions that determine the content to be included in the text
+- `#disable-tag-tool:` Disable tags on the same line
+- `#expect:` Condition check
+- `#file-template:` Template for checking the contents of a file
+- `#file-template-any-lines:` Lines that do not check the contents of the file
+- `#glossary:` Use the key in the child element as the keyword to be searched
+- `#if:` Conditions for enabling tags
+- `#keyword:` Search target keyword
+- `#original:` Value before replacement
+- `#ref:` Path of linked file
+- `#search:` Keywords when searching for links
+- `#(search)if:` Conditions for enabling search
+- `#template:` Template for replacing the body
+- `#template-at():` Template for replacing the body above two or more lines
+- `#template-if:` Conditions that determine the content to be included in the text
 
 You can find more informations of tags by searching this page.

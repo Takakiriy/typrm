@@ -1476,7 +1476,7 @@ var BlockDisableTagParser = /** @class */ (function () {
         else {
             this.isInBlock_ = this.previousLineHasTag;
         }
-        if (line.includes(blockDisableLabel)) {
+        if (line.includes(searchIfLabel)) {
             this.blockIndentLength = indentLength;
             this.previousLineHasTag = true;
         }
@@ -3434,7 +3434,7 @@ var fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 var keywordLabel = "#keyword:";
 var glossaryLabel = "#glossary:";
 var disableLabel = "#disable-tag-tool:";
-var blockDisableLabel = "#block-to-disable-tag-tool:";
+var searchIfLabel = "#(search)if: false";
 var ifLabel = "#if:";
 var expectLabel = "#expect:";
 var ignoredKeywords = [/#keyword:/g, /#search:/g];

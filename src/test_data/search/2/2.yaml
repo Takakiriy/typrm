@@ -70,7 +70,7 @@ lineNum:
     #test of TYPRM_LINE_NUM_GETTER
 
 block-to-disable-tag-tool tag:
-    ref:  #block-to-disable-tag-tool:
+    ref:  #(search)if: false
         Existing materials:  #keyword: document_in_block
 
         Existing materials (2):  #keyword: document_in_block

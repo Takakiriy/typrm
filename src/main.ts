@@ -1173,7 +1173,7 @@ class  BlockDisableTagParser {
             this.isInBlock_ = this.previousLineHasTag;
         }
 
-        if (line.includes(blockDisableLabel)) {
+        if (line.includes(searchIfLabel)) {
             this.blockIndentLength = indentLength;
             this.previousLineHasTag = true;
         } else {
@@ -3015,7 +3015,7 @@ const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
-const  blockDisableLabel = "#block-to-disable-tag-tool:";
+const  searchIfLabel = "#(search)if: false";
 const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#keyword:/g, /#search:/g ];

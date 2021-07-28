@@ -202,11 +202,11 @@ CSV の部分に文法の問題があるときに表示される警告を抑制�
 
     #keyword: abc"   #disable-tag-tool:
 
-`#block-to-disable-tag-tool:` タグがある行の次の行から
+`#(search)if: false` タグがある行の次の行から
 インデントが同じ深さの行の前までの、
 `#keyword:` タグと　`#glossary:` タグは検索対象外になります。
 
-    copy:  #block-to-disable-tag-tool:
+    copy:  #(search)if: false
         #keyword: abc  #// 検索対象外です
         #keyword: def  #// 検索対象外です
     original:
@@ -1092,19 +1092,19 @@ Jest を使うテストと Jest を使わないテストがあります。
 
 ## タグ一覧
 
-- `#block-to-disable-tag-tool:`: 子要素にあるタグを無効にします
-- `#disable-tag-tool:`: 同じ行にあるタグを無効にします
-- `#expect:`: 条件チェック
-- `#file-template:`: ファイルの内容をチェックするときのテンプレート
-- `#file-template-any-lines:`: ファイルの内容をチェックしない行
-- `#glossary:`: 子要素にあるキーを検索対象のキーワードにします
-- `#if:`: タグを有効にする条件
-- `#keyword:`: 検索対象のキーワード
-- `#original:`: 置き換える前の値
-- `#ref:`: リンク先のファイルのパス
-- `#search:`: リンク先を検索するときのキーワード
-- `#template:`: 本文を置き換えるときのテンプレート
-- `#template-at():`: 2行以上上の本文を置き換えるときのテンプレート
-- `#template-if:`: 本文に入れる内容を決める条件
+- `#disable-tag-tool:` 同じ行にあるタグを無効にします
+- `#expect:` 条件チェック
+- `#file-template:` ファイルの内容をチェックするときのテンプレート
+- `#file-template-any-lines:` ファイルの内容をチェックしない行
+- `#glossary:` 子要素にあるキーを検索対象のキーワードにします
+- `#if:` タグを有効にする条件
+- `#keyword:` 検索対象のキーワード
+- `#original:` 置き換える前の値
+- `#ref:` リンク先のファイルのパス
+- `#search:` リンク先を検索するときのキーワード
+- `#(search)if:` 検索を有効にする条件
+- `#template:` 本文を置き換えるときのテンプレート
+- `#template-at():` 2行以上上の本文を置き換えるときのテンプレート
+- `#template-if:` 本文に入れる内容を決める条件
 
 タグの詳細については、このページを検索してください。
