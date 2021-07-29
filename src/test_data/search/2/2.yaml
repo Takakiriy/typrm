@@ -76,3 +76,6 @@ block-to-disable-tag-tool tag:
         Existing materials (2):  #keyword: document_in_block
     memo: |
         Making materials:  #keyword: document_in_block
+
+Bug case (1):
+    #keyword: Go_language.yaml, go

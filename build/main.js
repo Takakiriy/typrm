@@ -1997,6 +1997,9 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                         previousPosition = result_1.position;
                     }
                 }
+                if (found.matchedKeywordCount < keywords.length) {
+                    found.score = 0;
+                }
                 if (found.score !== 0) {
                     found.score += keyphrase.length - aTestingString.length;
                     found.testedWordCount = aTestingString.split(' ').length;

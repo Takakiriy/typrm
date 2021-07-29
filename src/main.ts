@@ -1551,6 +1551,9 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string): 
                             previousPosition = result.position;
                         }
                     }
+                    if (found.matchedKeywordCount < keywords.length) {
+                        found.score = 0;
+                    }
                     if (found.score !== 0) {
                         found.score += keyphrase.length - aTestingString.length;
                         found.testedWordCount = aTestingString.split(' ').length;
