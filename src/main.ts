@@ -1360,9 +1360,17 @@ async function  searchSub(keyword: string) {
     const  fileFullPaths: string[] = [];
     const  targetFolders = await parseCSVColumns(programOptions.folder);
     for (const folder of targetFolders) {
-        const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+        const  targetFullPath = lib.getFullPath(folder, currentFolder);
+        const  fileName = path.basename(targetFullPath);
+        if (fileName.includes('*')) {
+            var  targetFolderFullPath = path.dirname(targetFullPath);
+            var  wildcard = fileName;
+        } else {
+            var  targetFolderFullPath = targetFullPath;
+            var  wildcard = '*';
+        }
         process.chdir(targetFolderFullPath);
-        const scanedPaths = await globby(['**/*']);
+        const scanedPaths = await globby([`**/${wildcard}`]);
         scanedPaths.forEach((scanedPath) => {
 
             fileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))

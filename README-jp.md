@@ -142,6 +142,24 @@ typrm コマンド:
 なぜなら `#keyword:` タグがないからです。 `#keyword:` タグがないテキストを
 検索するときは、grep など一般的な全文検索ツールを使ってください。
 
+`TYPRM_FOLDER` 環境変数、または `--folder` オプションに
+検索対象のファイルが入っているフォルダーのパスを指定します。
+
+PowerShell で環境変数を設定する場合:
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
+    typrm ls
+
+`--folder` オプションに指定する場合:
+
+    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
+
+`TYPRM_FOLDER` 環境変数の値は CSV 形式です。
+複数のフォルダーのパスを指定することができます。
+ファイル名のワイルドカードを指定することもできます。
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
+
 コロンまでをキーワードにするときは、`#keyword:` タグのパラメーターを省略できます。
 下記の場合、検索できるキーワードは ls です。
 

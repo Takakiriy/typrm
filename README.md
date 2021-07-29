@@ -142,6 +142,24 @@ Because there is no `#keyword:` tag.
 If you want to search for text that does not have the `#keyword:` tag,
 use a common full-text search tool such as grep.
 
+Specify the path of the folder containing the file to be searched
+in the `TYPRM_FOLDER` environment variable or the `--folder` option.
+
+Case of setting environment variables in PowerShell:
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
+    typrm ls
+
+Case of specifing to the `--folder` option:
+
+    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
+
+The value format of the `TYPRM_FOLDER` environment variable is CSV.
+You can specify multiple folder paths.
+You can also specify a wildcard for the file name.
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
+
 You can omit the parameter in the `#keyword:` tag
 if the keyword was written up to the colon.
 In the following cases, the searchable keyword is ls.
@@ -836,7 +854,7 @@ displayed path.
 The command is executed when the number of the command is
 additionally specified in the parameter of the search command.
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf　0  #// Folder command
+    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf  0  #// Folder command
 
 When you enter search keyword input mode and display the file path
 with the `#ref:` tag, the prompt changes to `keyword or number:`.
