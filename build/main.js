@@ -3007,6 +3007,10 @@ function searchAsText(getter, address) {
             switch (_c.label) {
                 case 0:
                     _b = splitFilePathAndKeyword(address, getter.regularExpression, getter.filePathRegularExpressionIndex, getter.keywordRegularExpressionIndex), filePath = _b.filePath, keyword = _b.keyword;
+                    if (!fs.existsSync(filePath)) {
+                        console.log("ERROR: not found a file at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
+                        return [2 /*return*/, filePath];
+                    }
                     reader = readline.createInterface({
                         input: fs.createReadStream(filePath),
                         crlfDelay: Infinity

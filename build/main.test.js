@@ -839,167 +839,221 @@ describe("searches glossary tag >>", function () {
     }); });
 });
 describe("print reference >>", function () {
-    test.each([
-        [
-            "1st",
-            ["search", "#ref:", "${TEST_ENV}/file.txt"],
-            { locale: "en-US" },
-            "testEnv/file.txt\n" +
-                "    0.Folder\n",
-        ], [
-            "multi parameters",
-            ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
-            { locale: "en-US" },
-            "testEnv/file1.txt testEnv/testEnv/file2.txt\n" +
-                "    0.Folder\n",
-        ], [
-            "escape",
-            ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
-            { locale: "en-US" },
-            "${TEST_ENV} -${TEST_ENV}- /testEnv\n" +
-                "    0.Folder\n",
-        ], [
-            "path",
-            ["search", "#ref:", "~/.ssh  folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
-            { locale: "en-US" },
-            lib.getHomePath() + "/.ssh  folder/f1.txt  C:/Test  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
-                "    0.Folder\n",
-        ], [
-            "shared folder",
-            ["search", "#ref:", "\\\\pc\\folder\\file.txt"],
-            { locale: "en-US" },
-            "\\\\pc\\folder\\file.txt\n" +
-                "    0.Folder\n",
-        ], [
-            "lineNum",
-            ["search", "#ref:", "test_data/search/2/2.yaml#lineNum"],
-            { locale: "en-US" },
-            "test_data/search/2/2.yaml:69\n" +
-                "    0.Folder\n",
-        ], [
-            "lineNum not found",
-            ["search", "#ref:", "test_data/search/2/2.yaml#notFound"],
-            { locale: "en-US" },
-            "test_data/search/2/2.yaml:0\n" +
-                "    0.Folder\n",
-        ], [
-            "recommend",
-            ["search", "#ref:", lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Test\\user1  c:\\Test  \\root  \\\\pc  last\\"],
-            { locale: "en-US" },
-            "Recommend: #ref: ~/.ssh  ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
-                lib.getHomePath().replace(/\\/g, '/') + "/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Test/user1  c:/Test  /root  //pc  last/\n" +
-                "    0.Folder\n",
-        ], [
-            "recommend (2)",
-            ["search", "#ref: '/User'"],
-            { locale: "en-US" },
-            "Recommend: #ref: /User\n" +
-                "/User\n" +
-                "    0.Folder\n",
-        ], [
-            "Do not recommend reserved variables",
-            ["search", "#ref: TYPRM_FOLDER"],
-            { locale: "en-US" },
-            "TYPRM_FOLDER\n" +
-                "    0.Folder\n",
-        ], [
-            "verb",
-            ["search", "#ref:", "../README.md", "7"],
-            { locale: "en-US" },
-            "{ref: ../README.md, windowsRef: ..\\README.md, file: ../README.md, windowsFile: ..\\README.md, fragment: }\n",
-        ], [
-            "verb (2)",
-            ["search", "#ref:", "../README.md#title", "7"],
-            { locale: "en-US" },
-            "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
-        ], [
-            "verb error",
-            ["search", "#ref:", "../README.md", "4"],
-            { locale: "en-US" },
-            "Error that verb number 4 is not defined\n",
-        ], [
-            "not found the folder",
-            ["search", "#ref:", "/Unknown_", "0"],
-            { locale: "en-US" },
-            (testingOS === 'Windows')
-                ? "Error of not found the file or folder at \"\\Unknown_\"\n"
-                : "Error of not found the file or folder at \"/Unknown_\"\n",
-        ], [
-            "verb verbose",
-            ["search", "#ref:", "../README.md", "4"],
-            { locale: "en-US", verbose: "" },
-            (testingOS === 'Windows')
-                ? // Windows
-                    "Verbose: TYPRM_TEST_ENV = testEnv\n" +
-                        "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
-                        "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
-                        "Verbose:     type: text\n" +
-                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
-                        "Verbose:     address: ${file}:${lineNum}\n" +
-                        "Verbose: TYPRM_VERB[0]:\n" +
-                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                        "Verbose:     label: 7.Test Echo\n" +
-                        "Verbose:     number: 7\n" +
-                        "Verbose:     command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
-                        "Verbose: TYPRM_VERB[1]:\n" +
-                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
-                        "Verbose:     label: 1.View\n" +
-                        "Verbose:     number: 1\n" +
-                        "Verbose:     command: msedge \"file://\${file}\"\n" +
-                        "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
-                        "Verbose:     address: ../README.md\n" +
-                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
-                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
-                        "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
-                        "Error that verb number 4 is not defined\n"
-                : // mac
-                    "Verbose: TYPRM_TEST_ENV = testEnv\n" +
-                        "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
-                        "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
-                        "Verbose:     type: text\n" +
-                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
-                        "Verbose:     address: ${file}:${lineNum}\n" +
-                        "Verbose: TYPRM_VERB[0]:\n" +
-                        "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                        "Verbose:     label: 7.Test Echo\n" +
-                        "Verbose:     number: 7\n" +
-                        "Verbose:     command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
-                        "Verbose: TYPRM_VERB[1]:\n" +
-                        "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
-                        "Verbose:     label: 1.View\n" +
-                        "Verbose:     number: 1\n" +
-                        "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
-                        "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
-                        "Verbose:     address: ../README.md\n" +
-                        "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
-                        "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                        "Verbose:     keywordRegularExpressionIndex: 4\n" +
-                        "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
-                        "Error that verb number 4 is not defined\n",
-        ],
-    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (arguments_[1].includes('TYPRM_FOLDER')) {
-                        process.env.TYPRM_FOLDER = 'TYPRM_FOLDER';
-                    }
-                    return [4 /*yield*/, callMain(arguments_, options)];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toBe(answer);
-                    if (arguments_[1].includes('TYPRM_FOLDER')) {
-                        delete process.env.TYPRM_FOLDER;
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    describe("basic >>", function () {
+        test.each([
+            [
+                "1st",
+                ["search", "#ref:", "${TEST_ENV}/file.txt"],
+                { locale: "en-US", test: "" },
+                "testEnv/file.txt\n" +
+                    "    0.Folder\n",
+            ], [
+                "multi parameters",
+                ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
+                { locale: "en-US", test: "" },
+                "testEnv/file1.txt testEnv/testEnv/file2.txt\n" +
+                    "    0.Folder\n",
+            ], [
+                "escape",
+                ["search", "#ref:", "\\${TEST_ENV}", "-\\${TEST_ENV}-", "/${TEST_ENV}"],
+                { locale: "en-US", test: "" },
+                "${TEST_ENV} -${TEST_ENV}- /testEnv\n" +
+                    "    0.Folder\n",
+            ], [
+                "path",
+                ["search", "#ref:", "~/.ssh  folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
+                { locale: "en-US", test: "" },
+                lib.getHomePath() + "/.ssh  folder/f1.txt  C:/Test  escaped\\ space  /root  //pc\n" + // TYPRM_TEST_PATH has \ but print replaced to /
+                    "    0.Folder\n",
+            ], [
+                "shared folder",
+                ["search", "#ref:", "\\\\pc\\folder\\file.txt"],
+                { locale: "en-US", test: "" },
+                "\\\\pc\\folder\\file.txt\n" +
+                    "    0.Folder\n",
+            ],
+        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                    case 1:
+                        _a.sent();
+                        expect(main.stdout).toBe(answer);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
+    describe("line number >>", function () {
+        test.each([
+            [
+                "lineNum",
+                ["search", "#ref:", "test_data/search/2/2.yaml#lineNum"],
+                { locale: "en-US", test: "" },
+                "test_data/search/2/2.yaml:69\n" +
+                    "    0.Folder\n",
+            ], [
+                "(error) lineNum not found",
+                ["search", "#ref:", "test_data/search/2/2.yaml#notFound"],
+                { locale: "en-US", test: "" },
+                "test_data/search/2/2.yaml:0\n" +
+                    "    0.Folder\n",
+            ], [
+                "(error) file not found",
+                ["search", "#ref:", "test_data/search/2/notFound.yaml#notFound"],
+                { locale: "en-US", test: "" },
+                'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n' +
+                    "test_data/search/2/notFound.yaml\n" +
+                    "    0.Folder\n",
+            ],
+        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                    case 1:
+                        _a.sent();
+                        expect(main.stdout).toBe(answer);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
+    describe("recommend >>", function () {
+        test.each([
+            [
+                "recommend",
+                ["search", "#ref:", lib.getHomePath() + "/.ssh  testEnv/file1.txt  testEnv\\testEnv\\file2.txt  C:\\Test\\user1  c:\\Test  \\root  \\\\pc  last\\"],
+                { locale: "en-US", test: "" },
+                "Recommend: #ref: ~/.ssh  ${TEST_ENV}/file1.txt  ${TEST_ENV}/${TEST_ENV}/file2.txt  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n" +
+                    lib.getHomePath().replace(/\\/g, '/') + "/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Test/user1  c:/Test  /root  //pc  last/\n" +
+                    "    0.Folder\n",
+            ], [
+                "recommend (2)",
+                ["search", "#ref: '/User'"],
+                { locale: "en-US", test: "" },
+                "Recommend: #ref: /User\n" +
+                    "/User\n" +
+                    "    0.Folder\n",
+            ], [
+                "Do not recommend reserved variables",
+                ["search", "#ref: TYPRM_FOLDER"],
+                { locale: "en-US", test: "" },
+                "TYPRM_FOLDER\n" +
+                    "    0.Folder\n",
+            ],
+        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (arguments_[1].includes('TYPRM_FOLDER')) {
+                            process.env.TYPRM_FOLDER = 'TYPRM_FOLDER';
+                        }
+                        return [4 /*yield*/, callMain(arguments_, options)];
+                    case 1:
+                        _a.sent();
+                        expect(main.stdout).toBe(answer);
+                        if (arguments_[1].includes('TYPRM_FOLDER')) {
+                            delete process.env.TYPRM_FOLDER;
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
+    describe("verb >>", function () {
+        test.each([
+            [
+                "verb",
+                ["search", "#ref:", "../README.md", "7"],
+                { locale: "en-US", test: "" },
+                "{ref: ../README.md, windowsRef: ..\\README.md, file: ../README.md, windowsFile: ..\\README.md, fragment: }\n",
+            ], [
+                "verb (2)",
+                ["search", "#ref:", "../README.md#title", "7"],
+                { locale: "en-US", test: "" },
+                "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
+            ], [
+                "verb error",
+                ["search", "#ref:", "../README.md", "4"],
+                { locale: "en-US", test: "" },
+                "Error that verb number 4 is not defined\n",
+            ], [
+                "not found the folder",
+                ["search", "#ref:", "/Unknown_", "0"],
+                { locale: "en-US", test: "" },
+                (testingOS === 'Windows')
+                    ? "Error of not found the file or folder at \"\\Unknown_\"\n"
+                    : "Error of not found the file or folder at \"/Unknown_\"\n",
+            ], [
+                "verb verbose",
+                ["search", "#ref:", "../README.md", "4"],
+                { locale: "en-US", test: "", verbose: "" },
+                (testingOS === 'Windows')
+                    ? // Windows
+                        "Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                            "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
+                            "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                            "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                            "Verbose:     type: text\n" +
+                            "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                            "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                            "Verbose:     address: ${file}:${lineNum}\n" +
+                            "Verbose: TYPRM_VERB[0]:\n" +
+                            "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
+                            "Verbose:     label: 7.Test Echo\n" +
+                            "Verbose:     number: 7\n" +
+                            "Verbose:     command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
+                            "Verbose: TYPRM_VERB[1]:\n" +
+                            "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                            "Verbose:     label: 1.View\n" +
+                            "Verbose:     number: 1\n" +
+                            "Verbose:     command: msedge \"file://\${file}\"\n" +
+                            "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
+                            "Verbose:     address: ../README.md\n" +
+                            "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                            "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                            "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                            "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
+                            "Error that verb number 4 is not defined\n"
+                    : // mac
+                        "Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                            "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
+                            "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                            "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                            "Verbose:     type: text\n" +
+                            "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                            "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                            "Verbose:     address: ${file}:${lineNum}\n" +
+                            "Verbose: TYPRM_VERB[0]:\n" +
+                            "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
+                            "Verbose:     label: 7.Test Echo\n" +
+                            "Verbose:     number: 7\n" +
+                            "Verbose:     command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
+                            "Verbose: TYPRM_VERB[1]:\n" +
+                            "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                            "Verbose:     label: 1.View\n" +
+                            "Verbose:     number: 1\n" +
+                            "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                            "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
+                            "Verbose:     address: ../README.md\n" +
+                            "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                            "Verbose:     filePathRegularExpressionIndex: 1\n" +
+                            "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                            "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
+                            "Error that verb number 4 is not defined\n",
+            ],
+        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                    case 1:
+                        _a.sent();
+                        expect(main.stdout).toBe(answer);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
 });
 describe("test of test >>", function () {
     test("checks snapshots files are confirmed", function () {
