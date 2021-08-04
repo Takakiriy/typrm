@@ -1727,7 +1727,7 @@ function search() {
 function searchSub(keyword) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _b, targetFolders_4, folder, targetFullPath, fileName, targetFolderFullPath, wildcard, targetFolderFullPath, wildcard, scanedPaths, glossaryTags, foundLines, _loop_3, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
+        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _b, targetFolders_4, folder, targetFullPath, fileName, targetFolderFullPath, wildcard, targetFolderFullPath, wildcard, scanedPaths, thesaurus, glossaryTags, foundLines, thesaurusFilePath, _loop_3, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -1769,8 +1769,19 @@ function searchSub(keyword) {
                     return [3 /*break*/, 2];
                 case 5:
                     process.chdir(currentFolder);
+                    thesaurus = new Thesaurus();
                     glossaryTags = [];
                     foundLines = [];
+                    if (!('thesaurus' in exports.programOptions)) return [3 /*break*/, 7];
+                    thesaurusFilePath = exports.programOptions.thesaurus;
+                    if (!fs.existsSync(thesaurusFilePath)) {
+                        throw new Error("not found the thesaurus file \"" + lib.getFullPath(thesaurusFilePath, process.cwd()) + "\"");
+                    }
+                    return [4 /*yield*/, thesaurus.load(thesaurusFilePath)];
+                case 6:
+                    _e.sent();
+                    _e.label = 7;
+                case 7:
                     _loop_3 = function (inputFileFullPath) {
                         var reader, blockDisable, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _f, _g, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _h, _j, match, _k, _l, match, e_6_1;
                         return __generator(this, function (_m) {
@@ -1810,7 +1821,7 @@ function searchSub(keyword) {
                                         })];
                                 case 4:
                                     columns = _m.sent();
-                                    found = getKeywordMatchingScore(columns, keyword);
+                                    found = getKeywordMatchingScore(columns, keyword, thesaurus);
                                     if (found.matchedKeywordCount >= 1) {
                                         if (withParameter) {
                                             positionOfCSV = line.indexOf(csv, line.indexOf(keywordLabel) + keywordLabel.length); // line.length - csv.length;
@@ -1880,7 +1891,7 @@ function searchSub(keyword) {
                                                 colonPosition = line.indexOf(':', currentIndent.length);
                                                 wordInGlossary = glossaryTag.glossaryWords +
                                                     line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                                                found = getKeywordMatchingScore([wordInGlossary], keyword);
+                                                found = getKeywordMatchingScore([wordInGlossary], keyword, thesaurus);
                                                 if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
                                                     found.score += glossaryMatchScore;
                                                     found.path = getTestablePath(inputFileFullPath);
@@ -1930,18 +1941,18 @@ function searchSub(keyword) {
                         });
                     };
                     _c = 0, fileFullPaths_1 = fileFullPaths;
-                    _e.label = 6;
-                case 6:
-                    if (!(_c < fileFullPaths_1.length)) return [3 /*break*/, 9];
-                    inputFileFullPath = fileFullPaths_1[_c];
-                    return [5 /*yield**/, _loop_3(inputFileFullPath)];
-                case 7:
-                    _e.sent();
                     _e.label = 8;
                 case 8:
-                    _c++;
-                    return [3 /*break*/, 6];
+                    if (!(_c < fileFullPaths_1.length)) return [3 /*break*/, 11];
+                    inputFileFullPath = fileFullPaths_1[_c];
+                    return [5 /*yield**/, _loop_3(inputFileFullPath)];
                 case 9:
+                    _e.sent();
+                    _e.label = 10;
+                case 10:
+                    _c++;
+                    return [3 /*break*/, 8];
+                case 11:
                     keyphraseWordCount = keyword.split(' ').length;
                     foundLines = foundLines.filter(function (found) { return (found.matchedKeywordCount >= keyphraseWordCount); });
                     foundLines.sort(compareScore);
@@ -1955,7 +1966,7 @@ function searchSub(keyword) {
     });
 }
 // getKeywordMatchingScore
-function getKeywordMatchingScore(testingStrings, keyphrase) {
+function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
     var lowerKeyphrase = keyphrase.toLowerCase();
     function subMain() {
         var bestFound = testingStrings.reduce(function (bestFound, aTestingString, stringIndex) {
@@ -1964,7 +1975,8 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
             var result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex, found);
             if (result.score !== 0) {
                 found.score = result.score * keywords.length * phraseMatchScoreWeight +
-                    keyphrase.length - aTestingString.length;
+                    keyphrase.length - aTestingString.length +
+                    notNormalizedScore * keywords.length;
                 found.matchedKeywordCount = keywords.length;
                 found.matchedTargetKeywordCount = keywords.length;
                 found.testedWordCount = aTestingString.split(' ').length;
@@ -1987,11 +1999,31 @@ function getKeywordMatchingScore(testingStrings, keyphrase) {
                         else {
                             found.score += result_1.score;
                         }
+                        found.score += notNormalizedScore;
                         found.matchedKeywordCount += 1;
                     }
                     if (result_1.position !== notFound) {
                         matchedCountsByWord[wordPositions.getWordIndex(result_1.position)] += 1;
                         previousPosition = result_1.position;
+                    }
+                    var useThesaurus = (result_1.score === 0 && result_1.position === notFound && thesaurus.enabled);
+                    if (useThesaurus) {
+                        var normalizedTestingString = thesaurus.normalize(aTestingString);
+                        var normalizedKeyword = thesaurus.normalize(keyword);
+                        var result_2 = getSubMatchedScore(normalizedTestingString, normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
+                        if (result_2.score !== 0) {
+                            if (result_2.position > previousPosition) {
+                                found.score += result_2.score * orderMatchScoreWeight;
+                            }
+                            else {
+                                found.score += result_2.score;
+                            }
+                            found.matchedKeywordCount += 1;
+                        }
+                        if (result_2.position !== notFound) {
+                            matchedCountsByWord[wordPositions.getWordIndex(result_2.position)] += 1;
+                            previousPosition = result_2.position;
+                        }
                     }
                 }
                 if (found.matchedKeywordCount < keywords.length) {
@@ -2862,6 +2894,54 @@ var Setting = /** @class */ (function () {
     }
     return Setting;
 }());
+// Thesaurus
+var Thesaurus = /** @class */ (function () {
+    function Thesaurus() {
+        this.synonym = {}; // the value is the normalized word
+    }
+    Object.defineProperty(Thesaurus.prototype, "enabled", {
+        get: function () { return Object.keys(this.synonym).length !== 0; },
+        enumerable: false,
+        configurable: true
+    });
+    Thesaurus.prototype.load = function (csvFilePath) {
+        return __awaiter(this, void 0, void 0, function () {
+            var promise;
+            var _this = this;
+            return __generator(this, function (_a) {
+                promise = new Promise(function (resolveFunction, _rejectFunction) {
+                    fs.createReadStream(csvFilePath)
+                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                        .on('data', function (columns) {
+                        if (columns.length >= 1) {
+                            var normalizedKeyword_1 = columns[0];
+                            columns.shift();
+                            var synonyms = columns;
+                            synonyms.forEach(function (synonym) {
+                                _this.synonym[synonym] = normalizedKeyword_1;
+                            });
+                        }
+                    })
+                        .on('end', function () {
+                        resolveFunction();
+                    });
+                });
+                return [2 /*return*/, promise];
+            });
+        });
+    };
+    Thesaurus.prototype.normalize = function (keyphrase) {
+        var words = keyphrase.split(' ');
+        for (var i = 0; i < words.length; i += 1) {
+            if (words[i] in this.synonym) {
+                words[i] = this.synonym[words[i]];
+            }
+        }
+        var normalizedKeyphrase = words.join(' ');
+        return normalizedKeyphrase;
+    };
+    return Thesaurus;
+}());
 // FoundLine
 // Found the keyword and matched part in the line
 var FoundLine = /** @class */ (function () {
@@ -3452,6 +3532,7 @@ var glossaryMatchScore = 1;
 var caseIgnoredFullMatchScore = 8;
 var wordsMatchScore = 7;
 var partMatchScore = 5;
+var notNormalizedScore = 1;
 var caseIgnoredWordMatchScore = 6;
 var caseIgnoredPartMatchScore = 3;
 var phraseMatchScoreWeight = 4;

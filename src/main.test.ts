@@ -653,6 +653,20 @@ describe("searches keyword tag >>", () => {
         await callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
     });
+
+    describe("thesaurus >>", () => {
+        test.each([
+            [
+                "acronym",
+                ["search", "PS"],
+                { folder: "test_data/thesaurus/1", thesaurus: "test_data/thesaurus/thesaurus.csv", test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/thesaurus/1/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
+            ],
+        ])("%s", async (_caseName, arguments_, options, answer) => {
+            await callMain(arguments_, options);
+            expect(main.stdout).toBe(answer);
+        });
+    });
 });
 
 describe("searches glossary tag >>", () => {

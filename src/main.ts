@@ -1380,6 +1380,13 @@ async function  searchSub(keyword: string) {
     const  thesaurus = new Thesaurus();
     const  glossaryTags: GlossaryTag[] = [];
     var  foundLines: FoundLine[] = [];
+    if ('thesaurus' in programOptions) {
+        const  thesaurusFilePath = programOptions.thesaurus;
+        if ( ! fs.existsSync(thesaurusFilePath)) {
+            throw  new Error(`not found the thesaurus file "${lib.getFullPath(thesaurusFilePath, process.cwd())}"`);
+        }
+        await  thesaurus.load(thesaurusFilePath);
+    }
 
     for (const inputFileFullPath of fileFullPaths) {
         const  reader = readline.createInterface({
@@ -1563,8 +1570,8 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                         }
                         const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
                         if (useThesaurus) {
-                            const  normalizedTestingString = aTestingString;
-                            const  normalizedKeyword = keyword;
+                            const  normalizedTestingString = thesaurus.normalize(aTestingString);
+                            const  normalizedKeyword = thesaurus.normalize(keyword);
 
                             const  result = getSubMatchedScore(normalizedTestingString,
                                 normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
@@ -2473,26 +2480,40 @@ class Thesaurus {
     synonym: {[word: string]: string} = {};  // the value is the normalized word
     get  enabled(): boolean { return Object.keys(this.synonym).length !== 0; }
 
-    load(csvFilePath: string) {
-        fs.createReadStream(csvFilePath)
-            .pipe(
-                csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
-            .on('data',
-                (columns) => {
-                    if (columns.length >= 1) {
-                        const  normalizedKeyword = columns[0];
-                        const  synonyms = columns.shift();
-                        synonyms.forEach( (synonym: string) => {
+    async  load(csvFilePath: string): Promise<void> {
+        const  promise = new Promise<void>((resolveFunction, _rejectFunction) => {
 
-                            this.synonym[synonym] = normalizedKeyword;
-                        });
-                    }
-                }
-            );
+            fs.createReadStream(csvFilePath)
+                .pipe(
+                    csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                .on('data',
+                    (columns) => {
+                        if (columns.length >= 1) {
+                            const  normalizedKeyword = columns[0];
+                            columns.shift();
+                            const  synonyms = columns;
+                            synonyms.forEach( (synonym: string) => {
+
+                                this.synonym[synonym] = normalizedKeyword;
+                            });
+                        }
+                    })
+                .on('end', () => {
+                    resolveFunction();
+                });
+        });
+        return  promise;
     }
 
-    normalizeKeywords(keywords: string) {
-
+    normalize(keyphrase: string): string {
+        const  words = keyphrase.split(' ');
+        for (let i = 0;  i < words.length;  i+=1) {
+            if (words[i] in this.synonym) {
+                words[i] = this.synonym[words[i]];
+            }
+        }
+        const   normalizedKeyphrase = words.join(' ');
+        return  normalizedKeyphrase;
     }
 }
 

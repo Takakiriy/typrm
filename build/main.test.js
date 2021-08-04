@@ -742,6 +742,26 @@ describe("searches keyword tag >>", function () {
             }
         });
     }); });
+    describe("thesaurus >>", function () {
+        test.each([
+            [
+                "acronym",
+                ["search", "PS"],
+                { folder: "test_data/thesaurus/1", thesaurus: "test_data/thesaurus/thesaurus.csv", test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/thesaurus/1/1.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('PowerShell') + "\n"),
+            ],
+        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                    case 1:
+                        _a.sent();
+                        expect(main.stdout).toBe(answer);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+    });
 });
 describe("searches glossary tag >>", function () {
     test.each([
