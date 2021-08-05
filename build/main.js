@@ -2368,6 +2368,12 @@ function runVerb(verbs, address, verbNum) {
 }
 // printConfig
 function printConfig() {
+    if ('folder' in exports.programOptions) {
+        console.log("Verbose: --folder, TYPRM_FOLDER: " + exports.programOptions.folder);
+    }
+    if ('thesaurus' in exports.programOptions) {
+        console.log("Verbose: --thesaurus, TYPRM_THESAURUS: " + exports.programOptions.thesaurus);
+    }
     for (var _i = 0, _a = Object.entries(process.env); _i < _a.length; _i++) {
         var _b = _a[_i], envName = _b[0], envValue = _b[1];
         if (envName.startsWith('TYPRM_') && envName !== 'TYPRM_LINE_NUM_GETTER' && envName !== 'TYPRM_VERB') {

@@ -13,6 +13,7 @@ async function  callMain() {
         .option("-t, --test")
         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
         .option("--color")
+        .option("--thesaurus <>", "The thesaurus CSV file path", process.env.TYPRM_THESAURUS)
         .option("--verbose")
         .parse(process.argv);
     

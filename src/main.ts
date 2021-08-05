@@ -1967,6 +1967,12 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
 
 // printConfig
 function  printConfig() {
+    if ('folder' in programOptions) {
+        console.log(`Verbose: --folder, TYPRM_FOLDER: ${programOptions.folder}`);
+    }
+    if ('thesaurus' in programOptions) {
+        console.log(`Verbose: --thesaurus, TYPRM_THESAURUS: ${programOptions.thesaurus}`);
+    }
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith('TYPRM_')  &&  envName !== 'TYPRM_LINE_NUM_GETTER'  &&  envName !== 'TYPRM_VERB') {
 
