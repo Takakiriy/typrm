@@ -190,6 +190,9 @@ or
 If the search keyword was the same as the command name of typrm,
 the command name (search or s) cannot be omitted.
 
+Entering `#keyword:` or `#search:` in the search keyword will be ignored.
+When searching, use a common full-text search tool such as grep.
+
 If you do not specify any keywords with the search command, search keyword input mode is started.
 Press Ctrl + C to exit this mode.
 
@@ -198,17 +201,19 @@ Press Ctrl + C to exit this mode.
     .../text.txt:1: #keyword: CSV, comma separated values
     keyword:
 
-Entering `#keyword:` or `#search:` in the search keyword will be ignored.
-When searching, use a common full-text search tool such as grep.
-
 If specifying a search keyword consisting of multiple words,
 it is not necessary to enclose it in " ".
-Also, even if the case is different, it will be hit,
-but the text with the same case will be displayed at the top.
-In typrm, the text that hits the top is displayed at the bottom.
+Specifying multiple words results in an AND search.
+If you increase the number of words, the search result will be refined.
+If you reduce the number of words, the related content will also be hit.
+OR search is not possible. You can OR search by several times search.
 
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values
+
+Even if the case is different, it will be hit,
+but the text with the same case will be displayed at the top.
+In typrm, the text that hits the top is displayed at the bottom.
 
 You can specify multiple keywords to be written
 by CSV format (comma separated values) after the `#keyword:` tag
@@ -260,6 +265,21 @@ and you will be able to perform a combination search.
 
 In the above case, if your input keyword was TLS, typrm shows both TLS.
 If your input keyword was C++ TLS, typrm shows only TLS in C++ glossary.
+
+`--thesaurus` option or in the TYPRM_THESAURUS environment variable is
+the path of the thesaurus file.
+The thesaurus file is in CSV format.
+Only synonyms can be specified for the thesaurus.
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
+    .../script.yaml:1: #keyword: JavaScript
+
+Exmple of thesaurus.csv:
+
+    JavaScript, js
+    document, doc
+    source, src
+    destination, dst, dest
 
 
 ## Install

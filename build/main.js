@@ -2917,7 +2917,7 @@ var Thesaurus = /** @class */ (function () {
             return __generator(this, function (_a) {
                 promise = new Promise(function (resolveFunction, _rejectFunction) {
                     fs.createReadStream(csvFilePath)
-                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                         .on('data', function (columns) {
                         if (columns.length >= 1) {
                             var normalizedKeyword_1 = columns[0];

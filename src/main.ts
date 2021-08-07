@@ -2491,7 +2491,7 @@ class Thesaurus {
 
             fs.createReadStream(csvFilePath)
                 .pipe(
-                    csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                    csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data',
                     (columns) => {
                         if (columns.length >= 1) {

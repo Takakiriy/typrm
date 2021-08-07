@@ -200,12 +200,16 @@ search コマンドにキーワードを指定しないと、検索キーワー�
     keyword:
 
 複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
-また、大文字小文字が違っていてもヒットしますが、
-大文字小文字が同じテキストが上位に表示されます。
-typrm では上位にヒットしたテキストが下側に表示されます。
+複数の単語を指定すると AND 検索になります。
+単語数を増やすと絞り込めます。単語数を減らすと関連する内容もヒットします。
+OR 検索はできません。何度か検索してください。
 
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values
+
+大文字小文字が違っていてもヒットしますが、
+大文字小文字が同じテキストが上位に表示されます。
+typrm では上位にヒットしたテキストが下側に表示されます。
 
 テキスト ファイルに書くキーワードは、
 `#keyword:` タグに続けて CSV 形式（コンマ区切り）で
@@ -254,6 +258,22 @@ CSV の部分に文法の問題があるときに表示される警告を抑制�
 
 上記の場合、TLS で検索すると両方とも見つかります。
 C++ TLS で検索すると C++ 用語の TLS だけが見つかります。
+
+`--thesaurus` オプション、または TYPRM_THESAURUS 環境変数に、
+シソーラス ファイル のパスを指定することができます。
+シソーラス ファイル は、CSV 形式です。
+シソーラスは、同義語だけ指定できます。
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
+    .../script.yaml:1: #keyword: JavaScript
+
+thesaurus.csv のサンプル:
+
+    JavaScript, js
+    document, doc
+    source, src
+    destination, dst, dest
+    string, 文字列
 
 
 ## インストール
