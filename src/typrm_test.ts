@@ -74,8 +74,14 @@ async function  TestOfCommandLine() {
         "parameters": "search",
         "check": "true",
         "inputLines": "#ref: \"../README.md\"\n7\n\n7\nexit()\n",
+    },{
+        "name": "search_mode_result_has_ref_verb",
+        "parameters": "search  --folder test_data/search/2",
+        "check": "true",
+        "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
+        // if (case_.name === 'search_mode_result_has_ref_verb') {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
 
         // Test Main

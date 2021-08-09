@@ -1307,8 +1307,8 @@ async function  search() {
 
             await  printRef(keyword);
         } else if (command === cRunVerb){
-            const  keywordWithoudVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
-            const  ref = await printRef(keywordWithoudVerb, {print: false});
+            const  keywordWithoutVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
+            const  ref = await printRef(keywordWithoutVerb, {print: false});
 
             runVerb(ref.verbs, ref.address, lastWord);
         }
@@ -1335,8 +1335,7 @@ async function  search() {
                 }
                 if (command === cSearch) {
 
-                    await  searchSub(keyword);
-                    previousPrint.hasVerbMenu = false;
+                    previousPrint = await searchSub(keyword);
                 } else if (command === cPrintRef) {
 
                     previousPrint = await printRef(keyword);
@@ -1351,7 +1350,7 @@ async function  search() {
 }
 
 // searchSub
-async function  searchSub(keyword: string) {
+async function  searchSub(keyword: string): Promise<PrintRefResult> {
     for (const ignoredKeyword of ignoredKeywords) {
         keyword = keyword.replace(ignoredKeyword, '')
     }
@@ -1524,6 +1523,27 @@ async function  searchSub(keyword: string) {
     for (const foundLineInformation of foundLines) {
 
         console.log(foundLineInformation.toString());
+    }
+
+    if (foundLines.length >= 1  &&  lastOf(foundLines).line.includes(refLabel)) {
+        const  foundLine = lastOf(foundLines).line;
+        const  refTagPosition = foundLine.indexOf(refLabel);
+        const  nextTagPosition = foundLine.indexOf(' #', refTagPosition + 1);
+        if (nextTagPosition === notFound) {
+            var  refTagAndAddress = foundLine.substr(refTagPosition);
+        } else {
+            var  refTagAndAddress = foundLine.substr(refTagPosition,  nextTagPosition - refTagPosition);
+        }
+
+        return  await printRef(refTagAndAddress);
+    } else {
+        const  normalReturn = {
+            hasVerbMenu: false,
+            verbs: [],
+            address: '',
+        } as PrintRefResult;
+
+        return  normalReturn;
     }
 }
 

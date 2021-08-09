@@ -706,7 +706,9 @@ describe("searches keyword tag >>", function () {
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + ("     #keyword: " + matchedColor('picture') + "  " + refColor('#ref: path') + "  #search: " + searchColor('keyword') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + ("     #keyword: " + matchedColor('picture') + "  " + refColor('#ref: path') + "  #search: " + searchColor('keyword') + "\n") +
+                'path\n' +
+                '    0.Folder\n',
         ], [
             "Multi folder",
             ["search", "ABC"],
@@ -830,7 +832,9 @@ describe("searches glossary tag >>", function () {
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path#hash') + "  #search: " + searchColor('keyword') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path#hash') + "  #search: " + searchColor('keyword') + "\n") +
+                'path#hash\n' +
+                '    0.Folder\n',
         ], [
             "nested glossary tag",
             ["search", "turnip"],

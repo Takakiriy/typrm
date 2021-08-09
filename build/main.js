@@ -1632,7 +1632,7 @@ function check(checkingFilePath) {
 // search
 function search() {
     return __awaiter(this, void 0, void 0, function () {
-        var startIndex, keyword, cSearch, cPrintRef, cRunVerb, lastWord, hasVerb, command, keywordWithoudVerb, ref, previousPrint, prompt, prompt, keyword_1, command, verbNumber;
+        var startIndex, keyword, cSearch, cPrintRef, cRunVerb, lastWord, hasVerb, command, keywordWithoutVerb, ref, previousPrint, prompt, prompt, keyword_1, command, verbNumber;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -1666,8 +1666,8 @@ function search() {
                     return [3 /*break*/, 6];
                 case 4:
                     if (!(command === cRunVerb)) return [3 /*break*/, 6];
-                    keywordWithoudVerb = exports.programArguments.slice(startIndex, exports.programArguments.length - 1).join(' ');
-                    return [4 /*yield*/, printRef(keywordWithoudVerb, { print: false })];
+                    keywordWithoutVerb = exports.programArguments.slice(startIndex, exports.programArguments.length - 1).join(' ');
+                    return [4 /*yield*/, printRef(keywordWithoutVerb, { print: false })];
                 case 5:
                     ref = _a.sent();
                     runVerb(ref.verbs, ref.address, lastWord);
@@ -1702,8 +1702,7 @@ function search() {
                     if (!(command === cSearch)) return [3 /*break*/, 13];
                     return [4 /*yield*/, searchSub(keyword_1)];
                 case 12:
-                    _a.sent();
-                    previousPrint.hasVerbMenu = false;
+                    previousPrint = _a.sent();
                     return [3 /*break*/, 16];
                 case 13:
                     if (!(command === cPrintRef)) return [3 /*break*/, 15];
@@ -1727,7 +1726,7 @@ function search() {
 function searchSub(keyword) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _b, targetFolders_4, folder, targetFullPath, fileName, targetFolderFullPath, wildcard, targetFolderFullPath, wildcard, scanedPaths, thesaurus, glossaryTags, foundLines, thesaurusFilePath, _loop_3, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation;
+        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _b, targetFolders_4, folder, targetFullPath, fileName, targetFolderFullPath, wildcard, targetFolderFullPath, wildcard, scanedPaths, thesaurus, glossaryTags, foundLines, thesaurusFilePath, _loop_3, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation, foundLine, refTagPosition, nextTagPosition, refTagAndAddress, refTagAndAddress, normalReturn;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -1960,7 +1959,25 @@ function searchSub(keyword) {
                         foundLineInformation = foundLines_1[_d];
                         console.log(foundLineInformation.toString());
                     }
-                    return [2 /*return*/];
+                    if (!(foundLines.length >= 1 && lastOf(foundLines).line.includes(refLabel))) return [3 /*break*/, 13];
+                    foundLine = lastOf(foundLines).line;
+                    refTagPosition = foundLine.indexOf(refLabel);
+                    nextTagPosition = foundLine.indexOf(' #', refTagPosition + 1);
+                    if (nextTagPosition === notFound) {
+                        refTagAndAddress = foundLine.substr(refTagPosition);
+                    }
+                    else {
+                        refTagAndAddress = foundLine.substr(refTagPosition, nextTagPosition - refTagPosition);
+                    }
+                    return [4 /*yield*/, printRef(refTagAndAddress)];
+                case 12: return [2 /*return*/, _e.sent()];
+                case 13:
+                    normalReturn = {
+                        hasVerbMenu: false,
+                        verbs: [],
+                        address: '',
+                    };
+                    return [2 /*return*/, normalReturn];
             }
         });
     });

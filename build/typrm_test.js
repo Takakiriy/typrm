@@ -122,12 +122,18 @@ function TestOfCommandLine() {
                             "parameters": "search",
                             "check": "true",
                             "inputLines": "#ref: \"../README.md\"\n7\n\n7\nexit()\n",
+                        }, {
+                            "name": "search_mode_result_has_ref_verb",
+                            "parameters": "search  --folder test_data/search/2",
+                            "check": "true",
+                            "inputLines": "file_path\nexit()\n",
                         }];
                     _i = 0, cases_1 = cases;
                     _a.label = 1;
                 case 1:
                     if (!(_i < cases_1.length)) return [3 /*break*/, 4];
                     case_ = cases_1[_i];
+                    // if (case_.name === 'search_mode_result_has_ref_verb') {
                     console.log("TestCase: TestOfCommandLine >> " + case_.name);
                     return [4 /*yield*/, callChildProccess("node " + scriptPath + " " + case_.parameters + " --test", { inputLines: case_.inputLines.split('\n') })];
                 case 2:

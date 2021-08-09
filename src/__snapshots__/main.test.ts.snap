@@ -1976,3 +1976,10 @@ file: ../README.md
 fragment: 
 keyword or number: keyword: keyword: "
 `;
+
+exports[`typrm_test >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
+"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
+../README.md#typrm
+    7.Test Echo, 0.Folder
+keyword or number: "
+`;

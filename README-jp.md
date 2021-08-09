@@ -780,7 +780,7 @@ typrm の search コマンドのパラメーターや、検索キーワード入
 `#ref:` と環境変数を含むパスを入力すると、コピー＆ペーストできるパスが表示されます。
 なお、コマンドラインに指定する `#` と `$` は `\` でエスケープする必要があります。
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
@@ -844,6 +844,16 @@ search コマンドのパラメーターにコマンドの数字を追加指定�
 
     $ typrm s
     keyword: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+    keyword or number: 0
+
+検索結果の中の第1候補の行（最も下の行）に `#ref:` タグが含まれたときも、
+ファイルに関連するコマンドを選ぶことができます。
+
+    $ typrm s
+    keyword: red book
+    .../books.yaml:32: #keyword: red book  #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
     keyword or number: 0

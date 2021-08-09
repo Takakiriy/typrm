@@ -79,3 +79,5 @@ block-to-disable-tag-tool tag:
 
 Bug case (1):
     #keyword: Go_language.yaml, go
+search verb:
+    #keyword: file_path  #ref: ../README.md#typrm

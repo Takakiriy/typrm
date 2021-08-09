@@ -813,7 +813,7 @@ or to the searching keyword input mode prompt,
 the path is displayed that you can copy and paste.
 Note that the `#` and `$` specified on the command line must be escaped with `\`.
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
@@ -884,6 +884,16 @@ when the prompt is `keyword:`.
 
     $ typrm s
     keyword: #ref: ${books}/manual/red_book_2021.pdf
+    C:/Users/user1/Documents/books/manual/red_book_2021.pdf
+        0.Folder
+    keyword or number: 0
+
+When the first candidate line (most bottom line) in the search results contains
+the `#ref:` tag, you can also select commands related to the file.
+
+    $ typrm s
+    keyword: red book
+    .../books.yaml:32: #keyword: red book  #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
     keyword or number: 0
