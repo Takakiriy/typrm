@@ -927,7 +927,7 @@ describe("print reference >>", function () {
                 ["search", "#ref:", "test_data/search/2/notFound.yaml#notFound"],
                 { locale: "en-US", test: "" },
                 'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n' +
-                    "test_data/search/2/notFound.yaml\n" +
+                    "test_data/search/2/notFound.yaml:0\n" +
                     "    0.Folder\n",
             ],
         ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
@@ -1066,6 +1066,7 @@ describe("print reference >>", function () {
                             "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
                             "Error that verb number 4 is not defined\n",
             ],
+            // Others test is "search_mode_ref_verb".
         ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {

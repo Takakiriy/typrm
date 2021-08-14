@@ -1951,35 +1951,36 @@ keyword: "
 `;
 
 exports[`typrm_test >> search_mode_ref_verb >> Windows: stdout 1`] = `
-"keyword: ../README.md
+"keyword: ../README.md:3
     7.Test Echo, 0.Folder
 keyword or number: 7
- "../README.md"
-keyword or number:  "../README.md"
+ "../README.md#parameters"
+keyword or number:  "../README.md#parameters"
 keyword or number: "
 `;
 
 exports[`typrm_test >> search_mode_ref_verb >> Windows2: stdout 1`] = `
-"keyword: Recommend: #ref: ../README.md
-../README.md
+"keyword: Recommend: #ref: ../README.md#parameters
+../README.md:3
     7.Test Echo, 0.Folder
-keyword or number:  "ref:  ../README.md";  echo  "file: ../README.md";  echo  "fragment: "
+keyword or number:  "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 3"
 keyword or number: keyword: keyword: "
 `;
 
 exports[`typrm_test >> search_mode_ref_verb >> mac: stdout 1`] = `
-"keyword: Recommend: #ref: ../README.md
-../README.md
+"keyword: Recommend: #ref: ../README.md#parameters
+../README.md:3
     7.Test Echo, 0.Folder
-keyword or number: ref:  ../README.md
+keyword or number: ref:  ../README.md#parameters
 file: ../README.md
-fragment: 
+fragment: parameters
+lineNum: 3
 keyword or number: keyword: keyword: "
 `;
 
 exports[`typrm_test >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
-../README.md#typrm
+../README.md:1
     7.Test Echo, 0.Folder
 keyword or number: "
 `;

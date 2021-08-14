@@ -1670,7 +1670,7 @@ function search() {
                     return [4 /*yield*/, printRef(keywordWithoutVerb, { print: false })];
                 case 5:
                     ref = _a.sent();
-                    runVerb(ref.verbs, ref.address, lastWord);
+                    runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
                     _a.label = 6;
                 case 6: return [3 /*break*/, 17];
                 case 7:
@@ -1713,7 +1713,7 @@ function search() {
                 case 15:
                     if (command === cRunVerb) {
                         verbNumber = keyword_1;
-                        runVerb(previousPrint.verbs, previousPrint.address, verbNumber);
+                        runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
                     }
                     _a.label = 16;
                 case 16: return [3 /*break*/, 8];
@@ -1972,11 +1972,7 @@ function searchSub(keyword) {
                     return [4 /*yield*/, printRef(refTagAndAddress)];
                 case 12: return [2 /*return*/, _e.sent()];
                 case 13:
-                    normalReturn = {
-                        hasVerbMenu: false,
-                        verbs: [],
-                        address: '',
-                    };
+                    normalReturn = getEmptyOfPrintRefResult();
                     return [2 /*return*/, normalReturn];
             }
         });
@@ -2144,15 +2140,16 @@ function getEmptyOfPrintRefResult() {
         hasVerbMenu: false,
         verbs: [],
         address: '',
+        addressLineNum: 0,
     };
 }
 // printRef
 function printRef(refTagAndAddress, option) {
     if (option === void 0) { option = printRefOptionDefault; }
     return __awaiter(this, void 0, void 0, function () {
-        var addressBefore, variableRe, variables, variable, address, _loop_4, _i, _a, variable, linkableAddress, getter, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, reservedNames, _b, _c, _d, envName, envValue, variableName, value, _e, sortedEnvronmentVariables_1, variable, verbs, verbMenu;
-        return __generator(this, function (_f) {
-            switch (_f.label) {
+        var addressBefore, variableRe, variables, variable, address, _loop_4, _i, _a, variable, linkableAddress, addressLineNum, getter, _b, filePath, lineNum, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, reservedNames, _c, _d, _e, envName, envValue, variableName, value, _f, sortedEnvronmentVariables_1, variable, verbs, verbMenu;
+        return __generator(this, function (_g) {
+            switch (_g.label) {
                 case 0:
                     addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
                     variableRe = new RegExp(variablePattern, 'g');
@@ -2211,12 +2208,20 @@ function printRef(refTagAndAddress, option) {
                         address = lib.getHomePath() + address.substr(1);
                     }
                     linkableAddress = address;
+                    addressLineNum = 0;
                     getter = getRelatedLineNumGetter(address);
                     if (!(getter.type === 'text')) return [3 /*break*/, 2];
                     return [4 /*yield*/, searchAsText(getter, address)];
                 case 1:
-                    linkableAddress = _f.sent();
-                    _f.label = 2;
+                    _b = _g.sent(), filePath = _b.filePath, lineNum = _b.lineNum;
+                    linkableAddress = getter.address
+                        .replace(verbVar.file, filePath.replace(/\\/g, '/'))
+                        .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
+                        .replace(verbVar.fragment, '')
+                        .replace(verbVar.lineNum, lineNum.toString());
+                    // This format is hyperlinkable in the Visual Studio Code Terminal
+                    addressLineNum = lineNum;
+                    _g.label = 2;
                 case 2:
                     recommended = address;
                     recommended = recommended.replace(/\$/g, '\\$');
@@ -2224,8 +2229,8 @@ function printRef(refTagAndAddress, option) {
                     upperCaseDriveRegExp = /^[A-Z]:/;
                     sortedEnvronmentVariables = [];
                     reservedNames = ['TYPRM_FOLDER'];
-                    for (_b = 0, _c = Object.entries(process.env); _b < _c.length; _b++) {
-                        _d = _c[_b], envName = _d[0], envValue = _d[1];
+                    for (_c = 0, _d = Object.entries(process.env); _c < _d.length; _c++) {
+                        _e = _d[_c], envName = _e[0], envValue = _e[1];
                         if (envName.startsWith(typrmEnvPrefix) && !reservedNames.includes(envName) && envValue) {
                             variableName = envName.substr(typrmEnvPrefix.length);
                             value = envValue.replace(/\\/g, '/');
@@ -2241,8 +2246,8 @@ function printRef(refTagAndAddress, option) {
                     sortedEnvronmentVariables.sort(function (a, b) {
                         return b.value.length - a.value.length; // descending order
                     });
-                    for (_e = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _e < sortedEnvronmentVariables_1.length; _e++) {
-                        variable = sortedEnvronmentVariables_1[_e];
+                    for (_f = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _f < sortedEnvronmentVariables_1.length; _f++) {
+                        variable = sortedEnvronmentVariables_1[_f];
                         recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
                     }
                     if (recommended.replace(/\\/g, '/').startsWith(lib.getHomePath().replace(/\\/g, '/'))) {
@@ -2264,6 +2269,7 @@ function printRef(refTagAndAddress, option) {
                             hasVerbMenu: (verbMenu !== ''),
                             verbs: verbs,
                             address: address,
+                            addressLineNum: addressLineNum,
                         }];
             }
         });
@@ -2327,7 +2333,7 @@ function getRelatedVerbs(address) {
     return relatedVerbs;
 }
 // runVerb
-function runVerb(verbs, address, verbNum) {
+function runVerb(verbs, address, lineNum, verbNum) {
     var command = '';
     var matchesVerbs = verbs.filter(function (verb) { return (verb.number.toString() === verbNum); });
     if (matchesVerbs.length >= 1) {
@@ -2339,7 +2345,8 @@ function runVerb(verbs, address, verbNum) {
                 .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
                 .replace(verbVar.file, address)
                 .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
-                .replace(verbVar.fragment, '');
+                .replace(verbVar.fragment, '')
+                .replace(verbVar.lineNum, lineNum.toString());
             var fileOrFolderPath = address;
         }
         else {
@@ -2348,7 +2355,8 @@ function runVerb(verbs, address, verbNum) {
                 .replace(verbVar.windowsRef, address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
                 .replace(verbVar.file, address.substr(0, fragmentIndex))
                 .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
-                .replace(verbVar.fragment, address.substr(fragmentIndex + 1));
+                .replace(verbVar.fragment, address.substr(fragmentIndex + 1))
+                .replace(verbVar.lineNum, lineNum.toString());
             var fileOrFolderPath = address.substr(0, fragmentIndex);
         }
         if (runningOS === 'Windows') {
@@ -3105,14 +3113,14 @@ function splitFilePathAndKeyword(address, regularExpression, filePathRegularExpr
 function searchAsText(getter, address) {
     var e_8, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _b, filePath, keyword, reader, lineNum, breaking, exception, reader_7, reader_7_1, line1, line, e_8_1, linkableAddress;
+        var _b, filePath, keyword, reader, lineNum, breaking, exception, reader_7, reader_7_1, line1, line, e_8_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
                     _b = splitFilePathAndKeyword(address, getter.regularExpression, getter.filePathRegularExpressionIndex, getter.keywordRegularExpressionIndex), filePath = _b.filePath, keyword = _b.keyword;
                     if (!fs.existsSync(filePath)) {
                         console.log("ERROR: not found a file at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
-                        return [2 /*return*/, filePath];
+                        return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
                     }
                     reader = readline.createInterface({
                         input: fs.createReadStream(filePath),
@@ -3170,12 +3178,7 @@ function searchAsText(getter, address) {
                     if (!breaking) {
                         lineNum = 0;
                     }
-                    linkableAddress = getter.address
-                        .replace(verbVar.file, filePath.replace(/\\/g, '/'))
-                        .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
-                        .replace(verbVar.lineNum, lineNum.toString())
-                        .replace(verbVar.fragment, '');
-                    return [2 /*return*/, linkableAddress];
+                    return [2 /*return*/, { filePath: filePath, lineNum: lineNum }];
             }
         });
     });
@@ -3191,6 +3194,14 @@ var VerbVariable;
     VerbVariable.lineNum = '${lineNum}';
 })(VerbVariable || (VerbVariable = {}));
 var verbVar = VerbVariable;
+// FilePathLineNum
+var FilePathLineNum = /** @class */ (function () {
+    function FilePathLineNum() {
+        this.filePath = '';
+        this.lineNum = 0;
+    }
+    return FilePathLineNum;
+}());
 // KeyValue
 var KeyValue = /** @class */ (function () {
     function KeyValue() {

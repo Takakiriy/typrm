@@ -822,7 +822,7 @@ describe("print reference >>", () => {
                 ["search", "#ref:", "test_data/search/2/notFound.yaml#notFound"],
                 {locale: "en-US", test: ""},
                 'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n' +
-                "test_data/search/2/notFound.yaml\n" +
+                "test_data/search/2/notFound.yaml:0\n" +
                 "    0.Folder\n",
             ],
         ])("%s", async (_caseName, arguments_, options, answer) => {
@@ -950,6 +950,7 @@ describe("print reference >>", () => {
                     "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
                     "Error that verb number 4 is not defined\n",
             ],
+            // Others test is "search_mode_ref_verb".
         ])("%s", async (_caseName, arguments_, options, answer) => {
 
             await callMain(arguments_, options);

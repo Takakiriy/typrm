@@ -828,14 +828,14 @@ typrm の search コマンドに `#ref:` タグと環境変数のないパスを
 search (s) コマンドに `#ref:` タグを付けてファイルのパスを表示すると、
 ファイルのパスをパラメーターに指定するコマンドの一覧が表示されます。
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
 `0.Folder` は表示されたパスのファイルがあるフォルダーを開くコマンドです。
 search コマンドのパラメーターにコマンドの数字を追加指定するとコマンドを実行します。
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf　0  #// Folder コマンド
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'　0  #// Folder コマンド
 
 検索キーワード入力モードに入って `#ref:` タグでファイルのパスを表示したら、
 プロンプトが keyword or number: に変わります。
@@ -860,7 +860,7 @@ search コマンドのパラメーターにコマンドの数字を追加指定�
 
 コマンドの一覧に独自のコマンドを追加することができます。
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         1.View, 7.Echo, 0.Folder
 
@@ -915,6 +915,7 @@ mac の zsh の場合:
 | ${file} | #ref: のパラメーターの # より左 |
 | ${windowsFile} | バックスラッシュを使ったパス |
 | ${fragment} | #ref: のパラメーターの # より右 |
+| ${lineNum} | 行番号。`TYPRM_LINE_NUM_GETTER` 環境変数の設定が必要です |
 
 typrm に --verbose オプションを付けると、設定値を確認できます。
 
@@ -924,7 +925,7 @@ typrm に --verbose オプションを付けると、設定値を確認できま
 search (s) コマンドに `#ref:` タグを付けてファイルのパスとパラメーターを指定すると、
 ファイルのパスと行番号に置き換えて表示します。
 
-    $ typrm s \#ref: \${projects}/project1/src/app.ts#main
+    $ typrm s \#ref: '${projects}/project1/src/app.ts#main'
     C:/Users/user1/Projects/project1/src/app.ts:25
         0.Folder
 

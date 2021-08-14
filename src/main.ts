@@ -1310,7 +1310,7 @@ async function  search() {
             const  keywordWithoutVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
             const  ref = await printRef(keywordWithoutVerb, {print: false});
 
-            runVerb(ref.verbs, ref.address, lastWord);
+            runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
         }
     } else {  // keyword === ''
         inputSkip(startIndex);
@@ -1342,7 +1342,7 @@ async function  search() {
                 } else if (command === cRunVerb) {
                     const  verbNumber = keyword;
 
-                    runVerb(previousPrint.verbs, previousPrint.address, verbNumber);
+                    runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
                 }
             }
         }
@@ -1537,12 +1537,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
 
         return  await printRef(refTagAndAddress);
     } else {
-        const  normalReturn = {
-            hasVerbMenu: false,
-            verbs: [],
-            address: '',
-        } as PrintRefResult;
-
+        const   normalReturn = getEmptyOfPrintRefResult();
         return  normalReturn;
     }
 }
@@ -1732,6 +1727,7 @@ interface  PrintRefResult {
     hasVerbMenu: boolean;
     verbs: Verb[];
     address: string;
+    addressLineNum: number;
 }
 
 // getEmptyOfPrintRefResult
@@ -1740,6 +1736,7 @@ function  getEmptyOfPrintRefResult(): PrintRefResult {
         hasVerbMenu: false,
         verbs: [],
         address: '',
+        addressLineNum: 0,
     }
 }
 
@@ -1802,9 +1799,18 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
 
     // linkableAddress = ...
     var  linkableAddress = address;
+    var  addressLineNum = 0;
     const  getter = getRelatedLineNumGetter(address);
     if (getter.type === 'text') {
-        linkableAddress = await searchAsText(getter, address);
+        const  { filePath, lineNum } = await searchAsText(getter, address);
+
+        linkableAddress = getter.address
+            .replace(verbVar.file, filePath.replace(/\\/g, '/'))
+            .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
+            .replace(verbVar.fragment, '')
+            .replace(verbVar.lineNum, lineNum.toString());
+            // This format is hyperlinkable in the Visual Studio Code Terminal
+        addressLineNum = lineNum;
     }
 
     // recommended = ...
@@ -1862,6 +1868,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         hasVerbMenu: (verbMenu !== ''),
         verbs,
         address,
+        addressLineNum,
     } as PrintRefResult;
 }
 
@@ -1929,7 +1936,7 @@ function  getRelatedVerbs(address: string): Verb[] {
 }
 
 // runVerb
-function  runVerb(verbs: Verb[], address: string, verbNum: string) {
+function  runVerb(verbs: Verb[], address: string, lineNum: number, verbNum: string) {
     var  command = '';
     const  matchesVerbs = verbs.filter((verb) => (verb.number.toString() === verbNum));
     if (matchesVerbs.length >= 1) {
@@ -1942,7 +1949,8 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
                 .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
                 .replace(verbVar.file, address)
                 .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
-                .replace(verbVar.fragment, '');
+                .replace(verbVar.fragment, '')
+                .replace(verbVar.lineNum, lineNum.toString());
             var  fileOrFolderPath = address;
         } else {
             command = verb.command
@@ -1950,7 +1958,8 @@ function  runVerb(verbs: Verb[], address: string, verbNum: string) {
                 .replace(verbVar.windowsRef,  address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
                 .replace(verbVar.file,        address.substr(0, fragmentIndex))
                 .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
-                .replace(verbVar.fragment,    address.substr(fragmentIndex + 1));
+                .replace(verbVar.fragment,    address.substr(fragmentIndex + 1))
+                .replace(verbVar.lineNum,     lineNum.toString());
             var  fileOrFolderPath = address.substr(0, fragmentIndex);
         }
         if (runningOS === 'Windows') {
@@ -2695,12 +2704,12 @@ function  splitFilePathAndKeyword(address: string, regularExpression: string,
 }
 
 // searchAsText
-async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<string> {
+async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<FilePathLineNum> {
     const  { filePath, keyword } = splitFilePathAndKeyword(address,  getter.regularExpression,
         getter.filePathRegularExpressionIndex,  getter.keywordRegularExpressionIndex);
     if ( ! fs.existsSync(filePath)) {
         console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
-        return  filePath;
+        return  { filePath, lineNum: 0 };
     }
 
     const  reader = readline.createInterface({
@@ -2733,12 +2742,7 @@ async function  searchAsText(getter: LineNumGetter, address: string): /* linkabl
         lineNum = 0;
     }
 
-    const  linkableAddress = getter.address
-        .replace(verbVar.file, filePath.replace(/\\/g, '/'))
-        .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
-        .replace(verbVar.lineNum, lineNum.toString())
-        .replace(verbVar.fragment, '');
-    return  linkableAddress;
+    return  { filePath, lineNum };
 }
 
 // Verb
@@ -2759,6 +2763,12 @@ namespace VerbVariable {
     export const  lineNum = '${lineNum}';
 }
 const  verbVar = VerbVariable;
+
+// FilePathLineNum
+class FilePathLineNum {
+    filePath: string = '';
+    lineNum: number = 0;
+}
 
 // KeyValue
 class KeyValue {

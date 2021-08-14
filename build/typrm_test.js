@@ -45,8 +45,8 @@ var scriptPath = "../build/typrm.js";
 var testFolderPath = "test_data" + path.sep;
 process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
-process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
-process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: .*\n        command: 'echo  \"ref:  ${ref}\";  echo  \"file: ${file}\";  echo  \"fragment: ${fragment}\"'\n";
+process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
+process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: .*\n        command: 'echo  \"ref:  ${ref}\";  echo  \"file: ${file}\";  echo  \"fragment: ${fragment}\";  echo  \"lineNum: ${lineNum}\"'\n";
 if (process.env.windir) {
     var testingOS = 'Windows';
 }
@@ -121,7 +121,7 @@ function TestOfCommandLine() {
                             "name": "search_mode_ref_verb",
                             "parameters": "search",
                             "check": "true",
-                            "inputLines": "#ref: \"../README.md\"\n7\n\n7\nexit()\n",
+                            "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
                         }, {
                             "name": "search_mode_result_has_ref_verb",
                             "parameters": "search  --folder test_data/search/2",

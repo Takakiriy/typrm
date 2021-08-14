@@ -865,7 +865,7 @@ that should be written in the manual.
 The search (s) command with the `#ref:` tag displays the file path
 and the list of commands that specify the file path as a parameter.
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
 
@@ -874,7 +874,7 @@ displayed path.
 The command is executed when the number of the command is
 additionally specified in the parameter of the search command.
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf  0  #// Folder command
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'  0  #// Folder command
 
 When you enter search keyword input mode and display the file path
 with the `#ref:` tag, the prompt changes to `keyword or number:`.
@@ -900,7 +900,7 @@ the `#ref:` tag, you can also select commands related to the file.
 
 You can add your defined commands to the list of commands.
 
-    $ typrm s \#ref: \${books}/manual/red_book_2021.pdf
+    $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         1.View, 7.Echo, 0.Folder
 
@@ -955,6 +955,7 @@ You can write variable references in the `command` parameter.
 | ${file} | left of `#` in `#ref:` parameter |
 | ${windowsFile} | the path with backslash |
 | ${fragment} | right of `#` in `#ref:` parameter |
+| ${lineNum} | the line number. Set `TYPRM_LINE_NUM_GETTER` environment variable |
 
 You can check the setting value by adding the --verbose option to typrm.
 
@@ -965,7 +966,7 @@ If you specify the file path and parameters by search (s)
 command with `#ref:` tag, the file path and line number will be
 displayed.
 
-    $ typrm s \#ref: \${projects}/project1/src/app.ts#main
+    $ typrm s \#ref: '${projects}/project1/src/app.ts#main'
     C:/Users/user1/Projects/project1/src/app.ts:25
         0.Folder
 

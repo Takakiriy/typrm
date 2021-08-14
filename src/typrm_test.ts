@@ -10,7 +10,7 @@ process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
-        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|py|go|swift))(#(.*))?\$
+        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?\$
         type: text
         filePathRegularExpressionIndex: 1
         keywordRegularExpressionIndex: 4
@@ -21,7 +21,7 @@ process.env.TYPRM_VERB = `
         label: 7.Test Echo
         number: 7
         regularExpression: .*
-        command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}"'
+        command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}";  echo  "lineNum: \${lineNum}"'
 `;
 if (process.env.windir) {
     var  testingOS = 'Windows';
@@ -73,7 +73,7 @@ async function  TestOfCommandLine() {
         "name": "search_mode_ref_verb",
         "parameters": "search",
         "check": "true",
-        "inputLines": "#ref: \"../README.md\"\n7\n\n7\nexit()\n",
+        "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
     },{
         "name": "search_mode_result_has_ref_verb",
         "parameters": "search  --folder test_data/search/2",
