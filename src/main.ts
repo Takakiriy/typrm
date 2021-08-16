@@ -143,7 +143,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                         if (key in setting) {
                             const  previous = setting[key];
                             console.log('');
-                            console.log('Error of duplicated variable name:');
+                            console.log(translate('Error of duplicated variable name:'));
                             console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
                             console.log(`  ContentsA: ${key}: ${previous.value}`);
                             console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
@@ -164,7 +164,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 if (typeof evaluatedContidion === 'boolean') {
                     if ( ! evaluatedContidion) {
                         console.log('');
-                        console.log('Error of not expected condition:');
+                        console.log(translate('Error of not expected condition:'));
                         console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                         console.log(`  Contents: ${condition}`);
                         errorCount += 1;
@@ -182,7 +182,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             const  templateTag = parseTemplateTag(line);
             if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
                 console.log("");
-                console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                console.log(`${translate('ErrorLine')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                 console.log(`  ${translate('Contents')}: ${line.trim()}`);
                 console.log(`  ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
                 templateTag.isFound = false;
@@ -207,7 +207,10 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
                 if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     console.log("");
-                    console.log(`${translate('ErrorLine')}: ${lineNum + templateTag.lineNumOffset}`);
+                    console.log(`${translate('ErrorLine')}: ${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}`);
+                    if (templateTag.lineNumOffset <= -2) {
+                        console.log(`${translate('Template')}:  ${getTestablePath(inputFilePath)}:${lineNum}`);
+                    }
                     console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
                     console.log(`  ${translate('Expected')}: ${expected}`);
                     if (commonCase) {
@@ -3045,6 +3048,9 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
                 "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
             "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
+            "Error of duplicated variable name:": "エラー：変数名が重複しています",
+            "Error of not expected condition:": "エラー：予期しない条件です",
+            "Error of expect tag syntax:": "エラー：expect タグの文法エラー",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
