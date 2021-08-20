@@ -100,6 +100,21 @@ describe("checks template value >>", () => {
         expect(main.stdout).toMatchSnapshot();
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
+
+    test("check files in multi folder", async () => {
+        const  sourceFileContents = getSnapshot(`checks template value >> one_error 1: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+        writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
+        writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+
+        await callMain(["check"], {
+            folder: '../test_data/_checking/1, ../test_data/_checking/2/*.yaml', test: "", locale: "en-US",
+        });
+        process.chdir('..');
+        expect(main.stdout).toMatchSnapshot();
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+    });
 });
 
 describe("checks file contents >>", () => {

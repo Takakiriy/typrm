@@ -941,7 +941,7 @@ Windows の PowerShell の場合:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4
@@ -954,7 +954,7 @@ bash, zsh の場合:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
             keywordRegularExpressionIndex: 4

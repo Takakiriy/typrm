@@ -92,6 +92,30 @@ export function  getHomePath(): string {
     }
 }
 
+// getGlobbyParameters
+export function  getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters {
+    const  targetFullPath = getFullPath(targetPath, baseFullPath);
+    const  fileName = path.basename(targetFullPath);
+    if (fileName.includes('*')) {
+        var  targetFolderFullPath = path.dirname(targetFullPath);
+        var  wildcard = fileName;
+    } else {
+        var  targetFolderFullPath = targetFullPath;
+        var  wildcard = '*';
+    }
+
+    return  {
+        targetFolderFullPath,
+        wildcard,
+    };
+}
+
+// GlobbyParameters
+interface  GlobbyParameters {
+    targetFolderFullPath: string;
+    wildcard: string;
+}
+
 // StandardInputBuffer
 class  StandardInputBuffer {
     readlines: readline.Interface | undefined;

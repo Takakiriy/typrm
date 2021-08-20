@@ -47,7 +47,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
+exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getGlobbyParameters = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
 var fs = require("fs");
 var path = require("path");
 var globby = require("globby");
@@ -184,6 +184,24 @@ function getHomePath() {
     }
 }
 exports.getHomePath = getHomePath;
+// getGlobbyParameters
+function getGlobbyParameters(targetPath, baseFullPath) {
+    var targetFullPath = getFullPath(targetPath, baseFullPath);
+    var fileName = path.basename(targetFullPath);
+    if (fileName.includes('*')) {
+        var targetFolderFullPath = path.dirname(targetFullPath);
+        var wildcard = fileName;
+    }
+    else {
+        var targetFolderFullPath = targetFullPath;
+        var wildcard = '*';
+    }
+    return {
+        targetFolderFullPath: targetFolderFullPath,
+        wildcard: wildcard,
+    };
+}
+exports.getGlobbyParameters = getGlobbyParameters;
 // StandardInputBuffer
 var StandardInputBuffer = /** @class */ (function () {
     function StandardInputBuffer() {

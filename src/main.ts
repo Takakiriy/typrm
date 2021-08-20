@@ -1264,12 +1264,12 @@ async function  check(checkingFilePath?: string) {
         var  filePaths = [checkingFilePath];
     } else {
         for (const folder of targetFolders) {
-            const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+            const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
             if (!fs.existsSync(targetFolderFullPath)) {
                 throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
             }
             process.chdir(targetFolderFullPath);
-            const scanedPaths = await globby(['**/*']);
+            const scanedPaths = await globby([`**/${wildcard}`]);
             scanedPaths.forEach((scanedPath) => {
 
                 inputFileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
@@ -1362,14 +1362,9 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
     const  fileFullPaths: string[] = [];
     const  targetFolders = await parseCSVColumns(programOptions.folder);
     for (const folder of targetFolders) {
-        const  targetFullPath = lib.getFullPath(folder, currentFolder);
-        const  fileName = path.basename(targetFullPath);
-        if (fileName.includes('*')) {
-            var  targetFolderFullPath = path.dirname(targetFullPath);
-            var  wildcard = fileName;
-        } else {
-            var  targetFolderFullPath = targetFullPath;
-            var  wildcard = '*';
+        const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
+        if (!fs.existsSync(targetFolderFullPath)) {
+            throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
         }
         process.chdir(targetFolderFullPath);
         const scanedPaths = await globby([`**/${wildcard}`]);

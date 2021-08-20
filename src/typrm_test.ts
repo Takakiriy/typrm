@@ -10,7 +10,7 @@ process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
-        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|md|py|go|swift))(#(.*))?\$
+        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?\$
         type: text
         filePathRegularExpressionIndex: 1
         keywordRegularExpressionIndex: 4

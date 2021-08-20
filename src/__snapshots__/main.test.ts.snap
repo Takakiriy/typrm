@@ -767,10 +767,41 @@ test_of_duplicated_variable_name_error:
 "
 `;
 
+exports[`checks template value >> check files in multi folder 1`] = `
+"
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5
+  Contents: value2  #template: var
+  Expected: value1
+  Template: var
+  SettingIndex: 1
+
+Warning: 0, Error: 1
+template count = 1
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5
+  Contents: value2  #template: var
+  Expected: value1
+  Template: var
+  SettingIndex: 1
+
+Warning: 0, Error: 1
+template count = 1
+"
+`;
+
 exports[`checks template value >> check one file only 1`] = `
 "
 Warning: 0, Error: 0
 template count = 8
+"
+`;
+
+exports[`checks template value >> one_error 1: sourceFileContents 1`] = `
+"one_error:
+    settings:
+        var: value1
+    body:
+        value2  #template: var
 "
 `;
 

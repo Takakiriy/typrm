@@ -121,6 +121,28 @@ describe("checks template value >>", function () {
             }
         });
     }); });
+    test("check files in multi folder", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFileContents;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sourceFileContents = getSnapshot("checks template value >> one_error 1: sourceFileContents 1");
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    writeFileSync("test_data/_checking/1/one_error_1.yaml", sourceFileContents);
+                    writeFileSync("test_data/_checking/2/one_error_1.yaml", sourceFileContents);
+                    process.chdir('empty_folder');
+                    return [4 /*yield*/, callMain(["check"], {
+                            folder: '../test_data/_checking/1, ../test_data/_checking/2/*.yaml', test: "", locale: "en-US",
+                        })];
+                case 1:
+                    _a.sent();
+                    process.chdir('..');
+                    expect(main.stdout).toMatchSnapshot();
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
 describe("checks file contents >>", function () {
     test.each([
