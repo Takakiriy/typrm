@@ -201,11 +201,26 @@ exports.cutLeftOf = cutLeftOf;
 function getGlobbyParameters(targetPath, baseFullPath) {
     var targetFullPath = getFullPath(targetPath, baseFullPath);
     var fileName = path.basename(targetFullPath);
+    var filePath = 1;
+    var folderPath = 2;
+    var pathIs = 0;
     if (fileName.includes('*')) {
+        pathIs = filePath;
+    }
+    else {
+        var fileExists = fs.lstatSync(targetFullPath).isFile(); // This raises an exception, if path has wildcard
+        if (fileExists) {
+            pathIs = filePath;
+        }
+        else {
+            pathIs = folderPath;
+        }
+    }
+    if (pathIs === filePath) {
         var targetFolderFullPath = path.dirname(targetFullPath);
         var wildcard = fileName;
     }
-    else {
+    else { // folderPath
         var targetFolderFullPath = targetFullPath;
         var wildcard = '*';
     }

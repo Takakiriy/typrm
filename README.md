@@ -157,6 +157,7 @@ Case of specifing to the `--folder` option:
 The value format of the `TYPRM_FOLDER` environment variable is CSV.
 You can specify multiple folder paths.
 You can also specify a wildcard for the file name.
+You can also specify a file path.
 
     ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
 

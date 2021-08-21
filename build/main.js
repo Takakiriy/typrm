@@ -156,7 +156,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, parser, lines, keywords, ifTagParser, d, reader_1, reader_1_1, line1, line, d, parsed, separator, key, value, previous, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, parser, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, parsed, separator, key, value, previous, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -192,7 +192,6 @@ function checkRoutine(isModal, inputFilePath) {
                     parser.command = CommandEnum.check;
                     parser.verbose = ('verbose' in exports.programOptions);
                     parser.filePath = inputFilePath;
-                    d = lib_1.pp('----------------------------');
                     _h.label = 4;
                 case 4:
                     _h.trys.push([4, 11, 12, 17]);
@@ -206,7 +205,6 @@ function checkRoutine(isModal, inputFilePath) {
                     lines.push(line);
                     lineNum += 1;
                     parser.lineNum = lineNum;
-                    d = lib_1.pp(lineNum + ":");
                     parsed = ifTagParser.evaluate(line, setting, [], parser);
                     if (parsed.errorCount >= 1) {
                         console.log('');

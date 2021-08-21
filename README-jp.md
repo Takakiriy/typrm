@@ -157,6 +157,7 @@ PowerShell で環境変数を設定する場合:
 `TYPRM_FOLDER` 環境変数の値は CSV 形式です。
 複数のフォルダーのパスを指定することができます。
 ファイル名のワイルドカードを指定することもできます。
+ファイルを指定することもできます。
 
     ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
 

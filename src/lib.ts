@@ -109,10 +109,24 @@ export function  cutLeftOf(input: string, keyword: string): string {
 export function  getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters {
     const  targetFullPath = getFullPath(targetPath, baseFullPath);
     const  fileName = path.basename(targetFullPath);
+    const  filePath = 1;
+    const  folderPath = 2;
+    var    pathIs = 0;
+
     if (fileName.includes('*')) {
+        pathIs = filePath;
+    } else {
+        const  fileExists = fs.lstatSync(targetFullPath).isFile();  // This raises an exception, if path has wildcard
+        if (fileExists) {
+            pathIs = filePath;
+        } else {
+            pathIs = folderPath;
+        }
+    }
+    if (pathIs === filePath) {
         var  targetFolderFullPath = path.dirname(targetFullPath);
         var  wildcard = fileName;
-    } else {
+    } else {  // folderPath
         var  targetFolderFullPath = targetFullPath;
         var  wildcard = '*';
     }

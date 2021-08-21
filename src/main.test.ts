@@ -664,6 +664,11 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],[
+            "target is file",
+            ["search", "wonderful"],
+            { folder: "test_data/search/2/2.yaml", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':85:') + `     #keyword: ${matchedColor('wonderful')}\n`,
+        ],[
             "file extension filter",
             ["search", "target"],
             { folder: "test_data/search/3/*.yaml", test: "" },
