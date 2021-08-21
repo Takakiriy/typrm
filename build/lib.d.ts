@@ -5,6 +5,7 @@ export declare function copyFileSync(sourceFilePath: string, destinationFilePath
 export declare function getFullPath(relativePath: string, basePath: string): string;
 export declare function isFullPath(path: string): boolean;
 export declare function getHomePath(): string;
+export declare function cutLeftOf(input: string, keyword: string): string;
 export declare function getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters;
 interface GlobbyParameters {
     targetFolderFullPath: string;

@@ -796,6 +796,33 @@ template count = 8
 "
 `;
 
+exports[`checks template value >> check_verbose 1: sourceFileContents 1`] = `
+"check_verbose:
+    settings:
+        var1: value1
+        #if: $settings.var1 == value1
+            var2: value2
+        #if: $settings.var1 != value1
+            var2: not value2
+    bad  #template: var1
+    #if: $settings.var2 == value2
+        bad2  #template: var2
+    #if: $settings.var2 != value2
+        bad2  #template: var2
+    #if: $env.TYPRM_TEST_ENV == testEnv
+        bad2  #template: var2
+    #if: $env.TYPRM_TEST_ENV != testEnv
+        bad2  #template: var2
+    #if: true
+        bad2  #template: var2
+    #if: false
+        bad2  #template: var2
+
+Warning: 0, Error: 0
+template count = 2
+"
+`;
+
 exports[`checks template value >> one_error 1: sourceFileContents 1`] = `
 "one_error:
     settings:
@@ -946,6 +973,49 @@ exports[`checks template value >> var_not_ref_1_error 1: sourceFileContents 1`] 
     Key3: value3
 手順: |
     - echo  "value3"  #template: - echo  "Key3"
+"
+`;
+
+exports[`checks template value >> verbose 1`] = `
+"Verbose: typrm command: check
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1: value1)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1: value1)
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8
+  Contents: bad  #template: var1
+  Expected: value1
+  Template: var1
+  SettingIndex: 1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2: value2)
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10
+  Contents: bad2  #template: var2
+  Expected: value2
+  Template: var2
+  SettingIndex: 1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2: value2)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV: testEnv)
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14
+  Contents: bad2  #template: var2
+  Expected: value2
+  Template: var2
+  SettingIndex: 1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV: testEnv)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18
+  Contents: bad2  #template: var2
+  Expected: value2
+  Template: var2
+  SettingIndex: 1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
+
+Warning: 0, Error: 4
+template count = 7
 "
 `;
 

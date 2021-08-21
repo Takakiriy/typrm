@@ -30,9 +30,15 @@ export async function  main() {
     } else if (programArguments.length >= 1 ) {
 
         if (programArguments[0] === 's'  ||  programArguments[0] === 'search') {
+            if (verboseMode) {
+                console.log('Verbose: typrm command: search');
+            }
             await search();
         }
         else if (programArguments[0] === 'c'  ||  programArguments[0] === 'check') {
+            if (verboseMode) {
+                console.log('Verbose: typrm command: check');
+            }
             var  checkingFilePath: string | undefined;
             if (programArguments.length >= 2) {
                 checkingFilePath = programArguments[1];
@@ -41,6 +47,9 @@ export async function  main() {
             await check(checkingFilePath);
         }
         else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
+            if (verboseMode) {
+                console.log('Verbose: typrm command: replace');
+            }
             varidateReplaceCommandArguments();
             if (programArguments.length === 3) {
                 var  inputFilePath = programArguments[1];
@@ -95,18 +104,22 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         let  errorCount = 0;
         let  warningCount = 0;
         let  secretLabelCount = 0;
+        const  parser = new Parser();
         const  lines = [];
         const  keywords: SearchKeyword[] = [];
-        const  ifTagParser = new IfTagParser();
+        const  ifTagParser = new IfTagParser(parser);
+        parser.command = CommandEnum.check;
+        parser.verbose = ('verbose' in programOptions);
+        parser.filePath = inputFilePath;
 
         for await (const line1 of reader) {
             const  line: string = line1;
             lines.push(line);
             lineNum += 1;
-            const  previousIsReadingSetting = isReadingSetting;
+            parser.lineNum = lineNum;
 
             // Set condition by "#if:" tag.
-            const  parsed = ifTagParser.evaluate(line, setting);
+            const  parsed = ifTagParser.evaluate(line, setting, [], parser);
             if (parsed.errorCount >= 1) {
                 console.log('');
                 console.log('Error of if tag syntax:');
@@ -120,6 +133,9 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 if (settingCount >= 1) {
                     onEndOfSettingScope(setting);
                 }
+                if (parser.verbose) {
+                    console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
+                }
                 isReadingSetting = true;
 
                 setting = {};
@@ -127,12 +143,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 settingIndentLength = indentRegularExpression.exec(line)![0].length;
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
-                if ('verbose' in programOptions) {
-                    console.log(`verbose: ${inputFilePath}: settings`);
-                    for (const [key, value] of Object.entries(setting))  {
-                        console.log(`verbose: ${inputFilePath}:${value.lineNum}:     ${key}: ${value.value}`);
-                    }
-                }
             }
             if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
                 const  separator = line.indexOf(':');
@@ -150,6 +160,9 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                             console.log(`  ContentsB: ${key}: ${value}`);
                             errorCount += 1;
                         }
+                        if (parser.verbose) {
+                            console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
+                        }
 
                         setting[key] = {value, isReferenced: false, lineNum};
                     }
@@ -160,7 +173,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             if (line.includes(expectLabel)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                 const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
 
-                const  evaluatedContidion = evaluateIfCondition(condition, setting);
+                const  evaluatedContidion = evaluateIfCondition(condition, setting, parser);
                 if (typeof evaluatedContidion === 'boolean') {
                     if ( ! evaluatedContidion) {
                         console.log('');
@@ -179,7 +192,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
 
             // Check if previous line has "template" replaced contents.
-            const  templateTag = parseTemplateTag(line);
+            const  templateTag = parseTemplateTag(line, parser);
             if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
                 console.log("");
                 console.log(`${translate('ErrorLine')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
@@ -495,9 +508,12 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     var    loop = true;
     var    loopCount = 0;
     const  replacedKeys: string[] = [];
-    const  verboseMode = 'verbose' in programOptions;
-    if (verboseMode) {
-        console.log(`Verbose: inputFilePath: ${inputFilePath}`);
+    const  parser = new Parser();
+    parser.command = CommandEnum.replace;
+    parser.verbose = ('verbose' in programOptions);
+    parser.filePath = inputFilePath;
+    if (parser.verbose) {
+        console.log(`Verbose: inputFilePath: ${getTestablePath(inputFilePath)}`);
         console.log(`Verbose: setting index: ${replacingSettingIndex}`)
         console.log(`Verbose: keyValues: ${JSON.stringify(keyValues)}`);
     }
@@ -522,11 +538,11 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         let  isCheckingTemplateIfKey = false;
         let  templateIfKeyError = false;
         const  evalatedKeyValues: {[key: string]: string} = {};
-        const  ifTagParser = new IfTagParser();
-        const  oldIfTagParser = new IfTagParser();
+        const  ifTagParser = new IfTagParser(parser);
+        const  oldIfTagParser = new IfTagParser(parser);
         const  previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
         loopCount += 1;
-        if (verboseMode) {
+        if (parser.verbose) {
             console.log(`Verbose: loopCount: ${loopCount}`);
             console.log(`Verbose: previousEvalatedKeyValuesLength: ${previousEvalatedKeyValuesLength}`);
         }
@@ -536,6 +552,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             lines.push(line);
             lineNum += 1;
             let  output = false;
+            parser.lineNum = lineNum;
 
             // isReadingSetting = ...
             if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
@@ -571,8 +588,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     }
                 }
             }
-            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues), verboseMode);
-            oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues), false);
+            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues), parser);
+            oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues));
 
             if (isReplacing) {
                 if ( ! ifTagParser.isReplacable) {
@@ -591,7 +608,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             } else {
                                 evalatedKeyValues[key] = oldValue;
                             }
-                            if (verboseMode) {
+                            if (parser.verbose) {
                                 if ( ! replacedKeys.includes(key)) {
                                     replacedKeys.push(key)
                                     console.log(`Verbose: evaluated setting: ${key}`)
@@ -628,7 +645,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + comment + "\n");
                                 output = true;
                                 setting[key] = {value: replacedValue, isReferenced: false, lineNum};
-                                if (verboseMode  &&  oldValue !== replacedValue) {
+                                if (parser.verbose  &&  oldValue !== replacedValue) {
                                     console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
                                     console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
                                 }
@@ -643,7 +660,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
 
                 // Out of settings
                 } else {
-                    const  templateTag = parseTemplateTag(line);
+                    const  templateTag = parseTemplateTag(line, parser);
                     if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
                             &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
                         const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
@@ -668,7 +685,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 writer.write(line.replace(before, after.replace(/\$/g,'$$')) +"\n");
                                 output = true;
                             }
-                            if (verboseMode  &&  before !== after) {
+                            if (parser.verbose  &&  before !== after) {
                                 console.log(`Verbose: replaced a line:`);
                                 console.log(`Verbose:     from: ${before}`);
                                 console.log(`Verbose:     to:   ${after}`);
@@ -807,6 +824,7 @@ class  TemplateTag {
     label = '';
     template = '';
     isFound = false;
+    parser: Parser;
 
     // template tag
     indexInLine = notFound;
@@ -816,7 +834,7 @@ class  TemplateTag {
     startIndexInLine = notFound;
     endIndexInLine = notFound;
 
-    // template-at tag
+    // template-if tag
     oldTemplate = '';
     newTemplate = '';
 
@@ -824,6 +842,11 @@ class  TemplateTag {
     templateLines: string[] = [];
     indentAtTag = '';
     minIndentLength = 0;
+
+    // constructor
+    constructor(parser: Parser) {
+        this.parser = parser;
+    }
 
     // parseLine
     parseLine(line: string) {
@@ -924,7 +947,7 @@ class  TemplateTag {
         }
         const  expression = this.template;
 
-        const  evaluatedContidion = evaluateIfCondition(expression, setting);
+        const  evaluatedContidion = evaluateIfCondition(expression, setting, this.parser);
         if (typeof evaluatedContidion === 'boolean') {
             if (evaluatedContidion) {
                 this.oldTemplate = templateIfNoKey;
@@ -1081,6 +1104,7 @@ class  TemplateTag {
 
 // IfTagParser
 class  IfTagParser {
+    readonly  parser: Parser;
     get       thisIsOutOfFalseBlock(): boolean {return this.thisIsOutOfFalseBlock_;}
     private   thisIsOutOfFalseBlock_: boolean = true;
     readonly  indentLengthsOfIfTag: IfTag[] = [
@@ -1089,9 +1113,14 @@ class  IfTagParser {
     get      isReplacable(): boolean {return this.isReplacable_;}  // #search: typrm replace with if tag
     private  isReplacable_: boolean = true;
 
+    // constructor
+    constructor(parser: Parser) {
+        this.parser = parser;
+    }
+
     // evaluate
     evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = [],
-            verboseMode: boolean = false): IfTagParserResult {
+            verbose: Parser | undefined = undefined): IfTagParserResult {
         var    expression = '';
         var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
@@ -1107,7 +1136,7 @@ class  IfTagParser {
         if (line.includes(ifLabel)) {
             expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
 
-            const  evaluatedContidion = evaluateIfCondition(expression, setting, previsousEvalatedKeys, verboseMode);
+            const  evaluatedContidion = evaluateIfCondition(expression, setting, this.parser, previsousEvalatedKeys);
             if (typeof evaluatedContidion === 'boolean') {
                 var  resultOfIf = evaluatedContidion;
                 var  isReplacable = false;
@@ -2069,14 +2098,19 @@ function onEndOfSettingScope(setting: Settings) {
 }
 
 // evaluateIfCondition
-function  evaluateIfCondition(expression: string, setting: Settings,
-        previsousEvalatedKeyValues: string[] = [],
-        verboseMode: boolean = false)
+function  evaluateIfCondition(expression: string, setting: Settings, parser: Parser,
+        previsousEvalatedKeyValues: string[] = [])
         : boolean | Error | EvaluatedCondition {
 
     if (expression === 'true') {
+        if (parser.verbose) {
+            console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: true`);
+        }
         return  true;
     } else if (expression === 'false') {
+        if (parser.verbose) {
+            console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: false`);
+        }
         return  false;
     }
     const  settingsDot = '$settings.';
@@ -2134,16 +2168,22 @@ function  evaluateIfCondition(expression: string, setting: Settings,
         }
         if (result !== undefined) {
             if (previsousEvalatedKeyValues.length === 0) {
-                if (verboseMode) {
-                    console.log(`Verbose: skipped evaluation: #if: ${expression}`);
+                if (parser.verbose) {
+                    if (parser.command == CommandEnum.replace) {
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
+                    } else if (parser.command == CommandEnum.check) {
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name}: ${leftValue})`);
+                    }
                 }
 
                 return  result;
             } else　{
                 const  isReplacable = previsousEvalatedKeyValues.includes(name)  ||  parent !== settingsDot;
-                if (verboseMode) {
+                if (parser.verbose) {
                     if ( ! isReplacable) {
-                        console.log(`Verbose: skipped evaluation: #if: ${expression}`);
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
+                    } else {
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name}: ${leftValue})`);
                     }
                 }
 
@@ -2402,8 +2442,8 @@ function  getNotSetTemplateIfTagVariableNames(settingKeys: string[]) {
 }
 
 // parseTemplateTag
-function  parseTemplateTag(line: string): TemplateTag {
-    const  tag = new TemplateTag();
+function  parseTemplateTag(line: string, parser: Parser): TemplateTag {
+    const  tag = new TemplateTag(parser);
     tag.parseLine(line);
     return  tag;
 }
@@ -2496,6 +2536,14 @@ function  isBackSlashParameter(checkingString: string, index: number): boolean {
     const  backSlashCount = startIndex - index - 1;
 
     return  (backSlashCount % 2 === 1);
+}
+
+// CommandEnum
+enum CommandEnum {
+    unknown,
+    check,
+    replace,
+    search,
 }
 
 // Setting
@@ -2806,6 +2854,14 @@ interface  IfTagForConditionScanner {
 interface  EvaluationLog {
     before: string;
     after: string;
+}
+
+// Parser
+class  Parser {
+    command = CommandEnum.unknown;
+    verbose = false;
+    filePath = '';
+    lineNum = 0;
 }
 
 // WriteBuffer

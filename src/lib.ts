@@ -92,7 +92,20 @@ export function  getHomePath(): string {
     }
 }
 
+// cutLeftOf
+// #keyword: cutLeftOf
+export function  cutLeftOf(input: string, keyword: string): string {
+    const  keywordPosition = input.indexOf(keyword);
+    if (keywordPosition !== notFound) {
+
+        return  input.substr(keywordPosition);
+    } else {
+        return  input;
+    }
+}
+
 // getGlobbyParameters
+// #keyword: getGlobbyParameters
 export function  getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters {
     const  targetFullPath = getFullPath(targetPath, baseFullPath);
     const  fileName = path.basename(targetFullPath);

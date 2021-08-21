@@ -47,7 +47,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getGlobbyParameters = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
+exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getGlobbyParameters = exports.cutLeftOf = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
 var fs = require("fs");
 var path = require("path");
 var globby = require("globby");
@@ -184,7 +184,20 @@ function getHomePath() {
     }
 }
 exports.getHomePath = getHomePath;
+// cutLeftOf
+// #keyword: cutLeftOf
+function cutLeftOf(input, keyword) {
+    var keywordPosition = input.indexOf(keyword);
+    if (keywordPosition !== notFound) {
+        return input.substr(keywordPosition);
+    }
+    else {
+        return input;
+    }
+}
+exports.cutLeftOf = cutLeftOf;
 // getGlobbyParameters
+// #keyword: getGlobbyParameters
 function getGlobbyParameters(targetPath, baseFullPath) {
     var targetFullPath = getFullPath(targetPath, baseFullPath);
     var fileName = path.basename(targetFullPath);

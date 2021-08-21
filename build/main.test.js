@@ -143,6 +143,27 @@ describe("checks template value >>", function () {
             }
         });
     }); });
+    test("verbose", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFileContents;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sourceFileContents = getSnapshot("checks template value >> check_verbose 1: sourceFileContents 1");
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    writeFileSync("test_data/_checking/check_verbose.yaml", sourceFileContents);
+                    process.chdir('empty_folder');
+                    return [4 /*yield*/, callMain(["check", "_checking/check_verbose.yaml"], {
+                            folder: '../test_data', test: "", locale: "en-US", verbose: "",
+                        })];
+                case 1:
+                    _a.sent();
+                    process.chdir('..');
+                    expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot();
+                    fs.rmdirSync('test_data/_checking', { recursive: true });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
 describe("checks file contents >>", function () {
     test.each([
@@ -1080,6 +1101,7 @@ describe("print reference >>", function () {
                             "Verbose:     label: 1.View\n" +
                             "Verbose:     number: 1\n" +
                             "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                            "Verbose: typrm command: search\n" +
                             "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                             "Verbose:     address: ../README.md\n" +
                             "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +

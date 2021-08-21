@@ -115,6 +115,20 @@ describe("checks template value >>", () => {
         expect(main.stdout).toMatchSnapshot();
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
+
+    test("verbose", async () => {
+        const  sourceFileContents = getSnapshot(`checks template value >> check_verbose 1: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+        writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+
+        await callMain(["check", "_checking/check_verbose.yaml"], {
+            folder: '../test_data', test: "", locale: "en-US", verbose: "",
+        });
+        process.chdir('..');
+        expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot();
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+    });
 });
 
 describe("checks file contents >>", () => {
@@ -957,6 +971,7 @@ describe("print reference >>", () => {
                     "Verbose:     label: 1.View\n" +
                     "Verbose:     number: 1\n" +
                     "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                    "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     "Verbose:     address: ../README.md\n" +
                     "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
