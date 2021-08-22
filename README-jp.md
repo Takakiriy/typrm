@@ -942,10 +942,11 @@ Windows の PowerShell の場合:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 6
+            targetMatchIdRegularExpressionIndex: 4
             address: "`${file}:`${lineNum}"
     "@
 
@@ -955,10 +956,11 @@ bash, zsh の場合:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 6
+            targetMatchIdRegularExpressionIndex: 4
             address: "${file}:${lineNum}"
     __HERE_DOCUMENT__
     )
@@ -973,8 +975,13 @@ bash, zsh の場合:
 [RegExp.exec (MDN)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#description) の仕様と同じです。
 
 `keywordRegularExpressionIndex` には、
-`filePathRegularExpressionIndex` と同様に
 キーワードの部分に相当するカッコの番号を指定します。
+
+`targetMatchIdRegularExpressionIndex` には、
+検索が何番目にマッチしたかを指定する部分に相当するカッコの番号を指定します。
+id=2 なら 2番目にマッチした行の行番号になります。
+
+    $ typrm s \#ref: '${projects}/project1/src/app.ts:id=2#function'
 
 `address` には address 固有の変数参照を含めることができます。
 
@@ -984,7 +991,9 @@ bash, zsh の場合:
 | ${windowsFile} | バックスラッシュを使ったパス |
 | ${lineNum} | 行番号 |
 
-typrm に --verbose オプションを付けると、設定値を確認できます。
+typrm の search コマンドに --verbose オプションを付けると、
+TYPRM_LINE_NUM_GETTER 環境変数の設定値、
+および `#ref:` タグの値を正規表現で解析した結果を確認できます。
 
 
 ## （開発者用） 開発環境の構築手順

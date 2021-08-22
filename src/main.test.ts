@@ -24,10 +24,11 @@ if (process.env.windir) {
 }
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
-        regularExpression: ^(.*\\.(yaml|md))(#(.*))?\$
+        regularExpression: ^(.*\\.(yaml|md))(:id=([0-9]+))?(#(.*))?\$
         type: text
         filePathRegularExpressionIndex: 1
-        keywordRegularExpressionIndex: 4
+        keywordRegularExpressionIndex: 6
+        targetMatchIdRegularExpressionIndex: 4
         address: "\${file}:\${lineNum}"
 `;
 if (testingOS === 'Windows') {
@@ -837,13 +838,19 @@ describe("print reference >>", () => {
         });
     });
 
-    describe("line number >>", () => {
+    describe("line number getter >>", () => {
         test.each([
             [
                 "lineNum",
                 ["search", "#ref:", "test_data/search/2/2.yaml#lineNum"],
                 {locale: "en-US", test: ""},
                 "test_data/search/2/2.yaml:69\n" +
+                "    0.Folder\n",
+            ],[
+                "second match",
+                ["search", "#ref:", "test_data/search/2/2.yaml:id=2#lineNum"],
+                {locale: "en-US", test: ""},
+                "test_data/search/2/2.yaml:86\n" +
                 "    0.Folder\n",
             ],[
                 "(error) lineNum not found",
@@ -935,10 +942,11 @@ describe("print reference >>", () => {
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                     "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
                     "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:id=([0-9]+))?(#(.*))?$\n" +
                     "Verbose:     type: text\n" +
                     "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                    "Verbose:     keywordRegularExpressionIndex: 6\n" +
+                    "Verbose:     targetMatchIdRegularExpressionIndex: 4\n" +
                     "Verbose:     address: ${file}:${lineNum}\n" +
                     "Verbose: TYPRM_VERB[0]:\n" +
                     "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
@@ -952,19 +960,21 @@ describe("print reference >>", () => {
                     "Verbose:     command: msedge \"file://\${file}\"\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     "Verbose:     address: ../README.md\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:id=([0-9]+))?(#(.*))?$\n" +
                     "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 4\n" +
-                    "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
+                    "Verbose:     keywordRegularExpressionIndex: 6\n" +
+                    "Verbose:     targetMatchIdRegularExpressionIndex: 4\n" +
+                    "Verbose:     matched: [../README.md, ../README.md, md, , , , ]\n" +
                     "Error that verb number 4 is not defined\n"
                 : // mac
                     "Verbose: TYPRM_TEST_ENV = testEnv\n" +
                     "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
                     "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:id=([0-9]+))?(#(.*))?$\n" +
                     "Verbose:     type: text\n" +
                     "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 4\n" +
+                    "Verbose:     keywordRegularExpressionIndex: 6\n" +
+                    "Verbose:     targetMatchIdRegularExpressionIndex: 4\n" +
                     "Verbose:     address: ${file}:${lineNum}\n" +
                     "Verbose: TYPRM_VERB[0]:\n" +
                     "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
@@ -979,10 +989,11 @@ describe("print reference >>", () => {
                     "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     "Verbose:     address: ../README.md\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(#(.*))?$\n" +
+                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:id=([0-9]+))?(#(.*))?$\n" +
                     "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 4\n" +
-                    "Verbose:     matched: [../README.md, ../README.md, md, , ]\n" +
+                    "Verbose:     keywordRegularExpressionIndex: 6\n" +
+                    "Verbose:     targetMatchIdRegularExpressionIndex: 4\n" +
+                    "Verbose:     matched: [../README.md, ../README.md, md, , , , ]\n" +
                     "Error that verb number 4 is not defined\n",
             ],
             // Others test is "search_mode_ref_verb".

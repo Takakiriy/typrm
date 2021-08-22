@@ -2446,6 +2446,7 @@ function printConfig() {
                 console.log("Verbose:     type: " + getter.type);
                 console.log("Verbose:     filePathRegularExpressionIndex: " + getter.filePathRegularExpressionIndex);
                 console.log("Verbose:     keywordRegularExpressionIndex: " + getter.keywordRegularExpressionIndex);
+                console.log("Verbose:     targetMatchIdRegularExpressionIndex: " + getter.targetMatchIdRegularExpressionIndex);
                 console.log("Verbose:     address: " + getter.address);
                 index += 1;
             }
@@ -3126,48 +3127,57 @@ var SearchKeyword = /** @class */ (function () {
     return SearchKeyword;
 }());
 // splitFilePathAndKeyword
-function splitFilePathAndKeyword(address, regularExpression, filePathRegularExpressionIndex, keywordRegularExpressionIndex) {
+function splitFilePathAndKeyword(address, getter) {
     var verboseMode = 'verbose' in exports.programOptions;
     if (verboseMode) {
         console.log("Verbose: Parsed by TYPRM_LINE_NUM_GETTER:");
         console.log("Verbose:     address: " + address);
-        console.log("Verbose:     regularExpression: " + regularExpression);
-        console.log("Verbose:     filePathRegularExpressionIndex: " + filePathRegularExpressionIndex);
-        console.log("Verbose:     keywordRegularExpressionIndex: " + keywordRegularExpressionIndex);
+        console.log("Verbose:     regularExpression: " + getter.regularExpression);
+        console.log("Verbose:     filePathRegularExpressionIndex: " + getter.filePathRegularExpressionIndex);
+        console.log("Verbose:     keywordRegularExpressionIndex: " + getter.keywordRegularExpressionIndex);
+        console.log("Verbose:     targetMatchIdRegularExpressionIndex: " + getter.targetMatchIdRegularExpressionIndex);
     }
-    var parameters = (new RegExp(regularExpression)).exec(address);
+    var parameters = (new RegExp(getter.regularExpression)).exec(address);
     if (!parameters) {
-        throw new Error("ERROR: regularExpression (" + regularExpression + ") of regularExpression " +
-            ("\"" + regularExpression + "\" in TYPRM_LINE_NUM_GETTER is not matched.") +
+        throw new Error("ERROR: regularExpression (" + getter.regularExpression + ") of regularExpression " +
+            ("\"" + getter.regularExpression + "\" in TYPRM_LINE_NUM_GETTER is not matched.") +
             ("testing string is \"" + address + "\"."));
     }
     if (verboseMode) {
         console.log("Verbose:     matched: [" + parameters.join(', ') + "]");
     }
-    if (filePathRegularExpressionIndex > parameters.length - 1) {
-        throw new Error("ERROR: filePathRegularExpressionIndex (" + filePathRegularExpressionIndex + ") of regularExpression " +
-            ("\"" + regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
+    if (getter.filePathRegularExpressionIndex > parameters.length - 1) {
+        throw new Error("ERROR: filePathRegularExpressionIndex (" + getter.filePathRegularExpressionIndex + ") of regularExpression " +
+            ("\"" + getter.regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
             ("testing string is \"" + address + "\"."));
     }
-    if (keywordRegularExpressionIndex > parameters.length - 1) {
-        throw new Error("ERROR: keywordRegularExpressionIndex (" + keywordRegularExpressionIndex + ") of regularExpression " +
-            ("\"" + regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
+    if (getter.keywordRegularExpressionIndex > parameters.length - 1) {
+        throw new Error("ERROR: keywordRegularExpressionIndex (" + getter.keywordRegularExpressionIndex + ") of regularExpression " +
+            ("\"" + getter.regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
             ("testing string is \"" + address + "\"."));
+    }
+    var targetMatchID = 1;
+    if (parameters.length >= getter.targetMatchIdRegularExpressionIndex) {
+        targetMatchID = parseInt(parameters[getter.targetMatchIdRegularExpressionIndex]);
+        if (!targetMatchID || targetMatchID < 1) {
+            targetMatchID = 1;
+        }
     }
     return {
-        filePath: parameters[filePathRegularExpressionIndex],
-        keyword: parameters[keywordRegularExpressionIndex],
+        filePath: parameters[getter.filePathRegularExpressionIndex],
+        keyword: parameters[getter.keywordRegularExpressionIndex],
+        targetMatchID: targetMatchID,
     };
 }
 // searchAsText
 function searchAsText(getter, address) {
     var e_8, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _b, filePath, keyword, reader, lineNum, breaking, exception, reader_7, reader_7_1, line1, line, e_8_1;
+        var _b, filePath, keyword, targetMatchID, reader, lineNum, breaking, exception, foundCount, reader_7, reader_7_1, line1, line, e_8_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    _b = splitFilePathAndKeyword(address, getter.regularExpression, getter.filePathRegularExpressionIndex, getter.keywordRegularExpressionIndex), filePath = _b.filePath, keyword = _b.keyword;
+                    _b = splitFilePathAndKeyword(address, getter), filePath = _b.filePath, keyword = _b.keyword, targetMatchID = _b.targetMatchID;
                     if (!fs.existsSync(filePath)) {
                         console.log("ERROR: not found a file at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
                         return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
@@ -3178,6 +3188,7 @@ function searchAsText(getter, address) {
                     });
                     lineNum = 0;
                     breaking = false;
+                    foundCount = 0;
                     _c.label = 1;
                 case 1:
                     _c.trys.push([1, 6, 7, 12]);
@@ -3194,8 +3205,11 @@ function searchAsText(getter, address) {
                         line = line1;
                         lineNum += 1;
                         if (line.includes(keyword)) {
-                            breaking = true; // return or break must not be written.
-                            // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                            foundCount += 1;
+                            if (foundCount >= targetMatchID) {
+                                breaking = true; // return or break must not be written.
+                                // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                            }
                         }
                     }
                     catch (e) {

@@ -987,10 +987,11 @@ Case of Windows PowerShell:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 6
+            targetMatchIdRegularExpressionIndex: 4
             address: "`${file}:`${lineNum}"
     "@
 
@@ -1000,10 +1001,11 @@ Case of bash or zsh:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 6
+            targetMatchIdRegularExpressionIndex: 4
             address: "${file}:${lineNum}"
     __HERE_DOCUMENT__
     )
@@ -1020,8 +1022,14 @@ the JavaScript
 [RegExp.exec (MDN)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#description) specification.
 
 For `keywordRegularExpressionIndex`, specify the number
-in parentheses that corresponds to the keyword part
-like the `filePathRegularExpressionIndex`.
+in parentheses that corresponds to the keyword part.
+
+For `targetMatchIdRegularExpressionIndex`, specify the number
+in parentheses that corresponds to the part that
+specifies ID of matches in the search.
+If id=2, the line number is the number to the second matching line.
+
+    $ typrm s \#ref: '${projects}/project1/src/app.ts:id=2#function'
 
 You can write variable references in the `address` parameter.
 
@@ -1031,7 +1039,9 @@ You can write variable references in the `address` parameter.
 | ${windowsFile} | the path with backslash |
 | ${lineNum} | the line number |
 
-You can check the setting value by adding the --verbose option to typrm.
+If you add the --verbose option to the search command of typrm,
+you can check the setting value of the TYPRM_LINE_NUM_GETTER environment variable
+and the result of the value of the `#ref:` tag parsed by the regular expression.
 
 
 ## (for developers) How to build the development environment
