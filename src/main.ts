@@ -1489,7 +1489,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                 if (line.includes(glossaryLabel)  &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
                     var  glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
                     if (glossaryWords !== '') {
-                        glossaryWords += ':';  // ':' is not included in the word in glossary
+                        glossaryWords += ' ';  // ' ' is a word separator
                     }
 
                     glossaryTags.push({
@@ -1528,7 +1528,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                                     match.position += glossaryTag.indentPosition;
                                 }
                             } else {
-                                found.line = glossaryTag.glossaryWords + line;
+                                found.line = glossaryTag.glossaryWords.trim() +':'+ line;
                                 for (const match of found.matches) {
                                     if (match.position >= glossaryTag.glossaryWords.length) {
                                         match.position += glossaryTag.indentPosition;
@@ -1571,7 +1571,6 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
 
 // getKeywordMatchingScore
 function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, thesaurus: Thesaurus): FoundLine {
-    const  lowerKeyphrase = keyphrase.toLowerCase();
 
     function  subMain() {
         const  bestFound = testingStrings.reduce(
@@ -1579,66 +1578,56 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                 const  keywords = keyphrase.split(' ');
                 const  found = new FoundLine();
 
-                const  result = getSubMatchedScore(aTestingString, keyphrase, lowerKeyphrase, stringIndex, found);
-                if (result.score !== 0) {
-                    found.score = result.score * keywords.length * phraseMatchScoreWeight +
-                        keyphrase.length - aTestingString.length +
-                        notNormalizedScore * keywords.length;
-                    found.matchedKeywordCount = keywords.length;
-                    found.matchedTargetKeywordCount = keywords.length;
-                    found.testedWordCount = aTestingString.split(' ').length;
-                } else {
-                    let    previousPosition = -1;
-                    const  wordPositions = new WordPositions();
-                    wordPositions.setPhrase(aTestingString);
-                    const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length).fill( 0 )
+                let    previousPosition = -1;
+                const  wordPositions = new WordPositions();
+                wordPositions.setPhrase(aTestingString);
+                const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length).fill( 0 )
 
-                    for (const keyword of keywords) {
-                        if (keyword === '') {continue;}
+                for (const keyword of keywords) {
+                    if (keyword === '') {continue;}
 
-                        const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
+                    const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
+                    if (result.score !== 0) {
+                        if (result.position > previousPosition) {
+                            found.score += result.score + orderMatchScoreWeight;
+                        } else {
+                            found.score += result.score;
+                        }
+                        found.score += notNormalizedScore;
+                        found.matchedKeywordCount += 1;
+                    }
+                    if (result.position !== notFound) {
+                        matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                        previousPosition = result.position;
+                    }
+                    const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
+                    if (useThesaurus) {
+                        const  normalizedTestingString = thesaurus.normalize(aTestingString);
+                        const  normalizedKeyword = thesaurus.normalize(keyword);
+
+                        const  result = getSubMatchedScore(normalizedTestingString,
+                            normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
                         if (result.score !== 0) {
                             if (result.position > previousPosition) {
                                 found.score += result.score * orderMatchScoreWeight;
                             } else {
                                 found.score += result.score;
                             }
-                            found.score += notNormalizedScore;
                             found.matchedKeywordCount += 1;
                         }
                         if (result.position !== notFound) {
                             matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
                             previousPosition = result.position;
                         }
-                        const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
-                        if (useThesaurus) {
-                            const  normalizedTestingString = thesaurus.normalize(aTestingString);
-                            const  normalizedKeyword = thesaurus.normalize(keyword);
-
-                            const  result = getSubMatchedScore(normalizedTestingString,
-                                normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
-                            if (result.score !== 0) {
-                                if (result.position > previousPosition) {
-                                    found.score += result.score * orderMatchScoreWeight;
-                                } else {
-                                    found.score += result.score;
-                                }
-                                found.matchedKeywordCount += 1;
-                            }
-                            if (result.position !== notFound) {
-                                matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
-                                previousPosition = result.position;
-                            }
-                        }
                     }
-                    if (found.matchedKeywordCount < keywords.length) {
-                        found.score = 0;
-                    }
-                    if (found.score !== 0) {
-                        found.score += keyphrase.length - aTestingString.length;
-                        found.testedWordCount = aTestingString.split(' ').length;
-                        found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    }
+                }
+                if (found.matchedKeywordCount < keywords.length) {
+                    found.score = 0;
+                }
+                if (found.score !== 0) {
+                    found.score += 2 * (keyphrase.length - aTestingString.length);  // 2 is double score from the score of different (upper/loser) case
+                    found.testedWordCount = aTestingString.split(' ').length;
+                    found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
                 }
                 const  matches = bestFound.matches.concat(found.matches);
                 if (compareScore(bestFound, found) < 0) {
@@ -1694,6 +1683,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
             matched.position = position;
             matched.length = keyword.replace(/"/g, '""').length;
             matched.testTargetIndex = stringIndex;
+            matched.matchedString = testingString.substr(position, matched.length);
             found.matches.push(matched);
         }
         return { score, position };
@@ -2687,6 +2677,7 @@ class MatchedPart {
     position: number = 0;
     length: number = 0;
     testTargetIndex: number = -1;
+    matchedString: string = '';
 }
 
 // SearchKeyword
@@ -3222,11 +3213,11 @@ const  fullMatchScore = 100;
 const  keywordMatchScore = 7;
 const  glossaryMatchScore = 1;
 const  caseIgnoredFullMatchScore = 8;
-const  wordsMatchScore = 7;
-const  partMatchScore = 5;
+const  wordsMatchScore = 17;
+const  partMatchScore = 15;
 const  notNormalizedScore = 1;
-const  caseIgnoredWordMatchScore = 6;
-const  caseIgnoredPartMatchScore = 3;
+const  caseIgnoredWordMatchScore = 16;
+const  caseIgnoredPartMatchScore = 14;
 const  phraseMatchScoreWeight = 4;
 const  orderMatchScoreWeight = 2;
 const  minLineNum = 0;

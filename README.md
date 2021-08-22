@@ -216,6 +216,11 @@ Even if the case is different, it will be hit,
 but the text with the same case will be displayed at the top.
 In typrm, the text that hits the top is displayed at the bottom.
 
+The more upper in the following list, the lower search score.
+- Difference numbers of words
+- Difference numbers of characters
+- Lettercase difference
+
 You can specify multiple keywords to be written
 by CSV format (comma separated values) after the `#keyword:` tag
 in the text file.

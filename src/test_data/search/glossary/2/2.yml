@@ -32,3 +32,10 @@ nested glossary tag:  #glossary: level-1
         red turnip:
         white turnip:
     turnip soup:
+search score comparison glossary and keyword:
+    glossary:  #glossary: search score
+        comparison: 1
+        comparison glossary: 2
+        comparison glossary and keyword: 3
+    keyword:
+        #keyword: search score comparison glossary and keyword
