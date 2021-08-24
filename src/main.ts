@@ -2568,7 +2568,7 @@ class Thesaurus {
                             const  synonyms = columns;
                             synonyms.forEach( (synonym: string) => {
 
-                                this.synonym[synonym] = normalizedKeyword;
+                                this.synonym[synonym.toLowerCase()] = normalizedKeyword;
                             });
                         }
                     })
@@ -2582,8 +2582,10 @@ class Thesaurus {
     normalize(keyphrase: string): string {
         const  words = keyphrase.split(' ');
         for (let i = 0;  i < words.length;  i+=1) {
-            if (words[i] in this.synonym) {
-                words[i] = this.synonym[words[i]];
+            const  word = words[i].toLowerCase();
+            if (word in this.synonym) {
+
+                words[i] = this.synonym[word];
             }
         }
         const   normalizedKeyphrase = words.join(' ');

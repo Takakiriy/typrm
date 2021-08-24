@@ -2991,7 +2991,7 @@ var Thesaurus = /** @class */ (function () {
                             columns.shift();
                             var synonyms = columns;
                             synonyms.forEach(function (synonym) {
-                                _this.synonym[synonym] = normalizedKeyword_1;
+                                _this.synonym[synonym.toLowerCase()] = normalizedKeyword_1;
                             });
                         }
                     })
@@ -3006,8 +3006,9 @@ var Thesaurus = /** @class */ (function () {
     Thesaurus.prototype.normalize = function (keyphrase) {
         var words = keyphrase.split(' ');
         for (var i = 0; i < words.length; i += 1) {
-            if (words[i] in this.synonym) {
-                words[i] = this.synonym[words[i]];
+            var word = words[i].toLowerCase();
+            if (word in this.synonym) {
+                words[i] = this.synonym[word];
             }
         }
         var normalizedKeyphrase = words.join(' ');

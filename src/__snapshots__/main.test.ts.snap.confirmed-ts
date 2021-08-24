@@ -2026,6 +2026,32 @@ exports[`replaces settings >> in 2_replace_9_template_if_4_operators: updatedFil
 "
 `;
 
+exports[`searches keyword tag >> thesaurus >> acronym: sourceFileContents 1`] = `
+"#keyword: PowerShell
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> acronym: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+PowerShell, PS
+PowerShell, PS
+PowerShell, PS
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> ignore case: sourceFileContents 1`] = `
+"#keyword: PowerShell
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> ignore case: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+PowerShell, PS
+PowerShell, PS
+PowerShell, PS
+"
+`;
+
 exports[`typrm_test >> locale >> Windows: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 "

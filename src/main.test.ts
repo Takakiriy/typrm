@@ -696,12 +696,24 @@ describe("searches keyword tag >>", () => {
             [
                 "acronym",
                 ["search", "PS"],
-                { folder: "test_data/thesaurus/1", thesaurus: "test_data/thesaurus/thesaurus.csv", test: "" },
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/thesaurus/1/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
+            ],[
+                "ignore case",
+                ["search", "ps"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
             ],
-        ])("%s", async (_caseName, arguments_, options, answer) => {
+        ])("%s", async (caseName, arguments_, options, answer) => {
+            const  sourceFileContents =    getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: sourceFileContents 1`);
+            const  thesaurusFileContents = getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: thesaurus 1`);
+            fs.rmdirSync('test_data/_checking', {recursive: true});
+            writeFileSync(`test_data/_checking/thesaurus/1.yaml`, sourceFileContents);
+            writeFileSync(`test_data/_checking/thesaurus/thesaurus.csv`, thesaurusFileContents);
+
             await callMain(arguments_, options);
             expect(main.stdout).toBe(answer);
+            fs.rmdirSync('test_data/_checking', {recursive: true});
         });
     });
 });

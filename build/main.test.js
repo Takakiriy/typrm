@@ -797,16 +797,29 @@ describe("searches keyword tag >>", function () {
             [
                 "acronym",
                 ["search", "PS"],
-                { folder: "test_data/thesaurus/1", thesaurus: "test_data/thesaurus/thesaurus.csv", test: "" },
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/thesaurus/1/1.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('PowerShell') + "\n"),
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('PowerShell') + "\n"),
+            ], [
+                "ignore case",
+                ["search", "ps"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('PowerShell') + "\n"),
             ],
-        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+        ])("%s", function (caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+            var sourceFileContents, thesaurusFileContents;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                    case 0:
+                        sourceFileContents = getSnapshot("searches keyword tag >> thesaurus >> " + caseName + ": sourceFileContents 1");
+                        thesaurusFileContents = getSnapshot("searches keyword tag >> thesaurus >> " + caseName + ": thesaurus 1");
+                        fs.rmdirSync('test_data/_checking', { recursive: true });
+                        writeFileSync("test_data/_checking/thesaurus/1.yaml", sourceFileContents);
+                        writeFileSync("test_data/_checking/thesaurus/thesaurus.csv", thesaurusFileContents);
+                        return [4 /*yield*/, callMain(arguments_, options)];
                     case 1:
                         _a.sent();
                         expect(main.stdout).toBe(answer);
+                        fs.rmdirSync('test_data/_checking', { recursive: true });
                         return [2 /*return*/];
                 }
             });
