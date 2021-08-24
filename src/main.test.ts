@@ -118,7 +118,7 @@ describe("checks template value >>", () => {
     });
 
     test("verbose", async () => {
-        const  sourceFileContents = getSnapshot(`checks template value >> check_verbose 1: sourceFileContents 1`);
+        const  sourceFileContents = getSnapshot(`checks template value >> verbose 1: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
         process.chdir('empty_folder');
@@ -707,7 +707,6 @@ describe("searches keyword tag >>", () => {
 });
 
 describe("searches glossary tag >>", () => {
-  test.skip('output order (3)',()=>{});
   test.each([
     [
         "1st",

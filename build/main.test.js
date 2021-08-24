@@ -148,7 +148,7 @@ describe("checks template value >>", function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    sourceFileContents = getSnapshot("checks template value >> check_verbose 1: sourceFileContents 1");
+                    sourceFileContents = getSnapshot("checks template value >> verbose 1: sourceFileContents 1");
                     fs.rmdirSync('test_data/_checking', { recursive: true });
                     writeFileSync("test_data/_checking/check_verbose.yaml", sourceFileContents);
                     process.chdir('empty_folder');
@@ -814,7 +814,6 @@ describe("searches keyword tag >>", function () {
     });
 });
 describe("searches glossary tag >>", function () {
-    test.skip('output order (3)', function () { });
     test.each([
         [
             "1st",
@@ -854,15 +853,13 @@ describe("searches glossary tag >>", function () {
             { folder: "test_data/search/glossary/1", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ("     " + matchedColor('de') + ": de\n") +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ("     " + matchedColor('DE') + ": de\n"),
-            /*
-                ],[
-                    "output order (3)",
-                    ["search", "search score comparison glossary"],
-                    { folder: "test_data/search/glossary/2", test: "" },
-                    pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':38:') + ` ${matchedColor('search score')}:        ${matchedColor('comparison glossary')} and keyword: 3\n` +
-                    pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':39:') + `         #keyword: ${matchedColor('search score comparison glossary')} and keyword\n` +
-                    pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':37:') + ` ${matchedColor('search score')}:        ${matchedColor('comparison glossary')}: 2\n`,
-            */
+        ], [
+            "output order (3)",
+            ["search", "search score comparison glossary"],
+            { folder: "test_data/search/glossary/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':39:') + (" " + matchedColor('search') + " " + matchedColor('score') + ":        " + matchedColor('comparison') + " " + matchedColor('glossary') + " and keyword: 3\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':41:') + ("         #keyword: " + matchedColor('search') + " " + matchedColor('score') + " " + matchedColor('comparison') + " " + matchedColor('glossary') + " and keyword\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':38:') + (" " + matchedColor('search') + " " + matchedColor('score') + ":        " + matchedColor('comparison') + " " + matchedColor('glossary') + ": 2\n"),
         ], [
             "glossary is less score than keyword",
             ["search", "grape"],

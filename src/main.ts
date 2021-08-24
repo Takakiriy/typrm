@@ -119,7 +119,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             parser.lineNum = lineNum;
 
             // Set condition by "#if:" tag.
-            const  parsed = ifTagParser.evaluate(line, setting, [], parser);
+            const  parsed = ifTagParser.evaluate(line, setting);
             if (parsed.errorCount >= 1) {
                 console.log('');
                 console.log('Error of if tag syntax:');
@@ -588,7 +588,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     }
                 }
             }
-            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues), parser);
+            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues));
             oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues));
 
             if (isReplacing) {
@@ -1119,8 +1119,7 @@ class  IfTagParser {
     }
 
     // evaluate
-    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = [],
-            verbose: Parser | undefined = undefined): IfTagParserResult {
+    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
         var    expression = '';
         var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
@@ -1130,6 +1129,9 @@ class  IfTagParser {
                 this.indentLengthsOfIfTag.pop();
                 this.thisIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
                 this.isReplacable_          = lastOf(this.indentLengthsOfIfTag).isReplacable;
+                if (this.parser.verbose) {
+                    console.log(`Verbose: ${getTestablePath(this.parser.filePath)}:${this.parser.lineNum - 1}: end #if:`);
+                }
             }
         }
 
@@ -2163,7 +2165,7 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
                     if (parser.command == CommandEnum.replace) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
                     } else if (parser.command == CommandEnum.check) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name}: ${leftValue})`);
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name} = ${leftValue})`);
                     }
                 }
 
@@ -2174,7 +2176,7 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
                     if ( ! isReplacable) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
                     } else {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name}: ${leftValue})`);
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name} = ${leftValue})`);
                     }
                 }
 

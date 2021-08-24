@@ -205,7 +205,7 @@ function checkRoutine(isModal, inputFilePath) {
                     lines.push(line);
                     lineNum += 1;
                     parser.lineNum = lineNum;
-                    parsed = ifTagParser.evaluate(line, setting, [], parser);
+                    parsed = ifTagParser.evaluate(line, setting);
                     if (parsed.errorCount >= 1) {
                         console.log('');
                         console.log('Error of if tag syntax:');
@@ -781,7 +781,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                             }
                                         }
                                     }
-                                    ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues), parser);
+                                    ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues));
                                     oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues));
                                     if (isReplacing) {
                                         if (!ifTagParser.isReplacable) {
@@ -1408,9 +1408,8 @@ var IfTagParser = /** @class */ (function () {
         configurable: true
     });
     // evaluate
-    IfTagParser.prototype.evaluate = function (line, setting, previsousEvalatedKeys, verbose) {
+    IfTagParser.prototype.evaluate = function (line, setting, previsousEvalatedKeys) {
         if (previsousEvalatedKeys === void 0) { previsousEvalatedKeys = []; }
-        if (verbose === void 0) { verbose = undefined; }
         var expression = '';
         var errorCount = 0;
         var indentLength = indentRegularExpression.exec(line)[0].length;
@@ -1419,6 +1418,9 @@ var IfTagParser = /** @class */ (function () {
                 this.indentLengthsOfIfTag.pop();
                 this.thisIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
                 this.isReplacable_ = lastOf(this.indentLengthsOfIfTag).isReplacable;
+                if (this.parser.verbose) {
+                    console.log("Verbose: " + getTestablePath(this.parser.filePath) + ":" + (this.parser.lineNum - 1) + ": end #if:");
+                }
             }
         }
         if (line.includes(ifLabel)) {
@@ -2558,7 +2560,7 @@ function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyVa
                         console.log("Verbose: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ": skipped evaluation: #if: " + expression);
                     }
                     else if (parser.command == CommandEnum.check) {
-                        console.log("Verbose: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ": #if: " + expression + "  (" + result + ", " + name_1 + ": " + leftValue + ")");
+                        console.log("Verbose: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ": #if: " + expression + "  (" + result + ", " + name_1 + " = " + leftValue + ")");
                     }
                 }
                 return result;
@@ -2570,7 +2572,7 @@ function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyVa
                         console.log("Verbose: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ": skipped evaluation: #if: " + expression);
                     }
                     else {
-                        console.log("Verbose: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ": #if: " + expression + "  (" + result + ", " + name_1 + ": " + leftValue + ")");
+                        console.log("Verbose: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ": #if: " + expression + "  (" + result + ", " + name_1 + " = " + leftValue + ")");
                     }
                 }
                 return {
