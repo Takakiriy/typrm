@@ -30,7 +30,7 @@ if (process.env.windir) {
 }
 
 async function  main() {
-    if (false) {
+    if (true) {
         await DoCustomDebug();
     } else {
         await TestOfCommandLine();
@@ -40,7 +40,8 @@ async function  main() {
 
 // DoCustomDebug
 async function  DoCustomDebug() {
-    const  returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+//    const  returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+const  returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\m-toda\\Documents\\IIJ\\IIJ.yaml 349 "$ElasticSearch: docker"`, {});
     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});
     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" ~/GitProjects 0`, {});
     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
