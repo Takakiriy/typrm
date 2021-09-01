@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as globby from 'globby';
 import * as readline from 'readline';
+import * as stream from 'stream';
+import * as csvParse from 'csv-parse';
 try {
     var snapshots = require("./__snapshots__/main.test.ts.snap");
 } catch (e) {
@@ -102,6 +104,43 @@ export function  cutLeftOf(input: string, keyword: string): string {
     } else {
         return  input;
     }
+}
+
+// parseCSVColumns
+export async function  parseCSVColumns(columns: string): Promise<string[]> {
+    if (!columns) {
+        return  [];  // stream.Readable.from(undefined) occurs an error
+    }
+    return new Promise((resolveFunction, rejectFunction) => {
+        let  columnArray: string[] = [];
+
+        stream.Readable.from(columns)
+            .pipe(
+                csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
+            )
+            .on('data', (columns) => {
+                columnArray = columns;
+            })
+            .on('end', () => {
+                resolveFunction(columnArray);
+            })
+            .on('error', (e: Error) => {
+                rejectFunction(e);
+            });
+    });
+}
+
+// parseCSVColumnPositions
+export function  parseCSVColumnPositions(csv: string, columns: string[]): number[] {
+    const  positions: number[] = [];
+    var  searchPosition = 0;
+    for (const column of columns) {
+        const  columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
+
+        positions.push(columnPosition);
+        searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
+    }
+    return  positions;
 }
 
 // getGlobbyParameters

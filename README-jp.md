@@ -947,11 +947,12 @@ Windows の PowerShell の場合:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:csv)?(:id=([0-9]+))?(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 6
-            targetMatchIdRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 7
+            csvOptionRegularExpressionIndex: 3
+            targetMatchIdRegularExpressionIndex: 5
             address: "`${file}:`${lineNum}"
     "@
 
@@ -961,11 +962,12 @@ bash, zsh の場合:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:csv)?(:id=([0-9]+))?(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 6
-            targetMatchIdRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 7
+            csvOptionRegularExpressionIndex: 3
+            targetMatchIdRegularExpressionIndex: 5
             address: "${file}:${lineNum}"
     __HERE_DOCUMENT__
     )
@@ -982,9 +984,18 @@ bash, zsh の場合:
 `keywordRegularExpressionIndex` には、
 キーワードの部分に相当するカッコの番号を指定します。
 
+`csvOptionRegularExpressionIndex` には、
+CSV オプション `:csv` を指定する部分のカッコの番号を指定します。
+CSV オプションが指定されると、`#` より右側を CSV 形式のキーワードのリストとし、
+最初のキーワードを検索して見つかった行の次の行から 2つ目のキーワードで検索します。
+キーワードは 3つ以上指定することもできます。
+
+    $ typrm s \#ref: '${projects}/project1/src/app.ts:csv#first, second'
+
+`targetMatchIdRegularExpressionIndex` は、非推奨になる予定です。
 `targetMatchIdRegularExpressionIndex` には、
-検索が何番目にマッチしたかを指定する部分に相当するカッコの番号を指定します。
-id=2 なら 2番目にマッチした行の行番号になります。
+検索が何番目にマッチしたかを指定する部分のカッコの番号を指定します。
+`:id=2` なら 2番目にマッチした行の行番号になります。
 
     $ typrm s \#ref: '${projects}/project1/src/app.ts:id=2#function'
 

@@ -992,11 +992,12 @@ Case of Windows PowerShell:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?`$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:csv)?(:id=([0-9]+))?(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 6
-            targetMatchIdRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 7
+            csvOptionRegularExpressionIndex: 3
+            targetMatchIdRegularExpressionIndex: 5
             address: "`${file}:`${lineNum}"
     "@
 
@@ -1006,11 +1007,12 @@ Case of bash or zsh:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:id=([0-9]+))?(#(.*))?$
+            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:csv)?(:id=([0-9]+))?(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 6
-            targetMatchIdRegularExpressionIndex: 4
+            keywordRegularExpressionIndex: 7
+            csvOptionRegularExpressionIndex: 3
+            targetMatchIdRegularExpressionIndex: 5
             address: "${file}:${lineNum}"
     __HERE_DOCUMENT__
     )
@@ -1029,10 +1031,22 @@ the JavaScript
 For `keywordRegularExpressionIndex`, specify the number
 in parentheses that corresponds to the keyword part.
 
+For `csvOptionRegularExpressionIndex`, specify the number
+in parentheses where the CSV option `:csv` is specified.
+If the CSV option is specified,
+the parameter on the right side of `#` will be interpreted as
+the list of keywords in CSV format.
+Also, the first keyword will be searched
+and the second keyword will be searched after the first found line.
+You can specify three or more keywords.
+
+    $ typrm s \#ref: '${projects}/project1/src/app.ts:csv#first, second'
+
+`targetMatchIdRegularExpressionIndex` will be deprecated.
 For `targetMatchIdRegularExpressionIndex`, specify the number
 in parentheses that corresponds to the part that
 specifies ID of matches in the search.
-If id=2, the line number is the number to the second matching line.
+If `:id=2`, the line number is the number to the second matching line.
 
     $ typrm s \#ref: '${projects}/project1/src/app.ts:id=2#function'
 

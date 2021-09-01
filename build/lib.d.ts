@@ -6,6 +6,8 @@ export declare function getFullPath(relativePath: string, basePath: string): str
 export declare function isFullPath(path: string): boolean;
 export declare function getHomePath(): string;
 export declare function cutLeftOf(input: string, keyword: string): string;
+export declare function parseCSVColumns(columns: string): Promise<string[]>;
+export declare function parseCSVColumnPositions(csv: string, columns: string[]): number[];
 export declare function getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters;
 interface GlobbyParameters {
     targetFolderFullPath: string;

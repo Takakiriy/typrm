@@ -85,3 +85,8 @@ search one:
     #keyword: wonderful
 lineNum second match:
     #test of TYPRM_LINE_NUM_GETTER
+lineNum keyword list:
+    secondKeyword
+    firstKeyword
+    secondKeyword
+    #test of TYPRM_LINE_NUM_GETTER

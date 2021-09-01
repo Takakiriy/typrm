@@ -47,11 +47,13 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getGlobbyParameters = exports.cutLeftOf = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
+exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getGlobbyParameters = exports.parseCSVColumnPositions = exports.parseCSVColumns = exports.cutLeftOf = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
 var fs = require("fs");
 var path = require("path");
 var globby = require("globby");
 var readline = require("readline");
+var stream = require("stream");
+var csvParse = require("csv-parse");
 try {
     var snapshots = require("./__snapshots__/main.test.ts.snap");
 }
@@ -196,6 +198,44 @@ function cutLeftOf(input, keyword) {
     }
 }
 exports.cutLeftOf = cutLeftOf;
+// parseCSVColumns
+function parseCSVColumns(columns) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            if (!columns) {
+                return [2 /*return*/, []]; // stream.Readable.from(undefined) occurs an error
+            }
+            return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
+                    var columnArray = [];
+                    stream.Readable.from(columns)
+                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                        .on('data', function (columns) {
+                        columnArray = columns;
+                    })
+                        .on('end', function () {
+                        resolveFunction(columnArray);
+                    })
+                        .on('error', function (e) {
+                        rejectFunction(e);
+                    });
+                })];
+        });
+    });
+}
+exports.parseCSVColumns = parseCSVColumns;
+// parseCSVColumnPositions
+function parseCSVColumnPositions(csv, columns) {
+    var positions = [];
+    var searchPosition = 0;
+    for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
+        var column = columns_1[_i];
+        var columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
+        positions.push(columnPosition);
+        searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
+    }
+    return positions;
+}
+exports.parseCSVColumnPositions = parseCSVColumnPositions;
 // getGlobbyParameters
 // #keyword: getGlobbyParameters
 function getGlobbyParameters(targetPath, baseFullPath) {

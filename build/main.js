@@ -52,7 +52,6 @@ var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
 var globby = require("globby");
 var readline = require("readline");
-var stream = require("stream");
 var csvParse = require("csv-parse");
 var chalk = require("chalk");
 var yaml = require("js-yaml");
@@ -635,7 +634,7 @@ function getInputFileFullPath(inputFilePath) {
             switch (_a.label) {
                 case 0:
                     currentFolder = process.cwd();
-                    return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
+                    return [4 /*yield*/, lib.parseCSVColumns(exports.programOptions.folder)];
                 case 1:
                     targetFolders = _a.sent();
                     fileFullPaths = [];
@@ -1575,7 +1574,7 @@ function check(checkingFilePath) {
         var targetFolders, currentFolder, inputFileFullPaths, notFoundPaths, _i, targetFolders_2, folder, targetFolderFullPath, inputFileFullPath, filePaths, _loop_2, _a, targetFolders_3, folder, _b, inputFileFullPaths_1, inputFileFullPath;
         return __generator(this, function (_c) {
             switch (_c.label) {
-                case 0: return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
+                case 0: return [4 /*yield*/, lib.parseCSVColumns(exports.programOptions.folder)];
                 case 1:
                     targetFolders = _c.sent();
                     currentFolder = process.cwd();
@@ -1762,7 +1761,7 @@ function searchSub(keyword) {
                     keyword = keyword.trim();
                     currentFolder = process.cwd();
                     fileFullPaths = [];
-                    return [4 /*yield*/, parseCSVColumns(exports.programOptions.folder)];
+                    return [4 /*yield*/, lib.parseCSVColumns(exports.programOptions.folder)];
                 case 1:
                     targetFolders = _e.sent();
                     _loop_3 = function (folder) {
@@ -1844,7 +1843,7 @@ function searchSub(keyword) {
                                         withParameter = false;
                                         csv = parseKeyName(line);
                                     }
-                                    return [4 /*yield*/, parseCSVColumns(csv)
+                                    return [4 /*yield*/, lib.parseCSVColumns(csv)
                                             .catch(function (e) {
                                             console.log("Warning: " + e.message + " in " + inputFileFullPath + ":" + lineNum + ": " + line);
                                             return [];
@@ -1859,7 +1858,7 @@ function searchSub(keyword) {
                                         else {
                                             positionOfCSV = line.indexOf(csv);
                                         }
-                                        columnPositions = parseCSVColumnPositions(csv, columns);
+                                        columnPositions = lib.parseCSVColumnPositions(csv, columns);
                                         found.score += keywordMatchScore;
                                         found.path = getTestablePath(inputFileFullPath);
                                         found.lineNum = lineNum;
@@ -2437,6 +2436,7 @@ function printConfig() {
                 console.log("Verbose:     type: " + getter.type);
                 console.log("Verbose:     filePathRegularExpressionIndex: " + getter.filePathRegularExpressionIndex);
                 console.log("Verbose:     keywordRegularExpressionIndex: " + getter.keywordRegularExpressionIndex);
+                console.log("Verbose:     csvOptionRegularExpressionIndex: " + getter.csvOptionRegularExpressionIndex);
                 console.log("Verbose:     targetMatchIdRegularExpressionIndex: " + getter.targetMatchIdRegularExpressionIndex);
                 console.log("Verbose:     address: " + getter.address);
                 index += 1;
@@ -2865,42 +2865,6 @@ function parseTemplateTag(line, parser) {
     tag.parseLine(line);
     return tag;
 }
-// parseCSVColumns
-function parseCSVColumns(columns) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            if (!columns) {
-                return [2 /*return*/, []]; // stream.Readable.from(undefined) occurs an error
-            }
-            return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
-                    var columnArray = [];
-                    stream.Readable.from(columns)
-                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
-                        .on('data', function (columns) {
-                        columnArray = columns;
-                    })
-                        .on('end', function () {
-                        resolveFunction(columnArray);
-                    })
-                        .on('error', function (e) {
-                        rejectFunction(e);
-                    });
-                })];
-        });
-    });
-}
-// parseCSVColumnPositions
-function parseCSVColumnPositions(csv, columns) {
-    var positions = [];
-    var searchPosition = 0;
-    for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
-        var column = columns_1[_i];
-        var columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
-        positions.push(columnPosition);
-        searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
-    }
-    return positions;
-}
 // parseKeyName
 function parseKeyName(line) {
     var colon = line.indexOf(':');
@@ -3128,6 +3092,7 @@ function splitFilePathAndKeyword(address, getter) {
         console.log("Verbose:     regularExpression: " + getter.regularExpression);
         console.log("Verbose:     filePathRegularExpressionIndex: " + getter.filePathRegularExpressionIndex);
         console.log("Verbose:     keywordRegularExpressionIndex: " + getter.keywordRegularExpressionIndex);
+        console.log("Verbose:     csvOptionRegularExpressionIndex: " + getter.csvOptionRegularExpressionIndex);
         console.log("Verbose:     targetMatchIdRegularExpressionIndex: " + getter.targetMatchIdRegularExpressionIndex);
     }
     var parameters = (new RegExp(getter.regularExpression)).exec(address);
@@ -3149,6 +3114,12 @@ function splitFilePathAndKeyword(address, getter) {
             ("\"" + getter.regularExpression + "\" in TYPRM_LINE_NUM_GETTER is out of range.") +
             ("testing string is \"" + address + "\"."));
     }
+    var csvOption = false;
+    if (parameters.length >= getter.csvOptionRegularExpressionIndex) {
+        if (parameters[getter.csvOptionRegularExpressionIndex]) {
+            csvOption = true;
+        }
+    }
     var targetMatchID = 1;
     if (parameters.length >= getter.targetMatchIdRegularExpressionIndex) {
         targetMatchID = parseInt(parameters[getter.targetMatchIdRegularExpressionIndex]);
@@ -3159,6 +3130,7 @@ function splitFilePathAndKeyword(address, getter) {
     return {
         filePath: parameters[getter.filePathRegularExpressionIndex],
         keyword: parameters[getter.keywordRegularExpressionIndex],
+        csvOption: csvOption,
         targetMatchID: targetMatchID,
     };
 }
@@ -3166,15 +3138,35 @@ function splitFilePathAndKeyword(address, getter) {
 function searchAsText(getter, address) {
     var e_8, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _b, filePath, keyword, targetMatchID, reader, lineNum, breaking, exception, foundCount, reader_7, reader_7_1, line1, line, e_8_1;
+        var _b, filePath, keyword, csvOption, targetMatchID, keywords, firstKeyword, currentKeyword, keywords, currentKeyword, reader, lineNum, breaking, exception, foundCount, reader_7, reader_7_1, line1, line, nextKeyword, e_8_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    _b = splitFilePathAndKeyword(address, getter), filePath = _b.filePath, keyword = _b.keyword, targetMatchID = _b.targetMatchID;
+                    _b = splitFilePathAndKeyword(address, getter), filePath = _b.filePath, keyword = _b.keyword, csvOption = _b.csvOption, targetMatchID = _b.targetMatchID;
                     if (!fs.existsSync(filePath)) {
                         console.log("ERROR: not found a file at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
                         return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
                     }
+                    if (!csvOption) return [3 /*break*/, 2];
+                    return [4 /*yield*/, lib.parseCSVColumns(keyword)];
+                case 1:
+                    keywords = _c.sent();
+                    firstKeyword = keywords.shift();
+                    if (!firstKeyword) {
+                        console.log("ERROR: no keywords at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
+                        return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
+                    }
+                    if (targetMatchID !== 1) {
+                        console.log("ERROR: both csvOption and targetMatchID must not be specified at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
+                        return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
+                    }
+                    currentKeyword = firstKeyword;
+                    return [3 /*break*/, 3];
+                case 2:
+                    keywords = [keyword];
+                    currentKeyword = keyword;
+                    _c.label = 3;
+                case 3:
                     reader = readline.createInterface({
                         input: fs.createReadStream(filePath),
                         crlfDelay: Infinity
@@ -3182,26 +3174,38 @@ function searchAsText(getter, address) {
                     lineNum = 0;
                     breaking = false;
                     foundCount = 0;
-                    _c.label = 1;
-                case 1:
-                    _c.trys.push([1, 6, 7, 12]);
+                    _c.label = 4;
+                case 4:
+                    _c.trys.push([4, 9, 10, 15]);
                     reader_7 = __asyncValues(reader);
-                    _c.label = 2;
-                case 2: return [4 /*yield*/, reader_7.next()];
-                case 3:
-                    if (!(reader_7_1 = _c.sent(), !reader_7_1.done)) return [3 /*break*/, 5];
+                    _c.label = 5;
+                case 5: return [4 /*yield*/, reader_7.next()];
+                case 6:
+                    if (!(reader_7_1 = _c.sent(), !reader_7_1.done)) return [3 /*break*/, 8];
                     line1 = reader_7_1.value;
                     if (breaking) {
-                        return [3 /*break*/, 4];
+                        return [3 /*break*/, 7];
                     } // "reader" requests read all lines
                     try {
                         line = line1;
                         lineNum += 1;
-                        if (line.includes(keyword)) {
-                            foundCount += 1;
-                            if (foundCount >= targetMatchID) {
-                                breaking = true; // return or break must not be written.
-                                // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                        if (line.includes(currentKeyword)) {
+                            if (!csvOption) {
+                                foundCount += 1;
+                                if (foundCount >= targetMatchID) { // targetMatchID
+                                    breaking = true; // return or break must not be written.
+                                    // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                                }
+                            }
+                            else { // csvOption
+                                nextKeyword = keywords.shift();
+                                if (!nextKeyword) {
+                                    breaking = true; // return or break must not be written.
+                                    currentKeyword = '';
+                                }
+                                else {
+                                    currentKeyword = nextKeyword;
+                                }
                             }
                         }
                     }
@@ -3209,26 +3213,26 @@ function searchAsText(getter, address) {
                         exception = e;
                         breaking = true;
                     }
-                    _c.label = 4;
-                case 4: return [3 /*break*/, 2];
-                case 5: return [3 /*break*/, 12];
-                case 6:
+                    _c.label = 7;
+                case 7: return [3 /*break*/, 5];
+                case 8: return [3 /*break*/, 15];
+                case 9:
                     e_8_1 = _c.sent();
                     e_8 = { error: e_8_1 };
-                    return [3 /*break*/, 12];
-                case 7:
-                    _c.trys.push([7, , 10, 11]);
-                    if (!(reader_7_1 && !reader_7_1.done && (_a = reader_7.return))) return [3 /*break*/, 9];
-                    return [4 /*yield*/, _a.call(reader_7)];
-                case 8:
-                    _c.sent();
-                    _c.label = 9;
-                case 9: return [3 /*break*/, 11];
+                    return [3 /*break*/, 15];
                 case 10:
+                    _c.trys.push([10, , 13, 14]);
+                    if (!(reader_7_1 && !reader_7_1.done && (_a = reader_7.return))) return [3 /*break*/, 12];
+                    return [4 /*yield*/, _a.call(reader_7)];
+                case 11:
+                    _c.sent();
+                    _c.label = 12;
+                case 12: return [3 /*break*/, 14];
+                case 13:
                     if (e_8) throw e_8.error;
                     return [7 /*endfinally*/];
-                case 11: return [7 /*endfinally*/];
-                case 12:
+                case 14: return [7 /*endfinally*/];
+                case 15:
                     if (exception) {
                         throw exception;
                     }

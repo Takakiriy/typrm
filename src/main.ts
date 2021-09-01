@@ -2,7 +2,6 @@ import * as fs from 'fs'; // file system
 import * as path from "path";  // or path = require("path")
 import * as globby from 'globby';
 import * as readline from 'readline';
-import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 import * as chalk from 'chalk';
 import * as yaml from 'js-yaml';
@@ -463,7 +462,7 @@ async function  revertSettings(inputFilePath: string, settingNameOrLineNum: stri
 // getInputFileFullPath
 async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
     const  currentFolder = process.cwd();
-    const  targetFolders = await parseCSVColumns(programOptions.folder);
+    const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
     const  fileFullPaths: string[] = [];
     if (targetFolders.length === 0) {
         const  inputFileFullPath = lib.getFullPath(inputFilePath, currentFolder);
@@ -1271,7 +1270,7 @@ class  WordPositions {
 
 // check
 async function  check(checkingFilePath?: string) {
-    const  targetFolders = await parseCSVColumns(programOptions.folder);
+    const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
@@ -1391,7 +1390,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
     keyword = keyword.trim();
     const  currentFolder = process.cwd();
     const  fileFullPaths: string[] = [];
-    const  targetFolders = await parseCSVColumns(programOptions.folder);
+    const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
     for (const folder of targetFolders) {
         const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
         if (!fs.existsSync(targetFolderFullPath)) {
@@ -1438,7 +1437,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                     var  withParameter = false;
                     csv = parseKeyName(line);
                 }
-                const  columns = await parseCSVColumns(csv)
+                const  columns = await lib.parseCSVColumns(csv)
                     .catch((e: Error) => {
                         console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
                         return [];
@@ -1451,7 +1450,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                     } else {
                         var  positionOfCSV = line.indexOf(csv);
                     }
-                    const  columnPositions = parseCSVColumnPositions(csv, columns);
+                    const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
 
                     found.score += keywordMatchScore;
                     found.path = getTestablePath(inputFileFullPath);
@@ -2039,6 +2038,7 @@ function  printConfig() {
                 console.log(`Verbose:     type: ${getter.type}`);
                 console.log(`Verbose:     filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
                 console.log(`Verbose:     keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
+                console.log(`Verbose:     csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
                 console.log(`Verbose:     targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
                 console.log(`Verbose:     address: ${getter.address}`);
                 index += 1;
@@ -2441,43 +2441,6 @@ function  parseTemplateTag(line: string, parser: Parser): TemplateTag {
     return  tag;
 }
 
-// parseCSVColumns
-async function  parseCSVColumns(columns: string): Promise<string[]> {
-    if (!columns) {
-        return  [];  // stream.Readable.from(undefined) occurs an error
-    }
-    return new Promise((resolveFunction, rejectFunction) => {
-        let  columnArray: string[] = [];
-
-        stream.Readable.from(columns)
-            .pipe(
-                csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
-            )
-            .on('data', (columns) => {
-                columnArray = columns;
-            })
-            .on('end', () => {
-                resolveFunction(columnArray);
-            })
-            .on('error', (e: Error) => {
-                rejectFunction(e);
-            });
-    });
-}
-
-// parseCSVColumnPositions
-function  parseCSVColumnPositions(csv: string, columns: string[]): number[] {
-    const  positions: number[] = [];
-    var  searchPosition = 0;
-    for (const column of columns) {
-        const  columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
-
-        positions.push(columnPosition);
-        searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
-    }
-    return  positions;
-}
-
 // parseKeyName
 function  parseKeyName(line: string): string {
 
@@ -2697,6 +2660,7 @@ interface  LineNumGetter {
     type: string;
     filePathRegularExpressionIndex: number;
     keywordRegularExpressionIndex: number;
+    csvOptionRegularExpressionIndex: number;
     targetMatchIdRegularExpressionIndex: number;
     address: string;
 }
@@ -2705,6 +2669,7 @@ interface  LineNumGetter {
 interface  FilePathAndKeyword {
     filePath: string;
     keyword: string;
+    csvOption: boolean;
     targetMatchID: number;
 }
 
@@ -2718,6 +2683,7 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
         console.log(`Verbose:     regularExpression: ${getter.regularExpression}`);
         console.log(`Verbose:     filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
         console.log(`Verbose:     keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
+        console.log(`Verbose:     csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
         console.log(`Verbose:     targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
     }
 
@@ -2741,6 +2707,13 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
             `testing string is "${address}".`);
     }
 
+    var  csvOption = false;
+    if (parameters.length >= getter.csvOptionRegularExpressionIndex) {
+        if (parameters[getter.csvOptionRegularExpressionIndex]) {
+            csvOption = true;
+        }
+    }
+
     var  targetMatchID = 1;
     if (parameters.length >= getter.targetMatchIdRegularExpressionIndex) {
         targetMatchID = parseInt(parameters[getter.targetMatchIdRegularExpressionIndex]);
@@ -2752,16 +2725,33 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
     return {
         filePath: parameters[getter.filePathRegularExpressionIndex],
         keyword:  parameters[getter.keywordRegularExpressionIndex],
+        csvOption,
         targetMatchID,
     } as FilePathAndKeyword;
 }
 
 // searchAsText
 async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<FilePathLineNum> {
-    const  { filePath, keyword, targetMatchID } = splitFilePathAndKeyword(address,  getter);
+    const  { filePath, keyword, csvOption, targetMatchID } = splitFilePathAndKeyword(address,  getter);
     if ( ! fs.existsSync(filePath)) {
         console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
         return  { filePath, lineNum: 0 };
+    }
+    if (csvOption) {
+        var    keywords = await lib.parseCSVColumns(keyword);
+        const  firstKeyword = keywords.shift();
+        if ( ! firstKeyword) {
+            console.log(`ERROR: no keywords at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
+            return  { filePath, lineNum: 0 };
+        }
+        if (targetMatchID !== 1) {
+            console.log(`ERROR: both csvOption and targetMatchID must not be specified at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
+            return  { filePath, lineNum: 0 };
+        }
+        var  currentKeyword = firstKeyword;
+    } else {
+        var  keywords = [keyword];
+        var  currentKeyword = keyword;
     }
 
     const  reader = readline.createInterface({
@@ -2779,11 +2769,21 @@ async function  searchAsText(getter: LineNumGetter, address: string): /* linkabl
             const  line: string = line1;
             lineNum += 1;
 
-            if (line.includes(keyword)) {
-                foundCount += 1;
-                if (foundCount >= targetMatchID) {
-                    breaking = true;  // return or break must not be written.
-                    // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+            if (line.includes(currentKeyword)) {
+                if ( ! csvOption) {
+                    foundCount += 1;
+                    if (foundCount >= targetMatchID) { // targetMatchID
+                        breaking = true;  // return or break must not be written.
+                        // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                    }
+                } else { // csvOption
+                    const  nextKeyword = keywords.shift();
+                    if ( ! nextKeyword) {
+                        breaking = true;  // return or break must not be written.
+                        currentKeyword = '';
+                    } else {
+                        currentKeyword = nextKeyword;
+                    }
                 }
             }
         } catch (e) {
