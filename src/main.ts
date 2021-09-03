@@ -1868,7 +1868,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     }
 
     // print the address
-    if (option.print) {
+    if (option.print  &&  addressLineNum !== notFound) {
         if (recommended !== addressBefore) {
             console.log('Recommend: #ref: ' + recommended);
         }
@@ -1876,10 +1876,15 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     }
 
     // print the verb menu
-    const  verbs = getRelatedVerbs(address);
-    var  verbMenu = verbs.map((verb) => (verb.label)).join(', ');
-    if (verbMenu !== ''  &&  option.print) {
-        console.log('    ' + verbMenu);
+    if (addressLineNum !== notFound) {
+        var  verbs = getRelatedVerbs(address);
+        var  verbMenu = verbs.map((verb) => (verb.label)).join(', ');
+        if (verbMenu !== ''  &&  option.print) {
+            console.log('    ' + verbMenu);
+        }
+    } else {
+        var  verbs: Verb[] = [];
+        var  verbMenu = '';
     }
 
     return  {
@@ -2735,18 +2740,18 @@ async function  searchAsText(getter: LineNumGetter, address: string): /* linkabl
     const  { filePath, keyword, csvOption, targetMatchID } = splitFilePathAndKeyword(address,  getter);
     if ( ! fs.existsSync(filePath)) {
         console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
-        return  { filePath, lineNum: 0 };
+        return  { filePath, lineNum: notFound };
     }
     if (csvOption) {
         var    keywords = await lib.parseCSVColumns(keyword);
         const  firstKeyword = keywords.shift();
         if ( ! firstKeyword) {
             console.log(`ERROR: no keywords at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
-            return  { filePath, lineNum: 0 };
+            return  { filePath, lineNum: notFound };
         }
         if (targetMatchID !== 1) {
             console.log(`ERROR: both csvOption and targetMatchID must not be specified at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
-            return  { filePath, lineNum: 0 };
+            return  { filePath, lineNum: notFound };
         }
         var  currentKeyword = firstKeyword;
     } else {

@@ -2166,7 +2166,7 @@ function getEmptyOfPrintRefResult() {
 function printRef(refTagAndAddress, option) {
     if (option === void 0) { option = printRefOptionDefault; }
     return __awaiter(this, void 0, void 0, function () {
-        var addressBefore, variableRe, variables, variable, address, _loop_5, _i, _a, variable, linkableAddress, addressLineNum, getter, _b, filePath, lineNum, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, reservedNames, _c, _d, _e, envName, envValue, variableName, value, _f, sortedEnvronmentVariables_1, variable, verbs, verbMenu;
+        var addressBefore, variableRe, variables, variable, address, _loop_5, _i, _a, variable, linkableAddress, addressLineNum, getter, _b, filePath, lineNum, recommended, lowerCaseDriveRegExp, upperCaseDriveRegExp, sortedEnvronmentVariables, reservedNames, _c, _d, _e, envName, envValue, variableName, value, _f, sortedEnvronmentVariables_1, variable, verbs, verbMenu, verbs, verbMenu;
         return __generator(this, function (_g) {
             switch (_g.label) {
                 case 0:
@@ -2273,16 +2273,23 @@ function printRef(refTagAndAddress, option) {
                         recommended = '~' + recommended.substr(lib.getHomePath().length);
                     }
                     // print the address
-                    if (option.print) {
+                    if (option.print && addressLineNum !== notFound) {
                         if (recommended !== addressBefore) {
                             console.log('Recommend: #ref: ' + recommended);
                         }
                         console.log(linkableAddress);
                     }
-                    verbs = getRelatedVerbs(address);
-                    verbMenu = verbs.map(function (verb) { return (verb.label); }).join(', ');
-                    if (verbMenu !== '' && option.print) {
-                        console.log('    ' + verbMenu);
+                    // print the verb menu
+                    if (addressLineNum !== notFound) {
+                        verbs = getRelatedVerbs(address);
+                        verbMenu = verbs.map(function (verb) { return (verb.label); }).join(', ');
+                        if (verbMenu !== '' && option.print) {
+                            console.log('    ' + verbMenu);
+                        }
+                    }
+                    else {
+                        verbs = [];
+                        verbMenu = '';
                     }
                     return [2 /*return*/, {
                             hasVerbMenu: (verbMenu !== ''),
@@ -3145,7 +3152,7 @@ function searchAsText(getter, address) {
                     _b = splitFilePathAndKeyword(address, getter), filePath = _b.filePath, keyword = _b.keyword, csvOption = _b.csvOption, targetMatchID = _b.targetMatchID;
                     if (!fs.existsSync(filePath)) {
                         console.log("ERROR: not found a file at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
-                        return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
+                        return [2 /*return*/, { filePath: filePath, lineNum: notFound }];
                     }
                     if (!csvOption) return [3 /*break*/, 2];
                     return [4 /*yield*/, lib.parseCSVColumns(keyword)];
@@ -3154,11 +3161,11 @@ function searchAsText(getter, address) {
                     firstKeyword = keywords.shift();
                     if (!firstKeyword) {
                         console.log("ERROR: no keywords at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
-                        return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
+                        return [2 /*return*/, { filePath: filePath, lineNum: notFound }];
                     }
                     if (targetMatchID !== 1) {
                         console.log("ERROR: both csvOption and targetMatchID must not be specified at \"" + getTestablePath(lib.getFullPath(filePath, process.cwd())) + "\"");
-                        return [2 /*return*/, { filePath: filePath, lineNum: 0 }];
+                        return [2 /*return*/, { filePath: filePath, lineNum: notFound }];
                     }
                     currentKeyword = firstKeyword;
                     return [3 /*break*/, 3];

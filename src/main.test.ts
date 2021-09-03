@@ -889,9 +889,7 @@ describe("print reference >>", () => {
                 "(error) file not found",
                 ["search", "#ref:", "test_data/search/2/notFound.yaml#notFound"],
                 {locale: "en-US", test: ""},
-                'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n' +
-                "test_data/search/2/notFound.yaml:0\n" +
-                "    0.Folder\n",
+                'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n',
             ],
         ])("%s", async (_caseName, arguments_, options, answer) => {
 
