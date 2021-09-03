@@ -383,14 +383,14 @@ typrm を使うには Node.js のインストールが必要です。
     Node.js をインストールします:
         - https://nodejs.org/ja/download/ >> (click 64-bit at the right of) Linux Binaries (x64) >>
             Copy the link
-        #// Case of version 14.16.0
+        #// Case of version 14.17.6
         - cd ${HOME}
-        - curl -L -O https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.xz
-        - tar -Jxvf  node-v14.16.0-linux-x64.tar.xz
-        - rm  node-v14.16.0-linux-x64.tar.xz
-        - sudo mv  node-v14.16.0-linux-x64  /opt
+        - curl -L -O https://nodejs.org/dist/v14.17.6/node-v14.17.6-linux-x64.tar.xz
+        - tar -Jxvf  node-v14.17.6-linux-x64.tar.xz
+        - rm  node-v14.17.6-linux-x64.tar.xz
+        - sudo mv  node-v14.17.6-linux-x64  /opt
         - cd /opt
-        - sudo ln -s  node-v14.16.0-linux-x64  node
+        - sudo ln -s  node-v14.17.6-linux-x64  node
         - cd ${HOME}
         - PATH=/opt/node/bin:$PATH
         - node --version
@@ -401,8 +401,11 @@ typrm を使うには Node.js のインストールが必要です。
         npm config -g set https-proxy "http://___.___.___.___:____"
 
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
+        mkdir -p ~/Downloads
         cd  ~/Downloads
-        wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        curl -L -O https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        mv  master.zip  typrm.zip
+        sudo yum install unzip
         rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// 更新するとき
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
@@ -421,6 +424,7 @@ typrm を使うには Node.js のインストールが必要です。
         echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x "${script}"
         unset script
+        mkdir -p "${HOME}/Documents/typrm"
 
     typrm が使えることを確認します:
         typrm --version
@@ -940,7 +944,7 @@ search (s) コマンドに `#ref:` タグを付けてファイルのパスとパ
 見つかった行番号 `25` を表示します。
 
 行番号に置き換えて表示するには、
-`TYPRM_LINE_NUM_GETTER` 環境変数に以下のように YAML 形式で設定します。
+`TYPRM_LINE_NUM_GETTER` 環境変数に以下のような YAML を設定します。
 ただし、`regularExpression` の設定は環境に応じて編集してください。
 
 Windows の PowerShell の場合:

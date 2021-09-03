@@ -389,14 +389,14 @@ To use typrm, you must install Node.js.
     Install Node.js:
         - https://nodejs.org/ja/download/ >> (click 64-bit at the right of) Linux Binaries (x64) >>
             Copy the link
-        #// Case of version 14.16.0
+        #// Case of version 14.17.6
         - cd ${HOME}
-        - curl -L -O https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.xz
-        - tar -Jxvf  node-v14.16.0-linux-x64.tar.xz
-        - rm  node-v14.16.0-linux-x64.tar.xz
-        - sudo mv  node-v14.16.0-linux-x64  /opt
+        - curl -L -O https://nodejs.org/dist/v14.17.6/node-v14.17.6-linux-x64.tar.xz
+        - tar -Jxvf  node-v14.17.6-linux-x64.tar.xz
+        - rm  node-v14.17.6-linux-x64.tar.xz
+        - sudo mv  node-v14.17.6-linux-x64  /opt
         - cd /opt
-        - sudo ln -s  node-v14.16.0-linux-x64  node
+        - sudo ln -s  node-v14.17.6-linux-x64  node
         - cd ${HOME}
         - PATH=/opt/node/bin:$PATH
         - node --version
@@ -407,8 +407,11 @@ To use typrm, you must install Node.js.
         npm config -g set https-proxy "http://___.___.___.___:____"
 
     Download and expand typrm and install Node.js packages used by typrm:
+        mkdir -p ~/Downloads
         cd  ~/Downloads
-        wget -O typrm.zip  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        curl -L -O https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
+        mv  master.zip  typrm.zip
+        sudo yum install unzip
         rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you are updating
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// The folder extracted from the Zip file
@@ -427,6 +430,7 @@ To use typrm, you must install Node.js.
         echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x "${script}"
         unset script
+        mkdir -p "${HOME}/Documents/typrm"
 
     Check to use typrm command:
         typrm --version
