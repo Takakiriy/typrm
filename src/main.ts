@@ -83,7 +83,7 @@ export async function  main() {
 // checkRoutine
 async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     if (isModal) {
-        var  inputFilePath = await inputPath( translate('YAML UTF-8 file path>') );
+        var  inputFilePath = await lib.inputPath( translate('YAML UTF-8 file path>') );
     }
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
@@ -376,7 +376,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         while (loop) {
             console.log(translate('Press Enter key to retry checking.'));
 
-            const  key = await input(translate('The line number to replace the variable value >'));
+            const  key = await lib.input(translate('The line number to replace the variable value >'));
             errorCount = 0;
             if (key === 'exit') {
                 return;
@@ -391,7 +391,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     console.log(`${translate('SettingIndex')}: ${replacingSettingIndex}`);
                     console.log(translate('Enter only: finish to input setting'));
                     for (;;) {
-                        const  keyValue = await input(translate('key: new_value>'));
+                        const  keyValue = await lib.input(translate('key: new_value>'));
                         if (keyValue === '') {
                             break;
                         }
@@ -464,7 +464,12 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
     const  currentFolder = process.cwd();
     const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
     const  fileFullPaths: string[] = [];
-    if (targetFolders.length === 0) {
+    if (lib.isFullPath(inputFilePath)) {
+        const  inputFileFullPath = inputFilePath;
+        if (fs.existsSync(inputFileFullPath)) {
+            fileFullPaths.push(inputFileFullPath);
+        }
+    } else if (targetFolders.length === 0) {
         const  inputFileFullPath = lib.getFullPath(inputFilePath, currentFolder);
         if (fs.existsSync(inputFileFullPath)) {
             fileFullPaths.push(inputFileFullPath);
@@ -1346,7 +1351,7 @@ async function  search() {
             runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
         }
     } else {  // keyword === ''
-        inputSkip(startIndex);
+        lib.inputSkip(startIndex);
         var  previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
             var  prompt = 'keyword:';
@@ -1354,7 +1359,7 @@ async function  search() {
                 var  prompt = 'keyword or number:';
             }
 
-            const  keyword = await input(chalk.yellow( prompt ) + ' ');
+            const  keyword = await lib.input(chalk.yellow( prompt ) + ' ');
             if (keyword === 'exit()') {
                 break;
             } else if (keyword === '') {
@@ -2944,124 +2949,6 @@ console.log = println;
 // lastOf
 function  lastOf<T>(array: Array<T>): T {
     return  array[array.length - 1];
-}
-
-// StandardInputBuffer
-class  StandardInputBuffer {
-    readlines: readline.Interface | undefined;
-    inputBuffer: string[] = [];
-    inputResolver?: (answer:string)=>void = undefined;
-
-    delayedConstructor() {  // It is not constructor, because "createInterface" stops the program, if stdin was not used.
-        this.readlines = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        this.readlines.on('line', async (line: string) => {
-            if (this.inputResolver) {
-                this.inputResolver(line);  // inputResolver() is resolve() in input()
-                this.inputResolver = undefined;
-            } else {
-                this.inputBuffer.push(line);
-            }
-        });
-
-        this.readlines.setPrompt('');
-        this.readlines.prompt();
-    }
-
-    async  input(guide: string): Promise<string> {
-        if (!this.readlines) {
-            this.delayedConstructor();
-        }
-
-        return  new Promise(
-            (resolve: (answer:string)=>void,  reject: (answer:string)=>void ) =>
-        {
-            const  nextLine = this.inputBuffer.shift();
-            if (nextLine) {
-                console.log(guide + nextLine);
-                resolve(nextLine);
-            } else {
-                process.stdout.write(guide);
-                this.inputResolver = resolve;
-            }
-        });
-    }
-
-    close() {
-        if (this.readlines) {
-            this.readlines.close();
-        }
-    }
-}
-
-// InputOption
-class InputOption {
-    inputLines: string[];
-    nextLineIndex: number;
-    nextParameterIndex: number;  // The index of the starting process parameters
-
-    constructor(inputLines: string[]) {
-        this.inputLines = inputLines;
-        this.nextLineIndex = 0;
-        this.nextParameterIndex = 2;
-    }
-}
-
-const  testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\typrm\test_data`+'\\';
-
-// inputOption
-const inputOption = new InputOption([
-/*
-    testBaseFolder +`____.yaml`,
-    String.raw `file`,
-*/
-]);
-
-// input
-// Example: const name = await input('What is your name? ');
-async function  input( guide: string ): Promise<string> {
-    // Input emulation
-    if (inputOption.inputLines) {
-        if (inputOption.nextLineIndex < inputOption.inputLines.length) {
-            const  value = inputOption.inputLines[inputOption.nextLineIndex];
-            inputOption.nextLineIndex += 1;
-            console.log(guide + value);
-
-            return  value;
-        }
-    }
-
-    // Read the starting process parameters
-    while (inputOption.nextParameterIndex < process.argv.length) {
-        const  value = process.argv[inputOption.nextParameterIndex];
-        inputOption.nextParameterIndex += 1;
-        if (value.substr(0,1) !== '-') {
-            console.log(guide + value);
-
-            return  value;
-        }
-        if (value !== '--test') {
-            inputOption.nextParameterIndex += 1;
-        }
-    }
-
-    // input
-    return  InputObject.input(guide);
-}
-export const  InputObject = new StandardInputBuffer();
-
-// inputPath
-// Example: const name = await input('What is your name? ');
-async function  inputPath( guide: string ) {
-    const  key = await input(guide);
-    return  pathResolve(key);
-}
-
-// inputSkip
-function  inputSkip(count: number) {
-    inputOption.nextParameterIndex += count;
 }
 
 // pathResolve

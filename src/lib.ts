@@ -195,7 +195,7 @@ class  StandardInputBuffer {
         });
         this.readlines.on('line', async (line: string) => {
             if (this.inputResolver) {
-                this.inputResolver(line);
+                this.inputResolver(line);  // inputResolver() is resolve() in input()
                 this.inputResolver = undefined;
             } else {
                 this.inputBuffer.push(line);

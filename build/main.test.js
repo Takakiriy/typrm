@@ -443,6 +443,7 @@ describe("replaces settings >>", function () {
             ["replace 1", fileNameHead + "_1_changing.yaml", changingFile1Path],
             ["replace 2", fileNameHead + "_2_changing.yaml", changingFile2Path],
             ["same name error", fileNameHead + "_same_name.yaml", undefined],
+            ["full path", process.cwd() + "/" + changingFile1Path, changingFile1Path],
         ])("%s", function (caseName, changingFileName, changingFilePath) { return __awaiter(void 0, void 0, void 0, function () {
             var sourceFileContents, fileContentsBefore, fileContentsAfter, fileContentsBefore, fileContents1, fileContents2;
             return __generator(this, function (_a) {

@@ -47,7 +47,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.InputObject = exports.main = void 0;
+exports.programOptions = exports.programArguments = exports.stdout = exports.callMainFromJest = exports.main = void 0;
 var fs = require("fs"); // file system
 var path = require("path"); // or path = require("path")
 var globby = require("globby");
@@ -160,7 +160,7 @@ function checkRoutine(isModal, inputFilePath) {
             switch (_h.label) {
                 case 0:
                     if (!isModal) return [3 /*break*/, 2];
-                    return [4 /*yield*/, inputPath(translate('YAML UTF-8 file path>'))];
+                    return [4 /*yield*/, lib.inputPath(translate('YAML UTF-8 file path>'))];
                 case 1:
                     inputFilePath = _h.sent();
                     _h.label = 2;
@@ -495,7 +495,7 @@ function checkRoutine(isModal, inputFilePath) {
                 case 32:
                     if (!loop) return [3 /*break*/, 42];
                     console.log(translate('Press Enter key to retry checking.'));
-                    return [4 /*yield*/, input(translate('The line number to replace the variable value >'))];
+                    return [4 /*yield*/, lib.input(translate('The line number to replace the variable value >'))];
                 case 33:
                     key = _h.sent();
                     errorCount = 0;
@@ -516,7 +516,7 @@ function checkRoutine(isModal, inputFilePath) {
                     console.log(translate('SettingIndex') + ": " + replacingSettingIndex);
                     console.log(translate('Enter only: finish to input setting'));
                     _h.label = 37;
-                case 37: return [4 /*yield*/, input(translate('key: new_value>'))];
+                case 37: return [4 /*yield*/, lib.input(translate('key: new_value>'))];
                 case 38:
                     keyValue = _h.sent();
                     if (keyValue === '') {
@@ -629,7 +629,7 @@ function revertSettings(inputFilePath, settingNameOrLineNum) {
 // getInputFileFullPath
 function getInputFileFullPath(inputFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var currentFolder, targetFolders, fileFullPaths, inputFileFullPath, _i, targetFolders_1, folder, targetFolderFullPath, inputFileFullPath;
+        var currentFolder, targetFolders, fileFullPaths, inputFileFullPath, inputFileFullPath, _i, targetFolders_1, folder, targetFolderFullPath, inputFileFullPath;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -638,7 +638,13 @@ function getInputFileFullPath(inputFilePath) {
                 case 1:
                     targetFolders = _a.sent();
                     fileFullPaths = [];
-                    if (targetFolders.length === 0) {
+                    if (lib.isFullPath(inputFilePath)) {
+                        inputFileFullPath = inputFilePath;
+                        if (fs.existsSync(inputFileFullPath)) {
+                            fileFullPaths.push(inputFileFullPath);
+                        }
+                    }
+                    else if (targetFolders.length === 0) {
                         inputFileFullPath = lib.getFullPath(inputFilePath, currentFolder);
                         if (fs.existsSync(inputFileFullPath)) {
                             fileFullPaths.push(inputFileFullPath);
@@ -1698,7 +1704,7 @@ function search() {
                     _a.label = 6;
                 case 6: return [3 /*break*/, 17];
                 case 7:
-                    inputSkip(startIndex);
+                    lib.inputSkip(startIndex);
                     previousPrint = getEmptyOfPrintRefResult();
                     _a.label = 8;
                 case 8:
@@ -1706,7 +1712,7 @@ function search() {
                     if (previousPrint.hasVerbMenu) {
                         prompt = 'keyword or number:';
                     }
-                    return [4 /*yield*/, input(chalk.yellow(prompt) + ' ')];
+                    return [4 /*yield*/, lib.input(chalk.yellow(prompt) + ' ')];
                 case 9:
                     keyword_1 = _a.sent();
                     if (!(keyword_1 === 'exit()')) return [3 /*break*/, 10];
@@ -3353,130 +3359,6 @@ console.log = println;
 function lastOf(array) {
     return array[array.length - 1];
 }
-// StandardInputBuffer
-var StandardInputBuffer = /** @class */ (function () {
-    function StandardInputBuffer() {
-        this.inputBuffer = [];
-        this.inputResolver = undefined;
-    }
-    StandardInputBuffer.prototype.delayedConstructor = function () {
-        var _this = this;
-        this.readlines = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        this.readlines.on('line', function (line) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (this.inputResolver) {
-                    this.inputResolver(line); // inputResolver() is resolve() in input()
-                    this.inputResolver = undefined;
-                }
-                else {
-                    this.inputBuffer.push(line);
-                }
-                return [2 /*return*/];
-            });
-        }); });
-        this.readlines.setPrompt('');
-        this.readlines.prompt();
-    };
-    StandardInputBuffer.prototype.input = function (guide) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                if (!this.readlines) {
-                    this.delayedConstructor();
-                }
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        var nextLine = _this.inputBuffer.shift();
-                        if (nextLine) {
-                            console.log(guide + nextLine);
-                            resolve(nextLine);
-                        }
-                        else {
-                            process.stdout.write(guide);
-                            _this.inputResolver = resolve;
-                        }
-                    })];
-            });
-        });
-    };
-    StandardInputBuffer.prototype.close = function () {
-        if (this.readlines) {
-            this.readlines.close();
-        }
-    };
-    return StandardInputBuffer;
-}());
-// InputOption
-var InputOption = /** @class */ (function () {
-    function InputOption(inputLines) {
-        this.inputLines = inputLines;
-        this.nextLineIndex = 0;
-        this.nextParameterIndex = 2;
-    }
-    return InputOption;
-}());
-var testBaseFolder = String.raw(templateObject_8 || (templateObject_8 = __makeTemplateObject(["R:homemem_cacheMyDocsrcTypeScript\typrm\test_data"], ["R:\\home\\mem_cache\\MyDoc\\src\\TypeScript\\typrm\\test_data"]))) + '\\';
-// inputOption
-var inputOption = new InputOption([
-/*
-    testBaseFolder +`____.yaml`,
-    String.raw `file`,
-*/
-]);
-// input
-// Example: const name = await input('What is your name? ');
-function input(guide) {
-    return __awaiter(this, void 0, void 0, function () {
-        var value, value;
-        return __generator(this, function (_a) {
-            // Input emulation
-            if (inputOption.inputLines) {
-                if (inputOption.nextLineIndex < inputOption.inputLines.length) {
-                    value = inputOption.inputLines[inputOption.nextLineIndex];
-                    inputOption.nextLineIndex += 1;
-                    console.log(guide + value);
-                    return [2 /*return*/, value];
-                }
-            }
-            // Read the starting process parameters
-            while (inputOption.nextParameterIndex < process.argv.length) {
-                value = process.argv[inputOption.nextParameterIndex];
-                inputOption.nextParameterIndex += 1;
-                if (value.substr(0, 1) !== '-') {
-                    console.log(guide + value);
-                    return [2 /*return*/, value];
-                }
-                if (value !== '--test') {
-                    inputOption.nextParameterIndex += 1;
-                }
-            }
-            // input
-            return [2 /*return*/, exports.InputObject.input(guide)];
-        });
-    });
-}
-exports.InputObject = new StandardInputBuffer();
-// inputPath
-// Example: const name = await input('What is your name? ');
-function inputPath(guide) {
-    return __awaiter(this, void 0, void 0, function () {
-        var key;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, input(guide)];
-                case 1:
-                    key = _a.sent();
-                    return [2 /*return*/, pathResolve(key)];
-            }
-        });
-    });
-}
-// inputSkip
-function inputSkip(count) {
-    inputOption.nextParameterIndex += count;
-}
 // pathResolve
 function pathResolve(path_) {
     // '/c/home' format to current OS format
@@ -3666,5 +3548,5 @@ var withJest = false;
 exports.stdout = '';
 exports.programArguments = [];
 exports.programOptions = {};
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8;
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7;
 //# sourceMappingURL=main.js.map

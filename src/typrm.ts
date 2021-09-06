@@ -1,5 +1,6 @@
 import * as commander from 'commander';
 import * as main from './main';
+import * as lib from './lib';
 
 function  exitFromCommander(e: commander.CommanderError) {
     if (e.code !== 'commander.version') {
@@ -37,7 +38,7 @@ async function  callMain() {
             }
         })
         .finally(()=>{
-            main.InputObject.close();
+            lib.getInputObject().close();
         });
 }
 callMain();

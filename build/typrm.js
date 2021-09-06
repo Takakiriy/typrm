@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var commander = require("commander");
 var main = require("./main");
+var lib = require("./lib");
 function exitFromCommander(e) {
     if (e.code !== 'commander.version') {
         console.log(e.message);
@@ -77,7 +78,7 @@ function callMain() {
                             }
                         })
                             .finally(function () {
-                            main.InputObject.close();
+                            lib.getInputObject().close();
                         })];
                 case 1:
                     _b.sent();

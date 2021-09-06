@@ -369,6 +369,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ["replace 1",        fileNameHead + "_1_changing.yaml",  changingFile1Path],
             ["replace 2",        fileNameHead + "_2_changing.yaml",  changingFile2Path],
             ["same name error",  fileNameHead + "_same_name.yaml",   undefined],
+            ["full path",        process.cwd() +"/"+ changingFile1Path,  changingFile1Path],
         ])("%s", async (caseName, changingFileName, changingFilePath) => {
             const  sourceFileContents = getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});

@@ -285,7 +285,7 @@ var StandardInputBuffer = /** @class */ (function () {
         this.readlines.on('line', function (line) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if (this.inputResolver) {
-                    this.inputResolver(line);
+                    this.inputResolver(line); // inputResolver() is resolve() in input()
                     this.inputResolver = undefined;
                 }
                 else {
