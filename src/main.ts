@@ -876,9 +876,7 @@ class  TemplateTag {
             }
 
             this.template = line.substr(this.indexInLine + this.label.length).trim();
-            if (this.label == templateIfLabel) {
-                this.template = getValue(this.template);
-            }
+            this.template = getValue(this.template);
             if (leftOfTemplate === '') {
                 this.lineNumOffset = -1;
             } else {
@@ -1450,17 +1448,18 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
 
                 const  found = getKeywordMatchingScore(columns, keyword, thesaurus);
                 if (found.matchedKeywordCount >= 1) {
+                    const  unescapedLine = unscapePercentByte(line);
                     if (withParameter) {
-                        var  positionOfCSV = line.indexOf(csv, line.indexOf(keywordLabel) + keywordLabel.length);// line.length - csv.length;
+                        var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(keywordLabel) + keywordLabel.length);
                     } else {
-                        var  positionOfCSV = line.indexOf(csv);
+                        var  positionOfCSV = unescapedLine.indexOf(csv);
                     }
                     const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
 
                     found.score += keywordMatchScore;
                     found.path = getTestablePath(inputFileFullPath);
                     found.lineNum = lineNum;
-                    found.line = line;
+                    found.line = unescapedLine;
                     for (const match of found.matches) {
                         match.position += positionOfCSV + columnPositions[match.testTargetIndex];
                     }
@@ -2414,9 +2413,46 @@ function  parseKeyValueLines(keyValueLines: string): {[key:string]: string} {
 // getValue
 function  getValue(line: string, separatorIndex: number = -1) {
     let    value = line.substr(separatorIndex + 1).trim();
+
     const  comment = value.indexOf('#');
     if (comment !== notFound) {
-        value = value.substr(0, comment).trim();
+        if (comment === 0  ||  value[comment - 1] === ' ') {  // space and #
+            value = value.substr(0, comment).trim();
+        }
+    }
+
+    value = unscapePercentByte(value);
+
+    return  value;
+}
+
+// unscapePercentByte
+function  unscapePercentByte(value: string): string {
+    var  found = 0;
+    for (;;) {
+        const  found20 = value.indexOf('"%20"', found);
+        const  found25 = value.indexOf('"%25"', found);
+        if (found20 !== notFound) {
+            if (found25 !== notFound) {
+                if (found20 < found25) {
+                    value = value.replace('"%20"', ' ');
+                    found = found20 + 1;
+                } else {
+                    value = value.replace('"%25"', '%');
+                    found = found25 + 1;
+                }
+            } else {
+                value = value.replace('"%20"', ' ');
+                found = found20 + 1;
+            }
+        } else {
+            if (found25 !== notFound) {
+                value = value.replace('"%25"', '%');
+                found = found25 + 1;
+            } else {
+                break;
+            }
+        }
     }
     return  value;
 }

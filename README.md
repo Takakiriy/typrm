@@ -227,7 +227,9 @@ in the text file.
 
     #keyword: CSV, comma separated values, "a,b"
 
-Keywords containing `#` cannot be specified.
+When specifying keywords that include ` #` (blank and #), write `"%20"#`.
+` #` (blank and #) are interpreted as the next tags.
+When specifying a keyword that contains `"%`, write `""%25"`.
 If you want to suppress the warning of the CSV part that has syntax problem,
 write `#disable-tag-tool:`.
 The `#keyword:` tag parameter is not treated as a keyword.
@@ -500,6 +502,13 @@ In the above case, if you do not enclose the value of the `#template:` tag in " 
     settings:
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
+
+If you want to include ` #` (blank and #) in your template, write `"%20"#`.
+` #` (blank and #) are interpreted as the next tags.
+When specifying a template that contains `"%`, write`""%25"`.
+
+    cd  "react1 #"  #template: __ProjectName__"%20"#
+
 
 ### The details of settings
 

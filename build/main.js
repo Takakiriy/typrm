@@ -1117,9 +1117,7 @@ var TemplateTag = /** @class */ (function () {
                 this.onFileTemplateTagReading(line);
             }
             this.template = line.substr(this.indexInLine + this.label.length).trim();
-            if (this.label == templateIfLabel) {
-                this.template = getValue(this.template);
-            }
+            this.template = getValue(this.template);
             if (leftOfTemplate === '') {
                 this.lineNumOffset = -1;
             }
@@ -1818,7 +1816,7 @@ function searchSub(keyword) {
                     _e.label = 7;
                 case 7:
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, blockDisable, reader_5, reader_5_1, line1, line, columns, found, columnPositions, _h, _j, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _k, _l, match, _m, _o, match, e_6_1;
+                        var reader, blockDisable, reader_5, reader_5_1, line1, line, columns, found, unescapedLine, columnPositions, _h, _j, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _k, _l, match, _m, _o, match, e_6_1;
                         return __generator(this, function (_p) {
                             switch (_p.label) {
                                 case 0:
@@ -1858,17 +1856,18 @@ function searchSub(keyword) {
                                     columns = _p.sent();
                                     found = getKeywordMatchingScore(columns, keyword, thesaurus);
                                     if (found.matchedKeywordCount >= 1) {
+                                        unescapedLine = unscapePercentByte(line);
                                         if (withParameter) {
-                                            positionOfCSV = line.indexOf(csv, line.indexOf(keywordLabel) + keywordLabel.length); // line.length - csv.length;
+                                            positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(keywordLabel) + keywordLabel.length);
                                         }
                                         else {
-                                            positionOfCSV = line.indexOf(csv);
+                                            positionOfCSV = unescapedLine.indexOf(csv);
                                         }
                                         columnPositions = lib.parseCSVColumnPositions(csv, columns);
                                         found.score += keywordMatchScore;
                                         found.path = getTestablePath(inputFileFullPath);
                                         found.lineNum = lineNum;
-                                        found.line = line;
+                                        found.line = unescapedLine;
                                         for (_h = 0, _j = found.matches; _h < _j.length; _h++) {
                                             match = _j[_h];
                                             match.position += positionOfCSV + columnPositions[match.testTargetIndex];
@@ -2844,7 +2843,44 @@ function getValue(line, separatorIndex) {
     var value = line.substr(separatorIndex + 1).trim();
     var comment = value.indexOf('#');
     if (comment !== notFound) {
-        value = value.substr(0, comment).trim();
+        if (comment === 0 || value[comment - 1] === ' ') { // space and #
+            value = value.substr(0, comment).trim();
+        }
+    }
+    value = unscapePercentByte(value);
+    return value;
+}
+// unscapePercentByte
+function unscapePercentByte(value) {
+    var found = 0;
+    for (;;) {
+        var found20 = value.indexOf('"%20"', found);
+        var found25 = value.indexOf('"%25"', found);
+        if (found20 !== notFound) {
+            if (found25 !== notFound) {
+                if (found20 < found25) {
+                    value = value.replace('"%20"', ' ');
+                    found = found20 + 1;
+                }
+                else {
+                    value = value.replace('"%25"', '%');
+                    found = found25 + 1;
+                }
+            }
+            else {
+                value = value.replace('"%20"', ' ');
+                found = found20 + 1;
+            }
+        }
+        else {
+            if (found25 !== notFound) {
+                value = value.replace('"%25"', '%');
+                found = found25 + 1;
+            }
+            else {
+                break;
+            }
+        }
     }
     return value;
 }

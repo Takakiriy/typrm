@@ -90,3 +90,5 @@ lineNum keyword list:
     firstKeyword
     secondKeyword
     #test of TYPRM_LINE_NUM_GETTER
+sharp:
+    #keyword: "space sharp is"%20"#. ""parcent 20"" is """%25"20""."

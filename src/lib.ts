@@ -362,7 +362,7 @@ export function  getSnapshot(label: string) {
         throw  new Error(`not found snapshot label "${label}" in "__Project__/src/__snapshots__/main.test.ts.snap" file.`)
     }
     const  snapshot = snapshots[label];
-    return  snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
+    return  snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');
 }
 
 // pp

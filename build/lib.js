@@ -455,7 +455,7 @@ function getSnapshot(label) {
         throw new Error("not found snapshot label \"" + label + "\" in \"__Project__/src/__snapshots__/main.test.ts.snap\" file.");
     }
     var snapshot = snapshots[label];
-    return snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
+    return snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');
 }
 exports.getSnapshot = getSnapshot;
 // pp

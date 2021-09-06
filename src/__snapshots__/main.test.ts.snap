@@ -1247,6 +1247,32 @@ exports[`replaces settings >> in 2_replace_1_ok: sourceFileContents 1`] = `
 "
 `;
 
+exports[`replaces settings >> in 2_replace_1A_end_of_template: sourceFileContents 1`] = `
+"設定:
+    key1: value1
+value1:  <!-- #template: key1 #-->
+value1#:  #template: key1#
+value1 #: #template: key1\\"%20\\"#
+value1%#: #template: key1\\"%25\\"#
+"
+`;
+
+exports[`replaces settings >> in 2_replace_1A_end_of_template: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_1A_end_of_template: updatedFileContents 1`] = `
+"設定:
+    key1: value1changed  #original: value1
+value1changed:  <!-- #template: key1 #-->
+value1changed#:  #template: key1#
+value1changed #: #template: key1\\"%20\\"#
+value1changed%#: #template: key1\\"%25\\"#
+"
+`;
+
 exports[`replaces settings >> in 2_replace_2_error: sourceFileContents 1`] = `
 "# 設定値を変更する >> エラーになるケース
 
