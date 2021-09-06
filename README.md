@@ -503,11 +503,11 @@ In the above case, if you do not enclose the value of the `#template:` tag in " 
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
 
+` #` (blank and #) are interpreted as the next tag or comment.
 If you want to include ` #` (blank and #) in your template, write `"%20"#`.
-` #` (blank and #) are interpreted as the next tags.
 When specifying a template that contains `"%`, write`""%25"`.
 
-    cd  "react1 #"  #template: __ProjectName__"%20"#
+    cd  "react1 #"  <!-- #template: __ProjectName__"%20"# #-->
 
 
 ### The details of settings

@@ -496,11 +496,11 @@ typrm を使うには Node.js のインストールが必要です。
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
 
+` #`（空白と#）は次のタグまたはコメントとして解釈されます。
 テンプレートに ` #`（空白と#）を含める時は、`"%20"#` と書いてください。
-` #`（空白と#）は次のタグとして解釈されます。
 `"%` を含むテンプレートを指定するときは、`""%25"` と書いてください。
 
-    cd  "react1 #"  #template: __ProjectName__"%20"#
+    cd  "react1 #"  <!-- #template: __ProjectName__"%20"# #-->
 
 
 ### 設定の詳細
