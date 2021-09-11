@@ -10,6 +10,7 @@ typrm は テキスト ファイル 形式のマニュアルに書かれたコ�
 
 - [typrm](#typrm)
   - [最初のサンプル - replace コマンド, revert コマンド](#最初のサンプル---replace-コマンド-revert-コマンド)
+    - [#to タグを使って置き換えます](#to-タグを使って置き換えます)
   - [強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します](#強力な検索機能---keyword-タグや-glossary-タグを使って精度よく検索します)
   - [インストール](#インストール)
     - [Windows の場合](#windows-の場合)
@@ -118,6 +119,36 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
     typrm replace  new_folder.yaml  4  "__Name1__: work1
         __Name2__: work2"
+
+### #to タグを使って置き換えます
+
+`#to:` タグを書くと、replace コマンドのパラメーターを省略して
+置き換えることができます。
+
+設定に `#to:` を書くときは、変数の値の右の最初の `#` に
+`#to:` と置き換えた後の値を書きます。
+
+    設定:
+        __Name__: workA1  #to: workA2
+        __Name__: workB1  #to: workB2  #// comment
+
+本文の `#template:` タグの左に 
+`#to:` と置き換えた後の値を書きます。
+
+    設定:
+        __Name__: work1
+    shell:
+        - mkdir work1  #to: work2  #template: __Name__
+        - cd    work1  #template: __Name__
+
+複数の変数があるときは、`#to:` タグに CSV 形式で書くか、
+テンプレートを置き換えた後の内容を書きます。
+
+    (workA1, workB1)  #to: workA2, workB2  #template: (__NameA__ : __NameB__)
+
+または
+
+    (workA1, workB1)  #to: (workA2 : workB2)  #template: (__NameA__ : __NameB__)
 
 
 ## 強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します

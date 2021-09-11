@@ -9,6 +9,9 @@ try {
 } catch (e) {
 }
 
+
+// File group
+
 // copyFolderSync
 // #keyword: copyFolderSync
 // sourceFolder/1.txt => destinationFolderPath/1.txt
@@ -35,6 +38,22 @@ export function  copyFileSync(sourceFilePath: string, destinationFilePath: strin
 	fs.mkdirSync(destinationFolderPath, {recursive: true});
 
 	fs.copyFileSync(sourceFilePath, destinationFilePath);
+}
+
+// pathResolve
+export function  pathResolve(path_: string) {
+
+    // '/c/home' format to current OS format
+    if (path_.length >= 3) {
+        if (path_[0] === '/'  &&  path_[2] === '/') {
+            path_ = path_[1] +':'+ path_.substr(2);
+        }
+    }
+
+    // Replace separators to OS format
+    path_ = path.resolve(path_);
+
+    return path_
 }
 
 // getFullPath
@@ -82,6 +101,39 @@ export function  isFullPath(path: string): boolean {
     return  isFullPath;
 }
 
+// checkNotInGitWorking
+export function  checkNotInGitWorking() {
+    var  path_ = process.cwd();
+
+    if ( ! path_.includes('extract_git_branches')) {
+        throw  new Error('This is not in project folder.')
+    }
+    while (path_.includes('extract_git_branches')) {
+        path_ = path.dirname(path_);
+    }
+    while (path_ !== '/') {
+
+        if (fs.existsSync(`${path_}/.git`)) {
+            throw  new Error('This test is not supported with git submodule.')
+        }
+        path_ = path.dirname(path_);
+    }
+}
+
+// getTestWorkFolderFullPath
+export function  getTestWorkFolderFullPath(): string {
+    var  path_ = process.cwd();
+
+    if ( ! path_.includes('extract_git_branches')) {
+        throw  new Error('This is not in project folder.')
+    }
+    while (path_.includes('extract_git_branches')) {
+        path_ = path.dirname(path_);
+    }
+
+    return  `${path_}/_test_of_extract_git_branches`;
+}
+
 // getHomePath
 // #keyword: getHomePath
 export function  getHomePath(): string {
@@ -93,6 +145,48 @@ export function  getHomePath(): string {
         throw new Error('unexpected');
     }
 }
+
+// getGlobbyParameters
+// #keyword: getGlobbyParameters
+export function  getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters {
+    const  targetFullPath = getFullPath(targetPath, baseFullPath);
+    const  fileName = path.basename(targetFullPath);
+    const  filePath = 1;
+    const  folderPath = 2;
+    var    pathIs = 0;
+
+    if (fileName.includes('*')) {
+        pathIs = filePath;
+    } else {
+        const  fileExists = fs.lstatSync(targetFullPath).isFile();  // This raises an exception, if path has wildcard
+        if (fileExists) {
+            pathIs = filePath;
+        } else {
+            pathIs = folderPath;
+        }
+    }
+    if (pathIs === filePath) {
+        var  targetFolderFullPath = path.dirname(targetFullPath);
+        var  wildcard = fileName;
+    } else {  // folderPath
+        var  targetFolderFullPath = targetFullPath;
+        var  wildcard = '*';
+    }
+
+    return  {
+        targetFolderFullPath,
+        wildcard,
+    };
+}
+
+// GlobbyParameters
+interface  GlobbyParameters {
+    targetFolderFullPath: string;
+    wildcard: string;
+}
+
+
+// String group
 
 // cutLeftOf
 // #keyword: cutLeftOf
@@ -143,43 +237,9 @@ export function  parseCSVColumnPositions(csv: string, columns: string[]): number
     return  positions;
 }
 
-// getGlobbyParameters
-// #keyword: getGlobbyParameters
-export function  getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters {
-    const  targetFullPath = getFullPath(targetPath, baseFullPath);
-    const  fileName = path.basename(targetFullPath);
-    const  filePath = 1;
-    const  folderPath = 2;
-    var    pathIs = 0;
-
-    if (fileName.includes('*')) {
-        pathIs = filePath;
-    } else {
-        const  fileExists = fs.lstatSync(targetFullPath).isFile();  // This raises an exception, if path has wildcard
-        if (fileExists) {
-            pathIs = filePath;
-        } else {
-            pathIs = folderPath;
-        }
-    }
-    if (pathIs === filePath) {
-        var  targetFolderFullPath = path.dirname(targetFullPath);
-        var  wildcard = fileName;
-    } else {  // folderPath
-        var  targetFolderFullPath = targetFullPath;
-        var  wildcard = '*';
-    }
-
-    return  {
-        targetFolderFullPath,
-        wildcard,
-    };
-}
-
-// GlobbyParameters
-interface  GlobbyParameters {
-    targetFolderFullPath: string;
-    wildcard: string;
+// escapeRegularExpression
+export function  escapeRegularExpression(expression: string) {
+    return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
 
 // StandardInputBuffer
@@ -231,6 +291,23 @@ class  StandardInputBuffer {
         }
     }
 }
+
+
+// Data group
+
+// getCommonElements
+export function  getCommonElements<T>(arrayA: T[], arrayB: T[]): T[] {
+    const  commonElements = [] as T[];
+    for (const item of arrayA) {
+        if (arrayB.includes(item)){
+            commonElements.push(item);
+        }
+    }
+    return  commonElements;
+}
+
+
+// User interface group
 
 // InputOption
 class InputOption {
@@ -305,55 +382,6 @@ export async function  inputPath( guide: string ) {
 // inputSkip
 export function  inputSkip(count: number) {
     inputOption.nextParameterIndex += count;
-}
-
-// pathResolve
-export function  pathResolve(path_: string) {
-
-    // '/c/home' format to current OS format
-    if (path_.length >= 3) {
-        if (path_[0] === '/'  &&  path_[2] === '/') {
-            path_ = path_[1] +':'+ path_.substr(2);
-        }
-    }
-
-    // Replace separators to OS format
-    path_ = path.resolve(path_);
-
-    return path_
-}
-
-// checkNotInGitWorking
-export function  checkNotInGitWorking() {
-    var  path_ = process.cwd();
-
-    if ( ! path_.includes('extract_git_branches')) {
-        throw  new Error('This is not in project folder.')
-    }
-    while (path_.includes('extract_git_branches')) {
-        path_ = path.dirname(path_);
-    }
-    while (path_ !== '/') {
-
-        if (fs.existsSync(`${path_}/.git`)) {
-            throw  new Error('This test is not supported with git submodule.')
-        }
-        path_ = path.dirname(path_);
-    }
-}
-
-// getTestWorkFolderFullPath
-export function  getTestWorkFolderFullPath(): string {
-    var  path_ = process.cwd();
-
-    if ( ! path_.includes('extract_git_branches')) {
-        throw  new Error('This is not in project folder.')
-    }
-    while (path_.includes('extract_git_branches')) {
-        path_ = path.dirname(path_);
-    }
-
-    return  `${path_}/_test_of_extract_git_branches`;
 }
 
 // getSnapshot

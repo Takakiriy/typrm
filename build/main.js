@@ -82,9 +82,9 @@ function main() {
                 case 2:
                     _a.sent();
                     _a.label = 3;
-                case 3: return [3 /*break*/, 14];
+                case 3: return [3 /*break*/, 20];
                 case 4:
-                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 14];
+                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 20];
                     if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 6];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: search');
@@ -92,7 +92,7 @@ function main() {
                     return [4 /*yield*/, search()];
                 case 5:
                     _a.sent();
-                    return [3 /*break*/, 14];
+                    return [3 /*break*/, 20];
                 case 6:
                     if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 8];
                     if (verboseMode) {
@@ -104,12 +104,18 @@ function main() {
                     return [4 /*yield*/, check(checkingFilePath)];
                 case 7:
                     _a.sent();
-                    return [3 /*break*/, 14];
+                    return [3 /*break*/, 20];
                 case 8:
-                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 10];
+                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 13];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: replace');
                     }
+                    if (!(exports.programArguments.length === 1)) return [3 /*break*/, 10];
+                    return [4 /*yield*/, replace()];
+                case 9:
+                    _a.sent();
+                    return [3 /*break*/, 12];
+                case 10:
                     varidateReplaceCommandArguments();
                     if (exports.programArguments.length === 3) {
                         inputFilePath = exports.programArguments[1];
@@ -121,12 +127,19 @@ function main() {
                         replacingLineNum = exports.programArguments[2];
                         keyValues = exports.programArguments[3];
                     }
-                    return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues)];
-                case 9:
+                    return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues, false)];
+                case 11:
                     _a.sent();
-                    return [3 /*break*/, 14];
-                case 10:
-                    if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 12];
+                    _a.label = 12;
+                case 12: return [3 /*break*/, 20];
+                case 13:
+                    if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 18];
+                    if (!(exports.programArguments.length === 1)) return [3 /*break*/, 15];
+                    return [4 /*yield*/, revert()];
+                case 14:
+                    _a.sent();
+                    return [3 /*break*/, 17];
+                case 15:
                     varidateRevertCommandArguments();
                     if (exports.programArguments.length === 2) {
                         inputFilePath = exports.programArguments[1];
@@ -137,14 +150,15 @@ function main() {
                         replacingLineNum = exports.programArguments[2];
                     }
                     return [4 /*yield*/, revertSettings(inputFilePath, replacingLineNum)];
-                case 11:
+                case 16:
                     _a.sent();
-                    return [3 /*break*/, 14];
-                case 12: return [4 /*yield*/, search()];
-                case 13:
+                    _a.label = 17;
+                case 17: return [3 /*break*/, 20];
+                case 18: return [4 /*yield*/, search()];
+                case 19:
                     _a.sent();
-                    _a.label = 14;
-                case 14: return [2 /*return*/];
+                    _a.label = 20;
+                case 20: return [2 /*return*/];
             }
         });
     });
@@ -523,7 +537,7 @@ function checkRoutine(isModal, inputFilePath) {
                         return [3 /*break*/, 41];
                     }
                     _e = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true, false, false)];
                 case 39:
                     errorCount = _e + _h.sent();
                     _h.label = 40;
@@ -547,7 +561,7 @@ function checkRoutine(isModal, inputFilePath) {
     });
 }
 // replaceSettings
-function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines) {
+function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines, cutReplaceToTagEnabled) {
     return __awaiter(this, void 0, void 0, function () {
         var inputFileFullPath, errorCount, replacingSettingIndex, _a;
         return __generator(this, function (_b) {
@@ -569,7 +583,7 @@ function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines) {
                     return [3 /*break*/, 6];
                 case 4:
                     _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true, false, cutReplaceToTagEnabled)];
                 case 5:
                     errorCount = _a + _b.sent();
                     _b.label = 6;
@@ -611,7 +625,7 @@ function revertSettings(inputFilePath, settingNameOrLineNum) {
                     if (!(_i < revertSettings_1.length)) return [3 /*break*/, 9];
                     revertSetting = revertSettings_1[_i];
                     _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(revertSetting), false)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(revertSetting), false, true, false)];
                 case 7:
                     errorCount = _a + _b.sent();
                     _b.label = 8;
@@ -680,10 +694,10 @@ function getInputFileFullPath(inputFilePath) {
     });
 }
 // replaceSettingsSub
-function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag) {
+function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, replacedKeys, parser, _loop_1, expected, replaced, expected, replaced;
+        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, replacedKeys, parser, _loop_1, expected, replaced, expected, replaced, replacedLine, replacedLine;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -706,9 +720,9 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                         console.log("Verbose: keyValues: " + JSON.stringify(keyValues));
                     }
                     _loop_1 = function () {
-                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, commentIndex, comment, original, templateTag, replacingLine, commonCase, before, after, necessaryVariableNames, e_3_1;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
+                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, replacingLine, commonCase, before, after, necessaryVariableNames, e_3_1;
+                        return __generator(this, function (_d) {
+                            switch (_d.label) {
                                 case 0:
                                     writer = new WriteBuffer(fs.createWriteStream(newFilePath));
                                     readStream = fs.createReadStream(oldFilePath);
@@ -737,14 +751,14 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                         console.log("Verbose: loopCount: " + loopCount);
                                         console.log("Verbose: previousEvalatedKeyValuesLength: " + previousEvalatedKeyValuesLength);
                                     }
-                                    _c.label = 1;
+                                    _d.label = 1;
                                 case 1:
-                                    _c.trys.push([1, 6, 7, 12]);
+                                    _d.trys.push([1, 6, 7, 12]);
                                     reader_3 = (e_3 = void 0, __asyncValues(reader));
-                                    _c.label = 2;
+                                    _d.label = 2;
                                 case 2: return [4 /*yield*/, reader_3.next()];
                                 case 3:
-                                    if (!(reader_3_1 = _c.sent(), !reader_3_1.done)) return [3 /*break*/, 5];
+                                    if (!(reader_3_1 = _d.sent(), !reader_3_1.done)) return [3 /*break*/, 5];
                                     line1 = reader_3_1.value;
                                     line = line1;
                                     lines.push(line);
@@ -819,23 +833,8 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                     replacingKeys = Object.keys(replacingKeyValues);
                                                     if (replacingKeys.includes(key) && ifTagParser.isReplacable) {
                                                         replacedValue = replacingKeyValues[key];
-                                                        commentIndex = line.indexOf('#', separator);
-                                                        comment = '';
-                                                        if (commentIndex !== notFound && !replacedValue.includes('#')) {
-                                                            comment = '  ' + line.substr(commentIndex);
-                                                        }
-                                                        original = '';
-                                                        if (!line.includes(originalLabel)) {
-                                                            if (addOriginalTag) {
-                                                                original = "  " + originalLabel + " " + oldValue;
-                                                            }
-                                                        }
-                                                        else {
-                                                            if (!addOriginalTag) {
-                                                                comment = comment.replace(new RegExp(" *" + originalLabel + " *" + escapeRegularExpression(replacedValue).replace(/\$/g, '$$')), '');
-                                                            }
-                                                        }
-                                                        writer.write(line.substr(0, separator + 1) + ' ' + replacedValue + original + comment + "\n");
+                                                        _c = getReplacedLineInSettings(line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled), original = _c.original, spaceAndComment = _c.spaceAndComment;
+                                                        writer.write(line.substr(0, separator + 1) + ' ' + replacedValue + original + spaceAndComment + "\n");
                                                         output = true;
                                                         setting[key] = { value: replacedValue, isReferenced: false, lineNum: lineNum };
                                                         if (parser.verbose && oldValue !== replacedValue) {
@@ -871,10 +870,18 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                     before = expected;
                                                     after = replaced;
                                                     if (templateTag.lineNumOffset <= -1) {
-                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine.replace(before, after.replace(/\$/g, '$$')) + "\n");
+                                                        replacedLine = replacingLine.replace(before, after.replace(/\$/g, '$$'));
+                                                        if (cutReplaceToTagEnabled) {
+                                                            replacedLine = cutReplaceToTag(replacedLine);
+                                                        }
+                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine + "\n");
                                                     }
                                                     else {
-                                                        writer.write(line.replace(before, after.replace(/\$/g, '$$')) + "\n");
+                                                        replacedLine = line.replace(before, after.replace(/\$/g, '$$'));
+                                                        if (cutReplaceToTagEnabled) {
+                                                            replacedLine = cutReplaceToTag(replacedLine);
+                                                        }
+                                                        writer.write(replacedLine + "\n");
                                                         output = true;
                                                     }
                                                     if (parser.verbose && before !== after) {
@@ -919,22 +926,27 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                         }
                                     }
                                     if (!output) {
-                                        writer.write(line + "\n");
+                                        if (!cutReplaceToTagEnabled) {
+                                            writer.write(line + "\n");
+                                        }
+                                        else {
+                                            writer.write(cutReplaceToTag(line) + "\n");
+                                        }
                                     }
-                                    _c.label = 4;
+                                    _d.label = 4;
                                 case 4: return [3 /*break*/, 2];
                                 case 5: return [3 /*break*/, 12];
                                 case 6:
-                                    e_3_1 = _c.sent();
+                                    e_3_1 = _d.sent();
                                     e_3 = { error: e_3_1 };
                                     return [3 /*break*/, 12];
                                 case 7:
-                                    _c.trys.push([7, , 10, 11]);
+                                    _d.trys.push([7, , 10, 11]);
                                     if (!(reader_3_1 && !reader_3_1.done && (_a = reader_3.return))) return [3 /*break*/, 9];
                                     return [4 /*yield*/, _a.call(reader_3)];
                                 case 8:
-                                    _c.sent();
-                                    _c.label = 9;
+                                    _d.sent();
+                                    _d.label = 9;
                                 case 9: return [3 /*break*/, 11];
                                 case 10:
                                     if (e_3) throw e_3.error;
@@ -967,7 +979,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                             });
                                         })];
                                 case 13:
-                                    _c.sent();
+                                    _d.sent();
                                     return [2 /*return*/];
                             }
                         });
@@ -983,6 +995,94 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
             }
         });
     });
+}
+// getReplacedLineInSettings
+function getReplacedLineInSettings(line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
+    // spaceAndComment
+    // __SettingB__: SetB
+    // __SettingB__: SetB  #// comment
+    // __SettingB__: SetB      #to: NewSetB   #// SetBB....
+    //                   ^ spaceAndCommentIndex
+    var spaceAndComment = '';
+    var commentMatch = / +#.*/.exec(line.substr(separator));
+    if (commentMatch) {
+        var spaceAndCommentIndex = separator + commentMatch.index;
+        spaceAndComment = line.substr(spaceAndCommentIndex);
+    }
+    else {
+        var spaceAndCommentIndex = notFound;
+    }
+    var original = '';
+    var lineIncludesOriginalLabel = line.includes(originalLabel);
+    // addOriginalTag
+    if (addOriginalTag && !lineIncludesOriginalLabel) {
+        // before: __SettingB__: SetB
+        // after:  __SettingB__: NewSetB  #original: SetB
+        original = "  " + originalLabel + " " + oldValue;
+        // cutReplaceToTag
+        if (cutReplaceToTagEnabled && spaceAndComment !== '') {
+            var commentIndex = line.indexOf('#', spaceAndCommentIndex);
+            var toLabelIndex = line.indexOf(toLabel, commentIndex);
+            if (toLabelIndex > commentIndex) {
+                throw new Error('set #to tag before the comment');
+            }
+            var nextCommentIndex = notFound;
+            if (toLabelIndex !== notFound) {
+                var nextCommentMatch = / +#.*/.exec(line.substr(commentIndex));
+                if (nextCommentMatch) {
+                    nextCommentIndex = commentIndex + nextCommentMatch.index;
+                }
+            }
+            if (toLabelIndex === notFound) {
+                // before: __SettingB__: SetB   #// comment
+                // after:  __SettingB__: NewSetB  #original: SetB   #// comment
+                // Do nothing
+            }
+            else {
+                if (nextCommentIndex === notFound) {
+                    // before: __SettingB__: SetB  #to: SetBB
+                    //                             ^ commentIndex == toLabelIndex
+                    // after:  __SettingB__: NewSetB  #original: SetB
+                    spaceAndComment = '';
+                }
+                else {
+                    // before: __SettingB__: SetB      #to: NewSetB   #// next comment
+                    //    commentIndex == toLabelIndex ^           ^ nextCommentIndex
+                    // after:  __SettingB__: NewSetB   #original: SetB      #// next comment
+                    var spaceCountBeforeToTag = line.indexOf('#', spaceAndCommentIndex) - spaceAndCommentIndex;
+                    var spaceCountAfterToTag = line.indexOf('#', nextCommentIndex) - nextCommentIndex;
+                    original = ' '.repeat(spaceCountAfterToTag) + (originalLabel + " " + oldValue);
+                    spaceAndComment = ' '.repeat(spaceCountBeforeToTag) + line.substr(nextCommentIndex + spaceCountAfterToTag);
+                }
+            }
+        }
+    }
+    // cutOriginalTag
+    if (cutOriginalTag && lineIncludesOriginalLabel) {
+        var replacedValuePattern = lib.escapeRegularExpression(replacedValue).replace(/\$/g, '$$');
+        spaceAndComment = spaceAndComment.replace(new RegExp(" *" + originalLabel + " *" + replacedValuePattern), '');
+    }
+    return { original: original, spaceAndComment: spaceAndComment };
+}
+// cutReplaceToTag
+function cutReplaceToTag(line) {
+    var toLabelIndex = line.indexOf(toLabel);
+    if (toLabelIndex !== notFound) {
+        var commentIndex = line.indexOf(' #', toLabelIndex);
+        if (commentIndex !== notFound) {
+            // added tag: SetB    #to: NewSetB  #template: __B__
+            // replaced:  NewSetB    #template: __B__
+            // reverted:  SetB    #template: __B__
+            line = line.substr(0, toLabelIndex) + line.substr(commentIndex + 1);
+        }
+        else {
+            // added tag: SetB    #to: NewSetB
+            // replaced:  NewSetB
+            // reverted:  SetB
+            line = line.substr(0, toLabelIndex).trimRight();
+        }
+    }
+    return line;
 }
 // makeRevertSettings
 function makeRevertSettings(inputFilePath, replacingSettingIndex) {
@@ -1112,7 +1212,7 @@ var TemplateTag = /** @class */ (function () {
         }
         if (this.indexInLine !== notFound && !disabled) {
             this.isFound = true;
-            var leftOfTemplate = line.substr(0, this.indexInLine).trim();
+            var leftOfTemplate = cutReplaceToTag(line.substr(0, this.indexInLine).trim());
             if (this.label === fileTemplateLabel) {
                 this.onFileTemplateTagReading(line);
             }
@@ -1178,6 +1278,66 @@ var TemplateTag = /** @class */ (function () {
         else { // if (this.label === templateIfLabel)
             return keys.includes(templateIfYesKey) && keys.includes(templateIfNoKey);
         }
+    };
+    // scanKeyValues
+    TemplateTag.prototype.scanKeyValues = function (toValue, allKeys) {
+        return __awaiter(this, void 0, void 0, function () {
+            var keysSortedByLength, foundIndices, template, _i, keysSortedByLength_1, key, index, indices, keys, placeholder, templatePattern, i, matchedInToValue, keyValues, i, toValues, i;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        keysSortedByLength = allKeys.slice();
+                        keysSortedByLength.sort(function (b, a) { return (a.length, b.length); });
+                        foundIndices = [];
+                        template = this.template;
+                        for (_i = 0, keysSortedByLength_1 = keysSortedByLength; _i < keysSortedByLength_1.length; _i++) {
+                            key = keysSortedByLength_1[_i];
+                            index = 0;
+                            for (;;) {
+                                index = template.indexOf(key, index);
+                                if (index === notFound) {
+                                    break;
+                                }
+                                foundIndices[index] = key;
+                                template =
+                                    template.substr(0, index) +
+                                        ' '.repeat(key.length) +
+                                        template.substr(index + key.length);
+                                // erase the key
+                                index += 1;
+                            }
+                        }
+                        indices = Object.keys(foundIndices).map(function (v) { return (parseInt(v)); }).sort();
+                        keys = indices.map(function (index) { return (foundIndices[index]); });
+                        placeholder = '\n';
+                        templatePattern = this.template;
+                        for (i = indices.length - 1; i >= 0; i -= 1) {
+                            templatePattern =
+                                templatePattern.substr(0, indices[i]) +
+                                    placeholder +
+                                    templatePattern.substr(indices[i] + keys[i].length);
+                        }
+                        templatePattern = lib.escapeRegularExpression(templatePattern).replace(new RegExp(placeholder, "g"), '(.*)');
+                        matchedInToValue = new RegExp(templatePattern).exec(toValue);
+                        keyValues = {};
+                        if (!matchedInToValue) return [3 /*break*/, 1];
+                        for (i = 1; i < matchedInToValue.length; i += 1) {
+                            keyValues[keys[i - 1]] = matchedInToValue[i];
+                        }
+                        return [3 /*break*/, 3];
+                    case 1: return [4 /*yield*/, lib.parseCSVColumns(toValue)];
+                    case 2:
+                        toValues = _a.sent();
+                        for (i = 0; i < keys.length; i += 1) {
+                            if (i < toValues.length && toValues[i]) {
+                                keyValues[keys[i]] = toValues[i];
+                            }
+                        }
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, keyValues];
+                }
+            });
+        });
     };
     // evaluate
     TemplateTag.prototype.evaluate = function (setting) {
@@ -1572,15 +1732,151 @@ var WordPositions = /** @class */ (function () {
     };
     return WordPositions;
 }());
+// replace
+function replace() {
+    return __awaiter(this, void 0, void 0, function () {
+        var _i, _a, inputFileFullPath, replaceKeyValuesSet, _b, replaceKeyValuesSet_1, replaceKeyValues;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _i = 0;
+                    return [4 /*yield*/, listUpFilePaths()];
+                case 1:
+                    _a = _c.sent();
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 8];
+                    inputFileFullPath = _a[_i];
+                    return [4 /*yield*/, makeReplaceSettingsFromToTags(inputFileFullPath)];
+                case 3:
+                    replaceKeyValuesSet = _c.sent();
+                    _b = 0, replaceKeyValuesSet_1 = replaceKeyValuesSet;
+                    _c.label = 4;
+                case 4:
+                    if (!(_b < replaceKeyValuesSet_1.length)) return [3 /*break*/, 7];
+                    replaceKeyValues = replaceKeyValuesSet_1[_b];
+                    return [4 /*yield*/, replaceSettings(inputFileFullPath, replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, true)];
+                case 5:
+                    _c.sent();
+                    _c.label = 6;
+                case 6:
+                    _b++;
+                    return [3 /*break*/, 4];
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 8: return [2 /*return*/];
+            }
+        });
+    });
+}
+// revert
+function revert() {
+    var e_6, _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var _i, _b, inputFileFullPath, text, readStream, reader, lineNum, reverted, reader_5, reader_5_1, line1, line, e_6_1;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0:
+                    _i = 0;
+                    return [4 /*yield*/, listUpFilePaths()];
+                case 1:
+                    _b = _c.sent();
+                    _c.label = 2;
+                case 2:
+                    if (!(_i < _b.length)) return [3 /*break*/, 16];
+                    inputFileFullPath = _b[_i];
+                    text = fs.readFileSync(inputFileFullPath, "utf-8");
+                    if (!text.includes(originalLabel)) return [3 /*break*/, 15];
+                    readStream = fs.createReadStream(inputFileFullPath);
+                    reader = readline.createInterface({
+                        input: readStream,
+                        crlfDelay: Infinity
+                    });
+                    lineNum = 0;
+                    reverted = false;
+                    _c.label = 3;
+                case 3:
+                    _c.trys.push([3, 9, 10, 15]);
+                    reader_5 = (e_6 = void 0, __asyncValues(reader));
+                    _c.label = 4;
+                case 4: return [4 /*yield*/, reader_5.next()];
+                case 5:
+                    if (!(reader_5_1 = _c.sent(), !reader_5_1.done)) return [3 /*break*/, 8];
+                    line1 = reader_5_1.value;
+                    line = line1;
+                    lineNum += 1;
+                    if (settingStartLabel.test(line) || settingStartLabelEn.test(line)) {
+                        reverted = false;
+                    }
+                    if (!(line.includes(originalLabel) && !reverted)) return [3 /*break*/, 7];
+                    return [4 /*yield*/, revertSettings(inputFileFullPath, lineNum.toString())];
+                case 6:
+                    _c.sent();
+                    reverted = true;
+                    _c.label = 7;
+                case 7: return [3 /*break*/, 4];
+                case 8: return [3 /*break*/, 15];
+                case 9:
+                    e_6_1 = _c.sent();
+                    e_6 = { error: e_6_1 };
+                    return [3 /*break*/, 15];
+                case 10:
+                    _c.trys.push([10, , 13, 14]);
+                    if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5.return))) return [3 /*break*/, 12];
+                    return [4 /*yield*/, _a.call(reader_5)];
+                case 11:
+                    _c.sent();
+                    _c.label = 12;
+                case 12: return [3 /*break*/, 14];
+                case 13:
+                    if (e_6) throw e_6.error;
+                    return [7 /*endfinally*/];
+                case 14: return [7 /*endfinally*/];
+                case 15:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 16: return [2 /*return*/];
+            }
+        });
+    });
+}
 // check
 function check(checkingFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var targetFolders, currentFolder, inputFileFullPaths, notFoundPaths, _i, targetFolders_2, folder, targetFolderFullPath, inputFileFullPath, filePaths, _loop_2, _a, targetFolders_3, folder, _b, inputFileFullPaths_1, inputFileFullPath;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var _i, _a, inputFileFullPath;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _i = 0;
+                    return [4 /*yield*/, listUpFilePaths(checkingFilePath)];
+                case 1:
+                    _a = _b.sent();
+                    _b.label = 2;
+                case 2:
+                    if (!(_i < _a.length)) return [3 /*break*/, 5];
+                    inputFileFullPath = _a[_i];
+                    return [4 /*yield*/, checkRoutine(false, inputFileFullPath)];
+                case 3:
+                    _b.sent();
+                    _b.label = 4;
+                case 4:
+                    _i++;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/];
+            }
+        });
+    });
+}
+// listUpFilePaths
+function listUpFilePaths(checkingFilePath) {
+    return __awaiter(this, void 0, void 0, function () {
+        var targetFolders, currentFolder, inputFileFullPaths, notFoundPaths, _i, targetFolders_2, folder, targetFolderFullPath, inputFileFullPath, _loop_2, _a, targetFolders_3, folder;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0: return [4 /*yield*/, lib.parseCSVColumns(exports.programOptions.folder)];
                 case 1:
-                    targetFolders = _c.sent();
+                    targetFolders = _b.sent();
                     currentFolder = process.cwd();
                     inputFileFullPaths = [];
                     notFoundPaths = [];
@@ -1601,22 +1897,21 @@ function check(checkingFilePath) {
                     if (inputFileFullPaths.length === 0) {
                         throw new Error("Not found specified target file at \"" + JSON.stringify(notFoundPaths) + "\".");
                     }
-                    filePaths = [checkingFilePath];
                     return [3 /*break*/, 7];
                 case 2:
                     _loop_2 = function (folder) {
-                        var _d, targetFolderFullPath, wildcard, scanedPaths;
-                        return __generator(this, function (_e) {
-                            switch (_e.label) {
+                        var _c, targetFolderFullPath, wildcard, scanedPaths;
+                        return __generator(this, function (_d) {
+                            switch (_d.label) {
                                 case 0:
-                                    _d = lib.getGlobbyParameters(folder, currentFolder), targetFolderFullPath = _d.targetFolderFullPath, wildcard = _d.wildcard;
+                                    _c = lib.getGlobbyParameters(folder, currentFolder), targetFolderFullPath = _c.targetFolderFullPath, wildcard = _c.wildcard;
                                     if (!fs.existsSync(targetFolderFullPath)) {
                                         throw new Error("Not found target folder at \"" + targetFolderFullPath + "\".");
                                     }
                                     process.chdir(targetFolderFullPath);
                                     return [4 /*yield*/, globby(["**/" + wildcard])];
                                 case 1:
-                                    scanedPaths = _e.sent();
+                                    scanedPaths = _d.sent();
                                     scanedPaths.forEach(function (scanedPath) {
                                         inputFileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath));
                                     });
@@ -1625,37 +1920,150 @@ function check(checkingFilePath) {
                         });
                     };
                     _a = 0, targetFolders_3 = targetFolders;
-                    _c.label = 3;
+                    _b.label = 3;
                 case 3:
                     if (!(_a < targetFolders_3.length)) return [3 /*break*/, 6];
                     folder = targetFolders_3[_a];
                     return [5 /*yield**/, _loop_2(folder)];
                 case 4:
-                    _c.sent();
-                    _c.label = 5;
+                    _b.sent();
+                    _b.label = 5;
                 case 5:
                     _a++;
                     return [3 /*break*/, 3];
                 case 6:
                     process.chdir(currentFolder);
-                    _c.label = 7;
-                case 7:
-                    _b = 0, inputFileFullPaths_1 = inputFileFullPaths;
-                    _c.label = 8;
-                case 8:
-                    if (!(_b < inputFileFullPaths_1.length)) return [3 /*break*/, 11];
-                    inputFileFullPath = inputFileFullPaths_1[_b];
-                    return [4 /*yield*/, checkRoutine(false, inputFileFullPath)];
-                case 9:
-                    _c.sent();
-                    _c.label = 10;
-                case 10:
-                    _b++;
-                    return [3 /*break*/, 8];
-                case 11: return [2 /*return*/];
+                    _b.label = 7;
+                case 7: return [2 /*return*/, inputFileFullPaths];
             }
         });
     });
+}
+// scanReplaceToTags
+function makeReplaceSettingsFromToTags(inputFilePath) {
+    var e_7, _a;
+    return __awaiter(this, void 0, void 0, function () {
+        var reader, lineNum, isReadingSetting, setting, settingCount, settingIndentLength, key, toValue, replaceKeyValues, errorCount, replaceKeyValuesSet, parser, reader_6, reader_6_1, line1, line, separator, keyOrNot, value, toLabelIndex, templateTag, newKeyValues, e_7_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    reader = readline.createInterface({
+                        input: fs.createReadStream(inputFilePath),
+                        crlfDelay: Infinity
+                    });
+                    lineNum = 0;
+                    isReadingSetting = false;
+                    setting = {};
+                    settingCount = 0;
+                    settingIndentLength = 0;
+                    key = '';
+                    toValue = '';
+                    replaceKeyValues = new ReplaceKeyValues();
+                    errorCount = 0;
+                    replaceKeyValuesSet = [];
+                    parser = new Parser();
+                    parser.command = CommandEnum.replace;
+                    parser.verbose = ('verbose' in exports.programOptions);
+                    parser.filePath = inputFilePath;
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 7, 8, 13]);
+                    reader_6 = __asyncValues(reader);
+                    _b.label = 2;
+                case 2: return [4 /*yield*/, reader_6.next()];
+                case 3:
+                    if (!(reader_6_1 = _b.sent(), !reader_6_1.done)) return [3 /*break*/, 6];
+                    line1 = reader_6_1.value;
+                    line = line1;
+                    lineNum += 1;
+                    // setting = ...
+                    if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+                        if (parser.verbose) {
+                            console.log("Verbose: " + getTestablePath(inputFilePath) + ":" + lineNum + ": settings");
+                        }
+                        isReadingSetting = true;
+                        setting = {};
+                        settingCount += 1;
+                        settingIndentLength = indentRegularExpression.exec(line)[0].length;
+                        toValue = '';
+                        replaceKeyValues = new ReplaceKeyValues();
+                        replaceKeyValues.settingNameOrLineNum = lineNum.toString();
+                        replaceKeyValuesSet.push(replaceKeyValues);
+                    }
+                    else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
+                        isReadingSetting = false;
+                        key = '';
+                    }
+                    if (isReadingSetting) {
+                        separator = line.indexOf(':');
+                        if (separator !== notFound) {
+                            keyOrNot = line.substr(0, separator).trim();
+                            if (keyOrNot[0] !== '#') {
+                                key = keyOrNot;
+                                value = getValue(line, separator);
+                                setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
+                            }
+                        }
+                    }
+                    toLabelIndex = line.indexOf(toLabel);
+                    if (toLabelIndex !== notFound) {
+                        toValue = getValue(line, toLabelIndex + toLabel.length - 1);
+                        if (isReadingSetting) {
+                            replaceKeyValues.keyValues[key] = toValue;
+                            toValue = '';
+                        }
+                    }
+                    templateTag = parseTemplateTag(line, parser);
+                    if (!templateTag.isFound) return [3 /*break*/, 5];
+                    return [4 /*yield*/, templateTag.scanKeyValues(toValue, Object.keys(setting))];
+                case 4:
+                    newKeyValues = _b.sent();
+                    errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues);
+                    replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+                    _b.label = 5;
+                case 5: return [3 /*break*/, 2];
+                case 6: return [3 /*break*/, 13];
+                case 7:
+                    e_7_1 = _b.sent();
+                    e_7 = { error: e_7_1 };
+                    return [3 /*break*/, 13];
+                case 8:
+                    _b.trys.push([8, , 11, 12]);
+                    if (!(reader_6_1 && !reader_6_1.done && (_a = reader_6.return))) return [3 /*break*/, 10];
+                    return [4 /*yield*/, _a.call(reader_6)];
+                case 9:
+                    _b.sent();
+                    _b.label = 10;
+                case 10: return [3 /*break*/, 12];
+                case 11:
+                    if (e_7) throw e_7.error;
+                    return [7 /*endfinally*/];
+                case 12: return [7 /*endfinally*/];
+                case 13:
+                    if (errorCount >= 1) {
+                        throw new Error("error count: " + errorCount);
+                    }
+                    return [2 /*return*/, replaceKeyValuesSet];
+            }
+        });
+    });
+}
+// checkNoConfilict
+function checkNoConfilict(keyValueA, keyValueB) {
+    var commonKeys = lib.getCommonElements(Object.keys(keyValueA), Object.keys(keyValueB));
+    var errorCount = 0;
+    for (var _i = 0, commonKeys_1 = commonKeys; _i < commonKeys_1.length; _i++) {
+        var key = commonKeys_1[_i];
+        if (keyValueA[key] !== keyValueB[key]) {
+            console.log('');
+            console.log('Error of conflict #to: tag:');
+            console.log("    key: " + key);
+            console.log("    valueA: " + keyValueA[key]);
+            console.log("    valueB: " + keyValueB[key]);
+            errorCount += 1;
+        }
+    }
+    return errorCount;
 }
 // search
 function search() {
@@ -1752,7 +2160,7 @@ function search() {
 }
 // searchSub
 function searchSub(keyword) {
-    var e_6, _a;
+    var e_8, _a;
     return __awaiter(this, void 0, void 0, function () {
         var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, thesaurus, glossaryTags, foundLines, thesaurusFilePath, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation, foundLine, refTagPosition, nextTagPosition, refTagAndAddress, refTagAndAddress, normalReturn;
         return __generator(this, function (_e) {
@@ -1816,7 +2224,7 @@ function searchSub(keyword) {
                     _e.label = 7;
                 case 7:
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, blockDisable, reader_5, reader_5_1, line1, line, columns, found, unescapedLine, columnPositions, _h, _j, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _k, _l, match, _m, _o, match, e_6_1;
+                        var reader, blockDisable, reader_7, reader_7_1, line1, line, columns, found, unescapedLine, columnPositions, _h, _j, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _k, _l, match, _m, _o, match, e_8_1;
                         return __generator(this, function (_p) {
                             switch (_p.label) {
                                 case 0:
@@ -1829,12 +2237,12 @@ function searchSub(keyword) {
                                     _p.label = 1;
                                 case 1:
                                     _p.trys.push([1, 8, 9, 14]);
-                                    reader_5 = (e_6 = void 0, __asyncValues(reader));
+                                    reader_7 = (e_8 = void 0, __asyncValues(reader));
                                     _p.label = 2;
-                                case 2: return [4 /*yield*/, reader_5.next()];
+                                case 2: return [4 /*yield*/, reader_7.next()];
                                 case 3:
-                                    if (!(reader_5_1 = _p.sent(), !reader_5_1.done)) return [3 /*break*/, 7];
-                                    line1 = reader_5_1.value;
+                                    if (!(reader_7_1 = _p.sent(), !reader_7_1.done)) return [3 /*break*/, 7];
+                                    line1 = reader_7_1.value;
                                     line = line1;
                                     lineNum += 1;
                                     blockDisable.evaluate(line);
@@ -1955,19 +2363,19 @@ function searchSub(keyword) {
                                 case 6: return [3 /*break*/, 2];
                                 case 7: return [3 /*break*/, 14];
                                 case 8:
-                                    e_6_1 = _p.sent();
-                                    e_6 = { error: e_6_1 };
+                                    e_8_1 = _p.sent();
+                                    e_8 = { error: e_8_1 };
                                     return [3 /*break*/, 14];
                                 case 9:
                                     _p.trys.push([9, , 12, 13]);
-                                    if (!(reader_5_1 && !reader_5_1.done && (_a = reader_5.return))) return [3 /*break*/, 11];
-                                    return [4 /*yield*/, _a.call(reader_5)];
+                                    if (!(reader_7_1 && !reader_7_1.done && (_a = reader_7.return))) return [3 /*break*/, 11];
+                                    return [4 /*yield*/, _a.call(reader_7)];
                                 case 10:
                                     _p.sent();
                                     _p.label = 11;
                                 case 11: return [3 /*break*/, 13];
                                 case 12:
-                                    if (e_6) throw e_6.error;
+                                    if (e_8) throw e_8.error;
                                     return [7 /*endfinally*/];
                                 case 13: return [7 /*endfinally*/];
                                 case 14: return [2 /*return*/];
@@ -2198,7 +2606,7 @@ function printRef(refTagAndAddress, option) {
                             var variableName = variable.substr('${'.length, variable.length - '${}'.length);
                             var value = process.env["" + typrmEnvPrefix + variableName];
                             if (value) {
-                                var variableRegExp = new RegExp('\\\\?' + escapeRegularExpression(variable), 'g');
+                                var variableRegExp = new RegExp('\\\\?' + lib.escapeRegularExpression(variable), 'g');
                                 address = address.replace(variableRegExp, function (match, offset) {
                                     var startsBackSlash = (match.substr(0, 1) === '\\');
                                     if (startsBackSlash) {
@@ -2272,7 +2680,7 @@ function printRef(refTagAndAddress, option) {
                     });
                     for (_f = 0, sortedEnvronmentVariables_1 = sortedEnvronmentVariables; _f < sortedEnvronmentVariables_1.length; _f++) {
                         variable = sortedEnvronmentVariables_1[_f];
-                        recommended = recommended.replace(new RegExp(escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
+                        recommended = recommended.replace(new RegExp(lib.escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
                     }
                     if (recommended.replace(/\\/g, '/').startsWith(lib.getHomePath().replace(/\\/g, '/'))) {
                         recommended = '~' + recommended.substr(lib.getHomePath().length);
@@ -2639,9 +3047,9 @@ function getTrueCondition(expression) {
 }
 // getSettingIndexFromLineNum
 function getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum) {
-    var e_7, _a;
+    var e_9, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var reader, settingCount, lineNum, breaking, isFound, exception, targetLineNum, targetSettingName, isOneSetting, reader_6, reader_6_1, line1, line, currentSettingName, e_7_1, settingIndex;
+        var reader, settingCount, lineNum, breaking, isFound, exception, targetLineNum, targetSettingName, isOneSetting, reader_8, reader_8_1, line1, line, currentSettingName, e_9_1, settingIndex;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -2663,12 +3071,12 @@ function getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum) {
                     _b.label = 1;
                 case 1:
                     _b.trys.push([1, 6, 7, 12]);
-                    reader_6 = __asyncValues(reader);
+                    reader_8 = __asyncValues(reader);
                     _b.label = 2;
-                case 2: return [4 /*yield*/, reader_6.next()];
+                case 2: return [4 /*yield*/, reader_8.next()];
                 case 3:
-                    if (!(reader_6_1 = _b.sent(), !reader_6_1.done)) return [3 /*break*/, 5];
-                    line1 = reader_6_1.value;
+                    if (!(reader_8_1 = _b.sent(), !reader_8_1.done)) return [3 /*break*/, 5];
+                    line1 = reader_8_1.value;
                     if (breaking) {
                         return [3 /*break*/, 4];
                     } // "reader" requests read all lines
@@ -2704,19 +3112,19 @@ function getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum) {
                 case 4: return [3 /*break*/, 2];
                 case 5: return [3 /*break*/, 12];
                 case 6:
-                    e_7_1 = _b.sent();
-                    e_7 = { error: e_7_1 };
+                    e_9_1 = _b.sent();
+                    e_9 = { error: e_9_1 };
                     return [3 /*break*/, 12];
                 case 7:
                     _b.trys.push([7, , 10, 11]);
-                    if (!(reader_6_1 && !reader_6_1.done && (_a = reader_6.return))) return [3 /*break*/, 9];
-                    return [4 /*yield*/, _a.call(reader_6)];
+                    if (!(reader_8_1 && !reader_8_1.done && (_a = reader_8.return))) return [3 /*break*/, 9];
+                    return [4 /*yield*/, _a.call(reader_8)];
                 case 8:
                     _b.sent();
                     _b.label = 9;
                 case 9: return [3 /*break*/, 11];
                 case 10:
-                    if (e_7) throw e_7.error;
+                    if (e_9) throw e_9.error;
                     return [7 /*endfinally*/];
                 case 11: return [7 /*endfinally*/];
                 case 12:
@@ -2789,7 +3197,7 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog) {
     var log = [];
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
-        var re = new RegExp(escapeRegularExpression(key), "gi");
+        var re = new RegExp(lib.escapeRegularExpression(key), "gi");
         var expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g, '$$'));
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
@@ -2841,11 +3249,14 @@ function parseKeyValueLines(keyValueLines) {
 function getValue(line, separatorIndex) {
     if (separatorIndex === void 0) { separatorIndex = -1; }
     var value = line.substr(separatorIndex + 1).trim();
-    var comment = value.indexOf('#');
+    if (value[0] === '#') {
+        var comment = 0;
+    }
+    else {
+        var comment = value.indexOf(' #');
+    }
     if (comment !== notFound) {
-        if (comment === 0 || value[comment - 1] === ' ') { // space and #
-            value = value.substr(0, comment).trim();
-        }
+        value = value.substr(0, comment).trim();
     }
     value = unscapePercentByte(value);
     return value;
@@ -2942,10 +3353,6 @@ function cutQuotation(str) {
         return str;
     }
 }
-// escapeRegularExpression
-function escapeRegularExpression(expression) {
-    return expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
-}
 // isBackSlashParameter
 // Example:
 //    ( '\na', 0 ) === false
@@ -2979,6 +3386,31 @@ var Setting = /** @class */ (function () {
         this.isReferenced = false;
     }
     return Setting;
+}());
+// ReplaceKeyValues
+var ReplaceKeyValues = /** @class */ (function () {
+    function ReplaceKeyValues() {
+        this.settingNameOrLineNum = '';
+        this.keyValues = {};
+    }
+    Object.defineProperty(ReplaceKeyValues.prototype, "keyValueLines", {
+        get: function () {
+            return Object.entries(this.keyValues).reduce(function (previousReturnValue, _a) {
+                var key = _a[0], value = _a[1];
+                return (previousReturnValue + (key + ": " + value + "\n"));
+            }, '');
+            /*
+                    var  lines = '';
+                    for (const [key, value] of Object.entries(this.keyValues)) {
+                        lines += `${key}: ${value}`;
+                    }
+                    return  lines;
+            */
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return ReplaceKeyValues;
 }());
 // Thesaurus
 var Thesaurus = /** @class */ (function () {
@@ -3185,9 +3617,9 @@ function splitFilePathAndKeyword(address, getter) {
 }
 // searchAsText
 function searchAsText(getter, address) {
-    var e_8, _a;
+    var e_10, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _b, filePath, keyword, csvOption, targetMatchID, keywords, firstKeyword, currentKeyword, keywords, currentKeyword, reader, lineNum, breaking, exception, foundCount, reader_7, reader_7_1, line1, line, nextKeyword, e_8_1;
+        var _b, filePath, keyword, csvOption, targetMatchID, keywords, firstKeyword, currentKeyword, keywords, currentKeyword, reader, lineNum, breaking, exception, foundCount, reader_9, reader_9_1, line1, line, nextKeyword, e_10_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -3226,12 +3658,12 @@ function searchAsText(getter, address) {
                     _c.label = 4;
                 case 4:
                     _c.trys.push([4, 9, 10, 15]);
-                    reader_7 = __asyncValues(reader);
+                    reader_9 = __asyncValues(reader);
                     _c.label = 5;
-                case 5: return [4 /*yield*/, reader_7.next()];
+                case 5: return [4 /*yield*/, reader_9.next()];
                 case 6:
-                    if (!(reader_7_1 = _c.sent(), !reader_7_1.done)) return [3 /*break*/, 8];
-                    line1 = reader_7_1.value;
+                    if (!(reader_9_1 = _c.sent(), !reader_9_1.done)) return [3 /*break*/, 8];
+                    line1 = reader_9_1.value;
                     if (breaking) {
                         return [3 /*break*/, 7];
                     } // "reader" requests read all lines
@@ -3266,19 +3698,19 @@ function searchAsText(getter, address) {
                 case 7: return [3 /*break*/, 5];
                 case 8: return [3 /*break*/, 15];
                 case 9:
-                    e_8_1 = _c.sent();
-                    e_8 = { error: e_8_1 };
+                    e_10_1 = _c.sent();
+                    e_10 = { error: e_10_1 };
                     return [3 /*break*/, 15];
                 case 10:
                     _c.trys.push([10, , 13, 14]);
-                    if (!(reader_7_1 && !reader_7_1.done && (_a = reader_7.return))) return [3 /*break*/, 12];
-                    return [4 /*yield*/, _a.call(reader_7)];
+                    if (!(reader_9_1 && !reader_9_1.done && (_a = reader_9.return))) return [3 /*break*/, 12];
+                    return [4 /*yield*/, _a.call(reader_9)];
                 case 11:
                     _c.sent();
                     _c.label = 12;
                 case 12: return [3 /*break*/, 14];
                 case 13:
-                    if (e_8) throw e_8.error;
+                    if (e_10) throw e_10.error;
                     return [7 /*endfinally*/];
                 case 14: return [7 /*endfinally*/];
                 case 15:
@@ -3532,6 +3964,7 @@ else {
 var settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
 var settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 var originalLabel = "#original:";
+var toLabel = "#to:"; // replace to tag
 var templateLabel = "#template:";
 var templateAtStartLabel = "#template-at(";
 var templateAtEndLabel = "):";

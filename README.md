@@ -12,6 +12,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 
 - [typrm](#typrm)
   - [First replace example - replace command, revert command](#first-replace-example---replace-command-revert-command)
+    - [Replace with #to tag](#replace-with-to-tag)
   - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
   - [Install](#install)
     - [For Windows](#for-windows)
@@ -115,6 +116,39 @@ you can copy and paste multiple linees and enter them continuously.
 
     typrm replace  new_folder.yaml  4  "__Name1__: work1
         __Name2__: work2"
+
+
+### Replace with #to tag
+
+You can omit almost parameters of the replace command
+and replace it by writing the `#to:` tag.
+
+When writing `#to:` in the settings,
+write `#to:` tag and the value after replacing 
+in the first `#` to the right of the variable value.
+
+    settings:
+        __Name__: workA1  #to: workA2
+        __Name__: workB1  #to: workB2  #// comment
+
+Write `#to:` tag and the value after replacing
+to the left of the `#template:` tag in the body.
+
+    settings:
+        __Name__: work1
+    shell:
+        - mkdir work1  #to: work2  #template: __Name__
+        - cd    work1  #template: __Name__
+
+If there are multiple variables,
+write `#to:` tag and values in CSV format,
+or write the contents after replacing the template.
+
+    (workA1, workB1)  #to: workA2, workB2  #template: (__NameA__ : __NameB__)
+
+or
+
+    (workA1, workB1)  #to: (workA2 : workB2)  #template: (__NameA__ : __NameB__)
 
 
 ## Powerful search - #keyword tag, #glossary tag make highly accurate search

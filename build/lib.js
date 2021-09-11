@@ -47,7 +47,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.pathResolve = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getGlobbyParameters = exports.parseCSVColumnPositions = exports.parseCSVColumns = exports.cutLeftOf = exports.getHomePath = exports.isFullPath = exports.getFullPath = exports.copyFileSync = exports.copyFolderSync = void 0;
+exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getCommonElements = exports.escapeRegularExpression = exports.parseCSVColumnPositions = exports.parseCSVColumns = exports.cutLeftOf = exports.getGlobbyParameters = exports.getHomePath = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.isFullPath = exports.getFullPath = exports.pathResolve = exports.copyFileSync = exports.copyFolderSync = void 0;
 var fs = require("fs");
 var path = require("path");
 var globby = require("globby");
@@ -59,6 +59,7 @@ try {
 }
 catch (e) {
 }
+// File group
 // copyFolderSync
 // #keyword: copyFolderSync
 // sourceFolder/1.txt => destinationFolderPath/1.txt
@@ -123,6 +124,19 @@ function copyFileSync(sourceFilePath, destinationFilePath) {
     fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
 exports.copyFileSync = copyFileSync;
+// pathResolve
+function pathResolve(path_) {
+    // '/c/home' format to current OS format
+    if (path_.length >= 3) {
+        if (path_[0] === '/' && path_[2] === '/') {
+            path_ = path_[1] + ':' + path_.substr(2);
+        }
+    }
+    // Replace separators to OS format
+    path_ = path.resolve(path_);
+    return path_;
+}
+exports.pathResolve = pathResolve;
 // getFullPath
 // #keyword: JavaScript (js) library getFullPath
 // If "basePath" is current directory, you can call "path.resolve"
@@ -172,6 +186,35 @@ function isFullPath(path) {
     return isFullPath;
 }
 exports.isFullPath = isFullPath;
+// checkNotInGitWorking
+function checkNotInGitWorking() {
+    var path_ = process.cwd();
+    if (!path_.includes('extract_git_branches')) {
+        throw new Error('This is not in project folder.');
+    }
+    while (path_.includes('extract_git_branches')) {
+        path_ = path.dirname(path_);
+    }
+    while (path_ !== '/') {
+        if (fs.existsSync(path_ + "/.git")) {
+            throw new Error('This test is not supported with git submodule.');
+        }
+        path_ = path.dirname(path_);
+    }
+}
+exports.checkNotInGitWorking = checkNotInGitWorking;
+// getTestWorkFolderFullPath
+function getTestWorkFolderFullPath() {
+    var path_ = process.cwd();
+    if (!path_.includes('extract_git_branches')) {
+        throw new Error('This is not in project folder.');
+    }
+    while (path_.includes('extract_git_branches')) {
+        path_ = path.dirname(path_);
+    }
+    return path_ + "/_test_of_extract_git_branches";
+}
+exports.getTestWorkFolderFullPath = getTestWorkFolderFullPath;
 // getHomePath
 // #keyword: getHomePath
 function getHomePath() {
@@ -186,6 +229,41 @@ function getHomePath() {
     }
 }
 exports.getHomePath = getHomePath;
+// getGlobbyParameters
+// #keyword: getGlobbyParameters
+function getGlobbyParameters(targetPath, baseFullPath) {
+    var targetFullPath = getFullPath(targetPath, baseFullPath);
+    var fileName = path.basename(targetFullPath);
+    var filePath = 1;
+    var folderPath = 2;
+    var pathIs = 0;
+    if (fileName.includes('*')) {
+        pathIs = filePath;
+    }
+    else {
+        var fileExists = fs.lstatSync(targetFullPath).isFile(); // This raises an exception, if path has wildcard
+        if (fileExists) {
+            pathIs = filePath;
+        }
+        else {
+            pathIs = folderPath;
+        }
+    }
+    if (pathIs === filePath) {
+        var targetFolderFullPath = path.dirname(targetFullPath);
+        var wildcard = fileName;
+    }
+    else { // folderPath
+        var targetFolderFullPath = targetFullPath;
+        var wildcard = '*';
+    }
+    return {
+        targetFolderFullPath: targetFolderFullPath,
+        wildcard: wildcard,
+    };
+}
+exports.getGlobbyParameters = getGlobbyParameters;
+// String group
 // cutLeftOf
 // #keyword: cutLeftOf
 function cutLeftOf(input, keyword) {
@@ -236,40 +314,11 @@ function parseCSVColumnPositions(csv, columns) {
     return positions;
 }
 exports.parseCSVColumnPositions = parseCSVColumnPositions;
-// getGlobbyParameters
-// #keyword: getGlobbyParameters
-function getGlobbyParameters(targetPath, baseFullPath) {
-    var targetFullPath = getFullPath(targetPath, baseFullPath);
-    var fileName = path.basename(targetFullPath);
-    var filePath = 1;
-    var folderPath = 2;
-    var pathIs = 0;
-    if (fileName.includes('*')) {
-        pathIs = filePath;
-    }
-    else {
-        var fileExists = fs.lstatSync(targetFullPath).isFile(); // This raises an exception, if path has wildcard
-        if (fileExists) {
-            pathIs = filePath;
-        }
-        else {
-            pathIs = folderPath;
-        }
-    }
-    if (pathIs === filePath) {
-        var targetFolderFullPath = path.dirname(targetFullPath);
-        var wildcard = fileName;
-    }
-    else { // folderPath
-        var targetFolderFullPath = targetFullPath;
-        var wildcard = '*';
-    }
-    return {
-        targetFolderFullPath: targetFolderFullPath,
-        wildcard: wildcard,
-    };
+// escapeRegularExpression
+function escapeRegularExpression(expression) {
+    return expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
-exports.getGlobbyParameters = getGlobbyParameters;
+exports.escapeRegularExpression = escapeRegularExpression;
 // StandardInputBuffer
 var StandardInputBuffer = /** @class */ (function () {
     function StandardInputBuffer() {
@@ -325,6 +374,20 @@ var StandardInputBuffer = /** @class */ (function () {
     };
     return StandardInputBuffer;
 }());
+// Data group
+// getCommonElements
+function getCommonElements(arrayA, arrayB) {
+    var commonElements = [];
+    for (var _i = 0, arrayA_1 = arrayA; _i < arrayA_1.length; _i++) {
+        var item = arrayA_1[_i];
+        if (arrayB.includes(item)) {
+            commonElements.push(item);
+        }
+    }
+    return commonElements;
+}
+exports.getCommonElements = getCommonElements;
+// User interface group
 // InputOption
 var InputOption = /** @class */ (function () {
     function InputOption(inputLines) {
@@ -407,48 +470,6 @@ function inputSkip(count) {
     inputOption.nextParameterIndex += count;
 }
 exports.inputSkip = inputSkip;
-// pathResolve
-function pathResolve(path_) {
-    // '/c/home' format to current OS format
-    if (path_.length >= 3) {
-        if (path_[0] === '/' && path_[2] === '/') {
-            path_ = path_[1] + ':' + path_.substr(2);
-        }
-    }
-    // Replace separators to OS format
-    path_ = path.resolve(path_);
-    return path_;
-}
-exports.pathResolve = pathResolve;
-// checkNotInGitWorking
-function checkNotInGitWorking() {
-    var path_ = process.cwd();
-    if (!path_.includes('extract_git_branches')) {
-        throw new Error('This is not in project folder.');
-    }
-    while (path_.includes('extract_git_branches')) {
-        path_ = path.dirname(path_);
-    }
-    while (path_ !== '/') {
-        if (fs.existsSync(path_ + "/.git")) {
-            throw new Error('This test is not supported with git submodule.');
-        }
-        path_ = path.dirname(path_);
-    }
-}
-exports.checkNotInGitWorking = checkNotInGitWorking;
-// getTestWorkFolderFullPath
-function getTestWorkFolderFullPath() {
-    var path_ = process.cwd();
-    if (!path_.includes('extract_git_branches')) {
-        throw new Error('This is not in project folder.');
-    }
-    while (path_.includes('extract_git_branches')) {
-        path_ = path.dirname(path_);
-    }
-    return path_ + "/_test_of_extract_git_branches";
-}
-exports.getTestWorkFolderFullPath = getTestWorkFolderFullPath;
 // getSnapshot
 function getSnapshot(label) {
     if (!(label in snapshots)) {

@@ -464,6 +464,36 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
     });
+
+    describe("to >>", () => {
+        test.each([
+            ['1_OK'],
+        ])("%s", async (subCaseName) => {
+            const  changingFolderPath = testFolderPath + '_changing';
+            const  changingFileName = subCaseName + "_1_changing.yaml";
+            const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+            const  sourceFileContents = lib.getSnapshot(`replaces settings >> to >> ${subCaseName}: sourceFileContents 1`);
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+            writeFileSync(changingFilePath, sourceFileContents);
+
+            // Test Main
+            await callMain(["replace"], {
+                folder: changingFolderPath, test: "", locale: "en-US"
+            });
+            const  replacedFileContents = fs.readFileSync(changingFilePath).toString();
+
+            expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
+
+            // Test Main
+            await callMain(["revert"], {
+                folder: changingFolderPath, test: "", locale: "en-US"
+            });
+            const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
+
+            expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        });
+    });
 });
 
 describe("searches keyword tag >>", () => {

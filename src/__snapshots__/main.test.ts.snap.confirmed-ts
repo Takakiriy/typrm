@@ -2052,6 +2052,90 @@ exports[`replaces settings >> in 2_replace_9_template_if_4_operators: updatedFil
 "
 `;
 
+exports[`replaces settings >> to >> 1_OK: replacedFileContents 1`] = `
+"settings:
+    __SettingA__: SetAA  #original: SetA
+    __SettingB__: SetB#    #original: SetB      #// SetB#....
+    __SettingC__: SetCCCC  #original: SettingC  #// SetCCCC..
+    in body:
+        __BodyA__: ValueAA  #original: ValueA
+        __BodyB__: ValueBB  #original: ValueB
+        __BodyC__: ValueCC  #original: ValueC
+        __BodyD__: ValueDD  #original: ValueD
+        __BodyE__: ValueEE  #original: ValueE    #// ....
+        __BodyF1__: ValueFF1  #original: ValueF1  #// ..
+        __BodyF2__: ValueFF2  #original: ValueF2
+        __BodyG1__: ValueGG1  #original: ValueG1
+        __BodyG2__: ValueGG2  #original: ValueG2
+body:
+    ValueAA   #template: __BodyA__
+    ValueBB
+        #template: __BodyB__
+    ValueCC
+        #template: __BodyC__
+    -(ValueDD)-             #template: (__BodyD__)
+    -(ValueEE)-             #template: (__BodyE__)
+    -(ValueFF1)-(ValueFF2)-  #template: (__BodyF1__)-(__BodyF2__)
+    -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
+"
+`;
+
+exports[`replaces settings >> to >> 1_OK: revertedFileContents 1`] = `
+"settings:
+    __SettingA__: SetA
+    __SettingB__: SetB      #// SetB#....
+    __SettingC__: SettingC  #// SetCCCC..
+    in body:
+        __BodyA__: ValueA
+        __BodyB__: ValueB
+        __BodyC__: ValueC
+        __BodyD__: ValueD
+        __BodyE__: ValueE    #// ....
+        __BodyF1__: ValueF1  #// ..
+        __BodyF2__: ValueF2
+        __BodyG1__: ValueG1
+        __BodyG2__: ValueG2
+body:
+    ValueA   #template: __BodyA__
+    ValueB
+        #template: __BodyB__
+    ValueC
+        #template: __BodyC__
+    -(ValueD)-             #template: (__BodyD__)
+    -(ValueE)-             #template: (__BodyE__)
+    -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)
+    -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
+"
+`;
+
+exports[`replaces settings >> to >> 1_OK: sourceFileContents 1`] = `
+"settings:
+    __SettingA__: SetA      #to: SetAA
+    __SettingB__: SetB      #to: SetB#    #// SetB#....
+    __SettingC__: SettingC  #to: SetCCCC  #// SetCCCC..
+    in body:
+        __BodyA__: ValueA
+        __BodyB__: ValueB
+        __BodyC__: ValueC
+        __BodyD__: ValueD
+        __BodyE__: ValueE    #// ....
+        __BodyF1__: ValueF1  #// ..
+        __BodyF2__: ValueF2
+        __BodyG1__: ValueG1
+        __BodyG2__: ValueG2
+body:
+    ValueA   #to: ValueAA    #template: __BodyA__
+    ValueB   #to: ValueBB
+        #template: __BodyB__
+    ValueC
+        #to: ValueCC  #template: __BodyC__
+    -(ValueD)-             #to:  ValueDD   #template: (__BodyD__)
+    -(ValueE)-             #to: (ValueEE)  #template: (__BodyE__)
+    -(ValueF1)-(ValueF2)-  #to:  ValueFF1, ValueFF2    #template: (__BodyF1__)-(__BodyF2__)
+    -(ValueG1)-(ValueG2)-  #to: (ValueGG1)-(ValueGG2)  #template: (__BodyG1__)-(__BodyG2__)
+"
+`;
+
 exports[`searches keyword tag >> thesaurus >> acronym: sourceFileContents 1`] = `
 "#keyword: PowerShell
 "

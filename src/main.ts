@@ -49,30 +49,40 @@ export async function  main() {
             if (verboseMode) {
                 console.log('Verbose: typrm command: replace');
             }
-            varidateReplaceCommandArguments();
-            if (programArguments.length === 3) {
-                var  inputFilePath = programArguments[1];
-                var  replacingLineNum = '';  // isOneSetting
-                var  keyValues = programArguments[2];
-            } else {
-                var  inputFilePath = programArguments[1];
-                var  replacingLineNum = programArguments[2];
-                var  keyValues = programArguments[3];
-            }
+            if (programArguments.length === 1) {
 
-            await replaceSettings(inputFilePath, replacingLineNum, keyValues);
+                await replace();
+            } else {
+                varidateReplaceCommandArguments();
+                if (programArguments.length === 3) {
+                    var  inputFilePath = programArguments[1];
+                    var  replacingLineNum = '';  // isOneSetting
+                    var  keyValues = programArguments[2];
+                } else {
+                    var  inputFilePath = programArguments[1];
+                    var  replacingLineNum = programArguments[2];
+                    var  keyValues = programArguments[3];
+                }
+
+                await replaceSettings(inputFilePath, replacingLineNum, keyValues, false);
+            }
         }
         else if (programArguments[0] === 'revert') {
-            varidateRevertCommandArguments();
-            if (programArguments.length === 2) {
-                var  inputFilePath = programArguments[1];
-                var  replacingLineNum = '';  // isOneSetting
-            } else {
-                var  inputFilePath = programArguments[1];
-                var  replacingLineNum = programArguments[2];
-            }
+            if (programArguments.length === 1) {
 
-            await revertSettings(inputFilePath, replacingLineNum);
+                await revert();
+            } else {
+                varidateRevertCommandArguments();
+                if (programArguments.length === 2) {
+                    var  inputFilePath = programArguments[1];
+                    var  replacingLineNum = '';  // isOneSetting
+                } else {
+                    var  inputFilePath = programArguments[1];
+                    var  replacingLineNum = programArguments[2];
+                }
+
+                await revertSettings(inputFilePath, replacingLineNum);
+            }
         }
         else {
             await search();
@@ -396,7 +406,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                             break;
                         }
                         errorCount += await replaceSettingsSub(
-                            inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true);
+                            inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true, false, false);
                     }
                 }
             }
@@ -413,7 +423,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 }
 
 // replaceSettings
-async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: string, keyValueLines: string) {
+async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: string, keyValueLines: string, cutReplaceToTagEnabled: boolean) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
@@ -427,7 +437,7 @@ async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: str
         } else {
 
             errorCount += await replaceSettingsSub(
-                inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true);
+                inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true, false, cutReplaceToTagEnabled);
         }
     }
     console.log('');
@@ -451,7 +461,7 @@ async function  revertSettings(inputFilePath: string, settingNameOrLineNum: stri
             for (const revertSetting of revertSettings) {
 
                 errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-                    parseKeyValueLines(revertSetting), false);
+                    parseKeyValueLines(revertSetting), false, true, false);
             }
         }
     }
@@ -502,7 +512,9 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 
 // replaceSettingsSub
 async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex: number,
-        keyValues: {[key: string]: string}, addOriginalTag: boolean): Promise<number>/*errorCount*/ {
+        keyValues: {[key: string]: string},
+        addOriginalTag: boolean, cutOriginalTag: boolean, cutReplaceToTagEnabled: boolean
+): Promise<number>/*errorCount*/ {
     var    errorCount = 0;
     var    replacingKeyValues = keyValues;
     var    previousEvalatedKeyValues: {[key: string]: string} = {};
@@ -626,27 +638,13 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                         }
                         if (ifTagParser.thisIsOutOfFalseBlock) {
                             const  replacingKeys = Object.keys(replacingKeyValues);
-
                             if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
                                 const  replacedValue = replacingKeyValues[key];
-                                const  commentIndex = line.indexOf('#', separator);
-                                let    comment= '';
-                                if (commentIndex !== notFound  &&  ! replacedValue.includes('#')) {
-                                    comment = '  ' + line.substr(commentIndex);
-                                }
-                                let  original = '';
-                                if ( ! line.includes(originalLabel)) {
-                                    if (addOriginalTag) {
-                                        original = `  ${originalLabel} ${oldValue}`;
-                                    }
-                                } else {
-                                    if ( ! addOriginalTag) {
-                                        comment = comment.replace(new RegExp(
-                                            ` *${originalLabel} *${escapeRegularExpression(replacedValue).replace(/\$/g,'$$')}`), '');
-                                    }
-                                }
 
-                                writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + comment + "\n");
+                                const  {original, spaceAndComment} = getReplacedLineInSettings(
+                                    line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
+
+                                writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
                                 output = true;
                                 setting[key] = {value: replacedValue, isReferenced: false, lineNum};
                                 if (parser.verbose  &&  oldValue !== replacedValue) {
@@ -682,11 +680,19 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             const  before = expected;
                             const  after = replaced;
                             if (templateTag.lineNumOffset <= -1) {
-                                writer.replaceAboveLine(templateTag.lineNumOffset,
-                                    replacingLine.replace(before, after.replace(/\$/g,'$$'))+"\n");
-                            } else {
+                                var  replacedLine = replacingLine.replace(before, after.replace(/\$/g,'$$'));
+                                if (cutReplaceToTagEnabled) {
+                                    replacedLine = cutReplaceToTag(replacedLine);
+                                }
 
-                                writer.write(line.replace(before, after.replace(/\$/g,'$$')) +"\n");
+                                writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
+                            } else {
+                                var  replacedLine = line.replace(before, after.replace(/\$/g,'$$'));
+                                if (cutReplaceToTagEnabled) {
+                                    replacedLine = cutReplaceToTag(replacedLine);
+                                }
+
+                                writer.write(replacedLine +"\n");
                                 output = true;
                             }
                             if (parser.verbose  &&  before !== after) {
@@ -728,7 +734,11 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                 }
             }
             if (!output) {
-                writer.write(line +"\n");
+                if ( ! cutReplaceToTagEnabled) {
+                    writer.write(line +"\n");
+                } else {
+                    writer.write(cutReplaceToTag(line) +"\n");
+                }
             }
         }
 
@@ -758,6 +768,117 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         });
     }
     return  errorCount;
+}
+
+// getReplacedLineInSettings
+function  getReplacedLineInSettings(
+        line: string, separator: number, oldValue: string, replacedValue: string,
+        addOriginalTag: boolean, cutOriginalTag: boolean, cutReplaceToTagEnabled: boolean
+): ReplacedLineInSettings {
+
+    // spaceAndComment
+    // __SettingB__: SetB
+    // __SettingB__: SetB  #// comment
+    // __SettingB__: SetB      #to: NewSetB   #// SetBB....
+    //                   ^ spaceAndCommentIndex
+    let  spaceAndComment= '';
+    const  commentMatch = / +#.*/.exec(line.substr(separator))
+    if (commentMatch) {
+        var  spaceAndCommentIndex = separator + commentMatch.index;
+        spaceAndComment = line.substr(spaceAndCommentIndex);
+    } else {
+        var  spaceAndCommentIndex = notFound;
+    }
+    let  original = '';
+    const  lineIncludesOriginalLabel = line.includes(originalLabel);
+
+    // addOriginalTag
+    if (addOriginalTag  &&  ! lineIncludesOriginalLabel) {
+
+        // before: __SettingB__: SetB
+        // after:  __SettingB__: NewSetB  #original: SetB
+        original = `  ${originalLabel} ${oldValue}`;
+
+        // cutReplaceToTag
+        if (cutReplaceToTagEnabled  &&  spaceAndComment !== '') {
+            const  commentIndex = line.indexOf('#', spaceAndCommentIndex);
+            const  toLabelIndex = line.indexOf(toLabel, commentIndex);
+            if (toLabelIndex > commentIndex) {
+                throw  new Error('set #to tag before the comment')
+            }
+            var  nextCommentIndex = notFound;
+            if (toLabelIndex !== notFound) {
+                const  nextCommentMatch = / +#.*/.exec(line.substr(commentIndex))
+                if (nextCommentMatch) {
+                    nextCommentIndex = commentIndex + nextCommentMatch.index;
+                }
+            }
+
+            if (toLabelIndex === notFound) {
+
+                // before: __SettingB__: SetB   #// comment
+                // after:  __SettingB__: NewSetB  #original: SetB   #// comment
+                // Do nothing
+            } else {
+                if (nextCommentIndex === notFound) {
+
+                    // before: __SettingB__: SetB  #to: SetBB
+                    //                             ^ commentIndex == toLabelIndex
+                    // after:  __SettingB__: NewSetB  #original: SetB
+                    spaceAndComment = '';
+                } else {
+
+                    // before: __SettingB__: SetB      #to: NewSetB   #// next comment
+                    //    commentIndex == toLabelIndex ^           ^ nextCommentIndex
+                    // after:  __SettingB__: NewSetB   #original: SetB      #// next comment
+                    const  spaceCountBeforeToTag = line.indexOf('#', spaceAndCommentIndex) - spaceAndCommentIndex;
+                    const  spaceCountAfterToTag  = line.indexOf('#', nextCommentIndex) - nextCommentIndex;
+
+                    original = ' '.repeat(spaceCountAfterToTag) + `${originalLabel} ${oldValue}`;
+                    spaceAndComment = ' '.repeat(spaceCountBeforeToTag) + line.substr(nextCommentIndex + spaceCountAfterToTag)
+                }
+            }
+        }
+    }
+
+    // cutOriginalTag
+    if (cutOriginalTag  &&  lineIncludesOriginalLabel) {
+        const  replacedValuePattern = lib.escapeRegularExpression(replacedValue).replace(/\$/g,'$$');
+
+        spaceAndComment = spaceAndComment.replace(
+            new RegExp(` *${originalLabel} *${replacedValuePattern}`),
+            '');
+    }
+
+    return { original, spaceAndComment } as ReplacedLineInSettings;
+}
+
+// ReplacedLineInSettings
+interface  ReplacedLineInSettings {
+    original: string;
+    spaceAndComment: string;
+}
+
+// cutReplaceToTag
+function  cutReplaceToTag(line: string): string {
+    const  toLabelIndex = line.indexOf(toLabel);
+    if (toLabelIndex !== notFound) {
+        const  commentIndex = line.indexOf(' #', toLabelIndex);
+        if (commentIndex !== notFound) {
+
+            // added tag: SetB    #to: NewSetB  #template: __B__
+            // replaced:  NewSetB    #template: __B__
+            // reverted:  SetB    #template: __B__
+            line = line.substr(0, toLabelIndex) + line.substr(commentIndex + 1);
+        } else {
+
+            // added tag: SetB    #to: NewSetB
+            // replaced:  NewSetB
+            // reverted:  SetB
+            line = line.substr(0, toLabelIndex).trimRight();
+        }
+    }
+    return  line;
 }
 
 // makeRevertSettings
@@ -870,7 +991,7 @@ class  TemplateTag {
         }
         if (this.indexInLine !== notFound  &&  ! disabled) {
             this.isFound = true;
-            const  leftOfTemplate = line.substr(0, this.indexInLine).trim();
+            const  leftOfTemplate = cutReplaceToTag(line.substr(0, this.indexInLine).trim());
             if (this.label === fileTemplateLabel) {
                 this.onFileTemplateTagReading(line);
             }
@@ -940,6 +1061,61 @@ class  TemplateTag {
         } else { // if (this.label === templateIfLabel)
             return  keys.includes(templateIfYesKey) && keys.includes(templateIfNoKey);
         }
+    }
+
+    // scanKeyValues
+    async  scanKeyValues(toValue: string, allKeys: string[]):  Promise<{[name: string]: string}> {
+        const  keysSortedByLength: string[] = allKeys.slice(); // copy
+        keysSortedByLength.sort((b,a)=>(a.length, b.length));
+        const  foundIndices: {[index: number]: string} = [];
+        var  template = this.template;
+
+        for (const key of keysSortedByLength) {
+            var  index = 0;
+            for (;;) {
+                index = template.indexOf(key, index);
+                if (index === notFound) {
+                    break;
+                }
+
+                foundIndices[index] = key;
+                template =
+                    template.substr(0, index) +
+                    ' '.repeat(key.length) +
+                    template.substr(index + key.length);
+                    // erase the key
+                index += 1;
+            }
+        }
+        const  indices = Object.keys(foundIndices).map((v)=>(parseInt(v))).sort();
+        const  keys = indices.map((index)=>( foundIndices[index] ));
+        const  placeholder = '\n';
+        let    templatePattern = this.template;
+        for (let i = indices.length - 1;  i >= 0;  i -= 1 ) {
+            templatePattern =
+                templatePattern.substr(0, indices[i]) +
+                placeholder +
+                templatePattern.substr(indices[i] + keys[i].length)
+        }
+        templatePattern = lib.escapeRegularExpression(templatePattern).replace(new RegExp( placeholder, "g"), '(.*)');
+        const  matchedInToValue = new RegExp( templatePattern ).exec( toValue );
+        const  keyValues: {[name: string]: string} = {};
+
+        if (matchedInToValue) { // toValue is matched with the template
+            for (let i = 1;  i < matchedInToValue.length;  i += 1 ) {
+
+                keyValues[keys[i-1]] = matchedInToValue[i];
+            }
+        } else {
+            const  toValues = await lib.parseCSVColumns( toValue );
+            for (let i = 0;  i < keys.length;  i += 1 ) {
+                if (i < toValues.length  &&  toValues[i]) {
+
+                    keyValues[keys[i]] = toValues[i];
+                }
+            }
+        }
+        return  keyValues;
     }
 
     // evaluate
@@ -1271,14 +1447,65 @@ class  WordPositions {
     }
 }
 
+// replace
+async function  replace() {
+    for (const inputFileFullPath of await listUpFilePaths()) {
+
+        const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
+        for (const replaceKeyValues of replaceKeyValuesSet) {
+
+            await  replaceSettings(inputFileFullPath,
+                replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, true);
+        }
+    }
+}
+
+// revert
+async function  revert() {
+    for (const inputFileFullPath of await listUpFilePaths()) {
+        const  text = fs.readFileSync(inputFileFullPath, "utf-8");
+        if (text.includes(originalLabel)) {
+            const  readStream = fs.createReadStream(inputFileFullPath);
+            const  reader = readline.createInterface({
+                input: readStream,
+                crlfDelay: Infinity
+            });
+            var  lineNum = 0;
+            var  reverted = false;
+
+            for await (const line1 of reader) {
+                const  line: string = line1;
+                lineNum += 1;
+                if (settingStartLabel.test(line) || settingStartLabelEn.test(line)) {
+                    reverted = false;
+                }
+                if (line.includes(originalLabel)  &&  ! reverted) {
+
+                    await  revertSettings(inputFileFullPath, lineNum.toString());
+                    reverted = true;
+                }
+            }
+        }
+    }
+}
+
 // check
 async function  check(checkingFilePath?: string) {
+    for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
+
+        await checkRoutine(false, inputFileFullPath);
+    }
+}
+
+// listUpFilePaths
+async function  listUpFilePaths(checkingFilePath?: string) {
     const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
     if (checkingFilePath) {
         targetFolders.push(currentFolder);
+
         for (const folder of targetFolders) {
             const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
 
@@ -1293,9 +1520,8 @@ async function  check(checkingFilePath?: string) {
         if (inputFileFullPaths.length === 0) {
             throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
         }
-
-        var  filePaths = [checkingFilePath];
     } else {
+
         for (const folder of targetFolders) {
             const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
             if (!fs.existsSync(targetFolderFullPath)) {
@@ -1311,10 +1537,111 @@ async function  check(checkingFilePath?: string) {
         process.chdir(currentFolder);
     }
 
-    for (const inputFileFullPath of inputFileFullPaths) {
+    return  inputFileFullPaths;
+}
 
-        await checkRoutine(false, inputFileFullPath);
+// scanReplaceToTags
+async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<ReplaceKeyValues[]> {
+    const  reader = readline.createInterface({
+        input: fs.createReadStream(inputFilePath),
+        crlfDelay: Infinity
+    });
+    var  lineNum = 0;
+    let  isReadingSetting = false;
+    let  setting: Settings = {};
+    let  settingCount = 0;
+    let  settingIndentLength = 0;
+    let  key = '';
+    let  toValue = '';
+    let  replaceKeyValues = new ReplaceKeyValues();
+    var  errorCount = 0;
+    const  replaceKeyValuesSet: ReplaceKeyValues[] = [];
+    const  parser = new Parser();
+    parser.command = CommandEnum.replace;
+    parser.verbose = ('verbose' in programOptions);
+    parser.filePath = inputFilePath;
+
+    for await (const line1 of reader) {
+        const  line: string = line1;
+        lineNum += 1;
+
+        // setting = ...
+        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+            if (parser.verbose) {
+                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
+            }
+            isReadingSetting = true;
+
+            setting = {};
+            settingCount += 1;
+            settingIndentLength = indentRegularExpression.exec(line)![0].length;
+            toValue = '';
+            replaceKeyValues = new ReplaceKeyValues();
+            replaceKeyValues.settingNameOrLineNum = lineNum.toString();
+            replaceKeyValuesSet.push(replaceKeyValues);
+        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+            isReadingSetting = false;
+            key = '';
+        }
+        if (isReadingSetting) {
+            const  separator = line.indexOf(':');
+            if (separator !== notFound) {
+                const  keyOrNot = line.substr(0, separator).trim();
+                if (keyOrNot[0] !== '#') {
+
+                    key = keyOrNot;
+                    const  value = getValue(line, separator);
+                    setting[key] = {value, isReferenced: false, lineNum};
+                }
+            }
+        }
+
+        // #to: tag in the settings
+        const  toLabelIndex = line.indexOf(toLabel);
+        if (toLabelIndex !== notFound) {
+            toValue = getValue(line, toLabelIndex + toLabel.length - 1);
+
+            if (isReadingSetting) {
+
+                replaceKeyValues.keyValues[key] = toValue;
+                toValue = '';
+            }
+        }
+
+        // #to: tag before the #template:
+        const  templateTag = parseTemplateTag(line, parser);
+        if (templateTag.isFound) {
+            const  newKeyValues = await templateTag.scanKeyValues(toValue, Object.keys(setting));
+            errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues);
+
+            replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+        }
     }
+    if (errorCount >= 1) {
+        throw  new Error(`error count: ${errorCount}`);
+    }
+
+    return  replaceKeyValuesSet;
+}
+
+// checkNoConfilict
+function  checkNoConfilict(
+        keyValueA: {[key: string]: string},
+        keyValueB: {[key: string]: string}): number /* error count */ {
+    const  commonKeys = lib.getCommonElements(Object.keys( keyValueA ), Object.keys( keyValueB ));
+    var  errorCount = 0;
+
+    for (const key of commonKeys) {
+        if (keyValueA[key] !== keyValueB[key]) {
+            console.log('');
+            console.log('Error of conflict #to: tag:');
+            console.log(`    key: ${key}`);
+            console.log(`    valueA: ${keyValueA[key]}`);
+            console.log(`    valueB: ${keyValueB[key]}`);
+            errorCount += 1;
+        }
+    }
+    return  errorCount;
 }
 
 // search
@@ -1790,7 +2117,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
             const  variableName = variable.substr('${'.length, variable.length - '${}'.length);
             const  value = process.env[`${typrmEnvPrefix}${variableName}`];
             if (value) {
-                const  variableRegExp = new RegExp('\\\\?'+ escapeRegularExpression( variable ), 'g');
+                const  variableRegExp = new RegExp('\\\\?'+ lib.escapeRegularExpression( variable ), 'g');
 
                 address = address.replace(variableRegExp, (match, offset) => {
                     const  startsBackSlash = (match.substr(0,1) === '\\');
@@ -1864,7 +2191,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     for (const variable of sortedEnvronmentVariables) {
 
         recommended = recommended.replace(
-            new RegExp(escapeRegularExpression( variable.value.replace('\\','\\\\')), 'g'),
+            new RegExp(lib.escapeRegularExpression( variable.value.replace('\\','\\\\')), 'g'),
             '${'+ variable.key +'}');  // Change the address to an address with variables
     }
     if (recommended.replace(/\\/g,'/').startsWith(lib.getHomePath().replace(/\\/g,'/'))) {
@@ -2355,7 +2682,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
     const  log: EvaluationLog[] = [];
 
     for (const key of Object.keys(setting)) {
-        const  re = new RegExp(escapeRegularExpression( key ), "gi" );
+        const  re = new RegExp(lib.escapeRegularExpression( key ), "gi" );
 
         const  expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g,'$$'));
         if (expectedAfter !== expected) {
@@ -2412,17 +2739,19 @@ function  parseKeyValueLines(keyValueLines: string): {[key:string]: string} {
 
 // getValue
 function  getValue(line: string, separatorIndex: number = -1) {
-    let    value = line.substr(separatorIndex + 1).trim();
 
-    const  comment = value.indexOf('#');
+    let  value = line.substr(separatorIndex + 1).trim();
+    if (value[0] === '#') {
+        var  comment = 0;
+    } else {
+        var  comment = value.indexOf(' #');
+    }
     if (comment !== notFound) {
-        if (comment === 0  ||  value[comment - 1] === ' ') {  // space and #
-            value = value.substr(0, comment).trim();
-        }
+
+        value = value.substr(0, comment).trim();
     }
 
     value = unscapePercentByte(value);
-
     return  value;
 }
 
@@ -2516,11 +2845,6 @@ function  cutQuotation(str: string) {
     }
 }
 
-// escapeRegularExpression
-function  escapeRegularExpression(expression: string) {
-    return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
-}
-
 // isBackSlashParameter
 // Example:
 //    ( '\na', 0 ) === false
@@ -2548,7 +2872,7 @@ enum CommandEnum {
     search,
 }
 
-// Setting
+// Settings
 type Settings = {[name: string]: Setting}
 
 // Setting
@@ -2556,6 +2880,23 @@ class Setting {
     value: string = '';
     lineNum: number = 0;
     isReferenced: boolean = false;
+}
+
+// ReplaceKeyValues
+class ReplaceKeyValues {
+    settingNameOrLineNum: string = '';
+    keyValues: {[name: string]: string} = {};
+    get  keyValueLines(): string {
+        return  Object.entries( this.keyValues ).reduce((previousReturnValue,
+            [key, value])=>( previousReturnValue + `${key}: ${value}\n` ), '');
+/*
+        var  lines = '';
+        for (const [key, value] of Object.entries(this.keyValues)) {
+            lines += `${key}: ${value}`;
+        }
+        return  lines;
+*/
+    }
 }
 
 // Thesaurus
@@ -3114,6 +3455,7 @@ if (process.env.windir) {
 const  settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
 const  settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 const  originalLabel = "#original:";
+const  toLabel = "#to:";  // replace to tag
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
