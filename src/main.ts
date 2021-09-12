@@ -49,9 +49,14 @@ export async function  main() {
             if (verboseMode) {
                 console.log('Verbose: typrm command: replace');
             }
-            if (programArguments.length === 1) {
+            if (programArguments.length <= 2) {
+                if (programArguments.length === 1) {
+                    var  inputFilePath = '';
+                } else {
+                    var  inputFilePath = programArguments[1];
+                }
 
-                await replace();
+                await replace(inputFilePath);
             } else {
                 varidateReplaceCommandArguments();
                 if (programArguments.length === 3) {
@@ -68,18 +73,18 @@ export async function  main() {
             }
         }
         else if (programArguments[0] === 'revert') {
-            if (programArguments.length === 1) {
-
-                await revert();
-            } else {
-                varidateRevertCommandArguments();
-                if (programArguments.length === 2) {
-                    var  inputFilePath = programArguments[1];
-                    var  replacingLineNum = '';  // isOneSetting
+            if (programArguments.length <= 2) {
+                if (programArguments.length === 1) {
+                    var  inputFilePath = '';
                 } else {
                     var  inputFilePath = programArguments[1];
-                    var  replacingLineNum = programArguments[2];
                 }
+
+                await revert(inputFilePath);
+            } else {
+                varidateRevertCommandArguments();
+                var  inputFilePath = programArguments[1];
+                var  replacingLineNum = programArguments[2];
 
                 await revertSettings(inputFilePath, replacingLineNum);
             }
@@ -1064,12 +1069,14 @@ class  TemplateTag {
     }
 
     // scanKeyValues
-    async  scanKeyValues(toValue: string, allKeys: string[]):  Promise<{[name: string]: string}> {
+    async  scanKeyValues(toValue: string, allKeys: string[], lineNum: number):  Promise<{[name: string]: Setting}> {
         const  keysSortedByLength: string[] = allKeys.slice(); // copy
         keysSortedByLength.sort((b,a)=>(a.length, b.length));
         const  foundIndices: {[index: number]: string} = [];
         var  template = this.template;
 
+        // #template: (__A__:__B__)
+        // key = [ __A__, __B__ ]
         for (const key of keysSortedByLength) {
             var  index = 0;
             for (;;) {
@@ -1098,15 +1105,17 @@ class  TemplateTag {
                 templatePattern.substr(indices[i] + keys[i].length)
         }
         templatePattern = lib.escapeRegularExpression(templatePattern).replace(new RegExp( placeholder, "g"), '(.*)');
-        const  matchedInToValue = new RegExp( templatePattern ).exec( toValue );
+        const  toValueIsMatchedWithTemplate = new RegExp( templatePattern ).exec( toValue );
         const  keyValues: {[name: string]: string} = {};
 
-        if (matchedInToValue) { // toValue is matched with the template
-            for (let i = 1;  i < matchedInToValue.length;  i += 1 ) {
+        if (toValueIsMatchedWithTemplate) {
+            // (A:B)  #to: (a:b)  #template: (__A__:__B__)
+            for (let i = 1;  i < toValueIsMatchedWithTemplate.length;  i += 1 ) {
 
-                keyValues[keys[i-1]] = matchedInToValue[i];
+                keyValues[keys[i-1]] = toValueIsMatchedWithTemplate[i];
             }
         } else {
+            // (A:B)  #to: a, b  #template: (__A__:__B__)
             const  toValues = await lib.parseCSVColumns( toValue );
             for (let i = 0;  i < keys.length;  i += 1 ) {
                 if (i < toValues.length  &&  toValues[i]) {
@@ -1115,7 +1124,15 @@ class  TemplateTag {
                 }
             }
         }
-        return  keyValues;
+        const  returnKeyValues = {} as {[name: string]: Setting};
+        for (const key of Object.keys(keyValues)) {
+            returnKeyValues[key] =  {
+                value: keyValues[key],
+                lineNum,
+            } as Setting;
+        }
+
+        return  returnKeyValues;
     }
 
     // evaluate
@@ -1448,8 +1465,8 @@ class  WordPositions {
 }
 
 // replace
-async function  replace() {
-    for (const inputFileFullPath of await listUpFilePaths()) {
+async function  replace(inputFilePath: string) {
+    for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
 
         const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
         for (const replaceKeyValues of replaceKeyValuesSet) {
@@ -1461,8 +1478,8 @@ async function  replace() {
 }
 
 // revert
-async function  revert() {
-    for (const inputFileFullPath of await listUpFilePaths()) {
+async function  revert(inputFilePath: string) {
+    for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
         const  text = fs.readFileSync(inputFileFullPath, "utf-8");
         if (text.includes(originalLabel)) {
             const  readStream = fs.createReadStream(inputFileFullPath);
@@ -1603,41 +1620,46 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
 
             if (isReadingSetting) {
 
-                replaceKeyValues.keyValues[key] = toValue;
+                replaceKeyValues.keyValues[key] = {
+                    value: toValue,
+                    lineNum,
+                } as Setting;
                 toValue = '';
             }
         }
 
         // #to: tag before the #template:
         const  templateTag = parseTemplateTag(line, parser);
-        if (templateTag.isFound) {
-            const  newKeyValues = await templateTag.scanKeyValues(toValue, Object.keys(setting));
-            errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues);
+        if (templateTag.isFound  &&  toValue !== '') {
+            const  newKeyValues = await templateTag.scanKeyValues(toValue, Object.keys(setting), lineNum);
+            errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
 
             replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+            toValue = '';
         }
     }
     if (errorCount >= 1) {
         throw  new Error(`error count: ${errorCount}`);
     }
 
-    return  replaceKeyValuesSet;
+    return  replaceKeyValuesSet.filter((replaceKeyValues)=>(Object.keys(replaceKeyValues.keyValues).length >= 1));
 }
 
 // checkNoConfilict
 function  checkNoConfilict(
-        keyValueA: {[key: string]: string},
-        keyValueB: {[key: string]: string}): number /* error count */ {
+        keyValueA: {[key: string]: Setting},
+        keyValueB: {[key: string]: Setting},
+        filePath: string): number /* error count */ {
     const  commonKeys = lib.getCommonElements(Object.keys( keyValueA ), Object.keys( keyValueB ));
     var  errorCount = 0;
 
     for (const key of commonKeys) {
-        if (keyValueA[key] !== keyValueB[key]) {
+        if (keyValueA[key].value !== keyValueB[key].value) {
             console.log('');
             console.log('Error of conflict #to: tag:');
             console.log(`    key: ${key}`);
-            console.log(`    valueA: ${keyValueA[key]}`);
-            console.log(`    valueB: ${keyValueB[key]}`);
+            console.log(`    valueA: ${keyValueA[key].value} in ${filePath}:${keyValueA[key].lineNum}`);
+            console.log(`    valueB: ${keyValueB[key].value} in ${filePath}:${keyValueB[key].lineNum}`);
             errorCount += 1;
         }
     }
@@ -2401,7 +2423,7 @@ function  printConfig() {
 
 // varidateUpdateCommandArguments
 function  varidateReplaceCommandArguments() {
-    if (programArguments.length < 3) {
+    if (programArguments.length < 2) {
         throw new Error('Error: Too few argurments.\n' +
             'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
             'Parameters2: typrm replace  __FilePath__  __NearbyLineNumOrSettingName__  "__KeyColonValue__"')
@@ -2876,26 +2898,24 @@ enum CommandEnum {
 type Settings = {[name: string]: Setting}
 
 // Setting
-class Setting {
-    value: string = '';
-    lineNum: number = 0;
-    isReferenced: boolean = false;
+interface Setting {
+    value: string;
+    lineNum: number;
+    isReferenced: boolean;
 }
 
 // ReplaceKeyValues
 class ReplaceKeyValues {
+
     settingNameOrLineNum: string = '';
-    keyValues: {[name: string]: string} = {};
+    keyValues: {[name: string]: Setting} = {};
+
     get  keyValueLines(): string {
-        return  Object.entries( this.keyValues ).reduce((previousReturnValue,
-            [key, value])=>( previousReturnValue + `${key}: ${value}\n` ), '');
-/*
         var  lines = '';
-        for (const [key, value] of Object.entries(this.keyValues)) {
-            lines += `${key}: ${value}`;
+        for (const [key, setting] of Object.entries(this.keyValues)) {
+            lines += `${key}: ${setting.value}\n`;
         }
         return  lines;
-*/
     }
 }
 

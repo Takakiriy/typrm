@@ -81,7 +81,6 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        // if (case_.name === 'search_mode_result_has_ref_verb') {
         console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
 
         // Test Main

@@ -561,32 +561,43 @@ describe("replaces settings >>", function () {
     describe("to >>", function () {
         test.each([
             ['1_OK'],
-        ])("%s", function (subCaseName) { return __awaiter(void 0, void 0, void 0, function () {
-            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, replacedFileContents, revertedFileContents;
+            ['2_FileParameter'],
+        ])("%s", function (caseName) { return __awaiter(void 0, void 0, void 0, function () {
+            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         changingFolderPath = testFolderPath + '_changing';
-                        changingFileName = subCaseName + "_1_changing.yaml";
+                        changingFileName = caseName + "_1_changing.yaml";
                         changingFilePath = changingFolderPath + '/' + changingFileName;
-                        sourceFileContents = lib.getSnapshot("replaces settings >> to >> " + subCaseName + ": sourceFileContents 1");
+                        sourceFileContents = lib.getSnapshot("replaces settings >> to >> " + caseName + ": sourceFileContents 1");
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         writeFileSync(changingFilePath, sourceFileContents);
-                        // Test Main
-                        return [4 /*yield*/, callMain(["replace"], {
+                        // Test Main >> replace
+                        if (caseName.includes('FileParameter')) {
+                            parameters = ["replace", changingFilePath];
+                        }
+                        else {
+                            parameters = ["replace"];
+                        }
+                        return [4 /*yield*/, callMain(parameters, {
                                 folder: changingFolderPath, test: "", locale: "en-US"
                             })];
                     case 1:
-                        // Test Main
                         _a.sent();
                         replacedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
-                        // Test Main
-                        return [4 /*yield*/, callMain(["revert"], {
+                        // Test Main >> revert
+                        if (caseName.includes('FileParameter')) {
+                            parameters = ["revert", changingFilePath];
+                        }
+                        else {
+                            parameters = ["revert"];
+                        }
+                        return [4 /*yield*/, callMain(parameters, {
                                 folder: changingFolderPath, test: "", locale: "en-US"
                             })];
                     case 2:
-                        // Test Main
                         _a.sent();
                         revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toMatchSnapshot('revertedFileContents');

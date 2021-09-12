@@ -2057,6 +2057,7 @@ exports[`replaces settings >> to >> 1_OK: replacedFileContents 1`] = `
     __SettingA__: SetAA  #original: SetA
     __SettingB__: SetB#    #original: SetB      #// SetB#....
     __SettingC__: SetCCCC  #original: SettingC  #// SetCCCC..
+    __SettingO__: SettingOther
     in body:
         __BodyA__: ValueAA  #original: ValueA
         __BodyB__: ValueBB  #original: ValueB
@@ -2085,6 +2086,7 @@ exports[`replaces settings >> to >> 1_OK: revertedFileContents 1`] = `
     __SettingA__: SetA
     __SettingB__: SetB      #// SetB#....
     __SettingC__: SettingC  #// SetCCCC..
+    __SettingO__: SettingOther
     in body:
         __BodyA__: ValueA
         __BodyB__: ValueB
@@ -2113,6 +2115,7 @@ exports[`replaces settings >> to >> 1_OK: sourceFileContents 1`] = `
     __SettingA__: SetA      #to: SetAA
     __SettingB__: SetB      #to: SetB#    #// SetB#....
     __SettingC__: SettingC  #to: SetCCCC  #// SetCCCC..
+    __SettingO__: SettingOther
     in body:
         __BodyA__: ValueA
         __BodyB__: ValueB
@@ -2133,6 +2136,24 @@ body:
     -(ValueE)-             #to: (ValueEE)  #template: (__BodyE__)
     -(ValueF1)-(ValueF2)-  #to:  ValueFF1, ValueFF2    #template: (__BodyF1__)-(__BodyF2__)
     -(ValueG1)-(ValueG2)-  #to: (ValueGG1)-(ValueGG2)  #template: (__BodyG1__)-(__BodyG2__)
+"
+`;
+
+exports[`replaces settings >> to >> 2_FileParameter: replacedFileContents 1`] = `
+"settings:
+    __SettingA__: SetAA  #original: SetA
+"
+`;
+
+exports[`replaces settings >> to >> 2_FileParameter: revertedFileContents 1`] = `
+"settings:
+    __SettingA__: SetA
+"
+`;
+
+exports[`replaces settings >> to >> 2_FileParameter: sourceFileContents 1`] = `
+"settings:
+    __SettingA__: SetA      #to: SetAA
 "
 `;
 

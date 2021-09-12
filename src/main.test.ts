@@ -468,24 +468,35 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
     describe("to >>", () => {
         test.each([
             ['1_OK'],
-        ])("%s", async (subCaseName) => {
+            ['2_FileParameter'],
+        ])("%s", async (caseName) => {
             const  changingFolderPath = testFolderPath + '_changing';
-            const  changingFileName = subCaseName + "_1_changing.yaml";
+            const  changingFileName = caseName + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-            const  sourceFileContents = lib.getSnapshot(`replaces settings >> to >> ${subCaseName}: sourceFileContents 1`);
+            const  sourceFileContents = lib.getSnapshot(`replaces settings >> to >> ${caseName}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFilePath, sourceFileContents);
 
-            // Test Main
-            await callMain(["replace"], {
+            // Test Main >> replace
+            if (caseName.includes('FileParameter')) {
+                var  parameters = ["replace", changingFilePath];
+            } else {
+                var  parameters = ["replace"];
+            }
+            await callMain(parameters, {
                 folder: changingFolderPath, test: "", locale: "en-US"
             });
             const  replacedFileContents = fs.readFileSync(changingFilePath).toString();
 
             expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
 
-            // Test Main
-            await callMain(["revert"], {
+            // Test Main >> revert
+            if (caseName.includes('FileParameter')) {
+                var  parameters = ["revert", changingFilePath];
+            } else {
+                var  parameters = ["revert"];
+            }
+            await callMain(parameters, {
                 folder: changingFolderPath, test: "", locale: "en-US"
             });
             const  revertedFileContents = fs.readFileSync(changingFilePath).toString();

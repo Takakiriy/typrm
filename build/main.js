@@ -61,7 +61,7 @@ var lib_1 = require("./lib");
 // main
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var verboseMode, checkingFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, inputFilePath, replacingLineNum;
+        var verboseMode, checkingFilePath, inputFilePath, inputFilePath, inputFilePath, replacingLineNum, keyValues, inputFilePath, replacingLineNum, keyValues, inputFilePath, inputFilePath, inputFilePath, replacingLineNum;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -110,8 +110,14 @@ function main() {
                     if (verboseMode) {
                         console.log('Verbose: typrm command: replace');
                     }
-                    if (!(exports.programArguments.length === 1)) return [3 /*break*/, 10];
-                    return [4 /*yield*/, replace()];
+                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 10];
+                    if (exports.programArguments.length === 1) {
+                        inputFilePath = '';
+                    }
+                    else {
+                        inputFilePath = exports.programArguments[1];
+                    }
+                    return [4 /*yield*/, replace(inputFilePath)];
                 case 9:
                     _a.sent();
                     return [3 /*break*/, 12];
@@ -134,21 +140,21 @@ function main() {
                 case 12: return [3 /*break*/, 20];
                 case 13:
                     if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 18];
-                    if (!(exports.programArguments.length === 1)) return [3 /*break*/, 15];
-                    return [4 /*yield*/, revert()];
+                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 15];
+                    if (exports.programArguments.length === 1) {
+                        inputFilePath = '';
+                    }
+                    else {
+                        inputFilePath = exports.programArguments[1];
+                    }
+                    return [4 /*yield*/, revert(inputFilePath)];
                 case 14:
                     _a.sent();
                     return [3 /*break*/, 17];
                 case 15:
                     varidateRevertCommandArguments();
-                    if (exports.programArguments.length === 2) {
-                        inputFilePath = exports.programArguments[1];
-                        replacingLineNum = '';
-                    }
-                    else {
-                        inputFilePath = exports.programArguments[1];
-                        replacingLineNum = exports.programArguments[2];
-                    }
+                    inputFilePath = exports.programArguments[1];
+                    replacingLineNum = exports.programArguments[2];
                     return [4 /*yield*/, revertSettings(inputFilePath, replacingLineNum)];
                 case 16:
                     _a.sent();
@@ -1280,16 +1286,18 @@ var TemplateTag = /** @class */ (function () {
         }
     };
     // scanKeyValues
-    TemplateTag.prototype.scanKeyValues = function (toValue, allKeys) {
+    TemplateTag.prototype.scanKeyValues = function (toValue, allKeys, lineNum) {
         return __awaiter(this, void 0, void 0, function () {
-            var keysSortedByLength, foundIndices, template, _i, keysSortedByLength_1, key, index, indices, keys, placeholder, templatePattern, i, matchedInToValue, keyValues, i, toValues, i;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var keysSortedByLength, foundIndices, template, _i, keysSortedByLength_1, key, index, indices, keys, placeholder, templatePattern, i, toValueIsMatchedWithTemplate, keyValues, i, toValues, i, returnKeyValues, _a, _b, key;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         keysSortedByLength = allKeys.slice();
                         keysSortedByLength.sort(function (b, a) { return (a.length, b.length); });
                         foundIndices = [];
                         template = this.template;
+                        // #template: (__A__:__B__)
+                        // key = [ __A__, __B__ ]
                         for (_i = 0, keysSortedByLength_1 = keysSortedByLength; _i < keysSortedByLength_1.length; _i++) {
                             key = keysSortedByLength_1[_i];
                             index = 0;
@@ -1318,23 +1326,33 @@ var TemplateTag = /** @class */ (function () {
                                     templatePattern.substr(indices[i] + keys[i].length);
                         }
                         templatePattern = lib.escapeRegularExpression(templatePattern).replace(new RegExp(placeholder, "g"), '(.*)');
-                        matchedInToValue = new RegExp(templatePattern).exec(toValue);
+                        toValueIsMatchedWithTemplate = new RegExp(templatePattern).exec(toValue);
                         keyValues = {};
-                        if (!matchedInToValue) return [3 /*break*/, 1];
-                        for (i = 1; i < matchedInToValue.length; i += 1) {
-                            keyValues[keys[i - 1]] = matchedInToValue[i];
+                        if (!toValueIsMatchedWithTemplate) return [3 /*break*/, 1];
+                        // (A:B)  #to: (a:b)  #template: (__A__:__B__)
+                        for (i = 1; i < toValueIsMatchedWithTemplate.length; i += 1) {
+                            keyValues[keys[i - 1]] = toValueIsMatchedWithTemplate[i];
                         }
                         return [3 /*break*/, 3];
                     case 1: return [4 /*yield*/, lib.parseCSVColumns(toValue)];
                     case 2:
-                        toValues = _a.sent();
+                        toValues = _c.sent();
                         for (i = 0; i < keys.length; i += 1) {
                             if (i < toValues.length && toValues[i]) {
                                 keyValues[keys[i]] = toValues[i];
                             }
                         }
-                        _a.label = 3;
-                    case 3: return [2 /*return*/, keyValues];
+                        _c.label = 3;
+                    case 3:
+                        returnKeyValues = {};
+                        for (_a = 0, _b = Object.keys(keyValues); _a < _b.length; _a++) {
+                            key = _b[_a];
+                            returnKeyValues[key] = {
+                                value: keyValues[key],
+                                lineNum: lineNum,
+                            };
+                        }
+                        return [2 /*return*/, returnKeyValues];
                 }
             });
         });
@@ -1733,14 +1751,14 @@ var WordPositions = /** @class */ (function () {
     return WordPositions;
 }());
 // replace
-function replace() {
+function replace(inputFilePath) {
     return __awaiter(this, void 0, void 0, function () {
         var _i, _a, inputFileFullPath, replaceKeyValuesSet, _b, replaceKeyValuesSet_1, replaceKeyValues;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
                     _i = 0;
-                    return [4 /*yield*/, listUpFilePaths()];
+                    return [4 /*yield*/, listUpFilePaths(inputFilePath)];
                 case 1:
                     _a = _c.sent();
                     _c.label = 2;
@@ -1771,7 +1789,7 @@ function replace() {
     });
 }
 // revert
-function revert() {
+function revert(inputFilePath) {
     var e_6, _a;
     return __awaiter(this, void 0, void 0, function () {
         var _i, _b, inputFileFullPath, text, readStream, reader, lineNum, reverted, reader_5, reader_5_1, line1, line, e_6_1;
@@ -1779,7 +1797,7 @@ function revert() {
             switch (_c.label) {
                 case 0:
                     _i = 0;
-                    return [4 /*yield*/, listUpFilePaths()];
+                    return [4 /*yield*/, listUpFilePaths(inputFilePath)];
                 case 1:
                     _b = _c.sent();
                     _c.label = 2;
@@ -2009,17 +2027,21 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     if (toLabelIndex !== notFound) {
                         toValue = getValue(line, toLabelIndex + toLabel.length - 1);
                         if (isReadingSetting) {
-                            replaceKeyValues.keyValues[key] = toValue;
+                            replaceKeyValues.keyValues[key] = {
+                                value: toValue,
+                                lineNum: lineNum,
+                            };
                             toValue = '';
                         }
                     }
                     templateTag = parseTemplateTag(line, parser);
-                    if (!templateTag.isFound) return [3 /*break*/, 5];
-                    return [4 /*yield*/, templateTag.scanKeyValues(toValue, Object.keys(setting))];
+                    if (!(templateTag.isFound && toValue !== '')) return [3 /*break*/, 5];
+                    return [4 /*yield*/, templateTag.scanKeyValues(toValue, Object.keys(setting), lineNum)];
                 case 4:
                     newKeyValues = _b.sent();
-                    errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues);
+                    errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
                     replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+                    toValue = '';
                     _b.label = 5;
                 case 5: return [3 /*break*/, 2];
                 case 6: return [3 /*break*/, 13];
@@ -2043,23 +2065,23 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     if (errorCount >= 1) {
                         throw new Error("error count: " + errorCount);
                     }
-                    return [2 /*return*/, replaceKeyValuesSet];
+                    return [2 /*return*/, replaceKeyValuesSet.filter(function (replaceKeyValues) { return (Object.keys(replaceKeyValues.keyValues).length >= 1); })];
             }
         });
     });
 }
 // checkNoConfilict
-function checkNoConfilict(keyValueA, keyValueB) {
+function checkNoConfilict(keyValueA, keyValueB, filePath) {
     var commonKeys = lib.getCommonElements(Object.keys(keyValueA), Object.keys(keyValueB));
     var errorCount = 0;
     for (var _i = 0, commonKeys_1 = commonKeys; _i < commonKeys_1.length; _i++) {
         var key = commonKeys_1[_i];
-        if (keyValueA[key] !== keyValueB[key]) {
+        if (keyValueA[key].value !== keyValueB[key].value) {
             console.log('');
             console.log('Error of conflict #to: tag:');
             console.log("    key: " + key);
-            console.log("    valueA: " + keyValueA[key]);
-            console.log("    valueB: " + keyValueB[key]);
+            console.log("    valueA: " + keyValueA[key].value + " in " + filePath + ":" + keyValueA[key].lineNum);
+            console.log("    valueB: " + keyValueB[key].value + " in " + filePath + ":" + keyValueB[key].lineNum);
             errorCount += 1;
         }
     }
@@ -2882,7 +2904,7 @@ function printConfig() {
 }
 // varidateUpdateCommandArguments
 function varidateReplaceCommandArguments() {
-    if (exports.programArguments.length < 3) {
+    if (exports.programArguments.length < 2) {
         throw new Error('Error: Too few argurments.\n' +
             'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
             'Parameters2: typrm replace  __FilePath__  __NearbyLineNumOrSettingName__  "__KeyColonValue__"');
@@ -3378,15 +3400,6 @@ var CommandEnum;
     CommandEnum[CommandEnum["replace"] = 2] = "replace";
     CommandEnum[CommandEnum["search"] = 3] = "search";
 })(CommandEnum || (CommandEnum = {}));
-// Setting
-var Setting = /** @class */ (function () {
-    function Setting() {
-        this.value = '';
-        this.lineNum = 0;
-        this.isReferenced = false;
-    }
-    return Setting;
-}());
 // ReplaceKeyValues
 var ReplaceKeyValues = /** @class */ (function () {
     function ReplaceKeyValues() {
@@ -3395,17 +3408,12 @@ var ReplaceKeyValues = /** @class */ (function () {
     }
     Object.defineProperty(ReplaceKeyValues.prototype, "keyValueLines", {
         get: function () {
-            return Object.entries(this.keyValues).reduce(function (previousReturnValue, _a) {
-                var key = _a[0], value = _a[1];
-                return (previousReturnValue + (key + ": " + value + "\n"));
-            }, '');
-            /*
-                    var  lines = '';
-                    for (const [key, value] of Object.entries(this.keyValues)) {
-                        lines += `${key}: ${value}`;
-                    }
-                    return  lines;
-            */
+            var lines = '';
+            for (var _i = 0, _a = Object.entries(this.keyValues); _i < _a.length; _i++) {
+                var _b = _a[_i], key = _b[0], setting = _b[1];
+                lines += key + ": " + setting.value + "\n";
+            }
+            return lines;
         },
         enumerable: false,
         configurable: true
