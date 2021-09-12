@@ -150,6 +150,17 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
     (workA1, workB1)  #to: (workA2 : workB2)  #template: (__NameA__ : __NameB__)
 
+typrm replace コマンドを実行すると、すべてのファイルにある `#to:` タグに従って
+ファイルの内容を置き換えます。 すべてのファイルとは、
+`TYPRM_FOLDER` 環境変数、または `--folder` オプションに指定した
+フォルダーに入っているファイルです。
+ファイル名を指定すると、指定したファイルにある `#to:` タグを処理します。
+
+    typrm r
+    typrm replace
+    typrm replace  --folder my_folder
+    typrm r  __FileName__
+
 
 ## 強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します
 
@@ -1225,5 +1236,7 @@ Jest を使うテストと Jest を使わないテストがあります。
 - `#template:` 本文を置き換えるときのテンプレート
 - `#template-at():` 2行以上上の本文を置き換えるときのテンプレート
 - `#template-if:` 本文に入れる内容を決める条件
+
+タグの前は空白文字、または行頭である必要があります。
 
 タグの詳細については、このページを検索してください。

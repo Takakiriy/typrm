@@ -150,6 +150,17 @@ or
 
     (workA1, workB1)  #to: (workA2 : workB2)  #template: (__NameA__ : __NameB__)
 
+The typrm replace command replaces the contents of a file according
+to the `#to:` tag found in all files.
+All files are files that are in the `TYPRM_FOLDER` environment variable
+or the folder specified in the `--folder` option.
+If you specify a file name, it processes the `#to:` tag in the specified file.
+
+    typrm r
+    typrm replace
+    typrm replace  --folder my_folder
+    typrm r  __FileName__
+
 
 ## Powerful search - #keyword tag, #glossary tag make highly accurate search
 
@@ -1281,5 +1292,7 @@ You can set the break point, click at the left of line number of the source file
 - `#template:` Template for replacing the body
 - `#template-at():` Template for replacing the body above two or more lines
 - `#template-if:` Conditions that determine the content to be included in the text
+
+The tags must be preceded by a space character or at the beginning of a line.
 
 You can find more informations of tags by searching this page.
