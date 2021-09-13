@@ -266,6 +266,15 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],[
             '2_replace_9_template_if_4_operators', '', '1', 'en-US',
             `__Stage__: develop`,
+        ],[
+            '2_replace_10_double_check', ' 1_OK', '1', 'en-US',
+            `__Full__: fo/fi
+            __Folder__: fo
+            __File__: fi`,
+        ],[
+            '2_replace_10_double_check', ' 2_BadPart', '1', 'en-US',
+            `__Full__: fo/fi
+            __File__: fi`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {

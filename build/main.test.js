@@ -311,6 +311,12 @@ describe("replaces settings >>", function () {
         ], [
             '2_replace_9_template_if_4_operators', '', '1', 'en-US',
             "__Stage__: develop",
+        ], [
+            '2_replace_10_double_check', ' 1_OK', '1', 'en-US',
+            "__Full__: fo/fi\n            __Folder__: fo\n            __File__: fi",
+        ], [
+            '2_replace_10_double_check', ' 2_BadPart', '1', 'en-US',
+            "__Full__: fo/fi\n            __File__: fi",
         ],
     ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
         var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;

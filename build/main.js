@@ -703,7 +703,7 @@ function getInputFileFullPath(inputFilePath) {
 function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, replacedKeys, parser, _loop_1, expected, replaced, expected, replaced, replacedLine, replacedLine;
+        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, conflictErrors, replacedKeys, parser, _loop_1, replacingLine, expected, replaced, expected, replaced, replacedLine, lengthSortedTemplates, replacedLine, maskedLine, i, errorMessage;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -715,6 +715,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                     reducedErrorWasOccurred = false;
                     loop = true;
                     loopCount = 0;
+                    conflictErrors = {};
                     replacedKeys = [];
                     parser = new Parser();
                     parser.command = CommandEnum.replace;
@@ -726,9 +727,9 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                         console.log("Verbose: keyValues: " + JSON.stringify(keyValues));
                     }
                     _loop_1 = function () {
-                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, replacingLine, commonCase, before, after, necessaryVariableNames, e_3_1;
-                        return __generator(this, function (_d) {
-                            switch (_d.label) {
+                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, checkedTemplateTags, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, commonCase, before, after, targetLineNum, mask, conflictedTemplates, _i, lengthSortedTemplates_1, template, _d, _e, template, necessaryVariableNames, e_3_1, _f, _g, conflictError;
+                        return __generator(this, function (_h) {
+                            switch (_h.label) {
                                 case 0:
                                     writer = new WriteBuffer(fs.createWriteStream(newFilePath));
                                     readStream = fs.createReadStream(oldFilePath);
@@ -748,6 +749,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     isAllReplacable = true;
                                     isCheckingTemplateIfKey = false;
                                     templateIfKeyError = false;
+                                    checkedTemplateTags = {};
                                     evalatedKeyValues = {};
                                     ifTagParser = new IfTagParser(parser);
                                     oldIfTagParser = new IfTagParser(parser);
@@ -757,14 +759,14 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                         console.log("Verbose: loopCount: " + loopCount);
                                         console.log("Verbose: previousEvalatedKeyValuesLength: " + previousEvalatedKeyValuesLength);
                                     }
-                                    _d.label = 1;
+                                    _h.label = 1;
                                 case 1:
-                                    _d.trys.push([1, 6, 7, 12]);
+                                    _h.trys.push([1, 6, 7, 12]);
                                     reader_3 = (e_3 = void 0, __asyncValues(reader));
-                                    _d.label = 2;
+                                    _h.label = 2;
                                 case 2: return [4 /*yield*/, reader_3.next()];
                                 case 3:
-                                    if (!(reader_3_1 = _d.sent(), !reader_3_1.done)) return [3 /*break*/, 5];
+                                    if (!(reader_3_1 = _h.sent(), !reader_3_1.done)) return [3 /*break*/, 5];
                                     line1 = reader_3_1.value;
                                     line = line1;
                                     lines.push(line);
@@ -875,20 +877,77 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                 if (replacingLine.includes(expected)) {
                                                     before = expected;
                                                     after = replaced;
-                                                    if (templateTag.lineNumOffset <= -1) {
-                                                        replacedLine = replacingLine.replace(before, after.replace(/\$/g, '$$'));
-                                                        if (cutReplaceToTagEnabled) {
-                                                            replacedLine = cutReplaceToTag(replacedLine);
-                                                        }
-                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine + "\n");
-                                                    }
-                                                    else {
-                                                        replacedLine = line.replace(before, after.replace(/\$/g, '$$'));
-                                                        if (cutReplaceToTagEnabled) {
-                                                            replacedLine = cutReplaceToTag(replacedLine);
-                                                        }
+                                                    if (templateTag.lineNumOffset === 0) {
+                                                        replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before), 'g'), after.replace(/\$/g, '$$'));
+                                                        // if (cutReplaceToTagEnabled) {
+                                                        //     replacedLine = cutReplaceToTag(replacedLine);
+                                                        // }
                                                         writer.write(replacedLine + "\n");
                                                         output = true;
+                                                        checkedTemplateTags[lineNum] = [];
+                                                        checkedTemplateTags[lineNum].push({
+                                                            templateLineNum: lineNum,
+                                                            template: templateTag.template,
+                                                            targetLineNum: lineNum + templateTag.lineNumOffset,
+                                                            expected: before,
+                                                            replaced: after.replace(/\$/g, '$$')
+                                                        });
+                                                    }
+                                                    else if (templateTag.lineNumOffset <= -1) {
+                                                        targetLineNum = lineNum + templateTag.lineNumOffset;
+                                                        if (!(targetLineNum in checkedTemplateTags)) {
+                                                            checkedTemplateTags[targetLineNum] = [];
+                                                        }
+                                                        checkedTemplateTags[targetLineNum].push({
+                                                            templateLineNum: lineNum,
+                                                            template: templateTag.template,
+                                                            targetLineNum: targetLineNum,
+                                                            expected: before,
+                                                            replaced: after.replace(/\$/g, '$$')
+                                                        });
+                                                        lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice();
+                                                        lengthSortedTemplates = lengthSortedTemplates.sort(function (b, a) { return (a.expected.length - b.expected.length); });
+                                                        replacedLine = replacingLine;
+                                                        maskedLine = replacingLine;
+                                                        mask = '\n';
+                                                        conflictedTemplates = [];
+                                                        for (_i = 0, lengthSortedTemplates_1 = lengthSortedTemplates; _i < lengthSortedTemplates_1.length; _i++) {
+                                                            template = lengthSortedTemplates_1[_i];
+                                                            i = 0;
+                                                            if (!maskedLine.includes(template.expected)) {
+                                                                if (!replacedLine.includes(template.replaced)) {
+                                                                    conflictedTemplates.push(template);
+                                                                }
+                                                            }
+                                                            else {
+                                                                for (;;) {
+                                                                    i = maskedLine.indexOf(template.expected, i);
+                                                                    if (i === notFound) {
+                                                                        break;
+                                                                    }
+                                                                    replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                                                    maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                                                    i += template.expected.length;
+                                                                }
+                                                            }
+                                                        }
+                                                        writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine + "\n");
+                                                        if (conflictedTemplates.length >= 1) {
+                                                            errorMessage = '';
+                                                            errorMessage += '\n';
+                                                            errorMessage += translate('ErrorIn') + ": " + getTestablePath(inputFilePath) + ":" + targetLineNum + "\n";
+                                                            errorMessage += "  " + translate('Error') + ": " + translate('template values are conflicted.') + "\n";
+                                                            errorMessage += "  " + translate('Contents') + ": " + replacingLine.trim() + "\n";
+                                                            for (_d = 0, _e = checkedTemplateTags[targetLineNum]; _d < _e.length; _d++) {
+                                                                template = _e[_d];
+                                                                errorMessage += "  " + translate('in ') + ": " + getTestablePath(inputFilePath) + ":" + template.templateLineNum + "\n";
+                                                                errorMessage += "  " + translate('Replaced') + ": " + template.replaced.trim() + "\n";
+                                                                errorMessage += "  " + translate('Expected') + ": " + template.expected.trim() + "\n";
+                                                                errorMessage += "  " + translate('Template') + ": " + template.template.trim() + "\n";
+                                                            }
+                                                            errorMessage += "  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum;
+                                                            conflictErrors[targetLineNum] = errorMessage;
+                                                        }
                                                     }
                                                     if (parser.verbose && before !== after) {
                                                         console.log("Verbose: replaced a line:");
@@ -939,26 +998,31 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                             writer.write(cutReplaceToTag(line) + "\n");
                                         }
                                     }
-                                    _d.label = 4;
+                                    _h.label = 4;
                                 case 4: return [3 /*break*/, 2];
                                 case 5: return [3 /*break*/, 12];
                                 case 6:
-                                    e_3_1 = _d.sent();
+                                    e_3_1 = _h.sent();
                                     e_3 = { error: e_3_1 };
                                     return [3 /*break*/, 12];
                                 case 7:
-                                    _d.trys.push([7, , 10, 11]);
+                                    _h.trys.push([7, , 10, 11]);
                                     if (!(reader_3_1 && !reader_3_1.done && (_a = reader_3.return))) return [3 /*break*/, 9];
                                     return [4 /*yield*/, _a.call(reader_3)];
                                 case 8:
-                                    _d.sent();
-                                    _d.label = 9;
+                                    _h.sent();
+                                    _h.label = 9;
                                 case 9: return [3 /*break*/, 11];
                                 case 10:
                                     if (e_3) throw e_3.error;
                                     return [7 /*endfinally*/];
                                 case 11: return [7 /*endfinally*/];
                                 case 12:
+                                    for (_f = 0, _g = Object.values(conflictErrors); _f < _g.length; _f++) {
+                                        conflictError = _g[_f];
+                                        console.log(conflictError);
+                                        errorCount += 1;
+                                    }
                                     // previousReplacedKeys = ...
                                     Object.keys(evalatedKeyValues).forEach(function (key) {
                                         previousEvalatedKeyValues[key] = evalatedKeyValues[key];
@@ -985,7 +1049,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                             });
                                         })];
                                 case 13:
-                                    _d.sent();
+                                    _h.sent();
                                     return [2 /*return*/];
                             }
                         });
@@ -1824,7 +1888,7 @@ function revert(inputFilePath) {
                     line1 = reader_5_1.value;
                     line = line1;
                     lineNum += 1;
-                    if (settingStartLabel.test(line) || settingStartLabelEn.test(line)) {
+                    if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                         reverted = false;
                     }
                     if (!(line.includes(originalLabel) && !reverted)) return [3 /*break*/, 7];
@@ -3795,8 +3859,9 @@ var WriteBuffer = /** @class */ (function () {
     WriteBuffer.prototype.write = function (line) {
         this.lineBuffer.push(line);
     };
-    WriteBuffer.prototype.replaceAboveLine = function (relativeLineNum, line) {
-        this.lineBuffer[this.lineBuffer.length + relativeLineNum] = line;
+    WriteBuffer.prototype.replaceAboveLine = function (relativeLineNum, replacedLine) {
+        var targetLineNum = this.lineBuffer.length + relativeLineNum;
+        this.lineBuffer[targetLineNum] = replacedLine;
     };
     return WriteBuffer;
 }());

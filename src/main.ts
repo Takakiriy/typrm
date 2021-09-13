@@ -528,6 +528,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     var    reducedErrorWasOccurred = false;
     var    loop = true;
     var    loopCount = 0;
+    const  conflictErrors: {[lineNum: number]: string} = {};
     const  replacedKeys: string[] = [];
     const  parser = new Parser();
     parser.command = CommandEnum.replace;
@@ -558,6 +559,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         let  isAllReplacable = true;
         let  isCheckingTemplateIfKey = false;
         let  templateIfKeyError = false;
+        const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
         const  evalatedKeyValues: {[key: string]: string} = {};
         const  ifTagParser = new IfTagParser(parser);
         const  oldIfTagParser = new IfTagParser(parser);
@@ -670,7 +672,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     const  templateTag = parseTemplateTag(line, parser);
                     if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
                             &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
-                        const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+                        var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                         const  commonCase = (templateTag.label !== templateIfLabel);
                         if (commonCase) {
                             var  expected = getExpectedLine(oldSetting, templateTag.template);
@@ -684,21 +686,76 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                         if (replacingLine.includes(expected)) {
                             const  before = expected;
                             const  after = replaced;
-                            if (templateTag.lineNumOffset <= -1) {
-                                var  replacedLine = replacingLine.replace(before, after.replace(/\$/g,'$$'));
-                                if (cutReplaceToTagEnabled) {
-                                    replacedLine = cutReplaceToTag(replacedLine);
-                                }
-
-                                writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
-                            } else {
-                                var  replacedLine = line.replace(before, after.replace(/\$/g,'$$'));
-                                if (cutReplaceToTagEnabled) {
-                                    replacedLine = cutReplaceToTag(replacedLine);
-                                }
+                            if (templateTag.lineNumOffset === 0) {
+                                var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
+                                // if (cutReplaceToTagEnabled) {
+                                //     replacedLine = cutReplaceToTag(replacedLine);
+                                // }
 
                                 writer.write(replacedLine +"\n");
                                 output = true;
+                                checkedTemplateTags[lineNum] = [];
+                                checkedTemplateTags[lineNum].push({
+                                    templateLineNum: lineNum,
+                                    template: templateTag.template,
+                                    targetLineNum: lineNum + templateTag.lineNumOffset,
+                                    expected: before,
+                                    replaced: after.replace(/\$/g,'$$')
+                                })
+                            } else if (templateTag.lineNumOffset <= -1) {
+                                const  targetLineNum = lineNum + templateTag.lineNumOffset;
+                                if ( !(targetLineNum in checkedTemplateTags)) {
+                                    checkedTemplateTags[targetLineNum] = [];
+                                }
+                                checkedTemplateTags[targetLineNum].push({
+                                    templateLineNum: lineNum,
+                                    template: templateTag.template,
+                                    targetLineNum,
+                                    expected: before,
+                                    replaced: after.replace(/\$/g,'$$')
+                                });
+                                var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice();
+                                lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
+                                var  replacedLine = replacingLine;
+                                var  maskedLine = replacingLine;
+                                const  mask = '\n';
+                                const  conflictedTemplates: CheckedTemplateTag[] = [];
+                                for (const template of lengthSortedTemplates) {
+                                    var  i = 0;
+                                    if ( ! maskedLine.includes(template.expected)) {
+                                        if ( ! replacedLine.includes(template.replaced)) {
+                                            conflictedTemplates.push(template);
+                                        }
+                                    } else {
+                                        for (;;) {
+                                            i = maskedLine.indexOf(template.expected, i);
+                                            if (i === notFound) {
+                                                break;
+                                            }
+
+                                            replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                            maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                            i += template.expected.length;
+                                        }
+                                    }
+                                }
+
+                                writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
+                                if (conflictedTemplates.length >= 1) {
+                                    var  errorMessage = '';
+                                    errorMessage += '\n';
+                                    errorMessage += `${translate('ErrorIn')}: ${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
+                                    errorMessage += `  ${translate('Error')}: ${translate('template values are conflicted.')}\n`;
+                                    errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
+                                    for (const template of checkedTemplateTags[targetLineNum]) {
+                                        errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
+                                        errorMessage += `  ${translate('Replaced')}: ${template.replaced.trim()}\n`;
+                                        errorMessage += `  ${translate('Expected')}: ${template.expected.trim()}\n`;
+                                        errorMessage += `  ${translate('Template')}: ${template.template.trim()}\n`;
+                                    }
+                                    errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
+                                    conflictErrors[targetLineNum] = errorMessage;
+                                }
                             }
                             if (parser.verbose  &&  before !== after) {
                                 console.log(`Verbose: replaced a line:`);
@@ -745,6 +802,10 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     writer.write(cutReplaceToTag(line) +"\n");
                 }
             }
+        }
+        for (const conflictError of Object.values(conflictErrors)) {
+            console.log(conflictError);
+            errorCount += 1;
         }
 
         // previousReplacedKeys = ...
@@ -1297,6 +1358,15 @@ class  TemplateTag {
     }
 }
 
+// CheckedTemplateTag
+interface  CheckedTemplateTag {
+    templateLineNum: number;
+    template: string;
+    targetLineNum: number;
+    expected: string;
+    replaced: string;
+}
+
 // IfTagParser
 class  IfTagParser {
     readonly  parser: Parser;
@@ -1493,7 +1563,7 @@ async function  revert(inputFilePath: string) {
             for await (const line1 of reader) {
                 const  line: string = line1;
                 lineNum += 1;
-                if (settingStartLabel.test(line) || settingStartLabelEn.test(line)) {
+                if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                     reverted = false;
                 }
                 if (line.includes(originalLabel)  &&  ! reverted) {
@@ -3306,8 +3376,10 @@ class  WriteBuffer {
         this.lineBuffer.push(line);
     }
 
-    replaceAboveLine(relativeLineNum: number, line: string) {
-        this.lineBuffer[this.lineBuffer.length + relativeLineNum] = line;
+    replaceAboveLine(relativeLineNum: number, replacedLine: string) {
+        const  targetLineNum = this.lineBuffer.length + relativeLineNum;
+
+        this.lineBuffer[targetLineNum] = replacedLine;
     }
 }
 

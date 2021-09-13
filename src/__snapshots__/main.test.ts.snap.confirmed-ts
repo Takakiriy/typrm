@@ -2052,6 +2052,126 @@ exports[`replaces settings >> in 2_replace_9_template_if_4_operators: updatedFil
 "
 `;
 
+exports[`replaces settings >> in 2_replace_10_double_check 1_OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_10_double_check 1_OK: updatedFileContents 1`] = `
+"settings:
+    __Full__: fo/fi  #original: folder/file
+    __Folder__: fo  #original: folder
+    __File__: fi  #original: file
+check:
+    - \\"fo/fi\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"fo/fi\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"fo/fi\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
+exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`] = `
+"
+ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9
+  Error: template values are conflicted.
+  Contents: - \\"folder/file\\"
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10
+  Replaced: \\"fo/fi\\"
+  Expected: \\"folder/file\\"
+  Template: \\"__Full__\\"
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11
+  Replaced: folder/fi
+  Expected: folder/file
+  Template: __Folder__/__File__
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12
+  Replaced: folder
+  Expected: folder
+  Template: __Folder__
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13
+  Replaced: fi
+  Expected: file
+  Template: __File__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
+
+ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14
+  Error: template values are conflicted.
+  Contents: - \\"folder/file\\"
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15
+  Replaced: fi
+  Expected: file
+  Template: __File__
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16
+  Replaced: folder
+  Expected: folder
+  Template: __Folder__
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17
+  Replaced: folder/fi
+  Expected: folder/file
+  Template: __Folder__/__File__
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18
+  Replaced: \\"fo/fi\\"
+  Expected: \\"folder/file\\"
+  Template: \\"__Full__\\"
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
+
+Warning: 0, Error: 2
+"
+`;
+
+exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: updatedFileContents 1`] = `
+"settings:
+    __Full__: folder/file
+    __Folder__: folder
+    __File__: file
+check:
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"folder/file\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
+exports[`replaces settings >> in 2_replace_10_double_check: sourceFileContents 1`] = `
+"settings:
+    __Full__: folder/file
+    __Folder__: folder
+    __File__: file
+check:
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"folder/file\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
 exports[`replaces settings >> to >> 1_OK: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
@@ -2078,6 +2198,8 @@ body:
     -(ValueEE)-             #template: (__BodyE__)
     -(ValueFF1)-(ValueFF2)-  #template: (__BodyF1__)-(__BodyF2__)
     -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
+    settings:
+        __SubA__: SetSubAA  #original: SetSubA
 "
 `;
 
@@ -2107,6 +2229,8 @@ body:
     -(ValueE)-             #template: (__BodyE__)
     -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)
     -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
+    settings:
+        __SubA__: SetSubA
 "
 `;
 
@@ -2136,6 +2260,8 @@ body:
     -(ValueE)-             #to: (ValueEE)  #template: (__BodyE__)
     -(ValueF1)-(ValueF2)-  #to:  ValueFF1, ValueFF2    #template: (__BodyF1__)-(__BodyF2__)
     -(ValueG1)-(ValueG2)-  #to: (ValueGG1)-(ValueGG2)  #template: (__BodyG1__)-(__BodyG2__)
+    settings:
+        __SubA__: SetSubA  #to: SetSubAA
 "
 `;
 
