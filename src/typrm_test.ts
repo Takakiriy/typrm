@@ -52,7 +52,7 @@ async function  DoCustomDebug() {
 
 // TestOfFileCheck
 async function  TestOfCommandLine() {
-    let  returns: ProcessReturns;
+    var  returns: ProcessReturns;
 
     var cases: ({[name: string]: string})[] = [{
         "name": "version",

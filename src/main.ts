@@ -102,22 +102,22 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     }
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
-    let  previousTemplateCount = 0;
+    var  previousTemplateCount = 0;
     for(;;) {
-        let  reader = readline.createInterface({
+        var  reader = readline.createInterface({
             input: fs.createReadStream(inputFilePath),
             crlfDelay: Infinity
         });
-        let  isReadingSetting = false;
-        let  setting: Settings = {};
-        let  settingCount = 0;
-        let  settingIndentLength = 0;
-        let  lineNum = 0;
-        let  templateCount = 0;
-        let  fileTemplateTag: TemplateTag | null = null;
-        let  errorCount = 0;
-        let  warningCount = 0;
-        let  secretLabelCount = 0;
+        var  isReadingSetting = false;
+        var  setting: Settings = {};
+        var  settingCount = 0;
+        var  settingIndentLength = 0;
+        var  lineNum = 0;
+        var  templateCount = 0;
+        var  fileTemplateTag: TemplateTag | null = null;
+        var  errorCount = 0;
+        var  warningCount = 0;
+        var  secretLabelCount = 0;
         const  parser = new Parser();
         const  lines = [];
         const  keywords: SearchKeyword[] = [];
@@ -295,7 +295,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
 
             // Get titles above or following.
-            let  match: RegExpExecArray | null;
+            var  match: RegExpExecArray | null;
             referPattern.lastIndex = 0;
 
             while ( (match = referPattern.exec( line )) !== null ) {
@@ -387,7 +387,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         }
 
         // Rescan or replace a value
-        let  loop = true;
+        var  loop = true;
         while (loop) {
             console.log(translate('Press Enter key to retry checking.'));
 
@@ -548,17 +548,17 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             crlfDelay: Infinity
         });
         const  lines = [];
-        let  isReadingSetting = false;
-        let  setting: Settings = {};
-        let  settingCount = 0;
-        let  settingIndentLength = 0;
-        let  settingLineNum = -1;
-        let  oldSetting: Settings = {};
-        let  lineNum = 0;
-        let  isReplacing = false;
-        let  isAllReplacable = true;
-        let  isCheckingTemplateIfKey = false;
-        let  templateIfKeyError = false;
+        var  isReadingSetting = false;
+        var  setting: Settings = {};
+        var  settingCount = 0;
+        var  settingIndentLength = 0;
+        var  settingLineNum = -1;
+        var  oldSetting: Settings = {};
+        var  lineNum = 0;
+        var  isReplacing = false;
+        var  isAllReplacable = true;
+        var  isCheckingTemplateIfKey = false;
+        var  templateIfKeyError = false;
         const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
         const  evalatedKeyValues: {[key: string]: string} = {};
         const  ifTagParser = new IfTagParser(parser);
@@ -574,7 +574,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             const  line: string = line1;
             lines.push(line);
             lineNum += 1;
-            let  output = false;
+            var  output = false;
             parser.lineNum = lineNum;
 
             // isReadingSetting = ...
@@ -847,7 +847,7 @@ function  getReplacedLineInSettings(
     // __SettingB__: SetB  #// comment
     // __SettingB__: SetB      #to: NewSetB   #// SetBB....
     //                   ^ spaceAndCommentIndex
-    let  spaceAndComment= '';
+    var  spaceAndComment= '';
     const  commentMatch = / +#.*/.exec(line.substr(separator))
     if (commentMatch) {
         var  spaceAndCommentIndex = separator + commentMatch.index;
@@ -855,7 +855,7 @@ function  getReplacedLineInSettings(
     } else {
         var  spaceAndCommentIndex = notFound;
     }
-    let  original = '';
+    var  original = '';
     const  lineIncludesOriginalLabel = line.includes(originalLabel);
 
     // addOriginalTag
@@ -956,12 +956,12 @@ async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex:
         input: readStream,
         crlfDelay: Infinity
     });
-    let  isReadingSetting = false;
-    let  revertSettings: string[] = [];
-    let  settingCount = 0;
-    let  settingIndentLength = 0;
-    let  lineNum = 0;
-    let  isReadingOriginal = false;
+    var  isReadingSetting = false;
+    var  revertSettings: string[] = [];
+    var  settingCount = 0;
+    var  settingIndentLength = 0;
+    var  lineNum = 0;
+    var  isReadingOriginal = false;
     const  ifTrueScanner = new IfTrueConditionScanner();
 
     for await (const line1 of reader) {
@@ -1098,7 +1098,7 @@ class  TemplateTag {
     }
     onReadLine(line: string): boolean {
         const  currentIndent = indentRegularExpression.exec(line)![0];
-        let  readingNext = true;
+        var  readingNext = true;
         if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
             const  skip = (this.templateLines.length === 0  &&  line.trim() === fileTemplateAnyLinesLabel);
             if ( ! skip ) {
@@ -1158,7 +1158,7 @@ class  TemplateTag {
         const  indices = Object.keys(foundIndices).map((v)=>(parseInt(v))).sort();
         const  keys = indices.map((index)=>( foundIndices[index] ));
         const  placeholder = '\n';
-        let    templatePattern = this.template;
+        var    templatePattern = this.template;
         for (let i = indices.length - 1;  i >= 0;  i -= 1 ) {
             templatePattern =
                 templatePattern.substr(0, indices[i]) +
@@ -1240,22 +1240,22 @@ class  TemplateTag {
             return  false;
         }
         const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
-        let  templateLineIndex = 0;
-        let  targetLineNum = 0;
-        let  errorTemplateLineIndex = 0;
-        let  errorTargetLineNum = 0;
-        let  errorContents = '';
-        let  errorExpected = '';
-        let  errorTemplate = '';
-        let  indent = '';
+        var  templateLineIndex = 0;
+        var  targetLineNum = 0;
+        var  errorTemplateLineIndex = 0;
+        var  errorTargetLineNum = 0;
+        var  errorContents = '';
+        var  errorExpected = '';
+        var  errorTemplate = '';
+        var  indent = '';
         enum Result { same, different, skipped };
-        let  result = Result.same;
-        let  skipTo = '';
-        let  skipToTemplate = '';
-        let  skipFrom = '';
-        let  skipStartLineNum = 0;
-        let  loop = true;
-        let  exception: any;
+        var  result = Result.same;
+        var  skipTo = '';
+        var  skipToTemplate = '';
+        var  skipFrom = '';
+        var  skipStartLineNum = 0;
+        var  loop = true;
+        var  exception: any;
 
         for await (const line1 of targetFileReader) {
             if (!loop) {continue;}  // "reader" requests read all lines
@@ -1330,7 +1330,7 @@ class  TemplateTag {
             throw exception;
         }
         if (result !== Result.same) {
-            let  templateLineNum = 0;
+            var  templateLineNum = 0;
             if (result === Result.different) {
                 templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
             }
@@ -1634,13 +1634,13 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
         crlfDelay: Infinity
     });
     var  lineNum = 0;
-    let  isReadingSetting = false;
-    let  setting: Settings = {};
-    let  settingCount = 0;
-    let  settingIndentLength = 0;
-    let  key = '';
-    let  toValue = '';
-    let  replaceKeyValues = new ReplaceKeyValues();
+    var  isReadingSetting = false;
+    var  setting: Settings = {};
+    var  settingCount = 0;
+    var  settingIndentLength = 0;
+    var  key = '';
+    var  toValue = '';
+    var  replaceKeyValues = new ReplaceKeyValues();
     var  errorCount = 0;
     const  replaceKeyValuesSet: ReplaceKeyValues[] = [];
     const  parser = new Parser();
@@ -2002,7 +2002,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                 const  keywords = keyphrase.split(' ');
                 const  found = new FoundLine();
 
-                let    previousPosition = -1;
+                var    previousPosition = -1;
                 const  wordPositions = new WordPositions();
                 wordPositions.setPhrase(aTestingString);
                 const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length).fill( 0 )
@@ -2072,8 +2072,8 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
 
     function  getSubMatchedScore(testingString: string, keyword: string,
             lowerKeyword: string, stringIndex: number, found: FoundLine): Result {
-        let  score = 0;
-        let  position = notFound;
+        var  score = 0;
+        var  position = notFound;
 
         if ((position = testingString.indexOf(keyword)) !== notFound) {
             if (testingString.length === keyword.length) {
@@ -2536,8 +2536,8 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
     }
     const  settingsDot = '$settings.';
     const  envDot = '$env.';
-    let    match: RegExpExecArray | null = null;
-    let    parent = '';
+    var    match: RegExpExecArray | null = null;
+    var    parent = '';
     if (expression.startsWith(settingsDot)) {
         parent = settingsDot;
 
@@ -2557,7 +2557,7 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
     if (match && parent) {
         const  name = match[1];
         const  operator = match[2];
-        let    rightValue = match[3];
+        var    rightValue = match[3];
         if (parent === settingsDot) {
             if (name in setting) {
 
@@ -2665,11 +2665,11 @@ async function  getSettingIndexFromLineNum(inputFilePath: string, settingNameOrL
         input: fs.createReadStream(inputFilePath),
         crlfDelay: Infinity
     });
-    let  settingCount = 0;
-    let  lineNum = 0;
-    let  breaking = false;
-    let  isFound = false;
-    let  exception: any;
+    var  settingCount = 0;
+    var  lineNum = 0;
+    var  breaking = false;
+    var  isFound = false;
+    var  exception: any;
     var  targetLineNum: number | undefined;
     var  targetSettingName: string | undefined;
     const  isOneSetting = (settingNameOrLineNum === '');
@@ -2770,7 +2770,7 @@ function  getExpectedLine(setting: Settings, template: string): string {
 // getExpectedLineAndEvaluationLog
 function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean
         ): {expected: string, log: EvaluationLog[]} {
-    let  expected = template;
+    var  expected = template;
     const  log: EvaluationLog[] = [];
 
     for (const key of Object.keys(setting)) {
@@ -2789,7 +2789,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
 // getExpectedLineInFileTemplate
 function  getExpectedLineInFileTemplate(setting: Settings, template: string) {
 
-    let  expected = getExpectedLine(setting, template);
+    var  expected = getExpectedLine(setting, template);
     const  templateIndex = expected.indexOf(templateLabel);
     if (templateIndex !== notFound) {
 
@@ -2832,7 +2832,7 @@ function  parseKeyValueLines(keyValueLines: string): {[key:string]: string} {
 // getValue
 function  getValue(line: string, separatorIndex: number = -1) {
 
-    let  value = line.substr(separatorIndex + 1).trim();
+    var  value = line.substr(separatorIndex + 1).trim();
     if (value[0] === '#') {
         var  comment = 0;
     } else {
@@ -3050,7 +3050,7 @@ class FoundLine {
         // colorParts = sort matched positions and merge overrlapping parts.
         const  colorParts: MatchedPart[] = [];
         const  sortedParts: MatchedPart[] = this.matches.sort((a, b) => (a.position - b.position));
-        let  previousPart = new MatchedPart();
+        var  previousPart = new MatchedPart();
         previousPart.position = -1;
         previousPart.length = 0;
         for (const part of sortedParts) {
@@ -3061,10 +3061,10 @@ class FoundLine {
         }
 
         // coloredLine = ...
-        let    coloredLine = '';
+        var    coloredLine = '';
         const  matchedColor = chalk.green.bold;
         const  line = this.line;
-        let    previousPosition = 0;
+        var    previousPosition = 0;
         for (const match of colorParts) {
 
             coloredLine +=
@@ -3235,10 +3235,10 @@ async function  searchAsText(getter: LineNumGetter, address: string): /* linkabl
         input: fs.createReadStream(filePath),
         crlfDelay: Infinity
     });
-    let  lineNum = 0;
-    let  breaking = false;
-    let  exception: any;
-    let  foundCount = 0;
+    var  lineNum = 0;
+    var  breaking = false;
+    var  exception: any;
+    var  foundCount = 0;
 
     for await (const line1 of reader) {
         if (breaking) {continue;}  // "reader" requests read all lines
@@ -3440,10 +3440,10 @@ function  pathResolve(path_: string) {
 // e.g. translate('english')
 // e.g. translate`price = ${price}`  // ... taggedTemplate
 function  translate(englishLiterals: TemplateStringsArray | string,  ...values: any[]): string {
-    let    dictionary: {[name: string]: string} | undefined = undefined;
+    var    dictionary: {[name: string]: string} | undefined = undefined;
     const  taggedTemplate = (typeof(englishLiterals) !== 'string');
 
-    let  english = englishLiterals as string;
+    var  english = englishLiterals as string;
     if (taggedTemplate) {
         english = '';
         for (let i=0; i<englishLiterals.length; i+=1) {
@@ -3497,7 +3497,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Error that verb number ${0} is not defined": "エラー：動詞番号 ${0} は定義されていません"
         };
     }
-    let  translated = english;
+    var  translated = english;
     if (dictionary) {
         if (english in dictionary) {
 

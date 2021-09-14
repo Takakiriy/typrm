@@ -206,7 +206,7 @@ export async function  parseCSVColumns(columns: string): Promise<string[]> {
         return  [];  // stream.Readable.from(undefined) occurs an error
     }
     return new Promise((resolveFunction, rejectFunction) => {
-        let  columnArray: string[] = [];
+        var  columnArray: string[] = [];
 
         stream.Readable.from(columns)
             .pipe(
