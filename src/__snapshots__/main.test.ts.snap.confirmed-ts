@@ -2086,42 +2086,42 @@ ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_
   Error: template values are conflicted.
   Contents: - \\"folder/file\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10
-  Replaced: \\"fo/fi\\"
-  Expected: \\"folder/file\\"
-  Template: \\"__Full__\\"
+    Replaced: \\"fo/fi\\"
+    Expected: \\"folder/file\\"
+    Template: \\"__Full__\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11
-  Replaced: folder/fi
-  Expected: folder/file
-  Template: __Folder__/__File__
+    Replaced: folder/fi
+    Expected: folder/file
+    Template: __Folder__/__File__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12
-  Replaced: folder
-  Expected: folder
-  Template: __Folder__
+    Replaced: folder
+    Expected: folder
+    Template: __Folder__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13
-  Replaced: fi
-  Expected: file
-  Template: __File__
+    Replaced: fi
+    Expected: file
+    Template: __File__
   Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
 
 ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14
   Error: template values are conflicted.
   Contents: - \\"folder/file\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15
-  Replaced: fi
-  Expected: file
-  Template: __File__
+    Replaced: fi
+    Expected: file
+    Template: __File__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16
-  Replaced: folder
-  Expected: folder
-  Template: __Folder__
+    Replaced: folder
+    Expected: folder
+    Template: __Folder__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17
-  Replaced: folder/fi
-  Expected: folder/file
-  Template: __Folder__/__File__
+    Replaced: folder/fi
+    Expected: folder/file
+    Template: __Folder__/__File__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18
-  Replaced: \\"fo/fi\\"
-  Expected: \\"folder/file\\"
-  Template: \\"__Full__\\"
+    Replaced: \\"fo/fi\\"
+    Expected: \\"folder/file\\"
+    Template: \\"__Full__\\"
   Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
 
 Warning: 0, Error: 2

@@ -749,9 +749,9 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                     errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
                                     for (const template of checkedTemplateTags[targetLineNum]) {
                                         errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
-                                        errorMessage += `  ${translate('Replaced')}: ${template.replaced.trim()}\n`;
-                                        errorMessage += `  ${translate('Expected')}: ${template.expected.trim()}\n`;
-                                        errorMessage += `  ${translate('Template')}: ${template.template.trim()}\n`;
+                                        errorMessage += `    ${translate('Replaced')}: ${template.replaced.trim()}\n`;
+                                        errorMessage += `    ${translate('Expected')}: ${template.expected.trim()}\n`;
+                                        errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
                                     }
                                     errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
                                     conflictErrors[targetLineNum] = errorMessage;
@@ -3562,7 +3562,7 @@ const  disableLabel = "#disable-tag-tool:";
 const  searchIfLabel = "#(search)if: false";
 const  ifLabel = "#if:";
 const  expectLabel = "#expect:";
-const  ignoredKeywords = [ /#keyword:/g, /#search:/g ];
+const  ignoredKeywords = [ /#search:/g, /: +#keyword:/g, /#keyword:/g ];
 const  searchLabel = "#search:";
 const  refLabel = "#ref:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];

@@ -941,9 +941,9 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                             for (_d = 0, _e = checkedTemplateTags[targetLineNum]; _d < _e.length; _d++) {
                                                                 template = _e[_d];
                                                                 errorMessage += "  " + translate('in ') + ": " + getTestablePath(inputFilePath) + ":" + template.templateLineNum + "\n";
-                                                                errorMessage += "  " + translate('Replaced') + ": " + template.replaced.trim() + "\n";
-                                                                errorMessage += "  " + translate('Expected') + ": " + template.expected.trim() + "\n";
-                                                                errorMessage += "  " + translate('Template') + ": " + template.template.trim() + "\n";
+                                                                errorMessage += "    " + translate('Replaced') + ": " + template.replaced.trim() + "\n";
+                                                                errorMessage += "    " + translate('Expected') + ": " + template.expected.trim() + "\n";
+                                                                errorMessage += "    " + translate('Template') + ": " + template.template.trim() + "\n";
                                                             }
                                                             errorMessage += "  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum;
                                                             conflictErrors[targetLineNum] = errorMessage;
@@ -4052,7 +4052,7 @@ var disableLabel = "#disable-tag-tool:";
 var searchIfLabel = "#(search)if: false";
 var ifLabel = "#if:";
 var expectLabel = "#expect:";
-var ignoredKeywords = [/#keyword:/g, /#search:/g];
+var ignoredKeywords = [/#search:/g, /: +#keyword:/g, /#keyword:/g];
 var searchLabel = "#search:";
 var refLabel = "#ref:";
 var temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];

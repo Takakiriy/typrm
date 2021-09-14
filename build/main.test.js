@@ -692,6 +692,17 @@ describe("searches keyword tag >>", function () {
             { folder: "test_data/search/1", test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n"),
         ], [
+            "ignored colon before keyword tag",
+            ["search", "AB: #keyword:"],
+            { folder: "test_data/search/1", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n"),
+        ], [
+            "CSV ignored colon before keyword tag",
+            ["search", "A,B: #keyword:"],
+            { folder: "test_data/search/1", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
+        ], [
             "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },
