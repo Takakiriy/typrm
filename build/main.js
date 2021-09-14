@@ -73,7 +73,8 @@ function main() {
                     if (verboseMode) {
                         printConfig();
                     }
-                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 4];
+                    if (!(exports.programArguments.length === 0)) return [3 /*break*/, 7];
+                    if (!exports.programOptions.replaceMode) return [3 /*break*/, 4];
                     return [4 /*yield*/, checkRoutine(true, '')];
                 case 1:
                     _a.sent();
@@ -82,19 +83,24 @@ function main() {
                 case 2:
                     _a.sent();
                     _a.label = 3;
-                case 3: return [3 /*break*/, 20];
-                case 4:
-                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 20];
-                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 6];
+                case 3: return [3 /*break*/, 6];
+                case 4: return [4 /*yield*/, search()];
+                case 5:
+                    _a.sent();
+                    _a.label = 6;
+                case 6: return [3 /*break*/, 23];
+                case 7:
+                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 23];
+                    if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 9];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: search');
                     }
                     return [4 /*yield*/, search()];
-                case 5:
+                case 8:
                     _a.sent();
-                    return [3 /*break*/, 20];
-                case 6:
-                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 8];
+                    return [3 /*break*/, 23];
+                case 9:
+                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 11];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: check');
                     }
@@ -102,15 +108,15 @@ function main() {
                         checkingFilePath = exports.programArguments[1];
                     }
                     return [4 /*yield*/, check(checkingFilePath)];
-                case 7:
+                case 10:
                     _a.sent();
-                    return [3 /*break*/, 20];
-                case 8:
-                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 13];
+                    return [3 /*break*/, 23];
+                case 11:
+                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 16];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: replace');
                     }
-                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 10];
+                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 13];
                     if (exports.programArguments.length === 1) {
                         inputFilePath = '';
                     }
@@ -118,10 +124,10 @@ function main() {
                         inputFilePath = exports.programArguments[1];
                     }
                     return [4 /*yield*/, replace(inputFilePath)];
-                case 9:
+                case 12:
                     _a.sent();
-                    return [3 /*break*/, 12];
-                case 10:
+                    return [3 /*break*/, 15];
+                case 13:
                     varidateReplaceCommandArguments();
                     if (exports.programArguments.length === 3) {
                         inputFilePath = exports.programArguments[1];
@@ -134,13 +140,13 @@ function main() {
                         keyValues = exports.programArguments[3];
                     }
                     return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues, false)];
-                case 11:
+                case 14:
                     _a.sent();
-                    _a.label = 12;
-                case 12: return [3 /*break*/, 20];
-                case 13:
-                    if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 18];
-                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 15];
+                    _a.label = 15;
+                case 15: return [3 /*break*/, 23];
+                case 16:
+                    if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 21];
+                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 18];
                     if (exports.programArguments.length === 1) {
                         inputFilePath = '';
                     }
@@ -148,23 +154,23 @@ function main() {
                         inputFilePath = exports.programArguments[1];
                     }
                     return [4 /*yield*/, revert(inputFilePath)];
-                case 14:
+                case 17:
                     _a.sent();
-                    return [3 /*break*/, 17];
-                case 15:
+                    return [3 /*break*/, 20];
+                case 18:
                     varidateRevertCommandArguments();
                     inputFilePath = exports.programArguments[1];
                     replacingLineNum = exports.programArguments[2];
                     return [4 /*yield*/, revertSettings(inputFilePath, replacingLineNum)];
-                case 16:
-                    _a.sent();
-                    _a.label = 17;
-                case 17: return [3 /*break*/, 20];
-                case 18: return [4 /*yield*/, search()];
                 case 19:
                     _a.sent();
                     _a.label = 20;
-                case 20: return [2 /*return*/];
+                case 20: return [3 /*break*/, 23];
+                case 21: return [4 /*yield*/, search()];
+                case 22:
+                    _a.sent();
+                    _a.label = 23;
+                case 23: return [2 /*return*/];
             }
         });
     });
@@ -378,7 +384,6 @@ function checkRoutine(isModal, inputFilePath) {
                             secretLabelCount += 1;
                         }
                     }
-                    match = void 0;
                     referPattern.lastIndex = 0;
                     while ((match = referPattern.exec(line)) !== null) {
                         keyword = new SearchKeyword();
@@ -703,7 +708,7 @@ function getInputFileFullPath(inputFilePath) {
 function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, conflictErrors, replacedKeys, parser, _loop_1, replacingLine, expected, replaced, expected, replaced, replacedLine, lengthSortedTemplates, replacedLine, maskedLine, i, errorMessage;
+        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, conflictErrors, replacedKeys, parser, _loop_1, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, output, replacingLine, expected, replaced, expected, replaced, replacedLine, lengthSortedTemplates, replacedLine, maskedLine, i, errorMessage;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -727,7 +732,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                         console.log("Verbose: keyValues: " + JSON.stringify(keyValues));
                     }
                     _loop_1 = function () {
-                        var writer, readStream, reader, lines, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, checkedTemplateTags, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, output, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, commonCase, before, after, targetLineNum, mask, conflictedTemplates, _i, lengthSortedTemplates_1, template, _d, _e, template, necessaryVariableNames, e_3_1, _f, _g, conflictError;
+                        var writer, readStream, reader, lines, checkedTemplateTags, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, commonCase, before, after, targetLineNum, mask, conflictedTemplates, _i, lengthSortedTemplates_1, template, _d, _e, template, necessaryVariableNames, e_3_1, _f, _g, conflictError;
                         return __generator(this, function (_h) {
                             switch (_h.label) {
                                 case 0:
@@ -1450,18 +1455,18 @@ var TemplateTag = /** @class */ (function () {
     TemplateTag.prototype.checkTargetFileContents = function (setting, inputFilePath, templateEndLineNum) {
         var e_5, _a;
         return __awaiter(this, void 0, void 0, function () {
-            var parentPath, targetFilePath, templateLineNum, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_5_1, templateLineNum;
+            var parentPath, targetFilePath, templateLineNum_1, targetFileReader, expectedFirstLine, templateLineIndex, targetLineNum, errorTemplateLineIndex, errorTargetLineNum, errorContents, errorExpected, errorTemplate, indent, Result, result, skipTo, skipToTemplate, skipFrom, skipStartLineNum, loop, exception, targetFileReader_1, targetFileReader_1_1, line1, targetLine, indentLength, expected, e_5_1, templateLineNum;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         parentPath = path.dirname(inputFilePath);
                         targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
                         if (!fs.existsSync(targetFilePath)) {
-                            templateLineNum = templateEndLineNum - this.templateLines.length;
+                            templateLineNum_1 = templateEndLineNum - this.templateLines.length;
                             console.log("");
                             console.log("Error of not found the target file:");
                             console.log("  " + translate('NotFound') + ": " + getTestablePath(targetFilePath));
-                            console.log("  Template: " + getTestablePath(inputFilePath) + ":" + templateLineNum);
+                            console.log("  Template: " + getTestablePath(inputFilePath) + ":" + templateLineNum_1);
                             return [2 /*return*/, false];
                         }
                         targetFileReader = readline.createInterface({

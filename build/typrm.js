@@ -57,6 +57,7 @@ function callMain() {
                         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
                         .option("--color")
                         .option("--thesaurus <>", "The thesaurus CSV file path", process.env.TYPRM_THESAURUS)
+                        .option("--replace-mode")
                         .option("--verbose")
                         .parse(process.argv);
                     for (_i = 0, _a = commander.program.args; _i < _a.length; _i++) {

@@ -21,10 +21,15 @@ export async function  main() {
     }
 
     if (programArguments.length === 0) {
-        await checkRoutine(true, '');
+        if (programOptions.replaceMode) {
 
-        if (programOptions.test) {  // Scan last input command line for the test
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await checkRoutine(true, '');
+            if (programOptions.test) {  // Scan last input command line for the test
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        } else {
+
+            await search();
         }
     } else if (programArguments.length >= 1 ) {
 
