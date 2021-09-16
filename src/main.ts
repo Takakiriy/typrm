@@ -150,7 +150,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             // setting = ...
             if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                 if (settingCount >= 1) {
-                    onEndOfSettingScope(setting);
+                    onEndOfSettingScope(setting, inputFilePath);
                 }
                 if (parser.verbose) {
                     console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
@@ -318,7 +318,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
         }
         if (settingCount >= 1) {
-            onEndOfSettingScope(setting);
+            onEndOfSettingScope(setting, inputFilePath);
         }
 
         // Check target file contents by "#file-template:" tag (2).
@@ -820,8 +820,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             loop = false;
         } else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
             console.log('');
-            console.log('Error of unexpected: The count of evalatedKeyValues is not increasing.' +
-                ' isReplacable may be not changed');
+            console.log(translate`Error of unexpected: The count of evalatedKeyValues is not increasing.' +
+                ' isReplacable may be not changed. Try typrm check command.`);
             errorCount += 1;
             loop = false;
         }
@@ -2515,10 +2515,11 @@ function  varidateRevertCommandArguments() {
 }
 
 // onEndOfSetting
-function onEndOfSettingScope(setting: Settings) {
+function onEndOfSettingScope(setting: Settings, inputFilePath: string) {
     for (const key of Object.keys(setting)) {
         if (!setting[key].isReferenced) {
-            console.log(translate`Not referenced: ${key} in line ${setting[key].lineNum}`);
+            console.log(translate`Error: ${getTestablePath(inputFilePath)} ${setting[key].lineNum}`);
+            console.log(translate`  Not referenced: ${key}`);
         }
     }
 }
@@ -3478,6 +3479,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Error of duplicated variable name:": "エラー：変数名が重複しています",
             "Error of not expected condition:": "エラー：予期しない条件です",
             "Error of expect tag syntax:": "エラー：expect タグの文法エラー",
+            "Error of unexpected: The count of evalatedKeyValues is not increasing.": "予期しないエラー：evalatedKeyValues の数が増えていません。",
+            "isReplacable may be not changed. Try typrm check command.": "isReplacable が変更されていません。 typrm check コマンドを試してください。",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
@@ -3498,7 +3501,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "The parameter must be less than 0": "パラメーターは 0 より小さくしてください",
             "Not found \"${0}\" above": "上方向に「${0}」が見つかりません",
             "Not found \"${0}\" following": "下方向に「${0}」が見つかりません",
-            "Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）",
+            "Not referenced:": "参照されていません：",
             "Error that verb number ${0} is not defined": "エラー：動詞番号 ${0} は定義されていません"
         };
     }

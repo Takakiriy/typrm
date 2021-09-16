@@ -241,7 +241,7 @@ function checkRoutine(isModal, inputFilePath) {
                     // setting = ...
                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                         if (settingCount >= 1) {
-                            onEndOfSettingScope(setting);
+                            onEndOfSettingScope(setting, inputFilePath);
                         }
                         if (parser.verbose) {
                             console.log("Verbose: " + getTestablePath(inputFilePath) + ":" + lineNum + ": settings");
@@ -420,7 +420,7 @@ function checkRoutine(isModal, inputFilePath) {
                 case 16: return [7 /*endfinally*/];
                 case 17:
                     if (settingCount >= 1) {
-                        onEndOfSettingScope(setting);
+                        onEndOfSettingScope(setting, inputFilePath);
                     }
                     if (!fileTemplateTag) return [3 /*break*/, 19];
                     fileTemplateTag.onReadLine(''); // Cut indent
@@ -1037,8 +1037,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                     }
                                     else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
                                         console.log('');
-                                        console.log('Error of unexpected: The count of evalatedKeyValues is not increasing.' +
-                                            ' isReplacable may be not changed');
+                                        console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error of unexpected: The count of evalatedKeyValues is not increasing.' +\n                ' isReplacable may be not changed. Try typrm check command."], ["Error of unexpected: The count of evalatedKeyValues is not increasing.' +\n                ' isReplacable may be not changed. Try typrm check command."]))));
                                         errorCount += 1;
                                         loop = false;
                                     }
@@ -2894,7 +2893,7 @@ function runVerb(verbs, address, lineNum, verbNum) {
         }
         fileOrFolderPath = lib.getFullPath(fileOrFolderPath, process.cwd());
         if (!fs.existsSync(fileOrFolderPath)) {
-            console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error of not found the file or folder at \"", "\""], ["Error of not found the file or folder at \"", "\""])), getTestablePath(fileOrFolderPath)));
+            console.log(translate(templateObject_6 || (templateObject_6 = __makeTemplateObject(["Error of not found the file or folder at \"", "\""], ["Error of not found the file or folder at \"", "\""])), getTestablePath(fileOrFolderPath)));
             return;
         }
     }
@@ -2918,7 +2917,7 @@ function runVerb(verbs, address, lineNum, verbNum) {
         console.log(stdout_);
     }
     else {
-        console.log(translate(templateObject_6 || (templateObject_6 = __makeTemplateObject(["Error that verb number ", " is not defined"], ["Error that verb number ", " is not defined"])), verbNum));
+        console.log(translate(templateObject_7 || (templateObject_7 = __makeTemplateObject(["Error that verb number ", " is not defined"], ["Error that verb number ", " is not defined"])), verbNum));
     }
 }
 // printConfig
@@ -2988,11 +2987,12 @@ function varidateRevertCommandArguments() {
     }
 }
 // onEndOfSetting
-function onEndOfSettingScope(setting) {
+function onEndOfSettingScope(setting, inputFilePath) {
     for (var _i = 0, _a = Object.keys(setting); _i < _a.length; _i++) {
         var key = _a[_i];
         if (!setting[key].isReferenced) {
-            console.log(translate(templateObject_7 || (templateObject_7 = __makeTemplateObject(["Not referenced: ", " in line ", ""], ["Not referenced: ", " in line ", ""])), key, setting[key].lineNum));
+            console.log(translate(templateObject_8 || (templateObject_8 = __makeTemplateObject(["Error: ", " ", ""], ["Error: ", " ", ""])), getTestablePath(inputFilePath), setting[key].lineNum));
+            console.log(translate(templateObject_9 || (templateObject_9 = __makeTemplateObject(["  Not referenced: ", ""], ["  Not referenced: ", ""])), key));
         }
     }
 }
@@ -3955,6 +3955,8 @@ function translate(englishLiterals) {
             "Error of duplicated variable name:": "エラー：変数名が重複しています",
             "Error of not expected condition:": "エラー：予期しない条件です",
             "Error of expect tag syntax:": "エラー：expect タグの文法エラー",
+            "Error of unexpected: The count of evalatedKeyValues is not increasing.": "予期しないエラー：evalatedKeyValues の数が増えていません。",
+            "isReplacable may be not changed. Try typrm check command.": "isReplacable が変更されていません。 typrm check コマンドを試してください。",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -3974,7 +3976,7 @@ function translate(englishLiterals) {
             "The parameter must be less than 0": "パラメーターは 0 より小さくしてください",
             "Not found \"${0}\" above": "上方向に「${0}」が見つかりません",
             "Not found \"${0}\" following": "下方向に「${0}」が見つかりません",
-            "Not referenced: ${0} in line ${1}": "参照されていません： ${0} （${1}行目）",
+            "Not referenced:": "参照されていません：",
             "Error that verb number ${0} is not defined": "エラー：動詞番号 ${0} は定義されていません"
         };
     }
@@ -4095,5 +4097,5 @@ var withJest = false;
 exports.stdout = '';
 exports.programArguments = [];
 exports.programOptions = {};
-var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7;
+var templateObject_1, templateObject_2, templateObject_3, templateObject_4, templateObject_5, templateObject_6, templateObject_7, templateObject_8, templateObject_9;
 //# sourceMappingURL=main.js.map

@@ -389,6 +389,8 @@ typrm を使うには Node.js のインストールが必要です。
         PowerShell または Git bash を新しく開いて:
             typrm --version
 
+    必要に応じて環境変数 TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+
 ### mac の場合
 
     Node.js をインストールします:
@@ -422,6 +424,8 @@ typrm を使うには Node.js のインストールが必要です。
     typrm が使えることを確認します:
         typrm --version
 
+    必要に応じて環境変数 TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+
 ### CentOS 7 の場合
 
     Node.js をインストールします:
@@ -445,11 +449,11 @@ typrm を使うには Node.js のインストールが必要です。
         npm config -g set https-proxy "http://___.___.___.___:____"
 
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
+        sudo yum install unzip  #// unzip が使えないとき
         mkdir -p ~/Downloads
         cd  ~/Downloads
         curl -L -O https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
         mv  master.zip  typrm.zip
-        sudo yum install unzip
         rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// 更新するとき
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
@@ -472,6 +476,8 @@ typrm を使うには Node.js のインストールが必要です。
 
     typrm が使えることを確認します:
         typrm --version
+
+    必要に応じて環境変数 TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     （使わなくなったら）typrm を削除します:
         - rm ~/bin/typrm

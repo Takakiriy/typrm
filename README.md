@@ -398,6 +398,8 @@ To use typrm, you must install Node.js.
         Open new PowerShell or new Git bash:
             typrm --version
 
+    Set the environment variables TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+
 ### For mac
 
     Install Node.js:
@@ -431,6 +433,8 @@ To use typrm, you must install Node.js.
     Check to use typrm command:
         typrm --version
 
+    Set the environment variables TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+
 ### For CentOS 7
 
     Install Node.js:
@@ -454,11 +458,11 @@ To use typrm, you must install Node.js.
         npm config -g set https-proxy "http://___.___.___.___:____"
 
     Download and expand typrm and install Node.js packages used by typrm:
+        sudo yum install unzip  #// When unzip cannot be executed
         mkdir -p ~/Downloads
         cd  ~/Downloads
         curl -L -O https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
         mv  master.zip  typrm.zip
-        sudo yum install unzip
         rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you are updating
         unzip -o typrm.zip
         mv  typrm-master  typrm  #// The folder extracted from the Zip file
@@ -486,6 +490,8 @@ To use typrm, you must install Node.js.
         - rm ~/bin/typrm
         - rm ~/Downloads/typrm.zip
         - rm -rf ~/Downloads/typrm/
+
+    Set the environment variables TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
 
 ## settings tag and #template tag: replaces settings values
