@@ -49,6 +49,7 @@ var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var refColor = chalk.yellow;
 var searchColor = chalk.yellow;
+var valueColor = chalk.yellow;
 var pathColor = chalk.cyan;
 var lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
@@ -1007,6 +1008,55 @@ describe("searches glossary tag >>", function () {
         });
     }); });
 });
+describe("where variable >>", function () {
+    test.each([
+        [
+            "1st",
+            ["where", "__VarA__"],
+            { folder: "test_data/_search_target", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/sub/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+        ],
+        [
+            "in the file",
+            ["where", "__VarA__", "1.yaml"],
+            { folder: "test_data/_search_target", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n") +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+        ],
+        [
+            "in the file near the line number (1)",
+            ["where", "__VarA__", "1.yaml", "5"],
+            { folder: "test_data/_search_target", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+        ],
+        [
+            "in the file near the line number (2)",
+            ["where", "__VarA__", "1.yaml", "6"],
+            { folder: "test_data/_search_target", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+        ],
+    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+        var sourceFileContents, subSourceFileContents;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    sourceFileContents = lib.getSnapshot("where variable >> all : sourceFileContents 1");
+                    subSourceFileContents = lib.getSnapshot("where variable >> sub : sourceFileContents 1");
+                    fs.rmdirSync('test_data/_search_target', { recursive: true });
+                    writeFileSync("test_data/_search_target/1.yaml", sourceFileContents);
+                    writeFileSync("test_data/_search_target/sub/1.yaml", subSourceFileContents);
+                    return [4 /*yield*/, callMain(arguments_, options)];
+                case 1:
+                    _a.sent();
+                    expect(main.stdout).toBe(answer);
+                    fs.rmdirSync('test_data/_search_target', { recursive: true });
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
 describe("print reference >>", function () {
     describe("basic >>", function () {
         test.each([
@@ -1160,9 +1210,7 @@ describe("print reference >>", function () {
                 "not found the folder",
                 ["search", "#ref:", "/Unknown_", "0"],
                 { locale: "en-US", test: "" },
-                (testingOS === 'Windows')
-                    ? "Error of not found the file or folder at \"\\Unknown_\"\n"
-                    : "Error of not found the file or folder at \"/Unknown_\"\n",
+                "Error of not found the file or folder at \"/Unknown_\"\n",
             ], [
                 "verb verbose",
                 ["search", "#ref:", "../README.md", "4"],
@@ -1189,6 +1237,7 @@ describe("print reference >>", function () {
                             "Verbose:     label: 1.View\n" +
                             "Verbose:     number: 1\n" +
                             "Verbose:     command: msedge \"file://\${file}\"\n" +
+                            "Verbose: typrm command: search\n" +
                             "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                             "Verbose:     address: ../README.md\n" +
                             "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +

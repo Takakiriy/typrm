@@ -13,6 +13,7 @@ const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
 const refColor = chalk.yellow;
 const searchColor = chalk.yellow;
+const valueColor = chalk.yellow;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
@@ -890,6 +891,48 @@ describe("searches glossary tag >>", () => {
     });
 });
 
+describe("where variable >>", () => {
+  test.each([
+    [
+        "1st",
+        ["where", "__VarA__"],
+        { folder: "test_data/_search_target", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/sub/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
+    ],
+    [
+        "in the file",
+        ["where", "__VarA__", "1.yaml"],
+        { folder: "test_data/_search_target", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
+    ],
+    [
+        "in the file near the line number (1)",
+        ["where", "__VarA__", "1.yaml", "5"],
+        { folder: "test_data/_search_target", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
+    ],
+    [
+        "in the file near the line number (2)",
+        ["where", "__VarA__", "1.yaml", "6"],
+        { folder: "test_data/_search_target", test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
+    ],
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        const  sourceFileContents = lib.getSnapshot(`where variable >> all : sourceFileContents 1`);
+        const  subSourceFileContents = lib.getSnapshot(`where variable >> sub : sourceFileContents 1`);
+        fs.rmdirSync('test_data/_search_target', {recursive: true});
+        writeFileSync(`test_data/_search_target/1.yaml`, sourceFileContents);
+        writeFileSync(`test_data/_search_target/sub/1.yaml`, subSourceFileContents);
+
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+        fs.rmdirSync('test_data/_search_target', {recursive: true});
+    });
+});
+
 describe("print reference >>", () => {
     describe("basic >>", () => {
         test.each([
@@ -1027,9 +1070,7 @@ describe("print reference >>", () => {
                 "not found the folder",
                 ["search", "#ref:", "/Unknown_", "0"],
                 {locale: "en-US", test: ""},
-                (testingOS === 'Windows')
-                ? "Error of not found the file or folder at \"\\Unknown_\"\n"
-                : "Error of not found the file or folder at \"/Unknown_\"\n",
+                "Error of not found the file or folder at \"/Unknown_\"\n",
             ],[
                 "verb verbose",
                 ["search", "#ref:", "../README.md", "4"],
@@ -1056,6 +1097,7 @@ describe("print reference >>", () => {
                     "Verbose:     label: 1.View\n" +
                     "Verbose:     number: 1\n" +
                     "Verbose:     command: msedge \"file://\${file}\"\n" +
+                    "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     "Verbose:     address: ../README.md\n" +
                     "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +

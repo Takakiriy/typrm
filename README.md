@@ -23,6 +23,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
     - [Setting name](#setting-name)
     - [#template-if tag - replaces the sign of whether the condition is met](#template-if-tag---replaces-the-sign-of-whether-the-condition-is-met)
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
+  - [where command - finds the definition of the setting (variable) value](#where-command---finds-the-definition-of-the-setting-variable-value)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
@@ -662,6 +663,40 @@ use the `check` command. The short command name is `c`.
 
 In order to correctly determine the range to replace the setting value,
 typrm checks that the text with the setting value exists before replacing.
+
+
+## where command - finds the definition of the setting (variable) value
+
+To find the location of the variable definitions
+(variable name: value) listed in `Settings:`,
+enter the where command.
+
+example.yaml:
+
+    1: 設定:
+    2:     __FileName__: file.txt
+    3:     __Number__: 12
+    4: 本文:
+    5:     file.txt  #template: __FileName__
+
+To display the location of `__FileName__` variable definition, enter:
+
+    typrm where __FileName__
+
+If found, the location and definition will be displayed as shown below.
+Also, you may find more than one.
+
+    .../example.yaml:2:     __FileName__: file.txt
+
+When filtering by file name, type the variable name followed by the file name.
+
+    typrm where __FileName__ example.yaml
+
+When you look for a definition of a variable referenced in a particular template,
+type the variable name followed by the file name and line number
+where the template is located.
+
+    typrm where __FileName__ example.yaml 5
 
 
 ## #file-template tag: checks the contents of the file

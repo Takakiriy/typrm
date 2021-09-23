@@ -29,7 +29,7 @@ export async function  main() {
             }
         } else {
 
-            await search();
+            await  search();
         }
     } else if (programArguments.length >= 1 ) {
 
@@ -37,7 +37,7 @@ export async function  main() {
             if (verboseMode) {
                 console.log('Verbose: typrm command: search');
             }
-            await search();
+            await  search();
         }
         else if (programArguments[0] === 'c'  ||  programArguments[0] === 'check') {
             if (verboseMode) {
@@ -48,7 +48,7 @@ export async function  main() {
                 checkingFilePath = programArguments[1];
             }
 
-            await check(checkingFilePath);
+            await  check(checkingFilePath);
         }
         else if (programArguments[0] === 'r'  ||  programArguments[0] === 'replace') {
             if (verboseMode) {
@@ -61,7 +61,7 @@ export async function  main() {
                     var  inputFilePath = programArguments[1];
                 }
 
-                await replace(inputFilePath);
+                await  replace(inputFilePath);
             } else {
                 varidateReplaceCommandArguments();
                 if (programArguments.length === 3) {
@@ -74,7 +74,7 @@ export async function  main() {
                     var  keyValues = programArguments[3];
                 }
 
-                await replaceSettings(inputFilePath, replacingLineNum, keyValues, false);
+                await  replaceSettings(inputFilePath, replacingLineNum, keyValues, false);
             }
         }
         else if (programArguments[0] === 'revert') {
@@ -85,17 +85,30 @@ export async function  main() {
                     var  inputFilePath = programArguments[1];
                 }
 
-                await revert(inputFilePath);
+                await  revert(inputFilePath);
             } else {
                 varidateRevertCommandArguments();
-                var  inputFilePath = programArguments[1];
-                var  replacingLineNum = programArguments[2];
+                const  inputFilePath = programArguments[1];
+                const  replacingLineNum = programArguments[2];
 
-                await revertSettings(inputFilePath, replacingLineNum);
+                await  revertSettings(inputFilePath, replacingLineNum);
             }
         }
+        else if (programArguments[0] === 'where') {
+            const  variableName = programArguments[1];
+            var  inputFilePath = '';
+            var  lineNum = 0;
+            if (programArguments.length >= 3) {
+                inputFilePath = programArguments[2];
+            }
+            if (programArguments.length >= 4) {
+                lineNum = parseInt(programArguments[3]);
+            }
+
+            await  lookUpVariable(variableName, inputFilePath, lineNum);
+        }
         else {
-            await search();
+            await  search();
         }
     }
 }
@@ -2158,6 +2171,64 @@ function  compareScore(a: FoundLine, b: FoundLine) {
     return  different;
 }
 
+// lookUpVariable
+async function  lookUpVariable(variableName: string, inputFilePath: string, referenceLineNum: number) {
+    const  valueColor = chalk.yellow;
+    for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
+        const  reader = readline.createInterface({
+            input: fs.createReadStream(inputFileFullPath),
+            crlfDelay: Infinity
+        });
+        var  lineNum = 0;
+        var  isReferenceFound = false;
+        var  isReadingSetting = false;
+        var  settingIndentLength = 0;
+        var  foundLine = '';
+
+        for await (const line1 of reader) {
+            const  line: string = line1;
+            lineNum += 1;
+
+            // setting = ...
+            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+                isReadingSetting = true;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
+                foundLine = '';
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                isReadingSetting = false;
+                isReferenceFound = false;
+            }
+            if (isReadingSetting) {
+                const  separator = line.indexOf(':');
+                if (separator !== notFound) {
+                    const  keyOrNot = line.substr(0, separator).trim();
+                    if (keyOrNot[0] !== '#') {
+                        const  key = keyOrNot;
+
+                        if (key === variableName) {
+                            const  value = getValue(line, separator);
+                            const  valueIndex = line.indexOf(value, separator);
+
+                            foundLine = `${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
+                                line.substr(0, valueIndex) + valueColor(value) + line.substr(valueIndex + value.length);
+                            if (referenceLineNum === 0  ||  isReferenceFound) {
+                                console.log(foundLine);
+                            }
+                        }
+                    }
+                }
+            }
+            if (lineNum === referenceLineNum) {
+                if (foundLine) {
+                    console.log(foundLine);
+                } else if (isReadingSetting) {
+                    isReferenceFound = true;
+                }
+            }
+        }
+    }
+}
+
 // PrintRefOption
 interface  PrintRefOption {
     print: boolean | undefined; 
@@ -2751,7 +2822,7 @@ function  getTestablePath(path_: string) {
 
         if (path_.startsWith(home)) {
             return  '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
-        } else if (path_.startsWith(inputFileParentPath + path.sep)) {
+        } else if (path_.startsWith(inputFileParentPath + path.sep)  &&  inputFileParentPath !== '') {
             return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
         } else {
             return  path_.replace(/\\/g, '/');
@@ -3118,7 +3189,7 @@ class FoundLine {
         }
 
         // colored string
-        return `${chalk.cyan(this.path)}${chalk.keyword('gray')(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
+        return `${pathColor(this.path)}${lineNumColor(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
     }
 }
 
@@ -3592,16 +3663,16 @@ const  partMatchScore = 15;
 const  notNormalizedScore = 1;
 const  caseIgnoredWordMatchScore = 16;
 const  caseIgnoredPartMatchScore = 14;
-const  phraseMatchScoreWeight = 4;
 const  orderMatchScoreWeight = 2;
 const  minLineNum = 0;
 const  maxLineNum = 999999999;
 const  maxNumber = 999999999;
 const  foundForAbove = minLineNum;
 const  foundForFollowing = maxLineNum;
+const  pathColor = chalk.cyan;
+const  lineNumColor = chalk.keyword('gray');
 const  notFound = -1;
 const  allSetting = 0;
-const  noSeparator = -1;
 var    inputFileParentPath = '';
 var    locale = '';
 var    withJest = false;
