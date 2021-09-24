@@ -475,7 +475,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         });
     });
 
-    describe("to >>", () => {
+    describe("to tag >>", () => {
         test.each([
             ['1_OK'],
             ['2_FileParameter'],
@@ -483,7 +483,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-            const  sourceFileContents = lib.getSnapshot(`replaces settings >> to >> ${caseName}: sourceFileContents 1`);
+            var  sourceFileContents = lib.getSnapshot(`replaces settings >> to tag >> ${caseName}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFilePath, sourceFileContents);
 
@@ -514,6 +514,20 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
+    });
+    test("to tag >> ToTestTag", async () => {
+        const  caseName = 'ToTestTag';
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFileName = caseName + "_1_changing.yaml";
+        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+        var  sourceFileContents = lib.getSnapshot(`replaces settings >> to tag >> ${caseName}: sourceFileContents 1`);
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        writeFileSync(changingFilePath, sourceFileContents);
+
+        await callMain(["replace"], {
+            folder: changingFolderPath, test: "", locale: "en-US"
+        });
+        expect(main.stdout).toMatchSnapshot('stdout');
     });
 });
 

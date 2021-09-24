@@ -26,6 +26,9 @@ declare class StandardInputBuffer {
     close(): void;
 }
 export declare function getCommonElements<T>(arrayA: T[], arrayB: T[]): T[];
+export declare namespace hasInterfaceOf {
+    function Error(object: any): object is Error;
+}
 export declare function input(guide: string): Promise<string>;
 export declare function getInputObject(): StandardInputBuffer;
 export declare function inputPath(guide: string): Promise<string>;

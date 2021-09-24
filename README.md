@@ -124,32 +124,108 @@ you can copy and paste multiple linees and enter them continuously.
 You can omit almost parameters of the replace command
 and replace it by writing the `#to:` tag.
 
-When writing `#to:` in the settings,
-write `#to:` tag and the value after replacing 
-in the first `#` to the right of the variable value.
+When writing `#to:` tag in the settings,
+write `#to:` tag and the value after replacing
+at the right of the variable value.
+
+Example before adding the `#to:` tag:
+
+    settings:
+        __Name__: workA1
+        __Name__: workB1  #// comment
+        __Name__: workC1  #// comment
+
+Example after adding the `#to:` tag:
 
     settings:
         __Name__: workA1  #to: workA2
         __Name__: workB1  #to: workB2  #// comment
+        __Name__: workC1  #// comment  #to: workC2
 
-Write `#to:` tag and the value after replacing
-to the left of the `#template:` tag in the body.
+Input command:
+
+    typrm replace
+
+Contents after command execution:
 
     settings:
-        __Name__: work1
+        __Name__: workA2  #original: workA1
+        __Name__: workB2  #original: workB1  #// comment
+        __Name__: workC2  #original: workC1  #// comment
+
+When writing `#to:` tag in the body,
+write `#to:` tag and the value after replacing
+to the right of the `#template:` tag.
+Also, add a line with only the `#to:` tag
+between the line of the target `#template:` tag
+and the line of the next `#template:` tag.
+
+    settings:
+        __NameA__: workA1
+        __NameB__: workB1
     shell:
-        - mkdir work1  #to: work2  #template: __Name__
-        - cd    work1  #template: __Name__
+        - mkdir workA1  #template: __NameA__  #to: workA2
+        - cd    workB1  #template: __NameB__
+                                #to: workB2
+
+You can write the `#to:` tag for the `#template-at:` tag as well.
+If you add a line with only the `#to:` tag,
+the position of the line indicated by the `#template-at:` tag
+(example: -2 = 2 lines before) will be incorrect,
+but typrm treats it as if there were no rows of only with the `#to:` tag.
+so it does not need to modify the position of the line.
+
+Example before adding the `#to:` tag:
+
+    - mkdir workA1
+    - cd    workB1
+        #template-at(-2): __NameA__
+        #template-at(-2): __NameB__
+
+Example after adding the `#to:` tag:
+
+    - mkdir workA1
+    - cd    workB1
+        #template-at(-2): __NameA__
+            #to: workA2
+        #template-at(-2): __NameB__
+            #to: workB2
 
 If there are multiple variables,
 write `#to:` tag and values in CSV format,
 or write the contents after replacing the template.
 
-    (workA1, workB1)  #to: workA2, workB2  #template: (__NameA__ : __NameB__)
+    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: workA2, workB2
 
 or
 
-    (workA1, workB1)  #to: (workA2 : workB2)  #template: (__NameA__ : __NameB__)
+    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
+
+You can write `#to-test:` tag instead of the `#to:` tag
+to test the value of the variable after the replacement.
+The file contains `#to-test:` tag does not replace contents.
+However, a replace command may not replace the file with the `#to-test:` tag,
+but at the same time replace another file without the `#to-test:` tag.
+
+    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to-test: workA2, workB2
+    (workC1, workD1)  #template: (__NameC__ : __NameD__)  #to-test: (workC2 : workD2)
+
+Example of displaying test results:
+
+    Verbose:     /____/____.yaml:1:
+    Verbose:         template: (__NameA__ : __NameB__)    ... #template: tag's value
+    Verbose:         templatePattern: (* : *)             ... replaced the variable part to * in the #template: tag's value
+    Verbose:         toValue: workA2, workB2              ... #to-test: tag's value
+    Verbose:         toValueIsMatchedWithTemplate: false  ... false = typrm treats #to-test: tag value as CSV
+    Verbose:         __NameA__: workA2                    ... The name of the variable replaced by #to: tag and the value after replacement
+    Verbose:         __NameB__: workB2
+    Verbose:     /____/____.yaml:2:
+    Verbose:         template: (__NameC__ : __NameD__)
+    Verbose:         templatePattern: (* : *)
+    Verbose:         toValue: (workC2 : workD2)
+    Verbose:         toValueIsMatchedWithTemplate: true  ... true = typrm treats #to-test: tag value as the content that replaced from template
+    Verbose:         __NameC__: workC2
+    Verbose:         __NameD__: workD2
 
 The typrm replace command replaces the contents of a file according
 to the `#to:` tag found in all files.

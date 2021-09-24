@@ -553,9 +553,10 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
     if (parser.verbose) {
-        console.log(`Verbose: inputFilePath: ${getTestablePath(inputFilePath)}`);
-        console.log(`Verbose: setting index: ${replacingSettingIndex}`)
-        console.log(`Verbose: keyValues: ${JSON.stringify(keyValues)}`);
+        console.log(`Verbose: replaceSettingsSub:`);
+        console.log(`Verbose:     inputFilePath: ${getTestablePath(inputFilePath)}`);
+        console.log(`Verbose:     replacingSettingIndex: ${replacingSettingIndex}`)
+        console.log(`Verbose:     keyValues: ${JSON.stringify(keyValues)}`);
     }
 
     while (loop) {
@@ -652,7 +653,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             if (parser.verbose) {
                                 if ( ! replacedKeys.includes(key)) {
                                     replacedKeys.push(key)
-                                    console.log(`Verbose: evaluated setting: ${key}`)
+                                    console.log(`Verbose:     evaluated setting: ${key}`)
                                 }
                             }
                         }
@@ -815,9 +816,19 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             }
             if (!output) {
                 if ( ! cutReplaceToTagEnabled) {
+
                     writer.write(line +"\n");
                 } else {
-                    writer.write(cutReplaceToTag(line) +"\n");
+                    if (line.trim() === '') {
+                        writer.write(line +"\n");
+                    } else {
+                        const  cutLine = cutReplaceToTag(line);
+                        if (cutLine.trim() === '') {
+                            lines.pop();  // for template-at tag
+                        } else {
+                            writer.write(cutLine +"\n");
+                        }
+                    }
                 }
             }
         }
@@ -865,8 +876,8 @@ function  getReplacedLineInSettings(
     // __SettingB__: SetB  #// comment
     // __SettingB__: SetB      #to: NewSetB   #// SetBB....
     //                   ^ spaceAndCommentIndex
-    var  spaceAndComment= '';
-    const  commentMatch = / +#.*/.exec(line.substr(separator))
+    var  spaceAndComment = '';
+    const  commentMatch = / +#.*/.exec(line.substr(separator));
     if (commentMatch) {
         var  spaceAndCommentIndex = separator + commentMatch.index;
         spaceAndComment = line.substr(spaceAndCommentIndex);
@@ -888,38 +899,70 @@ function  getReplacedLineInSettings(
             const  commentIndex = line.indexOf('#', spaceAndCommentIndex);
             const  toLabelIndex = line.indexOf(toLabel, commentIndex);
             if (toLabelIndex > commentIndex) {
-                throw  new Error('set #to tag before the comment')
-            }
-            var  nextCommentIndex = notFound;
-            if (toLabelIndex !== notFound) {
-                const  nextCommentMatch = / +#.*/.exec(line.substr(commentIndex))
-                if (nextCommentMatch) {
-                    nextCommentIndex = commentIndex + nextCommentMatch.index;
-                }
-            }
-
-            if (toLabelIndex === notFound) {
-
-                // before: __SettingB__: SetB   #// comment
-                // after:  __SettingB__: NewSetB  #original: SetB   #// comment
-                // Do nothing
-            } else {
+                var  nextCommentIndex = line.indexOf(' #', toLabelIndex + 1);
                 if (nextCommentIndex === notFound) {
 
-                    // before: __SettingB__: SetB  #to: SetBB
-                    //                             ^ commentIndex == toLabelIndex
-                    // after:  __SettingB__: NewSetB  #original: SetB
-                    spaceAndComment = '';
+                    // before: __SettingB__: SetB    #// comment1     #to: NewSetB
+                    //                               ^ commentIndex   ^ toLabelIndex
+                    // after:  __SettingB__: NewSetB  #original: SetB    #// comment1
+                    spaceAndComment = ' '.repeat(commentIndex - spaceAndCommentIndex) +
+                        line.substr(commentIndex, toLabelIndex - commentIndex).trimRight();
                 } else {
+                    nextCommentIndex += 1;
+                    if (line[toLabelIndex - 2] !== ' '  &&  line[nextCommentIndex - 2] !== ' ') {
 
-                    // before: __SettingB__: SetB      #to: NewSetB   #// next comment
-                    //    commentIndex == toLabelIndex ^           ^ nextCommentIndex
-                    // after:  __SettingB__: NewSetB   #original: SetB      #// next comment
-                    const  spaceCountBeforeToTag = line.indexOf('#', spaceAndCommentIndex) - spaceAndCommentIndex;
-                    const  spaceCountAfterToTag  = line.indexOf('#', nextCommentIndex) - nextCommentIndex;
+                        // before: __SettingB__: SetB    #// comment1 #to: NewSetB #// comment2
+                        //                               ^ commentIndex            ^ nextCommentIndex
+                        //      spaceAndCommentIndex ^                ^ toLabelIndex 
+                        // after:  __SettingB__: NewSetB  #original: SetB    #// comment1 #// comment2
+                        spaceAndComment = ' '.repeat(commentIndex - spaceAndCommentIndex) +
+                            line.substr(commentIndex, toLabelIndex - commentIndex) +
+                            line.substr(nextCommentIndex);
+                    } else {
+                        const  commentMatch2 = / +#.*/.exec(line.substr(toLabelIndex))!;
+                        const  spaceAndCommentIndex2 = toLabelIndex + commentMatch2.index;
 
-                    original = ' '.repeat(spaceCountAfterToTag) + `${originalLabel} ${oldValue}`;
-                    spaceAndComment = ' '.repeat(spaceCountBeforeToTag) + line.substr(nextCommentIndex + spaceCountAfterToTag)
+                        // before: __SettingB__: SetB    #// comment1     #to: NewSetB___      #// comment2
+                        //                               ^ commentIndex   ^ toLabelIndex       ^ nextCommentIndex
+                        //                           ^ spaceAndCommentIndex              ^ spaceAndCommentIndex2
+                        // after:  __SettingB__: NewSetB  #original: SetB    #// comment1         #// comment2
+                        spaceAndComment = ' '.repeat(commentIndex - spaceAndCommentIndex) +
+                            line.substr(commentIndex, toLabelIndex - commentIndex - 1) +
+                            line.substr(spaceAndCommentIndex2 + 1);
+                    }
+                }
+            } else {
+                var  nextCommentIndex = notFound;
+                if (toLabelIndex !== notFound) {
+                    const  nextCommentMatch = / +#.*/.exec(line.substr(commentIndex))
+                    if (nextCommentMatch) {
+                        nextCommentIndex = commentIndex + nextCommentMatch.index;
+                    }
+                }
+
+                if (toLabelIndex === notFound) {
+
+                    // before: __SettingB__: SetB   #// comment
+                    // after:  __SettingB__: NewSetB  #original: SetB   #// comment
+                    // Do nothing
+                } else {
+                    if (nextCommentIndex === notFound) {
+
+                        // before: __SettingB__: SetB  #to: NewSetB
+                        //                             ^ commentIndex == toLabelIndex
+                        // after:  __SettingB__: NewSetB  #original: SetB
+                        spaceAndComment = '';
+                    } else {
+
+                        // before: __SettingB__: SetB      #to: NewSetB   #// next comment
+                        //    commentIndex == toLabelIndex ^           ^ nextCommentIndex
+                        // after:  __SettingB__: NewSetB   #original: SetB      #// next comment
+                        const  spaceCountBeforeToTag = line.indexOf('#', spaceAndCommentIndex) - spaceAndCommentIndex;
+                        const  spaceCountAfterToTag  = line.indexOf('#', nextCommentIndex) - nextCommentIndex;
+
+                        original = ' '.repeat(spaceCountAfterToTag) + `${originalLabel} ${oldValue}`;
+                        spaceAndComment = ' '.repeat(spaceCountBeforeToTag) + line.substr(nextCommentIndex + spaceCountAfterToTag)
+                    }
                 }
             }
         }
@@ -1148,14 +1191,17 @@ class  TemplateTag {
     }
 
     // scanKeyValues
-    async  scanKeyValues(toValue: string, allKeys: string[], lineNum: number):  Promise<{[name: string]: Setting}> {
+    async  scanKeyValues(toValue: string, allKeys: string[], lineNum: number, parser: Parser, hasTestTag: boolean
+            ):  Promise<{[name: string]: Setting}> {
         const  keysSortedByLength: string[] = allKeys.slice(); // copy
         keysSortedByLength.sort((b,a)=>(a.length, b.length));
         const  foundIndices: {[index: number]: string} = [];
+        const  verboseMode = parser.verbose || hasTestTag;
         var  template = this.template;
 
-        // #template: (__A__:__B__)
-        // key = [ __A__, __B__ ]
+        // Set variable names to "key" from "#template:" tag's value
+        //     key = [ __A__, __B__ ]
+        //     #template: (__A__:__B__)
         for (const key of keysSortedByLength) {
             var  index = 0;
             for (;;) {
@@ -1173,7 +1219,7 @@ class  TemplateTag {
                 index += 1;
             }
         }
-        const  indices = Object.keys(foundIndices).map((v)=>(parseInt(v))).sort();
+        const  indices = Object.keys(foundIndices).map((v)=>(parseInt(v))).sort((a,b)=>(a-b));
         const  keys = indices.map((index)=>( foundIndices[index] ));
         const  placeholder = '\n';
         var    templatePattern = this.template;
@@ -1183,18 +1229,28 @@ class  TemplateTag {
                 placeholder +
                 templatePattern.substr(indices[i] + keys[i].length)
         }
-        templatePattern = lib.escapeRegularExpression(templatePattern).replace(new RegExp( placeholder, "g"), '(.*)');
-        const  toValueIsMatchedWithTemplate = new RegExp( templatePattern ).exec( toValue );
+        const  templateRegularExpression = lib.escapeRegularExpression(templatePattern).replace(new RegExp( placeholder, "g"), '(.*)');
+        const  toValueIsMatchedWithTemplate = new RegExp( templateRegularExpression ).exec( toValue );
         const  keyValues: {[name: string]: string} = {};
+        if (verboseMode) {
+            console.log(`Verbose:         template: ${this.template}`);
+            console.log(`Verbose:         templatePattern: ${templatePattern.replace(new RegExp( placeholder, "g"), '*')}`);
+            console.log(`Verbose:         toValue: ${toValue}`);
+            console.log(`Verbose:         toValueIsMatchedWithTemplate: ${toValueIsMatchedWithTemplate != null}`);
+        }
 
         if (toValueIsMatchedWithTemplate) {
-            // (A:B)  #to: (a:b)  #template: (__A__:__B__)
+
+            // Case that "#to:" tag is pattern of template
+            //     (A:B)  #to: (a:b)  #template: (__A__:__B__)
             for (let i = 1;  i < toValueIsMatchedWithTemplate.length;  i += 1 ) {
 
                 keyValues[keys[i-1]] = toValueIsMatchedWithTemplate[i];
             }
         } else {
-            // (A:B)  #to: a, b  #template: (__A__:__B__)
+
+            // Case that "#to:" tag is CSV
+            //     (A:B)  #to: a, b  #template: (__A__:__B__)
             const  toValues = await lib.parseCSVColumns( toValue );
             for (let i = 0;  i < keys.length;  i += 1 ) {
                 if (i < toValues.length  &&  toValues[i]) {
@@ -1558,9 +1614,11 @@ async function  replace(inputFilePath: string) {
 
         const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
         for (const replaceKeyValues of replaceKeyValuesSet) {
+            if ( ! replaceKeyValues.testMode) {
 
-            await  replaceSettings(inputFileFullPath,
-                replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, true);
+                await  replaceSettings(inputFileFullPath,
+                    replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, true);
+            }
         }
     }
 }
@@ -1645,7 +1703,7 @@ async function  listUpFilePaths(checkingFilePath?: string) {
     return  inputFileFullPaths;
 }
 
-// scanReplaceToTags
+// makeReplaceSettingsFromToTags
 async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<ReplaceKeyValues[]> {
     const  reader = readline.createInterface({
         input: fs.createReadStream(inputFilePath),
@@ -1657,14 +1715,17 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
     var  settingCount = 0;
     var  settingIndentLength = 0;
     var  key = '';
-    var  toValue = '';
+    var  previousTemplateTag: TemplateTag | null = null;
     var  replaceKeyValues = new ReplaceKeyValues();
     var  errorCount = 0;
-    const  replaceKeyValuesSet: ReplaceKeyValues[] = [];
+    var  replaceKeyValuesSet: ReplaceKeyValues[] = [];
     const  parser = new Parser();
     parser.command = CommandEnum.replace;
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
+    if (parser.verbose) {
+        console.log(`Verbose: makeReplaceSettingsFromToTags:`);
+    }
 
     for await (const line1 of reader) {
         const  line: string = line1;
@@ -1672,15 +1733,12 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
 
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-            if (parser.verbose) {
-                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
-            }
             isReadingSetting = true;
 
             setting = {};
             settingCount += 1;
             settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            toValue = '';
+            previousTemplateTag = null;
             replaceKeyValues = new ReplaceKeyValues();
             replaceKeyValues.settingNameOrLineNum = lineNum.toString();
             replaceKeyValuesSet.push(replaceKeyValues);
@@ -1700,37 +1758,66 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
                 }
             }
         }
-
-        // #to: tag in the settings
-        const  toLabelIndex = line.indexOf(toLabel);
+        var  toLabelIndex = line.indexOf(toLabel)
         if (toLabelIndex !== notFound) {
-            toValue = getValue(line, toLabelIndex + toLabel.length - 1);
+            var  toValue = getValue(line, toLabelIndex + toLabel.length - 1);
+        } else {
+            toLabelIndex = line.indexOf(toTestLabel);
+            if (toLabelIndex !== notFound) {
+                var  toValue = getValue(line, toLabelIndex + toTestLabel.length - 1);
+            } else {
+                var  toValue = '';
+            }
+        }
+        const  templateTag = parseTemplateTag(line, parser);
+        if (templateTag.isFound) {
+            previousTemplateTag = templateTag;
+        }
 
+        if (toValue) {
+            const  hasTestTag = (line.indexOf(toTestLabel) !== notFound);
+            if (hasTestTag) {
+                replaceKeyValues.testMode = true;
+            }
+
+            // #to: tag in the settings
             if (isReadingSetting) {
+                if (parser.verbose || hasTestTag) {
+                    console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
+                    console.log(`Verbose:         ${key}: ${toValue}`);
+                }
 
                 replaceKeyValues.keyValues[key] = {
                     value: toValue,
                     lineNum,
                 } as Setting;
-                toValue = '';
+            } else {
+
+                // #to: tag after the #template:
+                if (previousTemplateTag) {
+                    if (parser.verbose || hasTestTag) {
+                        console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
+                    }
+                    const  newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), lineNum, parser, hasTestTag);
+                    errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
+                    if (parser.verbose || hasTestTag) {
+                        for (const [key_, newValue] of Object.entries(newKeyValues)) {
+                            console.log(`Verbose:         ${key_}: ${newValue.value}`);
+                        }
+                    }
+
+                    replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+                    previousTemplateTag = null;
+                }
             }
-        }
-
-        // #to: tag before the #template:
-        const  templateTag = parseTemplateTag(line, parser);
-        if (templateTag.isFound  &&  toValue !== '') {
-            const  newKeyValues = await templateTag.scanKeyValues(toValue, Object.keys(setting), lineNum);
-            errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
-
-            replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
-            toValue = '';
         }
     }
     if (errorCount >= 1) {
         throw  new Error(`error count: ${errorCount}`);
     }
+    replaceKeyValuesSet = replaceKeyValuesSet.filter((replaceKeyValues)=>(Object.keys(replaceKeyValues.keyValues).length >= 1));
 
-    return  replaceKeyValuesSet.filter((replaceKeyValues)=>(Object.keys(replaceKeyValues.keyValues).length >= 1));
+    return  replaceKeyValuesSet;
 }
 
 // checkNoConfilict
@@ -3056,6 +3143,7 @@ class ReplaceKeyValues {
 
     settingNameOrLineNum: string = '';
     keyValues: {[name: string]: Setting} = {};
+    testMode: boolean = false;
 
     get  keyValueLines(): string {
         var  lines = '';
@@ -3552,6 +3640,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Error of expect tag syntax:": "エラー：expect タグの文法エラー",
             "Error of unexpected: The count of evalatedKeyValues is not increasing.": "予期しないエラー：evalatedKeyValues の数が増えていません。",
             "isReplacable may be not changed. Try typrm check command.": "isReplacable が変更されていません。 typrm check コマンドを試してください。",
+            "${0}a quote is found inside a field${1}": "${0}フィールド内に引用符があります${1}",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
@@ -3627,6 +3716,7 @@ const  settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
 const  settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
 const  originalLabel = "#original:";
 const  toLabel = "#to:";  // replace to tag
+const  toTestLabel = "#to-test:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";

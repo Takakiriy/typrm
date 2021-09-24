@@ -126,30 +126,103 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 `#to:` タグを書くと、replace コマンドのパラメーターを省略して
 置き換えることができます。
 
-設定に `#to:` を書くときは、変数の値の右の最初の `#` に
+設定に `#to:` タグを書くときは、変数の名前と値が書かれた行の値より右に
 `#to:` と置き換えた後の値を書きます。
+
+`#to:` タグを追加する前のサンプル:
+
+    設定:
+        __Name__: workA1
+        __Name__: workB1  #// comment
+        __Name__: workC1  #// comment
+
+`#to:` タグを追加した後のサンプル:
 
     設定:
         __Name__: workA1  #to: workA2
         __Name__: workB1  #to: workB2  #// comment
+        __Name__: workC1  #// comment  #to: workC2
 
-本文の `#template:` タグの左に 
-`#to:` と置き換えた後の値を書きます。
+入力するコマンド:
+
+    typrm replace
+
+コマンド実行後の内容:
 
     設定:
-        __Name__: work1
+        __Name__: workA2  #original: workA1
+        __Name__: workB2  #original: workB1  #// comment
+        __Name__: workC2  #original: workC1  #// comment
+
+本文に `#to:` タグを書くときは、
+`#template:` タグの右に `#to:` タグと置き換えた後の値を書きます。
+または、対象の `#template:` タグの行から、次の `#template:` タグの行の間に、
+`#to:` タグだけの行を追加します。
+
+    設定:
+        __NameA__: workA1
+        __NameB__: workB1
     shell:
-        - mkdir work1  #to: work2  #template: __Name__
-        - cd    work1  #template: __Name__
+        - mkdir workA1  #template: __NameA__  #to: workA2
+        - cd    workB1  #template: __NameB__
+                                #to: workB2
+
+`#template-at:` タグについても同様に `#to:` タグを書くことができます。
+`#to:` タグだけの行を追加すると、
+`#template-at:` タグが示す行の位置（例：-2 = 2行前）が正しくなくなりますが、
+`#to:` タグだけの行がないものとして処理するため、行の位置を修正する必要はありません。
+
+`#to:` タグを追加する前のサンプル:
+
+    - mkdir workA1
+    - cd    workB1
+        #template-at(-2): __NameA__
+        #template-at(-2): __NameB__
+
+`#to:` タグを追加した後のサンプル:
+
+    - mkdir workA1
+    - cd    workB1
+        #template-at(-2): __NameA__
+            #to: workA2
+        #template-at(-2): __NameB__
+            #to: workB2
 
 複数の変数があるときは、`#to:` タグに CSV 形式で書くか、
 テンプレートを置き換えた後の内容を書きます。
 
-    (workA1, workB1)  #to: workA2, workB2  #template: (__NameA__ : __NameB__)
+    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: workA2, workB2
 
 または
 
-    (workA1, workB1)  #to: (workA2 : workB2)  #template: (__NameA__ : __NameB__)
+    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
+
+`#to:` タグの代わりに `#to-test:` タグを書くと、
+置き換えた後の変数の値がどうなるかをテストすることができます。
+`#to-test:` タグがあるファイルは、内容の置き換えをしません。
+ただし、1回の replace コマンドで
+`#to-test:` タグがあるファイルが置き換えられず、
+同時に `#to-test:` タグがない別のファイルが置き換えられることはあります。
+
+    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to-test: workA2, workB2
+    (workC1, workD1)  #template: (__NameC__ : __NameD__)  #to-test: (workC2 : workD2)
+
+テストの結果の表示の例:
+
+    Verbose:     /____/____.yaml:1:
+    Verbose:         template: (__NameA__ : __NameB__)    ... #template: タグの内容
+    Verbose:         templatePattern: (* : *)             ... #template: タグの内容から変数の部分を * に置き換えた内容
+    Verbose:         toValue: workA2, workB2              ... #to-test: タグの内容
+    Verbose:         toValueIsMatchedWithTemplate: false  ... false = #to-test: タグの値を CSV として解釈します
+    Verbose:         __NameA__: workA2                    ... #to: タグによって置き換えれられる変数の名前と置き換えた後の値
+    Verbose:         __NameB__: workB2
+    Verbose:     /____/____.yaml:2:
+    Verbose:         template: (__NameC__ : __NameD__)
+    Verbose:         templatePattern: (* : *)
+    Verbose:         toValue: (workC2 : workD2)
+    Verbose:         toValueIsMatchedWithTemplate: true  ... true = #to-test: タグの値をテンプレートを置き換えた後の内容として解釈します
+    Verbose:         __NameC__: workC2
+    Verbose:         __NameD__: workD2
 
 typrm replace コマンドを実行すると、すべてのファイルにある `#to:` タグに従って
 ファイルの内容を置き換えます。 すべてのファイルとは、

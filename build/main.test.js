@@ -565,7 +565,7 @@ describe("replaces settings >>", function () {
             });
         }); });
     });
-    describe("to >>", function () {
+    describe("to tag >>", function () {
         test.each([
             ['1_OK'],
             ['2_FileParameter'],
@@ -577,7 +577,7 @@ describe("replaces settings >>", function () {
                         changingFolderPath = testFolderPath + '_changing';
                         changingFileName = caseName + "_1_changing.yaml";
                         changingFilePath = changingFolderPath + '/' + changingFileName;
-                        sourceFileContents = lib.getSnapshot("replaces settings >> to >> " + caseName + ": sourceFileContents 1");
+                        sourceFileContents = lib.getSnapshot("replaces settings >> to tag >> " + caseName + ": sourceFileContents 1");
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         writeFileSync(changingFilePath, sourceFileContents);
                         // Test Main >> replace
@@ -614,6 +614,28 @@ describe("replaces settings >>", function () {
             });
         }); });
     });
+    test("to tag >> ToTestTag", function () { return __awaiter(void 0, void 0, void 0, function () {
+        var caseName, changingFolderPath, changingFileName, changingFilePath, sourceFileContents;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    caseName = 'ToTestTag';
+                    changingFolderPath = testFolderPath + '_changing';
+                    changingFileName = caseName + "_1_changing.yaml";
+                    changingFilePath = changingFolderPath + '/' + changingFileName;
+                    sourceFileContents = lib.getSnapshot("replaces settings >> to tag >> " + caseName + ": sourceFileContents 1");
+                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+                    writeFileSync(changingFilePath, sourceFileContents);
+                    return [4 /*yield*/, callMain(["replace"], {
+                            folder: changingFolderPath, test: "", locale: "en-US"
+                        })];
+                case 1:
+                    _a.sent();
+                    expect(main.stdout).toMatchSnapshot('stdout');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
 });
 describe("searches keyword tag >>", function () {
     test.skip('sharp (best)', function () { });

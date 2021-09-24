@@ -47,7 +47,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.getCommonElements = exports.escapeRegularExpression = exports.parseCSVColumnPositions = exports.parseCSVColumns = exports.cutLeftOf = exports.getGlobbyParameters = exports.getHomePath = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.isFullPath = exports.getFullPath = exports.pathResolve = exports.copyFileSync = exports.copyFolderSync = void 0;
+exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.hasInterfaceOf = exports.getCommonElements = exports.escapeRegularExpression = exports.parseCSVColumnPositions = exports.parseCSVColumns = exports.cutLeftOf = exports.getGlobbyParameters = exports.getHomePath = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.isFullPath = exports.getFullPath = exports.pathResolve = exports.copyFileSync = exports.copyFolderSync = void 0;
 var fs = require("fs");
 var path = require("path");
 var globby = require("globby");
@@ -283,20 +283,30 @@ function parseCSVColumns(columns) {
             if (!columns) {
                 return [2 /*return*/, []]; // stream.Readable.from(undefined) occurs an error
             }
-            return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
-                    var columnArray = [];
-                    stream.Readable.from(columns)
-                        .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
-                        .on('data', function (columns) {
-                        columnArray = columns;
-                    })
-                        .on('end', function () {
-                        resolveFunction(columnArray);
-                    })
-                        .on('error', function (e) {
-                        rejectFunction(e);
-                    });
-                })];
+            // Prevent csv-parse module error, when a quote is found inside a field.
+            // A quote is always written at frist character.
+            // The inside quote should be parsed as a character data in the column.
+            if (columns[0] === '"' || columns.includes(',')) {
+                return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
+                        var columnArray = [];
+                        stream.Readable.from(columns)
+                            .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                            .on('data', function (columns) {
+                            columnArray = columns;
+                        })
+                            .on('end', function () {
+                            resolveFunction(columnArray);
+                        })
+                            .on('error', function (e) {
+                            e.message = "Error in csv-parse module. Parsing CSV is:\n" + columns + "\n" + e.message;
+                            rejectFunction(e);
+                        });
+                    })];
+            }
+            else {
+                return [2 /*return*/, [columns]];
+            }
+            return [2 /*return*/];
         });
     });
 }
@@ -387,6 +397,14 @@ function getCommonElements(arrayA, arrayB) {
     return commonElements;
 }
 exports.getCommonElements = getCommonElements;
+// hasInterfaceOf
+var hasInterfaceOf;
+(function (hasInterfaceOf) {
+    function Error(object) {
+        return (object.hasOwnProperty('message'));
+    }
+    hasInterfaceOf.Error = Error;
+})(hasInterfaceOf = exports.hasInterfaceOf || (exports.hasInterfaceOf = {}));
 // User interface group
 // InputOption
 var InputOption = /** @class */ (function () {
@@ -496,10 +514,18 @@ exports.getSnapshot = getSnapshot;
 //        d = [];  // Set break point here and watch the variable d
 //    }
 function pp(message) {
-    if (typeof message === 'object') {
-        message = JSON.stringify(message);
+    if (message instanceof Array) {
+        for (var _i = 0, message_1 = message; _i < message_1.length; _i++) {
+            var element = message_1[_i];
+            exports.debugOut.push(element.toString());
+        }
     }
-    exports.debugOut.push(message.toString());
+    else {
+        if (typeof message === 'object') {
+            message = JSON.stringify(message);
+        }
+        exports.debugOut.push(message.toString());
+    }
     return exports.debugOut;
 }
 exports.pp = pp;

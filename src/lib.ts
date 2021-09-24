@@ -205,23 +205,31 @@ export async function  parseCSVColumns(columns: string): Promise<string[]> {
     if (!columns) {
         return  [];  // stream.Readable.from(undefined) occurs an error
     }
-    return new Promise((resolveFunction, rejectFunction) => {
-        var  columnArray: string[] = [];
+    // Prevent csv-parse module error, when a quote is found inside a field.
+    // A quote is always written at frist character.
+    // The inside quote should be parsed as a character data in the column.
+    if ( columns[0] === '"'  ||  columns.includes(',')) {
+        return new Promise((resolveFunction, rejectFunction) => {
+            var  columnArray: string[] = [];
 
-        stream.Readable.from(columns)
-            .pipe(
-                csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
-            )
-            .on('data', (columns) => {
-                columnArray = columns;
-            })
-            .on('end', () => {
-                resolveFunction(columnArray);
-            })
-            .on('error', (e: Error) => {
-                rejectFunction(e);
-            });
-    });
+            stream.Readable.from(columns)
+                .pipe(
+                    csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
+                )
+                .on('data', (columns) => {
+                    columnArray = columns;
+                })
+                .on('end', () => {
+                    resolveFunction(columnArray);
+                })
+                .on('error', (e: Error) => {
+                    e.message = `Error in csv-parse module. Parsing CSV is:\n${columns}\n${e.message}`;
+                    rejectFunction(e);
+                });
+        });
+    } else {
+        return  [columns];
+    }
 }
 
 // parseCSVColumnPositions
@@ -304,6 +312,15 @@ export function  getCommonElements<T>(arrayA: T[], arrayB: T[]): T[] {
         }
     }
     return  commonElements;
+}
+
+// hasInterfaceOf
+export namespace  hasInterfaceOf {
+    export function  Error(object: any): object is Error {
+        return (
+            object.hasOwnProperty('message')
+        );
+    }
 }
 
 
@@ -410,10 +427,16 @@ export function  getSnapshot(label: string) {
 //        d = [];  // Set break point here and watch the variable d
 //    }
 export function  pp(message: any) {
-    if (typeof message === 'object') {
-        message = JSON.stringify(message);
+    if (message instanceof Array) {
+        for (const element of message) {
+            debugOut.push(element.toString());
+        }
+    } else {
+        if (typeof message === 'object') {
+            message = JSON.stringify(message);
+        }
+        debugOut.push(message.toString());
     }
-    debugOut.push(message.toString());
     return debugOut;
 }
 export const  debugOut: string[] = [];

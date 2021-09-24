@@ -46,7 +46,7 @@ async function  DoCustomDebug() {
     // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
     // const  returns = await callChildProccess(`node ${scriptPath} --verbose c C:\\Users\\user1\\steps\\!Temp.yaml`, {});
     // const  returns = await callChildProccess(`node ${scriptPath} s DSL --folder /Users/totadashi/Documents/typrm`, {});
-    console.log(returns.stdout);
+    console.log(`(typrm_test.ts) ${returns.stdout}`);
     console.log('Done');
 }
 

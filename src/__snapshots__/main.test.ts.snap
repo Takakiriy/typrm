@@ -2181,114 +2181,213 @@ check:
 "
 `;
 
-exports[`replaces settings >> to >> 1_OK: replacedFileContents 1`] = `
+exports[`replaces settings >> to tag >> 1_OK: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
     __SettingB__: SetB#    #original: SetB      #// SetB#....
     __SettingC__: SetCCCC  #original: SettingC  #// SetCCCC..
+    __SettingD__: SetDD  #original: SetD      #// CommentD
+    __SettingE__: SetEE  #original: SetE      #// CommentE1      #// CommentE2
+    __SettingF__: SetFF  #original: SetF      #// CommentF1 #// CommentF2
+    __SettingG__: SetGG  #original: SetG      #// CommentG
     __SettingO__: SettingOther
     in body:
         __BodyA__: ValueAA  #original: ValueA
         __BodyB__: ValueBB  #original: ValueB
         __BodyC__: ValueCC  #original: ValueC
+        __BodyC2__: ValueCC2  #original: ValueC2
         __BodyD__: ValueDD  #original: ValueD
         __BodyE__: ValueEE  #original: ValueE    #// ....
         __BodyF1__: ValueFF1  #original: ValueF1  #// ..
         __BodyF2__: ValueFF2  #original: ValueF2
         __BodyG1__: ValueGG1  #original: ValueG1
         __BodyG2__: ValueGG2  #original: ValueG2
-body:
+        __BodyL__: Valu  #original: ValueLength
+        __BodyAt1__: ValueAtAt1  #original: ValueAt1
+        __BodyAt2__: ValueAtAt2  #original: ValueAt2
+new body:
     ValueAA   #template: __BodyA__
     ValueBB
         #template: __BodyB__
     ValueCC
         #template: __BodyC__
+    ValueCC2
+        #template: __BodyC2__  #keyword: dummy
+    1. ValueAtAt1
+    2. ValueAtAt2
+        #template-at(-2): 1. __BodyAt1__
+        #template-at(-2): 2. __BodyAt2__
+    #test of empty line
+
     -(ValueDD)-             #template: (__BodyD__)
     -(ValueEE)-             #template: (__BodyE__)
     -(ValueFF1)-(ValueFF2)-  #template: (__BodyF1__)-(__BodyF2__)
     -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
+    -\\"Valu\\"-'Valu'-
+        #template: \\"__BodyL__\\"-'__BodyL__'
     settings:
         __SubA__: SetSubAA  #original: SetSubA
 "
 `;
 
-exports[`replaces settings >> to >> 1_OK: revertedFileContents 1`] = `
+exports[`replaces settings >> to tag >> 1_OK: revertedFileContents 1`] = `
 "settings:
     __SettingA__: SetA
     __SettingB__: SetB      #// SetB#....
     __SettingC__: SettingC  #// SetCCCC..
+    __SettingD__: SetD      #// CommentD
+    __SettingE__: SetE      #// CommentE1      #// CommentE2
+    __SettingF__: SetF      #// CommentF1 #// CommentF2
+    __SettingG__: SetG      #// CommentG
     __SettingO__: SettingOther
     in body:
         __BodyA__: ValueA
         __BodyB__: ValueB
         __BodyC__: ValueC
+        __BodyC2__: ValueC2
         __BodyD__: ValueD
         __BodyE__: ValueE    #// ....
         __BodyF1__: ValueF1  #// ..
         __BodyF2__: ValueF2
         __BodyG1__: ValueG1
         __BodyG2__: ValueG2
-body:
+        __BodyL__: ValueLength
+        __BodyAt1__: ValueAt1
+        __BodyAt2__: ValueAt2
+new body:
     ValueA   #template: __BodyA__
     ValueB
         #template: __BodyB__
     ValueC
         #template: __BodyC__
+    ValueC2
+        #template: __BodyC2__  #keyword: dummy
+    1. ValueAt1
+    2. ValueAt2
+        #template-at(-2): 1. __BodyAt1__
+        #template-at(-2): 2. __BodyAt2__
+    #test of empty line
+
     -(ValueD)-             #template: (__BodyD__)
     -(ValueE)-             #template: (__BodyE__)
     -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)
     -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
+    -\\"ValueLength\\"-'ValueLength'-
+        #template: \\"__BodyL__\\"-'__BodyL__'
     settings:
         __SubA__: SetSubA
 "
 `;
 
-exports[`replaces settings >> to >> 1_OK: sourceFileContents 1`] = `
+exports[`replaces settings >> to tag >> 1_OK: sourceFileContents 1`] = `
 "settings:
     __SettingA__: SetA      #to: SetAA
     __SettingB__: SetB      #to: SetB#    #// SetB#....
     __SettingC__: SettingC  #to: SetCCCC  #// SetCCCC..
+    __SettingD__: SetD      #// CommentD    #to: SetDD
+    __SettingE__: SetE      #// CommentE1   #to: SetEE     #// CommentE2
+    __SettingF__: SetF      #// CommentF1 #to: SetFF #// CommentF2
+    __SettingG__: SetG      #// CommentG
+        #to: SetGG
     __SettingO__: SettingOther
     in body:
         __BodyA__: ValueA
         __BodyB__: ValueB
         __BodyC__: ValueC
+        __BodyC2__: ValueC2
         __BodyD__: ValueD
         __BodyE__: ValueE    #// ....
         __BodyF1__: ValueF1  #// ..
         __BodyF2__: ValueF2
         __BodyG1__: ValueG1
         __BodyG2__: ValueG2
-body:
-    ValueA   #to: ValueAA    #template: __BodyA__
-    ValueB   #to: ValueBB
-        #template: __BodyB__
+        __BodyL__: ValueLength
+        __BodyAt1__: ValueAt1
+        __BodyAt2__: ValueAt2
+new body:
+    ValueA   #template: __BodyA__   #to: ValueAA
+    ValueB
+        #template: __BodyB__  #to: ValueBB
     ValueC
-        #to: ValueCC  #template: __BodyC__
-    -(ValueD)-             #to:  ValueDD   #template: (__BodyD__)
-    -(ValueE)-             #to: (ValueEE)  #template: (__BodyE__)
-    -(ValueF1)-(ValueF2)-  #to:  ValueFF1, ValueFF2    #template: (__BodyF1__)-(__BodyF2__)
-    -(ValueG1)-(ValueG2)-  #to: (ValueGG1)-(ValueGG2)  #template: (__BodyG1__)-(__BodyG2__)
+        #template: __BodyC__
+        #to: ValueCC
+    ValueC2
+        #template: __BodyC2__  #keyword: dummy
+        #to: ValueCC2
+    1. ValueAt1
+    2. ValueAt2
+        #template-at(-2): 1. __BodyAt1__
+            #to: ValueAtAt1
+        #template-at(-2): 2. __BodyAt2__
+            #to: ValueAtAt2
+    #test of empty line
+
+    -(ValueD)-             #template: (__BodyD__)  #to:  ValueDD
+    -(ValueE)-             #template: (__BodyE__)  #to: (ValueEE)
+    -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)  #to:  ValueFF1, ValueFF2
+    -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)  #to: (ValueGG1)-(ValueGG2)
+    -\\"ValueLength\\"-'ValueLength'-
+        #template: \\"__BodyL__\\"-'__BodyL__'
+        #to: \\"Valu\\"-'Valu'
     settings:
         __SubA__: SetSubA  #to: SetSubAA
 "
 `;
 
-exports[`replaces settings >> to >> 2_FileParameter: replacedFileContents 1`] = `
+exports[`replaces settings >> to tag >> 2_FileParameter: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
 "
 `;
 
-exports[`replaces settings >> to >> 2_FileParameter: revertedFileContents 1`] = `
+exports[`replaces settings >> to tag >> 2_FileParameter: revertedFileContents 1`] = `
 "settings:
     __SettingA__: SetA
 "
 `;
 
-exports[`replaces settings >> to >> 2_FileParameter: sourceFileContents 1`] = `
+exports[`replaces settings >> to tag >> 2_FileParameter: sourceFileContents 1`] = `
 "settings:
     __SettingA__: SetA      #to: SetAA
+"
+`;
+
+exports[`replaces settings >> to tag >> ToTestTag: sourceFileContents 1`] = `
+"settings:
+    __BodyA1__: ValueA1
+    __BodyA2__: ValueA2
+    __BodyB1__: ValueB1
+    __BodyB2__: ValueB2
+    __BodyC1__: ValueC1
+    __BodyC2__: ValueC2
+body:
+    -(ValueA1)-(ValueA2)-  #template: (__BodyA1__)-(__BodyA2__)  #to-test:  ValueAA1, ValueAA2
+    -(ValueB1)-(ValueB2)-  #template: (__BodyB1__)-(__BodyB2__)  #to-test: (ValueBB1)-(ValueBB2)
+    -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
+"
+`;
+
+exports[`replaces settings >> to tag >> ToTestTag: stdout 1`] = `
+"Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9:
+Verbose:         template: (__BodyA1__)-(__BodyA2__)
+Verbose:         templatePattern: (*)-(*)
+Verbose:         toValue: ValueAA1, ValueAA2
+Verbose:         toValueIsMatchedWithTemplate: false
+Verbose:         __BodyA1__: ValueAA1
+Verbose:         __BodyA2__: ValueAA2
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10:
+Verbose:         template: (__BodyB1__)-(__BodyB2__)
+Verbose:         templatePattern: (*)-(*)
+Verbose:         toValue: (ValueBB1)-(ValueBB2)
+Verbose:         toValueIsMatchedWithTemplate: true
+Verbose:         __BodyB1__: ValueBB1
+Verbose:         __BodyB2__: ValueBB2
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:
+Verbose:         template: (__BodyC1__)-(__BodyC2__)
+Verbose:         templatePattern: (*)-(*)
+Verbose:         toValue: (ValueCC1)-(ValueCC2
+Verbose:         toValueIsMatchedWithTemplate: false
+Verbose:         __BodyC1__: (ValueCC1)-(ValueCC2
 "
 `;
 
