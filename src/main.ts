@@ -39,6 +39,12 @@ export async function  main() {
             }
             await  search();
         }
+        else if (programArguments[0] === 'f'  ||  programArguments[0] === 'find') {
+            if (verboseMode) {
+                console.log('Verbose: typrm command: find');
+            }
+            await  find();
+        }
         else if (programArguments[0] === 'c'  ||  programArguments[0] === 'check') {
             if (verboseMode) {
                 console.log('Verbose: typrm command: check');
@@ -110,6 +116,12 @@ export async function  main() {
         else {
             await  search();
         }
+    }
+
+    // debug
+    if (false) {
+        var d = pp('');
+        d=d;
     }
 }
 
@@ -1885,7 +1897,11 @@ async function  search() {
             if (keyword === 'exit()') {
                 break;
             } else if (keyword === '') {
+                if (previousPrint.hasFindMenu) {
+                    await  findSub(previousPrint.previousKeyword);
+                }
                 previousPrint.hasVerbMenu = false;
+                previousPrint.hasFindMenu = false;
             } else {
                 var  command = cSearch;
                 if (previousPrint.hasVerbMenu  &&  numberRegularExpression.test(keyword)) {
@@ -1896,6 +1912,9 @@ async function  search() {
                 if (command === cSearch) {
 
                     previousPrint = await searchSub(keyword);
+                    if (previousPrint.hasFindMenu) {
+                        console.log(translate`Not found. To do full text search, press Enter key.`);
+                    }
                 } else if (command === cPrintRef) {
 
                     previousPrint = await printRef(keyword);
@@ -2093,7 +2112,11 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
 
         return  await printRef(refTagAndAddress);
     } else {
-        const   normalReturn = getEmptyOfPrintRefResult();
+        const  normalReturn = getEmptyOfPrintRefResult();
+        if (foundLines.length === 0) {
+            normalReturn.previousKeyword = keyword;
+            normalReturn.hasFindMenu = true;
+        }
         return  normalReturn;
     }
 }
@@ -2258,6 +2281,42 @@ function  compareScore(a: FoundLine, b: FoundLine) {
     return  different;
 }
 
+// find
+async function  find() {
+    const  keyword = programArguments.slice(1).join(' ');
+    if (keyword === '') {
+        search();
+    } else {
+        await  findSub(keyword);
+    }
+}
+
+// findSub
+async function  findSub(keyword: string) {
+    const  keywordLowerCase = keyword.toLowerCase();
+    for (const inputFileFullPath of await listUpFilePaths()) {
+        const  reader = readline.createInterface({
+            input: fs.createReadStream(inputFileFullPath),
+            crlfDelay: Infinity
+        });
+        var  lineNum = 0;
+
+        for await (const line1 of reader) {
+            const  line: string = line1;
+            lineNum += 1;
+
+            const  keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
+            if (keywordIndex !== notFound) {
+
+                console.log(`${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
+                    line.substr(0, keywordIndex) +
+                    matchedColor(line.substr(keywordIndex, keyword.length)) +
+                    line.substr(keywordIndex + keyword.length));
+            }
+        }
+    }
+}
+
 // lookUpVariable
 async function  lookUpVariable(variableName: string, inputFilePath: string, referenceLineNum: number) {
     const  valueColor = chalk.yellow;
@@ -2332,6 +2391,8 @@ interface  PrintRefResult {
     verbs: Verb[];
     address: string;
     addressLineNum: number;
+    hasFindMenu: boolean;
+    previousKeyword: string;
 }
 
 // getEmptyOfPrintRefResult
@@ -2341,6 +2402,8 @@ function  getEmptyOfPrintRefResult(): PrintRefResult {
         verbs: [],
         address: '',
         addressLineNum: 0,
+        hasFindMenu: false,
+        previousKeyword: '',
     }
 }
 
@@ -3227,7 +3290,6 @@ class FoundLine {
 
         // coloredLine = ...
         var    coloredLine = '';
-        const  matchedColor = chalk.green.bold;
         const  line = this.line;
         var    previousPosition = 0;
         for (const match of colorParts) {
@@ -3641,6 +3703,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Error of unexpected: The count of evalatedKeyValues is not increasing.": "予期しないエラー：evalatedKeyValues の数が増えていません。",
             "isReplacable may be not changed. Try typrm check command.": "isReplacable が変更されていません。 typrm check コマンドを試してください。",
             "${0}a quote is found inside a field${1}": "${0}フィールド内に引用符があります${1}",
+            "Not found. To do full text search, press Enter key.": "見つかりません。全文検索するときは Enter キーを押してください。",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
@@ -3761,6 +3824,7 @@ const  foundForAbove = minLineNum;
 const  foundForFollowing = maxLineNum;
 const  pathColor = chalk.cyan;
 const  lineNumColor = chalk.keyword('gray');
+const  matchedColor = chalk.green.bold;
 const  notFound = -1;
 const  allSetting = 0;
 var    inputFileParentPath = '';

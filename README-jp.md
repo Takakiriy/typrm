@@ -143,6 +143,8 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
         __Name__: workB1  #to: workB2  #// comment
         __Name__: workC1  #// comment  #to: workC2
 
+タグを追加したらファイルを保存してください。
+
 入力するコマンド:
 
     typrm replace
@@ -314,6 +316,17 @@ search コマンドにキーワードを指定しないと、検索キーワー�
     $ typrm s
     keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+検索キーワード入力モードで何も見つからなかったときは、
+Enter キーを押すことで全文検索ができます。
+その全文検索では、大文字小文字を区別しません。また、単語単位検索はできません。
+
+    $ typrm s
+    keyword: game
+    見つかりません。全文検索するときは Enter キーを押してください。
+    keyword:
+    .../text.txt:1: Game:
     keyword:
 
 複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。

@@ -142,6 +142,8 @@ Example after adding the `#to:` tag:
         __Name__: workB1  #to: workB2  #// comment
         __Name__: workC1  #// comment  #to: workC2
 
+Save the file after adding tagｓ.
+
 Input command:
 
     typrm replace
@@ -316,12 +318,25 @@ the command name (search or s) cannot be omitted.
 Entering `#keyword:` or `#search:` in the search keyword will be ignored.
 When searching, use a common full-text search tool such as grep.
 
-If you do not specify any keywords with the search command, search keyword input mode is started.
+If you do not specify any keywords with the search command,
+search keyword input mode is started.
 Press Ctrl + C to exit this mode.
 
     $ typrm s
     keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+If you cannot find anything in the search keyword input mode,
+you can do the full-text search by pressing the Enter key.
+The full-text search is not case sensitive.
+Also, word-based search is not possible.
+
+    $ typrm s
+    keyword: game
+    Not found. To do full text search, press Enter key.
+    keyword:
+    .../text.txt:1: Game:
     keyword:
 
 If specifying a search keyword consisting of multiple words,

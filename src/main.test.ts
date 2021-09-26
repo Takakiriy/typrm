@@ -905,6 +905,21 @@ describe("searches glossary tag >>", () => {
     });
 });
 
+describe("find >>", () => {
+  test.each([
+    [
+        "1st",
+        ["find", "not"],
+        { folder: "test_data/search/1", test: "", locale: "en-US" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':2:') + ` ${matchedColor('Not')} keyword  ABC, "do it", "a,b"\n`,
+    ],
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
+});
+
 describe("where variable >>", () => {
   test.each([
     [

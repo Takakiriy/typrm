@@ -75,30 +75,37 @@ async function  TestOfCommandLine() {
         "check": "true",
         "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
     },{
+        "name": "search_mode_find",
+        "parameters": "search  --folder test_data/search/1",
+        "check": "true",
+        "inputLines": "Not\n\nexit()\n",
+    },{
         "name": "search_mode_result_has_ref_verb",
         "parameters": "search  --folder test_data/search/2",
         "check": "true",
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
+        if ( true  ||  case_.name === 'search_mode_ref_verb') {
+            console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
 
-        // Test Main
-        returns = await callChildProccess(`node ${scriptPath} ${case_.parameters} --test`,
-            {inputLines: case_.inputLines.split('\n')});
+            // Test Main
+            returns = await callChildProccess(`node ${scriptPath} ${case_.parameters} --test`,
+                {inputLines: case_.inputLines.split('\n')});
 
-        // Check
-        if (case_.check === 'true') {
-            if (testingOS === 'Windows') {
-                testingOS = 'Windows2';
-            }
-            const  answer = getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
+            // Check
+            if (case_.check === 'true') {
+                if (testingOS === 'Windows') {
+                    testingOS = 'Windows2';
+                }
+                const  answer = getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
 
-            if (returns.stdout !== answer) {
-                printDifferentPaths('_output.txt', '_expected.txt');
-                fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                fs.writeFileSync(testFolderPath + "_expected.txt", answer);
-                throw new Error();
+                if (returns.stdout !== answer) {
+                    printDifferentPaths('_output.txt', '_expected.txt');
+                    fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
+                    fs.writeFileSync(testFolderPath + "_expected.txt", answer);
+                    throw new Error();
+                }
             }
         }
     }

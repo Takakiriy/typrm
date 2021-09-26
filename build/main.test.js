@@ -1030,6 +1030,26 @@ describe("searches glossary tag >>", function () {
         });
     }); });
 });
+describe("find >>", function () {
+    test.each([
+        [
+            "1st",
+            ["find", "not"],
+            { folder: "test_data/search/1", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':2:') + (" " + matchedColor('Not') + " keyword  ABC, \"do it\", \"a,b\"\n"),
+        ],
+    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, callMain(arguments_, options)];
+                case 1:
+                    _a.sent();
+                    expect(main.stdout).toBe(answer);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});
 describe("where variable >>", function () {
     test.each([
         [
