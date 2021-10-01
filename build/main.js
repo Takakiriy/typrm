@@ -88,9 +88,9 @@ function main() {
                 case 5:
                     _a.sent();
                     _a.label = 6;
-                case 6: return [3 /*break*/, 27];
+                case 6: return [3 /*break*/, 29];
                 case 7:
-                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 27];
+                    if (!(exports.programArguments.length >= 1)) return [3 /*break*/, 29];
                     if (!(exports.programArguments[0] === 's' || exports.programArguments[0] === 'search')) return [3 /*break*/, 9];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: search');
@@ -98,7 +98,7 @@ function main() {
                     return [4 /*yield*/, search()];
                 case 8:
                     _a.sent();
-                    return [3 /*break*/, 27];
+                    return [3 /*break*/, 29];
                 case 9:
                     if (!(exports.programArguments[0] === 'f' || exports.programArguments[0] === 'find')) return [3 /*break*/, 11];
                     if (verboseMode) {
@@ -107,9 +107,19 @@ function main() {
                     return [4 /*yield*/, find()];
                 case 10:
                     _a.sent();
-                    return [3 /*break*/, 27];
+                    return [3 /*break*/, 29];
                 case 11:
-                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 13];
+                    if (!(exports.programArguments[0] === 'm' || exports.programArguments[0] === 'mutual-search')) return [3 /*break*/, 13];
+                    varidateMutualSearchCommandArguments();
+                    if (verboseMode) {
+                        console.log('Verbose: typrm command: mutual-search');
+                    }
+                    return [4 /*yield*/, mutualSearch()];
+                case 12:
+                    _a.sent();
+                    return [3 /*break*/, 29];
+                case 13:
+                    if (!(exports.programArguments[0] === 'c' || exports.programArguments[0] === 'check')) return [3 /*break*/, 15];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: check');
                     }
@@ -117,15 +127,15 @@ function main() {
                         checkingFilePath = exports.programArguments[1];
                     }
                     return [4 /*yield*/, check(checkingFilePath)];
-                case 12:
+                case 14:
                     _a.sent();
-                    return [3 /*break*/, 27];
-                case 13:
-                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 18];
+                    return [3 /*break*/, 29];
+                case 15:
+                    if (!(exports.programArguments[0] === 'r' || exports.programArguments[0] === 'replace')) return [3 /*break*/, 20];
                     if (verboseMode) {
                         console.log('Verbose: typrm command: replace');
                     }
-                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 15];
+                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 17];
                     if (exports.programArguments.length === 1) {
                         inputFilePath = '';
                     }
@@ -133,10 +143,10 @@ function main() {
                         inputFilePath = exports.programArguments[1];
                     }
                     return [4 /*yield*/, replace(inputFilePath)];
-                case 14:
+                case 16:
                     _a.sent();
-                    return [3 /*break*/, 17];
-                case 15:
+                    return [3 /*break*/, 19];
+                case 17:
                     varidateReplaceCommandArguments();
                     if (exports.programArguments.length === 3) {
                         inputFilePath = exports.programArguments[1];
@@ -149,13 +159,13 @@ function main() {
                         keyValues = exports.programArguments[3];
                     }
                     return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues, false)];
-                case 16:
-                    _a.sent();
-                    _a.label = 17;
-                case 17: return [3 /*break*/, 27];
                 case 18:
-                    if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 23];
-                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 20];
+                    _a.sent();
+                    _a.label = 19;
+                case 19: return [3 /*break*/, 29];
+                case 20:
+                    if (!(exports.programArguments[0] === 'revert')) return [3 /*break*/, 25];
+                    if (!(exports.programArguments.length <= 2)) return [3 /*break*/, 22];
                     if (exports.programArguments.length === 1) {
                         inputFilePath = '';
                     }
@@ -163,20 +173,20 @@ function main() {
                         inputFilePath = exports.programArguments[1];
                     }
                     return [4 /*yield*/, revert(inputFilePath)];
-                case 19:
+                case 21:
                     _a.sent();
-                    return [3 /*break*/, 22];
-                case 20:
+                    return [3 /*break*/, 24];
+                case 22:
                     varidateRevertCommandArguments();
                     inputFilePath_1 = exports.programArguments[1];
                     replacingLineNum_1 = exports.programArguments[2];
                     return [4 /*yield*/, revertSettings(inputFilePath_1, replacingLineNum_1)];
-                case 21:
-                    _a.sent();
-                    _a.label = 22;
-                case 22: return [3 /*break*/, 27];
                 case 23:
-                    if (!(exports.programArguments[0] === 'where')) return [3 /*break*/, 25];
+                    _a.sent();
+                    _a.label = 24;
+                case 24: return [3 /*break*/, 29];
+                case 25:
+                    if (!(exports.programArguments[0] === 'where')) return [3 /*break*/, 27];
                     variableName = exports.programArguments[1];
                     inputFilePath = '';
                     lineNum = 0;
@@ -187,14 +197,14 @@ function main() {
                         lineNum = parseInt(exports.programArguments[3]);
                     }
                     return [4 /*yield*/, lookUpVariable(variableName, inputFilePath, lineNum)];
-                case 24:
-                    _a.sent();
-                    return [3 /*break*/, 27];
-                case 25: return [4 /*yield*/, search()];
                 case 26:
                     _a.sent();
-                    _a.label = 27;
-                case 27:
+                    return [3 /*break*/, 29];
+                case 27: return [4 /*yield*/, search()];
+                case 28:
+                    _a.sent();
+                    _a.label = 29;
+                case 29:
                     // debug
                     if (false) {
                         d = lib_1.pp('');
@@ -2295,7 +2305,7 @@ function search() {
                         }
                     }
                     if (!(command === cSearch)) return [3 /*break*/, 2];
-                    return [4 /*yield*/, searchSub(keyword)];
+                    return [4 /*yield*/, searchSub(keyword, false)];
                 case 1:
                     _a.sent();
                     return [3 /*break*/, 6];
@@ -2348,7 +2358,7 @@ function search() {
                         command = cPrintRef;
                     }
                     if (!(command === cSearch)) return [3 /*break*/, 15];
-                    return [4 /*yield*/, searchSub(keyword_1)];
+                    return [4 /*yield*/, searchSub(keyword_1, false)];
                 case 14:
                     previousPrint = _a.sent();
                     if (previousPrint.hasFindMenu) {
@@ -2374,10 +2384,10 @@ function search() {
     });
 }
 // searchSub
-function searchSub(keyword) {
+function searchSub(keyword, isMutual) {
     var e_8, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, thesaurus, glossaryTags, foundLines, thesaurusFilePath, _loop_4, lineNum, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation, foundLine, refTagPosition, nextTagPosition, refTagAndAddress, refTagAndAddress, normalReturn;
+        var _i, ignoredKeywords_1, ignoredKeyword, currentFolder, fileFullPaths, targetFolders, _loop_3, _b, targetFolders_4, folder, thesaurus, glossaryTags, foundLines, thesaurusFilePath, _loop_4, lineNum, label, indexOfLabel, labelLength, label, indexOfLabel, labelLength, csv, withParameter, withParameter, positionOfCSV, positionOfCSV, glossaryTag, glossaryWords, _c, fileFullPaths_1, inputFileFullPath, keyphraseWordCount, _d, foundLines_1, foundLineInformation, foundLine, refTagPosition, nextTagPosition, refTagAndAddress, refTagAndAddress, normalReturn;
         return __generator(this, function (_e) {
             switch (_e.label) {
                 case 0:
@@ -2439,7 +2449,7 @@ function searchSub(keyword) {
                     _e.label = 7;
                 case 7:
                     _loop_4 = function (inputFileFullPath) {
-                        var reader, blockDisable, reader_7, reader_7_1, line1, line, columns, found, unescapedLine, columnPositions, _h, _j, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _k, _l, match, _m, _o, match, e_8_1;
+                        var reader, blockDisable, reader_7, reader_7_1, line1, line, indexOfKeywordLabel, indexOfSearchLabelIfMutual, columns, found, unescapedLine, columnPositions, _h, _j, match, currentIndent, characterAtIndent, isGlossaryIndentLevel, isComment, colonPosition, wordInGlossary, found, _k, _l, match, _m, _o, match, e_8_1;
                         return __generator(this, function (_p) {
                             switch (_p.label) {
                                 case 0:
@@ -2461,8 +2471,21 @@ function searchSub(keyword) {
                                     line = line1;
                                     lineNum += 1;
                                     blockDisable.evaluate(line);
-                                    if (!(line.includes(keywordLabel) && !line.includes(disableLabel) && !blockDisable.isInBlock)) return [3 /*break*/, 5];
-                                    csv = getValue(line, line.indexOf(keywordLabel) + keywordLabel.length);
+                                    indexOfKeywordLabel = line.indexOf(keywordLabel);
+                                    indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
+                                    if (!((indexOfKeywordLabel !== notFound || indexOfSearchLabelIfMutual !== notFound)
+                                        && !line.includes(disableLabel) && !blockDisable.isInBlock)) return [3 /*break*/, 5];
+                                    if (indexOfKeywordLabel !== notFound) {
+                                        label = keywordLabel;
+                                        indexOfLabel = indexOfKeywordLabel;
+                                        labelLength = keywordLabel.length;
+                                    }
+                                    else {
+                                        label = searchLabel;
+                                        indexOfLabel = indexOfSearchLabelIfMutual;
+                                        labelLength = searchLabel.length;
+                                    }
+                                    csv = getValue(line, indexOfLabel + labelLength);
                                     if (csv !== '') {
                                         withParameter = true;
                                     }
@@ -2481,7 +2504,7 @@ function searchSub(keyword) {
                                     if (found.matchedKeywordCount >= 1) {
                                         unescapedLine = unscapePercentByte(line);
                                         if (withParameter) {
-                                            positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(keywordLabel) + keywordLabel.length);
+                                            positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
                                         }
                                         else {
                                             positionOfCSV = unescapedLine.indexOf(csv);
@@ -2491,6 +2514,7 @@ function searchSub(keyword) {
                                         found.path = getTestablePath(inputFileFullPath);
                                         found.lineNum = lineNum;
                                         found.line = unescapedLine;
+                                        found.tagLabel = label;
                                         for (_h = 0, _j = found.matches; _h < _j.length; _h++) {
                                             match = _j[_h];
                                             match.position += positionOfCSV + columnPositions[match.testTargetIndex];
@@ -2553,6 +2577,7 @@ function searchSub(keyword) {
                                                     found.score += glossaryMatchScore;
                                                     found.path = getTestablePath(inputFileFullPath);
                                                     found.lineNum = lineNum;
+                                                    found.tagLabel = glossaryLabel;
                                                     if (glossaryTag.glossaryWords === '') {
                                                         found.line = line;
                                                         for (_k = 0, _l = found.matches; _k < _l.length; _k++) {
@@ -2864,6 +2889,22 @@ function findSub(keyword) {
                     _i++;
                     return [3 /*break*/, 2];
                 case 15: return [2 /*return*/];
+            }
+        });
+    });
+}
+// mutualSearch
+function mutualSearch() {
+    return __awaiter(this, void 0, void 0, function () {
+        var keyword;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    keyword = exports.programArguments.slice(1).join(' ');
+                    return [4 /*yield*/, searchSub(keyword, true)];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
             }
         });
     });
@@ -3286,6 +3327,13 @@ function printConfig() {
                 index += 1;
             }
         }
+    }
+}
+// varidateMutualSearchCommandArguments
+function varidateMutualSearchCommandArguments() {
+    if (exports.programArguments.length < 2) {
+        throw new Error('Error: Too few argurments.\n' +
+            'typrm mutual-search  __Keywords__"');
     }
 }
 // varidateUpdateCommandArguments
@@ -3868,6 +3916,7 @@ var FoundLine = /** @class */ (function () {
         this.matchedKeywordCount = 0;
         this.matchedTargetKeywordCount = 0;
         this.testedWordCount = 0;
+        this.tagLabel = ''; // keywordLabel, searchLabel
         this.score = 0;
     }
     FoundLine.prototype.toString = function () {
@@ -3912,22 +3961,24 @@ var FoundLine = /** @class */ (function () {
                     refColor(refTagAndParameter) +
                     coloredLine.substr(refIndex + refTagAndParameter.length);
         }
-        var searchColor = chalk.yellow;
-        var searchIndex = coloredLine.indexOf(searchLabel);
-        if (searchIndex !== notFound) {
-            var spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))[0].length;
-            var parameterIndex = searchIndex + searchLabel.length + spaceCount;
-            var commentIndex = coloredLine.indexOf(' #', parameterIndex);
-            if (commentIndex === notFound) {
-                var searchKeyword = coloredLine.substr(parameterIndex).trim();
+        if (this.tagLabel !== searchLabel) {
+            var searchColor = chalk.yellow;
+            var searchIndex = coloredLine.indexOf(searchLabel);
+            if (searchIndex !== notFound) {
+                var spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))[0].length;
+                var parameterIndex = searchIndex + searchLabel.length + spaceCount;
+                var commentIndex = coloredLine.indexOf(' #', parameterIndex);
+                if (commentIndex === notFound) {
+                    var searchKeyword = coloredLine.substr(parameterIndex).trim();
+                }
+                else {
+                    var searchKeyword = coloredLine.substr(parameterIndex, commentIndex - parameterIndex).trim();
+                }
+                coloredLine =
+                    coloredLine.substr(0, parameterIndex) +
+                        searchColor(searchKeyword) +
+                        coloredLine.substr(parameterIndex + searchKeyword.length);
             }
-            else {
-                var searchKeyword = coloredLine.substr(parameterIndex, commentIndex - parameterIndex).trim();
-            }
-            coloredLine =
-                coloredLine.substr(0, parameterIndex) +
-                    searchColor(searchKeyword) +
-                    coloredLine.substr(parameterIndex + searchKeyword.length);
         }
         if (false) {
             var debugString = " (score: " + this.score + ", wordCount: " + this.testedWordCount + ", matchedCount: " + this.matchedTargetKeywordCount + ")";

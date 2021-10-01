@@ -920,6 +920,27 @@ describe("find >>", () => {
     });
 });
 
+describe("mutual search >>", () => {
+  test.each([
+    [
+        "1st",
+        ["mutual-search", "AAA"],
+        { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + ` Target: #keyword: ${matchedColor('AAA')}\n`,
+    ],[
+        "not mutual",
+        ["search", "AAA"],
+        { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + ` Target: #keyword: ${matchedColor('AAA')}\n`,
+    ],
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
+});
+
 describe("where variable >>", () => {
   test.each([
     [

@@ -23,6 +23,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
     - [Setting name](#setting-name)
     - [#template-if tag - replaces the sign of whether the condition is met](#template-if-tag---replaces-the-sign-of-whether-the-condition-is-met)
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
+  - [mutual-search command - search link sources and maintain the link relationship](#mutual-search-command---search-link-sources-and-maintain-the-link-relationship)
   - [where command - finds the definition of the setting (variable) value](#where-command---finds-the-definition-of-the-setting-variable-value)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#if tag: set conditions](#if-tag-set-conditions)
@@ -754,6 +755,49 @@ use the `check` command. The short command name is `c`.
 
 In order to correctly determine the range to replace the setting value,
 typrm checks that the text with the setting value exists before replacing.
+
+
+## mutual-search command - search link sources and maintain the link relationship
+
+The mutual-search command is used to maintain the link relationships shown below.
+
+The `#search:` tag corresponds to the link source and
+indicates that detailed or related information can be searched and found.
+For example, if you are reading the content of Title 1 below
+and want to see some helpful information,
+you can find the line of `Title2 #keyword: example detail`
+by `example detail` keyword specified typrm search command.
+
+    Title1:
+        Contents:
+            Some information.
+        Reference:
+            Title2: #search: example detail
+
+    Title2:  #keyword: example detail
+        The related information.
+
+When changing the search keyword that has the above link relationship,
+if you does not make the keyword specified in the `#keyword:` tag and
+the keyword specified in the `#search:` tag the same keyword,
+or does not include all the keywords specified in the `#keyword:` tag
+in the part of the keywords specified in the `#search:` tag,
+the link will be broken.
+
+The mutual-search command searches not only the keywords specified
+in the `#keyword:` tag but also the keywords specified
+in the `#search:` tag.
+Change both the source and destination keywords found in this way.
+
+Before:
+
+    example.yaml:5:   Title2: #search: sample detail
+    example.yaml:7: Title2:  #keyword: sample detail
+
+After:
+
+    example.yaml:5:   Title2: #search: example detail
+    example.yaml:7: Title2:  #keyword: example detail
 
 
 ## where command - finds the definition of the setting (variable) value

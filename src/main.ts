@@ -45,6 +45,13 @@ export async function  main() {
             }
             await  find();
         }
+        else if (programArguments[0] === 'm'  ||  programArguments[0] === 'mutual-search') {
+            varidateMutualSearchCommandArguments();
+            if (verboseMode) {
+                console.log('Verbose: typrm command: mutual-search');
+            }
+            await  mutualSearch();
+        }
         else if (programArguments[0] === 'c'  ||  programArguments[0] === 'check') {
             if (verboseMode) {
                 console.log('Verbose: typrm command: check');
@@ -1874,7 +1881,7 @@ async function  search() {
         }
         if (command === cSearch) {
 
-            await  searchSub(keyword);
+            await  searchSub(keyword, false);
         } else if (command === cPrintRef) {
 
             await  printRef(keyword);
@@ -1911,7 +1918,7 @@ async function  search() {
                 }
                 if (command === cSearch) {
 
-                    previousPrint = await searchSub(keyword);
+                    previousPrint = await searchSub(keyword, false);
                     if (previousPrint.hasFindMenu) {
                         console.log(translate`Not found. To do full text search, press Enter key.`);
                     }
@@ -1929,7 +1936,7 @@ async function  search() {
 }
 
 // searchSub
-async function  searchSub(keyword: string): Promise<PrintRefResult> {
+async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefResult> {
     for (const ignoredKeyword of ignoredKeywords) {
         keyword = keyword.replace(ignoredKeyword, '')
     }
@@ -1973,10 +1980,23 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
             const  line: string = line1;
             lineNum += 1;
             blockDisable.evaluate(line);
+            const  indexOfKeywordLabel = line.indexOf(keywordLabel);
+            const  indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
 
             // keyword tag
-            if (line.includes(keywordLabel)  &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
-                var  csv = getValue(line, line.indexOf(keywordLabel) + keywordLabel.length);
+            if ((indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound)
+                    &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
+                if (indexOfKeywordLabel !== notFound) {
+                    var  label = keywordLabel;
+                    var  indexOfLabel = indexOfKeywordLabel;
+                    var  labelLength = keywordLabel.length;
+                } else {
+                    var  label = searchLabel;
+                    var  indexOfLabel = indexOfSearchLabelIfMutual;
+                    var  labelLength = searchLabel.length;
+                }
+
+                var  csv = getValue(line, indexOfLabel + labelLength);
                 if (csv !== '') {
                     var  withParameter = true;
                 } else {
@@ -1993,7 +2013,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                 if (found.matchedKeywordCount >= 1) {
                     const  unescapedLine = unscapePercentByte(line);
                     if (withParameter) {
-                        var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(keywordLabel) + keywordLabel.length);
+                        var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
                     } else {
                         var  positionOfCSV = unescapedLine.indexOf(csv);
                     }
@@ -2003,6 +2023,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                     found.path = getTestablePath(inputFileFullPath);
                     found.lineNum = lineNum;
                     found.line = unescapedLine;
+                    found.tagLabel = label;
                     for (const match of found.matches) {
                         match.position += positionOfCSV + columnPositions[match.testTargetIndex];
                     }
@@ -2070,6 +2091,7 @@ async function  searchSub(keyword: string): Promise<PrintRefResult> {
                             found.score += glossaryMatchScore;
                             found.path = getTestablePath(inputFileFullPath);
                             found.lineNum = lineNum;
+                            found.tagLabel = glossaryLabel;
                             if (glossaryTag.glossaryWords === '') {
                                 found.line = line;
                                 for (const match of found.matches) {
@@ -2315,6 +2337,13 @@ async function  findSub(keyword: string) {
             }
         }
     }
+}
+
+// mutualSearch
+async function  mutualSearch() {
+    const  keyword = programArguments.slice(1).join(' ');
+
+    await  searchSub(keyword, true);
 }
 
 // lookUpVariable
@@ -2714,6 +2743,14 @@ function  printConfig() {
                 index += 1;
             }
         }
+    }
+}
+
+// varidateMutualSearchCommandArguments
+function  varidateMutualSearchCommandArguments() {
+    if (programArguments.length < 2) {
+        throw new Error('Error: Too few argurments.\n' +
+            'typrm mutual-search  __Keywords__"')
     }
 }
 
@@ -3271,6 +3308,7 @@ class FoundLine {
     matchedKeywordCount: number = 0;
     matchedTargetKeywordCount: number = 0;
     testedWordCount: number = 0;
+    tagLabel: string = '';  // keywordLabel, searchLabel
     score: number = 0;
 
     toString(): string {
@@ -3316,21 +3354,23 @@ class FoundLine {
                 coloredLine.substr(refIndex + refTagAndParameter.length);
         }
 
-        const  searchColor = chalk.yellow;
-        const  searchIndex = coloredLine.indexOf(searchLabel);
-        if (searchIndex !== notFound) {
-            const  spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))![0].length;
-            const  parameterIndex = searchIndex + searchLabel.length + spaceCount;
-            const  commentIndex = coloredLine.indexOf(' #', parameterIndex);
-            if (commentIndex === notFound) {
-                var  searchKeyword = coloredLine.substr(parameterIndex).trim();
-            } else {
-                var  searchKeyword = coloredLine.substr(parameterIndex,  commentIndex - parameterIndex).trim();
+        if (this.tagLabel !== searchLabel) {
+            const  searchColor = chalk.yellow;
+            const  searchIndex = coloredLine.indexOf(searchLabel);
+            if (searchIndex !== notFound) {
+                const  spaceCount = indentRegularExpression.exec(coloredLine.substr(searchIndex + searchLabel.length))![0].length;
+                const  parameterIndex = searchIndex + searchLabel.length + spaceCount;
+                const  commentIndex = coloredLine.indexOf(' #', parameterIndex);
+                if (commentIndex === notFound) {
+                    var  searchKeyword = coloredLine.substr(parameterIndex).trim();
+                } else {
+                    var  searchKeyword = coloredLine.substr(parameterIndex,  commentIndex - parameterIndex).trim();
+                }
+                coloredLine =
+                    coloredLine.substr(0, parameterIndex) +
+                    searchColor( searchKeyword ) +
+                    coloredLine.substr(parameterIndex + searchKeyword.length);
             }
-            coloredLine =
-                coloredLine.substr(0, parameterIndex) +
-                searchColor( searchKeyword ) +
-                coloredLine.substr(parameterIndex + searchKeyword.length);
         }
         if (false) {
             var  debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
