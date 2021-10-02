@@ -2181,7 +2181,7 @@ check:
 "
 `;
 
-exports[`replaces settings >> to tag >> 1_OK: replacedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 1_OK: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
     __SettingB__: SetB#    #original: SetB      #// SetB#....
@@ -2232,7 +2232,7 @@ new body:
 "
 `;
 
-exports[`replaces settings >> to tag >> 1_OK: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 1_OK: revertedFileContents 1`] = `
 "settings:
     __SettingA__: SetA
     __SettingB__: SetB      #// SetB#....
@@ -2283,7 +2283,7 @@ new body:
 "
 `;
 
-exports[`replaces settings >> to tag >> 1_OK: sourceFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 1_OK: sourceFileContents 1`] = `
 "settings:
     __SettingA__: SetA      #to: SetAA
     __SettingB__: SetB      #to: SetB#    #// SetB#....
@@ -2340,25 +2340,25 @@ new body:
 "
 `;
 
-exports[`replaces settings >> to tag >> 2_FileParameter: replacedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 2_FileParameter: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
 "
 `;
 
-exports[`replaces settings >> to tag >> 2_FileParameter: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 2_FileParameter: revertedFileContents 1`] = `
 "settings:
     __SettingA__: SetA
 "
 `;
 
-exports[`replaces settings >> to tag >> 2_FileParameter: sourceFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 2_FileParameter: sourceFileContents 1`] = `
 "settings:
     __SettingA__: SetA      #to: SetAA
 "
 `;
 
-exports[`replaces settings >> to tag >> 3_SimpleOneLoop: replacedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: replacedFileContents 1`] = `
 "    settings: #// simple after template. This test must do one loop in replaceSettingsSub()
         __SimpleA__: ValueAA  #original: ValueA
     body:
@@ -2366,7 +2366,7 @@ exports[`replaces settings >> to tag >> 3_SimpleOneLoop: replacedFileContents 1`
 "
 `;
 
-exports[`replaces settings >> to tag >> 3_SimpleOneLoop: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: revertedFileContents 1`] = `
 "    settings: #// simple after template. This test must do one loop in replaceSettingsSub()
         __SimpleA__: ValueA
     body:
@@ -2374,7 +2374,7 @@ exports[`replaces settings >> to tag >> 3_SimpleOneLoop: revertedFileContents 1`
 "
 `;
 
-exports[`replaces settings >> to tag >> 3_SimpleOneLoop: sourceFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: sourceFileContents 1`] = `
 "    settings: #// simple after template. This test must do one loop in replaceSettingsSub()
         __SimpleA__: ValueA
     body:
@@ -2382,7 +2382,7 @@ exports[`replaces settings >> to tag >> 3_SimpleOneLoop: sourceFileContents 1`] 
 "
 `;
 
-exports[`replaces settings >> to tag >> ToTestTag: sourceFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> ToTestTag: sourceFileContents 1`] = `
 "settings:
     __BodyA1__: ValueA1
     __BodyA2__: ValueA2
@@ -2397,7 +2397,7 @@ body:
 "
 `;
 
-exports[`replaces settings >> to tag >> ToTestTag: stdout 1`] = `
+exports[`replaces settings >> replace to tag >> ToTestTag: stdout 1`] = `
 "Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9:
 Verbose:         template: (__BodyA1__)-(__BodyA2__)
 Verbose:         templatePattern: (*)-(*)
@@ -2447,52 +2447,52 @@ PowerShell, PS
 "
 `;
 
-exports[`typrm_test >> locale >> Windows: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> locale >> Windows: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 "
 `;
 
-exports[`typrm_test >> locale >> Windows2: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> locale >> Windows2: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 "
 `;
 
-exports[`typrm_test >> locale >> mac: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 "
 `;
 
-exports[`typrm_test >> search_mode >> Windows: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode >> Windows: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 keyword: exit()
 "
 `;
 
-exports[`typrm_test >> search_mode >> Windows2: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode >> Windows2: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 keyword: exit()
 "
 `;
 
-exports[`typrm_test >> search_mode >> mac: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode >> mac: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 keyword: "
 `;
 
-exports[`typrm_test >> search_mode_find >> Windows2: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> Windows2: stdout 1`] = `
 "keyword: 見つかりません。全文検索するときは Enter キーを押してください。
 keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
 keyword: exit()
 "
 `;
 
-exports[`typrm_test >> search_mode_find >> mac: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> mac: stdout 1`] = `
 "keyword: Not found. To do full text search, press Enter key.
 keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
 keyword: "
 `;
 
-exports[`typrm_test >> search_mode_ref_verb >> Windows: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
 "keyword: ../README.md:3
     7.Test Echo, 0.Folder
 keyword or number: 7
@@ -2501,7 +2501,7 @@ keyword or number:  "../README.md#parameters"
 keyword or number: "
 `;
 
-exports[`typrm_test >> search_mode_ref_verb >> Windows2: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows2: stdout 1`] = `
 "keyword: Recommend: #ref: ../README.md#parameters
 ../README.md:3
     7.Test Echo, 0.Folder
@@ -2511,7 +2511,7 @@ keyword or number:  \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../READ
 keyword or number: "
 `;
 
-exports[`typrm_test >> search_mode_ref_verb >> mac: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
 "keyword: Recommend: #ref: ../README.md#parameters
 ../README.md:3
     7.Test Echo, 0.Folder
@@ -2523,7 +2523,7 @@ keyword or number: keyword: Not found. To do full text search, press Enter key.
 keyword: "
 `;
 
-exports[`typrm_test >> search_mode_result_has_ref_verb >> Windows2: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows2: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder
@@ -2531,7 +2531,7 @@ keyword or number: exit()
 "
 `;
 
-exports[`typrm_test >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
+exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder

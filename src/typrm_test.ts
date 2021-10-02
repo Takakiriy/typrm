@@ -99,7 +99,7 @@ async function  TestOfCommandLine() {
                 if (testingOS === 'Windows') {
                     testingOS = 'Windows2';
                 }
-                const  answer = lib.getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
+                const  answer = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
 
                 if (returns.stdout !== answer) {
                     printDifferentPaths('_output.txt', '_expected.txt');

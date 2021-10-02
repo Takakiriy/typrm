@@ -150,7 +150,7 @@ function TestOfCommandLine() {
                         if (testingOS === 'Windows') {
                             testingOS = 'Windows2';
                         }
-                        answer = lib.getSnapshot("typrm_test >> " + case_.name + " >> " + testingOS + ": stdout 1");
+                        answer = lib.getSnapshot("typrm_test >> TestOfCommandLine >> " + case_.name + " >> " + testingOS + ": stdout 1");
                         if (returns.stdout !== answer) {
                             printDifferentPaths('_output.txt', '_expected.txt');
                             fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
