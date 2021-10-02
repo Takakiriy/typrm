@@ -222,7 +222,7 @@ function checkRoutine(isModal, inputFilePath) {
     var inputFilePath;
     var e_1, _a, e_2, _b;
     return __awaiter(this, void 0, void 0, function () {
-        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, parser, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, parsed, separator, key, value, previous, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
+        var parentPath, previousTemplateCount, reader, isReadingSetting, setting, settingCount, settingLineNum, settingIndentLength, lineNum, templateCount, fileTemplateTag, errorCount, warningCount, secretLabelCount, parser, lines, keywords, ifTagParser, reader_1, reader_1_1, line1, line, parsed, separator, key, value, previous, condition, evaluatedContidion, templateTag, checkingLine, commonCase, expected, expected, checkingLineWithoutTemplate, checkingLineWithoutTemplate, continue_, checkPassed, _i, temporaryLabels_1, temporaryLabel, match, keyword, label, e_1_1, checkPassed, reader_2, reader_2_1, line1, line, _c, keywords_1, keyword, e_2_1, _d, keywords_2, keyword, loop, key, settingNameOrLineNum, replacingSettingIndex, keyValue, _e, _f, _g, key;
         return __generator(this, function (_h) {
             switch (_h.label) {
                 case 0:
@@ -244,6 +244,7 @@ function checkRoutine(isModal, inputFilePath) {
                     isReadingSetting = false;
                     setting = {};
                     settingCount = 0;
+                    settingLineNum = 0;
                     settingIndentLength = 0;
                     lineNum = 0;
                     templateCount = 0;
@@ -290,6 +291,7 @@ function checkRoutine(isModal, inputFilePath) {
                         isReadingSetting = true;
                         setting = {};
                         settingCount += 1;
+                        settingLineNum = lineNum;
                         settingIndentLength = indentRegularExpression.exec(line)[0].length;
                     }
                     else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isReadingSetting) {
@@ -380,7 +382,7 @@ function checkRoutine(isModal, inputFilePath) {
                             else { // if (templateTag.label === templateIfLabel)
                                 console.log("  " + translate('Expression') + ": " + templateTag.template);
                             }
-                            console.log("  " + translate('SettingIndex') + ": " + settingCount);
+                            console.log("  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum);
                             errorCount += 1;
                         }
                     }
@@ -406,7 +408,7 @@ function checkRoutine(isModal, inputFilePath) {
                             console.log("");
                             console.log(translate('WarningLine') + ": " + lineNum);
                             console.log("  " + translate('Contents') + ": " + line.trim());
-                            console.log("  " + translate('SettingIndex') + ": " + settingCount);
+                            console.log("  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum);
                             warningCount += 1;
                         }
                     }
@@ -419,7 +421,7 @@ function checkRoutine(isModal, inputFilePath) {
                                 console.log("  " + translate('This is a secret value.'));
                                 console.log('  ' + translate(templateObject_1 || (templateObject_1 = __makeTemplateObject(["Replace \"", "\" to \"", "\".'"], ["Replace \"", "\" to \"", "\".'"])), secretLabelEn, secretExamleLabelEn));
                                 console.log('  ' + translate(templateObject_2 || (templateObject_2 = __makeTemplateObject(["Replace \"", "\" to \"", "\".'"], ["Replace \"", "\" to \"", "\".'"])), secretLabel, secretExamleLabel));
-                                console.log("  " + translate('SettingIndex') + ": " + settingCount);
+                                console.log("  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum);
                                 warningCount += 1;
                             }
                             secretLabelCount += 1;

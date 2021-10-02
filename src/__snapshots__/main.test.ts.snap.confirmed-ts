@@ -128,7 +128,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/fi
   Contents: nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
   Expected: sub/dummy.txt
   Template: __Base__/dummy.txt
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_3_file_name_1_changing.yaml:1
 
 Error of not found the target file:
   NotFound: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
@@ -314,13 +314,13 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/fi
   Contents: user: 'user1'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:13
   Contents: user: 'user1'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 Error of not same as file contents:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:15
@@ -333,19 +333,19 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/fi
   Contents: - check: 'yes'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:33
   Contents: - check: 'yes'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:43
   Contents: - check: 'yes'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 Error of not same as file contents:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:48
@@ -468,63 +468,63 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_
   Contents: - echo  \\"value  2\\"
   Expected: - echo  \\"value2\\"
   Template: - echo  \\"__Key2__\\"
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:14
   Contents: - v1
   Expected: - value1
   Template: - key1
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:16
   Contents: - __ \\"value3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:18
   Contents: - __ \\"value3\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:25
   Contents: - value1
   Expected: - value11
   Template: - key1
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:27
   Contents: - １行に２つのケース： value1, value11
   Expected: value11, value11
   Template: key1, key1
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:29
   Contents: - １行に２つのケース： value11, value1
   Expected: value11, value11
   Template: key1, key1
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:31
 Template:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:33
   Contents: - ２行上のケース： \\"value11x\\"
   Expected: \\"value11\\"
   Template: \\"key1\\"
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:34
 Template:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:37
   Contents: - ３行上のケース： \\"value11x\\"
   Expected: \\"value11\\"
   Template: \\"key1\\"
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:38
   Contents: - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
   Expected: \\"value11\\"
   Template: \\"key1\\"
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:40
   Contents: #template-at(1): \\"key1\\"
@@ -538,7 +538,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_
   Contents: - value  #template: __Undefined__
   Expected: __Undefined__
   Template: __Undefined__
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 Warning: 0, Error: 13
 template count = 13
@@ -599,49 +599,49 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_
   Contents: - no  #template: __Setting1__
   Expected: yes
   Template: __Setting1__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:28
   Contents: - no  #template: __Setting2__
   Expected: yes
   Template: __Setting2__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:29
   Contents: - no  #template: __Env1__
   Expected: yes
   Template: __Env1__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:30
   Contents: - no  #template: __Env2__
   Expected: yes
   Template: __Env2__
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:31
   Contents: - no  #template: fruit
   Expected: banana
   Template: fruit
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:32
   Contents: - no  #template: bird
   Expected: swan
   Template: bird
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:41
   Contents: - no  #template: fish
   Expected: yes
   Template: fish
-  SettingIndex: 2
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:35
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50
   Contents: - 💤  #template-if: $settings.fruit == banana
   Expected: 🌟
   Expression: $settings.fruit == banana
-  SettingIndex: 3
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:44
 
 Error of not expected condition:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:58
@@ -774,7 +774,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error
   Contents: value2  #template: var
   Expected: value1
   Template: var
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2
 
 Warning: 0, Error: 1
 template count = 1
@@ -783,7 +783,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error
   Contents: value2  #template: var
   Expected: value1
   Template: var
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:2
 
 Warning: 0, Error: 1
 template count = 1
@@ -868,7 +868,7 @@ WarningLine: 4
   This is a secret value.
   Replace \\"#secret\\" to \\"#secret:example\\".'
   Replace \\"#★秘密\\" to \\"#★秘密:仮\\".'
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:1
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 2
   Not referenced: key1
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 3
@@ -897,13 +897,13 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if
   Contents: 🌟 case product:  #template-if: $settings.__Stage__ == product
   Expected: 💤
   Expression: $settings.__Stage__ == product
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:1
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:7
   Contents: 💤 case product:  #template-if: $settings.__Stage__ == develop
   Expected: 🌟
   Expression: $settings.__Stage__ == develop
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:1
 
 Warning: 0, Error: 2
 template count = 4
@@ -972,14 +972,14 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbo
   Contents: bad  #template: var1
   Expected: value1
   Template: var1
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10
   Contents: bad2  #template: var2
   Expected: value2
   Template: var2
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
@@ -989,7 +989,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbo
   Contents: bad2  #template: var2
   Expected: value2
   Template: var2
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
@@ -999,7 +999,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbo
   Contents: bad2  #template: var2
   Expected: value2
   Template: var2
-  SettingIndex: 1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
 

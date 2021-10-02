@@ -149,6 +149,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         var  isReadingSetting = false;
         var  setting: Settings = {};
         var  settingCount = 0;
+        var  settingLineNum = 0;
         var  settingIndentLength = 0;
         var  lineNum = 0;
         var  templateCount = 0;
@@ -192,6 +193,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
                 setting = {};
                 settingCount += 1;
+                settingLineNum = lineNum;
                 settingIndentLength = indentRegularExpression.exec(line)![0].length;
             } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                 isReadingSetting = false;
@@ -283,7 +285,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     } else { // if (templateTag.label === templateIfLabel)
                         console.log(`  ${translate('Expression')}: ${templateTag.template}`);
                     }
-                    console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
+                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                     errorCount += 1;
                 }
             }
@@ -311,7 +313,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     console.log("");
                     console.log(`${translate('WarningLine')}: ${lineNum}`);
                     console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                    console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
+                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                     warningCount += 1;
                 }
             }
@@ -325,7 +327,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                         console.log(`  ${translate('This is a secret value.')}`);
                         console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
                         console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
-                        console.log(`  ${translate('SettingIndex')}: ${settingCount}`);
+                        console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                         warningCount += 1;
                     }
                     secretLabelCount += 1;
