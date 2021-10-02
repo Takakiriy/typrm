@@ -570,6 +570,9 @@ describe("replaces settings >>", function () {
             ['1_OK'],
             ['2_FileParameter'],
             ['3_SimpleOneLoop'],
+            ['4_IfBlock_OK'],
+            ['4E_IfBlock_Error'],
+            ['5_Conflict_Error'],
         ])("%s", function (caseName) { return __awaiter(void 0, void 0, void 0, function () {
             var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents;
             return __generator(this, function (_a) {
@@ -594,6 +597,10 @@ describe("replaces settings >>", function () {
                     case 1:
                         _a.sent();
                         replacedFileContents = fs.readFileSync(changingFilePath).toString();
+                        if (!caseName.includes('_Error')) return [3 /*break*/, 2];
+                        expect(main.stdout).toMatchSnapshot('stdout');
+                        return [3 /*break*/, 4];
+                    case 2:
                         expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
                         // Test Main >> revert
                         if (caseName.includes('FileParameter')) {
@@ -605,10 +612,12 @@ describe("replaces settings >>", function () {
                         return [4 /*yield*/, callMain(parameters, {
                                 folder: changingFolderPath, test: "", locale: "en-US"
                             })];
-                    case 2:
+                    case 3:
                         _a.sent();
                         revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+                        _a.label = 4;
+                    case 4:
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         return [2 /*return*/];
                 }

@@ -87,7 +87,7 @@ export async function  main() {
                     var  keyValues = programArguments[3];
                 }
 
-                await  replaceSettings(inputFilePath, replacingLineNum, keyValues, false);
+                await  replaceSettings(inputFilePath, replacingLineNum, keyValues, {}, false);
             }
         }
         else if (programArguments[0] === 'revert') {
@@ -129,6 +129,7 @@ export async function  main() {
     if (false) {
         var d = pp('');
         d=d;
+        // If exception was raised, this code does not execute. Set a break point at the catch block of calling main.main
     }
 }
 
@@ -215,7 +216,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                             console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
                         }
 
-                        setting[key] = {value, isReferenced: false, lineNum};
+                        setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
                     }
                 }
             }
@@ -448,7 +449,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                             break;
                         }
                         errorCount += await replaceSettingsSub(
-                            inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true, false, false);
+                            inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), {}, true, false, false);
                     }
                 }
             }
@@ -465,7 +466,8 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 }
 
 // replaceSettings
-async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: string, keyValueLines: string, cutReplaceToTagEnabled: boolean) {
+async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: string,
+        keyValueLines: string, toTagLines: {[key: string]: number[]}, cutReplaceToTagEnabled: boolean) {
     const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
     var  errorCount = 0;
     if (inputFileFullPath === '') {
@@ -479,7 +481,7 @@ async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: str
         } else {
 
             errorCount += await replaceSettingsSub(
-                inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true, false, cutReplaceToTagEnabled);
+                inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), toTagLines, true, false, cutReplaceToTagEnabled);
         }
     }
     console.log('');
@@ -503,7 +505,7 @@ async function  revertSettings(inputFilePath: string, settingNameOrLineNum: stri
             for (const revertSetting of revertSettings) {
 
                 errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-                    parseKeyValueLines(revertSetting), false, true, false);
+                    parseKeyValueLines(revertSetting), {}, false, true, false);
             }
         }
     }
@@ -554,7 +556,7 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 
 // replaceSettingsSub
 async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex: number,
-        keyValues: {[key: string]: string},
+        keyValues: {[key: string]: string},  toTagLines: {[key: string]: number[]},
         addOriginalTag: boolean, cutOriginalTag: boolean, cutReplaceToTagEnabled: boolean
 ): Promise<number>/*errorCount*/ {
     var    errorCount = 0;
@@ -679,7 +681,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
 
                         if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
 
-                            oldSetting[key] = {value: oldValue, isReferenced: false, lineNum};
+                            oldSetting[key] = {value: oldValue, isReferenced: false, lineNum: [lineNum]};
                         }
                         if (ifTagParser.thisIsOutOfFalseBlock) {
                             const  replacingKeys = Object.keys(replacingKeyValues);
@@ -691,7 +693,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
 
                                 writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
                                 output = true;
-                                setting[key] = {value: replacedValue, isReferenced: false, lineNum};
+                                setting[key] = {value: replacedValue, isReferenced: false, lineNum: [lineNum]};
                                 if (parser.verbose  &&  oldValue !== replacedValue) {
                                     console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
                                     console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
@@ -699,7 +701,13 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             }
                             else {
                                 if (oldValue !== '') {
-                                    setting[key] = {value: oldValue, isReferenced: false, lineNum};
+                                    setting[key] = {value: oldValue, isReferenced: false, lineNum: [lineNum]};
+                                }
+                            }
+                        } else {
+                            if (loopCount === 1  &&  key in toTagLines) {
+                                if (toTagLines[key].includes(lineNum)) {
+                                    console.log(`\nError: ${getTestablePath(inputFilePath)}:${lineNum}: "#to:" tag cannot write in false condition block. Write "#to:" tags to be true condition.`);
                                 }
                             }
                         }
@@ -1282,7 +1290,7 @@ class  TemplateTag {
         for (const key of Object.keys(keyValues)) {
             returnKeyValues[key] =  {
                 value: keyValues[key],
-                lineNum,
+                lineNum: [lineNum],
             } as Setting;
         }
 
@@ -1634,9 +1642,13 @@ async function  replace(inputFilePath: string) {
         const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
         for (const replaceKeyValues of replaceKeyValuesSet) {
             if ( ! replaceKeyValues.testMode) {
+                const  toTagLines: {[key: string]: number[]} = {};
+                for (const [key, value] of Object.entries( replaceKeyValues.keyValues )) {
+                    toTagLines[key] = value.lineNum.slice(); // copy
+                }
 
                 await  replaceSettings(inputFileFullPath,
-                    replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, true);
+                    replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, toTagLines, true);
             }
         }
     }
@@ -1773,7 +1785,7 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
 
                     key = keyOrNot;
                     const  value = getValue(line, separator);
-                    setting[key] = {value, isReferenced: false, lineNum};
+                    setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
                 }
             }
         }
@@ -1806,10 +1818,10 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
                     console.log(`Verbose:         ${key}: ${toValue}`);
                 }
 
-                replaceKeyValues.keyValues[key] = {
-                    value: toValue,
-                    lineNum,
-                } as Setting;
+                replaceKeyValues.pushKeyValue(key, {
+                        value: toValue,
+                        lineNum: [lineNum],
+                    } as Setting);
             } else {
 
                 // #to: tag after the #template:
@@ -1824,18 +1836,20 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
                             console.log(`Verbose:         ${key_}: ${newValue.value}`);
                         }
                     }
+                    for (const [key_, newValue] of Object.entries(newKeyValues)) {
 
-                    replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+                        replaceKeyValues.pushKeyValue(key_, newValue);
+                    }
                     previousTemplateTag = null;
                 }
             }
         }
     }
     if (errorCount >= 1) {
-        throw  new Error(`error count: ${errorCount}`);
+        replaceKeyValuesSet = [];
+    } else {
+        replaceKeyValuesSet = replaceKeyValuesSet.filter((replaceKeyValues)=>(Object.keys(replaceKeyValues.keyValues).length >= 1));
     }
-    replaceKeyValuesSet = replaceKeyValuesSet.filter((replaceKeyValues)=>(Object.keys(replaceKeyValues.keyValues).length >= 1));
-
     return  replaceKeyValuesSet;
 }
 
@@ -1852,8 +1866,8 @@ function  checkNoConfilict(
             console.log('');
             console.log('Error of conflict #to: tag:');
             console.log(`    key: ${key}`);
-            console.log(`    valueA: ${keyValueA[key].value} in ${filePath}:${keyValueA[key].lineNum}`);
-            console.log(`    valueB: ${keyValueB[key].value} in ${filePath}:${keyValueB[key].lineNum}`);
+            console.log(`    valueA: ${keyValueA[key].value} in ${getTestablePath(filePath)}:${keyValueA[key].lineNum}`);
+            console.log(`    valueB: ${keyValueB[key].value} in ${getTestablePath(filePath)}:${keyValueB[key].lineNum}`);
             errorCount += 1;
         }
     }
@@ -3074,7 +3088,7 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
         } else {
             var  value = setting[key].value;
         }
-        replacedSetting[key] = { value, lineNum: 0 /*dummy*/,  isReferenced: true /*dummy*/ };
+        replacedSetting[key] = { value, lineNum: [] /*dummy*/,  isReferenced: true /*dummy*/ };
     }
 
     return  getExpectedLine(replacedSetting, template);
@@ -3234,7 +3248,7 @@ type Settings = {[name: string]: Setting}
 // Setting
 interface Setting {
     value: string;
-    lineNum: number;
+    lineNum: number[];
     isReferenced: boolean;
 }
 
@@ -3251,6 +3265,14 @@ class ReplaceKeyValues {
             lines += `${key}: ${setting.value}\n`;
         }
         return  lines;
+    }
+
+    pushKeyValue(key: string, keyValue: Setting) {
+        if ( ! (key in this.keyValues)) {
+            this.keyValues[key] = keyValue;
+        } else {
+            this.keyValues[key].lineNum.push(keyValue.lineNum[0]);
+        }
     }
 }
 

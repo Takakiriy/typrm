@@ -2382,6 +2382,196 @@ exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: sourceFileConte
 "
 `;
 
+exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: replacedFileContents 1`] = `
+"settings:
+    __Switch0__: B  #original: A
+    case A:  #if: $settings.__Switch0__ == A
+        __Set0__: AA
+    case B:  #if: $settings.__Switch0__ == B
+        __Set0__: BB
+body:
+    B   #template: __Switch0__
+    BB  #template: __Set0__
+
+settings:
+    __Switch1__: A
+    case A:  #if: $settings.__Switch1__ == A
+        __Set1__: aa  #original: AA
+    case B:  #if: $settings.__Switch1__ == B
+        __Set1__: BB
+body:
+    A   #template: __Switch1__
+    aa  #template: __Set1__
+
+settings:
+    __Switch2__: B  #original: A
+    case A:  #if: $settings.__Switch2__ == A
+        __Set2__: AA
+    case B:  #if: $settings.__Switch2__ == B
+        __Set2__: bb  #original: BB
+body:
+    B   #template: __Switch2__
+    bb  #template: __Set2__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: revertedFileContents 1`] = `
+"settings:
+    __Switch0__: A
+    case A:  #if: $settings.__Switch0__ == A
+        __Set0__: AA
+    case B:  #if: $settings.__Switch0__ == B
+        __Set0__: BB
+body:
+    A   #template: __Switch0__
+    AA  #template: __Set0__
+
+settings:
+    __Switch1__: A
+    case A:  #if: $settings.__Switch1__ == A
+        __Set1__: AA
+    case B:  #if: $settings.__Switch1__ == B
+        __Set1__: BB
+body:
+    A   #template: __Switch1__
+    AA  #template: __Set1__
+
+settings:
+    __Switch2__: A
+    case A:  #if: $settings.__Switch2__ == A
+        __Set2__: AA
+    case B:  #if: $settings.__Switch2__ == B
+        __Set2__: BB
+body:
+    A   #template: __Switch2__
+    AA  #template: __Set2__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: sourceFileContents 1`] = `
+"settings:
+    __Switch0__: A  #to: B
+    case A:  #if: $settings.__Switch0__ == A
+        __Set0__: AA
+    case B:  #if: $settings.__Switch0__ == B
+        __Set0__: BB
+body:
+    A   #template: __Switch0__
+    AA  #template: __Set0__
+
+settings:
+    __Switch1__: A
+    case A:  #if: $settings.__Switch1__ == A
+        __Set1__: AA  #to: aa
+    case B:  #if: $settings.__Switch1__ == B
+        __Set1__: BB
+body:
+    A   #template: __Switch1__
+    AA  #template: __Set1__
+
+settings:
+    __Switch2__: A  #to: B
+    case A:  #if: $settings.__Switch2__ == A
+        __Set2__: AA
+    case B:  #if: $settings.__Switch2__ == B
+        __Set2__: BB  #to: bb
+body:
+    A   #template: __Switch2__
+    AA  #template: __Set2__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: sourceFileContents 1`] = `
+"settings:
+    __Switch1__: A
+    case A:  #if: $settings.__Switch1__ == A
+        __Set1__: AA
+    case B:  #if: $settings.__Switch1__ == B
+        __Set1__: BB  #to: bb
+body:
+    A   #template: __Switch1__
+    AA  #template: __Set1__
+
+settings:
+    __Switch2__: A  #to: B
+    case A:  #if: $settings.__Switch2__ == A
+        __Set2__: AA  #to: aa
+    case B:  #if: $settings.__Switch2__ == B
+        __Set2__: BB
+body:
+    A   #template: __Switch2__
+    AA  #template: __Set2__
+
+settings:
+    __Switch1__: A
+    case A:  #if: $settings.__Switch1__ == A
+        __Set1__: AA  #to: aa
+    case B:  #if: $settings.__Switch1__ == B
+        __Set1__: BB  #to: aa
+body:
+    A   #template: __Switch1__
+    AA  #template: __Set1__
+
+settings:
+    __Switch1__: A  #to: B
+    case A:  #if: $settings.__Switch1__ == A
+        __Set1__: AA  #to: bb
+    case B:  #if: $settings.__Switch1__ == B
+        __Set1__: BB  #to: bb
+body:
+    A   #template: __Switch1__
+    AA  #template: __Set1__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: stdout 1`] = `
+"
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:6: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Warning: 0, Error: 0
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Warning: 0, Error: 0
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Warning: 0, Error: 0
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 5_Conflict_Error: sourceFileContents 1`] = `
+"settings:
+    __Set1__: A
+body:
+    A  #template: __Set1__  #to: B
+    A  #template: __Set1__  #to: b
+
+settings:
+    __Set1__: A  #to: B
+body:
+    A  #template: __Set1__  #to: b
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 5_Conflict_Error: stdout 1`] = `
+"
+Error of conflict #to: tag:
+    key: __Set1__
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:4
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:5
+
+Error of conflict #to: tag:
+    key: __Set1__
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:8
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10
+"
+`;
+
 exports[`replaces settings >> replace to tag >> ToTestTag: sourceFileContents 1`] = `
 "settings:
     __BodyA1__: ValueA1

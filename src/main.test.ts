@@ -480,6 +480,9 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ['1_OK'],
             ['2_FileParameter'],
             ['3_SimpleOneLoop'],
+            ['4_IfBlock_OK'],
+            ['4E_IfBlock_Error'],
+            ['5_Conflict_Error'],
         ])("%s", async (caseName) => {
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";
@@ -499,20 +502,25 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             });
             const  replacedFileContents = fs.readFileSync(changingFilePath).toString();
 
-            expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
-
-            // Test Main >> revert
-            if (caseName.includes('FileParameter')) {
-                var  parameters = ["revert", changingFilePath];
+            if (caseName.includes('_Error')) {
+                expect(main.stdout).toMatchSnapshot('stdout');
             } else {
-                var  parameters = ["revert"];
-            }
-            await callMain(parameters, {
-                folder: changingFolderPath, test: "", locale: "en-US"
-            });
-            const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
-            expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+                expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
+
+                // Test Main >> revert
+                if (caseName.includes('FileParameter')) {
+                    var  parameters = ["revert", changingFilePath];
+                } else {
+                    var  parameters = ["revert"];
+                }
+                await callMain(parameters, {
+                    folder: changingFolderPath, test: "", locale: "en-US"
+                });
+                const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
+
+                expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+            }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
     });

@@ -158,7 +158,7 @@ function main() {
                         replacingLineNum = exports.programArguments[2];
                         keyValues = exports.programArguments[3];
                     }
-                    return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues, false)];
+                    return [4 /*yield*/, replaceSettings(inputFilePath, replacingLineNum, keyValues, {}, false)];
                 case 18:
                     _a.sent();
                     _a.label = 19;
@@ -209,6 +209,7 @@ function main() {
                     if (false) {
                         d = lib_1.pp('');
                         d = d;
+                        // If exception was raised, this code does not execute. Set a break point at the catch block of calling main.main
                     }
                     return [2 /*return*/];
             }
@@ -313,7 +314,7 @@ function checkRoutine(isModal, inputFilePath) {
                                 if (parser.verbose) {
                                     console.log("Verbose: " + getTestablePath(inputFilePath) + ":" + lineNum + ":     " + key + ": " + value);
                                 }
-                                setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
+                                setting[key] = { value: value, isReferenced: false, lineNum: [lineNum] };
                             }
                         }
                     }
@@ -588,7 +589,7 @@ function checkRoutine(isModal, inputFilePath) {
                         return [3 /*break*/, 41];
                     }
                     _e = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), true, false, false)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), {}, true, false, false)];
                 case 39:
                     errorCount = _e + _h.sent();
                     _h.label = 40;
@@ -612,7 +613,7 @@ function checkRoutine(isModal, inputFilePath) {
     });
 }
 // replaceSettings
-function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines, cutReplaceToTagEnabled) {
+function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines, toTagLines, cutReplaceToTagEnabled) {
     return __awaiter(this, void 0, void 0, function () {
         var inputFileFullPath, errorCount, replacingSettingIndex, _a;
         return __generator(this, function (_b) {
@@ -634,7 +635,7 @@ function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines, cut
                     return [3 /*break*/, 6];
                 case 4:
                     _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), true, false, cutReplaceToTagEnabled)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), toTagLines, true, false, cutReplaceToTagEnabled)];
                 case 5:
                     errorCount = _a + _b.sent();
                     _b.label = 6;
@@ -676,7 +677,7 @@ function revertSettings(inputFilePath, settingNameOrLineNum) {
                     if (!(_i < revertSettings_1.length)) return [3 /*break*/, 9];
                     revertSetting = revertSettings_1[_i];
                     _a = errorCount;
-                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(revertSetting), false, true, false)];
+                    return [4 /*yield*/, replaceSettingsSub(inputFileFullPath, replacingSettingIndex, parseKeyValueLines(revertSetting), {}, false, true, false)];
                 case 7:
                     errorCount = _a + _b.sent();
                     _b.label = 8;
@@ -745,7 +746,7 @@ function getInputFileFullPath(inputFilePath) {
     });
 }
 // replaceSettingsSub
-function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
+function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toTagLines, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
         var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, conflictErrors, replacedKeys, parser, _loop_1, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, output, replacingLine, expected, replaced, expected, replaced, replacedLine, lengthSortedTemplates, replacedLine, maskedLine, i, errorMessage;
@@ -881,7 +882,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                     }
                                                 }
                                                 if (oldValue !== '' && oldIfTagParser.thisIsOutOfFalseBlock) {
-                                                    oldSetting[key] = { value: oldValue, isReferenced: false, lineNum: lineNum };
+                                                    oldSetting[key] = { value: oldValue, isReferenced: false, lineNum: [lineNum] };
                                                 }
                                                 if (ifTagParser.thisIsOutOfFalseBlock) {
                                                     replacingKeys = Object.keys(replacingKeyValues);
@@ -890,7 +891,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                         _c = getReplacedLineInSettings(line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled), original = _c.original, spaceAndComment = _c.spaceAndComment;
                                                         writer.write(line.substr(0, separator + 1) + ' ' + replacedValue + original + spaceAndComment + "\n");
                                                         output = true;
-                                                        setting[key] = { value: replacedValue, isReferenced: false, lineNum: lineNum };
+                                                        setting[key] = { value: replacedValue, isReferenced: false, lineNum: [lineNum] };
                                                         if (parser.verbose && oldValue !== replacedValue) {
                                                             console.log("Verbose: replaced \"" + key + "\" value from \"" + oldValue + "\" to \"" + replacedValue + "\"");
                                                             console.log("Verbose:     at: " + inputFilePath + ":" + lineNum + ":");
@@ -898,7 +899,14 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, add
                                                     }
                                                     else {
                                                         if (oldValue !== '') {
-                                                            setting[key] = { value: oldValue, isReferenced: false, lineNum: lineNum };
+                                                            setting[key] = { value: oldValue, isReferenced: false, lineNum: [lineNum] };
+                                                        }
+                                                    }
+                                                }
+                                                else {
+                                                    if (loopCount === 1 && key in toTagLines) {
+                                                        if (toTagLines[key].includes(lineNum)) {
+                                                            console.log("\nError: " + getTestablePath(inputFilePath) + ":" + lineNum + ": \"#to:\" tag cannot write in false condition block. Write \"#to:\" tags to be true condition.");
                                                         }
                                                     }
                                                 }
@@ -1510,7 +1518,7 @@ var TemplateTag = /** @class */ (function () {
                             key = _b[_a];
                             returnKeyValues[key] = {
                                 value: keyValues[key],
-                                lineNum: lineNum,
+                                lineNum: [lineNum],
                             };
                         }
                         return [2 /*return*/, returnKeyValues];
@@ -1914,31 +1922,36 @@ var WordPositions = /** @class */ (function () {
 // replace
 function replace(inputFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var _i, _a, inputFileFullPath, replaceKeyValuesSet, _b, replaceKeyValuesSet_1, replaceKeyValues;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        var _i, _a, inputFileFullPath, replaceKeyValuesSet, _b, replaceKeyValuesSet_1, replaceKeyValues, toTagLines, _c, _d, _e, key, value;
+        return __generator(this, function (_f) {
+            switch (_f.label) {
                 case 0:
                     _i = 0;
                     return [4 /*yield*/, listUpFilePaths(inputFilePath)];
                 case 1:
-                    _a = _c.sent();
-                    _c.label = 2;
+                    _a = _f.sent();
+                    _f.label = 2;
                 case 2:
                     if (!(_i < _a.length)) return [3 /*break*/, 8];
                     inputFileFullPath = _a[_i];
                     return [4 /*yield*/, makeReplaceSettingsFromToTags(inputFileFullPath)];
                 case 3:
-                    replaceKeyValuesSet = _c.sent();
+                    replaceKeyValuesSet = _f.sent();
                     _b = 0, replaceKeyValuesSet_1 = replaceKeyValuesSet;
-                    _c.label = 4;
+                    _f.label = 4;
                 case 4:
                     if (!(_b < replaceKeyValuesSet_1.length)) return [3 /*break*/, 7];
                     replaceKeyValues = replaceKeyValuesSet_1[_b];
                     if (!!replaceKeyValues.testMode) return [3 /*break*/, 6];
-                    return [4 /*yield*/, replaceSettings(inputFileFullPath, replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, true)];
+                    toTagLines = {};
+                    for (_c = 0, _d = Object.entries(replaceKeyValues.keyValues); _c < _d.length; _c++) {
+                        _e = _d[_c], key = _e[0], value = _e[1];
+                        toTagLines[key] = value.lineNum.slice(); // copy
+                    }
+                    return [4 /*yield*/, replaceSettings(inputFileFullPath, replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, toTagLines, true)];
                 case 5:
-                    _c.sent();
-                    _c.label = 6;
+                    _f.sent();
+                    _f.label = 6;
                 case 6:
                     _b++;
                     return [3 /*break*/, 4];
@@ -2123,9 +2136,9 @@ function listUpFilePaths(checkingFilePath) {
 function makeReplaceSettingsFromToTags(inputFilePath) {
     var e_7, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var reader, lineNum, isReadingSetting, setting, settingCount, settingIndentLength, key, previousTemplateTag, replaceKeyValues, errorCount, replaceKeyValuesSet, parser, reader_6, reader_6_1, line1, line, separator, keyOrNot, value, toLabelIndex, toValue, toValue, toValue, templateTag, hasTestTag, newKeyValues, _i, _b, _c, key_, newValue, e_7_1;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
+        var reader, lineNum, isReadingSetting, setting, settingCount, settingIndentLength, key, previousTemplateTag, replaceKeyValues, errorCount, replaceKeyValuesSet, parser, reader_6, reader_6_1, line1, line, separator, keyOrNot, value, toLabelIndex, toValue, toValue, toValue, templateTag, hasTestTag, newKeyValues, _i, _b, _c, key_, newValue, _d, _e, _f, key_, newValue, e_7_1;
+        return __generator(this, function (_g) {
+            switch (_g.label) {
                 case 0:
                     reader = readline.createInterface({
                         input: fs.createReadStream(inputFilePath),
@@ -2148,14 +2161,14 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     if (parser.verbose) {
                         console.log("Verbose: makeReplaceSettingsFromToTags:");
                     }
-                    _d.label = 1;
+                    _g.label = 1;
                 case 1:
-                    _d.trys.push([1, 8, 9, 14]);
+                    _g.trys.push([1, 8, 9, 14]);
                     reader_6 = __asyncValues(reader);
-                    _d.label = 2;
+                    _g.label = 2;
                 case 2: return [4 /*yield*/, reader_6.next()];
                 case 3:
-                    if (!(reader_6_1 = _d.sent(), !reader_6_1.done)) return [3 /*break*/, 7];
+                    if (!(reader_6_1 = _g.sent(), !reader_6_1.done)) return [3 /*break*/, 7];
                     line1 = reader_6_1.value;
                     line = line1;
                     lineNum += 1;
@@ -2181,7 +2194,7 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                             if (keyOrNot[0] !== '#') {
                                 key = keyOrNot;
                                 value = getValue(line, separator);
-                                setting[key] = { value: value, isReferenced: false, lineNum: lineNum };
+                                setting[key] = { value: value, isReferenced: false, lineNum: [lineNum] };
                             }
                         }
                     }
@@ -2212,10 +2225,10 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                         console.log("Verbose:     " + getTestablePath(inputFilePath) + ":" + lineNum + ":");
                         console.log("Verbose:         " + key + ": " + toValue);
                     }
-                    replaceKeyValues.keyValues[key] = {
+                    replaceKeyValues.pushKeyValue(key, {
                         value: toValue,
-                        lineNum: lineNum,
-                    };
+                        lineNum: [lineNum],
+                    });
                     return [3 /*break*/, 6];
                 case 4:
                     if (!previousTemplateTag) return [3 /*break*/, 6];
@@ -2224,7 +2237,7 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     }
                     return [4 /*yield*/, previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), lineNum, parser, hasTestTag)];
                 case 5:
-                    newKeyValues = _d.sent();
+                    newKeyValues = _g.sent();
                     errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
                     if (parser.verbose || hasTestTag) {
                         for (_i = 0, _b = Object.entries(newKeyValues); _i < _b.length; _i++) {
@@ -2232,22 +2245,25 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                             console.log("Verbose:         " + key_ + ": " + newValue.value);
                         }
                     }
-                    replaceKeyValues.keyValues = Object.assign(replaceKeyValues.keyValues, newKeyValues);
+                    for (_d = 0, _e = Object.entries(newKeyValues); _d < _e.length; _d++) {
+                        _f = _e[_d], key_ = _f[0], newValue = _f[1];
+                        replaceKeyValues.pushKeyValue(key_, newValue);
+                    }
                     previousTemplateTag = null;
-                    _d.label = 6;
+                    _g.label = 6;
                 case 6: return [3 /*break*/, 2];
                 case 7: return [3 /*break*/, 14];
                 case 8:
-                    e_7_1 = _d.sent();
+                    e_7_1 = _g.sent();
                     e_7 = { error: e_7_1 };
                     return [3 /*break*/, 14];
                 case 9:
-                    _d.trys.push([9, , 12, 13]);
+                    _g.trys.push([9, , 12, 13]);
                     if (!(reader_6_1 && !reader_6_1.done && (_a = reader_6.return))) return [3 /*break*/, 11];
                     return [4 /*yield*/, _a.call(reader_6)];
                 case 10:
-                    _d.sent();
-                    _d.label = 11;
+                    _g.sent();
+                    _g.label = 11;
                 case 11: return [3 /*break*/, 13];
                 case 12:
                     if (e_7) throw e_7.error;
@@ -2255,9 +2271,11 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                 case 13: return [7 /*endfinally*/];
                 case 14:
                     if (errorCount >= 1) {
-                        throw new Error("error count: " + errorCount);
+                        replaceKeyValuesSet = [];
                     }
-                    replaceKeyValuesSet = replaceKeyValuesSet.filter(function (replaceKeyValues) { return (Object.keys(replaceKeyValues.keyValues).length >= 1); });
+                    else {
+                        replaceKeyValuesSet = replaceKeyValuesSet.filter(function (replaceKeyValues) { return (Object.keys(replaceKeyValues.keyValues).length >= 1); });
+                    }
                     return [2 /*return*/, replaceKeyValuesSet];
             }
         });
@@ -2273,8 +2291,8 @@ function checkNoConfilict(keyValueA, keyValueB, filePath) {
             console.log('');
             console.log('Error of conflict #to: tag:');
             console.log("    key: " + key);
-            console.log("    valueA: " + keyValueA[key].value + " in " + filePath + ":" + keyValueA[key].lineNum);
-            console.log("    valueB: " + keyValueB[key].value + " in " + filePath + ":" + keyValueB[key].lineNum);
+            console.log("    valueA: " + keyValueA[key].value + " in " + getTestablePath(filePath) + ":" + keyValueA[key].lineNum);
+            console.log("    valueB: " + keyValueB[key].value + " in " + getTestablePath(filePath) + ":" + keyValueB[key].lineNum);
             errorCount += 1;
         }
     }
@@ -3686,7 +3704,7 @@ function getReplacedLine(setting, template, replacedValues) {
         else {
             var value = setting[key].value;
         }
-        replacedSetting[key] = { value: value, lineNum: 0 /*dummy*/, isReferenced: true /*dummy*/ };
+        replacedSetting[key] = { value: value, lineNum: [] /*dummy*/, isReferenced: true /*dummy*/ };
     }
     return getExpectedLine(replacedSetting, template);
 }
@@ -3854,6 +3872,14 @@ var ReplaceKeyValues = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    ReplaceKeyValues.prototype.pushKeyValue = function (key, keyValue) {
+        if (!(key in this.keyValues)) {
+            this.keyValues[key] = keyValue;
+        }
+        else {
+            this.keyValues[key].lineNum.push(keyValue.lineNum[0]);
+        }
+    };
     return ReplaceKeyValues;
 }());
 // Thesaurus
