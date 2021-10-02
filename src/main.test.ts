@@ -479,6 +479,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         test.each([
             ['1_OK'],
             ['2_FileParameter'],
+            ['3_SimpleOneLoop'],
         ])("%s", async (caseName) => {
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";

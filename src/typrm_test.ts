@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as path from 'path';
+import * as lib from "./lib";
 const currentFolder = process.cwd();
 const snapshots = require(currentFolder +"/__snapshots__/main.test.ts.snap");
 
@@ -98,7 +99,7 @@ async function  TestOfCommandLine() {
                 if (testingOS === 'Windows') {
                     testingOS = 'Windows2';
                 }
-                const  answer = getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
+                const  answer = lib.getSnapshot(`typrm_test >> ${case_.name} >> ${testingOS}: stdout 1`);
 
                 if (returns.stdout !== answer) {
                     printDifferentPaths('_output.txt', '_expected.txt');
@@ -151,15 +152,6 @@ async function  callChildProccess(commandLine: string,  option?: ProcessOption):
             throw Error(`Error in the command line ${commandLine}`);
         }
     });
-}
-
-// getSnapshot
-function  getSnapshot(label: string) {
-    const  snapshot = snapshots[label];
-    if ( ! snapshot) {
-        throw  new Error(`Not found '${label}' in __snapshots__/____.snap`);
-    }
-    return  snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
 }
 
 // deleteFile

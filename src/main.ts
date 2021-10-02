@@ -726,9 +726,9 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             const  after = replaced;
                             if (templateTag.lineNumOffset === 0) {
                                 var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
-                                // if (cutReplaceToTagEnabled) {
-                                //     replacedLine = cutReplaceToTag(replacedLine);
-                                // }
+                                if (cutReplaceToTagEnabled) {
+                                    replacedLine = cutReplaceToTag(replacedLine);
+                                }
 
                                 writer.write(replacedLine +"\n");
                                 output = true;

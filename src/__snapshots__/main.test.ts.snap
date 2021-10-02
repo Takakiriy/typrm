@@ -2225,8 +2225,10 @@ new body:
     -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
     -\\"Valu\\"-'Valu'-
         #template: \\"__BodyL__\\"-'__BodyL__'
-    settings:
+    settings: #// in second setting
         __SubA__: SetSubAA  #original: SetSubA
+    body:
+        SetSubAA   #template: __SubA__
 "
 `;
 
@@ -2274,8 +2276,10 @@ new body:
     -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
     -\\"ValueLength\\"-'ValueLength'-
         #template: \\"__BodyL__\\"-'__BodyL__'
-    settings:
+    settings: #// in second setting
         __SubA__: SetSubA
+    body:
+        SetSubA   #template: __SubA__
 "
 `;
 
@@ -2329,8 +2333,10 @@ new body:
     -\\"ValueLength\\"-'ValueLength'-
         #template: \\"__BodyL__\\"-'__BodyL__'
         #to: \\"Valu\\"-'Valu'
-    settings:
+    settings: #// in second setting
         __SubA__: SetSubA  #to: SetSubAA
+    body:
+        SetSubA   #template: __SubA__
 "
 `;
 
@@ -2349,6 +2355,30 @@ exports[`replaces settings >> to tag >> 2_FileParameter: revertedFileContents 1`
 exports[`replaces settings >> to tag >> 2_FileParameter: sourceFileContents 1`] = `
 "settings:
     __SettingA__: SetA      #to: SetAA
+"
+`;
+
+exports[`replaces settings >> to tag >> 3_SimpleOneLoop: replacedFileContents 1`] = `
+"    settings: #// simple after template. This test must do one loop in replaceSettingsSub()
+        __SimpleA__: ValueAA  #original: ValueA
+    body:
+        ValueAA   #template: __SimpleA__
+"
+`;
+
+exports[`replaces settings >> to tag >> 3_SimpleOneLoop: revertedFileContents 1`] = `
+"    settings: #// simple after template. This test must do one loop in replaceSettingsSub()
+        __SimpleA__: ValueA
+    body:
+        ValueA   #template: __SimpleA__
+"
+`;
+
+exports[`replaces settings >> to tag >> 3_SimpleOneLoop: sourceFileContents 1`] = `
+"    settings: #// simple after template. This test must do one loop in replaceSettingsSub()
+        __SimpleA__: ValueA
+    body:
+        ValueA   #template: __SimpleA__   #to: ValueAA
 "
 `;
 
@@ -2440,12 +2470,20 @@ keyword: exit()
 
 exports[`typrm_test >> search_mode >> Windows2: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-keyword: "
+keyword: exit()
+"
 `;
 
 exports[`typrm_test >> search_mode >> mac: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 keyword: "
+`;
+
+exports[`typrm_test >> search_mode_find >> Windows2: stdout 1`] = `
+"keyword: 見つかりません。全文検索するときは Enter キーを押してください。
+keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
+keyword: exit()
+"
 `;
 
 exports[`typrm_test >> search_mode_find >> mac: stdout 1`] = `
@@ -2467,8 +2505,10 @@ exports[`typrm_test >> search_mode_ref_verb >> Windows2: stdout 1`] = `
 "keyword: Recommend: #ref: ../README.md#parameters
 ../README.md:3
     7.Test Echo, 0.Folder
-keyword or number:  "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 3"
-keyword or number: keyword: keyword: "
+keyword or number: 7
+\\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
+keyword or number:  \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
+keyword or number: "
 `;
 
 exports[`typrm_test >> search_mode_ref_verb >> mac: stdout 1`] = `
@@ -2487,7 +2527,8 @@ exports[`typrm_test >> search_mode_result_has_ref_verb >> Windows2: stdout 1`] =
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder
-keyword or number: "
+keyword or number: exit()
+"
 `;
 
 exports[`typrm_test >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `

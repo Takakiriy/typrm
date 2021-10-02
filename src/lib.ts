@@ -5,7 +5,12 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 try {
-    var snapshots = require("./__snapshots__/main.test.ts.snap");
+    let  base = process.cwd();
+    if ( ! process.cwd().endsWith('/src')) {
+        base += '/src';
+    }
+
+    var snapshots = require(`${base}/__snapshots__/main.test.ts.snap`);
 } catch (e) {
 }
 

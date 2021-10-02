@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var child_process = require("child_process");
 var path = require("path");
+var lib = require("./lib");
 var currentFolder = process.cwd();
 var snapshots = require(currentFolder + "/__snapshots__/main.test.ts.snap");
 var scriptPath = "../build/typrm.js";
@@ -149,7 +150,7 @@ function TestOfCommandLine() {
                         if (testingOS === 'Windows') {
                             testingOS = 'Windows2';
                         }
-                        answer = getSnapshot("typrm_test >> " + case_.name + " >> " + testingOS + ": stdout 1");
+                        answer = lib.getSnapshot("typrm_test >> " + case_.name + " >> " + testingOS + ": stdout 1");
                         if (returns.stdout !== answer) {
                             printDifferentPaths('_output.txt', '_expected.txt');
                             fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
@@ -230,14 +231,6 @@ function callChildProccess(commandLine, option) {
                 }); })];
         });
     });
-}
-// getSnapshot
-function getSnapshot(label) {
-    var snapshot = snapshots[label];
-    if (!snapshot) {
-        throw new Error("Not found '" + label + "' in __snapshots__/____.snap");
-    }
-    return snapshot.substr(2, snapshot.length - 4).replace('\\"', '"');
 }
 // deleteFile
 function deleteFile(path) {

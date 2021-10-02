@@ -55,7 +55,11 @@ var readline = require("readline");
 var stream = require("stream");
 var csvParse = require("csv-parse");
 try {
-    var snapshots = require("./__snapshots__/main.test.ts.snap");
+    var base = process.cwd();
+    if (!process.cwd().endsWith('/src')) {
+        base += '/src';
+    }
+    var snapshots = require(base + "/__snapshots__/main.test.ts.snap");
 }
 catch (e) {
 }

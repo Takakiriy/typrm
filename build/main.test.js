@@ -569,6 +569,7 @@ describe("replaces settings >>", function () {
         test.each([
             ['1_OK'],
             ['2_FileParameter'],
+            ['3_SimpleOneLoop'],
         ])("%s", function (caseName) { return __awaiter(void 0, void 0, void 0, function () {
             var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents;
             return __generator(this, function (_a) {
