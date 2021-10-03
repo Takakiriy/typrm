@@ -437,9 +437,17 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ],[
                 '2_replace_6_if', ' setting name', 'set1', 'en-US',
                 `__Setting1__: replaced`,
+/*
+            ],[
+                '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
+                `__Full__: fo/fi
+                __Folder__: fo
+                __File__: fi`,
+*/
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
+//if (fileNameHead !== '2_replace_10_double_check') {return;}  // || subCase !== '____'
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -473,6 +481,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             expect(revertedFileContents).toBe(sourceFileContents);
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+//expect('test code').toBe('deleted skip code.');
         });
     });
 

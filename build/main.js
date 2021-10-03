@@ -997,8 +997,8 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                                             for (_d = 0, _e = checkedTemplateTags[targetLineNum]; _d < _e.length; _d++) {
                                                                 template = _e[_d];
                                                                 errorMessage += "  " + translate('in ') + ": " + getTestablePath(inputFilePath) + ":" + template.templateLineNum + "\n";
-                                                                errorMessage += "    " + translate('Before Editing') + ": " + template.replaced.trim() + "\n";
-                                                                errorMessage += "    " + translate('After  Editing') + ": " + template.expected.trim() + "\n";
+                                                                errorMessage += "    " + translate('Before Editing') + ": " + template.expected.trim() + "\n";
+                                                                errorMessage += "    " + translate('After  Editing') + ": " + template.replaced.trim() + "\n";
                                                                 errorMessage += "    " + translate('Template') + ": " + template.template.trim() + "\n";
                                                             }
                                                             errorMessage += "  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum;

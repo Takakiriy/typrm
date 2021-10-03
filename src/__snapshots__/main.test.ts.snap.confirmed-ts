@@ -2095,20 +2095,20 @@ ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_
   Error: template values are conflicted.
   Contents: - \\"folder/file\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10
-    Before Editing: \\"fo/fi\\"
-    After  Editing: \\"folder/file\\"
+    Before Editing: \\"folder/file\\"
+    After  Editing: \\"fo/fi\\"
     Template: \\"__Full__\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11
-    Before Editing: folder/fi
-    After  Editing: folder/file
+    Before Editing: folder/file
+    After  Editing: folder/fi
     Template: __Folder__/__File__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12
     Before Editing: folder
     After  Editing: folder
     Template: __Folder__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13
-    Before Editing: fi
-    After  Editing: file
+    Before Editing: file
+    After  Editing: fi
     Template: __File__
   Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
 
@@ -2116,20 +2116,20 @@ ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_
   Error: template values are conflicted.
   Contents: - \\"folder/file\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15
-    Before Editing: fi
-    After  Editing: file
+    Before Editing: file
+    After  Editing: fi
     Template: __File__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16
     Before Editing: folder
     After  Editing: folder
     Template: __Folder__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17
-    Before Editing: folder/fi
-    After  Editing: folder/file
+    Before Editing: folder/file
+    After  Editing: folder/fi
     Template: __Folder__/__File__
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18
-    Before Editing: \\"fo/fi\\"
-    After  Editing: \\"folder/file\\"
+    Before Editing: \\"folder/file\\"
+    After  Editing: \\"fo/fi\\"
     Template: \\"__Full__\\"
   Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
 
