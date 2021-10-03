@@ -503,12 +503,16 @@ async function  revertSettings(inputFilePath: string, settingNameOrLineNum: stri
             console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
             errorCount += 1;
         } else {
-            const  revertSettings = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
-            for (const revertSetting of revertSettings) {
 
-                errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-                    parseKeyValueLines(revertSetting), {}, false, true, false);
-            }
+            const  revertSettings_ = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
+
+            errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
+                parseKeyValueLines(revertSettings_.join("\n")), {}, false, true, false);
+            // for (const revertSetting of revertSettings_) {
+            //
+            //     errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
+            //         parseKeyValueLines(revertSetting), {}, false, true, false);
+            // }
         }
     }
     console.log('');
