@@ -505,14 +505,11 @@ async function  revertSettings(inputFilePath: string, settingNameOrLineNum: stri
         } else {
 
             const  revertSettings_ = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
-
-            errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-                parseKeyValueLines(revertSettings_.join("\n")), {}, false, true, false);
-            // for (const revertSetting of revertSettings_) {
-            //
-            //     errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-            //         parseKeyValueLines(revertSetting), {}, false, true, false);
-            // }
+            for (const revertSetting of revertSettings_) {
+            
+                errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
+                    parseKeyValueLines(revertSetting), {}, false, true, false);
+            }
         }
     }
     console.log('');
@@ -1051,7 +1048,8 @@ async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex:
         crlfDelay: Infinity
     });
     var  isReadingSetting = false;
-    var  revertSettings: string[] = [];
+    var  revertKeyValues: string = '';
+    var  revertKeyValuesWithCondition: {[condition: string]: string} = {};
     var  settingCount = 0;
     var  settingIndentLength = 0;
     var  lineNum = 0;
@@ -1090,18 +1088,25 @@ async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex:
                     const  originalValue = getValue(line, originalLabelSeparator);
                     if (ifTrueScanner.condition === '') {
 
-                        var  revertSetting = `${key}: ${originalValue}`;
+                        revertKeyValues += `${key}: ${originalValue}\n`;
                     } else {
-                        var  revertSetting = ifTrueScanner.condition + '\n' + `${key}: ${originalValue}`;
+                        if ( ! (ifTrueScanner.condition in revertKeyValuesWithCondition)) {
+                            revertKeyValuesWithCondition[ifTrueScanner.condition] = '';
+                        }
+                        revertKeyValuesWithCondition[ifTrueScanner.condition] += `${key}: ${originalValue}\n`;
                     }
                     console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-
-                    revertSettings.push(revertSetting);
                 }
             }
         }
     }
-    return  revertSettings.reverse();
+
+    const  revertSettings: string[] = [];
+    for (const [condition, revertKeyValues_] of Object.entries(revertKeyValuesWithCondition)) {
+        revertSettings.push(`${condition}\n${revertKeyValues_}`);
+    }
+    revertSettings.push(revertKeyValues);
+    return  revertSettings;
 }
 
 // TemplateTag

@@ -652,7 +652,7 @@ function replaceSettings(inputFilePath, settingNameOrLineNum, keyValueLines, toT
 // revertSettings
 function revertSettings(inputFilePath, settingNameOrLineNum) {
     return __awaiter(this, void 0, void 0, function () {
-        var inputFileFullPath, errorCount, replacingSettingIndex, revertSettings_2, _i, revertSettings_1, revertSetting, _a;
+        var inputFileFullPath, errorCount, replacingSettingIndex, revertSettings_, _i, revertSettings_1, revertSetting, _a;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0: return [4 /*yield*/, getInputFileFullPath(inputFilePath)];
@@ -672,8 +672,8 @@ function revertSettings(inputFilePath, settingNameOrLineNum) {
                     return [3 /*break*/, 9];
                 case 4: return [4 /*yield*/, makeRevertSettings(inputFileFullPath, replacingSettingIndex)];
                 case 5:
-                    revertSettings_2 = _b.sent();
-                    _i = 0, revertSettings_1 = revertSettings_2;
+                    revertSettings_ = _b.sent();
+                    _i = 0, revertSettings_1 = revertSettings_;
                     _b.label = 6;
                 case 6:
                     if (!(_i < revertSettings_1.length)) return [3 /*break*/, 9];
@@ -1256,9 +1256,9 @@ function cutReplaceToTag(line) {
 function makeRevertSettings(inputFilePath, replacingSettingIndex) {
     var e_4, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var readStream, reader, isReadingSetting, revertSettings, settingCount, settingIndentLength, lineNum, isReadingOriginal, ifTrueScanner, reader_4, reader_4_1, line1, line, separator, key, originalLabelSeparator, originalValue, revertSetting, revertSetting, e_4_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var readStream, reader, isReadingSetting, revertKeyValues, revertKeyValuesWithCondition, settingCount, settingIndentLength, lineNum, isReadingOriginal, ifTrueScanner, reader_4, reader_4_1, line1, line, separator, key, originalLabelSeparator, originalValue, e_4_1, revertSettings, _i, _b, _c, condition, revertKeyValues_;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0:
                     readStream = fs.createReadStream(inputFilePath);
                     reader = readline.createInterface({
@@ -1266,20 +1266,21 @@ function makeRevertSettings(inputFilePath, replacingSettingIndex) {
                         crlfDelay: Infinity
                     });
                     isReadingSetting = false;
-                    revertSettings = [];
+                    revertKeyValues = '';
+                    revertKeyValuesWithCondition = {};
                     settingCount = 0;
                     settingIndentLength = 0;
                     lineNum = 0;
                     isReadingOriginal = false;
                     ifTrueScanner = new IfTrueConditionScanner();
-                    _b.label = 1;
+                    _d.label = 1;
                 case 1:
-                    _b.trys.push([1, 6, 7, 12]);
+                    _d.trys.push([1, 6, 7, 12]);
                     reader_4 = __asyncValues(reader);
-                    _b.label = 2;
+                    _d.label = 2;
                 case 2: return [4 /*yield*/, reader_4.next()];
                 case 3:
-                    if (!(reader_4_1 = _b.sent(), !reader_4_1.done)) return [3 /*break*/, 5];
+                    if (!(reader_4_1 = _d.sent(), !reader_4_1.done)) return [3 /*break*/, 5];
                     line1 = reader_4_1.value;
                     line = line1;
                     lineNum += 1;
@@ -1310,36 +1311,45 @@ function makeRevertSettings(inputFilePath, replacingSettingIndex) {
                                 originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
                                 originalValue = getValue(line, originalLabelSeparator);
                                 if (ifTrueScanner.condition === '') {
-                                    revertSetting = key + ": " + originalValue;
+                                    revertKeyValues += key + ": " + originalValue + "\n";
                                 }
                                 else {
-                                    revertSetting = ifTrueScanner.condition + '\n' + (key + ": " + originalValue);
+                                    if (!(ifTrueScanner.condition in revertKeyValuesWithCondition)) {
+                                        revertKeyValuesWithCondition[ifTrueScanner.condition] = '';
+                                    }
+                                    revertKeyValuesWithCondition[ifTrueScanner.condition] += key + ": " + originalValue + "\n";
                                 }
                                 console.log(getTestablePath(inputFilePath) + ":" + lineNum + ": " + line);
-                                revertSettings.push(revertSetting);
                             }
                         }
                     }
-                    _b.label = 4;
+                    _d.label = 4;
                 case 4: return [3 /*break*/, 2];
                 case 5: return [3 /*break*/, 12];
                 case 6:
-                    e_4_1 = _b.sent();
+                    e_4_1 = _d.sent();
                     e_4 = { error: e_4_1 };
                     return [3 /*break*/, 12];
                 case 7:
-                    _b.trys.push([7, , 10, 11]);
+                    _d.trys.push([7, , 10, 11]);
                     if (!(reader_4_1 && !reader_4_1.done && (_a = reader_4.return))) return [3 /*break*/, 9];
                     return [4 /*yield*/, _a.call(reader_4)];
                 case 8:
-                    _b.sent();
-                    _b.label = 9;
+                    _d.sent();
+                    _d.label = 9;
                 case 9: return [3 /*break*/, 11];
                 case 10:
                     if (e_4) throw e_4.error;
                     return [7 /*endfinally*/];
                 case 11: return [7 /*endfinally*/];
-                case 12: return [2 /*return*/, revertSettings.reverse()];
+                case 12:
+                    revertSettings = [];
+                    for (_i = 0, _b = Object.entries(revertKeyValuesWithCondition); _i < _b.length; _i++) {
+                        _c = _b[_i], condition = _c[0], revertKeyValues_ = _c[1];
+                        revertSettings.push(condition + "\n" + revertKeyValues_);
+                    }
+                    revertSettings.push(revertKeyValues);
+                    return [2 /*return*/, revertSettings];
             }
         });
     });

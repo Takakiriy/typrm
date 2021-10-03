@@ -417,7 +417,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
     });
 
     describe("revert", () => {
-        test.only.each([
+        test.each([
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',
                 `key1: value1changed`,
@@ -445,8 +445,6 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
-//if (fileNameHead !== '2_replace_6_if' || _subCaseName !== ' both') {return;}
-if (fileNameHead !== '2_replace_10_double_check') {return;}
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -480,7 +478,6 @@ if (fileNameHead !== '2_replace_10_double_check') {return;}
             expect(revertedFileContents).toBe(sourceFileContents);
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-expect('test code').toBe('deleted skip code.');
         });
     });
 

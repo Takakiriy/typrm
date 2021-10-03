@@ -515,13 +515,9 @@ describe("replaces settings >>", function () {
             ], [
                 '2_replace_6_if', ' setting name', 'set1', 'en-US',
                 "__Setting1__: replaced",
-                /*
-                            ],[
-                                '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
-                                `__Full__: fo/fi
-                                __Folder__: fo
-                                __File__: fi`,
-                */
+            ], [
+                '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
+                "__Full__: fo/fi\n                __Folder__: fo\n                __File__: fi",
             ],
         ])("%s%s >>", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
             var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
