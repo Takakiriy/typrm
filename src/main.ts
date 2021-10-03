@@ -1090,6 +1090,7 @@ async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex:
                     } else {
                         var  revertSetting = ifTrueScanner.condition + '\n' + `${key}: ${originalValue}`;
                     }
+                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
 
                     revertSettings.push(revertSetting);
                 }
@@ -1647,6 +1648,9 @@ async function  replace(inputFilePath: string) {
                 const  toTagLines: {[key: string]: number[]} = {};
                 for (const [key, value] of Object.entries( replaceKeyValues.keyValues )) {
                     toTagLines[key] = value.lineNum.slice(); // copy
+                    for (const lineNum of value.lineNum) {
+                        console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${toLabel} ${key}: ${value.value}`);
+                    }
                 }
 
                 await  replaceSettings(inputFileFullPath,

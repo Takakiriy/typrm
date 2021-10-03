@@ -559,6 +559,7 @@ describe("replaces settings >>", function () {
                     case 8:
                         revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toBe(sourceFileContents);
+                        expect(main.stdout).toMatchSnapshot('stdout');
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         return [2 /*return*/];
                 }
@@ -597,10 +598,8 @@ describe("replaces settings >>", function () {
                     case 1:
                         _a.sent();
                         replacedFileContents = fs.readFileSync(changingFilePath).toString();
-                        if (!caseName.includes('_Error')) return [3 /*break*/, 2];
                         expect(main.stdout).toMatchSnapshot('stdout');
-                        return [3 /*break*/, 4];
-                    case 2:
+                        if (!!caseName.includes('_Error')) return [3 /*break*/, 3];
                         expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
                         // Test Main >> revert
                         if (caseName.includes('FileParameter')) {
@@ -612,12 +611,12 @@ describe("replaces settings >>", function () {
                         return [4 /*yield*/, callMain(parameters, {
                                 folder: changingFolderPath, test: "", locale: "en-US"
                             })];
-                    case 3:
+                    case 2:
                         _a.sent();
                         revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
-                        _a.label = 4;
-                    case 4:
+                        _a.label = 3;
+                    case 3:
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         return [2 /*return*/];
                 }

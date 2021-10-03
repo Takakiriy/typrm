@@ -2340,6 +2340,35 @@ new body:
 "
 `;
 
+exports[`replaces settings >> replace to tag >> 1_OK: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:2: #to: __SettingA__: SetAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:3: #to: __SettingB__: SetB#
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:4: #to: __SettingC__: SetCCCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:5: #to: __SettingD__: SetDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:6: #to: __SettingE__: SetEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:7: #to: __SettingF__: SetFF
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:9: #to: __SettingG__: SetGG
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:26: #to: __BodyA__: ValueAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:28: #to: __BodyB__: ValueBB
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:31: #to: __BodyC__: ValueCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:34: #to: __BodyC2__: ValueCC2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:38: #to: __BodyAt1__: ValueAtAt1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:40: #to: __BodyAt2__: ValueAtAt2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:43: #to: __BodyD__: ValueDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:44: #to: __BodyE__: ValueEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:45: #to: __BodyF1__: ValueFF1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:45: #to: __BodyF2__: ValueFF2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:46: #to: __BodyG1__: ValueGG1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:46: #to: __BodyG2__: ValueGG2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyL__: Valu
+
+Warning: 0, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:51: #to: __SubA__: SetSubAA
+
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces settings >> replace to tag >> 2_FileParameter: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
@@ -2355,6 +2384,13 @@ exports[`replaces settings >> replace to tag >> 2_FileParameter: revertedFileCon
 exports[`replaces settings >> replace to tag >> 2_FileParameter: sourceFileContents 1`] = `
 "settings:
     __SettingA__: SetA      #to: SetAA
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 2_FileParameter: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_FileParameter_1_changing.yaml:2: #to: __SettingA__: SetAA
+
+Warning: 0, Error: 0
 "
 `;
 
@@ -2379,6 +2415,13 @@ exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: sourceFileConte
         __SimpleA__: ValueA
     body:
         ValueA   #template: __SimpleA__   #to: ValueAA
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/3_SimpleOneLoop_1_changing.yaml:4: #to: __SimpleA__: ValueAA
+
+Warning: 0, Error: 0
 "
 `;
 
@@ -2481,6 +2524,20 @@ body:
 "
 `;
 
+exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:2: #to: __Switch0__: B
+
+Warning: 0, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:14: #to: __Set1__: aa
+
+Warning: 0, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:22: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:26: #to: __Set2__: bb
+
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: sourceFileContents 1`] = `
 "settings:
     __Switch1__: A
@@ -2525,18 +2582,26 @@ body:
 `;
 
 exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:6: #to: __Set1__: bb
+
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:6: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
 Warning: 0, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:12: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: #to: __Set2__: aa
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
 Warning: 0, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:24: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: #to: __Set1__: aa
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
 Warning: 0, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:32: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:36: #to: __Set1__: bb
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
@@ -2608,6 +2673,49 @@ Verbose:         templatePattern: (*)-(*)
 Verbose:         toValue: (ValueCC1)-(ValueCC2
 Verbose:         toValueIsMatchedWithTemplate: false
 Verbose:         __BodyC1__: (ValueCC1)-(ValueCC2
+"
+`;
+
+exports[`replaces settings >> revert 2_replace_1_ok setting 2 >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27:         key1: value1changed  #original: value11
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> revert 2_replace_6_if both >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3:         fruit: melon  #original: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7:             __Setting1__: replaced  #original: no
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> revert 2_replace_6_if in if block >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5:             __Setting1__: replaced  #original: yes
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> revert 2_replace_6_if in if variable >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3:         fruit: melon  #original: banana
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> revert 2_replace_6_if setting name >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5:             __Setting1__: replaced  #original: yes
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> revert 2_replace_6_if without line num >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5:             __Setting1__: replaced  #original: yes
+
+Warning: 0, Error: 0
 "
 `;
 

@@ -1315,6 +1315,7 @@ function makeRevertSettings(inputFilePath, replacingSettingIndex) {
                                 else {
                                     revertSetting = ifTrueScanner.condition + '\n' + (key + ": " + originalValue);
                                 }
+                                console.log(getTestablePath(inputFilePath) + ":" + lineNum + ": " + line);
                                 revertSettings.push(revertSetting);
                             }
                         }
@@ -1924,23 +1925,23 @@ var WordPositions = /** @class */ (function () {
 // replace
 function replace(inputFilePath) {
     return __awaiter(this, void 0, void 0, function () {
-        var _i, _a, inputFileFullPath, replaceKeyValuesSet, _b, replaceKeyValuesSet_1, replaceKeyValues, toTagLines, _c, _d, _e, key, value;
-        return __generator(this, function (_f) {
-            switch (_f.label) {
+        var _i, _a, inputFileFullPath, replaceKeyValuesSet, _b, replaceKeyValuesSet_1, replaceKeyValues, toTagLines, _c, _d, _e, key, value, _f, _g, lineNum;
+        return __generator(this, function (_h) {
+            switch (_h.label) {
                 case 0:
                     _i = 0;
                     return [4 /*yield*/, listUpFilePaths(inputFilePath)];
                 case 1:
-                    _a = _f.sent();
-                    _f.label = 2;
+                    _a = _h.sent();
+                    _h.label = 2;
                 case 2:
                     if (!(_i < _a.length)) return [3 /*break*/, 8];
                     inputFileFullPath = _a[_i];
                     return [4 /*yield*/, makeReplaceSettingsFromToTags(inputFileFullPath)];
                 case 3:
-                    replaceKeyValuesSet = _f.sent();
+                    replaceKeyValuesSet = _h.sent();
                     _b = 0, replaceKeyValuesSet_1 = replaceKeyValuesSet;
-                    _f.label = 4;
+                    _h.label = 4;
                 case 4:
                     if (!(_b < replaceKeyValuesSet_1.length)) return [3 /*break*/, 7];
                     replaceKeyValues = replaceKeyValuesSet_1[_b];
@@ -1949,11 +1950,15 @@ function replace(inputFilePath) {
                     for (_c = 0, _d = Object.entries(replaceKeyValues.keyValues); _c < _d.length; _c++) {
                         _e = _d[_c], key = _e[0], value = _e[1];
                         toTagLines[key] = value.lineNum.slice(); // copy
+                        for (_f = 0, _g = value.lineNum; _f < _g.length; _f++) {
+                            lineNum = _g[_f];
+                            console.log(getTestablePath(inputFileFullPath) + ":" + lineNum + ": " + toLabel + " " + key + ": " + value.value);
+                        }
                     }
                     return [4 /*yield*/, replaceSettings(inputFileFullPath, replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, toTagLines, true)];
                 case 5:
-                    _f.sent();
-                    _f.label = 6;
+                    _h.sent();
+                    _h.label = 6;
                 case 6:
                     _b++;
                     return [3 /*break*/, 4];

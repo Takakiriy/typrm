@@ -471,6 +471,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
             expect(revertedFileContents).toBe(sourceFileContents);
+            expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
     });
@@ -502,10 +503,8 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             });
             const  replacedFileContents = fs.readFileSync(changingFilePath).toString();
 
-            if (caseName.includes('_Error')) {
-                expect(main.stdout).toMatchSnapshot('stdout');
-            } else {
-
+            expect(main.stdout).toMatchSnapshot('stdout');
+            if ( ! caseName.includes('_Error')) {
                 expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
 
                 // Test Main >> revert
