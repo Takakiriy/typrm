@@ -88,7 +88,7 @@ async function  TestOfCommandLine() {
     }];
     for (const case_ of cases) {
         if ( true  ||  case_.name === 'search_mode_ref_verb') {
-            console.log(`TestCase: TestOfCommandLine >> ${case_.name}`);
+            console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
 
             // Test Main
             returns = await callChildProccess(`node ${scriptPath} ${case_.parameters} --test`,
@@ -96,15 +96,19 @@ async function  TestOfCommandLine() {
 
             // Check
             if (case_.check === 'true') {
-                if (testingOS === 'Windows') {
-                    testingOS = 'Windows2';
-                }
-                const  answer = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
+                const  noData = 'no data';
+                const  answer  = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
+                const  answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
 
-                if (returns.stdout !== answer) {
-                    printDifferentPaths('_output.txt', '_expected.txt');
+                if (returns.stdout !== answer  &&  returns.stdout !== answer2) {
+                    if (answer2 === noData) {
+                        printDifferentPaths('_output.txt', '_expected.txt');
+                    } else {
+                        printDifferentPaths('_output.txt', '_expected.txt', '_expected2.txt');
+                    }
                     fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
                     fs.writeFileSync(testFolderPath + "_expected.txt", answer);
+                    fs.writeFileSync(testFolderPath + "_expected2.txt", answer);
                     throw new Error();
                 }
             }
@@ -112,6 +116,7 @@ async function  TestOfCommandLine() {
     }
     deleteFile(testFolderPath + "_output.txt");
     deleteFile(testFolderPath + "_expected.txt");
+    deleteFile(testFolderPath + "_expected2.txt");
 }
 
 // callChildProccess
@@ -173,10 +178,13 @@ function  getFullPath(relativePath: string, basePath: string): string {
 }
 
 // printDifferentPaths
-function  printDifferentPaths(path1: string, path2: string) {
+function  printDifferentPaths(path1: string, path2: string, path3: string | undefined = undefined) {
     console.log(`Error: different between the following files`);
     console.log(`  Path1: ${testFolderFullPath + path1}`);
     console.log(`  Path2: ${testFolderFullPath + path2}`);
+    if (path3) {
+        console.log(`  Path3: ${testFolderFullPath + path3}`);
+    }
 }
 
 // diffStrings

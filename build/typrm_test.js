@@ -99,7 +99,7 @@ function DoCustomDebug() {
 // TestOfFileCheck
 function TestOfCommandLine() {
     return __awaiter(this, void 0, void 0, function () {
-        var returns, cases, _i, cases_1, case_, answer;
+        var returns, cases, _i, cases_1, case_, noData, answer, answer2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -140,21 +140,26 @@ function TestOfCommandLine() {
                     if (!(_i < cases_1.length)) return [3 /*break*/, 4];
                     case_ = cases_1[_i];
                     if (!(true || case_.name === 'search_mode_ref_verb')) return [3 /*break*/, 3];
-                    console.log("TestCase: TestOfCommandLine >> " + case_.name);
+                    console.log("\nTestCase: TestOfCommandLine >> " + case_.name);
                     return [4 /*yield*/, callChildProccess("node " + scriptPath + " " + case_.parameters + " --test", { inputLines: case_.inputLines.split('\n') })];
                 case 2:
                     // Test Main
                     returns = _a.sent();
                     // Check
                     if (case_.check === 'true') {
-                        if (testingOS === 'Windows') {
-                            testingOS = 'Windows2';
-                        }
+                        noData = 'no data';
                         answer = lib.getSnapshot("typrm_test >> TestOfCommandLine >> " + case_.name + " >> " + testingOS + ": stdout 1");
-                        if (returns.stdout !== answer) {
-                            printDifferentPaths('_output.txt', '_expected.txt');
+                        answer2 = lib.getSnapshot("typrm_test >> TestOfCommandLine >> " + case_.name + " >> " + testingOS + "2: stdout 1", noData);
+                        if (returns.stdout !== answer && returns.stdout !== answer2) {
+                            if (answer2 === noData) {
+                                printDifferentPaths('_output.txt', '_expected.txt');
+                            }
+                            else {
+                                printDifferentPaths('_output.txt', '_expected.txt', '_expected2.txt');
+                            }
                             fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
                             fs.writeFileSync(testFolderPath + "_expected.txt", answer);
+                            fs.writeFileSync(testFolderPath + "_expected2.txt", answer);
                             throw new Error();
                         }
                     }
@@ -165,6 +170,7 @@ function TestOfCommandLine() {
                 case 4:
                     deleteFile(testFolderPath + "_output.txt");
                     deleteFile(testFolderPath + "_expected.txt");
+                    deleteFile(testFolderPath + "_expected2.txt");
                     return [2 /*return*/];
             }
         });
@@ -250,10 +256,14 @@ function getFullPath(relativePath, basePath) {
     return fullPath;
 }
 // printDifferentPaths
-function printDifferentPaths(path1, path2) {
+function printDifferentPaths(path1, path2, path3) {
+    if (path3 === void 0) { path3 = undefined; }
     console.log("Error: different between the following files");
     console.log("  Path1: " + (testFolderFullPath + path1));
     console.log("  Path2: " + (testFolderFullPath + path2));
+    if (path3) {
+        console.log("  Path3: " + (testFolderFullPath + path3));
+    }
 }
 // diffStrings
 function diffStrings(result, answer) {

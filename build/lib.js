@@ -485,9 +485,13 @@ function inputSkip(count) {
 }
 exports.inputSkip = inputSkip;
 // getSnapshot
-function getSnapshot(label) {
+function getSnapshot(label, deafultSnapshot) {
+    if (deafultSnapshot === void 0) { deafultSnapshot = undefined; }
     if (!(label in snapshots)) {
-        throw new Error("not found snapshot label \"" + label + "\" in \"__Project__/src/__snapshots__/main.test.ts.snap\" file.");
+        if (!deafultSnapshot) {
+            throw new Error("not found snapshot label \"" + label + "\" in \"__Project__/src/__snapshots__/main.test.ts.snap\" file.");
+        }
+        return deafultSnapshot;
     }
     var snapshot = snapshots[label];
     return snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');

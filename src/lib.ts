@@ -399,9 +399,12 @@ export function  inputSkip(count: number) {
 }
 
 // getSnapshot
-export function  getSnapshot(label: string) {
+export function  getSnapshot(label: string, deafultSnapshot: string | undefined = undefined) {
     if ( ! (label in snapshots)) {
-        throw  new Error(`not found snapshot label "${label}" in "__Project__/src/__snapshots__/main.test.ts.snap" file.`)
+        if ( ! deafultSnapshot) {
+            throw  new Error(`not found snapshot label "${label}" in "__Project__/src/__snapshots__/main.test.ts.snap" file.`);
+        }
+        return  deafultSnapshot;
     }
     const  snapshot = snapshots[label];
     return  snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');

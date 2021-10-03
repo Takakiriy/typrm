@@ -33,7 +33,7 @@ export declare function input(guide: string): Promise<string>;
 export declare function getInputObject(): StandardInputBuffer;
 export declare function inputPath(guide: string): Promise<string>;
 export declare function inputSkip(count: number): void;
-export declare function getSnapshot(label: string): any;
+export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): any;
 export declare function pp(message: any): string[];
 export declare const debugOut: string[];
 export declare function cc(targetCount?: number, label?: string): {
