@@ -41,10 +41,10 @@ var path = require("path");
 var main = require("./main");
 var chalk = require("chalk");
 var lib = require("./lib");
-var snapshots = require("./__snapshots__/main.test.ts.snap");
+var snapshots = require(__dirname + "/../src/__snapshots__/main.test.ts.snap");
 var callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
-process.chdir(lib.getHomePath() + '/GitProjects/GitHub/typrm/src');
+process.chdir(__dirname);
 var testFolderPath = "test_data" + path.sep;
 var matchedColor = chalk.green.bold;
 var refColor = chalk.yellow;
@@ -571,14 +571,14 @@ describe("replaces settings >>", function () {
     });
     describe("replace to tag >>", function () {
         test.each([
-            ['1_OK'],
-            ['2_FileParameter'],
-            ['3_SimpleOneLoop'],
-            ['4_IfBlock_OK'],
-            ['4E_IfBlock_Error'],
-            ['5_Conflict_Error'],
-        ])("%s", function (caseName) { return __awaiter(void 0, void 0, void 0, function () {
-            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents;
+            ['1_OK', ''],
+            ['2_FileParameter', 'FileParameter'],
+            ['3_SimpleOneLoop', ''],
+            ['4_IfBlock_OK', ''],
+            ['4E_IfBlock_Error', 'ErrorCase'],
+            ['5_Conflict_Error', 'ErrorCase'],
+        ])("%s", function (caseName, options) { return __awaiter(void 0, void 0, void 0, function () {
+            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents, sourceFileContents2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -589,7 +589,7 @@ describe("replaces settings >>", function () {
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         writeFileSync(changingFilePath, sourceFileContents);
                         // Test Main >> replace
-                        if (caseName.includes('FileParameter')) {
+                        if (options.includes('FileParameter')) {
                             parameters = ["replace", changingFilePath];
                         }
                         else {
@@ -602,7 +602,7 @@ describe("replaces settings >>", function () {
                         _a.sent();
                         replacedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(main.stdout).toMatchSnapshot('stdout');
-                        if (!!caseName.includes('_Error')) return [3 /*break*/, 3];
+                        if (!!options.includes('ErrorCase')) return [3 /*break*/, 3];
                         expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
                         // Test Main >> revert
                         if (caseName.includes('FileParameter')) {
@@ -618,8 +618,12 @@ describe("replaces settings >>", function () {
                         _a.sent();
                         revertedFileContents = fs.readFileSync(changingFilePath).toString();
                         expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
-                        _a.label = 3;
+                        return [3 /*break*/, 4];
                     case 3:
+                        sourceFileContents2 = fs.readFileSync(changingFilePath).toString();
+                        expect(sourceFileContents2).toBe(sourceFileContents);
+                        _a.label = 4;
+                    case 4:
                         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
                         return [2 /*return*/];
                 }

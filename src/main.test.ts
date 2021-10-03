@@ -4,10 +4,10 @@ import * as main from "./main";
 import * as chalk from "chalk";
 import * as lib from "./lib";
 import { pp } from "./lib";
-const snapshots = require("./__snapshots__/main.test.ts.snap");
+const snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
-process.chdir(lib.getHomePath() + '/GitProjects/GitHub/typrm/src');
+process.chdir(__dirname);
 
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
@@ -483,13 +483,13 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
 
     describe("replace to tag >>", () => {
         test.each([
-            ['1_OK'],
-            ['2_FileParameter'],
-            ['3_SimpleOneLoop'],
-            ['4_IfBlock_OK'],
-            ['4E_IfBlock_Error'],
-            ['5_Conflict_Error'],
-        ])("%s", async (caseName) => {
+            ['1_OK', ''],
+            ['2_FileParameter', 'FileParameter'],
+            ['3_SimpleOneLoop', ''],
+            ['4_IfBlock_OK', ''],
+            ['4E_IfBlock_Error', 'ErrorCase'],
+            ['5_Conflict_Error', 'ErrorCase'],
+        ])("%s", async (caseName, options) => {
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -498,7 +498,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             writeFileSync(changingFilePath, sourceFileContents);
 
             // Test Main >> replace
-            if (caseName.includes('FileParameter')) {
+            if (options.includes('FileParameter')) {
                 var  parameters = ["replace", changingFilePath];
             } else {
                 var  parameters = ["replace"];
@@ -509,7 +509,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             const  replacedFileContents = fs.readFileSync(changingFilePath).toString();
 
             expect(main.stdout).toMatchSnapshot('stdout');
-            if ( ! caseName.includes('_Error')) {
+            if ( ! options.includes('ErrorCase')) {
                 expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
 
                 // Test Main >> revert
@@ -524,6 +524,10 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
                 const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
                 expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+            } else {  // error case
+                const  sourceFileContents2 = fs.readFileSync(changingFilePath).toString();
+
+                expect(sourceFileContents2).toBe(sourceFileContents);
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });

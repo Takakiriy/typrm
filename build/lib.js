@@ -54,15 +54,7 @@ var globby = require("globby");
 var readline = require("readline");
 var stream = require("stream");
 var csvParse = require("csv-parse");
-try {
-    var base = process.cwd();
-    if (!process.cwd().endsWith('/src')) {
-        base += '/src';
-    }
-    var snapshots = require(base + "/__snapshots__/main.test.ts.snap");
-}
-catch (e) {
-}
+var snapshots = require(__dirname + "/../src/__snapshots__/main.test.ts.snap");
 // File group
 // copyFolderSync
 // #keyword: copyFolderSync

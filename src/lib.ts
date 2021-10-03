@@ -4,15 +4,7 @@ import * as globby from 'globby';
 import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
-try {
-    let  base = process.cwd();
-    if ( ! process.cwd().endsWith('/src')) {
-        base += '/src';
-    }
-
-    var snapshots = require(`${base}/__snapshots__/main.test.ts.snap`);
-} catch (e) {
-}
+const  snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
 
 
 // File group

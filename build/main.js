@@ -909,6 +909,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                                     if (loopCount === 1 && key in toTagLines) {
                                                         if (toTagLines[key].includes(lineNum)) {
                                                             console.log("\nError: " + getTestablePath(inputFilePath) + ":" + lineNum + ": \"#to:\" tag cannot write in false condition block. Write \"#to:\" tags to be true condition.");
+                                                            errorCount += 1;
                                                         }
                                                     }
                                                 }

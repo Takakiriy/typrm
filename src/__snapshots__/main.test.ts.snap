@@ -2586,26 +2586,26 @@ exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: stdout 1`] = `
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:6: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 0
+Warning: 0, Error: 1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:12: #to: __Switch2__: B
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: #to: __Set2__: aa
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 0
+Warning: 0, Error: 1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:24: #to: __Set1__: aa
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: #to: __Set1__: aa
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 0
+Warning: 0, Error: 1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:32: #to: __Switch1__: B
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: #to: __Set1__: bb
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:36: #to: __Set1__: bb
 
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 0
+Warning: 0, Error: 1
 "
 `;
 
