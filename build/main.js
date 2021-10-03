@@ -997,8 +997,8 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                                             for (_d = 0, _e = checkedTemplateTags[targetLineNum]; _d < _e.length; _d++) {
                                                                 template = _e[_d];
                                                                 errorMessage += "  " + translate('in ') + ": " + getTestablePath(inputFilePath) + ":" + template.templateLineNum + "\n";
-                                                                errorMessage += "    " + translate('Replaced') + ": " + template.replaced.trim() + "\n";
-                                                                errorMessage += "    " + translate('Expected') + ": " + template.expected.trim() + "\n";
+                                                                errorMessage += "    " + translate('Before Editing') + ": " + template.replaced.trim() + "\n";
+                                                                errorMessage += "    " + translate('After  Editing') + ": " + template.expected.trim() + "\n";
                                                                 errorMessage += "    " + translate('Template') + ": " + template.template.trim() + "\n";
                                                             }
                                                             errorMessage += "  " + translate('Setting') + ": " + getTestablePath(inputFilePath) + ":" + settingLineNum;
@@ -4371,6 +4371,8 @@ function translate(englishLiterals) {
             "Contents": "内容",
             "Expected": "期待",
             "Template": "雛形",
+            "Before Editing": "編集前",
+            "After  Editing": "編集後",
             "WarningLine": "警告行",
             "Found": "見つかったもの",
             "Setting": "設定",

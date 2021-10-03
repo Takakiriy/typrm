@@ -797,8 +797,8 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                     errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
                                     for (const template of checkedTemplateTags[targetLineNum]) {
                                         errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
-                                        errorMessage += `    ${translate('Replaced')}: ${template.replaced.trim()}\n`;
-                                        errorMessage += `    ${translate('Expected')}: ${template.expected.trim()}\n`;
+                                        errorMessage += `    ${translate('Before Editing')}: ${template.replaced.trim()}\n`;
+                                        errorMessage += `    ${translate('After  Editing')}: ${template.expected.trim()}\n`;
                                         errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
                                     }
                                     errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
@@ -3783,6 +3783,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "Contents": "内容",
             "Expected": "期待",
             "Template": "雛形",
+            "Before Editing": "編集前",
+            "After  Editing": "編集後",
             "WarningLine": "警告行",
             "Found": "見つかったもの",
             "Setting": "設定",
