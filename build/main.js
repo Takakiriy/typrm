@@ -209,7 +209,8 @@ function main() {
                     if (false) {
                         d = lib_1.pp('');
                         d = d;
-                        // If exception was raised, this code does not execute. Set a break point at the catch block of calling main.main
+                        // If exception was raised, this code does not execute.
+                        // Set a break point at the catch block of calling "main.main"
                     }
                     return [2 /*return*/];
             }
@@ -751,18 +752,18 @@ function getInputFileFullPath(inputFilePath) {
 function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toTagLines, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     var e_3, _a;
     return __awaiter(this, void 0, void 0, function () {
-        var errorCount, replacingKeyValues, previousEvalatedKeyValues, oldFilePath, newFilePath, reducedErrorWasOccurred, loop, loopCount, conflictErrors, replacedKeys, parser, _loop_1, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, output, replacingLine, expected, replaced, expected, replaced, replacedLine, lengthSortedTemplates, replacedLine, maskedLine, i, errorMessage;
+        var errorCount, replacingKeyValues, previousEvalatedKeyValues, reducedErrorWasOccurred, loop, loopCount, updatingFilePath, previousUpdatingFilePath, conflictErrors, replacedKeys, parser, _loop_1, isReadingSetting, setting, settingCount, settingIndentLength, settingLineNum, oldSetting, lineNum, isReplacing, isAllReplacable, isCheckingTemplateIfKey, templateIfKeyError, output, replacingLine, expected, replaced, expected, replaced, replacedLine, lengthSortedTemplates, replacedLine, maskedLine, i, errorMessage;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     errorCount = 0;
                     replacingKeyValues = keyValues;
                     previousEvalatedKeyValues = {};
-                    oldFilePath = inputFilePath;
-                    newFilePath = inputFilePath + ".new";
                     reducedErrorWasOccurred = false;
                     loop = true;
                     loopCount = 0;
+                    updatingFilePath = inputFilePath + ".updating";
+                    previousUpdatingFilePath = inputFilePath + ".previous.updating";
                     conflictErrors = {};
                     replacedKeys = [];
                     parser = new Parser();
@@ -775,12 +776,17 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                         console.log("Verbose:     replacingSettingIndex: " + replacingSettingIndex);
                         console.log("Verbose:     keyValues: " + JSON.stringify(keyValues));
                     }
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, , 5, 6]);
                     _loop_1 = function () {
-                        var writer, readStream, reader, lines, checkedTemplateTags, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, commonCase, before, after, targetLineNum, mask, conflictedTemplates, _i, lengthSortedTemplates_1, template, _d, _e, template, necessaryVariableNames, cutLine, e_3_1, _f, _g, conflictError;
+                        var oldFilePath, writer, readStream, reader, lines, checkedTemplateTags, evalatedKeyValues, ifTagParser, oldIfTagParser, previousEvalatedKeyValuesLength, reader_3, reader_3_1, line1, line, settingNames_1, oldSettingNames, undefinedVariableNames, separator, key, oldValue, replacingKeys, replacedValue, _c, original, spaceAndComment, templateTag, commonCase, before, after, targetLineNum, mask, conflictedTemplates, _i, lengthSortedTemplates_1, template, _d, _e, template, necessaryVariableNames, cutLine, e_3_1, _f, _g, conflictError;
                         return __generator(this, function (_h) {
                             switch (_h.label) {
                                 case 0:
-                                    writer = new WriteBuffer(fs.createWriteStream(newFilePath));
+                                    loopCount += 1;
+                                    oldFilePath = (loopCount === 1) ? inputFilePath : previousUpdatingFilePath;
+                                    writer = new WriteBuffer(fs.createWriteStream(updatingFilePath));
                                     readStream = fs.createReadStream(oldFilePath);
                                     reader = readline.createInterface({
                                         input: readStream,
@@ -803,7 +809,6 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                     ifTagParser = new IfTagParser(parser);
                                     oldIfTagParser = new IfTagParser(parser);
                                     previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
-                                    loopCount += 1;
                                     if (parser.verbose) {
                                         console.log("Verbose: loopCount: " + loopCount);
                                         console.log("Verbose: previousEvalatedKeyValuesLength: " + previousEvalatedKeyValuesLength);
@@ -993,7 +998,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                                             errorMessage = '';
                                                             errorMessage += '\n';
                                                             errorMessage += translate('ErrorIn') + ": " + getTestablePath(inputFilePath) + ":" + targetLineNum + "\n";
-                                                            errorMessage += "  " + translate('Error') + ": " + translate('template values are conflicted.') + "\n";
+                                                            errorMessage += "  " + translate('Error') + ": " + translate('template values after replace are conflicted.') + "\n";
                                                             errorMessage += "  " + translate('Contents') + ": " + replacingLine.trim() + "\n";
                                                             for (_d = 0, _e = checkedTemplateTags[targetLineNum]; _d < _e.length; _d++) {
                                                                 template = _e[_d];
@@ -1100,7 +1105,7 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                     }
                                     else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
                                         console.log('');
-                                        console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error of unexpected: The count of evalatedKeyValues is not increasing.' +\n                ' isReplacable may be not changed. Try typrm check command."], ["Error of unexpected: The count of evalatedKeyValues is not increasing.' +\n                ' isReplacable may be not changed. Try typrm check command."]))));
+                                        console.log(translate(templateObject_5 || (templateObject_5 = __makeTemplateObject(["Error of unexpected: The count of evalatedKeyValues is not increasing.' +\n                    ' isReplacable may be not changed. Try typrm check command."], ["Error of unexpected: The count of evalatedKeyValues is not increasing.' +\n                    ' isReplacable may be not changed. Try typrm check command."]))));
                                         errorCount += 1;
                                         loop = false;
                                     }
@@ -1109,9 +1114,16 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                                     return [4 /*yield*/, new Promise(function (resolve) {
                                             writer.on('finish', function () {
                                                 if (errorCount === 0) {
-                                                    fs.copyFileSync(newFilePath, inputFilePath);
+                                                    if (loop) {
+                                                        fs.copyFileSync(updatingFilePath, previousUpdatingFilePath);
+                                                    }
+                                                    else {
+                                                        fs.copyFileSync(updatingFilePath, inputFilePath);
+                                                    }
                                                 }
-                                                deleteFileSync(newFilePath);
+                                                else {
+                                                    loop = false;
+                                                }
                                                 resolve();
                                             });
                                         })];
@@ -1121,14 +1133,19 @@ function replaceSettingsSub(inputFilePath, replacingSettingIndex, keyValues, toT
                             }
                         });
                     };
-                    _b.label = 1;
-                case 1:
-                    if (!loop) return [3 /*break*/, 3];
-                    return [5 /*yield**/, _loop_1()];
+                    _b.label = 2;
                 case 2:
+                    if (!loop) return [3 /*break*/, 4];
+                    return [5 /*yield**/, _loop_1()];
+                case 3:
                     _b.sent();
-                    return [3 /*break*/, 1];
-                case 3: return [2 /*return*/, errorCount];
+                    return [3 /*break*/, 2];
+                case 4: return [3 /*break*/, 6];
+                case 5:
+                    deleteFileSync(previousUpdatingFilePath);
+                    deleteFileSync(updatingFilePath);
+                    return [7 /*endfinally*/];
+                case 6: return [2 /*return*/, errorCount];
             }
         });
     });

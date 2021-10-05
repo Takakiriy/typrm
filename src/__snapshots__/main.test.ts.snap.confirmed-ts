@@ -2092,7 +2092,7 @@ check:
 exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`] = `
 "
 ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9
-  Error: template values are conflicted.
+  Error: template values after replace are conflicted.
   Contents: - \\"folder/file\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10
     Before Editing: \\"folder/file\\"
@@ -2113,7 +2113,7 @@ ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_
   Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
 
 ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14
-  Error: template values are conflicted.
+  Error: template values after replace are conflicted.
   Contents: - \\"folder/file\\"
   in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15
     Before Editing: file
@@ -2634,6 +2634,43 @@ Error of conflict #to: tag:
     key: __Set1__
     valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:8
     valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_Error: sourceFileContents 1`] = `
+"settings:
+    __Switch__: B
+    A: #if: $settings.__Switch__ == A
+        __Full__: ValueA1_ValueA2
+        __Part__: ValueA1
+    B: #if: $settings.__Switch__ == B
+        __Full__: ValueB1_ValueB2
+        __Part__: ValueB1
+check:
+    ValueB1_ValueB2
+        #template: __Full__
+            #to: ValueB9_ValueB9
+        #template-at(-2): __Part__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_Error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:12: #to: __Full__: ValueB9_ValueB9
+
+ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10
+  Error: template values after replace are conflicted.
+  Contents: ValueB1_ValueB2
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:11
+    Before Editing: ValueB1_ValueB2
+    After  Editing: ValueB9_ValueB9
+    Template: __Full__
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:12
+    Before Editing: ValueB1
+    After  Editing: ValueB1
+    Template: __Part__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:1
+
+Warning: 0, Error: 1
 "
 `;
 

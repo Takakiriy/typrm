@@ -129,7 +129,8 @@ export async function  main() {
     if (false) {
         var d = pp('');
         d=d;
-        // If exception was raised, this code does not execute. Set a break point at the catch block of calling main.main
+        // If exception was raised, this code does not execute.
+        // Set a break point at the catch block of calling "main.main"
     }
 }
 
@@ -565,11 +566,11 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     var    errorCount = 0;
     var    replacingKeyValues = keyValues;
     var    previousEvalatedKeyValues: {[key: string]: string} = {};
-    const  oldFilePath = inputFilePath;
-    const  newFilePath = inputFilePath +".new";
     var    reducedErrorWasOccurred = false;
     var    loop = true;
     var    loopCount = 0;
+    const  updatingFilePath = inputFilePath +".updating";
+    const  previousUpdatingFilePath = inputFilePath +".previous.updating";
     const  conflictErrors: {[lineNum: number]: string} = {};
     const  replacedKeys: string[] = [];
     const  parser = new Parser();
@@ -582,316 +583,326 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
         console.log(`Verbose:     replacingSettingIndex: ${replacingSettingIndex}`)
         console.log(`Verbose:     keyValues: ${JSON.stringify(keyValues)}`);
     }
+    try {
+        while (loop) {
+            loopCount += 1;
+            const  oldFilePath = (loopCount === 1) ? inputFilePath : previousUpdatingFilePath;
+            const  writer = new WriteBuffer(fs.createWriteStream(updatingFilePath));
+            const  readStream = fs.createReadStream(oldFilePath);
+            const  reader = readline.createInterface({
+                input: readStream,
+                crlfDelay: Infinity
+            });
+            const  lines = [];
+            var  isReadingSetting = false;
+            var  setting: Settings = {};
+            var  settingCount = 0;
+            var  settingIndentLength = 0;
+            var  settingLineNum = -1;
+            var  oldSetting: Settings = {};
+            var  lineNum = 0;
+            var  isReplacing = false;
+            var  isAllReplacable = true;
+            var  isCheckingTemplateIfKey = false;
+            var  templateIfKeyError = false;
+            const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
+            const  evalatedKeyValues: {[key: string]: string} = {};
+            const  ifTagParser = new IfTagParser(parser);
+            const  oldIfTagParser = new IfTagParser(parser);
+            const  previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
+            if (parser.verbose) {
+                console.log(`Verbose: loopCount: ${loopCount}`);
+                console.log(`Verbose: previousEvalatedKeyValuesLength: ${previousEvalatedKeyValuesLength}`);
+            }
 
-    while (loop) {
-        const  writer = new WriteBuffer(fs.createWriteStream(newFilePath));
-        const  readStream = fs.createReadStream(oldFilePath);
-        const  reader = readline.createInterface({
-            input: readStream,
-            crlfDelay: Infinity
-        });
-        const  lines = [];
-        var  isReadingSetting = false;
-        var  setting: Settings = {};
-        var  settingCount = 0;
-        var  settingIndentLength = 0;
-        var  settingLineNum = -1;
-        var  oldSetting: Settings = {};
-        var  lineNum = 0;
-        var  isReplacing = false;
-        var  isAllReplacable = true;
-        var  isCheckingTemplateIfKey = false;
-        var  templateIfKeyError = false;
-        const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
-        const  evalatedKeyValues: {[key: string]: string} = {};
-        const  ifTagParser = new IfTagParser(parser);
-        const  oldIfTagParser = new IfTagParser(parser);
-        const  previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
-        loopCount += 1;
-        if (parser.verbose) {
-            console.log(`Verbose: loopCount: ${loopCount}`);
-            console.log(`Verbose: previousEvalatedKeyValuesLength: ${previousEvalatedKeyValuesLength}`);
-        }
+            for await (const line1 of reader) {
+                const  line: string = line1;
+                lines.push(line);
+                lineNum += 1;
+                var  output = false;
+                parser.lineNum = lineNum;
 
-        for await (const line1 of reader) {
-            const  line: string = line1;
-            lines.push(line);
-            lineNum += 1;
-            var  output = false;
-            parser.lineNum = lineNum;
+                // isReadingSetting = ...
+                if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
+                    isReadingSetting = true;
+                    setting = {};
+                    settingCount += 1;
+                    settingIndentLength = indentRegularExpression.exec(line)![0].length;
+                    settingLineNum = lineNum;
+                    oldSetting = {};
+                    if (replacingSettingIndex === allSetting) {
+                        isReplacing = true;
+                    } else {
+                        isReplacing = (settingCount === replacingSettingIndex);
+                    }
+                    if ( ! templateIfKeyError) {
+                        isCheckingTemplateIfKey = true;
+                    }
+                } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
 
-            // isReadingSetting = ...
-            if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
-                isReadingSetting = true;
-                setting = {};
-                settingCount += 1;
-                settingIndentLength = indentRegularExpression.exec(line)![0].length;
-                settingLineNum = lineNum;
-                oldSetting = {};
-                if (replacingSettingIndex === allSetting) {
-                    isReplacing = true;
-                } else {
-                    isReplacing = (settingCount === replacingSettingIndex);
-                }
-                if ( ! templateIfKeyError) {
-                    isCheckingTemplateIfKey = true;
-                }
-            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-
-                isReadingSetting = false;
-                if ( ! reducedErrorWasOccurred) {
-                    const  settingNames = Object.keys(setting);
-                    const  oldSettingNames = Object.keys(oldSetting);
-                    const  undefinedVariableNames = oldSettingNames.filter((oldName)=>( ! settingNames.includes(oldName)));
-                    if (undefinedVariableNames.length >= 1) {
-                        console.log('');
-                        console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                        console.log(`  ${translate('Error')}: ${translate('The number of variable declarations has decreased')}`);
-                        console.log(`  ${translate('Solution')}: ${translate('Add variable declarations')}`);
-                        console.log(`  ${translate('Variables')}: ${undefinedVariableNames}`);
-                        reducedErrorWasOccurred = true;
-                        errorCount += 1;
+                    isReadingSetting = false;
+                    if ( ! reducedErrorWasOccurred) {
+                        const  settingNames = Object.keys(setting);
+                        const  oldSettingNames = Object.keys(oldSetting);
+                        const  undefinedVariableNames = oldSettingNames.filter((oldName)=>( ! settingNames.includes(oldName)));
+                        if (undefinedVariableNames.length >= 1) {
+                            console.log('');
+                            console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                            console.log(`  ${translate('Error')}: ${translate('The number of variable declarations has decreased')}`);
+                            console.log(`  ${translate('Solution')}: ${translate('Add variable declarations')}`);
+                            console.log(`  ${translate('Variables')}: ${undefinedVariableNames}`);
+                            reducedErrorWasOccurred = true;
+                            errorCount += 1;
+                        }
                     }
                 }
-            }
-            ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues));
-            oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues));
+                ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues));
+                oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues));
 
-            if (isReplacing) {
-                if ( ! ifTagParser.isReplacable) {
-                    isAllReplacable = false;
-                }
+                if (isReplacing) {
+                    if ( ! ifTagParser.isReplacable) {
+                        isAllReplacable = false;
+                    }
 
-                // In settings tag
-                if (isReadingSetting) {
-                    const  separator = line.indexOf(':');
-                    if (separator !== notFound) {
-                        const  key = line.substr(0, separator).trim();
-                        const  oldValue = getValue(line, separator);
-                        if (ifTagParser.isReplacable  &&  oldValue !== '') {
-                            if (key in replacingKeyValues) {
-                                evalatedKeyValues[key] = replacingKeyValues[key];
+                    // In settings tag
+                    if (isReadingSetting) {
+                        const  separator = line.indexOf(':');
+                        if (separator !== notFound) {
+                            const  key = line.substr(0, separator).trim();
+                            const  oldValue = getValue(line, separator);
+                            if (ifTagParser.isReplacable  &&  oldValue !== '') {
+                                if (key in replacingKeyValues) {
+                                    evalatedKeyValues[key] = replacingKeyValues[key];
+                                } else {
+                                    evalatedKeyValues[key] = oldValue;
+                                }
+                                if (parser.verbose) {
+                                    if ( ! replacedKeys.includes(key)) {
+                                        replacedKeys.push(key)
+                                        console.log(`Verbose:     evaluated setting: ${key}`)
+                                    }
+                                }
+                            }
+
+                            if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
+
+                                oldSetting[key] = {value: oldValue, isReferenced: false, lineNum: [lineNum]};
+                            }
+                            if (ifTagParser.thisIsOutOfFalseBlock) {
+                                const  replacingKeys = Object.keys(replacingKeyValues);
+                                if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
+                                    const  replacedValue = replacingKeyValues[key];
+
+                                    const  {original, spaceAndComment} = getReplacedLineInSettings(
+                                        line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
+
+                                    writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
+                                    output = true;
+                                    setting[key] = {value: replacedValue, isReferenced: false, lineNum: [lineNum]};
+                                    if (parser.verbose  &&  oldValue !== replacedValue) {
+                                        console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                        console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                                    }
+                                }
+                                else {
+                                    if (oldValue !== '') {
+                                        setting[key] = {value: oldValue, isReferenced: false, lineNum: [lineNum]};
+                                    }
+                                }
                             } else {
-                                evalatedKeyValues[key] = oldValue;
-                            }
-                            if (parser.verbose) {
-                                if ( ! replacedKeys.includes(key)) {
-                                    replacedKeys.push(key)
-                                    console.log(`Verbose:     evaluated setting: ${key}`)
+                                if (loopCount === 1  &&  key in toTagLines) {
+                                    if (toTagLines[key].includes(lineNum)) {
+                                        console.log(`\nError: ${getTestablePath(inputFilePath)}:${lineNum}: "#to:" tag cannot write in false condition block. Write "#to:" tags to be true condition.`);
+                                        errorCount += 1;
+                                    }
                                 }
                             }
                         }
 
-                        if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
-
-                            oldSetting[key] = {value: oldValue, isReferenced: false, lineNum: [lineNum]};
-                        }
-                        if (ifTagParser.thisIsOutOfFalseBlock) {
-                            const  replacingKeys = Object.keys(replacingKeyValues);
-                            if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
-                                const  replacedValue = replacingKeyValues[key];
-
-                                const  {original, spaceAndComment} = getReplacedLineInSettings(
-                                    line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
-
-                                writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
-                                output = true;
-                                setting[key] = {value: replacedValue, isReferenced: false, lineNum: [lineNum]};
-                                if (parser.verbose  &&  oldValue !== replacedValue) {
-                                    console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
-                                }
+                    // Out of settings
+                    } else {
+                        const  templateTag = parseTemplateTag(line, parser);
+                        if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
+                                &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
+                            var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+                            const  commonCase = (templateTag.label !== templateIfLabel);
+                            if (commonCase) {
+                                var  expected = getExpectedLine(oldSetting, templateTag.template);
+                                var  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
+                            } else { // if (templateTag.label === templateIfLabel)
+                                templateTag.evaluate(setting);
+                                var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
+                                var  replaced = getReplacedLine(setting, templateTag.newTemplate, replacingKeyValues);
                             }
-                            else {
-                                if (oldValue !== '') {
-                                    setting[key] = {value: oldValue, isReferenced: false, lineNum: [lineNum]};
+
+                            if (replacingLine.includes(expected)) {
+                                const  before = expected;
+                                const  after = replaced;
+                                if (templateTag.lineNumOffset === 0) {
+                                    var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
+                                    if (cutReplaceToTagEnabled) {
+                                        replacedLine = cutReplaceToTag(replacedLine);
+                                    }
+
+                                    writer.write(replacedLine +"\n");
+                                    output = true;
+                                    checkedTemplateTags[lineNum] = [];
+                                    checkedTemplateTags[lineNum].push({
+                                        templateLineNum: lineNum,
+                                        template: templateTag.template,
+                                        targetLineNum: lineNum + templateTag.lineNumOffset,
+                                        expected: before,
+                                        replaced: after.replace(/\$/g,'$$')
+                                    })
+                                } else if (templateTag.lineNumOffset <= -1) {
+                                    const  targetLineNum = lineNum + templateTag.lineNumOffset;
+                                    if ( !(targetLineNum in checkedTemplateTags)) {
+                                        checkedTemplateTags[targetLineNum] = [];
+                                    }
+                                    checkedTemplateTags[targetLineNum].push({
+                                        templateLineNum: lineNum,
+                                        template: templateTag.template,
+                                        targetLineNum,
+                                        expected: before,
+                                        replaced: after.replace(/\$/g,'$$')
+                                    });
+                                    var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice();
+                                    lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
+                                    var  replacedLine = replacingLine;
+                                    var  maskedLine = replacingLine;
+                                    const  mask = '\n';
+                                    const  conflictedTemplates: CheckedTemplateTag[] = [];
+                                    for (const template of lengthSortedTemplates) {
+                                        var  i = 0;
+                                        if ( ! maskedLine.includes(template.expected)) {
+                                            if ( ! replacedLine.includes(template.replaced)) {
+                                                conflictedTemplates.push(template);
+                                            }
+                                        } else {
+                                            for (;;) {
+                                                i = maskedLine.indexOf(template.expected, i);
+                                                if (i === notFound) {
+                                                    break;
+                                                }
+
+                                                replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                                maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                                i += template.expected.length;
+                                            }
+                                        }
+                                    }
+
+                                    writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
+                                    if (conflictedTemplates.length >= 1) {
+                                        var  errorMessage = '';
+                                        errorMessage += '\n';
+                                        errorMessage += `${translate('ErrorIn')}: ${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
+                                        errorMessage += `  ${translate('Error')}: ${translate('template values after replace are conflicted.')}\n`;
+                                        errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
+                                        for (const template of checkedTemplateTags[targetLineNum]) {
+                                            errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
+                                            errorMessage += `    ${translate('Before Editing')}: ${template.expected.trim()}\n`;
+                                            errorMessage += `    ${translate('After  Editing')}: ${template.replaced.trim()}\n`;
+                                            errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
+                                        }
+                                        errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
+                                        conflictErrors[targetLineNum] = errorMessage;
+                                    }
                                 }
-                            }
-                        } else {
-                            if (loopCount === 1  &&  key in toTagLines) {
-                                if (toTagLines[key].includes(lineNum)) {
-                                    console.log(`\nError: ${getTestablePath(inputFilePath)}:${lineNum}: "#to:" tag cannot write in false condition block. Write "#to:" tags to be true condition.`);
+                                if (parser.verbose  &&  before !== after) {
+                                    console.log(`Verbose: replaced a line:`);
+                                    console.log(`Verbose:     from: ${before}`);
+                                    console.log(`Verbose:     to:   ${after}`);
+                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
+                                }
+                            } else if (replacingLine.includes(replaced)) {
+                                // Do nothing
+                            } else {
+                                if (errorCount === 0) { // Since only one old value can be replaced at a time
+                                    console.log('');
+                                    console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                    console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
+                                    console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
+                                    console.log(`  ${translate('Contents')}: ${line.trim()}`);
+                                    console.log(`  ${translate('Expected')}: ${expected.trim()}`);
+                                    console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
+                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                                     errorCount += 1;
                                 }
                             }
-                        }
-                    }
-
-                // Out of settings
-                } else {
-                    const  templateTag = parseTemplateTag(line, parser);
-                    if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
-                            &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
-                        var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                        const  commonCase = (templateTag.label !== templateIfLabel);
-                        if (commonCase) {
-                            var  expected = getExpectedLine(oldSetting, templateTag.template);
-                            var  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
-                        } else { // if (templateTag.label === templateIfLabel)
-                            templateTag.evaluate(setting);
-                            var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                            var  replaced = getReplacedLine(setting, templateTag.newTemplate, replacingKeyValues);
-                        }
-
-                        if (replacingLine.includes(expected)) {
-                            const  before = expected;
-                            const  after = replaced;
-                            if (templateTag.lineNumOffset === 0) {
-                                var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
-                                if (cutReplaceToTagEnabled) {
-                                    replacedLine = cutReplaceToTag(replacedLine);
-                                }
-
-                                writer.write(replacedLine +"\n");
-                                output = true;
-                                checkedTemplateTags[lineNum] = [];
-                                checkedTemplateTags[lineNum].push({
-                                    templateLineNum: lineNum,
-                                    template: templateTag.template,
-                                    targetLineNum: lineNum + templateTag.lineNumOffset,
-                                    expected: before,
-                                    replaced: after.replace(/\$/g,'$$')
-                                })
-                            } else if (templateTag.lineNumOffset <= -1) {
-                                const  targetLineNum = lineNum + templateTag.lineNumOffset;
-                                if ( !(targetLineNum in checkedTemplateTags)) {
-                                    checkedTemplateTags[targetLineNum] = [];
-                                }
-                                checkedTemplateTags[targetLineNum].push({
-                                    templateLineNum: lineNum,
-                                    template: templateTag.template,
-                                    targetLineNum,
-                                    expected: before,
-                                    replaced: after.replace(/\$/g,'$$')
-                                });
-                                var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice();
-                                lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
-                                var  replacedLine = replacingLine;
-                                var  maskedLine = replacingLine;
-                                const  mask = '\n';
-                                const  conflictedTemplates: CheckedTemplateTag[] = [];
-                                for (const template of lengthSortedTemplates) {
-                                    var  i = 0;
-                                    if ( ! maskedLine.includes(template.expected)) {
-                                        if ( ! replacedLine.includes(template.replaced)) {
-                                            conflictedTemplates.push(template);
-                                        }
-                                    } else {
-                                        for (;;) {
-                                            i = maskedLine.indexOf(template.expected, i);
-                                            if (i === notFound) {
-                                                break;
-                                            }
-
-                                            replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
-                                            maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
-                                            i += template.expected.length;
-                                        }
-                                    }
-                                }
-
-                                writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
-                                if (conflictedTemplates.length >= 1) {
-                                    var  errorMessage = '';
-                                    errorMessage += '\n';
-                                    errorMessage += `${translate('ErrorIn')}: ${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
-                                    errorMessage += `  ${translate('Error')}: ${translate('template values are conflicted.')}\n`;
-                                    errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
-                                    for (const template of checkedTemplateTags[targetLineNum]) {
-                                        errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
-                                        errorMessage += `    ${translate('Before Editing')}: ${template.expected.trim()}\n`;
-                                        errorMessage += `    ${translate('After  Editing')}: ${template.replaced.trim()}\n`;
-                                        errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
-                                    }
-                                    errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
-                                    conflictErrors[targetLineNum] = errorMessage;
-                                }
-                            }
-                            if (parser.verbose  &&  before !== after) {
-                                console.log(`Verbose: replaced a line:`);
-                                console.log(`Verbose:     from: ${before}`);
-                                console.log(`Verbose:     to:   ${after}`);
-                                console.log(`Verbose:     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
-                            }
-                        } else if (replacingLine.includes(replaced)) {
-                            // Do nothing
                         } else {
-                            if (errorCount === 0) { // Since only one old value can be replaced at a time
-                                console.log('');
-                                console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                                console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
-                                console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
-                                console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                                console.log(`  ${translate('Expected')}: ${expected.trim()}`);
-                                console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
-                                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                                errorCount += 1;
-                            }
-                        }
-                    } else {
-                        if (isCheckingTemplateIfKey  &&  templateTag.label === templateIfLabel) {
-                            isCheckingTemplateIfKey = false;
-                            const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
-                            if (necessaryVariableNames !== '') {
-                                console.log('');
-                                console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                                console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
-                                console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
-                                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                                errorCount += 1;
-                                templateIfKeyError = true;
+                            if (isCheckingTemplateIfKey  &&  templateTag.label === templateIfLabel) {
+                                isCheckingTemplateIfKey = false;
+                                const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
+                                if (necessaryVariableNames !== '') {
+                                    console.log('');
+                                    console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                    console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
+                                    console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
+                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                    errorCount += 1;
+                                    templateIfKeyError = true;
+                                }
                             }
                         }
                     }
                 }
-            }
-            if (!output) {
-                if ( ! cutReplaceToTagEnabled) {
+                if (!output) {
+                    if ( ! cutReplaceToTagEnabled) {
 
-                    writer.write(line +"\n");
-                } else {
-                    if (line.trim() === '') {
                         writer.write(line +"\n");
                     } else {
-                        const  cutLine = cutReplaceToTag(line);
-                        if (cutLine.trim() === '') {
-                            lines.pop();  // for template-at tag
+                        if (line.trim() === '') {
+                            writer.write(line +"\n");
                         } else {
-                            writer.write(cutLine +"\n");
+                            const  cutLine = cutReplaceToTag(line);
+                            if (cutLine.trim() === '') {
+                                lines.pop();  // for template-at tag
+                            } else {
+                                writer.write(cutLine +"\n");
+                            }
                         }
                     }
                 }
             }
-        }
-        for (const conflictError of Object.values(conflictErrors)) {
-            console.log(conflictError);
-            errorCount += 1;
-        }
+            for (const conflictError of Object.values(conflictErrors)) {
+                console.log(conflictError);
+                errorCount += 1;
+            }
 
-        // previousReplacedKeys = ...
-        Object.keys(evalatedKeyValues).forEach((key: string) => {
-            previousEvalatedKeyValues[key] = evalatedKeyValues[key]; });
-        if (isAllReplacable) {
-            loop = false;
-        } else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
-            console.log('');
-            console.log(translate`Error of unexpected: The count of evalatedKeyValues is not increasing.' +
-                ' isReplacable may be not changed. Try typrm check command.`);
-            errorCount += 1;
-            loop = false;
-        }
+            // previousReplacedKeys = ...
+            Object.keys(evalatedKeyValues).forEach((key: string) => {
+                previousEvalatedKeyValues[key] = evalatedKeyValues[key]; });
+            if (isAllReplacable) {
+                loop = false;
+            } else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
+                console.log('');
+                console.log(translate`Error of unexpected: The count of evalatedKeyValues is not increasing.' +
+                    ' isReplacable may be not changed. Try typrm check command.`);
+                errorCount += 1;
+                loop = false;
+            }
 
-        // ...
-        writer.end();
-        await new Promise( (resolve) => {
-            writer.on('finish', () => {
-                if (errorCount === 0) {
-                    fs.copyFileSync(newFilePath, inputFilePath);
-                }
-                deleteFileSync(newFilePath);
-                resolve();
+            // ...
+            writer.end();
+            await new Promise( (resolve) => {
+                writer.on('finish', () => {
+                    if (errorCount === 0) {
+                        if (loop) {
+                            fs.copyFileSync(updatingFilePath, previousUpdatingFilePath);
+                        } else {
+                            fs.copyFileSync(updatingFilePath, inputFilePath);
+                        }
+                    } else {
+                        loop = false;
+                    }
+                    resolve();
+                });
             });
-        });
+        }
+    } finally {
+        deleteFileSync(previousUpdatingFilePath);
+        deleteFileSync(updatingFilePath);
     }
     return  errorCount;
 }
