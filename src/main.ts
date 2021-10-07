@@ -930,11 +930,15 @@ function  getReplacedLineInSettings(
     const  lineIncludesOriginalLabel = line.includes(originalLabel);
 
     // addOriginalTag
-    if (addOriginalTag  &&  ! lineIncludesOriginalLabel) {
+    if (addOriginalTag) {
 
         // before: __SettingB__: SetB
         // after:  __SettingB__: NewSetB  #original: SetB
-        original = `  ${originalLabel} ${oldValue}`;
+        if (! lineIncludesOriginalLabel) {
+            original = `  ${originalLabel} ${oldValue}`;
+        } else {
+            original = '';
+        }
 
         // cutReplaceToTag
         if (cutReplaceToTagEnabled  &&  spaceAndComment !== '') {

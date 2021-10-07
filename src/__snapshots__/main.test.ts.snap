@@ -2637,6 +2637,37 @@ Error of conflict #to: tag:
 "
 `;
 
+exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: replacedFileContents 1`] = `
+"settings:
+    __Set1__: B  #original: a
+body:
+    B  #template: __Set1__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: revertedFileContents 1`] = `
+"settings:
+    __Set1__: a
+body:
+    a  #template: __Set1__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: sourceFileContents 1`] = `
+"settings:
+    __Set1__: A  #original: a  #to: B
+body:
+    A  #template: __Set1__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/6_WithOriginalTag_1_changing.yaml:2: #to: __Set1__: B
+
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_Error: sourceFileContents 1`] = `
 "settings:
     __Switch__: B
