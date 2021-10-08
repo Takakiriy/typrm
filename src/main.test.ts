@@ -489,7 +489,9 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ['4_IfBlock_OK', ''],
             ['4E_IfBlock_Error', 'ErrorCase'],
             ['5_Conflict_Error', 'ErrorCase'],
-            ['6_WithOriginalTag', ''],
+            ['6_VariousTags', ''],
+            ['7_VariableCount', ''],
+            ['7E_VariableCount_Error', 'ErrorCase'],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {
             const  changingFolderPath = testFolderPath + '_changing';

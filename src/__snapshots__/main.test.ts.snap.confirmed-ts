@@ -2205,6 +2205,7 @@ exports[`replaces settings >> replace to tag >> 1_OK: replacedFileContents 1`] =
         __BodyL__: Valu  #original: ValueLength
         __BodyAt1__: ValueAtAt1  #original: ValueAt1
         __BodyAt2__: ValueAtAt2  #original: ValueAt2
+        __BodyAt3__: ValueAtAt3  #original: ValueAt3
 new body:
     ValueAA   #template: __BodyA__
     ValueBB
@@ -2215,8 +2216,10 @@ new body:
         #template: __BodyC2__  #keyword: dummy
     1. ValueAtAt1
     2. ValueAtAt2
-        #template-at(-2): 1. __BodyAt1__
-        #template-at(-2): 2. __BodyAt2__
+    3. ValueAtAt3
+        #template-at(-3): 1. __BodyAt1__
+        #template-at(-3): 2. __BodyAt2__
+        #template-at(-3): 3. __BodyAt3__
     #test of empty line
 
     -(ValueDD)-             #template: (__BodyD__)
@@ -2256,6 +2259,7 @@ exports[`replaces settings >> replace to tag >> 1_OK: revertedFileContents 1`] =
         __BodyL__: ValueLength
         __BodyAt1__: ValueAt1
         __BodyAt2__: ValueAt2
+        __BodyAt3__: ValueAt3
 new body:
     ValueA   #template: __BodyA__
     ValueB
@@ -2266,8 +2270,10 @@ new body:
         #template: __BodyC2__  #keyword: dummy
     1. ValueAt1
     2. ValueAt2
-        #template-at(-2): 1. __BodyAt1__
-        #template-at(-2): 2. __BodyAt2__
+    3. ValueAt3
+        #template-at(-3): 1. __BodyAt1__
+        #template-at(-3): 2. __BodyAt2__
+        #template-at(-3): 3. __BodyAt3__
     #test of empty line
 
     -(ValueD)-             #template: (__BodyD__)
@@ -2308,6 +2314,7 @@ exports[`replaces settings >> replace to tag >> 1_OK: sourceFileContents 1`] = `
         __BodyL__: ValueLength
         __BodyAt1__: ValueAt1
         __BodyAt2__: ValueAt2
+        __BodyAt3__: ValueAt3
 new body:
     ValueA   #template: __BodyA__   #to: ValueAA
     ValueB
@@ -2320,10 +2327,12 @@ new body:
         #to: ValueCC2
     1. ValueAt1
     2. ValueAt2
-        #template-at(-2): 1. __BodyAt1__
+    3. ValueAt3
+        #template-at(-3): 1. __BodyAt1__
             #to: ValueAtAt1
-        #template-at(-2): 2. __BodyAt2__
+        #template-at(-3): 2. __BodyAt2__
             #to: ValueAtAt2
+        #template-at(-3): 3. __BodyAt3__ #to: ValueAtAt3
     #test of empty line
 
     -(ValueD)-             #template: (__BodyD__)  #to:  ValueDD
@@ -2348,22 +2357,23 @@ exports[`replaces settings >> replace to tag >> 1_OK: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:6: #to: __SettingE__: SetEE
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:7: #to: __SettingF__: SetFF
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:9: #to: __SettingG__: SetGG
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:26: #to: __BodyA__: ValueAA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:28: #to: __BodyB__: ValueBB
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:31: #to: __BodyC__: ValueCC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:34: #to: __BodyC2__: ValueCC2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:38: #to: __BodyAt1__: ValueAtAt1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:40: #to: __BodyAt2__: ValueAtAt2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:43: #to: __BodyD__: ValueDD
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:44: #to: __BodyE__: ValueEE
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:45: #to: __BodyF1__: ValueFF1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:45: #to: __BodyF2__: ValueFF2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:46: #to: __BodyG1__: ValueGG1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:46: #to: __BodyG2__: ValueGG2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyL__: Valu
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:27: #to: __BodyA__: ValueAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:29: #to: __BodyB__: ValueBB
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:32: #to: __BodyC__: ValueCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:35: #to: __BodyC2__: ValueCC2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:40: #to: __BodyAt1__: ValueAtAt1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:42: #to: __BodyAt2__: ValueAtAt2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:43: #to: __BodyAt3__: ValueAtAt3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:46: #to: __BodyD__: ValueDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:47: #to: __BodyE__: ValueEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:48: #to: __BodyF1__: ValueFF1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:48: #to: __BodyF2__: ValueFF2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyG1__: ValueGG1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyG2__: ValueGG2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:52: #to: __BodyL__: Valu
 
 Warning: 0, Error: 0
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:51: #to: __SubA__: SetSubAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:54: #to: __SubA__: SetSubAA
 
 Warning: 0, Error: 0
 "
@@ -2620,6 +2630,11 @@ settings:
     __Set1__: A  #to: B
 body:
     A  #template: __Set1__  #to: b
+
+settings:
+    __Set1__: A
+body:
+    A/A  #template: __Set1__/__Set1__  #to: b/c
 "
 `;
 
@@ -2634,37 +2649,133 @@ Error of conflict #to: tag:
     key: __Set1__
     valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:8
     valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10
+
+Error of conflict #to: tag:
+    key: __Set1__
+    valueA: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:15
+    valueB: c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:15
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: replacedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 6_VariousTags: replacedFileContents 1`] = `
 "settings:
-    __Set1__: B  #original: a
+    __WithOriginalTag__: B  #original: a
 body:
-    B  #template: __Set1__
+    B  #template: __WithOriginalTag__
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 6_VariousTags: revertedFileContents 1`] = `
 "settings:
-    __Set1__: a
+    __WithOriginalTag__: a
 body:
-    a  #template: __Set1__
+    a  #template: __WithOriginalTag__
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: sourceFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 6_VariousTags: sourceFileContents 1`] = `
 "settings:
-    __Set1__: A  #original: a  #to: B
+    __WithOriginalTag__: A  #original: a  #to: B
 body:
-    A  #template: __Set1__
+    A  #template: __WithOriginalTag__
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 6_WithOriginalTag: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/6_WithOriginalTag_1_changing.yaml:2: #to: __Set1__: B
+exports[`replaces settings >> replace to tag >> 6_VariousTags: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/6_VariousTags_1_changing.yaml:2: #to: __WithOriginalTag__: B
 
 Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 7_VariableCount: replacedFileContents 1`] = `
+"settings:
+    __Set1A__: a  #original: A
+    __Set1B__: b  #original: B
+    __Set2A__: a  #original: A
+    __Set2B__: B
+    __Set3A__: A
+    __Set3B__: b  #original: B
+body:
+    a/b  #template: __Set1A__/__Set1B__
+    a/B  #template: __Set2A__/__Set2B__
+    A/b  #template: __Set3A__/__Set3B__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 7_VariableCount: revertedFileContents 1`] = `
+"settings:
+    __Set1A__: A
+    __Set1B__: B
+    __Set2A__: A
+    __Set2B__: B
+    __Set3A__: A
+    __Set3B__: B
+body:
+    A/B  #template: __Set1A__/__Set1B__
+    A/B  #template: __Set2A__/__Set2B__
+    A/B  #template: __Set3A__/__Set3B__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 7_VariableCount: sourceFileContents 1`] = `
+"settings:
+    __Set1A__: A
+    __Set1B__: B
+    __Set2A__: A
+    __Set2B__: B
+    __Set3A__: A
+    __Set3B__: B
+body:
+    A/B  #template: __Set1A__/__Set1B__
+        #to: a, b
+    A/B  #template: __Set2A__/__Set2B__
+        #to: a,
+    A/B  #template: __Set3A__/__Set3B__
+        #to: , b
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 7_VariableCount: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:10: #to: __Set1A__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:10: #to: __Set1B__: b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:12: #to: __Set2A__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:14: #to: __Set3B__: b
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 7E_VariableCount_Error: sourceFileContents 1`] = `
+"settings:
+    __SetA__: A
+    __SetB__: B
+body:
+    A/B  #template: __SetA__/__SetB__
+        #to: a
+    A/B  #template: __SetA__/__SetB__
+        #to: a, b, c
+    A  #template: __NotDefined__
+        #to: a
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 7E_VariableCount_Error: stdout 1`] = `
+"
+Error of the value count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6:        #to: a
+    Variable count in the template tag: 2
+    Variable count in the to tag: 1
+
+Error of the value count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8:        #to: a, b, c
+    Variable count in the template tag: 2
+    Variable count in the to tag: 3
+
+Error of the value count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:10:        #to: a
+    Variable count in the template tag: 0
+    Variable count in the to tag: 1
 "
 `;
 
@@ -2740,6 +2851,11 @@ Verbose:         template: (__BodyC1__)-(__BodyC2__)
 Verbose:         templatePattern: (*)-(*)
 Verbose:         toValue: (ValueCC1)-(ValueCC2
 Verbose:         toValueIsMatchedWithTemplate: false
+
+Error of the value count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:    -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
+    Variable count in the template tag: 2
+    Variable count in the to tag: 1
 Verbose:         __BodyC1__: (ValueCC1)-(ValueCC2
 "
 `;

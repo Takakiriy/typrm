@@ -577,7 +577,9 @@ describe("replaces settings >>", function () {
             ['4_IfBlock_OK', ''],
             ['4E_IfBlock_Error', 'ErrorCase'],
             ['5_Conflict_Error', 'ErrorCase'],
-            ['6_WithOriginalTag', ''],
+            ['6_VariousTags', ''],
+            ['7_VariableCount', ''],
+            ['7E_VariableCount_Error', 'ErrorCase'],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", function (caseName, options) { return __awaiter(void 0, void 0, void 0, function () {
             var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents, sourceFileContents2;

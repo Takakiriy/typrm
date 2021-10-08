@@ -1434,7 +1434,7 @@ var TemplateTag = /** @class */ (function () {
             this.isFound = true;
             this.endIndexInLine = line.indexOf(templateAtEndLabel, this.startIndexInLine);
             if (this.endIndexInLine !== notFound) {
-                this.template = line.substr(this.endIndexInLine + templateAtEndLabel.length).trim();
+                this.template = cutReplaceToTag(line.substr(this.endIndexInLine + templateAtEndLabel.length).trim());
                 this.lineNumOffset = parseInt(line.substring(this.startIndexInLine + templateAtStartLabel.length, this.endIndexInLine));
                 return;
             }
@@ -1482,7 +1482,7 @@ var TemplateTag = /** @class */ (function () {
         }
     };
     // scanKeyValues
-    TemplateTag.prototype.scanKeyValues = function (toValue, allKeys, lineNum, parser, hasTestTag) {
+    TemplateTag.prototype.scanKeyValues = function (toValue, allKeys, parser, hasTestTag) {
         return __awaiter(this, void 0, void 0, function () {
             var keysSortedByLength, foundIndices, verboseMode, template, _i, keysSortedByLength_1, key, index, indices, keys, placeholder, templatePattern, i, templateRegularExpression, toValueIsMatchedWithTemplate, keyValues, i, toValues, i, returnKeyValues, _a, _b, key;
             return __generator(this, function (_c) {
@@ -1536,14 +1536,24 @@ var TemplateTag = /** @class */ (function () {
                         // Case that "#to:" tag is pattern of template
                         //     (A:B)  #to: (a:b)  #template: (__A__:__B__)
                         for (i = 1; i < toValueIsMatchedWithTemplate.length; i += 1) {
+                            checkLineNoConfilict(keyValues, keys[i - 1], toValueIsMatchedWithTemplate[i], parser);
                             keyValues[keys[i - 1]] = toValueIsMatchedWithTemplate[i];
                         }
                         return [3 /*break*/, 3];
                     case 1: return [4 /*yield*/, lib.parseCSVColumns(toValue)];
                     case 2:
                         toValues = _c.sent();
+                        if (toValues.length !== keys.length) {
+                            console.log('');
+                            console.log('Error of the value count in #to tag:');
+                            console.log("    To tag: " + getTestablePath(parser.filePath) + ":" + parser.lineNum + ":" + parser.line);
+                            console.log("    Variable count in the template tag: " + keys.length);
+                            console.log("    Variable count in the to tag: " + toValues.length);
+                            parser.errorCount += 1;
+                        }
                         for (i = 0; i < keys.length; i += 1) {
                             if (i < toValues.length && toValues[i]) {
+                                checkLineNoConfilict(keyValues, keys[i], toValues[i], parser);
                                 keyValues[keys[i]] = toValues[i];
                             }
                         }
@@ -1554,7 +1564,7 @@ var TemplateTag = /** @class */ (function () {
                             key = _b[_a];
                             returnKeyValues[key] = {
                                 value: keyValues[key],
-                                lineNum: [lineNum],
+                                lineNum: [parser.lineNum],
                             };
                         }
                         return [2 /*return*/, returnKeyValues];
@@ -2212,6 +2222,8 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     line1 = reader_6_1.value;
                     line = line1;
                     lineNum += 1;
+                    parser.line = line;
+                    parser.lineNum = lineNum;
                     // setting = ...
                     if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                         isReadingSetting = true;
@@ -2275,7 +2287,7 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     if (parser.verbose || hasTestTag) {
                         console.log("Verbose:     " + getTestablePath(inputFilePath) + ":" + lineNum + ":");
                     }
-                    return [4 /*yield*/, previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), lineNum, parser, hasTestTag)];
+                    return [4 /*yield*/, previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), parser, hasTestTag)];
                 case 5:
                     newKeyValues = _g.sent();
                     errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
@@ -2310,6 +2322,7 @@ function makeReplaceSettingsFromToTags(inputFilePath) {
                     return [7 /*endfinally*/];
                 case 13: return [7 /*endfinally*/];
                 case 14:
+                    errorCount += parser.errorCount;
                     if (errorCount >= 1) {
                         replaceKeyValuesSet = [];
                     }
@@ -2337,6 +2350,19 @@ function checkNoConfilict(keyValueA, keyValueB, filePath) {
         }
     }
     return errorCount;
+}
+// checkLineNoConfilict
+function checkLineNoConfilict(keyValue, key, newValue, parser) {
+    if (key in keyValue) {
+        if (keyValue[key] !== newValue) {
+            console.log('');
+            console.log('Error of conflict #to: tag:');
+            console.log("    key: " + key);
+            console.log("    valueA: " + keyValue[key] + " in " + getTestablePath(parser.filePath) + ":" + parser.lineNum);
+            console.log("    valueB: " + newValue + " in " + getTestablePath(parser.filePath) + ":" + parser.lineNum);
+            parser.errorCount += 1;
+        }
+    }
 }
 // search
 function search() {
@@ -4274,9 +4300,11 @@ var Direction;
 var Parser = /** @class */ (function () {
     function Parser() {
         this.command = CommandEnum.unknown;
+        this.errorCount = 0;
         this.verbose = false;
         this.filePath = '';
         this.lineNum = 0;
+        this.line = '';
     }
     return Parser;
 }());

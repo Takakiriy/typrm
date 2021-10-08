@@ -1195,7 +1195,8 @@ class  TemplateTag {
             this.endIndexInLine =  line.indexOf(templateAtEndLabel, this.startIndexInLine);
             if (this.endIndexInLine !== notFound) {
 
-                this.template = line.substr(this.endIndexInLine + templateAtEndLabel.length).trim();
+                this.template = cutReplaceToTag(
+                    line.substr(this.endIndexInLine + templateAtEndLabel.length).trim());
                 this.lineNumOffset = parseInt(line.substring(
                     this.startIndexInLine + templateAtStartLabel.length,
                     this.endIndexInLine ));
@@ -1246,7 +1247,7 @@ class  TemplateTag {
     }
 
     // scanKeyValues
-    async  scanKeyValues(toValue: string, allKeys: string[], lineNum: number, parser: Parser, hasTestTag: boolean
+    async  scanKeyValues(toValue: string, allKeys: string[], parser: Parser, hasTestTag: boolean
             ):  Promise<{[name: string]: Setting}> {
         const  keysSortedByLength: string[] = allKeys.slice(); // copy
         keysSortedByLength.sort((b,a)=>(a.length, b.length));
@@ -1299,6 +1300,7 @@ class  TemplateTag {
             // Case that "#to:" tag is pattern of template
             //     (A:B)  #to: (a:b)  #template: (__A__:__B__)
             for (let i = 1;  i < toValueIsMatchedWithTemplate.length;  i += 1 ) {
+                checkLineNoConfilict(keyValues, keys[i-1], toValueIsMatchedWithTemplate[i], parser);
 
                 keyValues[keys[i-1]] = toValueIsMatchedWithTemplate[i];
             }
@@ -1307,8 +1309,17 @@ class  TemplateTag {
             // Case that "#to:" tag is CSV
             //     (A:B)  #to: a, b  #template: (__A__:__B__)
             const  toValues = await lib.parseCSVColumns( toValue );
+            if (toValues.length !== keys.length) {
+                console.log('');
+                console.log('Error of the value count in #to tag:');
+                console.log(`    To tag: ${getTestablePath(parser.filePath)}:${parser.lineNum}:${parser.line}`);
+                console.log(`    Variable count in the template tag: ${keys.length}`);
+                console.log(`    Variable count in the to tag: ${toValues.length}`);
+                parser.errorCount += 1;
+            }
             for (let i = 0;  i < keys.length;  i += 1 ) {
                 if (i < toValues.length  &&  toValues[i]) {
+                    checkLineNoConfilict(keyValues, keys[i], toValues[i], parser);
 
                     keyValues[keys[i]] = toValues[i];
                 }
@@ -1318,7 +1329,7 @@ class  TemplateTag {
         for (const key of Object.keys(keyValues)) {
             returnKeyValues[key] =  {
                 value: keyValues[key],
-                lineNum: [lineNum],
+                lineNum: [parser.lineNum],
             } as Setting;
         }
 
@@ -1792,6 +1803,8 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
+        parser.line = line;
+        parser.lineNum = lineNum;
 
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
@@ -1860,7 +1873,7 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
                     if (parser.verbose || hasTestTag) {
                         console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
                     }
-                    const  newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), lineNum, parser, hasTestTag);
+                    const  newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), parser, hasTestTag);
                     errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
                     if (parser.verbose || hasTestTag) {
                         for (const [key_, newValue] of Object.entries(newKeyValues)) {
@@ -1876,6 +1889,7 @@ async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<Re
             }
         }
     }
+    errorCount += parser.errorCount;
     if (errorCount >= 1) {
         replaceKeyValuesSet = [];
     } else {
@@ -1903,6 +1917,20 @@ function  checkNoConfilict(
         }
     }
     return  errorCount;
+}
+
+// checkLineNoConfilict
+function  checkLineNoConfilict(keyValue: {[key: string]: string}, key: string, newValue: string, parser: Parser) {
+    if (key in keyValue) {
+        if (keyValue[key] !== newValue) {
+            console.log('');
+            console.log('Error of conflict #to: tag:');
+            console.log(`    key: ${key}`);
+            console.log(`    valueA: ${keyValue[key]} in ${getTestablePath(parser.filePath)}:${parser.lineNum}`);
+            console.log(`    valueB: ${newValue} in ${getTestablePath(parser.filePath)}:${parser.lineNum}`);
+            parser.errorCount += 1;
+        }
+    }
 }
 
 // search
@@ -3666,9 +3694,11 @@ interface  EvaluationLog {
 // Parser
 class  Parser {
     command = CommandEnum.unknown;
+    errorCount = 0;
     verbose = false;
     filePath = '';
     lineNum = 0;
+    line = '';
 }
 
 // WriteBuffer
