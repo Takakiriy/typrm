@@ -907,6 +907,87 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     return  errorCount;
 }
 
+// makeSettingTree
+async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
+    const  settingsParser = new SettingsTreeParser();
+    const  parser = new Parser();
+    const  ifTagParser = new IfTagParser(parser);
+    var  reader = readline.createInterface({
+        input: fs.createReadStream(inputFilePath),
+        crlfDelay: Infinity
+    });
+    var  isReadingSetting = false;
+    var  setting: Settings = {};
+    var  settingCount = 0;
+    var  settingLineNum = 0;
+    var  lineNum = 0;
+    var  settingIndentLength = 0;
+    var  errorCount = 0;
+    parser.verbose = ('verbose' in programOptions);
+
+    for await (const line1 of reader) {
+        const  line: string = line1;
+        lineNum += 1;
+
+        // Set condition by "#if:" tag.
+        // setting
+        const  parsed = ifTagParser.evaluate(line, setting);
+// ToDo: check with parent settings
+        if (parsed.errorCount >= 1) {
+            console.log('');
+            console.log('Error of if tag syntax:');
+            console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+            console.log(`  Contents: ${parsed.condition}`);
+            errorCount += parsed.errorCount;
+        }
+
+        // setting = ...
+        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+            if (settingCount >= 1) {
+                // onEndOfSettingScope(setting, inputFilePath);
+            }
+            if (parser.verbose) {
+                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
+            }
+            isReadingSetting = true;
+
+            setting = {};
+            settingCount += 1;
+            settingLineNum = lineNum;
+            settingIndentLength = indentRegularExpression.exec(line)![0].length;
+        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+            isReadingSetting = false;
+        }
+        if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
+            const  separator = line.indexOf(':');
+            if (separator !== notFound) {
+                const  key = line.substr(0, separator).trim();
+                const  value = getValue(line, separator);
+                if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
+                    if (key in setting) {
+// ToDo: check with parent settings
+                        const  previous = setting[key];
+                        console.log('');
+                        console.log(translate('Error of duplicated variable name:'));
+                        console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
+                        console.log(`  ContentsA: ${key}: ${previous.value}`);
+                        console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                        console.log(`  ContentsB: ${key}: ${value}`);
+                        errorCount += 1;
+                    }
+                    if (parser.verbose) {
+                        console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
+                    }
+
+                    setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
+                }
+            }
+        }
+    }
+
+    return  settingsParser.getSettingsTree();
+}
+
 // getReplacedLineInSettings
 function  getReplacedLineInSettings(
         line: string, separator: number, oldValue: string, replacedValue: string,
@@ -3301,13 +3382,37 @@ enum CommandEnum {
     search,
 }
 
+// SettingsTreeParser
+class SettingsTreeParser {
+    settingsTree = new SettingsTree();
+
+    scanLine(lineNum: number, line: string) {
+
+    }
+
+    getSettingsTree(): SettingsTree {
+        return  this.settingsTree;
+    }
+}
+
+// SettingsTree
+class SettingsTree {
+    settings: {[lineNum: number]: Setting} = {};
+
+    getCurrentSetting(lineNum: number) {
+    }
+}
+
 // Settings
 type Settings = {[name: string]: Setting}
 
 // Setting
 interface Setting {
+    name?: string;
     value: string;
     lineNum: number[];
+    StartLineNum?: number;
+    LastLineNum?: number;
     isReferenced: boolean;
 }
 
