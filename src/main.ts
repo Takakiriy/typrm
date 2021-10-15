@@ -142,6 +142,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
     var  previousTemplateCount = 0;
+makeSettingTree(inputFilePath);
     for(;;) {
         var  reader = readline.createInterface({
             input: fs.createReadStream(inputFilePath),
@@ -906,11 +907,21 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     }
     return  errorCount;
 }
+var isDebug = false;
 
 // makeSettingTree
 async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
-    const  settingsParser = new SettingsTreeParser();
+    const  tree = new SettingsTree();
     const  parser = new Parser();
+    const  indentStack: {lineNum: number, indent: string}[] = [
+        {lineNum: 0, indent: ''}
+    ];
+    const  settingStack:
+            {lineNum: number, index: string, startLineNum: number, parentIndentLevel: number}[] = [
+        {lineNum: 0, index: '/',  startLineNum: 1, parentIndentLevel: -1},
+        {lineNum: 0, index: '/1', startLineNum: 0, parentIndentLevel: 0}
+        // "parentIndentLevel" is a parent indent of a settings tag. It is not a indent of a settings tag.
+    ];
     const  ifTagParser = new IfTagParser(parser);
     var  reader = readline.createInterface({
         input: fs.createReadStream(inputFilePath),
@@ -918,19 +929,62 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
     });
     var  isReadingSetting = false;
     var  setting: Settings = {};
-    var  settingCount = 0;
-    var  settingLineNum = 0;
+    var  currentSettingIndex = '/';
     var  lineNum = 0;
     var  settingIndentLength = 0;
     var  errorCount = 0;
     parser.verbose = ('verbose' in programOptions);
+    tree.indices[1] = '/';
+    tree.settings['/'] = {};
 
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
+var d = pp(`${lineNum}: ${line}`);
+
+        // indentStack = ...
+        const  indent = indentRegularExpression.exec(line)![0];
+        if (line !== '') {
+
+            // pop
+            while ( ! indent.startsWith(indentStack[indentStack.length - 1].indent)) {
+                indentStack.pop();
+            }
+            const  indentLevel = indentStack.length - 1;
+            const  previousIndent = indentStack[indentStack.length - 1];
+            while (indentLevel <= settingStack[settingStack.length - 2].parentIndentLevel) {
+                settingStack.pop();
+
+                const  setting_ = settingStack[settingStack.length - 1];
+                if ( ! (currentSettingIndex in tree.settings)) {
+                    tree.settings[currentSettingIndex] = setting;
+                    tree.indices[setting_.startLineNum] = currentSettingIndex;
+                }
+                setting = {}
+
+                currentSettingIndex = settingStack[settingStack.length - 2].index;
+                tree.indices[lineNum] = currentSettingIndex;
+
+                const  nextSetting = setting_;
+                const  parentSettingIndex = path.dirname(nextSetting.index);
+                const  usedNumber = parseInt(path.basename(nextSetting.index));
+                nextSetting.lineNum = 0;
+                if (parentSettingIndex === '/') {
+                    nextSetting.index = `/${usedNumber + 1}`;
+                } else {
+                    nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
+                }
+            }
+
+            // push
+            if (indent === previousIndent.indent) {
+                previousIndent.lineNum = lineNum;
+            } else {
+                indentStack.push({ lineNum, indent });
+            }
+        }
 
         // Set condition by "#if:" tag.
-        // setting
         const  parsed = ifTagParser.evaluate(line, setting);
 // ToDo: check with parent settings
         if (parsed.errorCount >= 1) {
@@ -943,20 +997,40 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
 
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-            if (settingCount >= 1) {
-                // onEndOfSettingScope(setting, inputFilePath);
-            }
-            if (parser.verbose) {
-                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
-            }
             isReadingSetting = true;
 
             setting = {};
-            settingCount += 1;
-            settingLineNum = lineNum;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+            settingIndentLength = indent.length;
+            if (indent === '') {
+                settingStack[0].lineNum = lineNum;
+                currentSettingIndex = '/';
+            } else {
+                const  setting_ = settingStack[settingStack.length - 1];
+                setting_.lineNum = lineNum;
+                setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
+                setting_.parentIndentLevel = indentStack.length - 2;
+                currentSettingIndex = setting_.index;
+                settingStack.push({
+                    lineNum: 0,
+                    index: setting_.index + '/1',
+                    startLineNum: 0,
+                    parentIndentLevel: -1
+                });
+            }
+            if (parser.verbose) {
+                console.log(`Verbose: settings ${currentSettingIndex}`);
+                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
+            }
+// ToDo: if (index in tree.settings) { error }
+        } else if (indent.length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
+
+            const  setting_ = settingStack[settingStack.length - 2];
+            if ( ! (currentSettingIndex in tree.settings)) {
+                tree.settings[currentSettingIndex] = setting;
+                tree.indices[setting_.startLineNum] = currentSettingIndex;
+            }
+            setting = {}
         }
         if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
             const  separator = line.indexOf(':');
@@ -984,8 +1058,18 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
             }
         }
     }
+    if (isReadingSetting) {
+        const  setting_ = settingStack[settingStack.length - 2];
+        tree.settings[currentSettingIndex] = setting;
+        tree.indices[setting_.startLineNum] = currentSettingIndex;
+    }
+    for (const index of Object.values(tree.indices)) {
+        if ( ! (index in tree.settings)) {
+            throw new Error('parse error in makeSettingTree');
+        }
+    }
 
-    return  settingsParser.getSettingsTree();
+    return  tree;
 }
 
 // getReplacedLineInSettings
@@ -3382,24 +3466,14 @@ enum CommandEnum {
     search,
 }
 
-// SettingsTreeParser
-class SettingsTreeParser {
-    settingsTree = new SettingsTree();
-
-    scanLine(lineNum: number, line: string) {
-
-    }
-
-    getSettingsTree(): SettingsTree {
-        return  this.settingsTree;
-    }
-}
-
 // SettingsTree
 class SettingsTree {
-    settings: {[lineNum: number]: Setting} = {};
+    indices: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
+    settings: {[indices: string]: {[name: string]: Setting}} = {};
+    currentSettings: {[name: string]: Setting} = {};
 
-    getCurrentSetting(lineNum: number) {
+    getCurrentSetting(lineNum: number): {[name: string]: Setting} {
+        return  this.currentSettings;
     }
 }
 
@@ -3410,7 +3484,7 @@ type Settings = {[name: string]: Setting}
 interface Setting {
     name?: string;
     value: string;
-    lineNum: number[];
+    lineNum: number[];  // This count is the same as #to: tag count
     StartLineNum?: number;
     LastLineNum?: number;
     isReferenced: boolean;

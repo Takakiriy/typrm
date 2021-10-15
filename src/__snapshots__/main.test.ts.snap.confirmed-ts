@@ -891,6 +891,110 @@ exports[`checks template value >> secret_1_error 1: sourceFileContents 1`] = `
     Key4: value4  #★秘密:あり"
 `;
 
+exports[`checks template value >> settings_tree 1: sourceFileContents 1`] = `
+"settings:
+    __A__: ValueA
+    __B__: ValueB
+main:
+    settings:
+        __1A__: Value1A
+        __1B__: Value1B
+    body:
+        - "ValueA"  #template: "__A__"
+        - "ValueB"  #template: "__B__"
+        - "Value1A"  #template: "__1A__"
+        - "Value1B"  #template: "__1B__"
+"
+`;
+
+exports[`checks template value >> settings_tree_deep 1: sourceFileContents 1`] = `
+"settings:
+    __A__: ValueA
+section1:
+    settings:
+        __1A__: Value1A
+    part1:
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        settings:
+            __11A__: Value11A
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        Value11A:  #template: __11A__
+    part2:
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        settings:
+            __11A__: Value11A_2
+            #// The next line is for the test of an empty line
+
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        Value11A_2:  #template: __11A__
+    ValueA:  #template: __A__
+    Value1A:  #template: __1A__
+    __11A__:  #template: __11A__
+    deep:
+        sub:
+            sub2:
+                settings:
+                    __111A__: Value111A
+                Value111A:  #template: __111A__
+            __111A__:  #template: __111A__
+    grand parent:
+        settings:
+            __11A__: Value11A_3
+__11A__:  #template: __11A__  #// ground parent of the previous line
+__1A__-1:  #template: __1A__-1
+section2:
+    settings:
+        __1A__: Value1A_2
+    Value1A_2:  #template: __1A__
+ValueA:  #template: __A__
+__1A__-2:  #template: __1A__-2
+"
+`;
+
+exports[`checks template value >> settings_tree_error 1: sourceFileContents 1`] = `
+"BadA:  #template: __A__
+main:
+    BadA:  #template: __A__
+    Bad1A:  #template: __1A__
+    Bad11A:  #template: __11A__
+    settings:
+        __1A__: Value1A
+    sub:
+        settings:
+            __11A__: Value11A
+        Bad11A:  #template: __11A__
+    BadA:  #template: __A__
+    Bad1A:  #template: __1A__
+    Bad11A:  #template: __11A__
+    deep:
+        sub:
+            sub2:
+                settings:
+                    __111A__: Value111A
+                Bad111A:  #template: __111A__
+settings:
+    __A__: ValueA
+"
+`;
+
+exports[`checks template value >> settings_tree_position 1: sourceFileContents 1`] = `
+"ValueA:  #template: __A__
+main1:
+    ValueA:  #template: __A__
+    Value1A:  #template: __1A__
+    settings:
+        __1A__: Value1A
+    ValueA:  #template: __A__
+    Value1A:  #template: __1A__
+settings:
+    __A__: ValueA
+"
+`;
+
 exports[`checks template value >> template_if_1_error 1`] = `
 "
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:6
