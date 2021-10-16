@@ -994,26 +994,32 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tr
   Template: __11A__
   Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:17
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:30
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:33
+  Contents: __111A__:  #template: __111A__
+  Expected: Value111A
+  Template: __111A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:30
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:37
   Contents: __11A__:  #template: __11A__  #// ground parent of the previous line
   Expected: Value11A_3
   Template: __11A__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:28
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:35
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:36
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:43
   Contents: ValueA:  #template: __A__
   Expected: __A__
   Template: __A__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:33
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:40
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:37
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:44
   Contents: __1A__-2:  #template: __1A__-2
   Expected: Value1A_2-2
   Template: __1A__-2
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:33
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:40
 
-Warning: 0, Error: 13
-template count = 18
+Warning: 0, Error: 14
+template count = 20
 "
 `;
 
@@ -1062,6 +1068,71 @@ section2:
     Value1A_2:  #template: __1A__
 ValueA:  #template: __A__
 __1A__-2:  #template: __1A__-2
+"
+`;
+
+exports[`checks template value >> settings_tree_error 1`] = `
+"
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:1
+  Contents: BadA:  #template: __A__
+  Expected: __A__
+  Template: __A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:0
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:3
+  Contents: BadA:  #template: __A__
+  Expected: __A__
+  Template: __A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:0
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:4
+  Contents: Bad1A:  #template: __1A__
+  Expected: __1A__
+  Template: __1A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:0
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:5
+  Contents: Bad11A:  #template: __11A__
+  Expected: __11A__
+  Template: __11A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:0
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml 7
+  Not referenced: __1A__
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:11
+  Contents: Bad11A:  #template: __11A__
+  Expected: Value11A
+  Template: __11A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:9
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:12
+  Contents: BadA:  #template: __A__
+  Expected: __A__
+  Template: __A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:9
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:13
+  Contents: Bad1A:  #template: __1A__
+  Expected: __1A__
+  Template: __1A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:9
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:14
+  Contents: Bad11A:  #template: __11A__
+  Expected: Value11A
+  Template: __11A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:9
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:20
+  Contents: Bad111A:  #template: __111A__
+  Expected: Value111A
+  Template: __111A__
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:18
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml 22
+  Not referenced: __A__
+
+Warning: 0, Error: 9
+template count = 9
 "
 `;
 

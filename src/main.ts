@@ -142,8 +142,11 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
     var  previousTemplateCount = 0;
-makeSettingTree(inputFilePath);
     for(;;) {
+        // const  settingTree = await makeSettingTree(inputFilePath);
+        // if (settingTree.errorCount >= 1) {
+        //     break;
+        // }
         var  reader = readline.createInterface({
             input: fs.createReadStream(inputFilePath),
             crlfDelay: Infinity
@@ -907,7 +910,6 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
     }
     return  errorCount;
 }
-var isDebug = false;
 
 // makeSettingTree
 async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
@@ -940,7 +942,6 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
-var d = pp(`${lineNum}: ${line}`);
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -1068,6 +1069,7 @@ var d = pp(`${lineNum}: ${line}`);
             throw new Error('parse error in makeSettingTree');
         }
     }
+    tree.errorCount = errorCount;
 
     return  tree;
 }
@@ -3470,10 +3472,59 @@ enum CommandEnum {
 class SettingsTree {
     indices: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
     settings: {[indices: string]: {[name: string]: Setting}} = {};
+    errorCount: number = 0;
+
     currentSettings: {[name: string]: Setting} = {};
+    nextSettingLineNum = 1;
+    nextLineNumIndex = 0;
 
     getCurrentSetting(lineNum: number): {[name: string]: Setting} {
+
+        // If compatible mode
+        if (lineNum === this.nextSettingLineNum) {
+            const  index = this.indices[lineNum];  // e.g. "/a/b"
+
+            this.currentSettings = this.settings[index];
+            const  startLineNums = Object.keys(this.indices);
+            if (this.nextLineNumIndex < startLineNums.length) {
+                this.nextLineNumIndex += 1;
+
+                this.nextSettingLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
+            } else {
+                this.nextSettingLineNum = 0;
+            }
+        }
+
         return  this.currentSettings;
+
+        // // If tree mode
+        // if (lineNum === this.nextSettingLineNum) {
+        //     const  index = this.indices[lineNum];  // e.g. "/a/b"
+        //     var    parentIndex = '/';
+        //     var    separatorPosition = 0;
+        // 
+        //     this.currentSettings = {};
+        //     for (;;) {
+        //         const  parentSetting = this.settings[parentIndex];
+        // 
+        //         this.currentSettings = { ...this.currentSettings, ...parentSetting };
+        //         separatorPosition = index.indexOf('/', separatorPosition + 1);
+        //         if (separatorPosition === notFound) {
+        //             break;
+        //         }
+        //         parentIndex = index.substr(0, separatorPosition);
+        //     }
+        //     const  startLineNums = Object.keys(this.indices);
+        //     if (this.nextLineNumIndex < startLineNums.length) {
+        //         this.nextLineNumIndex += 1;
+        // 
+        //         this.nextSettingLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
+        //     } else {
+        //         this.nextSettingLineNum = 0;
+        //     }
+        // }
+        // 
+        // return  this.currentSettings;
     }
 }
 

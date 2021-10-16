@@ -65,7 +65,7 @@ beforeAll(()=>{
 });
 
 describe("checks template value >>", () => {
-    test.only.each([
+    test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
@@ -80,7 +80,7 @@ describe("checks template value >>", () => {
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
-if (fileNameHead !== 'settings_tree_error') {return;}  // || subCase !== '____'
+//if (fileNameHead !== 'settings_tree_error') {return;}  // || subCase !== '____'
         const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead} 1: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
@@ -93,7 +93,7 @@ if (fileNameHead !== 'settings_tree_error') {return;}  // || subCase !== '____'
         process.chdir('..');
         expect(main.stdout).toMatchSnapshot();
         fs.rmdirSync('test_data/_checking', {recursive: true});
-expect('test code').toBe('deleted skip code.');
+//expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {
