@@ -468,63 +468,53 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_
   Contents: - echo  \\"value  2\\"
   Expected: - echo  \\"value2\\"
   Template: - echo  \\"__Key2__\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:14
   Contents: - v1
   Expected: - value1
   Template: - key1
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:16
   Contents: - __ \\"value3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:18
   Contents: - __ \\"value3\\"  #template: - \\"Key3\\"
   Expected: - \\"value3\\"
   Template: - \\"Key3\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:25
   Contents: - value1
   Expected: - value11
   Template: - key1
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:27
   Contents: - １行に２つのケース： value1, value11
   Expected: value11, value11
   Template: key1, key1
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:29
   Contents: - １行に２つのケース： value11, value1
   Expected: value11, value11
   Template: key1, key1
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:31
 Template:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:33
   Contents: - ２行上のケース： \\"value11x\\"
   Expected: \\"value11\\"
   Template: \\"key1\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:34
 Template:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:37
   Contents: - ３行上のケース： \\"value11x\\"
   Expected: \\"value11\\"
   Template: \\"key1\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:38
   Contents: - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
   Expected: \\"value11\\"
   Template: \\"key1\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:40
   Contents: #template-at(1): \\"key1\\"
@@ -538,7 +528,6 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_
   Contents: - value  #template: __Undefined__
   Expected: __Undefined__
   Template: __Undefined__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21
 
 Warning: 0, Error: 13
 template count = 13
@@ -861,13 +850,16 @@ WarningLine: 4
   This is a secret value.
   Replace \\"#secret\\" to \\"#secret:example\\".'
   Replace \\"#★秘密\\" to \\"#★秘密:仮\\".'
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:1
+
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 2
   Not referenced: key1
+
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 3
   Not referenced: __Key2__
+
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 4
   Not referenced: Key3
+
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 5
   Not referenced: Key4
 
@@ -1235,13 +1227,17 @@ exports[`checks template value >> template_if_1_error: sourceFileContents 1`] = 
 `;
 
 exports[`checks template value >> var_not_ref_1_error: answer 1`] = `
-"Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 2
+"
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 3
   Not referenced: key1
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 5
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 6
   Not referenced: Key3
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 12
-  Not referenced: key1
+
 Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 13
+  Not referenced: key1
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 14
   Not referenced: __Key2__
 
 Warning: 0, Error: 0
@@ -1250,22 +1246,23 @@ template count = 2
 `;
 
 exports[`checks template value >> var_not_ref_1_error: sourceFileContents 1`] = `
-"設定:
-    key1: value1
-    __Key2__: value2  #コメント
-        #コメント
-    Key3: value3
+"A:
+    設定:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
 
-手順:
-    - echo  "value2"
-        #template: - echo  "__Key2__"
-
-設定:
-    key1: value11
-    __Key2__: value2
-    Key3: value3
-手順: |
-    - echo  "value3"  #template: - echo  "Key3"
+    手順:
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+B:
+    設定:
+        key1: value11
+        __Key2__: value2
+        Key3: value3
+    手順: |
+        - echo  "value3"  #template: - echo  "Key3"
 "
 `;
 

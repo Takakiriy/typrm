@@ -341,7 +341,6 @@ var d = pp(`- ${lineNum} ${line}`);
                         console.log(`  ${translate('This is a secret value.')}`);
                         console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
                         console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
-                        console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                         warningCount += 1;
                     }
                     secretLabelCount += 1;
