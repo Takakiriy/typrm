@@ -23,6 +23,8 @@ if (process.env.windir) {
 } else {
     var  testingOS = 'Linux';
 }
+const  newSpecification = false;
+const  newCode = true;
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
         regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?\$
@@ -65,7 +67,7 @@ beforeAll(()=>{
 });
 
 describe("checks template value >>", () => {
-    test.each([
+    test.only.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
@@ -80,8 +82,8 @@ describe("checks template value >>", () => {
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
-//if (fileNameHead !== 'settings_tree_error') {return;}  // || subCase !== '____'
-        const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead} 1: sourceFileContents 1`);
+if (fileNameHead !== '1_template_3_if') {return;}  // || subCase !== '____'
+        const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
         process.chdir('empty_folder');
@@ -91,13 +93,13 @@ describe("checks template value >>", () => {
         });
 
         process.chdir('..');
-        expect(main.stdout).toMatchSnapshot();
+        expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
+expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {
-        const  sourceFileContents = lib.getSnapshot(`checks template value >> 1_template_1_ok 1: sourceFileContents 1`);
+        const  sourceFileContents = lib.getSnapshot(`checks template value >> 1_template_1_ok: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/1_template_1_ok_1.yaml`, sourceFileContents);
         process.chdir('empty_folder');
@@ -106,12 +108,12 @@ describe("checks template value >>", () => {
             folder: '../test_data', test: "", locale: "en-US",
         });
         process.chdir('..');
-        expect(main.stdout).toMatchSnapshot();
+        expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
     test("check files in multi folder", async () => {
-        const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error 1: sourceFileContents 1`);
+        const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
         writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
@@ -121,12 +123,12 @@ describe("checks template value >>", () => {
             folder: '../test_data/_checking/1, ../test_data/_checking/2/*.yaml', test: "", locale: "en-US",
         });
         process.chdir('..');
-        expect(main.stdout).toMatchSnapshot();
+        expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
     test("verbose", async () => {
-        const  sourceFileContents = lib.getSnapshot(`checks template value >> verbose 1: sourceFileContents 1`);
+        const  sourceFileContents = lib.getSnapshot(`checks template value >> verbose: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
         process.chdir('empty_folder');

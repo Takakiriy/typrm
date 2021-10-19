@@ -139,14 +139,12 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     if (isModal) {
         var  inputFilePath = await lib.inputPath( translate('YAML UTF-8 file path>') );
     }
+pp('checkRoutine')
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
     var  previousTemplateCount = 0;
     for(;;) {
-        // const  settingTree = await makeSettingTree(inputFilePath);
-        // if (settingTree.errorCount >= 1) {
-        //     break;
-        // }
+        const  settingTree = await makeSettingTree(inputFilePath);
         var  reader = readline.createInterface({
             input: fs.createReadStream(inputFilePath),
             crlfDelay: Infinity
@@ -159,7 +157,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
         var  lineNum = 0;
         var  templateCount = 0;
         var  fileTemplateTag: TemplateTag | null = null;
-        var  errorCount = 0;
+        var  errorCount = settingTree.errorCount;
         var  warningCount = 0;
         var  secretLabelCount = 0;
         const  parser = new Parser();
@@ -175,6 +173,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             lines.push(line);
             lineNum += 1;
             parser.lineNum = lineNum;
+var d = pp(`- ${lineNum} ${line}`);
 
             // Set condition by "#if:" tag.
             const  parsed = ifTagParser.evaluate(line, setting);
@@ -187,43 +186,54 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             }
 
             // setting = ...
-            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                if (settingCount >= 1) {
-                    onEndOfSettingScope(setting, inputFilePath);
-                }
-                if (parser.verbose) {
-                    console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
-                }
-                isReadingSetting = true;
+            if (newCode) {
 
-                setting = {};
-                settingCount += 1;
-                settingLineNum = lineNum;
-                settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-                isReadingSetting = false;
-            }
-            if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                const  separator = line.indexOf(':');
-                if (separator !== notFound) {
-                    const  key = line.substr(0, separator).trim();
-                    const  value = getValue(line, separator);
-                    if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
-                        if (key in setting) {
-                            const  previous = setting[key];
-                            console.log('');
-                            console.log(translate('Error of duplicated variable name:'));
-                            console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
-                            console.log(`  ContentsA: ${key}: ${previous.value}`);
-                            console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                            console.log(`  ContentsB: ${key}: ${value}`);
-                            errorCount += 1;
-                        }
-                        if (parser.verbose) {
-                            console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
-                        }
+                settingTree.moveToLine(lineNum);
+                setting = settingTree.currentSettings;
 
-                        setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
+                if (settingTree.outOfScopeSettingIndices.length >= 1) {
+                    onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                        inputFilePath);
+                }
+            } else {
+                if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+                    if (settingCount >= 1) {
+                        onEndOfSettingScope(setting, inputFilePath);
+                    }
+                    if (parser.verbose) {
+                        console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
+                    }
+                    isReadingSetting = true;
+
+                    setting = {};
+                    settingCount += 1;
+                    settingLineNum = lineNum;
+                    settingIndentLength = indentRegularExpression.exec(line)![0].length;
+                } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                    isReadingSetting = false;
+                }
+                if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                    const  separator = line.indexOf(':');
+                    if (separator !== notFound) {
+                        const  key = line.substr(0, separator).trim();
+                        const  value = getValue(line, separator);
+                        if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
+                            if (key in setting) {
+                                const  previous = setting[key];
+                                console.log('');
+                                console.log(translate('Error of duplicated variable name:'));
+                                console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
+                                console.log(`  ContentsA: ${key}: ${previous.value}`);
+                                console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                                console.log(`  ContentsB: ${key}: ${value}`);
+                                errorCount += 1;
+                            }
+                            if (parser.verbose) {
+                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
+                            }
+
+                            setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
+                        }
                     }
                 }
             }
@@ -290,7 +300,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     } else { // if (templateTag.label === templateIfLabel)
                         console.log(`  ${translate('Expression')}: ${templateTag.template}`);
                     }
-                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                     errorCount += 1;
                 }
             }
@@ -357,8 +366,16 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                 keywords.push(keyword);
             }
         }
-        if (settingCount >= 1) {
-            onEndOfSettingScope(setting, inputFilePath);
+        if (newCode) {
+            settingTree.moveToEndOfFile();
+            if (settingTree.outOfScopeSettingIndices.length >= 1) {
+                onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                    inputFilePath);
+            }
+        } else {
+            if (settingCount >= 1) {
+                onEndOfSettingScope(setting, inputFilePath);
+            }
         }
 
         // Check target file contents by "#file-template:" tag (2).
@@ -900,7 +917,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                     } else {
                         loop = false;
                     }
-                    resolve();
+                    resolve(errorCount);
                 });
             });
         }
@@ -938,10 +955,12 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
     parser.verbose = ('verbose' in programOptions);
     tree.indices[1] = '/';
     tree.settings['/'] = {};
+pp('makeSettingTree')
 
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
+var d = pp(`${lineNum}: ${line}`);
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -960,6 +979,10 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
                 if ( ! (currentSettingIndex in tree.settings)) {
                     tree.settings[currentSettingIndex] = setting;
                     tree.indices[setting_.startLineNum] = currentSettingIndex;
+                    tree.settingsInformation[currentSettingIndex] = {
+                        index: currentSettingIndex,
+                        lineNum: setting_.lineNum
+                    };
                 }
                 setting = {}
 
@@ -989,11 +1012,13 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
         const  parsed = ifTagParser.evaluate(line, setting);
 // ToDo: check with parent settings
         if (parsed.errorCount >= 1) {
-            console.log('');
-            console.log('Error of if tag syntax:');
-            console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-            console.log(`  Contents: ${parsed.condition}`);
-            errorCount += parsed.errorCount;
+            if (newCode) {
+                console.log('');
+                console.log('Error of if tag syntax:');
+                console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                console.log(`  Contents: ${parsed.condition}`);
+                errorCount += parsed.errorCount;
+            }
         }
 
         // setting = ...
@@ -1025,13 +1050,16 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
 // ToDo: if (index in tree.settings) { error }
         } else if (indent.length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
-
             const  setting_ = settingStack[settingStack.length - 2];
             if ( ! (currentSettingIndex in tree.settings)) {
+
                 tree.settings[currentSettingIndex] = setting;
                 tree.indices[setting_.startLineNum] = currentSettingIndex;
+                tree.settingsInformation[currentSettingIndex] = {
+                    index: currentSettingIndex,
+                    lineNum: setting_.lineNum
+                };
             }
-            setting = {}
         }
         if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
             const  separator = line.indexOf(':');
@@ -1041,14 +1069,16 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
                 if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
                     if (key in setting) {
 // ToDo: check with parent settings
-                        const  previous = setting[key];
-                        console.log('');
-                        console.log(translate('Error of duplicated variable name:'));
-                        console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
-                        console.log(`  ContentsA: ${key}: ${previous.value}`);
-                        console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                        console.log(`  ContentsB: ${key}: ${value}`);
-                        errorCount += 1;
+                        if (newCode) {
+                            const  previous = setting[key];
+                            console.log('');
+                            console.log(translate('Error of duplicated variable name:'));
+                            console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
+                            console.log(`  ContentsA: ${key}: ${previous.value}`);
+                            console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                            console.log(`  ContentsB: ${key}: ${value}`);
+                            errorCount += 1;
+                        }
                     }
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
@@ -1063,6 +1093,10 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
         const  setting_ = settingStack[settingStack.length - 2];
         tree.settings[currentSettingIndex] = setting;
         tree.indices[setting_.startLineNum] = currentSettingIndex;
+        tree.settingsInformation[currentSettingIndex] = {
+            index: currentSettingIndex,
+            lineNum : setting_.lineNum
+        };
     }
     for (const index of Object.values(tree.indices)) {
         if ( ! (index in tree.settings)) {
@@ -1070,8 +1104,21 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
         }
     }
     tree.errorCount = errorCount;
+printSettingTree(tree);
 
     return  tree;
+}
+
+function  printSettingTree(tree: SettingsTree) {
+pp('-------------------------------------------------')
+pp('end of makeSettingTree')
+for (const [index, settings] of Object.entries(tree.settings)) {
+    pp(`index = ${index}`);
+    for (const [name, setting] of Object.entries(settings)) {
+        pp(`${lib.getObjectID(setting)}: ${name} ${setting.isReferenced}`);
+    }
+}
+pp('-------------------------------------------------')
 }
 
 // getReplacedLineInSettings
@@ -3012,20 +3059,26 @@ function  varidateRevertCommandArguments() {
     }
 }
 
-// onEndOfSetting
+// onEndOfSettingScope
 function onEndOfSettingScope(setting: Settings, inputFilePath: string) {
+var d = pp('onEndOfSettingScope')
+pp(setting)
     for (const key of Object.keys(setting)) {
+pp(`${lib.getObjectID(setting[key])}: ${key} .isReferenced: ${setting[key].isReferenced}`);
         if (!setting[key].isReferenced) {
+            console.log('');
             console.log(translate`Error: ${getTestablePath(inputFilePath)} ${setting[key].lineNum}`);
             console.log(translate`  Not referenced: ${key}`);
         }
     }
+pp('')
 }
 
 // evaluateIfCondition
 function  evaluateIfCondition(expression: string, setting: Settings, parser: Parser,
         previsousEvalatedKeyValues: string[] = [])
         : boolean | Error | EvaluatedCondition {
+pp('evaluateIfCondition')
 
     if (expression === 'true') {
         if (parser.verbose) {
@@ -3066,6 +3119,7 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
             if (name in setting) {
 
                 var  leftValue = setting[name].value;
+pp(`a) ${lib.getObjectID(setting[name])}: ${name} .isReferenced = true`);
                 setting[name].isReferenced = true;
             } else {
                 return  new Error(`not found ${name} in the settings`);
@@ -3282,6 +3336,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
 
         const  expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g,'$$'));
         if (expectedAfter !== expected) {
+pp(`b) ${lib.getObjectID(setting[key])}: ${key} .isReferenced = true`);
             setting[key].isReferenced = true;
             log.push({before: key, after: setting[key].value});
         }
@@ -3472,27 +3527,36 @@ enum CommandEnum {
 class SettingsTree {
     indices: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
     settings: {[indices: string]: {[name: string]: Setting}} = {};
+    settingsInformation: {[indices: string]: SettingsInformation} = {};
     errorCount: number = 0;
 
     currentSettings: {[name: string]: Setting} = {};
-    nextSettingLineNum = 1;
+    currentSettingIndex = '';
+    nextSettingsLineNum = 1;
     nextLineNumIndex = 0;
+    outOfScopeSettingIndices: string[] = [];
 
-    getCurrentSetting(lineNum: number): {[name: string]: Setting} {
+    moveToLine(lineNum: number) {
 
         // If compatible mode
-        if (lineNum === this.nextSettingLineNum) {
+        if (lineNum === this.nextSettingsLineNum) {
             const  index = this.indices[lineNum];  // e.g. "/a/b"
 
+            if (this.currentSettingIndex) {
+                this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
+            }
             this.currentSettings = this.settings[index];
+            this.currentSettingIndex = index;
             const  startLineNums = Object.keys(this.indices);
             if (this.nextLineNumIndex < startLineNums.length) {
                 this.nextLineNumIndex += 1;
 
-                this.nextSettingLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
+                this.nextSettingsLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
             } else {
-                this.nextSettingLineNum = 0;
+                this.nextSettingsLineNum = 0;
             }
+        } else {
+            this.outOfScopeSettingIndices = [];
         }
 
         return  this.currentSettings;
@@ -3522,10 +3586,30 @@ class SettingsTree {
         //     } else {
         //         this.nextSettingLineNum = 0;
         //     }
+        // outOfScopeSettingIndices
         // }
         // 
         // return  this.currentSettings;
     }
+
+    moveToEndOfFile() {
+
+        // If compatible mode
+        this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
+        this.currentSettings = {};
+        this.currentSettingIndex = '';
+        this.nextSettingsLineNum = 0;
+        this.nextLineNumIndex = 0;
+
+        // If tree mode
+        // Not implemeted yet
+    }
+}
+
+// SettingsInformation
+interface SettingsInformation {
+    index: string;
+    lineNum: number;
 }
 
 // Settings
@@ -3533,11 +3617,12 @@ type Settings = {[name: string]: Setting}
 
 // Setting
 interface Setting {
-    name?: string;
+//(ToDo)    name?: string;
     value: string;
     lineNum: number[];  // This count is the same as #to: tag count
-    StartLineNum?: number;
-    LastLineNum?: number;
+//(ToDo)
+//    StartLineNum?: number;
+//    LastLineNum?: number;
     isReferenced: boolean;
 }
 
@@ -4125,6 +4210,8 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     }
 }
 
+const  newSpecification = false;
+const  newCode = true;
 if (process.env.windir) {
     var  runningOS = 'Windows';
 } else {

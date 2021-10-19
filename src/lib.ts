@@ -320,6 +320,20 @@ export namespace  hasInterfaceOf {
     }
 }
 
+// getObjectID
+// Exmaple:
+//    var  object1={}, object2={}
+//    console.log( objectId(object1) ) // 1
+//    console.log( objectId(object2) ) // 2
+export function  getObjectID(object: any) {
+    if ( ! objectIDs.has(object)) {
+        objectCount += 1;
+        objectIDs.set(object, objectCount);
+    }
+    return  objectIDs.get(object);
+}
+const  objectIDs = new WeakMap
+var  objectCount = 0;
 
 // User interface group
 
