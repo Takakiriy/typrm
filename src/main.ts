@@ -286,6 +286,9 @@ var d = pp(`- ${lineNum} ${line}`);
                 } else {
                     var  checkingLineWithoutTemplate = checkingLine;
                 }
+if (lineNum === 6){
+d=d;
+}
 
                 if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     console.log("");
@@ -935,9 +938,9 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
         {lineNum: 0, indent: ''}
     ];
     const  settingStack:
-            {lineNum: number, index: string, startLineNum: number, parentIndentLevel: number}[] = [
-        {lineNum: 0, index: '/',  startLineNum: 1, parentIndentLevel: -1},
-        {lineNum: 0, index: '/1', startLineNum: 0, parentIndentLevel: 0}
+            {lineNum: number, index: string, startLineNum: number, indentLevel: number, parentIndentLevel: number}[] = [
+        {lineNum: 0, index: '/',  startLineNum: 1, indentLevel: 0, parentIndentLevel: -1},
+        {lineNum: 0, index: '/1', startLineNum: 0, indentLevel: 1, parentIndentLevel: 0}
         // "parentIndentLevel" is a parent indent of a settings tag. It is not a indent of a settings tag.
     ];
     const  ifTagParser = new IfTagParser(parser);
@@ -953,13 +956,16 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
     var  errorCount = 0;
     parser.verbose = ('verbose' in programOptions);
     tree.indices[1] = '/';
-    tree.settings['/'] = {};
+    tree.settings = {};
 pp('makeSettingTree')
 
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
 var d = pp(`${lineNum}: ${line}`);
+if (lineNum === 5) {
+d=d;
+}
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -1033,12 +1039,14 @@ var d = pp(`${lineNum}: ${line}`);
                 const  setting_ = settingStack[settingStack.length - 1];
                 setting_.lineNum = lineNum;
                 setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
+                setting_.indentLevel = settingIndentLength;
                 setting_.parentIndentLevel = indentStack.length - 2;
                 currentSettingIndex = setting_.index;
                 settingStack.push({
                     lineNum: 0,
                     index: setting_.index + '/1',
                     startLineNum: 0,
+                    indentLevel: 0,
                     parentIndentLevel: -1
                 });
             }
@@ -1096,6 +1104,9 @@ var d = pp(`${lineNum}: ${line}`);
             index: currentSettingIndex,
             lineNum : setting_.lineNum
         };
+    }
+    if ( ! ('/' in tree.settings)) {
+        tree.settings = {};
     }
     for (const index of Object.values(tree.indices)) {
         if ( ! (index in tree.settings)) {
