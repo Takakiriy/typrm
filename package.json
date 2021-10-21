@@ -13,21 +13,21 @@
     "devDependencies": {
         "@types/csv-parse": "^1.2.2",
         "@types/globby": "^9.1.0",
-        "@types/jest": "^26.0.16",
-        "@types/js-yaml": "^4.0.1",
+        "@types/jest": "^26.0.24",
+        "@types/js-yaml": "^4.0.3",
         "@types/node": "^13.13.4",
-        "@types/prettier": "^2.2.3",
+        "@types/prettier": "^2.4.1",
         "jest": "^26.6.3",
-        "prettier": "^2.2.1",
+        "prettier": "^2.4.1",
         "ts-jest": "^26.4.4",
         "ts-node": "^9.1.1",
-        "typescript": "^4.1.2"
+        "typescript": "^4.4.4"
     },
     "dependencies": {
-        "chalk": "^4.1.1",
+        "chalk": "^4.1.2",
         "commander": "^7.2.0",
-        "csv-parse": "^4.15.4",
-        "globby": "^11.0.3",
+        "csv-parse": "^4.16.3",
+        "globby": "^11.0.4",
         "js-yaml": "^4.1.0"
     },
     "jest": {

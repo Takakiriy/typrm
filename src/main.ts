@@ -963,7 +963,7 @@ pp('makeSettingTree')
         const  line: string = line1;
         lineNum += 1;
 var d = pp(`${lineNum}: ${line}`);
-if (lineNum === 5) {
+if (lineNum === 10) {
 d=d;
 }
 
@@ -971,14 +971,20 @@ d=d;
         const  indent = indentRegularExpression.exec(line)![0];
         if (line !== '') {
 
-            // pop
+            // Pop "indentStack"
             while ( ! indent.startsWith(indentStack[indentStack.length - 1].indent)) {
                 indentStack.pop();
             }
             const  indentLevel = indentStack.length - 1;
-            const  previousIndent = indentStack[indentStack.length - 1];
-            while (indentLevel <= settingStack[settingStack.length - 2].parentIndentLevel) {
+
+            // Pop "settingStack"
+            const  currentIndentStackIndex = indentStack.length - 1;
+            var    currentSettingStackIndex = settingStack.length - 2;
+            const  previousIndent = indentStack[currentIndentStackIndex];
+
+            while (indentLevel <= settingStack[currentSettingStackIndex].parentIndentLevel) {
                 settingStack.pop();
+                currentSettingStackIndex -= 1;
 
                 const  setting_ = settingStack[settingStack.length - 1];
                 if ( ! (currentSettingIndex in tree.settings)) {
@@ -991,7 +997,7 @@ d=d;
                 }
                 setting = {}
 
-                currentSettingIndex = settingStack[settingStack.length - 2].index;
+                currentSettingIndex = settingStack[currentSettingStackIndex].index;
                 tree.indices[lineNum] = currentSettingIndex;
 
                 const  nextSetting = setting_;
@@ -1005,7 +1011,7 @@ d=d;
                 }
             }
 
-            // push
+            // push "indentStack"
             if (indent === previousIndent.indent) {
                 previousIndent.lineNum = lineNum;
             } else {
@@ -1106,7 +1112,7 @@ d=d;
         };
     }
     if ( ! ('/' in tree.settings)) {
-        tree.settings = {};
+        tree.settings['/'] = {};
     }
     for (const index of Object.values(tree.indices)) {
         if ( ! (index in tree.settings)) {
@@ -3544,75 +3550,97 @@ class SettingsTree {
     currentSettingIndex = '';
     nextSettingsLineNum = 1;
     nextLineNumIndex = 0;
-    outOfScopeSettingIndices: string[] = [];
+    outOfScopeSettingIndices: string[] = [];  // This is set when previous line is in scope
 
     moveToLine(lineNum: number) {
 
-        // If compatible mode
-        if (lineNum === this.nextSettingsLineNum) {
-            const  index = this.indices[lineNum];  // e.g. "/a/b"
+        if (newCodeMode === 'compatible') {
+            if (lineNum === this.nextSettingsLineNum) {
+                const  index = this.indices[lineNum];  // e.g. "/a/b"
 
-            if (this.currentSettingIndex) {
-                this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
-            }
-            this.currentSettings = this.settings[index];
-            this.currentSettingIndex = index;
-            const  startLineNums = Object.keys(this.indices);
-            if (this.nextLineNumIndex < startLineNums.length) {
-                this.nextLineNumIndex += 1;
+                if (this.currentSettingIndex) {
+                    this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
+                }
+                this.currentSettings = this.settings[index];
+                this.currentSettingIndex = index;
+                const  startLineNums = Object.keys(this.indices);
+                if (this.nextLineNumIndex < startLineNums.length) {
+                    this.nextLineNumIndex += 1;
 
-                this.nextSettingsLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
+                    this.nextSettingsLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
+                } else {
+                    this.nextSettingsLineNum = 0;
+                }
             } else {
-                this.nextSettingsLineNum = 0;
+                this.outOfScopeSettingIndices = [];
             }
-        } else {
-            this.outOfScopeSettingIndices = [];
+
+            return  this.currentSettings;
+
+        } else { // if (newCodeMode === 'tree')
+            if (lineNum === this.nextSettingsLineNum) {
+                const  previousSettingIndex = this.currentSettingIndex;
+                this.currentSettingIndex = this.indices[lineNum];  // e.g. "/a/bc"
+
+                this.outOfScopeSettingIndices = [];
+                const  currentSettingIndexSlash = `${this.currentSettingIndex}/`;  // e.g. "/a/bc/"
+                var    previousParentIndex = previousSettingIndex;  // e.g. "/a/b/d/e"
+                while ( ! currentSettingIndexSlash.startsWith(`${previousParentIndex}/`)) {
+                        // e.g. previousParentIndex == "/a", not "/a/b"
+                        // The last slash is in order not to match a part of folder name.
+
+                    this.outOfScopeSettingIndices.push(previousParentIndex);
+                    previousParentIndex = path.dirname(previousParentIndex);
+                }
+
+                this.currentSettings = {};
+                const  index = this.currentSettingIndex;
+                var    parentIndex = '/';
+                var    separatorPosition = 0;
+                for (;;) {
+                    const  parentSetting = this.settings[parentIndex];
+
+                    this.currentSettings = { ...this.currentSettings, ...parentSetting };
+                    separatorPosition = index.indexOf('/', separatorPosition + 1);
+                    if (separatorPosition === notFound) {
+                        break;
+                    }
+                    parentIndex = index.substr(0, separatorPosition);
+                }
+                const  startLineNums = Object.keys(this.indices);
+                if (this.nextLineNumIndex < startLineNums.length) {
+                    this.nextLineNumIndex += 1;
+
+                    this.nextSettingsLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
+                } else {
+                    this.nextSettingsLineNum = 0;
+                }
+            } else {
+                this.outOfScopeSettingIndices = [];
+            }
+
+            return  this.currentSettings;
         }
-
-        return  this.currentSettings;
-
-        // // If tree mode
-        // if (lineNum === this.nextSettingLineNum) {
-        //     const  index = this.indices[lineNum];  // e.g. "/a/b"
-        //     var    parentIndex = '/';
-        //     var    separatorPosition = 0;
-        // 
-        //     this.currentSettings = {};
-        //     for (;;) {
-        //         const  parentSetting = this.settings[parentIndex];
-        // 
-        //         this.currentSettings = { ...this.currentSettings, ...parentSetting };
-        //         separatorPosition = index.indexOf('/', separatorPosition + 1);
-        //         if (separatorPosition === notFound) {
-        //             break;
-        //         }
-        //         parentIndex = index.substr(0, separatorPosition);
-        //     }
-        //     const  startLineNums = Object.keys(this.indices);
-        //     if (this.nextLineNumIndex < startLineNums.length) {
-        //         this.nextLineNumIndex += 1;
-        // 
-        //         this.nextSettingLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
-        //     } else {
-        //         this.nextSettingLineNum = 0;
-        //     }
-        // outOfScopeSettingIndices
-        // }
-        // 
-        // return  this.currentSettings;
     }
 
     moveToEndOfFile() {
 
-        // If compatible mode
-        this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
+        if (newCodeMode === 'compatible') {
+            this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
+        } else { // if (newCodeMode === 'tree')
+            this.outOfScopeSettingIndices = [];
+            const  previousSettingIndex = this.currentSettingIndex;
+            var    previousParentIndex = previousSettingIndex;
+            while (previousParentIndex !== '/') {
+
+                this.outOfScopeSettingIndices.push(previousParentIndex);
+                previousParentIndex = path.dirname(previousParentIndex);
+            }
+        }
         this.currentSettings = {};
         this.currentSettingIndex = '';
         this.nextSettingsLineNum = 0;
         this.nextLineNumIndex = 0;
-
-        // If tree mode
-        // Not implemeted yet
     }
 }
 
@@ -4222,6 +4250,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
 
 const  newSpecification = false;
 const  newCode = true;
+const  newCodeMode: 'compatible' | 'tree' = 'tree';
 if (process.env.windir) {
     var  runningOS = 'Windows';
 } else {

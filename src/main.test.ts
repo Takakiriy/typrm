@@ -82,7 +82,7 @@ describe("checks template value >>", () => {
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
-if (fileNameHead !== 'template_if_1_error') {return;}  // || subCase !== '____'
+if (fileNameHead !== 'settings_tree_deep') {return;}  // || subCase !== '____'
         const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
