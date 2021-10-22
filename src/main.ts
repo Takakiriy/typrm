@@ -8,6 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
+import { parse } from 'commander';
 
 // main
 export async function  main() {
@@ -139,12 +140,11 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     if (isModal) {
         var  inputFilePath = await lib.inputPath( translate('YAML UTF-8 file path>') );
     }
-pp('checkRoutine')
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
     var  previousTemplateCount = 0;
     for(;;) {
-        const  settingTree = await makeSettingTree(inputFilePath);
+        const  settingTree = await makeSettingTree(inputFilePath, CommandEnum.check);
         var  reader = readline.createInterface({
             input: fs.createReadStream(inputFilePath),
             crlfDelay: Infinity
@@ -167,13 +167,15 @@ pp('checkRoutine')
         parser.command = CommandEnum.check;
         parser.verbose = ('verbose' in programOptions);
         parser.filePath = inputFilePath;
+        if (parser.verbose) {
+            console.log(`Verbose: Phase 2: check ...`);
+        }
 
         for await (const line1 of reader) {
             const  line: string = line1;
             lines.push(line);
             lineNum += 1;
             parser.lineNum = lineNum;
-var d = pp(`- ${lineNum} ${line}`);
 
             // Set condition by "#if:" tag.
             const  parsed = ifTagParser.evaluate(line, setting);
@@ -188,7 +190,7 @@ var d = pp(`- ${lineNum} ${line}`);
             // setting = ...
             if (newCode) {
 
-                settingTree.moveToLine(lineNum);
+                settingTree.moveToLine(parser);
                 setting = settingTree.currentSettings;
 
                 if (settingTree.outOfScopeSettingIndices.length >= 1) {
@@ -286,9 +288,6 @@ var d = pp(`- ${lineNum} ${line}`);
                 } else {
                     var  checkingLineWithoutTemplate = checkingLine;
                 }
-if (lineNum === 6){
-d=d;
-}
 
                 if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     console.log("");
@@ -445,7 +444,6 @@ d=d;
             console.log(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
         }
         console.log(`${translate('template count')} = ${templateCount}`);
-printSettingTree(settingTree);
 
         if (!isModal) {
             break;
@@ -932,7 +930,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
 }
 
 // makeSettingTree
-async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
+async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Promise<SettingsTree> {
     const  tree = new SettingsTree();
     const  parser = new Parser();
     const  indentStack: {lineNum: number, indent: string}[] = [
@@ -954,16 +952,20 @@ async function  makeSettingTree(inputFilePath: string): Promise<SettingsTree> {
     var  currentSettingIndex = '/';
     var  lineNum = 0;
     var  settingIndentLength = 0;
-    var  errorCount = 0;
+    parser.command = command;
     parser.verbose = ('verbose' in programOptions);
+    parser.filePath = inputFilePath;
     tree.indices[1] = '/';
     tree.settings = {};
-pp('makeSettingTree')
+    if (parser.verbose) {
+        console.log(`Verbose: Phase 1: parse settings ...`);
+    }
 
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
-var d = pp(`${lineNum}: ${line}`);
+        parser.line = line;
+        parser.lineNum = lineNum;
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -1026,7 +1028,7 @@ var d = pp(`${lineNum}: ${line}`);
                 console.log('Error of if tag syntax:');
                 console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                 console.log(`  Contents: ${parsed.condition}`);
-                errorCount += parsed.errorCount;
+                parser.errorCount += parsed.errorCount;
             }
         }
 
@@ -1088,7 +1090,7 @@ var d = pp(`${lineNum}: ${line}`);
                             console.log(`  ContentsA: ${key}: ${previous.value}`);
                             console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
                             console.log(`  ContentsB: ${key}: ${value}`);
-                            errorCount += 1;
+                            parser.errorCount += 1;
                         }
                     }
                     if (parser.verbose) {
@@ -1117,22 +1119,9 @@ var d = pp(`${lineNum}: ${line}`);
             throw new Error('parse error in makeSettingTree');
         }
     }
-    tree.errorCount = errorCount;
-printSettingTree(tree);
+    tree.errorCount = parser.errorCount;
 
     return  tree;
-}
-
-function  printSettingTree(tree: SettingsTree) {
-pp('-------------------------------------------------')
-pp('end of makeSettingTree')
-for (const [index, settings] of Object.entries(tree.settings)) {
-    pp(`index = ${index}`);
-    for (const [name, setting] of Object.entries(settings)) {
-        pp(`${lib.getObjectID(setting)}: ${name} ${setting.isReferenced}`);
-    }
-}
-pp('-------------------------------------------------')
 }
 
 // getReplacedLineInSettings
@@ -3075,11 +3064,8 @@ function  varidateRevertCommandArguments() {
 
 // onEndOfSettingScope
 function onEndOfSettingScope(setting: Settings, inputFilePath: string): /* warningCount */ number {
-var d = pp('onEndOfSettingScope')
-pp(setting)
     var  warningCount = 0;
     for (const key of Object.keys(setting)) {
-pp(`${lib.getObjectID(setting[key])}: ${key} .isReferenced: ${setting[key].isReferenced}`);
         if (!setting[key].isReferenced) {
             console.log('');
             console.log(translate`Warning: ${getTestablePath(inputFilePath)}:${setting[key].lineNum}`);
@@ -3094,7 +3080,6 @@ pp(`${lib.getObjectID(setting[key])}: ${key} .isReferenced: ${setting[key].isRef
 function  evaluateIfCondition(expression: string, setting: Settings, parser: Parser,
         previsousEvalatedKeyValues: string[] = [])
         : boolean | Error | EvaluatedCondition {
-pp('evaluateIfCondition')
 
     if (expression === 'true') {
         if (parser.verbose) {
@@ -3135,7 +3120,6 @@ pp('evaluateIfCondition')
             if (name in setting) {
 
                 var  leftValue = setting[name].value;
-pp(`a) ${lib.getObjectID(setting[name])}: ${name} .isReferenced = true`);
                 setting[name].isReferenced = true;
             } else {
                 return  new Error(`not found ${name} in the settings`);
@@ -3352,7 +3336,6 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
 
         const  expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g,'$$'));
         if (expectedAfter !== expected) {
-pp(`b) ${lib.getObjectID(setting[key])}: ${key} .isReferenced = true`);
             setting[key].isReferenced = true;
             log.push({before: key, after: setting[key].value});
         }
@@ -3552,11 +3535,11 @@ class SettingsTree {
     nextLineNumIndex = 0;
     outOfScopeSettingIndices: string[] = [];  // This is set when previous line is in scope
 
-    moveToLine(lineNum: number) {
+    moveToLine(parser: Parser) {
 
         if (newCodeMode === 'compatible') {
-            if (lineNum === this.nextSettingsLineNum) {
-                const  index = this.indices[lineNum];  // e.g. "/a/b"
+            if (parser.lineNum === this.nextSettingsLineNum) {
+                const  index = this.indices[parser.lineNum];  // e.g. "/a/b"
 
                 if (this.currentSettingIndex) {
                     this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
@@ -3578,9 +3561,9 @@ class SettingsTree {
             return  this.currentSettings;
 
         } else { // if (newCodeMode === 'tree')
-            if (lineNum === this.nextSettingsLineNum) {
+            if (parser.lineNum === this.nextSettingsLineNum) {
                 const  previousSettingIndex = this.currentSettingIndex;
-                this.currentSettingIndex = this.indices[lineNum];  // e.g. "/a/bc"
+                this.currentSettingIndex = this.indices[parser.lineNum];  // e.g. "/a/bc"
 
                 this.outOfScopeSettingIndices = [];
                 const  currentSettingIndexSlash = `${this.currentSettingIndex}/`;  // e.g. "/a/bc/"
@@ -3617,6 +3600,12 @@ class SettingsTree {
                     this.nextSettingsLineNum = parseInt(startLineNums[this.nextLineNumIndex]);
                 } else {
                     this.nextSettingsLineNum = 0;
+                }
+                if (parser.verbose) {
+                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: settings are changed to ${this.currentSettingIndex} settings:`);
+                    for (const [key, setting] of Object.entries(this.currentSettings)) {
+                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
+                    }
                 }
             } else {
                 this.outOfScopeSettingIndices = [];

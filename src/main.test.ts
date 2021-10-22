@@ -82,7 +82,6 @@ describe("checks template value >>", () => {
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
-//if (fileNameHead !== 'settings_tree') {return;}  // || subCase !== '____'
         const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
@@ -95,7 +94,6 @@ describe("checks template value >>", () => {
         process.chdir('..');
         expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {
@@ -137,7 +135,7 @@ describe("checks template value >>", () => {
             folder: '../test_data', test: "", locale: "en-US", verbose: "",
         });
         process.chdir('..');
-        expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot();
+        expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 });

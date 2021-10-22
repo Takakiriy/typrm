@@ -128,7 +128,6 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/fi
   Contents: nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
   Expected: sub/dummy.txt
   Template: __Base__/dummy.txt
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_3_file_name_1_changing.yaml:1
 
 Error of not found the target file:
   NotFound: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
@@ -310,17 +309,23 @@ Target of template file >> any lines at first:
 
 exports[`checks file contents >> if in file_4_if, file/1 : stdout 1`] = `
 "
+Error of if tag syntax:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:90
+  Contents: value == value
+
+Error of if tag syntax:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
+  Contents: $env.value = value
+
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:9
   Contents: user: 'user1'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:13
   Contents: user: 'user1'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 Error of not same as file contents:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:15
@@ -333,19 +338,16 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/fi
   Contents: - check: 'yes'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:33
   Contents: - check: 'yes'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:43
   Contents: - check: 'yes'  #template: __Stage__
   Expected: develop
   Template: __Stage__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:3
 
 Error of not same as file contents:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:48
@@ -411,7 +413,7 @@ Error of if tag syntax:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
   Contents: $env.value = value
 
-Warning: 0, Error: 16
+Warning: 0, Error: 18
 template count = 34
 "
 `;
@@ -756,7 +758,6 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error
   Contents: value2  #template: var
   Expected: value1
   Template: var
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2
 
 Warning: 0, Error: 1
 template count = 1
@@ -765,7 +766,6 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error
   Contents: value2  #template: var
   Expected: value1
   Template: var
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:2
 
 Warning: 0, Error: 1
 template count = 1
@@ -779,7 +779,7 @@ template count = 8
 "
 `;
 
-exports[`checks template value >> one_error: answer 1`] = `
+exports[`checks template value >> one_error: sourceFileContents 1`] = `
 "one_error:
     settings:
         var: value1
@@ -1128,10 +1128,31 @@ B:
 
 exports[`checks template value >> verbose: answer 1`] = `
 "Verbose: typrm command: check
+Verbose: Phase 1: parse settings ...
+Verbose: settings /1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
+Verbose: Phase 2: check ...
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings are changed to /1 settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
@@ -1140,14 +1161,12 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbo
   Contents: bad  #template: var1
   Expected: value1
   Template: var1
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10
   Contents: bad2  #template: var2
   Expected: value2
   Template: var2
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
@@ -1157,7 +1176,6 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbo
   Contents: bad2  #template: var2
   Expected: value2
   Template: var2
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
@@ -1167,7 +1185,6 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbo
   Contents: bad2  #template: var2
   Expected: value2
   Template: var2
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
 
