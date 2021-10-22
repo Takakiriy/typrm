@@ -654,10 +654,10 @@ Error of not expected condition:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:74
   Contents: false
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml 84
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:84
   Not referenced: target1
 
-Warning: 0, Error: 15
+Warning: 1, Error: 15
 template count = 12
 "
 `;
@@ -851,19 +851,19 @@ WarningLine: 4
   Replace \\"#secret\\" to \\"#secret:example\\".'
   Replace \\"#★秘密\\" to \\"#★秘密:仮\\".'
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 2
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:2
   Not referenced: key1
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 3
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:3
   Not referenced: __Key2__
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 4
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:4
   Not referenced: Key3
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml 5
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:5
   Not referenced: Key4
 
-Warning: 1, Error: 0
+Warning: 5, Error: 0
 template count = 0
 "
 `;
@@ -878,23 +878,7 @@ exports[`checks template value >> secret_1_error: sourceFileContents 1`] = `
 
 exports[`checks template value >> settings_tree: answer 1`] = `
 "
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_1.yaml 2
-  Not referenced: __A__
-
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_1.yaml 3
-  Not referenced: __B__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_1.yaml:9
-  Contents: - \\"ValueA\\"  #template: \\"__A__\\"
-  Expected: \\"__A__\\"
-  Template: \\"__A__\\"
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_1.yaml:10
-  Contents: - \\"ValueB\\"  #template: \\"__B__\\"
-  Expected: \\"__B__\\"
-  Template: \\"__B__\\"
-
-Warning: 0, Error: 2
+Warning: 0, Error: 0
 template count = 4
 "
 `;
@@ -917,80 +901,10 @@ main:
 
 exports[`checks template value >> settings_tree_deep: answer 1`] = `
 "
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml 2
-  Not referenced: __A__
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:36
+  Not referenced: __11A__
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:7
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:11
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:12
-  Contents: Value1A:  #template: __1A__
-  Expected: __1A__
-  Template: __1A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:15
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:16
-  Contents: Value1A:  #template: __1A__
-  Expected: __1A__
-  Template: __1A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:21
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:22
-  Contents: Value1A:  #template: __1A__
-  Expected: __1A__
-  Template: __1A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:24
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:25
-  Contents: Value1A:  #template: __1A__
-  Expected: __1A__
-  Template: __1A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:26
-  Contents: __11A__:  #template: __11A__
-  Expected: Value11A_2
-  Template: __11A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:33
-  Contents: __111A__:  #template: __111A__
-  Expected: Value111A
-  Template: __111A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:37
-  Contents: __11A__:  #template: __11A__  #// ground parent of the previous line
-  Expected: Value11A_3
-  Template: __11A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:43
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:44
-  Contents: __1A__-2:  #template: __1A__-2
-  Expected: Value1A_2-2
-  Template: __1A__-2
-
-Warning: 0, Error: 14
+Warning: 1, Error: 0
 template count = 20
 "
 `;
@@ -1047,26 +961,23 @@ exports[`checks template value >> settings_tree_error: answer 1`] = `
 "
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:1
   Contents: BadA:  #template: __A__
-  Expected: __A__
+  Expected: ValueA
   Template: __A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:3
   Contents: BadA:  #template: __A__
-  Expected: __A__
+  Expected: ValueA
   Template: __A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:4
   Contents: Bad1A:  #template: __1A__
-  Expected: __1A__
+  Expected: Value1A
   Template: __1A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:5
   Contents: Bad11A:  #template: __11A__
   Expected: __11A__
   Template: __11A__
-
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml 7
-  Not referenced: __1A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:11
   Contents: Bad11A:  #template: __11A__
@@ -1075,26 +986,23 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tr
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:12
   Contents: BadA:  #template: __A__
-  Expected: __A__
+  Expected: ValueA
   Template: __A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:13
   Contents: Bad1A:  #template: __1A__
-  Expected: __1A__
+  Expected: Value1A
   Template: __1A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:14
   Contents: Bad11A:  #template: __11A__
-  Expected: Value11A
+  Expected: __11A__
   Template: __11A__
 
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:20
   Contents: Bad111A:  #template: __111A__
   Expected: Value111A
   Template: __111A__
-
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml 22
-  Not referenced: __A__
 
 Warning: 0, Error: 9
 template count = 9
@@ -1129,30 +1037,7 @@ settings:
 
 exports[`checks template value >> settings_tree_position: answer 1`] = `
 "
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_position_1.yaml:1
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_position_1.yaml:3
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_position_1.yaml:4
-  Contents: Value1A:  #template: __1A__
-  Expected: __1A__
-  Template: __1A__
-
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_position_1.yaml:7
-  Contents: ValueA:  #template: __A__
-  Expected: __A__
-  Template: __A__
-
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_position_1.yaml 10
-  Not referenced: __A__
-
-Warning: 0, Error: 4
+Warning: 0, Error: 0
 template count = 5
 "
 `;
@@ -1203,19 +1088,19 @@ exports[`checks template value >> template_if_1_error: sourceFileContents 1`] = 
 
 exports[`checks template value >> var_not_ref_1_error: answer 1`] = `
 "
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 3
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:3
   Not referenced: key1
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 6
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:6
   Not referenced: Key3
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 13
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:13
   Not referenced: key1
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml 14
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:14
   Not referenced: __Key2__
 
-Warning: 0, Error: 0
+Warning: 4, Error: 0
 template count = 2
 "
 `;
@@ -1238,6 +1123,62 @@ B:
         Key3: value3
     手順: |
         - echo  "value3"  #template: - echo  "Key3"
+"
+`;
+
+exports[`checks template value >> verbose 1`] = `
+"Verbose: typrm command: check
+Verbose: settings /1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
+Verbose: :-1: end #if:
+Verbose: :-1: end #if:
+Verbose: :-1: end #if:
+Verbose: :-1: end #if:
+Verbose: :-1: end #if:
+Verbose: :-1: end #if:
+Verbose: :0: #if: true
+Verbose: :-1: end #if:
+Verbose: :0: #if: false
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8
+  Contents: bad  #template: var1
+  Expected: value1
+  Template: var1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10
+  Contents: bad2  #template: var2
+  Expected: value2
+  Template: var2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14
+  Contents: bad2  #template: var2
+  Expected: value2
+  Template: var2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
+
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18
+  Contents: bad2  #template: var2
+  Expected: value2
+  Template: var2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
+
+Warning: 0, Error: 4
+template count = 7
 "
 `;
 

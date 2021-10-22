@@ -192,13 +192,13 @@ var d = pp(`- ${lineNum} ${line}`);
                 setting = settingTree.currentSettings;
 
                 if (settingTree.outOfScopeSettingIndices.length >= 1) {
-                    onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                    warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
                         inputFilePath);
                 }
             } else {
                 if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                     if (settingCount >= 1) {
-                        onEndOfSettingScope(setting, inputFilePath);
+                        warningCount += onEndOfSettingScope(setting, inputFilePath);
                     }
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
@@ -371,12 +371,12 @@ d=d;
         if (newCode) {
             settingTree.moveToEndOfFile();
             if (settingTree.outOfScopeSettingIndices.length >= 1) {
-                onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
                     inputFilePath);
             }
         } else {
             if (settingCount >= 1) {
-                onEndOfSettingScope(setting, inputFilePath);
+                warningCount += onEndOfSettingScope(setting, inputFilePath);
             }
         }
 
@@ -445,6 +445,7 @@ d=d;
             console.log(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
         }
         console.log(`${translate('template count')} = ${templateCount}`);
+printSettingTree(settingTree);
 
         if (!isModal) {
             break;
@@ -963,9 +964,6 @@ pp('makeSettingTree')
         const  line: string = line1;
         lineNum += 1;
 var d = pp(`${lineNum}: ${line}`);
-if (lineNum === 10) {
-d=d;
-}
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -3076,18 +3074,20 @@ function  varidateRevertCommandArguments() {
 }
 
 // onEndOfSettingScope
-function onEndOfSettingScope(setting: Settings, inputFilePath: string) {
+function onEndOfSettingScope(setting: Settings, inputFilePath: string): /* warningCount */ number {
 var d = pp('onEndOfSettingScope')
 pp(setting)
+    var  warningCount = 0;
     for (const key of Object.keys(setting)) {
 pp(`${lib.getObjectID(setting[key])}: ${key} .isReferenced: ${setting[key].isReferenced}`);
         if (!setting[key].isReferenced) {
             console.log('');
-            console.log(translate`Error: ${getTestablePath(inputFilePath)} ${setting[key].lineNum}`);
+            console.log(translate`Warning: ${getTestablePath(inputFilePath)}:${setting[key].lineNum}`);
             console.log(translate`  Not referenced: ${key}`);
+            warningCount += 1;
         }
     }
-pp('')
+    return  warningCount;
 }
 
 // evaluateIfCondition
@@ -3585,7 +3585,7 @@ class SettingsTree {
                 this.outOfScopeSettingIndices = [];
                 const  currentSettingIndexSlash = `${this.currentSettingIndex}/`;  // e.g. "/a/bc/"
                 var    previousParentIndex = previousSettingIndex;  // e.g. "/a/b/d/e"
-                while ( ! currentSettingIndexSlash.startsWith(`${previousParentIndex}/`)) {
+                while ( ! currentSettingIndexSlash.startsWith(`${previousParentIndex}/`)  &&  previousParentIndex !== '/') {
                         // e.g. previousParentIndex == "/a", not "/a/b"
                         // The last slash is in order not to match a part of folder name.
 
@@ -3606,6 +3606,9 @@ class SettingsTree {
                         break;
                     }
                     parentIndex = index.substr(0, separatorPosition);
+                }
+                if (index !== '/') {
+                    this.currentSettings = { ...this.currentSettings, ...this.settings[index] };
                 }
                 const  startLineNums = Object.keys(this.indices);
                 if (this.nextLineNumIndex < startLineNums.length) {
@@ -3636,6 +3639,7 @@ class SettingsTree {
                 this.outOfScopeSettingIndices.push(previousParentIndex);
                 previousParentIndex = path.dirname(previousParentIndex);
             }
+            this.outOfScopeSettingIndices.push('/');
         }
         this.currentSettings = {};
         this.currentSettingIndex = '';
