@@ -79,9 +79,11 @@ describe("checks template value >>", () => {
         ["settings_tree"],
         ["settings_tree_deep"],
         ["settings_tree_position"],
+        ["settings_tree_if"],
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
+if (fileNameHead !== 'settings_tree_if') {return;}  // || subCase !== '____'
         const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
@@ -94,6 +96,7 @@ describe("checks template value >>", () => {
         process.chdir('..');
         expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
+expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {

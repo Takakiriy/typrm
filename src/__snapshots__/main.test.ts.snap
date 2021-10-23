@@ -1035,6 +1035,38 @@ settings:
 "
 `;
 
+exports[`checks template value >> settings_tree_if: answer 1`] = `
+"
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:5
+  Contents: test error  #template: __C__
+  Expected: ValueC
+  Template: __C__
+
+Warning: 0, Error: 1
+template count = 2
+"
+`;
+
+exports[`checks template value >> settings_tree_if: sourceFileContents 1`] = `
+"section:
+    table:
+        cell:
+            ValueC      #template: __C__
+            test error  #template: __C__
+        settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                __C__: ValueC
+settings:
+    a: #if: $settings.__A__ == bad
+        __B__: not_used
+    b: #if: $settings.__A__ != bad
+        __B__: ValueB
+    __A__: ValueA
+"
+`;
+
 exports[`checks template value >> settings_tree_position: answer 1`] = `
 "
 Warning: 0, Error: 0
