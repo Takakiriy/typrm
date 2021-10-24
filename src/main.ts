@@ -992,7 +992,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     tree.indices[setting_.startLineNum] = currentSettingIndex;
                     tree.settingsInformation[currentSettingIndex] = {
                         index: currentSettingIndex,
-                        lineNum: setting_.lineNum
+                        lineNum: setting_.lineNum,
+                        condition: '',
                     };
                 }
                 setting = {}
@@ -1020,7 +1021,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
         }
 
         // Set condition by "#if:" tag.
-        const  parsed = ifTagParser.evaluate(line, setting);
+        // old
+        const  parsed = ifTagParser.evaluate(line, setting);  // ToDo
 // ToDo: check with parent settings
         if (parsed.errorCount >= 1) {
             if (newCode) {
@@ -1030,6 +1032,9 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 console.log(`  Contents: ${parsed.condition}`);
                 parser.errorCount += parsed.errorCount;
             }
+        }
+        // new
+        if (line.includes(ifLabel)) ) {
         }
 
         // setting = ...
@@ -1070,11 +1075,12 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 tree.indices[setting_.startLineNum] = currentSettingIndex;
                 tree.settingsInformation[currentSettingIndex] = {
                     index: currentSettingIndex,
-                    lineNum: setting_.lineNum
+                    lineNum: setting_.lineNum,
+                    condition: '',
                 };
             }
         }
-        if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
+        if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {  // ToDo
             const  separator = line.indexOf(':');
             if (separator !== notFound) {
                 const  key = line.substr(0, separator).trim();
@@ -1108,7 +1114,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
         tree.indices[setting_.startLineNum] = currentSettingIndex;
         tree.settingsInformation[currentSettingIndex] = {
             index: currentSettingIndex,
-            lineNum : setting_.lineNum
+            lineNum : setting_.lineNum,
+            condition: '',
         };
     }
     if ( ! ('/' in tree.settings)) {
@@ -3525,8 +3532,8 @@ enum CommandEnum {
 // SettingsTree
 class SettingsTree {
     indices: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
-    settings: {[indices: string]: {[name: string]: Setting}} = {};
-    settingsInformation: {[indices: string]: SettingsInformation} = {};
+    settings: {[index: string]: {[name: string]: Setting}} = {};
+    settingsInformation: {[index: string]: SettingsInformation} = {};
     errorCount: number = 0;
 
     currentSettings: {[name: string]: Setting} = {};
@@ -3641,6 +3648,7 @@ class SettingsTree {
 interface SettingsInformation {
     index: string;
     lineNum: number;
+    condition: string;
 }
 
 // Settings
@@ -4267,6 +4275,7 @@ const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
 const  searchIfLabel = "#(search)if: false";
 const  ifLabel = "#if:";
+const  ifLabelRE = /(?<= |^)#/;
 const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#search:/g, /: +#keyword:/g, /#keyword:/g ];
 const  searchLabel = "#search:";
