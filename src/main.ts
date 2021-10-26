@@ -987,7 +987,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 currentSettingStackIndex -= 1;
 
                 const  setting_ = settingStack[settingStack.length - 1];
-                if ( ! (currentSettingIndex in tree.settings)) {
+                if ( ! (currentSettingIndex in tree.settings)) {  // ToDo: is it necessary?
                     tree.settings[currentSettingIndex] = setting;
                     tree.indices[setting_.startLineNum] = currentSettingIndex;
                     tree.settingsInformation[currentSettingIndex] = {
@@ -1002,13 +1002,21 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 tree.indices[lineNum] = currentSettingIndex;
 
                 const  nextSetting = setting_;
-                const  parentSettingIndex = path.dirname(nextSetting.index);
-                const  usedNumber = parseInt(path.basename(nextSetting.index));
-                nextSetting.lineNum = 0;
-                if (parentSettingIndex === '/') {
-                    nextSetting.index = `/${usedNumber + 1}`;
-                } else {
-                    nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
+                const  inIfBlock = lib.isAlphabetIndex(nextSetting.index);
+                if ( ! inIfBlock) {
+                    const  parentSettingIndex = path.dirname(nextSetting.index);
+                    const  usedNumber = parseInt(path.basename(nextSetting.index));
+                    nextSetting.lineNum = 0;
+                    if (parentSettingIndex === '/') {
+                        nextSetting.index = `/${usedNumber + 1}`;
+                    } else {
+                        nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
+                    }
+                } else {  // inIfBlock
+                    const  parentSettingIndex = path.dirname(nextSetting.index);
+                    const  usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
+                    nextSetting.lineNum = 0;
+                    nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
                 }
             }
 
@@ -1032,9 +1040,6 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 console.log(`  Contents: ${parsed.condition}`);
                 parser.errorCount += parsed.errorCount;
             }
-        }
-        // new
-        if (line.includes(ifLabel)) ) {
         }
 
         // setting = ...
@@ -1060,7 +1065,13 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     indentLevel: 0,
                     parentIndentLevel: -1
                 });
+                tree.indices[setting_.startLineNum] = currentSettingIndex;
             }
+            tree.settingsInformation[currentSettingIndex] = {
+                index: currentSettingIndex,
+                lineNum,
+                condition: '',
+            };
             if (parser.verbose) {
                 console.log(`Verbose: settings ${currentSettingIndex}`);
                 console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
@@ -1072,12 +1083,6 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
             if ( ! (currentSettingIndex in tree.settings)) {
 
                 tree.settings[currentSettingIndex] = setting;
-                tree.indices[setting_.startLineNum] = currentSettingIndex;
-                tree.settingsInformation[currentSettingIndex] = {
-                    index: currentSettingIndex,
-                    lineNum: setting_.lineNum,
-                    condition: '',
-                };
             }
         }
         if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {  // ToDo
@@ -1105,6 +1110,47 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
 
                     setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
                 }
+            }
+        }
+
+        // Set condition by "#if:" tag.
+        // new
+        const  ifPosition = ifLabelRE.exec(line);
+        if (ifPosition) {
+
+            setting = {};
+            settingIndentLength = indent.length;
+
+            const  setting_ = settingStack[settingStack.length - 2];
+            const  condition = getValue(line, ifPosition.index + ifPosition[0].length);
+            const  inIfBlock = lib.isAlphabetIndex(setting_.index);
+            if ( ! inIfBlock) {
+                currentSettingIndex = setting_.index + '/a';
+                settingStack.push({
+                    lineNum,
+                    index: setting_.index + '/a',
+                    startLineNum: setting_.startLineNum,
+                    indentLevel: indentStack.length - 1,
+                    parentIndentLevel: setting_.parentIndentLevel,
+                });
+                settingStack.push({
+                    lineNum: 0,
+                    index: setting_.index + '/a/a',
+                    startLineNum: 0,
+                    indentLevel: 0,
+                    parentIndentLevel: -1
+                });
+            } else {
+                // ToDo:
+            }
+            tree.settingsInformation[currentSettingIndex] = {
+                index: currentSettingIndex,
+                lineNum,
+                condition,
+            };
+            if (parser.verbose) {
+                console.log(`Verbose: settings ${currentSettingIndex}`);
+                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: #if: ${condition}`);
             }
         }
     }
@@ -4275,7 +4321,7 @@ const  glossaryLabel = "#glossary:";
 const  disableLabel = "#disable-tag-tool:";
 const  searchIfLabel = "#(search)if: false";
 const  ifLabel = "#if:";
-const  ifLabelRE = /(?<= |^)#/;
+const  ifLabelRE = /(?<= |^)#if:/;
 const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#search:/g, /: +#keyword:/g, /#keyword:/g ];
 const  searchLabel = "#search:";
