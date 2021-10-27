@@ -966,6 +966,10 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
         lineNum += 1;
         parser.line = line;
         parser.lineNum = lineNum;
+pp(`${lineNum}: ${line}`)
+if (lineNum===9) {
+pp('')
+}
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -981,6 +985,29 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
             const  currentIndentStackIndex = indentStack.length - 1;
             var    currentSettingStackIndex = settingStack.length - 2;
             const  previousIndent = indentStack[currentIndentStackIndex];
+            const  inIfBlock = lib.isAlphabetIndex(currentSettingIndex);
+
+            if (inIfBlock) {
+
+                while (indentLevel <= settingStack[currentSettingStackIndex].indentLevel) {
+                    const  parentSettingStackIndex = currentSettingStackIndex - 1;
+                    const  lastEndIf = ! lib.isAlphabetIndex(settingStack[parentSettingStackIndex].index);
+
+                    tree.settings[currentSettingIndex] = setting;
+                    settingStack.pop();
+                    currentSettingStackIndex -= 1;
+                    setting = {}
+                    if ( ! lastEndIf) {
+                    } else {  // lastEndIf
+                    }
+                    currentSettingIndex = settingStack[currentSettingStackIndex].index;
+                }
+                const  nextSetting = settingStack[settingStack.length - 1];;
+                const  parentSettingIndex = path.dirname(nextSetting.index);
+                const  usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
+                nextSetting.lineNum = 0;
+                nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
+            }
 
             while (indentLevel <= settingStack[currentSettingStackIndex].parentIndentLevel) {
                 settingStack.pop();
@@ -1003,20 +1030,13 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
 
                 const  nextSetting = setting_;
                 const  inIfBlock = lib.isAlphabetIndex(nextSetting.index);
-                if ( ! inIfBlock) {
-                    const  parentSettingIndex = path.dirname(nextSetting.index);
-                    const  usedNumber = parseInt(path.basename(nextSetting.index));
-                    nextSetting.lineNum = 0;
-                    if (parentSettingIndex === '/') {
-                        nextSetting.index = `/${usedNumber + 1}`;
-                    } else {
-                        nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
-                    }
-                } else {  // inIfBlock
-                    const  parentSettingIndex = path.dirname(nextSetting.index);
-                    const  usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
-                    nextSetting.lineNum = 0;
-                    nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                const  parentSettingIndex = path.dirname(nextSetting.index);
+                const  usedNumber = parseInt(path.basename(nextSetting.index));
+                nextSetting.lineNum = 0;
+                if (parentSettingIndex === '/') {
+                    nextSetting.index = `/${usedNumber + 1}`;
+                } else {
+                    nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
                 }
             }
 
