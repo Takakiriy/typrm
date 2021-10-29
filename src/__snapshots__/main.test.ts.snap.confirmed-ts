@@ -309,14 +309,6 @@ Target of template file >> any lines at first:
 
 exports[`checks file contents >> if in file_4_if, file/1 : stdout 1`] = `
 "
-Error of if tag syntax:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:90
-  Contents: value == value
-
-Error of if tag syntax:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
-  Contents: $env.value = value
-
 ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:9
   Contents: user: 'user1'  #template: __Stage__
   Expected: develop
@@ -413,7 +405,7 @@ Error of if tag syntax:
   typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file_4_if_1_changing.yaml:91
   Contents: $env.value = value
 
-Warning: 0, Error: 18
+Warning: 0, Error: 16
 template count = 34
 "
 `;
@@ -1043,7 +1035,7 @@ ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tr
   Template: __C__
 
 Warning: 0, Error: 1
-template count = 2
+template count = 4
 "
 `;
 
@@ -1053,17 +1045,31 @@ exports[`checks template value >> settings_tree_if: sourceFileContents 1`] = `
         cell:
             ValueC      #template: __C__
             test error  #template: __C__
+            ValueD      #template: __D__
+            ValueE      #template: __E__
         settings:
             a: #if: $settings.__B__ == ValueA
                 __C__: not_used
             b: #if: $settings.__B__ == ValueB
-                __C__: ValueC
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ != ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: not_used
+            __E__: ValueE
 settings:
     a: #if: $settings.__A__ == bad
         __B__: not_used
     b: #if: $settings.__A__ != bad
         __B__: ValueB
     __A__: ValueA
+    __B2__: ValueB2
 "
 `;
 
@@ -1164,22 +1170,14 @@ Verbose: Phase 1: parse settings ...
 Verbose: settings /1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
+Verbose: settings /1/a
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
+Verbose: settings /1/b
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7:     var2: not value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
 Verbose: Phase 2: check ...
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings are changed to /1 settings:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1

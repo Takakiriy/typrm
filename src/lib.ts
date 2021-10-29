@@ -315,23 +315,24 @@ export function  getCommonElements<T>(arrayA: T[], arrayB: T[]): T[] {
 export function  isAlphabetIndex(index: string): boolean {
     const  lastCharacter = index.substr(-1);
     const  lastCharacterIsNumber = ! isNaN(lastCharacter as any);
-    return  ! lastCharacterIsNumber;
+    return  ! lastCharacterIsNumber  &&  index !== '/';
 }
 
 // getAlphabetIndex
-// 1=>a, 2=>b, ..., 25=>y, 26=>26z, 27=>27z, ...
+// 1=>a, 2=>b, ..., 25=>y, 26=>z26z, 27=>z27z, ...
+// First charactor and last cahractor must be alphabet.
 export function  getAlphabetIndex(num: number | string): string {
     const  index = parseInt(num as any);
     if (index >= 1  &&  index <= 25) {
         const  ascii_code_a_minus1 = 96;
         return String.fromCharCode(index + ascii_code_a_minus1);
     } else {
-        return `${num}z`;
+        return `z${num}z`;
     }
 }
 
 // fromAlphabetIndex
-// a=>1, b=>2, ..., y=>25, 26z=>26, 27z=>27, ...
+// a=>1, b=>2, ..., y=>25, z26z=>26, z27z=>27, ...
 export function  fromAlphabetIndex(index: string): number {
     const  code = index.charCodeAt(0)
     const  ascii_code_a_minus1 = 96;
@@ -339,7 +340,7 @@ export function  fromAlphabetIndex(index: string): number {
     if (code > ascii_code_a_minus1  &&  code <= ascii_code_y) {
         return  code - ascii_code_a_minus1;
     } else if (isAlphabetIndex(index)) {
-        return  parseInt(index.slice(0,-1));
+        return  parseInt(index.slice(1,-1));
     } else {
         return  NaN;
     }

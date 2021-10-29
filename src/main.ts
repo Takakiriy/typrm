@@ -937,9 +937,9 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
         {lineNum: 0, indent: ''}
     ];
     const  settingStack:
-            {lineNum: number, index: string, startLineNum: number, indentLevel: number, parentIndentLevel: number}[] = [
-        {lineNum: 0, index: '/',  startLineNum: 1, indentLevel: 0, parentIndentLevel: -1},
-        {lineNum: 0, index: '/1', startLineNum: 0, indentLevel: 1, parentIndentLevel: 0}
+            {lineNum: number, index: string, indentLevel: number, startLineNum: number, startIndentLevel: number}[] = [
+        {lineNum: 0, index: '/',  indentLevel: 0, startLineNum: 1, startIndentLevel: -1},
+        {lineNum: 0, index: '/1', indentLevel: 1, startLineNum: 0, startIndentLevel: 0}
         // "parentIndentLevel" is a parent indent of a settings tag. It is not a indent of a settings tag.
     ];
     const  ifTagParser = new IfTagParser(parser);
@@ -966,10 +966,6 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
         lineNum += 1;
         parser.line = line;
         parser.lineNum = lineNum;
-pp(`${lineNum}: ${line}`)
-if (lineNum===9) {
-pp('')
-}
 
         // indentStack = ...
         const  indent = indentRegularExpression.exec(line)![0];
@@ -979,7 +975,6 @@ pp('')
             while ( ! indent.startsWith(indentStack[indentStack.length - 1].indent)) {
                 indentStack.pop();
             }
-            const  indentLevel = indentStack.length - 1;
 
             // Pop "settingStack"
             const  currentIndentStackIndex = indentStack.length - 1;
@@ -989,32 +984,42 @@ pp('')
 
             if (inIfBlock) {
 
-                while (indentLevel <= settingStack[currentSettingStackIndex].indentLevel) {
+                while (indent.length <= settingStack[currentSettingStackIndex].indentLevel) {
                     const  parentSettingStackIndex = currentSettingStackIndex - 1;
                     const  lastEndIf = ! lib.isAlphabetIndex(settingStack[parentSettingStackIndex].index);
 
-                    tree.settings[currentSettingIndex] = setting;
+                    tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
+                    setting = {}
                     settingStack.pop();
                     currentSettingStackIndex -= 1;
-                    setting = {}
-                    if ( ! lastEndIf) {
-                    } else {  // lastEndIf
+                    if (parser.verbose) {
+                        console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum - 1}: end #if:`);
                     }
-                    currentSettingIndex = settingStack[currentSettingStackIndex].index;
+
+                    const  nextSetting = settingStack[settingStack.length - 1];
+                    const  parentSettingIndex = path.dirname(nextSetting.index);
+                    const  usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
+                    nextSetting.lineNum = 0;
+                    if (parentSettingIndex === '/') {
+                        nextSetting.index = `/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                    } else {
+                        nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                    }
+                    if ( ! lastEndIf) {
+                        currentSettingIndex = settingStack[currentSettingStackIndex].index;
+                    } else {  // lastEndIf
+                        currentSettingIndex = settingStack[parentSettingStackIndex].index;
+                        break;
+                    }
                 }
-                const  nextSetting = settingStack[settingStack.length - 1];;
-                const  parentSettingIndex = path.dirname(nextSetting.index);
-                const  usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
-                nextSetting.lineNum = 0;
-                nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
             }
 
-            while (indentLevel <= settingStack[currentSettingStackIndex].parentIndentLevel) {
+            while (indent.length <= settingStack[currentSettingStackIndex].startIndentLevel) {
                 settingStack.pop();
                 currentSettingStackIndex -= 1;
 
                 const  setting_ = settingStack[settingStack.length - 1];
-                if ( ! (currentSettingIndex in tree.settings)) {  // ToDo: is it necessary?
+                if ( ! (currentSettingIndex in tree.settings)) {
                     tree.settings[currentSettingIndex] = setting;
                     tree.indices[setting_.startLineNum] = currentSettingIndex;
                     tree.settingsInformation[currentSettingIndex] = {
@@ -1022,6 +1027,8 @@ pp('')
                         lineNum: setting_.lineNum,
                         condition: '',
                     };
+                } else {
+                    tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
                 }
                 setting = {}
 
@@ -1029,7 +1036,6 @@ pp('')
                 tree.indices[lineNum] = currentSettingIndex;
 
                 const  nextSetting = setting_;
-                const  inIfBlock = lib.isAlphabetIndex(nextSetting.index);
                 const  parentSettingIndex = path.dirname(nextSetting.index);
                 const  usedNumber = parseInt(path.basename(nextSetting.index));
                 nextSetting.lineNum = 0;
@@ -1048,20 +1054,6 @@ pp('')
             }
         }
 
-        // Set condition by "#if:" tag.
-        // old
-        const  parsed = ifTagParser.evaluate(line, setting);  // ToDo
-// ToDo: check with parent settings
-        if (parsed.errorCount >= 1) {
-            if (newCode) {
-                console.log('');
-                console.log('Error of if tag syntax:');
-                console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                console.log(`  Contents: ${parsed.condition}`);
-                parser.errorCount += parsed.errorCount;
-            }
-        }
-
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
             isReadingSetting = true;
@@ -1074,16 +1066,16 @@ pp('')
             } else {
                 const  setting_ = settingStack[settingStack.length - 1];
                 setting_.lineNum = lineNum;
-                setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
                 setting_.indentLevel = settingIndentLength;
-                setting_.parentIndentLevel = indentStack.length - 2;
+                setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
+                setting_.startIndentLevel = indentStack[indentStack.length - 2].indent.length;
                 currentSettingIndex = setting_.index;
                 settingStack.push({
                     lineNum: 0,
                     index: setting_.index + '/1',
-                    startLineNum: 0,
                     indentLevel: 0,
-                    parentIndentLevel: -1
+                    startLineNum: 0,
+                    startIndentLevel: -1
                 });
                 tree.indices[setting_.startLineNum] = currentSettingIndex;
             }
@@ -1099,13 +1091,10 @@ pp('')
 // ToDo: if (index in tree.settings) { error }
         } else if (indent.length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
-            const  setting_ = settingStack[settingStack.length - 2];
-            if ( ! (currentSettingIndex in tree.settings)) {
 
-                tree.settings[currentSettingIndex] = setting;
-            }
+            tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
         }
-        if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {  // ToDo
+        if (isReadingSetting) {  // ToDo  old:  &&  ifTagParser.thisIsOutOfFalseBlock
             const  separator = line.indexOf(':');
             if (separator !== notFound) {
                 const  key = line.substr(0, separator).trim();
@@ -1131,52 +1120,53 @@ pp('')
                     setting[key] = {value, isReferenced: false, lineNum: [lineNum]};
                 }
             }
-        }
 
-        // Set condition by "#if:" tag.
-        // new
-        const  ifPosition = ifLabelRE.exec(line);
-        if (ifPosition) {
+            // Set condition by "#if:" tag.
+            const  ifPosition = ifLabelRE.exec(line);
+            if (ifPosition) {
+                const  condition = getValue(line, ifPosition.index + ifPosition[0].length);
 
-            setting = {};
-            settingIndentLength = indent.length;
+                tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
+                setting = {};
+                const  setting_    = settingStack[settingStack.length - 2];
+                const  nextSetting = settingStack[settingStack.length - 1];
+                const  inIfBlock = lib.isAlphabetIndex(setting_.index);
+                const  isSecondIfBlock = lib.isAlphabetIndex(nextSetting.index);
 
-            const  setting_ = settingStack[settingStack.length - 2];
-            const  condition = getValue(line, ifPosition.index + ifPosition[0].length);
-            const  inIfBlock = lib.isAlphabetIndex(setting_.index);
-            if ( ! inIfBlock) {
-                currentSettingIndex = setting_.index + '/a';
-                settingStack.push({
-                    lineNum,
-                    index: setting_.index + '/a',
-                    startLineNum: setting_.startLineNum,
-                    indentLevel: indentStack.length - 1,
-                    parentIndentLevel: setting_.parentIndentLevel,
-                });
+                nextSetting.lineNum = lineNum;
+                if ( ! inIfBlock  &&  ! isSecondIfBlock) {
+                    if (setting_.index === '/') {
+                        nextSetting.index = '/a';
+                    } else {
+                        nextSetting.index = setting_.index + '/a';
+                    }
+                }
+                nextSetting.indentLevel = indent.length;
+                nextSetting.startLineNum = setting_.startLineNum;
+                nextSetting.startIndentLevel = setting_.startIndentLevel;
                 settingStack.push({
                     lineNum: 0,
-                    index: setting_.index + '/a/a',
-                    startLineNum: 0,
+                    index: nextSetting.index + '/a',
                     indentLevel: 0,
-                    parentIndentLevel: -1
+                    startLineNum: 0,
+                    startIndentLevel: -1
                 });
-            } else {
-                // ToDo:
-            }
-            tree.settingsInformation[currentSettingIndex] = {
-                index: currentSettingIndex,
-                lineNum,
-                condition,
-            };
-            if (parser.verbose) {
-                console.log(`Verbose: settings ${currentSettingIndex}`);
-                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: #if: ${condition}`);
+                currentSettingIndex = nextSetting.index;
+                tree.settingsInformation[currentSettingIndex] = {
+                    index: currentSettingIndex,
+                    lineNum,
+                    condition,
+                };
+                if (parser.verbose) {
+                    console.log(`Verbose: settings ${currentSettingIndex}`);
+                    console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: #if: ${condition}`);
+                }
             }
         }
     }
     if (isReadingSetting) {
         const  setting_ = settingStack[settingStack.length - 2];
-        tree.settings[currentSettingIndex] = setting;
+        tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
         tree.indices[setting_.startLineNum] = currentSettingIndex;
         tree.settingsInformation[currentSettingIndex] = {
             index: currentSettingIndex,
@@ -3657,6 +3647,7 @@ class SettingsTree {
                     const  parentSetting = this.settings[parentIndex];
 
                     this.currentSettings = { ...this.currentSettings, ...parentSetting };
+                    this.addCurrentSettingsInIfTag(parentIndex, parser);
                     separatorPosition = index.indexOf('/', separatorPosition + 1);
                     if (separatorPosition === notFound) {
                         break;
@@ -3665,6 +3656,7 @@ class SettingsTree {
                 }
                 if (index !== '/') {
                     this.currentSettings = { ...this.currentSettings, ...this.settings[index] };
+                    this.addCurrentSettingsInIfTag(index, parser);
                 }
                 const  startLineNums = Object.keys(this.indices);
                 if (this.nextLineNumIndex < startLineNums.length) {
@@ -3685,6 +3677,54 @@ class SettingsTree {
             }
 
             return  this.currentSettings;
+        }
+    }
+    
+    addCurrentSettingsInIfTag(currentIndex: string, parser: Parser) {
+        const  notVerboseParser = {...parser, verbose: false};
+        const  ifTagParser = new IfTagParser(notVerboseParser);
+        if (currentIndex === '/') {
+            var  firstIndex = '/a';
+            var  currentIndexSlash = '/';
+        } else {
+            var  firstIndex = currentIndex + '/a';
+            var  currentIndexSlash = currentIndex + '/';
+        }
+        const  disabledFalseIndex = '!';  // startsWith(falseIndex) returns false
+        var    falseIndex = disabledFalseIndex;
+        var    isInCurrentSetting = false;
+        for (const index of Object.keys(this.settingsInformation)) {
+            if ( ! isInCurrentSetting) {
+                isInCurrentSetting = (index === firstIndex);
+            } else {
+                isInCurrentSetting = (
+                    index.startsWith(currentIndexSlash)  &&
+                    lib.isAlphabetIndex(index.substr(currentIndexSlash.length, 1)));
+                if ( ! isInCurrentSetting) {
+                    return;
+                }
+            }
+            if (isInCurrentSetting) {
+                if ( ! index.startsWith(falseIndex)) {
+                    const  condition = this.settingsInformation[index].condition;
+
+                    const  parsed = ifTagParser.evaluate(`#if: ${condition}`, this.currentSettings);
+                    if (parsed.errorCount >= 1) {
+                        console.log('');
+                        console.log('Error of if tag syntax:');
+                        console.log(`  ${translate('typrmFile')}: ${getTestablePath(parser.filePath)}:${parser.lineNum}`);
+                        console.log(`  Contents: ${parsed.condition}`);
+                        parser.errorCount += parsed.errorCount;
+                    }
+
+                    if (ifTagParser.thisIsOutOfFalseBlock) {
+                        this.currentSettings = {...this.currentSettings, ...this.settings[index]};
+                        falseIndex = disabledFalseIndex;
+                    } else {
+                        falseIndex = index + '/';
+                    }
+                }
+            }
         }
     }
 
