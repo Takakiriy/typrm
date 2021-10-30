@@ -1043,6 +1043,8 @@ exports[`checks template value >> settings_tree_if: sourceFileContents 1`] = `
 "section:
     table:
         cell:
+            ValueA      #template: __A__
+            ValueB      #template: __B__
             ValueC      #template: __C__
             test error  #template: __C__
             ValueD      #template: __D__
@@ -3072,6 +3074,152 @@ Error of the value count in #to tag:
     Variable count in the template tag: 2
     Variable count in the to tag: 1
 Verbose:         __BodyC1__: (ValueCC1)-(ValueCC2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> settings_tree_if: replacedFileContents 1`] = `
+"section:
+    table:
+        cell:
+            ValueA_Next      #template: __A__
+            ValueB_Next      #template: __B__
+            ValueC_Next      #template: __C__
+            ValueD_Next      #template: __D__
+            ValueE      #template: __E__
+        settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ == ValueB_Next
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC_Next  #original: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD_Next
+            __E__: ValueE
+settings:
+    a: #if: $settings.__A__ == ValueA_Next
+        __B__: ValueB_Next
+    b: #if: $settings.__A__ != ValueA_Next
+        __B__: ValueB
+    __A__: ValueA_Next  #original: ValueA
+    __B2__: ValueB2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> settings_tree_if: revertedFileContents 1`] = `
+"section:
+    table:
+        cell:
+            ValueA      #template: __A__
+            ValueB      #template: __B__
+            ValueC      #template: __C__
+            ValueD      #template: __D__
+            ValueE      #template: __E__
+        settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ == ValueB_Next
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD_Next
+            __E__: ValueE
+settings:
+    a: #if: $settings.__A__ == ValueA_Next
+        __B__: ValueB_Next
+    b: #if: $settings.__A__ != ValueA_Next
+        __B__: ValueB
+    __A__: ValueA
+    __B2__: ValueB2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> settings_tree_if: sourceFileContents 1`] = `
+"section:
+    table:
+        cell:
+            ValueA      #template: __A__
+            ValueB      #template: __B__
+            ValueC      #template: __C__
+            ValueD      #template: __D__
+            ValueE      #template: __E__
+        settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ == ValueB_Next
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: not_used  #to: ValueC_Next
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD_Next
+            __E__: ValueE
+settings:
+    a: #if: $settings.__A__ == ValueA_Next
+        __B__: ValueB_Next
+    b: #if: $settings.__A__ != ValueA_Next
+        __B__: ValueB
+    __A__: ValueA  #to: ValueA_Next
+    __B2__: ValueB2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> settings_tree_if: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> replace to tag >> settings_tree_if_out_of_settings: sourceFileContents 1`] = `
+"section:
+    table:
+        cell:
+            ValueA      #template: __A__  #to: ValueA_Next
+            ValueB      #template: __B__
+            ValueC      #template: __C__  #to: ValueC_Next
+            ValueD      #template: __D__
+            ValueE      #template: __E__
+        settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ == ValueB_Next
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD_Next
+            __E__: ValueE
+settings:
+    a: #if: $settings.__A__ == ValueA_Next
+        __B__: ValueB_Next
+    b: #if: $settings.__A__ != ValueA_Next
+        __B__: ValueB
+    __A__: ValueA
+    __B2__: ValueB2
 "
 `;
 

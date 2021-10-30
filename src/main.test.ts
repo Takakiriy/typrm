@@ -489,7 +489,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
     });
 
     describe("replace to tag >>", () => {
-        test.each([
+        test.only.each([
             ['1_OK', ''],
             ['2_FileParameter', 'FileParameter'],
             ['3_SimpleOneLoop', ''],
@@ -499,8 +499,10 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ['6_VariousTags', ''],
             ['7_VariableCount', ''],
             ['7E_VariableCount_Error', 'ErrorCase'],
+            ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {
+if (caseName !== 'settings_tree_if') {return;}  // || subCase !== '____'
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -541,6 +543,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
                 expect(sourceFileContents2).toBe(sourceFileContents);
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+expect('test code').toBe('deleted skip code.');
         });
     });
     test("replace to tag >> ToTestTag", async () => {
