@@ -644,9 +644,6 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                 lineNum += 1;
                 var  output = false;
                 parser.lineNum = lineNum;
-if (lineNum === 30  &&  '__A__' in keyValues) {
-    isDebug = true;
-}
 
                 // isReadingSetting = ...
                 if (false /*newCode*/) {
@@ -729,9 +726,6 @@ if (lineNum === 30  &&  '__A__' in keyValues) {
                                     const  {original, spaceAndComment} = getReplacedLineInSettings(
                                         line, separator, oldValue, replacedValue,
                                         addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
-if (isDebug) {
-    isDebug = isDebug;
-}
 
                                     writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
                                     output = true;
@@ -924,9 +918,6 @@ if (isDebug) {
             writer.end();
             await new Promise( (resolve) => {
                 writer.on('finish', () => {
-if (isDebug) {
-isDebug = isDebug;
-}
                     if (errorCount === 0) {
                         if (loop) {
                             fs.copyFileSync(updatingFilePath, previousUpdatingFilePath);
@@ -974,6 +965,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
     tree.indices[1] = '/';
+    tree.indicesWithIf[1] = '/';
     tree.settings = {};
     if (parser.verbose) {
         console.log(`Verbose: Phase 1: parse settings ...`);
@@ -994,12 +986,13 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 indentStack.pop();
             }
 
-            // Pop "settingStack"
+            // ...
             const  currentIndentStackIndex = indentStack.length - 1;
             var    currentSettingStackIndex = settingStack.length - 2;
             const  previousIndent = indentStack[currentIndentStackIndex];
             const  inIfBlock = lib.isAlphabetIndex(currentSettingIndex);
 
+            // Pop "settingStack" in #if: block
             if (inIfBlock) {
 
                 while (indent.length <= settingStack[currentSettingStackIndex].indentLevel) {
@@ -1023,15 +1016,15 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     } else {
                         nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
                     }
-                    if ( ! lastEndIf) {
-                        currentSettingIndex = settingStack[currentSettingStackIndex].index;
-                    } else {  // lastEndIf
-                        currentSettingIndex = settingStack[parentSettingStackIndex].index;
+                    currentSettingIndex = settingStack[currentSettingStackIndex].index;
+                    tree.indicesWithIf[lineNum] = currentSettingIndex;
+                    if (lastEndIf) {
                         break;
                     }
                 }
             }
 
+            // Pop "settingStack" out of #if: block
             while (indent.length <= settingStack[currentSettingStackIndex].startIndentLevel) {
                 settingStack.pop();
                 currentSettingStackIndex -= 1;
@@ -1040,6 +1033,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 if ( ! (currentSettingIndex in tree.settings)) {
                     tree.settings[currentSettingIndex] = setting;
                     tree.indices[setting_.startLineNum] = currentSettingIndex;
+                    tree.indicesWithIf[setting_.startLineNum] = currentSettingIndex;
                     tree.settingsInformation[currentSettingIndex] = {
                         index: currentSettingIndex,
                         lineNum: setting_.lineNum,
@@ -1052,6 +1046,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
 
                 currentSettingIndex = settingStack[currentSettingStackIndex].index;
                 tree.indices[lineNum] = currentSettingIndex;
+                tree.indicesWithIf[lineNum] = currentSettingIndex;
 
                 const  nextSetting = setting_;
                 const  parentSettingIndex = path.dirname(nextSetting.index);
@@ -1096,6 +1091,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     startIndentLevel: -1
                 });
                 tree.indices[setting_.startLineNum] = currentSettingIndex;
+                tree.indicesWithIf[setting_.startLineNum] = currentSettingIndex;
             }
             tree.settingsInformation[currentSettingIndex] = {
                 index: currentSettingIndex,
@@ -1170,6 +1166,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     startIndentLevel: -1
                 });
                 currentSettingIndex = nextSetting.index;
+                tree.indicesWithIf[lineNum] = currentSettingIndex;
                 tree.settingsInformation[currentSettingIndex] = {
                     index: currentSettingIndex,
                     lineNum,
@@ -1186,6 +1183,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
         const  setting_ = settingStack[settingStack.length - 2];
         tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
         tree.indices[setting_.startLineNum] = currentSettingIndex;
+        tree.indicesWithIf[setting_.startLineNum] = currentSettingIndex;
         tree.settingsInformation[currentSettingIndex] = {
             index: currentSettingIndex,
             lineNum : setting_.lineNum,
@@ -1206,31 +1204,44 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
 }
 
 // makeReplaceToTagTree
-async function  makeReplaceToTagTree(inputFilePath: string, settingTree: SettingsTree): Promise<ReplaceToTagTree>  {
+async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonly<SettingsTree>): Promise<ReplaceToTagTree>  {
     const  toTagTree = new ReplaceToTagTree();
     const  parser = new Parser();
     var  reader = readline.createInterface({
         input: fs.createReadStream(inputFilePath),
         crlfDelay: Infinity
     });
-    var  lineNum = 0;
     var  isReadingSetting = false;
     var  settingIndentLength = 0;
     var  key = '';
     var  value = '';
     var  previousTemplateTag: TemplateTag | null = null;
+    var  currentSettingIndex = '';
+    var  blockStartLineNums = Object.keys(settingTree.indicesWithIf).map((x)=>parseInt(x));
+    var  nextBlockIndex = 0;
+    var  nextBlockLineNum = 1;
     if (parser.verbose) {
         console.log(`Verbose: Phase 2: parse "to" tags ...`);
     }
 
+    var  lineNum = 0;
     for await (const line1 of reader) {
         const  line: string = line1;
         lineNum += 1;
         parser.line = line;
         parser.lineNum = lineNum;
+if (lineNum === 2) {
+isDebug = true;
+}
+
         settingTree.moveToLine(parser);
-        if ( ! (settingTree.currentSettingIndex in toTagTree.replaceTo)) {
-            toTagTree.replaceTo[settingTree.currentSettingIndex] = {} as {[key: string]: Setting};
+        if (lineNum === nextBlockLineNum) {
+            currentSettingIndex = settingTree.indicesWithIf[lineNum];
+            nextBlockIndex += 1;
+            nextBlockLineNum = blockStartLineNums[nextBlockIndex];
+        }
+        if ( ! (currentSettingIndex in toTagTree.replaceTo)) {
+            toTagTree.replaceTo[currentSettingIndex] = {} as {[key: string]: Setting};
         }
 
         // setting = ...
@@ -1278,11 +1289,14 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Setting
                     console.log(`Verbose:         ${key}: ${value}  #to: ${toValue}`);
                 }
 
-                toTagTree.replaceTo[settingTree.currentSettingIndex][key] = {
+                toTagTree.replaceTo[currentSettingIndex][key] = {
                     value: toValue,
                     lineNum: [lineNum],
                     isReferenced: false,
                 } as Setting;
+if (isDebug) {
+isDebug = isDebug;
+}
 
             // #to: tag after the #template:
             } else {
@@ -1300,7 +1314,7 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Setting
                     }
                     for (const [key_, newValue] of Object.entries(newKeyValues)) {
 
-                        toTagTree.replaceTo[settingTree.currentSettingIndex][key_] = newValue;
+                        toTagTree.replaceTo[currentSettingIndex][key_] = newValue;
                     }
                     previousTemplateTag = null;
                 }
@@ -3746,6 +3760,7 @@ enum CommandEnum {
 // SettingsTree
 class SettingsTree {
     indices: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
+    indicesWithIf: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
     settings: {[index: string]: {[name: string]: Setting}} = {};
     settingsInformation: {[index: string]: SettingsInformation} = {};
     errorCount: number = 0;
@@ -3758,7 +3773,9 @@ class SettingsTree {
     outOfScopeSettingIndices: string[] = [];  // This is set when previous line is in scope
 
     moveToLine(parser: Parser) {
-        Object.assign(this, this.moveToLine_Immutably(parser));
+        const  r = this.moveToLine_Immutably(parser);
+        Object.assign(this, r.this_);
+        Object.assign(parser, r.parser);
     }
     moveToLine_Immutably(parser: Readonly<Parser>): SettingsTree_moveToLine {
         const  this_ = this as Readonly<SettingsTree>;
@@ -3797,7 +3814,7 @@ class SettingsTree {
             return  return_;
 
         } else { // if (newCodeMode === 'tree')
-            if (parser.lineNum === this_.nextSettingsLineNum) {
+            if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
                 const  previousSettingIndex = this_.currentSettingIndex;
                 return_.this_.currentSettingIndex = this_.indices[parser.lineNum];  // e.g. "/a/bc"
 
@@ -3842,7 +3859,7 @@ class SettingsTree {
                 if (this_.nextLineNumIndex < startLineNums.length) {
                     return_.this_.nextLineNumIndex += 1;
 
-                    return_.this_.nextSettingsLineNum = parseInt(startLineNums[this_.nextLineNumIndex]);
+                    return_.this_.nextSettingsLineNum = parseInt(startLineNums[this_.nextLineNumIndex + 1]);
                 } else {
                     return_.this_.nextSettingsLineNum = 0;
                 }
@@ -3969,21 +3986,42 @@ class ReplaceToTagTree {
 
     currentReplacedSettings: {[name: string]: Setting} = {};
 
+    nextSettingsLineNum: number = 1;
+
     moveToLine(parser: Parser, settingsTree: SettingsTree) {
         Object.assign(this, this.moveToLine_Immutably(parser, settingsTree));
     }
     moveToLine_Immutably(parser: Readonly<Parser>, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_moveToLine {
+        // "settingsTree" must be called "moveToLine" method.
         const  this_ = this as Readonly<ReplaceToTagTree>;
         const  return_: ReplaceToTagTree_moveToLine = {
             currentReplacedSettings: {},
+            nextSettingsLineNum: this_.nextSettingsLineNum,
         };
+        if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
+
+            return_.currentReplacedSettings = {};
+            const  index = settingsTree.currentSettingIndex;
+            var    parentIndex = '/';
+            var    separatorPosition = 0;
+            for (;;) {
+                const  parentSetting = settingsTree.settings[parentIndex];
+                const  parentToTags = this_.replaceTo[settingsTree.currentSettingIndex];
+
+                return_.currentReplacedSettings = { ...return_.currentReplacedSettings, ...parentSetting };
+                return_.currentReplacedSettings = { ...return_.currentReplacedSettings, ...parentToTags };
 
 
+            }
+            return_.currentReplacedSettings = {...settingsTree.currentSettings, ...this_.replaceTo[settingsTree.currentSettingIndex]};
+            return_.nextSettingsLineNum = settingsTree.nextSettingsLineNum;
+        }
         return  return_;
     }
 };
 interface  ReplaceToTagTree_moveToLine {
     currentReplacedSettings: {[name: string]: Setting};
+    nextSettingsLineNum: number;
 }
 
 // SettingsInformation
