@@ -2120,6 +2120,9 @@ async function  replace(inputFileOrFolderPath: string) {
                 lines.push(line);
                 lineNum += 1;
                 parser.lineNum = lineNum;
+if (lineNum === 2) {
+pp('')
+}
                 settingTree.moveToLine(parser);
                 toTagTree.moveToLine(parser, settingTree);
                 const  oldSetting = settingTree.currentSettings;
@@ -3856,10 +3859,13 @@ class SettingsTree {
                     return_.parser = {...return_.parser, ...r.parser};
                 }
                 const  startLineNums = Object.keys(this_.indices);
-                if (this_.nextLineNumIndex < startLineNums.length) {
+                if (parser.lineNum === 1) {
+                    return_.this_.nextLineNumIndex = 0;
+                }
+                if (return_.this_.nextLineNumIndex < startLineNums.length) {
                     return_.this_.nextLineNumIndex += 1;
 
-                    return_.this_.nextSettingsLineNum = parseInt(startLineNums[this_.nextLineNumIndex + 1]);
+                    return_.this_.nextSettingsLineNum = parseInt(startLineNums[return_.this_.nextLineNumIndex]);
                 } else {
                     return_.this_.nextSettingsLineNum = 0;
                 }
@@ -3874,9 +3880,9 @@ class SettingsTree {
             return  return_;
         }
     }
-    
+
     addCurrentSettingsInIfTag_Immutably(
-        currentIndex: Readonly<string>,
+        currentIndex: string,
         currentSettings: Readonly<{[name: string]: Setting}>,
         parser: Readonly<Parser>)
     : SettingsTree_addCurrentSettingsInIfTag {
@@ -3982,25 +3988,33 @@ interface  SettingsTree_addCurrentSettingsInIfTag {
 // ReplaceToTagTree
 class ReplaceToTagTree {
     replaceTo: {[index: string]: {[name: string]: Setting}} = {};
-    errorCount: number = 0;
 
     currentReplacedSettings: {[name: string]: Setting} = {};
 
+    nextLineNumIndex: number = 0;
     nextSettingsLineNum: number = 1;
 
     moveToLine(parser: Parser, settingsTree: SettingsTree) {
-        Object.assign(this, this.moveToLine_Immutably(parser, settingsTree));
+        const  r = this.moveToLine_Immutably(parser, settingsTree);
+        Object.assign(this, r.this_);
+        Object.assign(parser, r.parser);
     }
     moveToLine_Immutably(parser: Readonly<Parser>, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_moveToLine {
         // "settingsTree" must be called "moveToLine" method.
         const  this_ = this as Readonly<ReplaceToTagTree>;
         const  return_: ReplaceToTagTree_moveToLine = {
-            currentReplacedSettings: {},
-            nextSettingsLineNum: this_.nextSettingsLineNum,
+            this_: {
+                currentReplacedSettings: {},
+                nextLineNumIndex: this_.nextLineNumIndex,
+                nextSettingsLineNum: this_.nextSettingsLineNum,
+            },
+            parser: {
+                errorCount: 0,
+            }
         };
         if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
 
-            return_.currentReplacedSettings = {};
+            return_.this_.currentReplacedSettings = {};
             const  index = settingsTree.currentSettingIndex;
             var    parentIndex = '/';
             var    separatorPosition = 0;
@@ -4008,21 +4022,132 @@ class ReplaceToTagTree {
                 const  parentSetting = settingsTree.settings[parentIndex];
                 const  parentToTags = this_.replaceTo[settingsTree.currentSettingIndex];
 
-                return_.currentReplacedSettings = { ...return_.currentReplacedSettings, ...parentSetting };
-                return_.currentReplacedSettings = { ...return_.currentReplacedSettings, ...parentToTags };
+                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...parentSetting };
+                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...parentToTags };
 
-
+                const  r = this_.addCurrentSettingsInIfTag_Immutably(
+                    parentIndex, return_.this_.currentReplacedSettings, settingsTree, parser);
+                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...r.this_.currentReplacedSettings };
+                return_.parser = {...return_.parser, ...r.parser};
+                separatorPosition = index.indexOf('/', separatorPosition + 1);
+                if (separatorPosition === notFound) {
+                    break;
+                }
+                parentIndex = index.substr(0, separatorPosition);
             }
-            return_.currentReplacedSettings = {...settingsTree.currentSettings, ...this_.replaceTo[settingsTree.currentSettingIndex]};
-            return_.nextSettingsLineNum = settingsTree.nextSettingsLineNum;
+            if (index !== '/') {
+
+                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...settingsTree.settings[index] };
+                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...this_.replaceTo[index] };
+
+                const  r = this_.addCurrentSettingsInIfTag_Immutably(
+                    index, return_.this_.currentReplacedSettings, settingsTree, parser);
+                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...r.this_.currentReplacedSettings };
+                return_.parser = {...return_.parser, ...r.parser};
+            }
+            const  startLineNums = Object.keys(settingsTree.indices);
+            if (parser.lineNum === 1) {
+                return_.this_.nextLineNumIndex = 0;
+            }
+            if (return_.this_.nextLineNumIndex < startLineNums.length) {
+                return_.this_.nextLineNumIndex += 1;
+
+                return_.this_.nextSettingsLineNum = parseInt(startLineNums[return_.this_.nextLineNumIndex]);
+            } else {
+                return_.this_.nextSettingsLineNum = 0;
+            }
+            if (parser.verbose) {
+                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: settings are changed to ${settingsTree.currentSettingIndex} settings:`);
+                for (const [key, setting] of Object.entries(settingsTree.currentSettings)) {
+                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
+                }
+            }
+        }
+        return  return_;
+    }
+
+    addCurrentSettingsInIfTag_Immutably(
+        currentIndex: string,
+        currentReplacedSettings: Readonly<{[name: string]: Setting}>,
+        settingsTree: Readonly<SettingsTree>,
+        parser: Readonly<Parser>)
+    : ReplaceToTagTree_addCurrentSettingsInIfTag {
+        const  this_ = this as Readonly<ReplaceToTagTree>;
+        const  return_: ReplaceToTagTree_addCurrentSettingsInIfTag = {
+            this_: {
+                currentReplacedSettings: currentReplacedSettings,
+            },
+            parser: {
+                errorCount: parser.errorCount,
+            },
+        };
+        const  notVerboseParser = {...parser, verbose: false};
+        const  ifTagParser = new IfTagParser(notVerboseParser);
+        if (currentIndex === '/') {
+            var  firstIndex = '/a';
+            var  currentIndexSlash = '/';
+        } else {
+            var  firstIndex = currentIndex + '/a';
+            var  currentIndexSlash = currentIndex + '/';
+        }
+        const  disabledFalseIndex = '!';  // startsWith(falseIndex) returns false
+        var    falseIndex = disabledFalseIndex;
+        var    isInCurrentSetting = false;
+        for (const index of Object.keys(settingsTree.settingsInformation)) {
+            if ( ! isInCurrentSetting) {
+                isInCurrentSetting = (index === firstIndex);
+            } else {
+                isInCurrentSetting = (
+                    index.startsWith(currentIndexSlash)  &&
+                    lib.isAlphabetIndex(index.substr(currentIndexSlash.length, 1)));
+                if ( ! isInCurrentSetting) {
+                    return  return_;
+                }
+            }
+            if (isInCurrentSetting) {
+                if ( ! index.startsWith(falseIndex)) {
+                    const  condition = settingsTree.settingsInformation[index].condition;
+
+                    const  parsed = ifTagParser.evaluate(`#if: ${condition}`, return_.this_.currentReplacedSettings);
+                    if (parsed.errorCount >= 1) {
+                        console.log('');
+                        console.log('Error of if tag syntax:');
+                        console.log(`  ${translate('typrmFile')}: ${getTestablePath(parser.filePath)}:${parser.lineNum}`);
+                        console.log(`  Contents: ${parsed.condition}`);
+                        return_.parser.errorCount += parsed.errorCount;
+                    }
+
+                    if (ifTagParser.thisIsOutOfFalseBlock) {
+                        return_.this_.currentReplacedSettings = {...return_.this_.currentReplacedSettings, ...settingsTree.settings[index]};
+                        return_.this_.currentReplacedSettings = {...return_.this_.currentReplacedSettings, ...this_.replaceTo[index]};
+                        falseIndex = disabledFalseIndex;
+                    } else {
+                        falseIndex = index + '/';
+                    }
+                }
+            }
         }
         return  return_;
     }
 };
 interface  ReplaceToTagTree_moveToLine {
-    currentReplacedSettings: {[name: string]: Setting};
-    nextSettingsLineNum: number;
+    this_: {
+        currentReplacedSettings: {[name: string]: Setting};
+        nextLineNumIndex: number;
+        nextSettingsLineNum: number;
+    },
+    parser: {
+        errorCount: number,
+    }
 }
+interface  ReplaceToTagTree_addCurrentSettingsInIfTag {
+    this_: {
+        currentReplacedSettings: {[name: string]: Setting},
+    },
+    parser: {
+        errorCount: number,
+    }
+};
 
 // SettingsInformation
 interface SettingsInformation {
