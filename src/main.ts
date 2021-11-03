@@ -8,6 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
+import { isDeepStrictEqual } from 'util';
 
 // main
 export async function  main() {
@@ -1231,7 +1232,7 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
         parser.line = line;
         parser.lineNum = lineNum;
 if (lineNum === 2) {
-isDebug = true;
+pp('')
 }
 
         settingTree.moveToLine(parser);
@@ -2122,6 +2123,7 @@ async function  replace(inputFileOrFolderPath: string) {
                 parser.lineNum = lineNum;
 if (lineNum === 2) {
 pp('')
+isDebug = true
 }
                 settingTree.moveToLine(parser);
                 toTagTree.moveToLine(parser, settingTree);
@@ -3817,47 +3819,52 @@ class SettingsTree {
             return  return_;
 
         } else { // if (newCodeMode === 'tree')
+if (parser.lineNum === 2  &&  isDebug) {
+isDebug = isDebug
+}
             if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
                 const  previousSettingIndex = this_.currentSettingIndex;
-                return_.this_.currentSettingIndex = this_.indices[parser.lineNum];  // e.g. "/a/bc"
+                const  currentSettingIndex = this_.indices[parser.lineNum];  // e.g. "/a/bc"
+                const  currentSettingIndexSlash = `${currentSettingIndex}/`;  // e.g. "/a/bc/"
+                return_.this_.currentSettingIndex = currentSettingIndex;
 
-                return_.this_.outOfScopeSettingIndices = [];
-                const  currentSettingIndexSlash = `${this_.currentSettingIndex}/`;  // e.g. "/a/bc/"
-                var    previousParentIndex = previousSettingIndex;  // e.g. "/a/b/d/e"
+                var  outOfScopeSettingIndices = [];
+                var  previousParentIndex = previousSettingIndex;  // e.g. "/a/b/d/e"
                 while ( ! currentSettingIndexSlash.startsWith(`${previousParentIndex}/`)  &&  previousParentIndex !== '/') {
                         // e.g. previousParentIndex == "/a", not "/a/b"
                         // The last slash is in order not to match a part of folder name.
 
-                    this_.outOfScopeSettingIndices.push(previousParentIndex);
+                    outOfScopeSettingIndices.push(previousParentIndex);
                     previousParentIndex = path.dirname(previousParentIndex);
                 }
+                return_.this_.outOfScopeSettingIndices = outOfScopeSettingIndices;
 
-                return_.this_.currentSettings = {};
-                const  index = this_.currentSettingIndex;
-                var    parentIndex = '/';
-                var    separatorPosition = 0;
+                var  currentSettings: {[name: string]: Setting} = {};
+                var  parentIndex = '/';
+                var  separatorPosition = 0;
                 for (;;) {
                     const  parentSetting = this_.settings[parentIndex];
 
-                    return_.this_.currentSettings = { ...return_.this_.currentSettings, ...parentSetting };
+                    currentSettings = { ...currentSettings, ...parentSetting };
 
-                    const  r = this_.addCurrentSettingsInIfTag_Immutably(parentIndex, return_.this_.currentSettings, parser);
-                    return_.this_.currentSettings = { ...return_.this_.currentSettings, ...r.this_.currentSettings };
+                    const  r = this_.addCurrentSettingsInIfTag_Immutably(parentIndex, currentSettings, parser);
+                    currentSettings = { ...currentSettings, ...r.this_.currentSettings };
                     return_.parser = {...return_.parser, ...r.parser};
-                    separatorPosition = index.indexOf('/', separatorPosition + 1);
+                    separatorPosition = currentSettingIndex.indexOf('/', separatorPosition + 1);
                     if (separatorPosition === notFound) {
                         break;
                     }
-                    parentIndex = index.substr(0, separatorPosition);
+                    parentIndex = currentSettingIndex.substr(0, separatorPosition);
                 }
-                if (index !== '/') {
+                if (currentSettingIndex !== '/') {
 
-                    return_.this_.currentSettings = { ...return_.this_.currentSettings, ...this_.settings[index] };
+                    currentSettings = { ...currentSettings, ...this_.settings[currentSettingIndex] };
 
-                    const  r = this_.addCurrentSettingsInIfTag_Immutably(index, return_.this_.currentSettings, parser);
-                    return_.this_.currentSettings = { ...return_.this_.currentSettings, ...r.this_.currentSettings };
+                    const  r = this_.addCurrentSettingsInIfTag_Immutably(currentSettingIndex, return_.this_.currentSettings, parser);
+                    currentSettings = { ...currentSettings, ...r.this_.currentSettings };
                     return_.parser = {...return_.parser, ...r.parser};
                 }
+                return_.this_.currentSettings = currentSettings;
                 const  startLineNums = Object.keys(this_.indices);
                 if (parser.lineNum === 1) {
                     return_.this_.nextLineNumIndex = 0;
@@ -3870,8 +3877,8 @@ class SettingsTree {
                     return_.this_.nextSettingsLineNum = 0;
                 }
                 if (parser.verbose) {
-                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: settings are changed to ${this_.currentSettingIndex} settings:`);
-                    for (const [key, setting] of Object.entries(this_.currentSettings)) {
+                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: settings are changed to ${currentSettingIndex} settings:`);
+                    for (const [key, setting] of Object.entries(currentSettings)) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                     }
                 }
@@ -4012,22 +4019,26 @@ class ReplaceToTagTree {
                 errorCount: 0,
             }
         };
+if (parser.lineNum === 2  &&  isDebug) {
+isDebug = isDebug
+}
         if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
 
             return_.this_.currentReplacedSettings = {};
             const  index = settingsTree.currentSettingIndex;
             var    parentIndex = '/';
             var    separatorPosition = 0;
+            var    currentReplacedSettings: {[name: string]: Setting} = {}
             for (;;) {
                 const  parentSetting = settingsTree.settings[parentIndex];
-                const  parentToTags = this_.replaceTo[settingsTree.currentSettingIndex];
+                const  parentToTags = this_.replaceTo[parentIndex];
 
-                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...parentSetting };
-                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...parentToTags };
+                currentReplacedSettings = { ...currentReplacedSettings, ...parentSetting };
+                currentReplacedSettings = { ...currentReplacedSettings, ...parentToTags };
 
                 const  r = this_.addCurrentSettingsInIfTag_Immutably(
-                    parentIndex, return_.this_.currentReplacedSettings, settingsTree, parser);
-                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...r.this_.currentReplacedSettings };
+                    parentIndex, currentReplacedSettings, settingsTree, parser);
+                currentReplacedSettings = { ...currentReplacedSettings, ...r.this_.currentReplacedSettings };
                 return_.parser = {...return_.parser, ...r.parser};
                 separatorPosition = index.indexOf('/', separatorPosition + 1);
                 if (separatorPosition === notFound) {
@@ -4037,14 +4048,15 @@ class ReplaceToTagTree {
             }
             if (index !== '/') {
 
-                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...settingsTree.settings[index] };
-                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...this_.replaceTo[index] };
+                currentReplacedSettings = { ...currentReplacedSettings, ...settingsTree.settings[index] };
+                currentReplacedSettings = { ...currentReplacedSettings, ...this_.replaceTo[index] };
 
                 const  r = this_.addCurrentSettingsInIfTag_Immutably(
-                    index, return_.this_.currentReplacedSettings, settingsTree, parser);
-                return_.this_.currentReplacedSettings = { ...return_.this_.currentReplacedSettings, ...r.this_.currentReplacedSettings };
+                    index, currentReplacedSettings, settingsTree, parser);
+                currentReplacedSettings = { ...currentReplacedSettings, ...r.this_.currentReplacedSettings };
                 return_.parser = {...return_.parser, ...r.parser};
             }
+            return_.this_.currentReplacedSettings = currentReplacedSettings;
             const  startLineNums = Object.keys(settingsTree.indices);
             if (parser.lineNum === 1) {
                 return_.this_.nextLineNumIndex = 0;
