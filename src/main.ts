@@ -749,7 +749,11 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                     }
                                 }
                             }
-                        }
+                                                            if (parser.verbose  &&  oldValue !== replacedValue) {
+                                        console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                        console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                                    }
+  
 
                     // Out of settings
                     } else {
@@ -2104,6 +2108,8 @@ async function  replace(inputFileOrFolderPath: string) {
             parser.command = CommandEnum.replace;
             parser.verbose = ('verbose' in programOptions);
             parser.filePath = inputFilePath;
+            const  ifTagParser = new IfTagParser(parser);
+            const  oldIfTagParser = new IfTagParser(parser);
             if (parser.verbose) {
                 console.log(`Verbose: replaceSettingsSub:`);
                 console.log(`Verbose:     inputFilePath: ${getTestablePath(inputFilePath)}`);
@@ -2116,21 +2122,217 @@ async function  replace(inputFileOrFolderPath: string) {
             });
             const  lines = [];
             var  lineNum = 0;
-            for await (const line1 of reader) {
-                const  line: string = line1;
-                lines.push(line);
-                lineNum += 1;
-                parser.lineNum = lineNum;
+            try {
+                for await (const line1 of reader) {
+                    const  line: string = line1;
+                    lines.push(line);
+                    lineNum += 1;
+                    parser.lineNum = lineNum;
 if (lineNum === 2) {
 pp('')
 isDebug = true
 }
-                settingTree.moveToLine(parser);
-                toTagTree.moveToLine(parser, settingTree);
-                const  oldSetting = settingTree.currentSettings;
-                const  newSetting = toTagTree.currentReplacedSettings;
+                    settingTree.moveToLine(parser);
+                    toTagTree.moveToLine(parser, settingTree);
+                    const  oldSetting = settingTree.currentSettings;
+                    const  newSetting = toTagTree.currentReplacedSettings;
+                    ifTagParser.evaluate(line, setting);
+                    oldIfTagParser.evaluate(line, oldSetting);
+                    if (settingTree.wasChanged)
+                        const  replacingKeys = Object.keys(replacingKeyValues);
+                    }
+                    
+                    if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
+                        isReadingSetting = true;
+                    } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                        isReadingSetting = false;
+                    }
+                    if (isReadingSetting) {
+                        if (ifTagParser.thisIsOutOfFalseBlock) {
+                            if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
+                                const  replacedValue = replacingKeyValues[key];
+        
+                                // Change a settings value
+                                const  {original, spaceAndComment} = getReplacedLineInSettings(
+                                    line, separator, oldValue, replacedValue,
+                                    addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
+        
+                                writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
+                                output = true;
+                                if (parser.verbose  &&  oldValue !== replacedValue) {
+                                    console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                                }
+                            }
+                        }
+      
+                    // Out of settings
+                    } else {
+                        const  templateTag = parseTemplateTag(line, parser);
+                        if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
+                                &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
+                            var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+                            const  commonCase = (templateTag.label !== templateIfLabel);
+                            if (commonCase) {
+                                var  expected = getExpectedLine(oldSetting, templateTag.template);
+                                var  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
+                            } else { // if (templateTag.label === templateIfLabel)
+                                templateTag.evaluate(setting);
+                                var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
+                                var  replaced = getReplacedLine(setting, templateTag.newTemplate, replacingKeyValues);
+                            }
+    
+                            if (replacingLine.includes(expected)) {
+                                const  before = expected;
+                                const  after = replaced;
+                                if (templateTag.lineNumOffset === 0) {
+                                    var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
+                                    if (cutReplaceToTagEnabled) {
+                                        replacedLine = cutReplaceToTag(replacedLine);
+                                    }
+    
+                                    writer.write(replacedLine +"\n");
+                                    output = true;
+                                    checkedTemplateTags[lineNum] = [];
+                                    checkedTemplateTags[lineNum].push({
+                                        templateLineNum: lineNum,
+                                        template: templateTag.template,
+                                        targetLineNum: lineNum + templateTag.lineNumOffset,
+                                        expected: before,
+                                        replaced: after.replace(/\$/g,'$$')
+                                    })
+                                } else if (templateTag.lineNumOffset <= -1) {
+                                    const  targetLineNum = lineNum + templateTag.lineNumOffset;
+                                    if ( !(targetLineNum in checkedTemplateTags)) {
+                                        checkedTemplateTags[targetLineNum] = [];
+                                    }
+                                    checkedTemplateTags[targetLineNum].push({
+                                        templateLineNum: lineNum,
+                                        template: templateTag.template,
+                                        targetLineNum,
+                                        expected: before,
+                                        replaced: after.replace(/\$/g,'$$')
+                                    });
+                                    var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice();
+                                    lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
+                                    var  replacedLine = replacingLine;
+                                    var  maskedLine = replacingLine;
+                                    const  mask = '\n';
+                                    const  conflictedTemplates: CheckedTemplateTag[] = [];
+                                    for (const template of lengthSortedTemplates) {
+                                        var  i = 0;
+                                        if ( ! maskedLine.includes(template.expected)) {
+                                            if ( ! replacedLine.includes(template.replaced)) {
+                                                conflictedTemplates.push(template);
+                                            }
+                                        } else {
+                                            for (;;) {
+                                                i = maskedLine.indexOf(template.expected, i);
+                                                if (i === notFound) {
+                                                    break;
+                                                }
+    
+                                                replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                                maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                                i += template.expected.length;
+                                            }
+                                        }
+                                    }
+    
+                                    writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
+                                    if (conflictedTemplates.length >= 1) {
+                                        var  errorMessage = '';
+                                        errorMessage += '\n';
+                                        errorMessage += `${translate('ErrorIn')}: ${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
+                                        errorMessage += `  ${translate('Error')}: ${translate('template values after replace are conflicted.')}\n`;
+                                        errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
+                                        for (const template of checkedTemplateTags[targetLineNum]) {
+                                            errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
+                                            errorMessage += `    ${translate('Before Editing')}: ${template.expected.trim()}\n`;
+                                            errorMessage += `    ${translate('After  Editing')}: ${template.replaced.trim()}\n`;
+                                            errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
+                                        }
+                                        errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
+                                        conflictErrors[targetLineNum] = errorMessage;
+                                    }
+                                }
+                                if (parser.verbose  &&  before !== after) {
+                                    console.log(`Verbose: replaced a line:`);
+                                    console.log(`Verbose:     from: ${before}`);
+                                    console.log(`Verbose:     to:   ${after}`);
+                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
+                                }
+                            } else if (replacingLine.includes(replaced)) {
+                                // Do nothing
+                            } else {
+                                if (errorCount === 0) { // Since only one old value can be replaced at a time
+                                    console.log('');
+                                    console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                    console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
+                                    console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
+                                    console.log(`  ${translate('Contents')}: ${line.trim()}`);
+                                    console.log(`  ${translate('Expected')}: ${expected.trim()}`);
+                                    console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
+                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                    errorCount += 1;
+                                }
+                            }
+                        } else {
+                            if (isCheckingTemplateIfKey  &&  templateTag.label === templateIfLabel) {
+                                isCheckingTemplateIfKey = false;
+                                const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
+                                if (necessaryVariableNames !== '') {
+                                    console.log('');
+                                    console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                    console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
+                                    console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
+                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                    errorCount += 1;
+                                    templateIfKeyError = true;
+                                }
+                            }
+                        }
+                    }
+                    if (!output) {
+                        if ( ! cutReplaceToTagEnabled) {
+    
+                            writer.write(line +"\n");
+                        } else {
+                            if (line.trim() === '') {
+                                writer.write(line +"\n");
+                            } else {
+                                const  cutLine = cutReplaceToTag(line);
+                                if (cutLine.trim() === '') {
+                                    lines.pop();  // for template-at tag
+                                } else {
+                                    writer.write(cutLine +"\n");
+                                }
+                            }
+                        }
+                    }
+                }
+                for (const conflictError of Object.values(conflictErrors)) {
+                    console.log(conflictError);
+                    errorCount += 1;
+                }
 
-
+                writer.end();
+                await new Promise( (resolve) => {
+                    writer.on('finish', () => {
+                        if (errorCount === 0) {
+                            if (loop) {
+                                fs.copyFileSync(updatingFilePath, previousUpdatingFilePath);
+                            } else {
+                                fs.copyFileSync(updatingFilePath, inputFilePath);
+                            }
+                        } else {
+                            loop = false;
+                        }
+                        resolve(errorCount);
+                    });
+                });
+            } finally {
+                deleteFileSync(updatingFilePath);
             }
         } else {
             const  inputFileFullPath = inputFilePath;
