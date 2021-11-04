@@ -749,11 +749,11 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                     }
                                 }
                             }
-                                                            if (parser.verbose  &&  oldValue !== replacedValue) {
-                                        console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                        console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
-                                    }
-  
+                            if (parser.verbose  &&  oldValue !== replacedValue) {
+                                console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                            }
+                        }
 
                     // Out of settings
                     } else {
@@ -904,19 +904,6 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
             for (const conflictError of Object.values(conflictErrors)) {
                 console.log(conflictError);
                 errorCount += 1;
-            }
-
-            // previousReplacedKeys = ...
-            Object.keys(evalatedKeyValues).forEach((key: string) => {
-                previousEvalatedKeyValues[key] = evalatedKeyValues[key]; });
-            if (isAllReplacable) {
-                loop = false;
-            } else if (previousEvalatedKeyValuesLength == Object.keys(evalatedKeyValues).length) {
-                console.log('');
-                console.log(translate`Error of unexpected: The count of evalatedKeyValues is not increasing.' +
-                    ' isReplacable may be not changed. Try typrm check command.`);
-                errorCount += 1;
-                loop = false;
             }
 
             // ...
@@ -2102,8 +2089,16 @@ async function  replace(inputFileOrFolderPath: string) {
     for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
 
         if (newCode) {
+            const  addOriginalTag = true
+            const  cutOriginalTag = false
+            const  cutReplaceToTagEnabled = false
+
             const  settingTree = await makeSettingTree(inputFilePath, CommandEnum.check);
             const  toTagTree = await makeReplaceToTagTree(inputFilePath, settingTree);
+            var    isReadingSetting = false;
+            const  conflictErrors: {[lineNum: number]: string} = {};
+            var    replacingKeys: string[] = [];
+            var    replacingKeyValues: {[key: string]: string} = {};
             const  parser = new Parser();
             parser.command = CommandEnum.replace;
             parser.verbose = ('verbose' in programOptions);
@@ -2115,19 +2110,25 @@ async function  replace(inputFileOrFolderPath: string) {
                 console.log(`Verbose:     inputFilePath: ${getTestablePath(inputFilePath)}`);
             }
             const  updatingFilePath = inputFilePath +".updating";
+            const  writer = new WriteBuffer(fs.createWriteStream(updatingFilePath));
             const  readStream = fs.createReadStream(inputFilePath);
             const  reader = readline.createInterface({
                 input: readStream,
                 crlfDelay: Infinity
             });
             const  lines = [];
+            var  settingIndentLength = 0;
             var  lineNum = 0;
+            var  isCheckingTemplateIfKey = false;
+            var  templateIfKeyError = false;
+            const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
             try {
                 for await (const line1 of reader) {
                     const  line: string = line1;
                     lines.push(line);
                     lineNum += 1;
                     parser.lineNum = lineNum;
+                    var  output = false;
 if (lineNum === 2) {
 pp('')
 isDebug = true
@@ -2136,32 +2137,44 @@ isDebug = true
                     toTagTree.moveToLine(parser, settingTree);
                     const  oldSetting = settingTree.currentSettings;
                     const  newSetting = toTagTree.currentReplacedSettings;
-                    ifTagParser.evaluate(line, setting);
+                    ifTagParser.evaluate(line, newSetting);
                     oldIfTagParser.evaluate(line, oldSetting);
-                    if (settingTree.wasChanged)
-                        const  replacingKeys = Object.keys(replacingKeyValues);
+                    if (settingTree.wasChanged) {
+                        replacingKeys = Object.keys(oldSetting);
+                        replacingKeyValues = {};
+                        for (const [key, value] of Object.entries(newSetting)) {
+                            replacingKeyValues[key] = value.value;
+                        }
                     }
                     
                     if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
                         isReadingSetting = true;
+                        if ( ! templateIfKeyError) {
+                            isCheckingTemplateIfKey = true;
+                        }
                     } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
                         isReadingSetting = false;
                     }
                     if (isReadingSetting) {
-                        if (ifTagParser.thisIsOutOfFalseBlock) {
-                            if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
-                                const  replacedValue = replacingKeyValues[key];
-        
-                                // Change a settings value
-                                const  {original, spaceAndComment} = getReplacedLineInSettings(
-                                    line, separator, oldValue, replacedValue,
-                                    addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
-        
-                                writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
-                                output = true;
-                                if (parser.verbose  &&  oldValue !== replacedValue) {
-                                    console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                        const  separator = line.indexOf(':');
+                        if (separator !== notFound) {
+                            const  key = line.substr(0, separator).trim();
+                            const  oldValue = oldSetting[key].value;
+                            if (ifTagParser.thisIsOutOfFalseBlock) {
+                                if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
+                                    const  replacedValue = newSetting[key].value;
+            
+                                    // Change a settings value
+                                    const  {original, spaceAndComment} = getReplacedLineInSettings(
+                                        line, separator, oldValue, replacedValue,
+                                        addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
+            
+                                    writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
+                                    output = true;
+                                    if (parser.verbose  &&  oldValue !== replacedValue) {
+                                        console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
+                                        console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                                    }
                                 }
                             }
                         }
@@ -2169,17 +2182,17 @@ isDebug = true
                     // Out of settings
                     } else {
                         const  templateTag = parseTemplateTag(line, parser);
-                        if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
+                        if (templateTag.isFound  &&  templateTag.includesKey(replacingKeys)
                                 &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
                             var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                             const  commonCase = (templateTag.label !== templateIfLabel);
                             if (commonCase) {
                                 var  expected = getExpectedLine(oldSetting, templateTag.template);
-                                var  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
+                                var  replaced = getReplacedLine(newSetting, templateTag.template, replacingKeyValues);
                             } else { // if (templateTag.label === templateIfLabel)
-                                templateTag.evaluate(setting);
+                                templateTag.evaluate(newSetting);
                                 var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                                var  replaced = getReplacedLine(setting, templateTag.newTemplate, replacingKeyValues);
+                                var  replaced = getReplacedLine(newSetting, templateTag.newTemplate, replacingKeyValues);
                             }
     
                             if (replacingLine.includes(expected)) {
@@ -2265,7 +2278,7 @@ isDebug = true
                             } else if (replacingLine.includes(replaced)) {
                                 // Do nothing
                             } else {
-                                if (errorCount === 0) { // Since only one old value can be replaced at a time
+                                if (parser.errorCount === 0) { // Since only one old value can be replaced at a time
                                     console.log('');
                                     console.log(`${translate('ErrorLine')}: ${lineNum}`);
                                     console.log(`  ${translate('Error')}: ${translate('Not found any replacing target')}`);
@@ -2274,7 +2287,7 @@ isDebug = true
                                     console.log(`  ${translate('Expected')}: ${expected.trim()}`);
                                     console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
                                     console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                                    errorCount += 1;
+                                    parser.errorCount += 1;
                                 }
                             }
                         } else {
@@ -2287,7 +2300,7 @@ isDebug = true
                                     console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
                                     console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
                                     console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                                    errorCount += 1;
+                                    parser.errorCount += 1;
                                     templateIfKeyError = true;
                                 }
                             }
@@ -2313,22 +2326,16 @@ isDebug = true
                 }
                 for (const conflictError of Object.values(conflictErrors)) {
                     console.log(conflictError);
-                    errorCount += 1;
+                    parser.errorCount += 1;
                 }
 
                 writer.end();
                 await new Promise( (resolve) => {
                     writer.on('finish', () => {
-                        if (errorCount === 0) {
-                            if (loop) {
-                                fs.copyFileSync(updatingFilePath, previousUpdatingFilePath);
-                            } else {
-                                fs.copyFileSync(updatingFilePath, inputFilePath);
-                            }
-                        } else {
-                            loop = false;
+                        if (parser.errorCount === 0) {
+                            fs.copyFileSync(updatingFilePath, inputFilePath);
                         }
-                        resolve(errorCount);
+                        resolve(parser.errorCount);
                     });
                 });
             } finally {
