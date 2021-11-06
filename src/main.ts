@@ -579,7 +579,6 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
 
     return  fileFullPaths[0];
 }
-var  isDebug = false;  // pp
 
 // replaceSettingsSub
 async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex: number,
@@ -748,10 +747,6 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                         errorCount += 1;
                                     }
                                 }
-                            }
-                            if (parser.verbose  &&  oldValue !== replacedValue) {
-                                console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
                             }
                         }
 
@@ -956,8 +951,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
     parser.command = command;
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
-    tree.indices[1] = '/';
-    tree.indicesWithIf[1] = '/';
+    tree.indices.set(1, '/');
+    tree.indicesWithIf.set(1, '/');
     tree.settings = {};
     if (parser.verbose) {
         console.log(`Verbose: Phase 1: parse settings ...`);
@@ -1009,7 +1004,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                         nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
                     }
                     currentSettingIndex = settingStack[currentSettingStackIndex].index;
-                    tree.indicesWithIf[lineNum] = currentSettingIndex;
+                    tree.indicesWithIf.set(lineNum, currentSettingIndex);
                     if (lastEndIf) {
                         break;
                     }
@@ -1024,8 +1019,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 const  setting_ = settingStack[settingStack.length - 1];
                 if ( ! (currentSettingIndex in tree.settings)) {
                     tree.settings[currentSettingIndex] = setting;
-                    tree.indices[setting_.startLineNum] = currentSettingIndex;
-                    tree.indicesWithIf[setting_.startLineNum] = currentSettingIndex;
+                    tree.indices.set(setting_.startLineNum, currentSettingIndex);
+                    tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
                     tree.settingsInformation[currentSettingIndex] = {
                         index: currentSettingIndex,
                         lineNum: setting_.lineNum,
@@ -1037,8 +1032,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 setting = {}
 
                 currentSettingIndex = settingStack[currentSettingStackIndex].index;
-                tree.indices[lineNum] = currentSettingIndex;
-                tree.indicesWithIf[lineNum] = currentSettingIndex;
+                tree.indices.set(lineNum, currentSettingIndex);
+                tree.indicesWithIf.set(lineNum, currentSettingIndex);
 
                 const  nextSetting = setting_;
                 const  parentSettingIndex = path.dirname(nextSetting.index);
@@ -1082,8 +1077,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     startLineNum: 0,
                     startIndentLevel: -1
                 });
-                tree.indices[setting_.startLineNum] = currentSettingIndex;
-                tree.indicesWithIf[setting_.startLineNum] = currentSettingIndex;
+                tree.indices.set(setting_.startLineNum, currentSettingIndex);
+                tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
             }
             tree.settingsInformation[currentSettingIndex] = {
                 index: currentSettingIndex,
@@ -1158,7 +1153,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                     startIndentLevel: -1
                 });
                 currentSettingIndex = nextSetting.index;
-                tree.indicesWithIf[lineNum] = currentSettingIndex;
+                tree.indicesWithIf.set(lineNum, currentSettingIndex);
                 tree.settingsInformation[currentSettingIndex] = {
                     index: currentSettingIndex,
                     lineNum,
@@ -1174,8 +1169,8 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
     if (isReadingSetting) {
         const  setting_ = settingStack[settingStack.length - 2];
         tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
-        tree.indices[setting_.startLineNum] = currentSettingIndex;
-        tree.indicesWithIf[setting_.startLineNum] = currentSettingIndex;
+        tree.indices.set(setting_.startLineNum, currentSettingIndex);
+        tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
         tree.settingsInformation[currentSettingIndex] = {
             index: currentSettingIndex,
             lineNum : setting_.lineNum,
@@ -1209,7 +1204,7 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
     var  value = '';
     var  previousTemplateTag: TemplateTag | null = null;
     var  currentSettingIndex = '';
-    var  blockStartLineNums = Object.keys(settingTree.indicesWithIf).map((x)=>parseInt(x));
+    var  blockStartLineNums = Array.from(settingTree.indicesWithIf.keys());
     var  nextBlockIndex = 0;
     var  nextBlockLineNum = 1;
     if (parser.verbose) {
@@ -1222,18 +1217,15 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
         lineNum += 1;
         parser.line = line;
         parser.lineNum = lineNum;
-if (lineNum === 2) {
-pp('')
-}
 
         settingTree.moveToLine(parser);
         if (lineNum === nextBlockLineNum) {
-            currentSettingIndex = settingTree.indicesWithIf[lineNum];
+            currentSettingIndex = settingTree.indicesWithIf.get(lineNum)!;
             nextBlockIndex += 1;
             nextBlockLineNum = blockStartLineNums[nextBlockIndex];
         }
         if ( ! (currentSettingIndex in toTagTree.replaceTo)) {
-            toTagTree.replaceTo[currentSettingIndex] = {} as {[key: string]: Setting};
+            toTagTree.replaceTo[currentSettingIndex] = {};
         }
 
         // setting = ...
@@ -1286,9 +1278,6 @@ pp('')
                     lineNum: [lineNum],
                     isReferenced: false,
                 } as Setting;
-if (isDebug) {
-isDebug = isDebug;
-}
 
             // #to: tag after the #template:
             } else {
@@ -1661,7 +1650,7 @@ class  TemplateTag {
             ):  Promise<{[name: string]: Setting}> {
         const  keysSortedByLength: string[] = allKeys.slice(); // copy
         keysSortedByLength.sort((b,a)=>(a.length, b.length));
-        const  foundIndices: {[index: number]: string} = [];
+        const  foundIndices = new Map</*index*/ number, string>();
         const  verboseMode = parser.verbose || hasTestTag;
         var  template = this.template;
 
@@ -1676,7 +1665,7 @@ class  TemplateTag {
                     break;
                 }
 
-                foundIndices[index] = key;
+                foundIndices.set(index, key);
                 template =
                     template.substr(0, index) +
                     ' '.repeat(key.length) +
@@ -1685,8 +1674,8 @@ class  TemplateTag {
                 index += 1;
             }
         }
-        const  indices = Object.keys(foundIndices).map((v)=>(parseInt(v))).sort((a,b)=>(a-b));
-        const  keys = indices.map((index)=>( foundIndices[index] ));
+        const  indices = Array.from(foundIndices.keys()).sort((a,b)=>(a-b));
+        const  keys = indices.map((index)=>( foundIndices.get(index)! ));
         const  placeholder = '\n';
         var    templatePattern = this.template;
         for (let i = indices.length - 1;  i >= 0;  i -= 1 ) {
@@ -2086,12 +2075,13 @@ class  WordPositions {
 
 // replace
 async function  replace(inputFileOrFolderPath: string) {
+    var  errorCount = 0;
     for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
 
         if (newCode) {
             const  addOriginalTag = true
             const  cutOriginalTag = false
-            const  cutReplaceToTagEnabled = false
+            const  cutReplaceToTagEnabled = true
 
             const  settingTree = await makeSettingTree(inputFilePath, CommandEnum.check);
             const  toTagTree = await makeReplaceToTagTree(inputFilePath, settingTree);
@@ -2103,8 +2093,6 @@ async function  replace(inputFileOrFolderPath: string) {
             parser.command = CommandEnum.replace;
             parser.verbose = ('verbose' in programOptions);
             parser.filePath = inputFilePath;
-            const  ifTagParser = new IfTagParser(parser);
-            const  oldIfTagParser = new IfTagParser(parser);
             if (parser.verbose) {
                 console.log(`Verbose: replaceSettingsSub:`);
                 console.log(`Verbose:     inputFilePath: ${getTestablePath(inputFilePath)}`);
@@ -2129,16 +2117,10 @@ async function  replace(inputFileOrFolderPath: string) {
                     lineNum += 1;
                     parser.lineNum = lineNum;
                     var  output = false;
-if (lineNum === 2) {
-pp('')
-isDebug = true
-}
                     settingTree.moveToLine(parser);
                     toTagTree.moveToLine(parser, settingTree);
                     const  oldSetting = settingTree.currentSettings;
                     const  newSetting = toTagTree.currentReplacedSettings;
-                    ifTagParser.evaluate(line, newSetting);
-                    oldIfTagParser.evaluate(line, oldSetting);
                     if (settingTree.wasChanged) {
                         replacingKeys = Object.keys(oldSetting);
                         replacingKeyValues = {};
@@ -2159,21 +2141,25 @@ isDebug = true
                         const  separator = line.indexOf(':');
                         if (separator !== notFound) {
                             const  key = line.substr(0, separator).trim();
-                            const  oldValue = oldSetting[key].value;
-                            if (ifTagParser.thisIsOutOfFalseBlock) {
-                                if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
-                                    const  replacedValue = newSetting[key].value;
-            
-                                    // Change a settings value
-                                    const  {original, spaceAndComment} = getReplacedLineInSettings(
-                                        line, separator, oldValue, replacedValue,
-                                        addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
-            
-                                    writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
-                                    output = true;
-                                    if (parser.verbose  &&  oldValue !== replacedValue) {
-                                        console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                        console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                            if (key in oldSetting  &&  toTagTree.currentIsOutOfFalseBlock) {
+                                if (replacingKeys.includes(key)) {
+                                    
+                                    const  oldValue = getValue(line, separator);
+                                        // This is not "oldSetting[key].value", because it adds bad #original tag in #if tag block.
+                                    const  newValue = newSetting[key].value;
+                                    if (newValue !== oldValue) {
+
+                                        // Change a settings value
+                                        const  {original, spaceAndComment} = getReplacedLineInSettings(
+                                            line, separator, oldValue, newValue,
+                                            addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
+                
+                                        writer.write(line.substr(0, separator + 1) +' '+ newValue + original + spaceAndComment + "\n");
+                                        output = true;
+                                        if (parser.verbose  &&  oldValue !== newValue) {
+                                            console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${newValue}"`);
+                                            console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                                        }
                                     }
                                 }
                             }
@@ -2183,7 +2169,7 @@ isDebug = true
                     } else {
                         const  templateTag = parseTemplateTag(line, parser);
                         if (templateTag.isFound  &&  templateTag.includesKey(replacingKeys)
-                                &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
+                                &&  toTagTree.currentIsOutOfFalseBlock) {
                             var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                             const  commonCase = (templateTag.label !== templateIfLabel);
                             if (commonCase) {
@@ -2265,7 +2251,8 @@ isDebug = true
                                             errorMessage += `    ${translate('After  Editing')}: ${template.replaced.trim()}\n`;
                                             errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
                                         }
-                                        errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
+                                        errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${
+                                            settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`;
                                         conflictErrors[targetLineNum] = errorMessage;
                                     }
                                 }
@@ -2286,20 +2273,22 @@ isDebug = true
                                     console.log(`  ${translate('Contents')}: ${line.trim()}`);
                                     console.log(`  ${translate('Expected')}: ${expected.trim()}`);
                                     console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
-                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${
+                                        settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`);
                                     parser.errorCount += 1;
                                 }
                             }
                         } else {
                             if (isCheckingTemplateIfKey  &&  templateTag.label === templateIfLabel) {
                                 isCheckingTemplateIfKey = false;
-                                const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
+                                const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(replacingKeys);
                                 if (necessaryVariableNames !== '') {
                                     console.log('');
                                     console.log(`${translate('ErrorLine')}: ${lineNum}`);
                                     console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
                                     console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
-                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${
+                                        settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`);
                                     parser.errorCount += 1;
                                     templateIfKeyError = true;
                                 }
@@ -2341,6 +2330,7 @@ isDebug = true
             } finally {
                 deleteFileSync(updatingFilePath);
             }
+            errorCount += parser.errorCount;
         } else {
             const  inputFileFullPath = inputFilePath;
             const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
@@ -2359,6 +2349,10 @@ isDebug = true
                 }
             }
         }
+    }
+    if (newCode) {
+        console.log('');
+        console.log(`Warning: 0, Error: ${errorCount}`);
     }
 }
 
@@ -2431,7 +2425,7 @@ async function  listUpFilePaths(checkingFilePath?: string) {
             }
             process.chdir(targetFolderFullPath);
             const scanedPaths = await globby([`**/${wildcard}`]);
-            scanedPaths.forEach((scanedPath) => {
+            scanedPaths.forEach((scanedPath: string) => {
 
                 inputFileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
             });
@@ -2690,7 +2684,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
         }
         process.chdir(targetFolderFullPath);
         const scanedPaths = await globby([`**/${wildcard}`]);
-        scanedPaths.forEach((scanedPath) => {
+        scanedPaths.forEach((scanedPath: string) => {
 
             fileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
         });
@@ -3973,14 +3967,15 @@ enum CommandEnum {
 
 // SettingsTree
 class SettingsTree {
-    indices: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
-    indicesWithIf: {[startLineNum: number]: string} = {};  // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
+    indices = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
+    indicesWithIf = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
     settings: {[index: string]: {[name: string]: Setting}} = {};
     settingsInformation: {[index: string]: SettingsInformation} = {};
     errorCount: number = 0;
 
     currentSettings: {[name: string]: Setting} = {};
     currentSettingIndex = '';
+    wasChanged = false;
 
     nextSettingsLineNum = 1;
     nextLineNumIndex = 0;
@@ -4000,6 +3995,7 @@ class SettingsTree {
                 outOfScopeSettingIndices: [],
                 nextLineNumIndex:    this_.nextLineNumIndex,
                 nextSettingsLineNum: this_.nextSettingsLineNum,
+                wasChanged:          false,
             },
             parser: {
                 errorCount: parser.errorCount,
@@ -4008,7 +4004,7 @@ class SettingsTree {
 
         if (newCodeMode === 'compatible') {
             if (parser.lineNum === this_.nextSettingsLineNum) {
-                const  index = this_.indices[parser.lineNum];  // e.g. "/a/b"
+                const  index = this_.indices.get(parser.lineNum)!;  // e.g. "/a/b"
 
                 if (this_.currentSettingIndex) {
                     return_.this_.outOfScopeSettingIndices = [ this_.currentSettingIndex ];
@@ -4023,17 +4019,15 @@ class SettingsTree {
                 } else {
                     return_.this_.nextSettingsLineNum = 0;
                 }
+                return_.this_.wasChanged = true;
             }
 
             return  return_;
 
         } else { // if (newCodeMode === 'tree')
-if (parser.lineNum === 2  &&  isDebug) {
-isDebug = isDebug
-}
             if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
                 const  previousSettingIndex = this_.currentSettingIndex;
-                const  currentSettingIndex = this_.indices[parser.lineNum];  // e.g. "/a/bc"
+                const  currentSettingIndex = this_.indices.get(parser.lineNum)!;  // e.g. "/a/bc"
                 const  currentSettingIndexSlash = `${currentSettingIndex}/`;  // e.g. "/a/bc/"
                 return_.this_.currentSettingIndex = currentSettingIndex;
 
@@ -4074,14 +4068,14 @@ isDebug = isDebug
                     return_.parser = {...return_.parser, ...r.parser};
                 }
                 return_.this_.currentSettings = currentSettings;
-                const  startLineNums = Object.keys(this_.indices);
+                const  startLineNums = Array.from(this_.indices.keys());
                 if (parser.lineNum === 1) {
                     return_.this_.nextLineNumIndex = 0;
                 }
                 if (return_.this_.nextLineNumIndex < startLineNums.length) {
                     return_.this_.nextLineNumIndex += 1;
 
-                    return_.this_.nextSettingsLineNum = parseInt(startLineNums[return_.this_.nextLineNumIndex]);
+                    return_.this_.nextSettingsLineNum = startLineNums[return_.this_.nextLineNumIndex];
                 } else {
                     return_.this_.nextSettingsLineNum = 0;
                 }
@@ -4091,6 +4085,7 @@ isDebug = isDebug
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                     }
                 }
+                return_.this_.wasChanged = true;
             }
 
             return  return_;
@@ -4187,6 +4182,7 @@ interface  SettingsTree_moveToLine {
         outOfScopeSettingIndices: string[];
         nextLineNumIndex: number;
         nextSettingsLineNum: number;
+        wasChanged: boolean;
     },
     parser: {
         errorCount: number,
@@ -4204,11 +4200,15 @@ interface  SettingsTree_addCurrentSettingsInIfTag {
 // ReplaceToTagTree
 class ReplaceToTagTree {
     replaceTo: {[index: string]: {[name: string]: Setting}} = {};
+    outOfFalseBlock = new Map</*lineNum*/ number, boolean>();
 
     currentReplacedSettings: {[name: string]: Setting} = {};
+    currentIsOutOfFalseBlock: boolean = false;
 
     nextLineNumIndex: number = 0;
     nextSettingsLineNum: number = 1;
+    nextIfLineNumIndex: number = 0;
+    nextIfLineNum: number = 1;
 
     moveToLine(parser: Parser, settingsTree: SettingsTree) {
         const  r = this.moveToLine_Immutably(parser, settingsTree);
@@ -4220,20 +4220,24 @@ class ReplaceToTagTree {
         const  this_ = this as Readonly<ReplaceToTagTree>;
         const  return_: ReplaceToTagTree_moveToLine = {
             this_: {
-                currentReplacedSettings: {},
+                currentReplacedSettings: this_.currentReplacedSettings,
                 nextLineNumIndex: this_.nextLineNumIndex,
                 nextSettingsLineNum: this_.nextSettingsLineNum,
+                outOfFalseBlock: this_.outOfFalseBlock,
+                nextIfLineNumIndex :this_.nextIfLineNumIndex,
+                nextIfLineNum: this_.nextIfLineNum,
+                currentIsOutOfFalseBlock: this_.currentIsOutOfFalseBlock,
             },
             parser: {
                 errorCount: 0,
             }
         };
-if (parser.lineNum === 2  &&  isDebug) {
-isDebug = isDebug
-}
-        if (parser.lineNum === 1  ||  parser.lineNum === this_.nextSettingsLineNum) {
+        const  lineNum = parser.lineNum;
+        var    outOfFalseBlock: Map</*lineNum*/ number, boolean> = this_.outOfFalseBlock;
+        if (lineNum === 1  ||  lineNum === this_.nextSettingsLineNum) {
 
             return_.this_.currentReplacedSettings = {};
+            outOfFalseBlock = new Map</*lineNum*/ number, boolean>();
             const  index = settingsTree.currentSettingIndex;
             var    parentIndex = '/';
             var    separatorPosition = 0;
@@ -4248,6 +4252,7 @@ isDebug = isDebug
                 const  r = this_.addCurrentSettingsInIfTag_Immutably(
                     parentIndex, currentReplacedSettings, settingsTree, parser);
                 currentReplacedSettings = { ...currentReplacedSettings, ...r.this_.currentReplacedSettings };
+                outOfFalseBlock = new Map([...outOfFalseBlock, ...r.this_.outOfFalseBlock]);
                 return_.parser = {...return_.parser, ...r.parser};
                 separatorPosition = index.indexOf('/', separatorPosition + 1);
                 if (separatorPosition === notFound) {
@@ -4263,27 +4268,44 @@ isDebug = isDebug
                 const  r = this_.addCurrentSettingsInIfTag_Immutably(
                     index, currentReplacedSettings, settingsTree, parser);
                 currentReplacedSettings = { ...currentReplacedSettings, ...r.this_.currentReplacedSettings };
+                outOfFalseBlock = new Map([...outOfFalseBlock, ...r.this_.outOfFalseBlock]);
                 return_.parser = {...return_.parser, ...r.parser};
             }
             return_.this_.currentReplacedSettings = currentReplacedSettings;
-            const  startLineNums = Object.keys(settingsTree.indices);
-            if (parser.lineNum === 1) {
+            const  startLineNums = Array.from(settingsTree.indices.keys());
+            if (lineNum === 1) {
                 return_.this_.nextLineNumIndex = 0;
             }
             if (return_.this_.nextLineNumIndex < startLineNums.length) {
                 return_.this_.nextLineNumIndex += 1;
 
-                return_.this_.nextSettingsLineNum = parseInt(startLineNums[return_.this_.nextLineNumIndex]);
+                return_.this_.nextSettingsLineNum = startLineNums[return_.this_.nextLineNumIndex];
             } else {
                 return_.this_.nextSettingsLineNum = 0;
             }
             if (parser.verbose) {
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: settings are changed to ${settingsTree.currentSettingIndex} settings:`);
+                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings are changed to ${settingsTree.currentSettingIndex} settings:`);
                 for (const [key, setting] of Object.entries(settingsTree.currentSettings)) {
                     console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                 }
             }
         }
+        if (lineNum === 1  ||  lineNum === this_.nextIfLineNum) {
+
+            return_.this_.currentIsOutOfFalseBlock = outOfFalseBlock.get(lineNum)!;
+            const  startLineNums = Array.from(settingsTree.indicesWithIf.keys());
+            if (lineNum === 1) {
+                return_.this_.nextIfLineNumIndex = 0;
+            }
+            if (return_.this_.nextIfLineNumIndex < startLineNums.length) {
+                return_.this_.nextIfLineNumIndex += 1;
+
+                return_.this_.nextIfLineNum = startLineNums[return_.this_.nextIfLineNumIndex];
+            } else {
+                return_.this_.nextIfLineNum = 0;
+            }
+        }
+        return_.this_.outOfFalseBlock = outOfFalseBlock;
         return  return_;
     }
 
@@ -4297,11 +4319,13 @@ isDebug = isDebug
         const  return_: ReplaceToTagTree_addCurrentSettingsInIfTag = {
             this_: {
                 currentReplacedSettings: currentReplacedSettings,
+                outOfFalseBlock: new Map</*lineNum*/ number, boolean>(),
             },
             parser: {
                 errorCount: parser.errorCount,
             },
         };
+        const  outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
         const  notVerboseParser = {...parser, verbose: false};
         const  ifTagParser = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
@@ -4314,26 +4338,31 @@ isDebug = isDebug
         const  disabledFalseIndex = '!';  // startsWith(falseIndex) returns false
         var    falseIndex = disabledFalseIndex;
         var    isInCurrentSetting = false;
-        for (const index of Object.keys(settingsTree.settingsInformation)) {
+        for (const [lineNum, index] of Array.from(settingsTree.indicesWithIf.entries())) {
             if ( ! isInCurrentSetting) {
+                if (index === currentIndex) {
+                    outOfFalseBlocks.set(lineNum, true);
+                }
                 isInCurrentSetting = (index === firstIndex);
             } else {
                 isInCurrentSetting = (
                     index.startsWith(currentIndexSlash)  &&
                     lib.isAlphabetIndex(index.substr(currentIndexSlash.length, 1)));
                 if ( ! isInCurrentSetting) {
-                    return  return_;
+                    outOfFalseBlocks.set(lineNum, true);
+                    break;
                 }
             }
             if (isInCurrentSetting) {
-                if ( ! index.startsWith(falseIndex)) {
+                const  outOfFalseBlock = ! index.startsWith(falseIndex);
+                if (outOfFalseBlock) {
                     const  condition = settingsTree.settingsInformation[index].condition;
 
                     const  parsed = ifTagParser.evaluate(`#if: ${condition}`, return_.this_.currentReplacedSettings);
                     if (parsed.errorCount >= 1) {
                         console.log('');
                         console.log('Error of if tag syntax:');
-                        console.log(`  ${translate('typrmFile')}: ${getTestablePath(parser.filePath)}:${parser.lineNum}`);
+                        console.log(`  ${translate('typrmFile')}: ${getTestablePath(parser.filePath)}:${lineNum}`);
                         console.log(`  Contents: ${parsed.condition}`);
                         return_.parser.errorCount += parsed.errorCount;
                     }
@@ -4346,8 +4375,10 @@ isDebug = isDebug
                         falseIndex = index + '/';
                     }
                 }
+                outOfFalseBlocks.set(lineNum, falseIndex == disabledFalseIndex);
             }
         }
+        return_.this_.outOfFalseBlock = outOfFalseBlocks;
         return  return_;
     }
 };
@@ -4356,6 +4387,10 @@ interface  ReplaceToTagTree_moveToLine {
         currentReplacedSettings: {[name: string]: Setting};
         nextLineNumIndex: number;
         nextSettingsLineNum: number;
+        outOfFalseBlock: Map</*lineNum*/ number, boolean>;
+        nextIfLineNumIndex: number;
+        nextIfLineNum: number;
+        currentIsOutOfFalseBlock: boolean;
     },
     parser: {
         errorCount: number,
@@ -4363,10 +4398,11 @@ interface  ReplaceToTagTree_moveToLine {
 }
 interface  ReplaceToTagTree_addCurrentSettingsInIfTag {
     this_: {
-        currentReplacedSettings: {[name: string]: Setting},
+        currentReplacedSettings: {[name: string]: Setting};
+        outOfFalseBlock: Map</*lineNum*/ number, boolean>;
     },
     parser: {
-        errorCount: number,
+        errorCount: number;
     }
 };
 
@@ -4427,7 +4463,7 @@ class Thesaurus {
                 .pipe(
                     csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data',
-                    (columns) => {
+                    (columns: string[]) => {
                         if (columns.length >= 1) {
                             const  normalizedKeyword = columns[0];
                             columns.shift();
