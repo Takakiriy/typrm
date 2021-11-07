@@ -1052,6 +1052,9 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 indentStack.push({ lineNum, indent });
             }
         }
+if (lineNum === 53) {
+pp('')
+}
 
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
@@ -1094,7 +1097,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
 
             tree.settings[currentSettingIndex] = {...tree.settings[currentSettingIndex], ...setting};
         }
-        if (isReadingSetting) {  // ToDo  old:  &&  ifTagParser.thisIsOutOfFalseBlock
+        if (isReadingSetting) {
             const  separator = line.indexOf(':');
             if (separator !== notFound) {
                 const  key = line.substr(0, separator).trim();
@@ -1164,6 +1167,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
                 }
             }
         }
+var d = pp(`${lineNum}: ${tree.indicesWithIf.size}`)
     }
     if (isReadingSetting) {
         const  setting_ = settingStack[settingStack.length - 2];
@@ -1199,7 +1203,7 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
     });
     var  isReadingSetting = false;
     var  settingIndentLength = 0;
-    var  key = '';
+    var  variableName = '';
     var  value = '';
     var  previousTemplateTag: TemplateTag | null = null;
     var  currentSettingIndex = '';
@@ -1216,6 +1220,9 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
         lineNum += 1;
         parser.line = line;
         parser.lineNum = lineNum;
+if (lineNum === 26) {
+pp('')
+}
 
         settingTree.moveToLine(parser);
         if (lineNum === nextBlockLineNum) {
@@ -1234,7 +1241,7 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
             previousTemplateTag = null;
         } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
-            key = '';
+            variableName = '';
             value = '';
         }
         if (isReadingSetting) {
@@ -1243,7 +1250,7 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
                 const  keyOrNot = line.substr(0, separator).trim();
                 if (keyOrNot[0] !== '#') {
 
-                    key = keyOrNot;
+                    variableName = keyOrNot;
                     value = getValue(line, separator);
                 }
             }
@@ -1269,17 +1276,21 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
             if (isReadingSetting) {
                 if (parser.verbose) {
                     console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
-                    console.log(`Verbose:         ${key}: ${value}  #to: ${toValue}`);
+                    console.log(`Verbose:         ${variableName}: ${value}  #to: ${toValue}`);
                 }
 
-                toTagTree.replaceTo[currentSettingIndex][key] = {
+                toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: toValue,
                     lineNum: [lineNum],
                     isReferenced: false,
                 };
+                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: #to: ${variableName}: ${toValue}`);
 
             // #to: tag after the #template:
             } else {
+if (lineNum === 27) {
+pp('');
+}
                 if (previousTemplateTag) {
                     if (parser.verbose) {
                         console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
@@ -1288,13 +1299,16 @@ async function  makeReplaceToTagTree(inputFilePath: string, settingTree: Readonl
                         toValue, Object.keys(settingTree.currentSettings), parser, false);
 //                    parser.errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
                     if (parser.verbose) {
-                        for (const [key_, newValue] of Object.entries(newKeyValues)) {
-                            console.log(`Verbose:         ${key_}: ${newValue.value}`);
+                        for (const [variableName, newValue] of Object.entries(newKeyValues)) {
+                            console.log(`Verbose:         ${variableName}: ${newValue.value}`);
                         }
                     }
-                    for (const [key_, newValue] of Object.entries(newKeyValues)) {
+                    for (const [variableName, newValue] of Object.entries(newKeyValues)) {
+                        const  index = searchDefinedSettingIndex(
+                            variableName, currentSettingIndex, settingTree.settings);
 
-                        toTagTree.replaceTo[currentSettingIndex][key_] = newValue;
+                        toTagTree.replaceTo[index][variableName] = newValue;
+                        console.log(`${getTestablePath(inputFilePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
                     }
                     previousTemplateTag = null;
                 }
@@ -2230,7 +2244,7 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset'):
         var  cutOriginalTag = true
         var  cutReplaceToTagEnabled = false
     }
-    var    isReadingSetting = false;
+    var    isSetting = false;
     const  conflictErrors: {[lineNum: number]: string} = {};
     var    replacingKeys: string[] = [];
     var    replacingKeyValues: {[key: string]: string} = {};
@@ -2263,6 +2277,9 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset'):
             lineNum += 1;
             parser.lineNum = lineNum;
             settingTree.moveToLine(parser);
+if (lineNum === 48  &&  command === 'reset') {
+pp('')
+}
             toTagTree.moveToLine(parser, settingTree);
             const  oldSetting = settingTree.currentSettings;
             const  newSetting = toTagTree.currentReplacedSettings;
@@ -2274,31 +2291,26 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset'):
                     replacingKeyValues[key] = value.value;
                 }
             }
-            
+
             if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
-                isReadingSetting = true;
+                isSetting = true;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
                 if ( ! templateIfKeyError) {
                     isCheckingTemplateIfKey = true;
                 }
-            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-                isReadingSetting = false;
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isSetting) {
+                isSetting = false;
             }
-if (lineNum === 27  &&  command === 'reset') {
-pp('')
-}
-var d = pp(`${lineNum}:`)
-            if (isReadingSetting) {
+
+            // In settings
+            if (isSetting) {
                 const  separator = line.indexOf(':');
                 if (separator !== notFound) {
                     const  key = line.substr(0, separator).trim();
                     if (command === 'replace') {
                         var  currentIsOutOfFalse = toTagTree.currentIsOutOfFalseBlock;
                     } else {  // command === 'reset'
-                        var  currentIsOutOfFalse_1 = toTagTree.currentIsOutOfFalseBlockBeforeReplace;
-pp(`currentIsOutOfFalse: ${currentIsOutOfFalse_1}`)
-                        var  currentIsOutOfFalse_2 = settingTree.currentIsOutOfFalseBlock;
-pp(`currentIsOutOfFalse_: ${currentIsOutOfFalse_2}`)
-                        var  currentIsOutOfFalse = currentIsOutOfFalse_2;
+                        var  currentIsOutOfFalse = settingTree.currentIsOutOfFalseBlock;
                     }
                     if (key in oldSetting  &&  replacingKeys.includes(key)  &&  currentIsOutOfFalse) {
                         const  oldValue = getValue(line, separator);
@@ -4093,7 +4105,7 @@ class SettingsTree {
     wasChanged = false;
     currentSettings: {[name: string]: Setting} = {};
     currentSettingIndex = '';
-    currentIsOutOfFalseBlock: boolean = true;
+    currentIsOutOfFalseBlock: boolean = true;  // by settings before replaced
     outOfScopeSettingIndices: string[] = [];  // This is set when previous line is in scope
 
     // next: next for "moveToLine" method
@@ -4364,15 +4376,13 @@ interface  SettingsTree_addCurrentSettingsInIfTag {
 // ReplaceToTagTree
 class ReplaceToTagTree {
     replaceTo: {[index: string]: {[name: string]: Setting}} = {};
-    outOfFalseBlocksAfterReplace = new Map</*lineNum*/ number, boolean>();
-    outOfFalseBlocksBeforeReplace = new Map</*lineNum*/ number, boolean>();
+    outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
     command: 'replace' | 'reset' = 'replace';
 
     // current: current line moved by "moveToLine" method
     currentReplacedSettings: {[name: string]: Setting} = {};  // to tag. It includes settings before replace
     currentOriginalSettings: {[name: string]: Setting} = {};  // original tag. It does not include other than original tag
-    currentIsOutOfFalseBlock: boolean = false;
-    currentIsOutOfFalseBlockBeforeReplace: boolean = false;
+    currentIsOutOfFalseBlock: boolean = false;  // by settings after replaced
 
     // next: next for "moveToLine" method
     nextLineNumIndex: number = 0;
@@ -4390,34 +4400,30 @@ class ReplaceToTagTree {
         const  toTagTree = this as Readonly<ReplaceToTagTree>;
         const  return_: ReplaceToTagTree_moveToLine = {
             toTagTree: { // this
-                currentReplacedSettings:       toTagTree.currentReplacedSettings,
-                currentOriginalSettings:       toTagTree.currentOriginalSettings,
-                nextLineNumIndex:              toTagTree.nextLineNumIndex,
-                nextSettingsLineNum:           toTagTree.nextSettingsLineNum,
-                outOfFalseBlocksAfterReplace:  toTagTree.outOfFalseBlocksAfterReplace,
-                outOfFalseBlocksBeforeReplace: toTagTree.outOfFalseBlocksBeforeReplace,
-                currentIsOutOfFalseBlock:      toTagTree.currentIsOutOfFalseBlock,
-                currentIsOutOfFalseBlockBeforeReplace: toTagTree.currentIsOutOfFalseBlockBeforeReplace,
-                nextIfLineNumIndex:            toTagTree.nextIfLineNumIndex,
-                nextIfLineNum:                 toTagTree.nextIfLineNum,
+                currentReplacedSettings:   toTagTree.currentReplacedSettings,
+                currentOriginalSettings:   toTagTree.currentOriginalSettings,
+                nextLineNumIndex:          toTagTree.nextLineNumIndex,
+                nextSettingsLineNum:       toTagTree.nextSettingsLineNum,
+                outOfFalseBlocks:          toTagTree.outOfFalseBlocks,
+                currentIsOutOfFalseBlock:  toTagTree.currentIsOutOfFalseBlock,
+                nextIfLineNumIndex:        toTagTree.nextIfLineNumIndex,
+                nextIfLineNum:             toTagTree.nextIfLineNum,
             },
             parser: {
                 errorCount: 0,
             }
         };
         const  lineNum = parser.lineNum;
-        var    outOfFalseBlocksAfterReplace: Map</*lineNum*/ number, boolean> = toTagTree.outOfFalseBlocksAfterReplace;
-        var    outOfFalseBlocksBeforeReplace: Map</*lineNum*/ number, boolean> = toTagTree.outOfFalseBlocksBeforeReplace;
+        var    outOfFalseBlocks: Map</*lineNum*/ number, boolean> = toTagTree.outOfFalseBlocks;
         if (lineNum === 1  ||  lineNum === toTagTree.nextSettingsLineNum) {
 
-            outOfFalseBlocksAfterReplace = new Map</*lineNum*/ number, boolean>();
-            outOfFalseBlocksBeforeReplace = new Map</*lineNum*/ number, boolean>();
+            outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
             const  index = settingsTree.currentSettingIndex;
             var    parentIndex = '/';
             var    separatorPosition = 0;
             var    currentReplacedSettings: {[name: string]: Setting} = {}
             var    currentOriginalSettings: {[name: string]: Setting} = {}
-if (lineNum === 2  &&  toTagTree.command === 'reset') {
+if (lineNum === 25  &&  toTagTree.command === 'reset') {
 pp('')
 }
             for (;;) {
@@ -4434,8 +4440,7 @@ pp('')
                     parentIndex, currentReplacedSettings, currentOriginalSettings, settingsTree, parser);
                 currentReplacedSettings = { ...currentReplacedSettings, ...r.toTagTree.currentReplacedSettings };
                 currentOriginalSettings = { ...currentOriginalSettings, ...r.toTagTree.currentOriginalSettings };
-                outOfFalseBlocksAfterReplace = new Map([...outOfFalseBlocksAfterReplace, ...r.toTagTree.outOfFalseBlocksAfterReplace]);
-                outOfFalseBlocksBeforeReplace = new Map([...outOfFalseBlocksBeforeReplace, ...r.toTagTree.outOfFalseBlocksBeforeReplace]);
+                outOfFalseBlocks = new Map([...outOfFalseBlocks, ...r.toTagTree.outOfFalseBlocks]);
                 return_.parser = {...return_.parser, ...r.parser};
                 separatorPosition = index.indexOf('/', separatorPosition + 1);
                 if (separatorPosition === notFound) {
@@ -4447,13 +4452,15 @@ pp('')
 
                 currentReplacedSettings = { ...currentReplacedSettings, ...settingsTree.settings[index] };
                 currentReplacedSettings = { ...currentReplacedSettings, ...toTagTree.replaceTo[index] };
+                if (toTagTree.command === 'reset') {
+                    currentOriginalSettings = { ...currentOriginalSettings, ...toTagTree.replaceTo[index] };
+                }
 
                 const  r = toTagTree.addCurrentSettingsInIfTag_Immutably(
                     index, currentReplacedSettings, currentOriginalSettings, settingsTree, parser);
                 currentReplacedSettings = { ...currentReplacedSettings, ...r.toTagTree.currentReplacedSettings };
                 currentOriginalSettings = { ...currentOriginalSettings, ...r.toTagTree.currentOriginalSettings };
-                outOfFalseBlocksAfterReplace = new Map([...outOfFalseBlocksAfterReplace, ...r.toTagTree.outOfFalseBlocksAfterReplace]);
-                outOfFalseBlocksBeforeReplace = new Map([...outOfFalseBlocksBeforeReplace, ...r.toTagTree.outOfFalseBlocksBeforeReplace]);
+                outOfFalseBlocks = new Map([...outOfFalseBlocks, ...r.toTagTree.outOfFalseBlocks]);
                 return_.parser = {...return_.parser, ...r.parser};
             }
             return_.toTagTree.currentReplacedSettings = currentReplacedSettings;
@@ -4478,8 +4485,7 @@ pp('')
         }
         if (lineNum === 1  ||  lineNum === toTagTree.nextIfLineNum) {
 
-            return_.toTagTree.currentIsOutOfFalseBlock = outOfFalseBlocksAfterReplace.get(lineNum)!;
-            return_.toTagTree.currentIsOutOfFalseBlockBeforeReplace = outOfFalseBlocksBeforeReplace.get(lineNum)!;
+            return_.toTagTree.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;
             const  startLineNums = Array.from(settingsTree.indicesWithIf.keys());
             if (lineNum === 1) {
                 return_.toTagTree.nextIfLineNumIndex = 0;
@@ -4492,8 +4498,7 @@ pp('')
                 return_.toTagTree.nextIfLineNum = 0;
             }
         }
-        return_.toTagTree.outOfFalseBlocksAfterReplace = outOfFalseBlocksAfterReplace;
-        return_.toTagTree.outOfFalseBlocksBeforeReplace = outOfFalseBlocksBeforeReplace;
+        return_.toTagTree.outOfFalseBlocks = outOfFalseBlocks;
 if (toTagTree.command === 'reset'){
 var d = pp('')
 pp('')
@@ -4513,8 +4518,7 @@ pp('')
             toTagTree: {
                 currentReplacedSettings: currentReplacedSettings,
                 currentOriginalSettings: currentOriginalSettings,
-                outOfFalseBlocksAfterReplace: new Map</*lineNum*/ number, boolean>(),
-                outOfFalseBlocksBeforeReplace: new Map</*lineNum*/ number, boolean>(),
+                outOfFalseBlocks: new Map</*lineNum*/ number, boolean>(),
             },
             parser: {
                 errorCount: parser.errorCount,
@@ -4522,8 +4526,7 @@ pp('')
         };
         var    replacedSettings = currentReplacedSettings;
         var    originalSettings = currentOriginalSettings;
-        const  outOfFalseBlocksAfterReplace = new Map</*lineNum*/ number, boolean>();
-        const  outOfFalseBlocksBeforeReplace = new Map</*lineNum*/ number, boolean>();
+        const  outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
         const  notVerboseParser = {...parser, verbose: false};
         const  ifTagParserAfterReplace = new IfTagParser(notVerboseParser);
         const  ifTagParserBeforeReplace = new IfTagParser(notVerboseParser);
@@ -4541,8 +4544,7 @@ pp('')
         for (const [lineNum, index] of Array.from(settingsTree.indicesWithIf.entries())) {
             if ( ! isInCurrentSetting) {
                 if (index === currentIndex) {
-                    outOfFalseBlocksAfterReplace.set(lineNum, true);
-                    outOfFalseBlocksBeforeReplace.set(lineNum, true);
+                    outOfFalseBlocks.set(lineNum, true);
                 }
                 isInCurrentSetting = (index === firstIndex);
             } else {
@@ -4550,8 +4552,7 @@ pp('')
                     index.startsWith(currentIndexSlash)  &&
                     lib.isAlphabetIndex(index.substr(currentIndexSlash.length, 1)));
                 if ( ! isInCurrentSetting) {
-                    outOfFalseBlocksAfterReplace.set(lineNum, true);
-                    outOfFalseBlocksBeforeReplace.set(lineNum, true);
+                    outOfFalseBlocks.set(lineNum, true);
                     break;
                 }
             }
@@ -4559,8 +4560,8 @@ if (toTagTree.command == 'reset'  &&  currentIndex === '/'  &&  lineNum == 26) {
 pp('')
 }
             if (isInCurrentSetting) {
-                const  outOfFalseBlockAfterReplace = ! index.startsWith(falseIndexAfterReplace);
-                if (outOfFalseBlockAfterReplace) {
+                const  outOfFalseBlock = ! index.startsWith(falseIndexAfterReplace);
+                if (outOfFalseBlock) {
                     const  condition = settingsTree.settingsInformation[index].condition;
                     var  settingsForIf = replacedSettings;
 
@@ -4582,7 +4583,7 @@ pp('')
                     }
                 }
 
-                outOfFalseBlocksAfterReplace.set(lineNum, falseIndexAfterReplace == disabledFalseIndex);
+                outOfFalseBlocks.set(lineNum, falseIndexAfterReplace == disabledFalseIndex);
                 const  outOfFalseBlockBeforeReplace = ! index.startsWith(falseIndexBeforeReplace);
                 if (outOfFalseBlockBeforeReplace) {
                     const  condition = settingsTree.settingsInformation[index].condition;
@@ -4605,14 +4606,11 @@ pp('')
                         falseIndexBeforeReplace = index + '/';
                     }
                 }
-
-                outOfFalseBlocksBeforeReplace.set(lineNum, falseIndexBeforeReplace == disabledFalseIndex);
             }
         }
         return_.toTagTree.currentReplacedSettings = replacedSettings;
         return_.toTagTree.currentOriginalSettings = originalSettings;
-        return_.toTagTree.outOfFalseBlocksAfterReplace = outOfFalseBlocksAfterReplace;
-        return_.toTagTree.outOfFalseBlocksBeforeReplace = outOfFalseBlocksBeforeReplace;
+        return_.toTagTree.outOfFalseBlocks = outOfFalseBlocks;
         return  return_;
     }
 };
@@ -4622,10 +4620,8 @@ interface  ReplaceToTagTree_moveToLine {
         currentOriginalSettings: {[name: string]: Setting};
         nextLineNumIndex: number;
         nextSettingsLineNum: number;
-        outOfFalseBlocksAfterReplace: Map</*lineNum*/ number, boolean>;
-        outOfFalseBlocksBeforeReplace: Map</*lineNum*/ number, boolean>;
+        outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
         currentIsOutOfFalseBlock: boolean;
-        currentIsOutOfFalseBlockBeforeReplace: boolean;
         nextIfLineNumIndex: number;
         nextIfLineNum: number;
     },
@@ -4637,8 +4633,7 @@ interface  ReplaceToTagTree_addCurrentSettingsInIfTag {
     toTagTree: { // this
         currentReplacedSettings: {[name: string]: Setting};
         currentOriginalSettings: {[name: string]: Setting};
-        outOfFalseBlocksAfterReplace: Map</*lineNum*/ number, boolean>;
-        outOfFalseBlocksBeforeReplace: Map</*lineNum*/ number, boolean>;
+        outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
     },
     parser: {
         errorCount: number;
@@ -4665,6 +4660,24 @@ interface Setting {
 //    StartLineNum?: number;
 //    LastLineNum?: number;
     isReferenced: boolean;
+}
+
+// searchDefinedSettingIndex
+function  searchDefinedSettingIndex(
+    variableName: string,
+    currentSettingIndex: string,
+    settings: {[index: string]: {[variableName: string]: any}},
+): /* definedSettingIndex */ string {
+
+    var  index = currentSettingIndex;
+    while ( ! (variableName in settings[index])) {
+        if (index === '/') {
+            throw new Error(`Error of not found "${variableName}" in settings "${currentSettingIndex}"`);
+        }
+        index = path.dirname(index);
+    }
+
+    return  index;
 }
 
 // ReplaceKeyValues

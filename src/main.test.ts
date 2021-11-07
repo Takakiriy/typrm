@@ -502,7 +502,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
             ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {
-if (caseName !== 'settings_tree_if') {return;}  // || subCase !== '____'
+//if (caseName !== 'settings_tree_if') {return;}  // || subCase !== '____'
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -543,7 +543,7 @@ if (caseName !== 'settings_tree_if') {return;}  // || subCase !== '____'
                 expect(sourceFileContents2).toBe(sourceFileContents);
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-expect('test code').toBe('deleted skip code.');
+//expect('test code').toBe('deleted skip code.');
         });
     });
     test("replace to tag >> ToTestTag", async () => {

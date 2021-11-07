@@ -2588,8 +2588,6 @@ exports[`replaces settings >> replace to tag >> 1_OK: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyG1__: ValueGG1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyG2__: ValueGG2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:52: #to: __BodyL__: Valu
-
-Warning: 0, Error: 0
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:54: #to: __SubA__: SetSubAA
 
 Warning: 0, Error: 0
@@ -3183,7 +3181,9 @@ settings:
 `;
 
 exports[`replaces settings >> replace to tag >> settings_tree_if: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/settings_tree_if_1_changing.yaml:20: #to: __C__: ValueC_Next
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/settings_tree_if_1_changing.yaml:30: #to: __A__: ValueA_Next
+
 Warning: 0, Error: 0
 "
 `;
