@@ -3081,11 +3081,11 @@ exports[`replaces settings >> replace to tag >> settings_tree_if: replacedFileCo
 "section:
     table:
         cell:
-            ValueA_Next      #template: __A__
-            ValueB_Next      #template: __B__
-            ValueC_Next      #template: __C__
-            ValueD_Next      #template: __D__
-            ValueE      #template: __E__
+            - ValueA_Next      #template: __A__
+            - ValueB_Next      #template: __B__
+            - ValueC_Next      #template: __C__
+            - ValueD_Next      #template: __D__
+            - ValueE      #template: __E__
         settings:
             a: #if: $settings.__B__ == ValueA
                 __C__: not_used
@@ -3116,11 +3116,11 @@ exports[`replaces settings >> replace to tag >> settings_tree_if: revertedFileCo
 "section:
     table:
         cell:
-            ValueA      #template: __A__
-            ValueB      #template: __B__
-            ValueC      #template: __C__
-            ValueD      #template: __D__
-            ValueE      #template: __E__
+            - ValueA      #template: __A__
+            - ValueB      #template: __B__
+            - ValueC      #template: __C__
+            - ValueD      #template: __D__
+            - ValueE      #template: __E__
         settings:
             a: #if: $settings.__B__ == ValueA
                 __C__: not_used
@@ -3151,11 +3151,11 @@ exports[`replaces settings >> replace to tag >> settings_tree_if: sourceFileCont
 "section:
     table:
         cell:
-            ValueA      #template: __A__
-            ValueB      #template: __B__
-            ValueC      #template: __C__
-            ValueD      #template: __D__
-            ValueE      #template: __E__
+            - ValueA      #template: __A__
+            - ValueB      #template: __B__
+            - ValueC      #template: __C__
+            - ValueD      #template: __D__
+            - ValueE      #template: __E__
         settings:
             a: #if: $settings.__B__ == ValueA
                 __C__: not_used
@@ -3192,11 +3192,11 @@ exports[`replaces settings >> replace to tag >> settings_tree_if_out_of_settings
 "section:
     table:
         cell:
-            ValueA      #template: __A__  #to: ValueA_Next
-            ValueB      #template: __B__
-            ValueC      #template: __C__  #to: ValueC_Next
-            ValueD      #template: __D__
-            ValueE      #template: __E__
+            - ValueA      #template: __A__  #to: ValueA_Next
+            - ValueB      #template: __B__
+            - ValueC      #template: __C__  #to: ValueC_Next
+            - ValueD      #template: __D__
+            - ValueE      #template: __E__
         settings:
             a: #if: $settings.__B__ == ValueA
                 __C__: not_used

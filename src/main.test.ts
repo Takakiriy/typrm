@@ -1,7 +1,7 @@
 ﻿import * as fs from "fs";
 import * as path from "path";
 import * as main from "./main";
-import * as chalk from "chalk";
+import chalk from "chalk";
 import * as lib from "./lib";
 import { pp } from "./lib";
 const snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
@@ -524,23 +524,23 @@ if (caseName !== 'settings_tree_if') {return;}  // || subCase !== '____'
             expect(main.stdout).toMatchSnapshot('stdout');
             if ( ! options.includes('ErrorCase')) {
                 expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
-// 
-//                 // Test Main >> revert
-//                 if (caseName.includes('FileParameter')) {
-//                     var  parameters = ["revert", changingFilePath];
-//                 } else {
-//                     var  parameters = ["revert"];
-//                 }
-//                 await callMain(parameters, {
-//                     folder: changingFolderPath, test: "", locale: "en-US"
-//                 });
-//                 const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
-// 
-//                 expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
-//             } else {  // error case
-//                 const  sourceFileContents2 = fs.readFileSync(changingFilePath).toString();
-// 
-//                 expect(sourceFileContents2).toBe(sourceFileContents);
+
+                // Test Main >> revert
+                if (caseName.includes('FileParameter')) {
+                    var  parameters = ["revert", changingFilePath];
+                } else {
+                    var  parameters = ["revert"];
+                }
+                await callMain(parameters, {
+                    folder: changingFolderPath, test: "", locale: "en-US"
+                });
+                const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
+
+                expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+            } else {  // error case
+                const  sourceFileContents2 = fs.readFileSync(changingFilePath).toString();
+
+                expect(sourceFileContents2).toBe(sourceFileContents);
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
 expect('test code').toBe('deleted skip code.');

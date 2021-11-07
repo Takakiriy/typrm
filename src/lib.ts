@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as globby from 'globby';
+import globby from 'globby';
 import * as readline from 'readline';
 import * as stream from 'stream';
-import * as csvParse from 'csv-parse';
+import csvParse from 'csv-parse';
 const  snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
 
 
@@ -213,7 +213,7 @@ export async function  parseCSVColumns(columns: string): Promise<string[]> {
                 .pipe(
                     csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
                 )
-                .on('data', (columns) => {
+                .on('data', (columns: string[]) => {
                     columnArray = columns;
                 })
                 .on('end', () => {
@@ -483,6 +483,10 @@ export function  pp(message: any) {
     } else {
         if (typeof message === 'object') {
             message = JSON.stringify(message);
+        } else if (message === undefined) {
+            message = '(undefined)';
+        } else if (message === null) {
+            message = '(null)';
         }
         debugOut.push(message.toString());
     }
