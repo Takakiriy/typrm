@@ -2651,113 +2651,118 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: replacedFileContents 1`] = `
-"settings:
-    __Switch0__: B  #original: A
-    case A:  #if: $settings.__Switch0__ == A
-        __Set0__: AA
-    case B:  #if: $settings.__Switch0__ == B
-        __Set0__: BB
-body:
-    B   #template: __Switch0__
-    BB  #template: __Set0__
+"A:
+    settings:
+        __Switch0__: B  #original: A
+        case A:  #if: $settings.__Switch0__ == A
+            __Set0__: AA
+        case B:  #if: $settings.__Switch0__ == B
+            __Set0__: BB
+    body:
+        B   #template: __Switch0__
+        BB  #template: __Set0__
 
-settings:
-    __Switch1__: A
-    case A:  #if: $settings.__Switch1__ == A
-        __Set1__: aa  #original: AA
-    case B:  #if: $settings.__Switch1__ == B
-        __Set1__: BB
-body:
-    A   #template: __Switch1__
-    aa  #template: __Set1__
+B:
+    settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: aa  #original: AA
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB
+    body:
+        A   #template: __Switch1__
+        aa  #template: __Set1__
 
-settings:
-    __Switch2__: B  #original: A
-    case A:  #if: $settings.__Switch2__ == A
-        __Set2__: AA
-    case B:  #if: $settings.__Switch2__ == B
-        __Set2__: bb  #original: BB
-body:
-    B   #template: __Switch2__
-    bb  #template: __Set2__
+C:
+    settings:
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: bb  #original: BB
+    body:
+        B   #template: __Switch2__
+        bb  #template: __Set2__
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: revertedFileContents 1`] = `
-"settings:
-    __Switch0__: A
-    case A:  #if: $settings.__Switch0__ == A
-        __Set0__: AA
-    case B:  #if: $settings.__Switch0__ == B
-        __Set0__: BB
-body:
-    A   #template: __Switch0__
-    AA  #template: __Set0__
+"A:
+    settings:
+        __Switch0__: A
+        case A:  #if: $settings.__Switch0__ == A
+            __Set0__: AA
+        case B:  #if: $settings.__Switch0__ == B
+            __Set0__: BB
+    body:
+        A   #template: __Switch0__
+        AA  #template: __Set0__
 
-settings:
-    __Switch1__: A
-    case A:  #if: $settings.__Switch1__ == A
-        __Set1__: AA
-    case B:  #if: $settings.__Switch1__ == B
-        __Set1__: BB
-body:
-    A   #template: __Switch1__
-    AA  #template: __Set1__
+B:
+    settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: AA
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB
+    body:
+        A   #template: __Switch1__
+        AA  #template: __Set1__
 
-settings:
-    __Switch2__: A
-    case A:  #if: $settings.__Switch2__ == A
-        __Set2__: AA
-    case B:  #if: $settings.__Switch2__ == B
-        __Set2__: BB
-body:
-    A   #template: __Switch2__
-    AA  #template: __Set2__
+C:
+    settings:
+        __Switch2__: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB
+    body:
+        A   #template: __Switch2__
+        AA  #template: __Set2__
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: sourceFileContents 1`] = `
-"settings:
-    __Switch0__: A  #to: B
-    case A:  #if: $settings.__Switch0__ == A
-        __Set0__: AA
-    case B:  #if: $settings.__Switch0__ == B
-        __Set0__: BB
-body:
-    A   #template: __Switch0__
-    AA  #template: __Set0__
+"A:
+    settings:
+        __Switch0__: A  #to: B
+        case A:  #if: $settings.__Switch0__ == A
+            __Set0__: AA
+        case B:  #if: $settings.__Switch0__ == B
+            __Set0__: BB
+    body:
+        A   #template: __Switch0__
+        AA  #template: __Set0__
 
-settings:
-    __Switch1__: A
-    case A:  #if: $settings.__Switch1__ == A
-        __Set1__: AA  #to: aa
-    case B:  #if: $settings.__Switch1__ == B
-        __Set1__: BB
-body:
-    A   #template: __Switch1__
-    AA  #template: __Set1__
+B:
+    settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: AA  #to: aa
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB
+    body:
+        A   #template: __Switch1__
+        AA  #template: __Set1__
 
-settings:
-    __Switch2__: A  #to: B
-    case A:  #if: $settings.__Switch2__ == A
-        __Set2__: AA
-    case B:  #if: $settings.__Switch2__ == B
-        __Set2__: BB  #to: bb
-body:
-    A   #template: __Switch2__
-    AA  #template: __Set2__
+C:
+    settings:
+        __Switch2__: A  #to: B
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB  #to: bb
+    body:
+        A   #template: __Switch2__
+        AA  #template: __Set2__
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:2: #to: __Switch0__: B
-
-Warning: 0, Error: 0
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:14: #to: __Set1__: aa
-
-Warning: 0, Error: 0
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:22: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:26: #to: __Set2__: bb
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:3: #to: __Switch0__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:16: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:25: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:29: #to: __Set2__: bb
 
 Warning: 0, Error: 0
 "

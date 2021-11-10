@@ -929,7 +929,7 @@ async function  makeSettingTree(inputFilePath: string, command: CommandEnum): Pr
     const  tree = new SettingsTree();
     const  parser = new Parser();
     const  indentStack: {lineNum: number, indent: string}[] = [
-        {lineNum: 0, indent: ''}
+        {lineNum: 1, indent: ''}
     ];
     const  settingStack:
             {lineNum: number, index: string, indentLevel: number, startLineNum: number, startIndentLevel: number}[] = [
