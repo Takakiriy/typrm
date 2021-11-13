@@ -4,13 +4,14 @@ import globby from 'globby';
 import * as readline from 'readline';
 import * as stream from 'stream';
 import csvParse from 'csv-parse';
+import { stringify } from "querystring";
 const  snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
 
 
 // File group
 
 // copyFolderSync
-// #keyword: copyFolderSync
+// #keyword: lib.ts copyFolderSync
 // sourceFolder/1.txt => destinationFolderPath/1.txt
 export async function  copyFolderSync(sourceFolderPath: string, destinationFolderPath: string) {
     const  currentFolderPath = process.cwd();
@@ -28,13 +29,25 @@ export async function  copyFolderSync(sourceFolderPath: string, destinationFolde
 }
 
 // copyFileSync
-// #keyword: copyFileSync
+// #keyword: lib.ts copyFileSync
 // This also makes the copy target folder.
 export function  copyFileSync(sourceFilePath: string, destinationFilePath: string) {
 	const  destinationFolderPath = path.dirname(destinationFilePath);
 	fs.mkdirSync(destinationFolderPath, {recursive: true});
 
 	fs.copyFileSync(sourceFilePath, destinationFilePath);
+}
+
+// replaceFileSync
+// #keyword: lib.ts replaceFileSync
+// replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
+export function  replaceFileSync(sourceFilePath: string, replaceFunction: {(text: string): string}, destinationFilePath: string = '') {
+    const  text = fs.readFileSync(sourceFilePath, 'utf-8');
+    const  replacedText = replaceFunction(text);
+    if (destinationFilePath === '') {
+        destinationFilePath = sourceFilePath;
+    }
+    fs.writeFileSync(destinationFilePath, replacedText);
 }
 
 // pathResolve
@@ -54,7 +67,7 @@ export function  pathResolve(path_: string) {
 }
 
 // getFullPath
-// #keyword: JavaScript (js) library getFullPath
+// #keyword: lib.ts JavaScript (js) library getFullPath
 // If "basePath" is current directory, you can call "path.resolve"
 // If the variable has full path and litteral relative path, write `${___FullPath}/relative_path}`
 export function  getFullPath(relativePath: string, basePath: string): string {
@@ -77,7 +90,7 @@ export function  getFullPath(relativePath: string, basePath: string): string {
 }
 
 // isFullPath
-// #keyword: JavaScript (js) library isFullPath
+// #keyword: lib.ts JavaScript (js) library isFullPath
 export function  isFullPath(path: string): boolean {
     const  colonPosition = path.indexOf(':');
     const  slashPosition = path.indexOf('/');
@@ -132,7 +145,7 @@ export function  getTestWorkFolderFullPath(): string {
 }
 
 // getHomePath
-// #keyword: getHomePath
+// #keyword: lib.ts getHomePath
 export function  getHomePath(): string {
     if (process.env.HOME) {
         return  process.env.HOME;
@@ -144,7 +157,7 @@ export function  getHomePath(): string {
 }
 
 // getGlobbyParameters
-// #keyword: getGlobbyParameters
+// #keyword: lib.ts getGlobbyParameters
 export function  getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters {
     const  targetFullPath = getFullPath(targetPath, baseFullPath);
     const  fileName = path.basename(targetFullPath);
@@ -186,7 +199,7 @@ interface  GlobbyParameters {
 // String group
 
 // cutLeftOf
-// #keyword: cutLeftOf
+// #keyword: lib.ts cutLeftOf
 // cutLeftOf("abcde", "c") == "cde"
 export function  cutLeftOf(input: string, keyword: string): string {
     const  keywordPosition = input.indexOf(keyword);
@@ -199,7 +212,7 @@ export function  cutLeftOf(input: string, keyword: string): string {
 }
 
 // cutLast
-// #keyword: cutLast
+// #keyword: lib.ts cutLast
 // cutLast("ab/", "/") == "ab"
 // cutLast("abc", "/") == "abc"
 export function  cutLast(input: string, keyword: string): string {
@@ -260,6 +273,22 @@ export function  parseCSVColumnPositions(csv: string, columns: string[]): number
 export function  escapeRegularExpression(expression: string) {
     return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
+
+// replace
+export function  replace(input: string, replacers: ReplaceParameter[]): string {
+    var  replaced = input;
+    for (const replacer of replacers) {
+        replaced = replaced.replace(replacer.from, replacer.to);
+    }
+    return  replaced;
+}
+
+// ReplaceParameter
+interface ReplaceParameter {
+    from: string;
+    to: string;
+}
+
 
 // StandardInputBuffer
 class  StandardInputBuffer {
@@ -410,6 +439,7 @@ const inputOption = new InputOption([
 ]);
 
 // input
+// #keyword: lib.ts input
 // Example: const name = await input('What is your name? ');
 export async function  input( guide: string ): Promise<string> {
     // Input emulation
@@ -475,7 +505,7 @@ export function  getSnapshot(label: string, deafultSnapshot: string | undefined 
 
 // pp
 // Debug print.
-// #keyword: pp
+// #keyword: lib.ts pp
 // Example:
 //    pp(var);
 // Example:
@@ -510,7 +540,7 @@ export const  debugOut: string[] = [];
 
 // cc
 // Through counter.
-// #keyword: cc
+// #keyword: lib.ts cc
 // Example:
 //   cc();
 // Example:

@@ -1029,13 +1029,13 @@ settings:
 
 exports[`checks template value >> settings_tree_if: answer 1`] = `
 "
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:5
+ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:7
   Contents: test error  #template: __C__
   Expected: ValueC
   Template: __C__
 
 Warning: 0, Error: 1
-template count = 4
+template count = 6
 "
 `;
 
@@ -1260,7 +1260,10 @@ Warning: 0, Error: 1
 `;
 
 exports[`replaces settings >> in 2_replace_1_ok setting 1: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:5: #to: key1: value1changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:6: #to: __Key2__: value2changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #to: Key3: value3changed
+
 Warning: 0, Error: 0
 "
 `;
@@ -1370,8 +1373,20 @@ exports[`replaces settings >> in 2_replace_1_ok setting 2 lineNum: updatedFileCo
 `;
 
 exports[`replaces settings >> in 2_replace_1_ok setting 2: stdout 1`] = `
-"
-Warning: 0, Error: 0
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27: #to: key1: value1changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:18:         - \\"value3changed\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:19:             #template: - \\"Key3\\"
+    Warning: Not matched with the template.
+    Expected: - \\"value3\\"
+    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:21:         - \\"value3changed\\"  #template: - \\"Key3\\"
+    Warning: Not matched with the template.
+    Expected: - \\"value3\\"
+    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4
+
+Warning: 2, Error: 0
 "
 `;
 
@@ -1475,7 +1490,7 @@ exports[`replaces settings >> in 2_replace_1_ok: sourceFileContents 1`] = `
 
 exports[`replaces settings >> in 2_replace_1A_end_of_template: sourceFileContents 1`] = `
 "設定:
-    key1: value1
+    key1: value1  #to: value1changed
 value1:  <!-- #template: key1 #-->
 value1#:  #template: key1#
 value1 #: #template: key1\\"%20\\"#
@@ -1484,7 +1499,8 @@ value1%#: #template: key1\\"%25\\"#
 `;
 
 exports[`replaces settings >> in 2_replace_1A_end_of_template: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1A_end_of_template_1_changing.yaml:2: #to: key1: value1changed
+
 Warning: 0, Error: 0
 "
 `;
@@ -1507,18 +1523,18 @@ exports[`replaces settings >> in 2_replace_2_error: sourceFileContents 1`] = `
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3
+        Key3: value3  #to: value3changed
 
     手順:
-        - cd ".."
-        - echo  "value2"
-            #template: - echo  "__Key2__"
+        - cd \\"..\\"
+        - echo  \\"value2\\"
+            #template: - echo  \\"__Key2__\\"
         - value1
             #template: - key1
-        - "value3"
-            #template: - "Key3"
-        - "value3"  #template: - "Key3"
-        - "value3_bad"  #template: - "Key3"
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
+        - \\"value3_bad\\"  #template: - \\"Key3\\"
 
 手順B:
     設定:
@@ -1533,14 +1549,12 @@ exports[`replaces settings >> in 2_replace_2_error: sourceFileContents 1`] = `
 `;
 
 exports[`replaces settings >> in 2_replace_2_error: stdout 1`] = `
-"
-ErrorLine: 19
-  Error: Not found any replacing target
-  Solution: Set old value at settings in the replacing file
-  Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
-  Expected: - \\"value3\\"
-  Template: - \\"Key3\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:8: #to: Key3: value3changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+    Error: Not found any replacing target. Set old or new value.
+    Expected: - \\"value3\\"
+    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -1554,7 +1568,7 @@ exports[`replaces settings >> in 2_replace_2_error: updatedFileContents 1`] = `
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3
+        Key3: value3  #to: value3changed
 
     手順:
         - cd \\"..\\"
@@ -1587,7 +1601,7 @@ Process A:
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3  #コメント
+        Key3: value3  #コメント  #to: value3changed
 
     steps:
         - cd ".."
@@ -1629,14 +1643,12 @@ Process B:
 `;
 
 exports[`replaces settings >> in 2_replace_3_English: stdout 1`] = `
-"
-ErrorLine: 21
-  Error: Not found any replacing target
-  Solution: Set old value at settings in the replacing file
-  Contents: - \\"value3_bad\\"  #template: - \\"Key3\\"
-  Expected: - \\"value3\\"
-  Template: - \\"Key3\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:8: #to: Key3: value3changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:21:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+    Error: Not found any replacing target. Set old or new value.
+    Expected: - \\"value3\\"
+    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -1650,7 +1662,7 @@ Process A:
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3  #コメント
+        Key3: value3  #コメント  #to: value3changed
 
     steps:
         - cd \\"..\\"
@@ -1699,7 +1711,7 @@ exports[`replaces settings >> in 2_replace_4_Japanese: sourceFileContents 1`] = 
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3
+        Key3: value3  #to: value3changed
 
     手順:
         - cd ".."
@@ -1725,14 +1737,12 @@ exports[`replaces settings >> in 2_replace_4_Japanese: sourceFileContents 1`] = 
 `;
 
 exports[`replaces settings >> in 2_replace_4_Japanese: stdout 1`] = `
-"
-エラー行: 19
-  エラー: 置き換える対象が見つかりません
-  解決法: 置き換えるファイルの中の設定に古い値を設定してください
-  内容: - \\"value3_bad\\"  #template: - \\"Key3\\"
-  期待: - \\"value3\\"
-  雛形: - \\"Key3\\"
-  設定: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:8: #to: Key3: value3changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+    エラー: 置き換える対象が見つかりません。 テンプレートの対象を古い値または新しい値に修正してください。
+    期待: - \\"value3\\"
+    設定: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4
 
 警告: 0, エラー: 1
 "
@@ -1746,7 +1756,7 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
         key1: value1
         __Key2__: value2  #コメント
             #コメント
-        Key3: value3
+        Key3: value3  #to: value3changed
 
     手順:
         - cd \\"..\\"
@@ -1771,177 +1781,6 @@ exports[`replaces settings >> in 2_replace_4_Japanese: updatedFileContents 1`] =
 "
 `;
 
-exports[`replaces settings >> in 2_replace_5_setting_name setting 1: stdout 1`] = `
-"
-警告: 0, エラー: 0
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting 1: updatedFileContents 1`] = `
-"# 設定値を変更する。設定のセットは設定名で指定
-
-手順A:
-    設定(1st):
-        key1: value1changed  #original: value11
-
-    手順:
-        - value1changed
-            #template: - key1
-
-手順B:
-    設定（2番目）:
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順C:
-    settings(3rd):  #// English
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting 2: stdout 1`] = `
-"
-警告: 0, エラー: 0
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting 2: updatedFileContents 1`] = `
-"# 設定値を変更する。設定のセットは設定名で指定
-
-手順A:
-    設定(1st):
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順B:
-    設定（2番目）:
-        key1: value1changed  #original: value11
-
-    手順:
-        - value1changed
-            #template: - key1
-
-手順C:
-    settings(3rd):  #// English
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting 3: stdout 1`] = `
-"
-Warning: 0, Error: 0
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting 3: updatedFileContents 1`] = `
-"# 設定値を変更する。設定のセットは設定名で指定
-
-手順A:
-    設定(1st):
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順B:
-    設定（2番目）:
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順C:
-    settings(3rd):  #// English
-        key1: value1changed  #original: value11
-
-    手順:
-        - value1changed
-            #template: - key1
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting not found: stdout 1`] = `
-"
-Error of not found specified setting name: not found
-
-Warning: 0, Error: 1
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name setting not found: updatedFileContents 1`] = `
-"# 設定値を変更する。設定のセットは設定名で指定
-
-手順A:
-    設定(1st):
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順B:
-    設定（2番目）:
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順C:
-    settings(3rd):  #// English
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-"
-`;
-
-exports[`replaces settings >> in 2_replace_5_setting_name: sourceFileContents 1`] = `
-"# 設定値を変更する。設定のセットは設定名で指定
-
-手順A:
-    設定(1st):
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順B:
-    設定（2番目）:
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-
-手順C:
-    settings(3rd):  #// English
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-"
-`;
-
 exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
 "test_of_if_tag_in_settings_reverse:
     settings(set1):
@@ -1962,7 +1801,9 @@ exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
 `;
 
 exports[`replaces settings >> in 2_replace_6_if both: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #to: fruit: melon
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7: #to: __Setting1__: replaced
+
 Warning: 0, Error: 0
 "
 `;
@@ -1987,7 +1828,8 @@ exports[`replaces settings >> in 2_replace_6_if both: updatedFileContents 1`] = 
 `;
 
 exports[`replaces settings >> in 2_replace_6_if in if block: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #to: __Setting1__: replaced
+
 Warning: 0, Error: 0
 "
 `;
@@ -2012,7 +1854,8 @@ exports[`replaces settings >> in 2_replace_6_if in if block: updatedFileContents
 `;
 
 exports[`replaces settings >> in 2_replace_6_if in if variable: stdout 1`] = `
-"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #to: fruit: melon
+
 Warning: 0, Error: 0
 "
 `;

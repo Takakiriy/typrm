@@ -144,29 +144,26 @@ describe("checks template value >>", () => {
 describe("checks file contents >>", () => {
     test.each([
         [
-            "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
+            "OK", "file_1_ok_and_bad", null,
         ],[
-            "NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+            "NG", "file_1_ok_and_bad", { from: "__User__: user1", to: "__User__: user2" },
         ],[
-            "file name", "file_3_file_name", "", "", 1, 1, "",
+            "file name", "file_3_file_name", null,
         ],[
-            "if", "file_4_if", "file/1", "", 0, 0, "",
+            "if", "file_4_if", null,
         ],[
-            "any_lines", "file_8_others", "file/1", "", 0, 0, "",
+            "any_lines", "file_8_others", null,
         ]
-    ])("%s in %s, %s %s", async (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) => {
+    ])("%s in %s, %s %s", async (caseName, fileNameHead, option) => {
         const  sourceFileContents = lib.getSnapshot(`checks file contents >> ${fileNameHead} : sourceFileContents 1`);
         const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
         const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(changingFilePath, sourceFileContents);
-        process.chdir('empty_folder');
-
-        if (optionOperation === 'replace') {
-            await callMain(["replace", changingFileRelativePath, String(lineNum), keyValues], {
-                folder: '../test_data', test: "", locale: "en-US",
-            });
+        if (option) {
+            lib.replaceFileSync(changingFilePath, (text)=>(text.replace(option.from, option.to)))
         }
+        process.chdir('empty_folder');
 
         // Test Main
         await callMain(["check"], {
@@ -207,107 +204,118 @@ describe("checks file contents >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.each([
+    test.only.each([
         [
             '2_replace_1_ok', ' setting 1', '10', 'en-US',
             `key1: value1changed
    __Key2__: value2changed  #ここは置き換え後に入らないコメント
 Key3: value3changed  #ここは置き換え後に入らないコメント`,
+            { replacers:[
+                { from: 'key1: value1',     to: 'key1: value1  #to: value1changed' },
+                { from: '__Key2__: value2', to: '__Key2__: value2  #to: value2changed' },
+                { from: 'Key3: value3',     to: 'Key3: value3  #to: value3changed' },
+            ]},
         ],[
             '2_replace_1_ok', ' setting 2', '29', 'en-US',
             `key1: value1changed`,
-        ],[
-            '2_replace_1_ok', ' setting 2 lineNum', '26', 'en-US',  // lineNum on settings
-            `key1: value1changed`,
+            { replacers:[{ from: 'key1: value11',  to: 'key1: value11  #to: value1changed' }]},
         ],[
             '2_replace_1A_end_of_template', '', '2', 'en-US',
             `key1: value1changed`,
+            null,
         ],[
             '2_replace_2_error', '', '4', 'en-US',
             `Key3: value3changed`,
+            null,
         ],[
             '2_replace_3_English', '', '10', 'en-US',
             `Key3: value3changed`,
+            null,
         ],[
             '2_replace_4_Japanese', '', '10', 'ja-JP',
             `Key3: value3changed`,
-        ],[
-            '2_replace_5_setting_name', ' setting 1', '1st', 'ja-JP',
-            `key1: value1changed`,
-        ],[
-            '2_replace_5_setting_name', ' setting 2', '2番目', 'ja-JP',
-            `key1: value1changed`,
-        ],[
-            '2_replace_5_setting_name', ' setting 3', '3rd', 'en-US',
-            `key1: value1changed`,
-        ],[
-            '2_replace_5_setting_name', ' setting not found', 'not found', 'en-US',
-            `key1: value1changed`,
+            null,
         ],[
             '2_replace_6_if', ' in if block', '9', 'en-US',
             `__Setting1__: replaced`,
+            { replacers:[{ from: '__Setting1__: yes',  to: '__Setting1__: yes  #to: replaced' }]},
         ],[
             '2_replace_6_if', ' in if variable', '9', 'en-US',
             `fruit: melon`,
+            { replacers:[{ from: 'fruit: banana',  to: 'fruit: banana  #to: melon' }]},
         ],[
             '2_replace_6_if', ' both', '9', 'en-US',
             `fruit: melon
             __Setting1__: replaced`,
+            { replacers:[
+                { from: 'fruit: banana',  to: 'fruit: banana  #to: melon' },
+                { from: '__Setting1__: no',  to: '__Setting1__: no  #to: replaced' },
+            ]},
         ],[
             '2_replace_7_undefined_if', '', '3', 'en-US',
-            `fruit: apple`,
+            `fruit: apple`, null,
         ],[
             '2_replace_8_one_setting', ' without line num', undefined, 'en-US',
-            `key1: changed1`,
+            `key1: changed1`, null,
         ],[
             '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
-            `key1: changed1`,
+            `key1: changed1`, null,
         ],[
             '2_replace_9_template_if_1_OK', '', '1', 'en-US',
-            `__Stage__: develop`,
+            `__Stage__: develop`, null,
         ],[
             '2_replace_9_template_if_2_NG', '', '1', 'en-US',
-            `__Stage__: develop`,
+            `__Stage__: develop`, null,
         ],[
             '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
-            `__Stage__: develop`,
+            `__Stage__: develop`, null,
         ],[
             '2_replace_9_template_if_4_operators', '', '1', 'en-US',
-            `__Stage__: develop`,
+            `__Stage__: develop`, null,
         ],[
             '2_replace_10_double_check', ' 1_OK', '1', 'en-US',
             `__Full__: fo/fi
             __Folder__: fo
             __File__: fi`,
+            null,
         ],[
             '2_replace_10_double_check', ' 2_BadPart', '1', 'en-US',
             `__Full__: fo/fi
             __File__: fi`,
+            null,
         ],
 
-    ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
+    ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
+if (fileNameHead !== '2_replace_6_if' || _subCaseName !== ' both') {return;}
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
         const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         writeFileSync(changingFilePath, sourceFileContents);
+        if (option) {
+            lib.replaceFileSync(changingFilePath, (text)=>(lib.replace(text, option.replacers)))
+        }
 
         // Test Main
-        if (lineNum) {
-            await callMain(["replace", changingFileName, lineNum, keyValues], {
-                folder: changingFolderPath, test: "", locale,
-            });
-        } else {
-            await callMain(["replace", changingFileName, keyValues], {
-                folder: changingFolderPath, test: "", locale,
-            });
-        }
+        await callMain(["replace", changingFileName], {
+            folder: changingFolderPath, test: "", locale,
+        });
+        // if (lineNum) {
+        //     await callMain(["replace", changingFileName, lineNum, keyValues], {
+        //         folder: changingFolderPath, test: "", locale,
+        //     });
+        // } else {
+        //     await callMain(["replace", changingFileName, keyValues], {
+        //         folder: changingFolderPath, test: "", locale,
+        //     });
+        // }
         const  updatedFileContents = fs.readFileSync(changingFilePath).toString();
 
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+expect('test code').toBe('deleted skip code.');
     });
 
     test.each([
@@ -489,7 +497,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
     });
 
     describe("replace to tag >>", () => {
-        test.only.each([
+        test.each([
             ['1_OK', ''],
             ['2_FileParameter', 'FileParameter'],
             ['3_SimpleOneLoop', ''],
