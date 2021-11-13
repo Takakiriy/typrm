@@ -187,11 +187,25 @@ interface  GlobbyParameters {
 
 // cutLeftOf
 // #keyword: cutLeftOf
+// cutLeftOf("abcde", "c") == "cde"
 export function  cutLeftOf(input: string, keyword: string): string {
     const  keywordPosition = input.indexOf(keyword);
     if (keywordPosition !== notFound) {
 
         return  input.substr(keywordPosition);
+    } else {
+        return  input;
+    }
+}
+
+// cutLast
+// #keyword: cutLast
+// cutLast("ab/", "/") == "ab"
+// cutLast("abc", "/") == "abc"
+export function  cutLast(input: string, keyword: string): string {
+    if (input.endsWith(keyword)) {
+
+        return  input.substr(0, input.length - keyword.length);
     } else {
         return  input;
     }

@@ -2683,6 +2683,17 @@ C:
     body:
         B   #template: __Switch2__
         bb  #template: __Set2__
+
+in body:
+    settings:
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: bb  #original: BB
+    body:
+        B   #template: __Switch2__
+        bb  #template: __Set2__
 "
 `;
 
@@ -2710,6 +2721,17 @@ B:
         AA  #template: __Set1__
 
 C:
+    settings:
+        __Switch2__: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB
+    body:
+        A   #template: __Switch2__
+        AA  #template: __Set2__
+
+in body:
     settings:
         __Switch2__: A
         case A:  #if: $settings.__Switch2__ == A
@@ -2755,6 +2777,17 @@ C:
     body:
         A   #template: __Switch2__
         AA  #template: __Set2__
+
+in body:
+    settings:
+        __Switch2__: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB
+    body:
+        A   #template: __Switch2__  #to: B
+        AA  #template: __Set2__  #to: bb
 "
 `;
 
@@ -2763,117 +2796,152 @@ exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:16: #to: __Set1__: aa
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:25: #to: __Switch2__: B
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:29: #to: __Set2__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:42: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:43: #to: __Set2__: bb
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: sourceFileContents 1`] = `
-"settings:
-    __Switch1__: A
-    case A:  #if: $settings.__Switch1__ == A
-        __Set1__: AA
-    case B:  #if: $settings.__Switch1__ == B
-        __Set1__: BB  #to: bb
-body:
-    A   #template: __Switch1__
-    AA  #template: __Set1__
+"A:
+    settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: AA
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB  #to: bb
+    body:
+        A   #template: __Switch1__
+        AA  #template: __Set1__
 
-settings:
-    __Switch2__: A  #to: B
-    case A:  #if: $settings.__Switch2__ == A
-        __Set2__: AA  #to: aa
-    case B:  #if: $settings.__Switch2__ == B
-        __Set2__: BB
-body:
-    A   #template: __Switch2__
-    AA  #template: __Set2__
+B:
+    settings:
+        __Switch2__: A  #to: B
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA  #to: aa
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB
+    body:
+        A   #template: __Switch2__
+        AA  #template: __Set2__
 
-settings:
-    __Switch1__: A
-    case A:  #if: $settings.__Switch1__ == A
-        __Set1__: AA  #to: aa
-    case B:  #if: $settings.__Switch1__ == B
-        __Set1__: BB  #to: aa
-body:
-    A   #template: __Switch1__
-    AA  #template: __Set1__
+C:
+    settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: AA  #to: aa
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB  #to: aa
+    body:
+        A   #template: __Switch1__
+        AA  #template: __Set1__
 
-settings:
-    __Switch1__: A  #to: B
-    case A:  #if: $settings.__Switch1__ == A
-        __Set1__: AA  #to: bb
-    case B:  #if: $settings.__Switch1__ == B
-        __Set1__: BB  #to: bb
-body:
-    A   #template: __Switch1__
-    AA  #template: __Set1__
+D:
+    settings:
+        __Switch1__: A  #to: B
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: AA  #to: aa
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB  #to: bb
+    body:
+        A   #template: __Switch1__
+        AA  #template: __Set1__
+
+E:
+    settings:
+        __Switch1__: A  #to: B
+    body:
+        settings:
+            __Switch2__: C  #to: D
+            case A:  #if: $settings.__Switch1__ == A
+                __Set1__: AA  #to: aa
+            case B:  #if: $settings.__Switch1__ == B
+                __Set1__: BB  #to: bb
+            case C:  #if: $settings.__Switch2__ == C
+                __Set2__: CC  #to: cc
+            case D:  #if: $settings.__Switch2__ == D
+                __Set2__: DD  #to: dd
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:6: #to: __Set1__: bb
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:7: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:16: #to: __Set2__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:27: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:29: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:36: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:38: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:40: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:47: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:50: #to: __Switch2__: D
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:52: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:54: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:56: #to: __Set2__: cc
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:58: #to: __Set2__: dd
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:6: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:7: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:12: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: #to: __Set2__: aa
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:16: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:29: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:24: #to: __Set1__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: #to: __Set1__: aa
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:38: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:26: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:52: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Warning: 0, Error: 1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:32: #to: __Switch1__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: #to: __Set1__: bb
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:36: #to: __Set1__: bb
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:56: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:34: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
-
-Warning: 0, Error: 1
+Warning: 0, Error: 6
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 5_Conflict_Error: sourceFileContents 1`] = `
-"settings:
-    __Set1__: A
-body:
-    A  #template: __Set1__  #to: B
-    A  #template: __Set1__  #to: b
+"A:
+    settings:
+        __Set1__: A
+    body:
+        A  #template: __Set1__  #to: B
+        A  #template: __Set1__  #to: b
 
-settings:
-    __Set1__: A  #to: B
-body:
-    A  #template: __Set1__  #to: b
+B:
+    settings:
+        __Set1__: A  #to: B
+    body:
+        A  #template: __Set1__  #to: b
 
-settings:
-    __Set1__: A
-body:
-    A/A  #template: __Set1__/__Set1__  #to: b/c
+C:
+    settings:
+        __Set1__: A
+    body:
+        A/A  #template: __Set1__/__Set1__  #to: b/c
 "
 `;
 
 exports[`replaces settings >> replace to tag >> 5_Conflict_Error: stdout 1`] = `
-"
-Error of conflict #to: tag:
-    key: __Set1__
-    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:4
-    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:5
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:5: #to: __Set1__: B
 
 Error of conflict #to: tag:
-    key: __Set1__
-    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:8
-    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10
+    variableName: __Set1__
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:5
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:6
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:6: #to: __Set1__: b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10: #to: __Set1__: B
 
 Error of conflict #to: tag:
-    key: __Set1__
-    valueA: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:15
-    valueB: c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:15
+    variableName: __Set1__
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:12
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:12: #to: __Set1__: b
+
+Error of conflict #to: tag:
+    variableName: __Set1__
+    valueA: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:18
+    valueB: c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:18
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:18: #to: __Set1__: c
+
+Warning: 0, Error: 3
 "
 `;
 
@@ -2986,16 +3054,26 @@ Error of the value count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6:        #to: a
     Variable count in the template tag: 2
     Variable count in the to tag: 1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6: #to: __SetA__: a
 
 Error of the value count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8:        #to: a, b, c
     Variable count in the template tag: 2
     Variable count in the to tag: 3
 
+Error of conflict #to: tag:
+    variableName: __SetA__
+    valueA: a in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6
+    valueB: a, b, c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8: #to: __SetA__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8: #to: __SetB__: b
+
 Error of the value count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:10:        #to: a
     Variable count in the template tag: 0
     Variable count in the to tag: 1
+
+Warning: 0, Error: 4
 "
 `;
 
@@ -3026,7 +3104,7 @@ ErrorIn: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_If
     Before Editing: ValueB1_ValueB2
     After  Editing: ValueB9_ValueB9
     Template: __Full__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:12
+  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:13
     Before Editing: ValueB1
     After  Editing: ValueB1
     Template: __Part__
