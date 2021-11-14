@@ -521,6 +521,7 @@ export function  getSnapshot(label: string, deafultSnapshot: string | undefined 
 //    }
 export function  pp(message: any) {
     if (message instanceof Array) {
+        debugOut.push(`length: ${message.length}`);
         for (const element of message) {
             pp(element);
         }

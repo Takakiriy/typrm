@@ -67,7 +67,7 @@ beforeAll(()=>{
 });
 
 describe("checks template value >>", () => {
-    test.each([
+    test.only.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
@@ -83,6 +83,7 @@ describe("checks template value >>", () => {
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
+//if (fileNameHead !== 'settings_tree_error') {return;}  // || subCase !== '____'
         const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
@@ -95,6 +96,7 @@ describe("checks template value >>", () => {
         process.chdir('..');
         expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
+//expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {
@@ -142,27 +144,23 @@ describe("checks template value >>", () => {
 });
 
 describe("checks file contents >>", () => {
-    test.each([
+    test.only.each([
         [
-            "OK", "file_1_ok_and_bad", null,
+            "OK", "file_1_ok_and_bad",
         ],[
-            "NG", "file_1_ok_and_bad", { from: "__User__: user1", to: "__User__: user2" },
+            "NG", "file_1_ok_and_bad",
         ],[
-            "file name", "file_3_file_name", null,
+            "file name", "file_3_file_name",
         ],[
-            "if", "file_4_if", null,
+            "if", "file_4_if",
         ],[
-            "any_lines", "file_8_others", null,
+            "any_lines", "file_8_others",
         ]
-    ])("%s in %s, %s %s", async (caseName, fileNameHead, option) => {
-        const  sourceFileContents = lib.getSnapshot(`checks file contents >> ${fileNameHead} : sourceFileContents 1`);
-        const  changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
-        const  changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
+    ])("First >> %s", async (caseName, fileNameHead) => {
+        const  sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
+        const  changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(changingFilePath, sourceFileContents);
-        if (option) {
-            lib.replaceFileSync(changingFilePath, (text)=>(text.replace(option.from, option.to)))
-        }
         process.chdir('empty_folder');
 
         // Test Main
@@ -206,87 +204,63 @@ describe("checks file contents >>", () => {
 describe("replaces settings >>", () => {
     test.only.each([
         [
-            '2_replace_1_ok', ' setting 1', '10', 'en-US',
-            `key1: value1changed
-   __Key2__: value2changed  #ここは置き換え後に入らないコメント
-Key3: value3changed  #ここは置き換え後に入らないコメント`,
+            '2_replace_1_ok', ' setting 1', 'en-US',
             { replacers:[
                 { from: 'key1: value1',     to: 'key1: value1  #to: value1changed' },
                 { from: '__Key2__: value2', to: '__Key2__: value2  #to: value2changed' },
                 { from: 'Key3: value3',     to: 'Key3: value3  #to: value3changed' },
             ]},
         ],[
-            '2_replace_1_ok', ' setting 2', '29', 'en-US',
-            `key1: value1changed`,
+            '2_replace_1_ok', ' setting 2', 'en-US',
             { replacers:[{ from: 'key1: value11',  to: 'key1: value11  #to: value1changed' }]},
         ],[
-            '2_replace_1A_end_of_template', '', '2', 'en-US',
-            `key1: value1changed`,
-            null,
+            '2_replace_1A_end_of_template', '', 'en-US', null,
         ],[
-            '2_replace_2_error', '', '4', 'en-US',
-            `Key3: value3changed`,
-            null,
+            '2_replace_2_error', '', 'en-US', null,
         ],[
-            '2_replace_3_English', '', '10', 'en-US',
-            `Key3: value3changed`,
-            null,
+            '2_replace_3_English', '', 'en-US', null,
         ],[
-            '2_replace_4_Japanese', '', '10', 'ja-JP',
-            `Key3: value3changed`,
-            null,
+            '2_replace_4_Japanese', '', 'ja-JP', null,
         ],[
-            '2_replace_6_if', ' in if block', '9', 'en-US',
-            `__Setting1__: replaced`,
+            '2_replace_6_if', ' in if block', 'en-US',
             { replacers:[{ from: '__Setting1__: yes',  to: '__Setting1__: yes  #to: replaced' }]},
         ],[
-            '2_replace_6_if', ' in if variable', '9', 'en-US',
-            `fruit: melon`,
+            '2_replace_6_if', ' in if variable', 'en-US',
             { replacers:[{ from: 'fruit: banana',  to: 'fruit: banana  #to: melon' }]},
         ],[
-            '2_replace_6_if', ' both', '9', 'en-US',
-            `fruit: melon
-            __Setting1__: replaced`,
+            '2_replace_6_if', ' both', 'en-US',
             { replacers:[
                 { from: 'fruit: banana',  to: 'fruit: banana  #to: melon' },
                 { from: '__Setting1__: no',  to: '__Setting1__: no  #to: replaced' },
             ]},
         ],[
-            '2_replace_7_undefined_if', '', '3', 'en-US',
-            `fruit: apple`, null,
+            '2_replace_7_undefined_if', '', 'en-US', null,
         ],[
-            '2_replace_8_one_setting', ' without line num', undefined, 'en-US',
-            `key1: changed1`, null,
+            '2_replace_8_one_setting', ' without line num', 'en-US', null,
         ],[
-            '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
-            `key1: changed1`, null,
+            '2_replace_9_template_if_1_OK', '', 'en-US', null,
         ],[
-            '2_replace_9_template_if_1_OK', '', '1', 'en-US',
-            `__Stage__: develop`, null,
+            '2_replace_9_template_if_2_NG', '', 'en-US', null,
         ],[
-            '2_replace_9_template_if_2_NG', '', '1', 'en-US',
-            `__Stage__: develop`, null,
+            '2_replace_9_template_if_3_not_set', '', 'en-US', null,
         ],[
-            '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
-            `__Stage__: develop`, null,
+            '2_replace_9_template_if_4_operators', '', 'en-US', null,
         ],[
-            '2_replace_9_template_if_4_operators', '', '1', 'en-US',
-            `__Stage__: develop`, null,
+            '2_replace_10_double_check', ' 1_OK', 'en-US',
+            { replacers:[
+                { from: '__Full__: folder/file',  to: '__Full__: folder/file  #to: fo/fi' },
+                { from: '__Folder__: folder',  to: '__Folder__: folder  #to: fo' },
+                { from: '__File__: file',  to: '__File__: file  #to: fi' },
+            ]},
         ],[
-            '2_replace_10_double_check', ' 1_OK', '1', 'en-US',
-            `__Full__: fo/fi
-            __Folder__: fo
-            __File__: fi`,
-            null,
-        ],[
-            '2_replace_10_double_check', ' 2_BadPart', '1', 'en-US',
-            `__Full__: fo/fi
-            __File__: fi`,
-            null,
+            '2_replace_10_double_check', ' 2_BadPart', 'en-US',
+            { replacers:[
+                { from: '__Full__: folder/file',  to: '__Full__: folder/file  #to: fo/fi' },
+                { from: '__File__: file',  to: '__File__: file  #to: fi' },
+            ]},
         ],
 
-    ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-if (fileNameHead !== '2_replace_7_undefined_if' || _subCaseName !== '') {return;}
+    ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -301,21 +275,11 @@ if (fileNameHead !== '2_replace_7_undefined_if' || _subCaseName !== '') {return;
         await callMain(["replace", changingFileName], {
             folder: changingFolderPath, test: "", locale,
         });
-        // if (lineNum) {
-        //     await callMain(["replace", changingFileName, lineNum, keyValues], {
-        //         folder: changingFolderPath, test: "", locale,
-        //     });
-        // } else {
-        //     await callMain(["replace", changingFileName, keyValues], {
-        //         folder: changingFolderPath, test: "", locale,
-        //     });
-        // }
         const  updatedFileContents = fs.readFileSync(changingFilePath).toString();
 
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-expect('test code').toBe('deleted skip code.');
     });
 
     test.each([
@@ -496,7 +460,7 @@ expect('test code').toBe('deleted skip code.');
         });
     });
 
-    describe("replace to tag >>", () => {
+    describe.only("replace to tag >>", () => {
         test.each([
             ['1_OK', ''],
             ['2_FileParameter', 'FileParameter'],
@@ -510,7 +474,6 @@ expect('test code').toBe('deleted skip code.');
             ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {
-//if (caseName !== '1_OK') {return;}  // || subCase !== '____'
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = caseName + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -551,7 +514,6 @@ expect('test code').toBe('deleted skip code.');
                 expect(sourceFileContents2).toBe(sourceFileContents);
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
         });
     });
     test("replace to tag >> ToTestTag", async () => {

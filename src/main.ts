@@ -266,9 +266,8 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             const  templateTag = parseTemplateTag(line, parser);
             if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
                 console.log("");
-                console.log(`${translate('ErrorLine')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                console.log(`  ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
+                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line.trim()}`);
+                console.log(`    ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
                 templateTag.isFound = false;
                 templateCount += 1;
                 errorCount += 1;
@@ -291,17 +290,12 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
 
                 if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                     console.log("");
-                    console.log(`${translate('ErrorLine')}: ${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}`);
-                    if (templateTag.lineNumOffset <= -2) {
-                        console.log(`${translate('Template')}:  ${getTestablePath(inputFilePath)}:${lineNum}`);
+                    console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${checkingLine}`);
+                    if (templateTag.lineNumOffset !== 0) {
+                        console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);  // template
                     }
-                    console.log(`  ${translate('Contents')}: ${checkingLine.trim()}`);
-                    console.log(`  ${translate('Expected')}: ${expected}`);
-                    if (commonCase) {
-                        console.log(`  ${translate('Template')}: ${templateTag.template}`);
-                    } else { // if (templateTag.label === templateIfLabel)
-                        console.log(`  ${translate('Expression')}: ${templateTag.template}`);
-                    }
+                    console.log(`    ${translate('Error')}: ${translate('Not matched with the template.')}`);
+                    console.log(`    ${translate('Expected')}: ${expected}`);
                     errorCount += 1;
                 }
             }
@@ -676,7 +670,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                             if (undefinedVariableNames.length >= 1) {
                                 console.log('');
                                 console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                                console.log(`  ${translate('Error')}: ${translate('The number of variable declarations has decreased')}`);
+                                console.log(`    ${translate('Error')}: ${translate('The number of variable declarations has decreased')}`);
                                 console.log(`  ${translate('Solution')}: ${translate('Add variable declarations')}`);
                                 console.log(`  ${translate('Variables')}: ${undefinedVariableNames}`);
                                 reducedErrorWasOccurred = true;
@@ -828,7 +822,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                     if (conflictedTemplates.length >= 1) {
                                         var  errorMessage = '';
                                         errorMessage += '\n';
-                                        errorMessage += `${translate('ErrorIn')}: ${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
+                                        errorMessage += `${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
                                         errorMessage += `  ${translate('Error')}: ${translate('template values after replace are conflicted.')}\n`;
                                         errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
                                         for (const template of checkedTemplateTags[targetLineNum]) {
@@ -868,7 +862,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                 const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
                                 if (necessaryVariableNames !== '') {
                                     console.log('');
-                                    console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
                                     console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
                                     console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
                                     console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
@@ -2001,12 +1995,10 @@ class  TemplateTag {
                 errorTemplate = this.templateLines[0];
             }
             console.log('');
-            console.log(`${translate('Error of not same as file contents:')}`);
-            console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
-            console.log(`  ${translate('ErrorFile')}: ${getTestablePath(targetFilePath)}:${errorTargetLineNum}`);
-            console.log(`  Template: ${errorTemplate}`);
-            console.log(`  Expected: ${errorExpected}`);
-            console.log(`  Contents: ${errorContents}`);
+            console.log(`${getTestablePath(inputFilePath)}:${templateLineNum}: ${errorTemplate}`);
+            console.log(`${getTestablePath(targetFilePath)}:${errorTargetLineNum}: ${errorContents}`);
+            console.log(`    ${translate('Error')}: ${translate('Not same as file contents')}`);
+            console.log(`    ${translate('Expected')}: ${errorExpected}`);
         }
         return  result === Result.same;
     }
@@ -2365,9 +2357,6 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
             // Out of settings
             } else {
                 const  templateTag = parseTemplateTag(line, parser);
-if (lineNum === 13) {
-var d = pp('')
-}
                 if (templateTag.isFound  &&  templateTag.includesKey(replacingKeys)
                         &&  toTagTree.currentIsOutOfFalseBlock) {
                     const  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
@@ -2444,7 +2433,7 @@ var d = pp('')
                             if (conflictedTemplates.length >= 1) {
                                 var  errorMessage = '';
                                 errorMessage += '\n';
-                                errorMessage += `${translate('ErrorIn')}: ${getTestablePath(inputFilePath)}:${outputTargetLineNum}\n`;
+                                errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}\n`;
                                 errorMessage += `  ${translate('Error')}: ${translate('template values after replace are conflicted.')}\n`;
                                 errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
                                 for (const template of checkedTemplateTags[outputTargetLineNum]) {
@@ -2492,7 +2481,7 @@ var d = pp('')
                         const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(replacingKeys);
                         if (necessaryVariableNames !== '') {
                             console.log('');
-                            console.log(`${translate('ErrorLine')}: ${lineNum}`);
+                            console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
                             console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
                             console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
                             console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${
@@ -2538,7 +2527,6 @@ var d = pp('')
     } finally {
         deleteFileSync(updatingFilePath);
     }
-var d = pp('');
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
 }
@@ -3719,9 +3707,6 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
         var    rightValue = match[3];
         if (parent === settingsDot) {
             if (name in setting) {
-if ( ! setting[name]) {
-pp('')
-}
 
                 var  leftValue = setting[name].value;
                 setting[name].isReferenced = true;
@@ -4429,8 +4414,6 @@ class ReplaceToTagTree {
         var    outOfFalseBlocks: Map</*lineNum*/ number, boolean> = toTagTree.outOfFalseBlocks;
         if (lineNum === 1  ||  lineNum === toTagTree.nextSettingsLineNum) {
 
-pp('-----------------------')
-var d = pp(Object.values(toTagTree.currentReplacedSettings))
             outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
             const  index = settingsTree.currentSettingIndex;
             var    parentIndex = '/';
@@ -4472,14 +4455,29 @@ var d = pp(Object.values(toTagTree.currentReplacedSettings))
                 currentOriginalSettings = { ...currentOriginalSettings, ...r.currentOriginalSettings };
                 outOfFalseBlocks = new Map([...outOfFalseBlocks, ...r.outOfFalseBlocks]);
             }
-pp('======================')
-var d = pp(Object.values(currentReplacedSettings))
-if (lineNum === 8) {
-var d = pp('')
-}
+            const  variableNamesBefore = Object.keys(settingsTree.currentSettings);
+            const  variableNamesAfter = Object.keys(currentReplacedSettings);
+            const  addedVariableNames = variableNamesAfter.filter((element) => (variableNamesBefore.indexOf(element) === -1))
+            const  removedVariableNames = variableNamesBefore.filter((element) => (variableNamesAfter.indexOf(element) === -1))
+            if (addedVariableNames.length >= 1) {
+                const  settingsLineNum = settingsTree.settingsInformation[settingsTree.currentSettingIndex].lineNum;
+                console.log('');
+                console.log(`${getTestablePath(parser.filePath)}:${settingsLineNum}: settings`);
+                console.log(`    ${translate('Error')}: ${translate('Defined variables are increased')}`);
+                console.log(`    ${translate('New defined variables')}: ${removedVariableNames.join(', ')}`);
+                parser.errorCount += 1;
+            }
+            if (removedVariableNames.length >= 1) {
+                const  settingsLineNum = settingsTree.settingsInformation[settingsTree.currentSettingIndex].lineNum;
+                console.log('');
+                console.log(`${getTestablePath(parser.filePath)}:${settingsLineNum}: settings`);
+                console.log(`    ${translate('Error')}: ${translate('Defined variables are decreased')}`);
+                console.log(`    ${translate('Not defined variables')}: ${removedVariableNames.join(', ')}`);
+                parser.errorCount += 1;
+            }
             return_.currentReplacedSettings = currentReplacedSettings;
             return_.currentOriginalSettings = currentOriginalSettings;
-            const  startLineNums = Array.from(settingsTree.indicesWithIf.keys());
+            const  startLineNums = Array.from(settingsTree.indices.keys());
             if (lineNum === 1) {
                 return_.nextLineNumIndex = 0;
             }
@@ -4506,9 +4504,6 @@ var d = pp('')
             const  variablesInCondition: string[] = []
             const  currentIndexWithIf = settingsTree.indicesWithIf.get(lineNum)!;
             var    parentIndex = currentIndexWithIf;
-if (lineNum === 10) {
-var d = pp('')
-}
             while (lib.isAlphabetIndex(parentIndex)) {
                 const  ifTag = settingsTree.settingsInformation[parentIndex];
                 if (ifTag.condition !== ''  &&  ! ifTag.inSettings) {
@@ -4539,7 +4534,11 @@ var d = pp('')
                 partToTagTree.replaceTo[index] = {};
                 for (const name of Object.keys(settingsTree.settings[index])) {
                     if (variablesInCondition.includes(name)) {
-                        partToTagTree.replaceTo[index][name] = toTagTree.replaceTo[index][name];
+                        if (name in toTagTree.replaceTo[index]) {
+                            partToTagTree.replaceTo[index][name] = toTagTree.replaceTo[index][name];
+                        } else {
+                            partToTagTree.replaceTo[index][name] = settingsTree.settings[index][name];
+                        }
                     }
                 }
             }
@@ -5306,6 +5305,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ...values: 
             "The line number to replace the variable value >": "置き換える変数値がある行番号 >",
             "Enter only: finish to input setting": "Enter のみ：設定の入力を終わる",
             "The number of variable declarations has decreased": "変数宣言の数が減りました",
+            "Defined variables are increased": "定義された変数が増えました",
+            "Defined variables are decreased": "定義された変数が減りました",
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.":
                 "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
