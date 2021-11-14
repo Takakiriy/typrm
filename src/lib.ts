@@ -522,7 +522,7 @@ export function  getSnapshot(label: string, deafultSnapshot: string | undefined 
 export function  pp(message: any) {
     if (message instanceof Array) {
         for (const element of message) {
-            debugOut.push(element.toString());
+            pp(element);
         }
     } else {
         if (typeof message === 'object') {

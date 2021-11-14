@@ -286,7 +286,7 @@ Key3: value3changed  #ここは置き換え後に入らないコメント`,
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-if (fileNameHead !== '2_replace_6_if' || _subCaseName !== ' both') {return;}
+if (fileNameHead !== '2_replace_7_undefined_if' || _subCaseName !== '') {return;}
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;

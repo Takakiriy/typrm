@@ -3719,6 +3719,9 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
         var    rightValue = match[3];
         if (parent === settingsDot) {
             if (name in setting) {
+if ( ! setting[name]) {
+pp('')
+}
 
                 var  leftValue = setting[name].value;
                 setting[name].isReferenced = true;
@@ -4424,11 +4427,10 @@ class ReplaceToTagTree {
         };
         const  lineNum = parser.lineNum;
         var    outOfFalseBlocks: Map</*lineNum*/ number, boolean> = toTagTree.outOfFalseBlocks;
-if (lineNum === 11) {
-var d = pp('')
-}
         if (lineNum === 1  ||  lineNum === toTagTree.nextSettingsLineNum) {
 
+pp('-----------------------')
+var d = pp(Object.values(toTagTree.currentReplacedSettings))
             outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
             const  index = settingsTree.currentSettingIndex;
             var    parentIndex = '/';
@@ -4470,6 +4472,11 @@ var d = pp('')
                 currentOriginalSettings = { ...currentOriginalSettings, ...r.currentOriginalSettings };
                 outOfFalseBlocks = new Map([...outOfFalseBlocks, ...r.outOfFalseBlocks]);
             }
+pp('======================')
+var d = pp(Object.values(currentReplacedSettings))
+if (lineNum === 8) {
+var d = pp('')
+}
             return_.currentReplacedSettings = currentReplacedSettings;
             return_.currentOriginalSettings = currentOriginalSettings;
             const  startLineNums = Array.from(settingsTree.indicesWithIf.keys());
