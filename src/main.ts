@@ -24,7 +24,7 @@ var d = pp(programArguments);
     if (programArguments.length === 0) {
         if (programOptions.replaceMode) {
 
-            await checkRoutine(true, '');
+            await checkRoutine(true, '', new Parser());
             if (programOptions.test) {  // Scan last input command line for the test
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
@@ -136,7 +136,7 @@ var d = pp(programArguments);
 }
 
 // checkRoutine
-async function  checkRoutine(isModal: boolean, inputFilePath: string) {
+async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Parser) {
     if (isModal) {
         var  inputFilePath = await lib.inputPath( translate('YAML UTF-8 file path>') );
     }
@@ -144,7 +144,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
     inputFileParentPath = parentPath;
     var  previousTemplateCount = 0;
     for(;;) {
-        const  parser = new Parser();
         parser.command = CommandEnum.check;
         parser.verbose = ('verbose' in programOptions);
         parser.filePath = inputFilePath;
@@ -294,7 +293,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
                     if (templateTag.lineNumOffset !== 0) {
                         console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);  // template
                     }
-                    console.log(`    ${translate('Error')}: ${translate('Not matched with the template.')}`);
+                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                     console.log(`    ${translate('Expected')}: ${expected}`);
                     errorCount += 1;
                 }
@@ -482,6 +481,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string) {
             setting[key].isReferenced = false;
         }
     }
+    parser.warningCount = errorCount;
 }
 
 // replaceSettings
@@ -503,8 +503,6 @@ async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: str
                 inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), toTagLineNums, true, false, cutReplaceToTagEnabled);
         }
     }
-    console.log('');
-    console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
 }
 
 // revertSettings
@@ -2533,10 +2531,13 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
 
 // check
 async function  check(checkingFilePath?: string) {
+    const  parser = new Parser();
     for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
 
-        await checkRoutine(false, inputFileFullPath);
+        await checkRoutine(false, inputFileFullPath, parser);
     }
+    console.log('');
+    console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
 }
 
 // listUpFilePaths

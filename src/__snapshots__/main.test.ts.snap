@@ -717,21 +717,16 @@ test_of_duplicated_variable_name_error:
 
 exports[`checks template value >> check files in multi folder: answer 1`] = `
 "
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5
-  Contents: value2  #template: var
-  Expected: value1
-  Template: var
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
 
-Warning: 0, Error: 1
-template count = 1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5
-  Contents: value2  #template: var
-  Expected: value1
-  Template: var
-
-Warning: 0, Error: 1
-template count = 1
+Warning: 2, Error: 0
+template count = 2
 "
 `;
 

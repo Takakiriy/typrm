@@ -67,7 +67,7 @@ beforeAll(()=>{
 });
 
 describe("checks template value >>", () => {
-    test.only.each([
+    test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
@@ -83,7 +83,6 @@ describe("checks template value >>", () => {
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {
-//if (fileNameHead !== 'settings_tree_error') {return;}  // || subCase !== '____'
         const  sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
@@ -96,7 +95,6 @@ describe("checks template value >>", () => {
         process.chdir('..');
         expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
     });
 
     test("check one file only", async () => {
@@ -113,7 +111,7 @@ describe("checks template value >>", () => {
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
-    test("check files in multi folder", async () => {
+    test.only("check files in multi folder", async () => {
         const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
@@ -144,7 +142,7 @@ describe("checks template value >>", () => {
 });
 
 describe("checks file contents >>", () => {
-    test.only.each([
+    test.each([
         [
             "OK", "file_1_ok_and_bad",
         ],[
@@ -202,7 +200,7 @@ describe("checks file contents >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.only.each([
+    test.each([
         [
             '2_replace_1_ok', ' setting 1', 'en-US',
             { replacers:[
@@ -460,7 +458,7 @@ describe("replaces settings >>", () => {
         });
     });
 
-    describe.only("replace to tag >>", () => {
+    describe("replace to tag >>", () => {
         test.each([
             ['1_OK', ''],
             ['2_FileParameter', 'FileParameter'],
