@@ -162,10 +162,10 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
         var  settingLineNum = 0;
         var  settingIndentLength = 0;
         var  lineNum = 0;
-        var  templateCount = 0;
+        var  templateCount = parser.templateCount;
         var  fileTemplateTag: TemplateTag | null = null;
-        var  errorCount = settingTree.errorCount;
-        var  warningCount = 0;
+        var  errorCount = parser.errorCount + settingTree.errorCount;
+        var  warningCount = parser.warningCount;
         var  secretLabelCount = 0;
         const  lines = [];
         const  keywords: SearchKeyword[] = [];
@@ -295,7 +295,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                     }
                     console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                     console.log(`    ${translate('Expected')}: ${expected}`);
-                    errorCount += 1;
+                    warningCount += 1;
                 }
             }
 
@@ -430,6 +430,10 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
             }
         }
 
+        if (!isModal) {
+            break;
+        }
+
         // Show the result
         console.log('');
         console.log(`${translate('Warning')}: ${warningCount}, ${translate('Error')}: ${errorCount}`);
@@ -437,10 +441,6 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
             console.log(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
         }
         console.log(`${translate('template count')} = ${templateCount}`);
-
-        if (!isModal) {
-            break;
-        }
 
         // Rescan or replace a value
         var  loop = true;
@@ -481,7 +481,9 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
             setting[key].isReferenced = false;
         }
     }
-    parser.warningCount = errorCount;
+    parser.errorCount = errorCount;
+    parser.warningCount = warningCount;
+    parser.templateCount = templateCount;
 }
 
 // replaceSettings
@@ -2538,6 +2540,7 @@ async function  check(checkingFilePath?: string) {
     }
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
+    console.log(`template count = ${parser.templateCount}`);
 }
 
 // listUpFilePaths
@@ -5178,6 +5181,7 @@ class  Parser {
     command = CommandEnum.unknown;
     errorCount = 0;
     warningCount = 0;
+    templateCount = 0;
     verbose = false;
     filePath = '';
     lineNum = 0;

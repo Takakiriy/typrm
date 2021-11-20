@@ -66,7 +66,7 @@ beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
 });
 
-describe("checks template value >>", () => {
+describe.only("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -111,7 +111,7 @@ describe("checks template value >>", () => {
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
-    test.only("check files in multi folder", async () => {
+    test("check files in multi folder", async () => {
         const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
