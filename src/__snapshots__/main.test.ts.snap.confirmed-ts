@@ -133,14 +133,14 @@ nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
 exports[`checks file contents >> First >> file name: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:3: nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: sub/dummy.txt
 
 Error of not found the target file:
   NotFound: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
   Template: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:4
 
-Warning: 0, Error: 2
+Warning: 1, Error: 1
 template count = 1
 "
 `;
@@ -249,11 +249,11 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
     Error: if tag syntax
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:9:         user: 'user1'  #template: __Stage__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: develop
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:13:             user: 'user1'  #template: __Stage__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: develop
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:15: Checks
@@ -262,15 +262,15 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
     Expected: Checks
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:28:             - check: 'yes'  #template: __Stage__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: develop
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:33:             - check: 'yes'  #template: __Stage__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: develop
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:43:         - check: 'yes'  #template: __Stage__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: develop
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:48: Checks if develop  #template: __Stage__
@@ -319,73 +319,60 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91:     #if: $env.value = value
     Error: if tag syntax
 
-Warning: 0, Error: 16
+Warning: 5, Error: 11
 template count = 34
 "
 `;
 
 exports[`checks file contents >> Multi folder >> all: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
-template count = 1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
-
-Warning: 0, Error: 1
-template count = 1
+Warning: 2, Error: 0
+template count = 2
 "
 `;
 
 exports[`checks file contents >> Multi folder >> file in 1st folder: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 1
 "
 `;
 
 exports[`checks file contents >> Multi folder >> file in 2nd folder: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 1
 "
 `;
 
 exports[`checks file contents >> Multi folder >> full path: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 1
 "
 `;
@@ -446,50 +433,50 @@ exports[`checks template value >> 1_template_2_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:12:         - echo  \\"value  2\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:13:             #template: - echo  \\"__Key2__\\"
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: - echo  \\"value2\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:14:         - v1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:15:             #template: - key1
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: - value1
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:16:         - __ \\"value3\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:17:             #template: - \\"Key3\\"
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:18:         - __ \\"value3\\"  #template: - \\"Key3\\"
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:25:         - value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:26:             #template: - key1
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: - value11
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:27:         - １行に２つのケース： value1, value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:28:             #template: key1, key1
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: value11, value11
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:29:         - １行に２つのケース： value11, value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:30:             #template: key1, key1
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: value11, value11
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:31:         - ２行上のケース： \\"value11x\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:33:             #template-at(-2): \\"key1\\"
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: \\"value11\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:34:         - ３行上のケース： \\"value11x\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:37:             #template-at(-3): \\"key1\\"
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: \\"value11\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:38:         - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: \\"value11\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:40: #template-at(1): \\"key1\\"
@@ -499,10 +486,10 @@ exports[`checks template value >> 1_template_2_error: answer 1`] = `
     Error: The parameter must be less than 0
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:43:         - value  #template: __Undefined__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: __Undefined__
 
-Warning: 0, Error: 13
+Warning: 11, Error: 2
 template count = 13
 "
 `;
@@ -564,35 +551,35 @@ Error of duplicated variable name:
   ContentsB: target1: yellow
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:27:         - no  #template: __Setting1__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: yes
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:28:         - no  #template: __Setting2__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: yes
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:29:         - no  #template: __Env1__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: yes
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:30:         - no  #template: __Env2__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: yes
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:31:         - no  #template: fruit
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: banana
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:32:         - no  #template: bird
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: swan
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:41:         - no  #template: fish
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: yes
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50:         - 💤  #template-if: $settings.fruit == banana
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: 🌟
 
 Error of not expected condition:
@@ -622,7 +609,7 @@ Error of not expected condition:
 Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:84
   Not referenced: target1
 
-Warning: 1, Error: 15
+Warning: 9, Error: 8
 template count = 12
 "
 `;
@@ -717,21 +704,16 @@ test_of_duplicated_variable_name_error:
 
 exports[`checks template value >> check files in multi folder: answer 1`] = `
 "
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5
-  Contents: value2  #template: var
-  Expected: value1
-  Template: var
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
 
-Warning: 0, Error: 1
-template count = 1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5
-  Contents: value2  #template: var
-  Expected: value1
-  Template: var
-
-Warning: 0, Error: 1
-template count = 1
+Warning: 2, Error: 0
+template count = 2
 "
 `;
 
@@ -923,42 +905,42 @@ __1A__-2:  #template: __1A__-2
 exports[`checks template value >> settings_tree_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:1: BadA:  #template: __A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: ValueA
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:3:     BadA:  #template: __A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: ValueA
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:4:     Bad1A:  #template: __1A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: Value1A
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:5:     Bad11A:  #template: __11A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: __11A__
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:11:         Bad11A:  #template: __11A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: Value11A
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:12:     BadA:  #template: __A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: ValueA
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:13:     Bad1A:  #template: __1A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: Value1A
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:14:     Bad11A:  #template: __11A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: __11A__
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:20:                 Bad111A:  #template: __111A__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: Value111A
 
-Warning: 0, Error: 9
+Warning: 9, Error: 0
 template count = 9
 "
 `;
@@ -992,10 +974,10 @@ settings:
 exports[`checks template value >> settings_tree_if: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:7:             test error  #template: __C__
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: ValueC
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 6
 "
 `;
@@ -1060,14 +1042,14 @@ settings:
 exports[`checks template value >> template_if_1_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:6:     🌟 case product:  #template-if: $settings.__Stage__ == product
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: 💤
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:7:     💤 case product:  #template-if: $settings.__Stage__ == develop
-    Error: Not matched with the template.
+    Warning: Not matched with the template.
     Expected: 🌟
 
-Warning: 0, Error: 2
+Warning: 2, Error: 0
 template count = 4
 "
 `;
@@ -1139,6 +1121,23 @@ Verbose: settings /1/b
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7:     var2: not value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
+Verbose: settings /1/c
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
+Verbose: settings /1/d
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
+Verbose: settings /1/e
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
+Verbose: settings /1/f
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
+Verbose: settings /1/g
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
+Verbose: settings /1/h
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
 Verbose: Phase 2: check ...
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings are changed to /1 settings:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
@@ -1148,38 +1147,34 @@ Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8
-  Contents: bad  #template: var1
-  Expected: value1
-  Template: var1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8:     bad  #template: var1
+    Warning: Not matched with the template.
+    Expected: value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10
-  Contents: bad2  #template: var2
-  Expected: value2
-  Template: var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         bad2  #template: var2
+    Warning: Not matched with the template.
+    Expected: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14
-  Contents: bad2  #template: var2
-  Expected: value2
-  Template: var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14:         bad2  #template: var2
+    Warning: Not matched with the template.
+    Expected: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
 
-ErrorLine: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18
-  Contents: bad2  #template: var2
-  Expected: value2
-  Template: var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18:         bad2  #template: var2
+    Warning: Not matched with the template.
+    Expected: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
 
-Warning: 0, Error: 4
+Warning: 4, Error: 0
 template count = 7
 "
 `;
@@ -1210,7 +1205,7 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
 
 exports[`replaces settings >> Multi folder >> same name error: stdout 1`] = `
 "
-Error of same file name exists.
+Error: same file name exists.
     FileName: 2_replace_1_ok_same_name.yaml
     Folder: test_data/_changing/1, test_data/_changing/2
 

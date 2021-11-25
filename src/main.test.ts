@@ -66,7 +66,7 @@ beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
 });
 
-describe.only("checks template value >>", () => {
+describe("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -182,7 +182,7 @@ describe("checks file contents >>", () => {
             "full path", ["check", getFullPath("test_data/_checking/2/file_2.yaml", process.cwd())],
         ]
     ])("Multi folder >> %s", async (caseName, parameters) => {
-        const  sourceFileContents = lib.getSnapshot(`checks file contents >> file_0_one_error : sourceFileContents 1`);
+        const  sourceFileContents = lib.getSnapshot(`checks file contents >> file_0_one_error: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
         writeFileSync(`test_data/_checking/1/file_1.yaml`, sourceFileContents);
         writeFileSync(`test_data/_checking/2/file_2.yaml`, sourceFileContents);
@@ -346,7 +346,7 @@ describe("replaces settings >>", () => {
         expect(errorMessage).toBe(expectedErrorMessage);
     });
 
-    describe("Multi folder >>", () => {
+    describe.only("Multi folder >>", () => {
         const  fileNameHead = '2_replace_1_ok';
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFile1Path  = changingFolderPath +'/1/'+ fileNameHead + "_1_changing.yaml";
@@ -361,15 +361,20 @@ describe("replaces settings >>", () => {
             ["same name error",  fileNameHead + "_same_name.yaml",   undefined],
             ["full path",        process.cwd() +"/"+ changingFile1Path,  changingFile1Path],
         ])("%s", async (caseName, changingFileName, changingFilePath) => {
+//if (caseName !== 'full path') {return;}  // || subCase !== '____'
             const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFile1Path,  sourceFileContents);
             writeFileSync(changingFile2Path,  sourceFileContents);
             writeFileSync(changingFile1APath, sourceFileContents);
             writeFileSync(changingFile2APath, sourceFileContents);
+            if (changingFilePath) {
+                lib.replaceFileSync(changingFilePath, (text)=>(lib.replace(text,
+                    [{ from: 'key1: value1', to: 'key1: value1changed' }])));
+            }
 
             // Test Main
-            await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+            await callMain(["replace", changingFileName], {
                 folder: `${changingFolderPath}/1, ${changingFolderPath}/2`, test: "", locale: "en-US"
             });
 
@@ -385,11 +390,12 @@ describe("replaces settings >>", () => {
                 const  fileContents1 = fs.readFileSync(changingFile1APath).toString();
                 const  fileContents2 = fs.readFileSync(changingFile2APath).toString();
 
+                expect(main.stdout).toMatchSnapshot('stdout');
                 expect(fileContents1).toBe(fileContentsBefore);
                 expect(fileContents2).toBe(fileContentsBefore);
-                expect(main.stdout).toMatchSnapshot('stdout');
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+//expect('test code').toBe('deleted skip code.');
         });
     });
 

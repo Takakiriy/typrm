@@ -162,10 +162,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
         var  settingLineNum = 0;
         var  settingIndentLength = 0;
         var  lineNum = 0;
-        var  templateCount = parser.templateCount;
         var  fileTemplateTag: TemplateTag | null = null;
-        var  errorCount = parser.errorCount + settingTree.errorCount;
-        var  warningCount = parser.warningCount;
         var  secretLabelCount = 0;
         const  lines = [];
         const  keywords: SearchKeyword[] = [];
@@ -183,7 +180,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                 console.log('');
                 console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
                 console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                errorCount += parsed.errorCount;
+                parser.errorCount += parsed.errorCount;
             }
 
             // setting = ...
@@ -193,13 +190,13 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                 setting = settingTree.currentSettings;
 
                 if (settingTree.outOfScopeSettingIndices.length >= 1) {
-                    warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                    parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
                         inputFilePath);
                 }
             } else {
                 if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
                     if (settingCount >= 1) {
-                        warningCount += onEndOfSettingScope(setting, inputFilePath);
+                        parser.warningCount += onEndOfSettingScope(setting, inputFilePath);
                     }
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
@@ -227,7 +224,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                                 console.log(`  ContentsA: ${key}: ${previous.value}`);
                                 console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
                                 console.log(`  ContentsB: ${key}: ${value}`);
-                                errorCount += 1;
+                                parser.errorCount += 1;
                             }
                             if (parser.verbose) {
                                 console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
@@ -250,14 +247,14 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                         console.log(translate('Error of not expected condition:'));
                         console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                         console.log(`  Contents: ${condition}`);
-                        errorCount += 1;
+                        parser.errorCount += 1;
                     }
                 } else {
                     console.log('');
                     console.log('Error of expect tag syntax:');
                     console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                     console.log(`  Contents: ${condition}`);
-                    errorCount += 1;
+                    parser.errorCount += 1;
                 }
             }
 
@@ -268,11 +265,11 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                 console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line.trim()}`);
                 console.log(`    ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
                 templateTag.isFound = false;
-                templateCount += 1;
-                errorCount += 1;
+                parser.templateCount += 1;
+                parser.errorCount += 1;
             }
             if (templateTag.isFound) {
-                templateCount += 1;
+                parser.templateCount += 1;
                 const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
                 const  commonCase = (templateTag.label !== templateIfLabel);
                 if (commonCase) {
@@ -295,7 +292,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                     }
                     console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                     console.log(`    ${translate('Expected')}: ${expected}`);
-                    warningCount += 1;
+                    parser.warningCount += 1;
                 }
             }
 
@@ -304,11 +301,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                 const continue_ = fileTemplateTag.onReadLine(line);
                 if (!continue_) {
 
-                    const  checkPassed = await fileTemplateTag.checkTargetFileContents(
-                        setting, inputFilePath, lineNum);
-                    if (!checkPassed) {
-                        errorCount += 1;
-                    }
+                    await fileTemplateTag.checkTargetFileContents(setting, parser);
                     fileTemplateTag = null;
                 }
             }
@@ -323,7 +316,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                     console.log(`${translate('WarningLine')}: ${lineNum}`);
                     console.log(`  ${translate('Contents')}: ${line.trim()}`);
                     console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                    warningCount += 1;
+                    parser.warningCount += 1;
                 }
             }
 
@@ -336,7 +329,7 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                         console.log(`  ${translate('This is a secret value.')}`);
                         console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
                         console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
-                        warningCount += 1;
+                        parser.warningCount += 1;
                     }
                     secretLabelCount += 1;
                 }
@@ -363,24 +356,21 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
         if (newCode) {
             settingTree.moveToEndOfFile();
             if (settingTree.outOfScopeSettingIndices.length >= 1) {
-                warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
                     inputFilePath);
             }
         } else {
             if (settingCount >= 1) {
-                warningCount += onEndOfSettingScope(setting, inputFilePath);
+                parser.warningCount += onEndOfSettingScope(setting, inputFilePath);
             }
         }
+        parser.lineNum += 1;
 
         // Check target file contents by "#file-template:" tag (2).
         if (fileTemplateTag) {
             fileTemplateTag.onReadLine('');  // Cut indent
 
-            const  checkPassed = await fileTemplateTag.checkTargetFileContents(
-                setting, inputFilePath, lineNum + 1);
-            if (!checkPassed) {
-                errorCount += 1;
-            }
+            await fileTemplateTag.checkTargetFileContents(setting, parser);
         }
 
         // Check if there is the title above or following.
@@ -418,14 +408,14 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
                     console.log('');
                     console.log(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
                     console.log('  ' + translate`Not found "${keyword.keyword}" above`);
-                    errorCount += 1;
+                    parser.errorCount += 1;
                 }
             } else if (keyword.direction === Direction.Following) {
                 if (keyword.startLineNum !== foundForFollowing) {
                     console.log('');
                     console.log(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
                     console.log('  ' + translate`Not found "${keyword.keyword}" following`);
-                    errorCount += 1;
+                    parser.errorCount += 1;
                 }
             }
         }
@@ -436,14 +426,15 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
 
         // Show the result
         console.log('');
-        console.log(`${translate('Warning')}: ${warningCount}, ${translate('Error')}: ${errorCount}`);
+        console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
         if (previousTemplateCount) {
             console.log(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
         }
-        console.log(`${translate('template count')} = ${templateCount}`);
+        console.log(`${translate('template count')} = ${parser.templateCount}`);
 
         // Rescan or replace a value
         var  loop = true;
+        var  errorCount = 0;
         while (loop) {
             console.log(translate('Press Enter key to retry checking.'));
 
@@ -476,14 +467,11 @@ async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Pa
 
         // Rescan
         console.log('========================================');
-        previousTemplateCount = templateCount
+        previousTemplateCount = parser.templateCount
         for (const key of Object.keys(setting)) {
             setting[key].isReferenced = false;
         }
     }
-    parser.errorCount = errorCount;
-    parser.warningCount = warningCount;
-    parser.templateCount = templateCount;
 }
 
 // replaceSettings
@@ -556,16 +544,17 @@ async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
                 fileFullPaths.push(inputFileFullPath);
             }
         }
+        if (fileFullPaths.length >= 2) {
+            console.log('');
+            console.log(`${translate('Error of same file name exists.')}`);
+            console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
+            console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
+            return  '';
+        }
     }
     if (fileFullPaths.length === 0) {
         console.log('');
         console.log(`${translate('Error of not found the specified file.')}`);
-        console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
-        console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
-        return  '';
-    } else if (fileFullPaths.length >= 2) {
-        console.log('');
-        console.log(`${translate('Error of same file name exists.')}`);
         console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
         console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
         return  '';
@@ -1186,7 +1175,6 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             throw new Error('parse error in makeSettingTree');
         }
     }
-    tree.errorCount = parser.errorCount;
 
     return  tree;
 }
@@ -1869,15 +1857,16 @@ class  TemplateTag {
     }
 
     // checkTargetFileContents
-    async  checkTargetFileContents(setting: Settings, inputFilePath: string, templateEndLineNum: number): Promise<boolean> {
-        const  parentPath = path.dirname(inputFilePath);
+    async  checkTargetFileContents(setting: Settings, parser: Parser): Promise<boolean> {
+        const  parentPath = path.dirname(parser.filePath);
         const  targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
+        const  templateEndLineNum = parser.lineNum;
         if (!fs.existsSync(targetFilePath)) {
             const  templateLineNum = templateEndLineNum - this.templateLines.length;
             console.log("");
             console.log(`Error of not found the target file:`);
             console.log(`  ${translate('NotFound')}: ${getTestablePath(targetFilePath)}`);
-            console.log(`  Template: ${getTestablePath(inputFilePath)}:${templateLineNum}`);
+            console.log(`  Template: ${getTestablePath(parser.filePath)}:${templateLineNum}`);
             return  false;
         }
         const  targetFileReader = readline.createInterface({
@@ -1975,6 +1964,7 @@ class  TemplateTag {
             }
         }
         if (exception) {
+            parser.errorCount += 1;
             throw exception;
         }
         if (result !== Result.same) {
@@ -1995,10 +1985,11 @@ class  TemplateTag {
                 errorTemplate = this.templateLines[0];
             }
             console.log('');
-            console.log(`${getTestablePath(inputFilePath)}:${templateLineNum}: ${errorTemplate}`);
+            console.log(`${getTestablePath(parser.filePath)}:${templateLineNum}: ${errorTemplate}`);
             console.log(`${getTestablePath(targetFilePath)}:${errorTargetLineNum}: ${errorContents}`);
-            console.log(`    ${translate('Error')}: ${translate('Not same as file contents')}`);
+            console.log(`    ${translate('Warning')}: ${translate('Not same as file contents')}`);
             console.log(`    ${translate('Expected')}: ${errorExpected}`);
+            parser.warningCount += 1;
         }
         return  result === Result.same;
     }
@@ -2183,63 +2174,73 @@ class  WordPositions {
 // replace
 async function  replace(inputFileOrFolderPath: string) {
     var  errorCount = 0;
-    for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
+    try {
+        for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
 
-        if (newCode) {
-            await replaceSub(inputFilePath, 'replace');
-        } else {
-            const  inputFileFullPath = inputFilePath;
-            const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
-            for (const replaceKeyValues of replaceKeyValuesSet) {
-                if ( ! replaceKeyValues.testMode) {
-                    const  toTagLineNums: {[key: string]: number[]} = {};
-                    for (const [key, value] of Object.entries( replaceKeyValues.keyValues )) {
-                        toTagLineNums[key] = value.lineNum.slice(); // copy
-                        for (const lineNum of value.lineNum) {
-                            console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${toLabel} ${key}: ${value.value}`);
+            if (newCode) {
+                await replaceSub(inputFilePath, 'replace');
+            } else {
+                const  inputFileFullPath = inputFilePath;
+                const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
+                for (const replaceKeyValues of replaceKeyValuesSet) {
+                    if ( ! replaceKeyValues.testMode) {
+                        const  toTagLineNums: {[key: string]: number[]} = {};
+                        for (const [key, value] of Object.entries( replaceKeyValues.keyValues )) {
+                            toTagLineNums[key] = value.lineNum.slice(); // copy
+                            for (const lineNum of value.lineNum) {
+                                console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${toLabel} ${key}: ${value.value}`);
+                            }
                         }
-                    }
 
-                    await  replaceSettings(inputFileFullPath,
-                        replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, toTagLineNums, true);
+                        await  replaceSettings(inputFileFullPath,
+                            replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, toTagLineNums, true);
+                    }
                 }
             }
         }
+    } catch (e: any) {
+        console.log('');
+        console.log(`${translate('Warning')}: 0, ${translate('Error')}: 1`);
     }
 }
 
 // revert
 async function  revert(inputFilePath: string) {
     var  errorCount = 0;
-    for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
+    try {
+        for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
 
-        if (newCode) {
-            await replaceSub(inputFileFullPath, 'reset');
-        } else {
-            const  text = fs.readFileSync(inputFileFullPath, "utf-8");
-            if (text.includes(originalLabel)) {
-                const  readStream = fs.createReadStream(inputFileFullPath);
-                const  reader = readline.createInterface({
-                    input: readStream,
-                    crlfDelay: Infinity
-                });
-                var  lineNum = 0;
-                var  reverted = false;
+            if (newCode) {
+                await replaceSub(inputFileFullPath, 'reset');
+            } else {
+                const  text = fs.readFileSync(inputFileFullPath, "utf-8");
+                if (text.includes(originalLabel)) {
+                    const  readStream = fs.createReadStream(inputFileFullPath);
+                    const  reader = readline.createInterface({
+                        input: readStream,
+                        crlfDelay: Infinity
+                    });
+                    var  lineNum = 0;
+                    var  reverted = false;
 
-                for await (const line1 of reader) {
-                    const  line: string = line1;
-                    lineNum += 1;
-                    if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                        reverted = false;
-                    }
-                    if (line.includes(originalLabel)  &&  ! reverted) {
+                    for await (const line1 of reader) {
+                        const  line: string = line1;
+                        lineNum += 1;
+                        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+                            reverted = false;
+                        }
+                        if (line.includes(originalLabel)  &&  ! reverted) {
 
-                        await  revertSettings(inputFileFullPath, lineNum.toString());
-                        reverted = true;
+                            await  revertSettings(inputFileFullPath, lineNum.toString());
+                            reverted = true;
+                        }
                     }
                 }
             }
         }
+    } catch (e: any) {
+        console.log('');
+        console.log(`${translate('Warning')}: 0, ${translate('Error')}: 1`);
     }
 }
 
@@ -2558,13 +2559,18 @@ async function  listUpFilePaths(checkingFilePath?: string) {
             const  inputFileFullPath = lib.getFullPath(checkingFilePath, targetFolderFullPath);
             if (fs.existsSync(inputFileFullPath)) {
                 inputFileFullPaths.push(inputFileFullPath);
-                break;
             } else {
                 notFoundPaths.push(inputFileFullPath);
             }
         }
         if (inputFileFullPaths.length === 0) {
             throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
+        } else if (inputFileFullPaths.length >= 2) {
+            console.log('');
+            console.log(`${translate('Error')}: ${translate('same file name exists.')}`);
+            console.log(`    FileName: ${getTestablePath(checkingFilePath)}`);
+            console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
+            throw new Error(`same file name exists "${JSON.stringify(checkingFilePath)}".`);
         }
     } else {
 
@@ -4122,7 +4128,6 @@ class SettingsTree {
     outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
     settings: {[index: string]: {[name: string]: Setting}} = {};
     settingsInformation: {[index: string]: SettingsInformation} = {};
-    errorCount: number = 0;
 
     // current: current line moved by "moveToLine" method
     wasChanged = false;

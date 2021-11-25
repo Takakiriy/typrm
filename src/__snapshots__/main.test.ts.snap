@@ -326,66 +326,53 @@ template count = 34
 
 exports[`checks file contents >> Multi folder >> all: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
-template count = 1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
-
-Warning: 0, Error: 1
-template count = 1
+Warning: 2, Error: 0
+template count = 2
 "
 `;
 
 exports[`checks file contents >> Multi folder >> file in 1st folder: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 1
 "
 `;
 
 exports[`checks file contents >> Multi folder >> file in 2nd folder: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 1
 "
 `;
 
 exports[`checks file contents >> Multi folder >> full path: stdout 1`] = `
 "
-Error of not same as file contents:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2
-  ErrorFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0
-  Template: correct contents
-  Expected: correct contents
-  Contents: (Not found)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
 
-Warning: 0, Error: 1
+Warning: 1, Error: 0
 template count = 1
 "
 `;
@@ -1218,7 +1205,7 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
 
 exports[`replaces settings >> Multi folder >> same name error: stdout 1`] = `
 "
-Error of same file name exists.
+Error: same file name exists.
     FileName: 2_replace_1_ok_same_name.yaml
     Folder: test_data/_changing/1, test_data/_changing/2
 
