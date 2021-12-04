@@ -1213,6 +1213,16 @@ Warning: 0, Error: 1
 "
 `;
 
+exports[`replaces settings >> in 2_replace_1_ok setting 1: answer 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_changing/2_replace_1_ok_1_changing.yaml:5: #to: key1: value1changed
+\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_changing/2_replace_1_ok_1_changing.yaml:6: #to: __Key2__: value2changed
+\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #to: Key3: value3changed
+
+Warning: 0, Error: 0
+template count = 8
+"
+`;
+
 exports[`replaces settings >> in 2_replace_1_ok setting 1: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:5: #to: key1: value1changed
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:6: #to: __Key2__: value2changed

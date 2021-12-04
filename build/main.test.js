@@ -1,57 +1,18 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var fs = require("fs");
-var path = require("path");
-var main = require("./main");
-var chalk = require("chalk");
-var lib = require("./lib");
-var snapshots = require(__dirname + "/../src/__snapshots__/main.test.ts.snap");
-var callMain = main.callMainFromJest;
+import * as fs from "fs";
+import * as path from "path";
+import * as main from "./main";
+import chalk from "chalk";
+import * as lib from "./lib";
+const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
-var testFolderPath = "test_data" + path.sep;
-var matchedColor = chalk.green.bold;
-var refColor = chalk.yellow;
-var searchColor = chalk.yellow;
-var valueColor = chalk.yellow;
-var pathColor = chalk.cyan;
-var lineNumColor = chalk.keyword('gray');
+const testFolderPath = `test_data` + path.sep;
+const matchedColor = chalk.green.bold;
+const refColor = chalk.yellow;
+const searchColor = chalk.yellow;
+const valueColor = chalk.yellow;
+const pathColor = chalk.cyan;
+const lineNumColor = chalk.keyword('gray');
 process.env.TYPRM_TEST_ENV = 'testEnv';
 process.env.TYPRM_TEST_PATH = 'C:\\Test';
 if (process.env.windir) {
@@ -60,17 +21,50 @@ if (process.env.windir) {
 else {
     var testingOS = 'Linux';
 }
-process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 7\n        csvOptionRegularExpressionIndex: 3\n        targetMatchIdRegularExpressionIndex: 5\n        address: \"${file}:${lineNum}\"\n";
+const newSpecification = false;
+const newCode = true;
+process.env.TYPRM_LINE_NUM_GETTER = `
+    - #
+        regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?\$
+        type: text
+        filePathRegularExpressionIndex: 1
+        keywordRegularExpressionIndex: 7
+        csvOptionRegularExpressionIndex: 3
+        targetMatchIdRegularExpressionIndex: 5
+        address: "\${file}:\${lineNum}"
+`;
 if (testingOS === 'Windows') {
-    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo {ref: ${ref}, windowsRef: ${windowsRef}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: 'msedge \"file://${file}\"'\n    ";
+    process.env.TYPRM_VERB = `
+        - #
+            label: 7.Test Echo
+            number: 7
+            regularExpression: ^.*\\.md(#.*)?\$
+            command: 'echo {ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}'
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
+            command: 'msedge "file://\${file}"'
+    `;
 }
 else {
-    process.env.TYPRM_VERB = "\n        - #\n            label: 7.Test Echo\n            number: 7\n            regularExpression: ^.*\\.md(#.*)?$\n            command: 'echo  \"{ref: ${ref}, windowsRef: ${windowsRef}, file: ${file}, windowsFile: ${windowsFile}, fragment: ${fragment}}\"'\n        - #\n            label: 1.View\n            number: 1\n            regularExpression: ^.*\\.(svg|svgz)(#.*)?$\n            command: '\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" \"file://${file}\"'\n    ";
+    process.env.TYPRM_VERB = `
+        - #
+            label: 7.Test Echo
+            number: 7
+            regularExpression: ^.*\\.md(#.*)?\$
+            command: 'echo  "{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}"'
+        - #
+            label: 1.View
+            number: 1
+            regularExpression: ^.*\\.(svg|svgz)(#.*)?\$
+            command: '"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome" "file://\${file}"'
+    `;
 }
-beforeAll(function () {
+beforeAll(() => {
     fs.mkdirSync('empty_folder', { recursive: true });
 });
-describe("checks template value >>", function () {
+describe.only("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -80,138 +74,88 @@ describe("checks template value >>", function () {
         ["secret_1_error"],
         ["var_not_ref_1_error"],
         ["template_if_1_error"],
-    ])("%s", function (fileNameHead) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("checks template value >> " + fileNameHead + " 1: sourceFileContents 1");
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    writeFileSync("test_data/_checking/" + fileNameHead + "_1.yaml", sourceFileContents);
-                    process.chdir('empty_folder');
-                    return [4 /*yield*/, callMain(["check"], {
-                            folder: '../test_data/_checking', test: "", locale: "en-US",
-                        })];
-                case 1:
-                    _a.sent();
-                    process.chdir('..');
-                    expect(main.stdout).toMatchSnapshot();
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    return [2 /*return*/];
-            }
+        ["settings_tree"],
+        ["settings_tree_deep"],
+        ["settings_tree_position"],
+        ["settings_tree_if"],
+        ["settings_tree_error"],
+    ])("%s", async (fileNameHead) => {
+        const sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+        await callMain(["check"], {
+            folder: '../test_data/_checking', test: "", locale: "en-US",
         });
-    }); });
-    test("check one file only", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("checks template value >> 1_template_1_ok 1: sourceFileContents 1");
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    writeFileSync("test_data/_checking/1_template_1_ok_1.yaml", sourceFileContents);
-                    process.chdir('empty_folder');
-                    return [4 /*yield*/, callMain(["check", "_checking/1_template_1_ok_1.yaml"], {
-                            folder: '../test_data', test: "", locale: "en-US",
-                        })];
-                case 1:
-                    _a.sent();
-                    process.chdir('..');
-                    expect(main.stdout).toMatchSnapshot();
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    return [2 /*return*/];
-            }
+        process.chdir('..');
+        expect(main.stdout).toMatchSnapshot(`answer`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+    });
+    test("check one file only", async () => {
+        const sourceFileContents = lib.getSnapshot(`checks template value >> 1_template_1_ok: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(`test_data/_checking/1_template_1_ok_1.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+        await callMain(["check", "_checking/1_template_1_ok_1.yaml"], {
+            folder: '../test_data', test: "", locale: "en-US",
         });
-    }); });
-    test("check files in multi folder", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("checks template value >> one_error 1: sourceFileContents 1");
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    writeFileSync("test_data/_checking/1/one_error_1.yaml", sourceFileContents);
-                    writeFileSync("test_data/_checking/2/one_error_1.yaml", sourceFileContents);
-                    process.chdir('empty_folder');
-                    return [4 /*yield*/, callMain(["check"], {
-                            folder: '../test_data/_checking/1, ../test_data/_checking/2/*.yaml', test: "", locale: "en-US",
-                        })];
-                case 1:
-                    _a.sent();
-                    process.chdir('..');
-                    expect(main.stdout).toMatchSnapshot();
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    return [2 /*return*/];
-            }
+        process.chdir('..');
+        expect(main.stdout).toMatchSnapshot(`answer`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+    });
+    test("check files in multi folder", async () => {
+        const sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
+        writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+        await callMain(["check"], {
+            folder: '../test_data/_checking/1, ../test_data/_checking/2/*.yaml', test: "", locale: "en-US",
         });
-    }); });
-    test("verbose", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("checks template value >> verbose 1: sourceFileContents 1");
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    writeFileSync("test_data/_checking/check_verbose.yaml", sourceFileContents);
-                    process.chdir('empty_folder');
-                    return [4 /*yield*/, callMain(["check", "_checking/check_verbose.yaml"], {
-                            folder: '../test_data', test: "", locale: "en-US", verbose: "",
-                        })];
-                case 1:
-                    _a.sent();
-                    process.chdir('..');
-                    expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot();
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    return [2 /*return*/];
-            }
+        process.chdir('..');
+        expect(main.stdout).toMatchSnapshot(`answer`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+    });
+    test("verbose", async () => {
+        const sourceFileContents = lib.getSnapshot(`checks template value >> verbose: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+        await callMain(["check", "_checking/check_verbose.yaml"], {
+            folder: '../test_data', test: "", locale: "en-US", verbose: "",
         });
-    }); });
+        process.chdir('..');
+        expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+    });
 });
-describe("checks file contents >>", function () {
+describe("checks file contents >>", () => {
     test.each([
         [
-            "OK", "file_1_ok_and_bad", "file/1", "", 0, 0, "",
+            "OK", "file_1_ok_and_bad",
         ], [
-            "NG", "file_1_ok_and_bad", "file/1", "replace", 6, 1, "__User__: user2",
+            "NG", "file_1_ok_and_bad",
         ], [
-            "file name", "file_3_file_name", "", "", 1, 1, "",
+            "file name", "file_3_file_name",
         ], [
-            "if", "file_4_if", "file/1", "", 0, 0, "",
+            "if", "file_4_if",
         ], [
-            "any_lines", "file_8_others", "file/1", "", 0, 0, "",
+            "any_lines", "file_8_others",
         ]
-    ])("%s in %s, %s %s", function (caseName, fileNameHead, targetPath, optionOperation, lineNum, settingNum, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents, changingFilePath, changingFileRelativePath;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("checks file contents >> " + fileNameHead + " : sourceFileContents 1");
-                    changingFilePath = 'test_data/_checking/document/' + fileNameHead + "_1_changing.yaml";
-                    changingFileRelativePath = '_checking/document/' + fileNameHead + "_1_changing.yaml";
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    writeFileSync(changingFilePath, sourceFileContents);
-                    process.chdir('empty_folder');
-                    if (!(optionOperation === 'replace')) return [3 /*break*/, 2];
-                    return [4 /*yield*/, callMain(["replace", changingFileRelativePath, String(lineNum), keyValues], {
-                            folder: '../test_data', test: "", locale: "en-US",
-                        })];
-                case 1:
-                    _a.sent();
-                    _a.label = 2;
-                case 2: 
-                // Test Main
-                return [4 /*yield*/, callMain(["check"], {
-                        folder: '../test_data/_checking/document', test: "", locale: "en-US",
-                    })];
-                case 3:
-                    // Test Main
-                    _a.sent();
-                    process.chdir('..');
-                    expect(main.stdout).toMatchSnapshot('stdout');
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    return [2 /*return*/];
-            }
+    ])("First >> %s", async (caseName, fileNameHead) => {
+        const sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
+        const changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(changingFilePath, sourceFileContents);
+        process.chdir('empty_folder');
+        // Test Main
+        await callMain(["check"], {
+            folder: '../test_data/_checking/document', test: "", locale: "en-US",
         });
-    }); });
+        process.chdir('..');
+        expect(main.stdout).toMatchSnapshot('stdout');
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+    });
     test.each([
         [
             "all", ["check"],
@@ -222,354 +166,294 @@ describe("checks file contents >>", function () {
         ], [
             "full path", ["check", getFullPath("test_data/_checking/2/file_2.yaml", process.cwd())],
         ]
-    ])("Multi folder >> %s", function (caseName, parameters) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("checks file contents >> file_0_one_error : sourceFileContents 1");
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    writeFileSync("test_data/_checking/1/file_1.yaml", sourceFileContents);
-                    writeFileSync("test_data/_checking/2/file_2.yaml", sourceFileContents);
-                    process.chdir('empty_folder');
-                    // Test Main
-                    return [4 /*yield*/, callMain(parameters, {
-                            folder: '../test_data/_checking/1, ../test_data/_checking/2', test: "", locale: "en-US",
-                        })];
-                case 1:
-                    // Test Main
-                    _a.sent();
-                    process.chdir('..');
-                    expect(main.stdout).toMatchSnapshot('stdout');
-                    fs.rmdirSync('test_data/_checking', { recursive: true });
-                    return [2 /*return*/];
-            }
+    ])("Multi folder >> %s", async (caseName, parameters) => {
+        const sourceFileContents = lib.getSnapshot(`checks file contents >> file_0_one_error: sourceFileContents 1`);
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(`test_data/_checking/1/file_1.yaml`, sourceFileContents);
+        writeFileSync(`test_data/_checking/2/file_2.yaml`, sourceFileContents);
+        process.chdir('empty_folder');
+        // Test Main
+        await callMain(parameters, {
+            folder: '../test_data/_checking/1, ../test_data/_checking/2', test: "", locale: "en-US",
         });
-    }); });
+        process.chdir('..');
+        expect(main.stdout).toMatchSnapshot('stdout');
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+    });
 });
-describe("replaces settings >>", function () {
+describe("replaces settings >>", () => {
     test.each([
         [
-            '2_replace_1_ok', ' setting 1', '10', 'en-US',
-            "key1: value1changed\n   __Key2__: value2changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8\nKey3: value3changed  #\u3053\u3053\u306F\u7F6E\u304D\u63DB\u3048\u5F8C\u306B\u5165\u3089\u306A\u3044\u30B3\u30E1\u30F3\u30C8",
+            '2_replace_1_ok', ' setting 1', 'en-US',
+            { replacers: [
+                    { from: 'key1: value1', to: 'key1: value1  #to: value1changed' },
+                    { from: '__Key2__: value2', to: '__Key2__: value2  #to: value2changed' },
+                    { from: 'Key3: value3', to: 'Key3: value3  #to: value3changed' },
+                ] },
         ], [
-            '2_replace_1_ok', ' setting 2', '29', 'en-US',
-            "key1: value1changed",
+            '2_replace_1_ok', ' setting 2', 'en-US',
+            { replacers: [{ from: 'key1: value11', to: 'key1: value11  #to: value1changed' }] },
         ], [
-            '2_replace_1_ok', ' setting 2 lineNum', '26', 'en-US',
-            "key1: value1changed",
+            '2_replace_1A_end_of_template', '', 'en-US', null,
         ], [
-            '2_replace_1A_end_of_template', '', '2', 'en-US',
-            "key1: value1changed",
+            '2_replace_2_error', '', 'en-US', null,
         ], [
-            '2_replace_2_error', '', '4', 'en-US',
-            "Key3: value3changed",
+            '2_replace_3_English', '', 'en-US', null,
         ], [
-            '2_replace_3_English', '', '10', 'en-US',
-            "Key3: value3changed",
+            '2_replace_4_Japanese', '', 'ja-JP', null,
         ], [
-            '2_replace_4_Japanese', '', '10', 'ja-JP',
-            "Key3: value3changed",
+            '2_replace_6_if', ' in if block', 'en-US',
+            { replacers: [{ from: '__Setting1__: yes', to: '__Setting1__: yes  #to: replaced' }] },
         ], [
-            '2_replace_5_setting_name', ' setting 1', '1st', 'ja-JP',
-            "key1: value1changed",
+            '2_replace_6_if', ' in if variable', 'en-US',
+            { replacers: [{ from: 'fruit: banana', to: 'fruit: banana  #to: melon' }] },
         ], [
-            '2_replace_5_setting_name', ' setting 2', '2番目', 'ja-JP',
-            "key1: value1changed",
+            '2_replace_6_if', ' both', 'en-US',
+            { replacers: [
+                    { from: 'fruit: banana', to: 'fruit: banana  #to: melon' },
+                    { from: '__Setting1__: no', to: '__Setting1__: no  #to: replaced' },
+                ] },
         ], [
-            '2_replace_5_setting_name', ' setting 3', '3rd', 'en-US',
-            "key1: value1changed",
+            '2_replace_7_undefined_if', '', 'en-US', null,
         ], [
-            '2_replace_5_setting_name', ' setting not found', 'not found', 'en-US',
-            "key1: value1changed",
+            '2_replace_8_one_setting', ' without line num', 'en-US', null,
         ], [
-            '2_replace_6_if', ' in if block', '9', 'en-US',
-            "__Setting1__: replaced",
+            '2_replace_9_template_if_1_OK', '', 'en-US', null,
         ], [
-            '2_replace_6_if', ' in if variable', '9', 'en-US',
-            "fruit: melon",
+            '2_replace_9_template_if_2_NG', '', 'en-US', null,
         ], [
-            '2_replace_6_if', ' both', '9', 'en-US',
-            "fruit: melon\n            __Setting1__: replaced",
+            '2_replace_9_template_if_3_not_set', '', 'en-US', null,
         ], [
-            '2_replace_7_undefined_if', '', '3', 'en-US',
-            "fruit: apple",
+            '2_replace_9_template_if_4_operators', '', 'en-US', null,
         ], [
-            '2_replace_8_one_setting', ' without line num', undefined, 'en-US',
-            "key1: changed1",
+            '2_replace_10_double_check', ' 1_OK', 'en-US',
+            { replacers: [
+                    { from: '__Full__: folder/file', to: '__Full__: folder/file  #to: fo/fi' },
+                    { from: '__Folder__: folder', to: '__Folder__: folder  #to: fo' },
+                    { from: '__File__: file', to: '__File__: file  #to: fi' },
+                ] },
         ], [
-            '2_replace_8_one_setting', ' line num 1', '1', 'en-US',
-            "key1: changed1",
-        ], [
-            '2_replace_9_template_if_1_OK', '', '1', 'en-US',
-            "__Stage__: develop",
-        ], [
-            '2_replace_9_template_if_2_NG', '', '1', 'en-US',
-            "__Stage__: develop",
-        ], [
-            '2_replace_9_template_if_3_not_set', '', '1', 'en-US',
-            "__Stage__: develop",
-        ], [
-            '2_replace_9_template_if_4_operators', '', '1', 'en-US',
-            "__Stage__: develop",
-        ], [
-            '2_replace_10_double_check', ' 1_OK', '1', 'en-US',
-            "__Full__: fo/fi\n            __Folder__: fo\n            __File__: fi",
-        ], [
-            '2_replace_10_double_check', ' 2_BadPart', '1', 'en-US',
-            "__Full__: fo/fi\n            __File__: fi",
+            '2_replace_10_double_check', ' 2_BadPart', 'en-US',
+            { replacers: [
+                    { from: '__Full__: folder/file', to: '__Full__: folder/file  #to: fo/fi' },
+                    { from: '__File__: file', to: '__File__: file  #to: fi' },
+                ] },
         ],
-    ])("in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-        var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    changingFolderPath = testFolderPath + '_changing';
-                    changingFileName = fileNameHead + "_1_changing.yaml";
-                    changingFilePath = changingFolderPath + '/' + changingFileName;
-                    sourceFileContents = lib.getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    writeFileSync(changingFilePath, sourceFileContents);
-                    if (!lineNum) return [3 /*break*/, 2];
-                    return [4 /*yield*/, callMain(["replace", changingFileName, lineNum, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
-                        })];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                        folder: changingFolderPath, test: "", locale: locale,
-                    })];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4:
-                    updatedFileContents = fs.readFileSync(changingFilePath).toString();
-                    expect(main.stdout).toMatchSnapshot('stdout');
-                    expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    return [2 /*return*/];
-            }
+    ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
+        const changingFolderPath = testFolderPath + '_changing';
+        const changingFileName = fileNameHead + "_1_changing.yaml";
+        const changingFilePath = changingFolderPath + '/' + changingFileName;
+        const sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        writeFileSync(changingFilePath, sourceFileContents);
+        if (option) {
+            lib.replaceFileSync(changingFilePath, (text) => (lib.replace(text, option.replacers)));
+        }
+        // Test Main
+        await callMain(["replace", changingFileName], {
+            folder: changingFolderPath, test: "", locale,
         });
-    }); });
+        const updatedFileContents = fs.readFileSync(changingFilePath).toString();
+        expect(main.stdout).toMatchSnapshot('stdout');
+        expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+    });
     test.each([
         [
             '2_replace_1_ok', ' one setting', undefined, 'en-US',
-            "key1: changed1",
+            `key1: changed1`,
             'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
         ],
-    ])("Exception case >> in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) { return __awaiter(void 0, void 0, void 0, function () {
-        var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, errorMessage, e_1, e_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    changingFolderPath = testFolderPath + '_changing';
-                    changingFileName = fileNameHead + "_1_changing.yaml";
-                    changingFilePath = changingFolderPath + '/' + changingFileName;
-                    sourceFileContents = lib.getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
-                    errorMessage = '';
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    writeFileSync(changingFilePath, sourceFileContents);
-                    if (!lineNum) return [3 /*break*/, 5];
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
-                        })];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    e_1 = _a.sent();
-                    errorMessage = e_1.message;
-                    return [3 /*break*/, 4];
-                case 4: return [3 /*break*/, 8];
-                case 5:
-                    _a.trys.push([5, 7, , 8]);
-                    return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale,
-                        })];
-                case 6:
-                    _a.sent();
-                    return [3 /*break*/, 8];
-                case 7:
-                    e_2 = _a.sent();
-                    errorMessage = e_2.message;
-                    return [3 /*break*/, 8];
-                case 8:
-                    expect(errorMessage).toBe(expectedErrorMessage);
-                    return [2 /*return*/];
+    ])("Exception case >> in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) => {
+        const changingFolderPath = testFolderPath + '_changing';
+        const changingFileName = fileNameHead + "_1_changing.yaml";
+        const changingFilePath = changingFolderPath + '/' + changingFileName;
+        const sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+        var errorMessage = '';
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        writeFileSync(changingFilePath, sourceFileContents);
+        // Test Main
+        if (lineNum) {
+            try {
+                await callMain(["replace", changingFileName, String(lineNum), keyValues], {
+                    folder: changingFolderPath, test: "", locale,
+                });
             }
-        });
-    }); });
+            catch (e) {
+                errorMessage = e.message;
+            }
+        }
+        else {
+            try {
+                await callMain(["replace", changingFileName, keyValues], {
+                    folder: changingFolderPath, test: "", locale,
+                });
+            }
+            catch (e) {
+                errorMessage = e.message;
+            }
+        }
+        expect(errorMessage).toBe(expectedErrorMessage);
+    });
     test.each([
         [
             '2_replace_1_ok', ' without folder option', undefined, 'en-US',
-            "key1: changed1",
+            `key1: changed1`,
             'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
         ],
-    ])("Exception case >> in %s%s", function (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) { return __awaiter(void 0, void 0, void 0, function () {
-        var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, errorMessage, e_3;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    changingFolderPath = testFolderPath + '_changing';
-                    changingFileName = fileNameHead + "_1_changing.yaml";
-                    changingFilePath = changingFolderPath + '/' + changingFileName;
-                    sourceFileContents = lib.getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
-                    errorMessage = '';
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    writeFileSync(changingFilePath, sourceFileContents);
-                    _a.label = 1;
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, callMain(["replace", changingFilePath, keyValues], {
-                            folder: "", test: "", locale: locale,
-                        })];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    e_3 = _a.sent();
-                    errorMessage = e_3.message;
-                    return [3 /*break*/, 4];
-                case 4:
-                    expect(errorMessage).toBe(expectedErrorMessage);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    describe("Multi folder >>", function () {
-        var fileNameHead = '2_replace_1_ok';
-        var changingFolderPath = testFolderPath + '_changing';
-        var changingFile1Path = changingFolderPath + '/1/' + fileNameHead + "_1_changing.yaml";
-        var changingFile2Path = changingFolderPath + '/2/' + fileNameHead + "_2_changing.yaml";
-        var changingFile1APath = changingFolderPath + '/1/' + fileNameHead + "_same_name.yaml";
-        var changingFile2APath = changingFolderPath + '/2/' + fileNameHead + "_same_name.yaml";
-        var lineNum = 29;
-        var keyValues = "key1: value1changed";
+    ])("Exception case >> in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) => {
+        const changingFolderPath = testFolderPath + '_changing';
+        const changingFileName = fileNameHead + "_1_changing.yaml";
+        const changingFilePath = changingFolderPath + '/' + changingFileName;
+        const sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+        var errorMessage = '';
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        writeFileSync(changingFilePath, sourceFileContents);
+        // Test Main
+        try {
+            await callMain(["replace", changingFilePath, keyValues], {
+                folder: "", test: "", locale,
+            });
+        }
+        catch (e) {
+            errorMessage = e.message;
+        }
+        expect(errorMessage).toBe(expectedErrorMessage);
+    });
+    describe("Multi folder >>", () => {
+        const fileNameHead = '2_replace_1_ok';
+        const changingFolderPath = testFolderPath + '_changing';
+        const changingFile1Path = changingFolderPath + '/1/' + fileNameHead + "_1_changing.yaml";
+        const changingFile2Path = changingFolderPath + '/2/' + fileNameHead + "_2_changing.yaml";
+        const changingFile1APath = changingFolderPath + '/1/' + fileNameHead + "_same_name.yaml";
+        const changingFile2APath = changingFolderPath + '/2/' + fileNameHead + "_same_name.yaml";
+        const lineNum = 29;
+        const keyValues = `key1: value1changed`;
         test.each([
             ["replace 1", fileNameHead + "_1_changing.yaml", changingFile1Path],
             ["replace 2", fileNameHead + "_2_changing.yaml", changingFile2Path],
             ["same name error", fileNameHead + "_same_name.yaml", undefined],
             ["full path", process.cwd() + "/" + changingFile1Path, changingFile1Path],
-        ])("%s", function (caseName, changingFileName, changingFilePath) { return __awaiter(void 0, void 0, void 0, function () {
-            var sourceFileContents, fileContentsBefore, fileContentsAfter, fileContentsBefore, fileContents1, fileContents2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        sourceFileContents = lib.getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
-                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        writeFileSync(changingFile1Path, sourceFileContents);
-                        writeFileSync(changingFile2Path, sourceFileContents);
-                        writeFileSync(changingFile1APath, sourceFileContents);
-                        writeFileSync(changingFile2APath, sourceFileContents);
-                        // Test Main
-                        return [4 /*yield*/, callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                                folder: changingFolderPath + "/1, " + changingFolderPath + "/2", test: "", locale: "en-US"
-                            })];
-                    case 1:
-                        // Test Main
-                        _a.sent();
-                        // Check
-                        if (caseName !== "same name error") { // Case of relace 1, replace 2
-                            if (!changingFilePath) {
-                                throw new Error('unexpected');
-                            }
-                            fileContentsBefore = sourceFileContents;
-                            fileContentsAfter = fs.readFileSync(changingFilePath).toString();
-                            expect(fileContentsAfter).not.toBe(fileContentsBefore);
-                        }
-                        else { // Case of same name error
-                            fileContentsBefore = sourceFileContents;
-                            fileContents1 = fs.readFileSync(changingFile1APath).toString();
-                            fileContents2 = fs.readFileSync(changingFile2APath).toString();
-                            expect(fileContents1).toBe(fileContentsBefore);
-                            expect(fileContents2).toBe(fileContentsBefore);
-                            expect(main.stdout).toMatchSnapshot('stdout');
-                        }
-                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        return [2 /*return*/];
-                }
+        ])("%s", async (caseName, changingFileName, changingFilePath) => {
+            const sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+            fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+            writeFileSync(changingFile1Path, sourceFileContents);
+            writeFileSync(changingFile2Path, sourceFileContents);
+            writeFileSync(changingFile1APath, sourceFileContents);
+            writeFileSync(changingFile2APath, sourceFileContents);
+            if (changingFilePath) {
+                lib.replaceFileSync(changingFilePath, (text) => (lib.replace(text, [{ from: 'key1: value1', to: 'key1: value1changed' }])));
+            }
+            // Test Main
+            await callMain(["replace", changingFileName], {
+                folder: `${changingFolderPath}/1, ${changingFolderPath}/2`, test: "", locale: "en-US"
             });
-        }); });
+            // Check
+            if (caseName !== "same name error") { // Case of relace 1, replace 2
+                if (!changingFilePath) {
+                    throw new Error('unexpected');
+                }
+                const fileContentsBefore = sourceFileContents;
+                const fileContentsAfter = fs.readFileSync(changingFilePath).toString();
+                expect(fileContentsAfter).not.toBe(fileContentsBefore);
+            }
+            else { // Case of same name error
+                const fileContentsBefore = sourceFileContents;
+                const fileContents1 = fs.readFileSync(changingFile1APath).toString();
+                const fileContents2 = fs.readFileSync(changingFile2APath).toString();
+                expect(main.stdout).toMatchSnapshot('stdout');
+                expect(fileContents1).toBe(fileContentsBefore);
+                expect(fileContents2).toBe(fileContentsBefore);
+            }
+            fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        });
     });
-    describe("revert", function () {
+    describe("revert", () => {
         test.each([
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',
-                "key1: value1changed",
+                `key1: value1changed`,
+                { replacers: [
+                        { fromCSV: '手順B:, key1: value11', to: 'key1: value11  #to: value1changed1' },
+                    ] },
             ], [
                 '2_replace_6_if', ' in if block', 9, 'en-US',
-                "__Setting1__: replaced",
+                `__Setting1__: replaced`,
+                { replacers: [
+                        { fromCSV: '__Setting1__: value1', to: '__Setting1__: value1  #to: replaced' },
+                    ] },
             ], [
                 '2_replace_6_if', ' in if variable', 9, 'en-US',
-                "fruit: melon",
+                `fruit: melon`,
+                null,
             ], [
                 '2_replace_6_if', ' both', 9, 'en-US',
-                "fruit: melon\n                __Setting1__: replaced",
+                `fruit: melon
+                __Setting1__: replaced`,
+                null,
             ], [
                 '2_replace_6_if', ' without line num', undefined, 'en-US',
-                "__Setting1__: replaced",
+                `__Setting1__: replaced`,
+                null,
             ], [
                 '2_replace_6_if', ' setting name', 'set1', 'en-US',
-                "__Setting1__: replaced",
+                `__Setting1__: replaced`,
+                null,
             ], [
                 '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
-                "__Full__: fo/fi\n                __Folder__: fo\n                __File__: fi",
+                `__Full__: fo/fi
+                __Folder__: fo
+                __File__: fi`,
+                null,
             ],
-        ])("%s%s >>", function (fileNameHead, _subCaseName, lineNum, locale, keyValues) { return __awaiter(void 0, void 0, void 0, function () {
-            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, updatedFileContents, revertedFileContents;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        changingFolderPath = testFolderPath + '_changing';
-                        changingFileName = fileNameHead + "_1_changing.yaml";
-                        changingFilePath = changingFolderPath + '/' + changingFileName;
-                        sourceFileContents = lib.getSnapshot("replaces settings >> in " + fileNameHead + ": sourceFileContents 1");
-                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        writeFileSync(changingFilePath, sourceFileContents);
-                        if (!lineNum) return [3 /*break*/, 2];
-                        return [4 /*yield*/, callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                                folder: changingFolderPath, test: "", locale: locale
-                            })];
-                    case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, callMain(["replace", changingFileName, keyValues], {
-                            folder: changingFolderPath, test: "", locale: locale
-                        })];
-                    case 3:
-                        _a.sent();
-                        _a.label = 4;
-                    case 4:
-                        updatedFileContents = fs.readFileSync(changingFilePath).toString();
-                        expect(updatedFileContents).not.toBe(sourceFileContents);
-                        if (!lineNum) return [3 /*break*/, 6];
-                        return [4 /*yield*/, callMain(["revert", changingFileName, lineNum.toString()], {
-                                folder: changingFolderPath, test: "", locale: locale
-                            })];
-                    case 5:
-                        _a.sent();
-                        return [3 /*break*/, 8];
-                    case 6: return [4 /*yield*/, callMain(["revert", changingFileName], {
-                            folder: changingFolderPath, test: "", locale: locale
-                        })];
-                    case 7:
-                        _a.sent();
-                        _a.label = 8;
-                    case 8:
-                        revertedFileContents = fs.readFileSync(changingFilePath).toString();
-                        expect(revertedFileContents).toBe(sourceFileContents);
-                        expect(main.stdout).toMatchSnapshot('stdout');
-                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        return [2 /*return*/];
-                }
+        ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
+            if (fileNameHead !== '2_replace_1_ok') {
+                return;
+            } // || subCase !== '____'
+            const changingFolderPath = testFolderPath + '_changing';
+            const changingFileName = fileNameHead + "_1_changing.yaml";
+            const changingFilePath = changingFolderPath + '/' + changingFileName;
+            const sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+            fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+            writeFileSync(changingFilePath, sourceFileContents);
+            if (option) {
+                await lib.replaceFileAsync(changingFilePath, async (text) => (await lib.replaceAsync(text, option.replacers)));
+            }
+            await callMain(["replace", changingFileName], {
+                folder: changingFolderPath, test: "", locale
             });
-        }); });
+            // if (lineNum) {
+            //     await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
+            //         folder: changingFolderPath, test: "", locale
+            //     });
+            // } else {
+            //     await callMain(["replace", changingFileName, keyValues], {
+            //         folder: changingFolderPath, test: "", locale
+            //     });
+            // }
+            const updatedFileContents = fs.readFileSync(changingFilePath).toString();
+            expect(updatedFileContents).not.toBe(sourceFileContents);
+            // Test Main
+            await callMain(["reset", changingFileName], {
+                folder: changingFolderPath, test: "", locale
+            });
+            // if (lineNum) {
+            //     await callMain(["revert", changingFileName, lineNum.toString()], {
+            //         folder: changingFolderPath, test: "", locale
+            //     });
+            // } else {
+            //     await callMain(["revert", changingFileName], {
+            //         folder: changingFolderPath, test: "", locale
+            //     });
+            // }
+            const revertedFileContents = fs.readFileSync(changingFilePath).toString();
+            expect(revertedFileContents).toBe(sourceFileContents);
+            expect(main.stdout).toMatchSnapshot('stdout');
+            fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        });
+        expect('test code').toBe('deleted skip code.');
     });
-    describe("replace to tag >>", function () {
+    describe("replace to tag >>", () => {
         test.each([
             ['1_OK', ''],
             ['2_FileParameter', 'FileParameter'],
@@ -580,91 +464,71 @@ describe("replaces settings >>", function () {
             ['6_VariousTags', ''],
             ['7_VariableCount', ''],
             ['7E_VariableCount_Error', 'ErrorCase'],
+            ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
-        ])("%s", function (caseName, options) { return __awaiter(void 0, void 0, void 0, function () {
-            var changingFolderPath, changingFileName, changingFilePath, sourceFileContents, parameters, parameters, replacedFileContents, parameters, parameters, revertedFileContents, sourceFileContents2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        changingFolderPath = testFolderPath + '_changing';
-                        changingFileName = caseName + "_1_changing.yaml";
-                        changingFilePath = changingFolderPath + '/' + changingFileName;
-                        sourceFileContents = lib.getSnapshot("replaces settings >> replace to tag >> " + caseName + ": sourceFileContents 1");
-                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        writeFileSync(changingFilePath, sourceFileContents);
-                        // Test Main >> replace
-                        if (options.includes('FileParameter')) {
-                            parameters = ["replace", changingFilePath];
-                        }
-                        else {
-                            parameters = ["replace"];
-                        }
-                        return [4 /*yield*/, callMain(parameters, {
-                                folder: changingFolderPath, test: "", locale: "en-US"
-                            })];
-                    case 1:
-                        _a.sent();
-                        replacedFileContents = fs.readFileSync(changingFilePath).toString();
-                        expect(main.stdout).toMatchSnapshot('stdout');
-                        if (!!options.includes('ErrorCase')) return [3 /*break*/, 3];
-                        expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
-                        // Test Main >> revert
-                        if (caseName.includes('FileParameter')) {
-                            parameters = ["revert", changingFilePath];
-                        }
-                        else {
-                            parameters = ["revert"];
-                        }
-                        return [4 /*yield*/, callMain(parameters, {
-                                folder: changingFolderPath, test: "", locale: "en-US"
-                            })];
-                    case 2:
-                        _a.sent();
-                        revertedFileContents = fs.readFileSync(changingFilePath).toString();
-                        expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
-                        return [3 /*break*/, 4];
-                    case 3:
-                        sourceFileContents2 = fs.readFileSync(changingFilePath).toString();
-                        expect(sourceFileContents2).toBe(sourceFileContents);
-                        _a.label = 4;
-                    case 4:
-                        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-    test("replace to tag >> ToTestTag", function () { return __awaiter(void 0, void 0, void 0, function () {
-        var caseName, changingFolderPath, changingFileName, changingFilePath, sourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    caseName = 'ToTestTag';
-                    changingFolderPath = testFolderPath + '_changing';
-                    changingFileName = caseName + "_1_changing.yaml";
-                    changingFilePath = changingFolderPath + '/' + changingFileName;
-                    sourceFileContents = lib.getSnapshot("replaces settings >> replace to tag >> " + caseName + ": sourceFileContents 1");
-                    fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
-                    writeFileSync(changingFilePath, sourceFileContents);
-                    return [4 /*yield*/, callMain(["replace"], {
-                            folder: changingFolderPath, test: "", locale: "en-US"
-                        })];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toMatchSnapshot('stdout');
-                    return [2 /*return*/];
+        ])("%s", async (caseName, options) => {
+            const changingFolderPath = testFolderPath + '_changing';
+            const changingFileName = caseName + "_1_changing.yaml";
+            const changingFilePath = changingFolderPath + '/' + changingFileName;
+            var sourceFileContents = lib.getSnapshot(`replaces settings >> replace to tag >> ${caseName}: sourceFileContents 1`);
+            fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+            writeFileSync(changingFilePath, sourceFileContents);
+            // Test Main >> replace
+            if (options.includes('FileParameter')) {
+                var parameters = ["replace", changingFilePath];
             }
+            else {
+                var parameters = ["replace"];
+            }
+            await callMain(parameters, {
+                folder: changingFolderPath, test: "", locale: "en-US"
+            });
+            const replacedFileContents = fs.readFileSync(changingFilePath).toString();
+            expect(main.stdout).toMatchSnapshot('stdout');
+            if (!options.includes('ErrorCase')) {
+                expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
+                // Test Main >> revert
+                if (caseName.includes('FileParameter')) {
+                    var parameters = ["revert", changingFilePath];
+                }
+                else {
+                    var parameters = ["revert"];
+                }
+                await callMain(parameters, {
+                    folder: changingFolderPath, test: "", locale: "en-US"
+                });
+                const revertedFileContents = fs.readFileSync(changingFilePath).toString();
+                expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+            }
+            else { // error case
+                const sourceFileContents2 = fs.readFileSync(changingFilePath).toString();
+                expect(sourceFileContents2).toBe(sourceFileContents);
+            }
+            fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
         });
-    }); });
+    });
+    test("replace to tag >> ToTestTag", async () => {
+        const caseName = 'ToTestTag';
+        const changingFolderPath = testFolderPath + '_changing';
+        const changingFileName = caseName + "_1_changing.yaml";
+        const changingFilePath = changingFolderPath + '/' + changingFileName;
+        var sourceFileContents = lib.getSnapshot(`replaces settings >> replace to tag >> ${caseName}: sourceFileContents 1`);
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        writeFileSync(changingFilePath, sourceFileContents);
+        await callMain(["replace"], {
+            folder: changingFolderPath, test: "", locale: "en-US"
+        });
+        expect(main.stdout).toMatchSnapshot('stdout');
+    });
 });
-describe("searches keyword tag >>", function () {
-    test.skip('sharp (best)', function () { });
+describe.only("searches keyword tag >>", () => {
+    test.skip('sharp (best)', () => { });
     test.each([
         [
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ], [
             "not found",
             ["search", "notFound"],
@@ -674,479 +538,431 @@ describe("searches keyword tag >>", function () {
             "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n")
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`
         ], [
             "ommit command name (1)",
             ["ABC"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n")
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`
         ], [
             "ommit command name (2)",
             ["do", "it"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " " + matchedColor('it') + "\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
         ], [
             "space",
             ["search", "do it"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " " + matchedColor('it') + "\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
         ], [
             "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n`,
         ], [
             "double quotation",
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + (" #keyword: \"" + matchedColor('double') + " " + matchedColor('quotation') + " " + matchedColor('is') + " " + matchedColor('"".') + "\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('double')} ${matchedColor('quotation')} ${matchedColor('is')} ${matchedColor('"".')}"\n`,
         ], [
             "sharp",
             ["search", 'space sharp is #. "parcent 20" is "%20".'],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':94:') + ("     #keyword: \"" + matchedColor('space') + " " + matchedColor('sharp') + " " + matchedColor('is') + matchedColor('is') + " " + matchedColor('#.') + " " + matchedColor('""parcent') + matchedColor(' 20"') + "\" i" + matchedColor('s ""%20"') + "\".\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':94:') + `     #keyword: "${matchedColor('space')} ${matchedColor('sharp')} ${matchedColor('is')}${matchedColor('is')} ${matchedColor('#.')} ${matchedColor('""parcent')}${matchedColor(' 20"')}" i${matchedColor('s ""%20"')}"."\n`,
             // This is little wrong answer
         ], [
             "ignore case",
             ["search", "DO It"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " " + matchedColor('it') + "\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
         ], [
             "word(1)",
             ["search", "AB"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('AB')}C, "do it", "a,b"\n`,
         ], [
             "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + (" #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
         ], [
             "trim",
             ["search", " do "],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + (" #keyword: \"" + matchedColor('do') + "uble quotation is \"\".\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"" + matchedColor('do') + " it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` #keyword: "${matchedColor('do')}uble quotation is ""."\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "${matchedColor('do')} it", "a,b"\n`,
         ], [
             "ignored keyword",
             ["search", "#search: #keyword: AB"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('AB')}C, "do it", "a,b"\n`,
         ], [
             "ignored colon before keyword tag",
             ["search", "AB: #keyword:"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('AB') + "C, \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('AB')}C, "do it", "a,b"\n`,
         ], [
             "CSV ignored colon before keyword tag",
             ["search", "A,B: #keyword:"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n`,
         ], [
             "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':2:') + (" #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + " xxx\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('aaa') + " " + matchedColor('bbb') + " xxx\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':4:') + (" #keyword: " + matchedColor('bbb') + " " + matchedColor('aaa') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('aaa') + " " + matchedColor('bbb') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':2:') + ` #keyword: ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('aaa')} ${matchedColor('bbb')} xxx\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':4:') + ` #keyword: ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('aaa')} ${matchedColor('bbb')}\n`,
         ], [
             "words order score (2)",
             ["search", "user", "interface"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':10:') + ("     #keyword: " + matchedColor('user') + " " + matchedColor('interface') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':10:') + `     #keyword: ${matchedColor('user')} ${matchedColor('interface')}\n`,
         ], [
             "1 word search score",
             ["search", "second"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':15:') + ("     #keyword: " + matchedColor('second') + " screen\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':14:') + ("     #keyword: " + matchedColor('second') + "ary\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':13:') + ("     #keyword: " + matchedColor('second') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':15:') + `     #keyword: ${matchedColor('second')} screen\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':14:') + `     #keyword: ${matchedColor('second')}ary\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':13:') + `     #keyword: ${matchedColor('second')}\n`,
         ], [
             "word match is better than same case",
             ["search", "ipad"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':18:') + ("     #keyword: " + matchedColor('ipad') + " pro, " + matchedColor('ipad') + " nano\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':17:') + ("     #keyword: " + matchedColor('iPad') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':18:') + `     #keyword: ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':17:') + `     #keyword: ${matchedColor('iPad')}\n`,
         ], [
             "target word count",
             ["search", "new task"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':21:') + ("     #keyword: " + matchedColor('new') + " " + matchedColor('task') + "s only\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':20:') + ("     #keyword: " + matchedColor('new') + " " + matchedColor('task') + "s\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':22:') + ("     #keyword: " + matchedColor('new') + " " + matchedColor('task') + "s\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':21:') + `     #keyword: ${matchedColor('new')} ${matchedColor('task')}s only\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':20:') + `     #keyword: ${matchedColor('new')} ${matchedColor('task')}s\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':22:') + `     #keyword: ${matchedColor('new')} ${matchedColor('task')}s\n`,
         ], [
             "target word count 3",
             ["search", "world wide web"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':67:') + ("     #keyword: " + matchedColor('web') + " " + matchedColor('World') + " " + matchedColor('wide') + ", " + matchedColor('World') + " " + matchedColor('wide') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + ("     #keyword: " + matchedColor('World') + " " + matchedColor('wide') + " " + matchedColor('web') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + ("     #keyword: " + matchedColor('World') + " " + matchedColor('wide') + " " + matchedColor('web') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':67:') + `     #keyword: ${matchedColor('web')} ${matchedColor('World')} ${matchedColor('wide')}, ${matchedColor('World')} ${matchedColor('wide')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + `     #keyword: ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + `     #keyword: ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
         ], [
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':6:') + (" #keyword: " + matchedColor('frame') + matchedColor('set') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':5:') + (" #keyword: " + matchedColor('frame') + " " + matchedColor('set') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':6:') + ` #keyword: ${matchedColor('frame')}${matchedColor('set')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':5:') + ` #keyword: ${matchedColor('frame')} ${matchedColor('set')}\n`,
         ], [
             "bug case (1)",
             ["search", "go lang"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':81:') + ("     #keyword: " + matchedColor('Go') + "_" + matchedColor('lang') + "uage.yaml, " + matchedColor('go') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':81:') + `     #keyword: ${matchedColor('Go')}_${matchedColor('lang')}uage.yaml, ${matchedColor('go')}\n`,
         ], [
             "output order (1)",
             ["search", "a,b"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n`,
         ], [
             "output order (2)",
             ["search", "A,B"],
             { folder: "test_data/search/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: ABC, \"do it\", \"" + matchedColor('a,b') + "\"\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + (" #keyword: \"" + matchedColor('A,B') + "\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ABC, "do it", "${matchedColor('a,b')}"\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` #keyword: "${matchedColor('A,B')}"\n`,
         ], [
             "output order (3)",
             ["search", "grape"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + ("     #keyword: " + matchedColor('grape') + "fruit juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':32:') + ("     #keyword: " + matchedColor('grape') + "fruit juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + ("     #keyword: pink " + matchedColor('GRAPE') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':31:') + ("     #keyword: pink " + matchedColor('grape') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':45:') + ("     #keyword: " + matchedColor('GRAPE') + " juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':47:') + ("     #keyword: " + matchedColor('GRAPE') + " juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':35:') + ("     #keyword: " + matchedColor('grape') + " juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':37:') + ("     #keyword: " + matchedColor('grape') + " juice\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':46:') + ("     #keyword: pink " + matchedColor('GRAPE') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':36:') + ("     #keyword: pink " + matchedColor('grape') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':43:') + ("     #keyword: " + matchedColor('GRAPE') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':33:') + ("     #keyword: " + matchedColor('grape') + "fruit\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':44:') + ("     #keyword: " + matchedColor('GRAPE') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':48:') + ("     #keyword: " + matchedColor('GRAPE') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':34:') + ("     #keyword: " + matchedColor('grape') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':38:') + ("     #keyword: " + matchedColor('grape') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + `     #keyword: ${matchedColor('GRAPE')}fruit juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + `     #keyword: ${matchedColor('GRAPE')}fruit juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + `     #keyword: ${matchedColor('grape')}fruit juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':32:') + `     #keyword: ${matchedColor('grape')}fruit juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + `     #keyword: pink ${matchedColor('GRAPE')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':31:') + `     #keyword: pink ${matchedColor('grape')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':45:') + `     #keyword: ${matchedColor('GRAPE')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':47:') + `     #keyword: ${matchedColor('GRAPE')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':35:') + `     #keyword: ${matchedColor('grape')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':37:') + `     #keyword: ${matchedColor('grape')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':46:') + `     #keyword: pink ${matchedColor('GRAPE')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':36:') + `     #keyword: pink ${matchedColor('grape')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + `     #keyword: ${matchedColor('GRAPE')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':43:') + `     #keyword: ${matchedColor('GRAPE')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + `     #keyword: ${matchedColor('grape')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':33:') + `     #keyword: ${matchedColor('grape')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':44:') + `     #keyword: ${matchedColor('GRAPE')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':48:') + `     #keyword: ${matchedColor('GRAPE')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':34:') + `     #keyword: ${matchedColor('grape')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':38:') + `     #keyword: ${matchedColor('grape')}\n`,
         ], [
             "output order (4)",
             ["search", "main", "stage"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':51:') + ("     #keyword: " + matchedColor('main') + "ly " + matchedColor('stage') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':50:') + ("     #keyword: " + matchedColor('Main') + " " + matchedColor('stage') + "s\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':52:') + ("     #keyword: " + matchedColor('main') + " " + matchedColor('stage') + "s\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':51:') + `     #keyword: ${matchedColor('main')}ly ${matchedColor('stage')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':50:') + `     #keyword: ${matchedColor('Main')} ${matchedColor('stage')}s\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':52:') + `     #keyword: ${matchedColor('main')} ${matchedColor('stage')}s\n`,
         ], [
             "output order (5)",
             ["search", "silver", "arrow"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + ("     #keyword: add " + matchedColor('SILVER') + " " + matchedColor('arrow') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + ("     #keyword: add " + matchedColor('SILVER') + " " + matchedColor('arrow') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + ("     #keyword: [" + matchedColor('silver') + "/super-system], " + matchedColor('SILVER') + " " + matchedColor('Arrow') + "s\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + `     #keyword: add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + `     #keyword: add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + `     #keyword: [${matchedColor('silver')}/super-system], ${matchedColor('SILVER')} ${matchedColor('Arrow')}s\n`,
         ], [
             "output order (6)",
             ["search", "tool", "release"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + ("     #keyword: " + matchedColor('Tool') + " " + matchedColor('release') + " now\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + ("     #keyword: " + matchedColor('Tool') + " " + matchedColor('release') + ", " + matchedColor('Tool') + " deploy\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + ("     #keyword: " + matchedColor('Tool') + " " + matchedColor('release') + ", " + matchedColor('Tool') + " deploy\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + `     #keyword: ${matchedColor('Tool')} ${matchedColor('release')} now\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + `     #keyword: ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + `     #keyword: ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n`,
         ], [
             "without tag parameter",
             ["search", "specular"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':25:') + ("         " + matchedColor('specular') + " reflection light:  #keyword:  #// out of keyword parameter\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + ("         - " + matchedColor('specular') + " reflection:  #keyword:\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + ("     " + matchedColor('specular') + ":  #// the mirror-like reflection  #keyword:\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':25:') + `         ${matchedColor('specular')} reflection light:  #keyword:  #// out of keyword parameter\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  #keyword:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  #keyword:\n`,
         ], [
             "block-to-disable-tag-tool tag",
             ["search", "document_in_block"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':78:') + ("         Making materials:  #keyword: " + matchedColor('document_in_block') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':78:') + `         Making materials:  #keyword: ${matchedColor('document_in_block')}\n`,
         ], [
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + ("     #keyword: " + matchedColor('picture') + "  " + refColor('#ref: path') + "  #search: " + searchColor('keyword') + "\n") +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + `     #keyword: ${matchedColor('picture')}  ${refColor('#ref: path')}  #search: ${searchColor('keyword')}\n` +
                 'path\n' +
                 '    0.Folder\n',
         ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ], [
             "target is file",
             ["search", "wonderful"],
             { folder: "test_data/search/2/2.yaml", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':85:') + ("     #keyword: " + matchedColor('wonderful') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':85:') + `     #keyword: ${matchedColor('wonderful')}\n`,
         ], [
             "file extension filter",
             ["search", "target"],
             { folder: "test_data/search/3/*.yaml", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/3/31.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('target') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/3/31.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('target')}\n`,
         ], [
             "Windows typrm folder path",
             ["search", "ABC"],
-            { folder: process.cwd() + "\\test_data\\search\\1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"),
+            { folder: `${process.cwd()}\\test_data\\search\\1`, test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],
-    ])("%s", function (caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-        var isWindowsEnvironment, isWindowsCase;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    isWindowsEnvironment = (path.sep === '\\');
-                    isWindowsCase = (caseName.indexOf('Windows') !== notFound);
-                    if (!isWindowsEnvironment && isWindowsCase) {
-                        return [2 /*return*/];
-                    }
-                    return [4 /*yield*/, callMain(arguments_, options)];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toBe(answer);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    describe("thesaurus >>", function () {
+    ])("%s", async (caseName, arguments_, options, answer) => {
+        const isWindowsEnvironment = (path.sep === '\\');
+        const isWindowsCase = (caseName.indexOf('Windows') !== notFound);
+        if (!isWindowsEnvironment && isWindowsCase) {
+            return;
+        }
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
+    describe("thesaurus >>", () => {
         test.each([
             [
                 "acronym",
                 ["search", "PS"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", test: "" },
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('PowerShell') + "\n"),
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
             ], [
                 "ignore case",
                 ["search", "ps"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", test: "" },
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + (" #keyword: " + matchedColor('PowerShell') + "\n"),
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
             ],
-        ])("%s", function (caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-            var sourceFileContents, thesaurusFileContents;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        sourceFileContents = lib.getSnapshot("searches keyword tag >> thesaurus >> " + caseName + ": sourceFileContents 1");
-                        thesaurusFileContents = lib.getSnapshot("searches keyword tag >> thesaurus >> " + caseName + ": thesaurus 1");
-                        fs.rmdirSync('test_data/_checking', { recursive: true });
-                        writeFileSync("test_data/_checking/thesaurus/1.yaml", sourceFileContents);
-                        writeFileSync("test_data/_checking/thesaurus/thesaurus.csv", thesaurusFileContents);
-                        return [4 /*yield*/, callMain(arguments_, options)];
-                    case 1:
-                        _a.sent();
-                        expect(main.stdout).toBe(answer);
-                        fs.rmdirSync('test_data/_checking', { recursive: true });
-                        return [2 /*return*/];
-                }
-            });
-        }); });
+        ])("%s", async (caseName, arguments_, options, answer) => {
+            const sourceFileContents = lib.getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: sourceFileContents 1`);
+            const thesaurusFileContents = lib.getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: thesaurus 1`);
+            fs.rmdirSync('test_data/_checking', { recursive: true });
+            writeFileSync(`test_data/_checking/thesaurus/1.yaml`, sourceFileContents);
+            writeFileSync(`test_data/_checking/thesaurus/thesaurus.csv`, thesaurusFileContents);
+            await callMain(arguments_, options);
+            expect(main.stdout).toBe(answer);
+            fs.rmdirSync('test_data/_checking', { recursive: true });
+        });
     });
 });
-describe("searches glossary tag >>", function () {
+describe("searches glossary tag >>", () => {
     test.each([
         [
             "1st",
             ["search", "ABC"],
             { folder: "test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n`,
         ], [
             "ignore case",
             ["search", "abc"],
             { folder: "test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n`,
         ], [
             "word",
             ["search", "AB"],
             { folder: "test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('AB') + "C: abc\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('AB')}C: abc\n`,
         ], [
             "nested indent",
             ["search", "ABC"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + "D: abcd\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':4:') + ("     " + matchedColor('ABC') + ": abc\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}D: abcd\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':4:') + `     ${matchedColor('ABC')}: abc\n`,
         ], [
             "skip comment",
             ["search", "comment"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':26:') + ("     " + matchedColor('comment') + ": hit\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':26:') + `     ${matchedColor('comment')}: hit\n`,
         ], [
             "output order (1)",
             ["search", "de"],
             { folder: "test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ("     " + matchedColor('DE') + ": de\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ("     " + matchedColor('de') + ": de\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + `     ${matchedColor('DE')}: de\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + `     ${matchedColor('de')}: de\n`,
         ], [
             "output order (2)",
             ["search", "DE"],
             { folder: "test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ("     " + matchedColor('de') + ": de\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ("     " + matchedColor('DE') + ": de\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + `     ${matchedColor('de')}: de\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + `     ${matchedColor('DE')}: de\n`,
         ], [
             "output order (3)",
             ["search", "search score comparison glossary"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':39:') + (" " + matchedColor('search') + " " + matchedColor('score') + ":        " + matchedColor('comparison') + " " + matchedColor('glossary') + " and keyword: 3\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':41:') + ("         #keyword: " + matchedColor('search') + " " + matchedColor('score') + " " + matchedColor('comparison') + " " + matchedColor('glossary') + " and keyword\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':38:') + (" " + matchedColor('search') + " " + matchedColor('score') + ":        " + matchedColor('comparison') + " " + matchedColor('glossary') + ": 2\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':39:') + ` ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword: 3\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':41:') + `         #keyword: ${matchedColor('search')} ${matchedColor('score')} ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':38:') + ` ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')}: 2\n`,
         ], [
             "glossary is less score than keyword",
             ["search", "grape"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ("         " + matchedColor('grape') + ":\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ("         " + matchedColor('grape') + ":\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + ("     keyword:  #keyword: " + matchedColor('grape') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + `         ${matchedColor('grape')}:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + `         ${matchedColor('grape')}:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + `     keyword:  #keyword: ${matchedColor('grape')}\n`,
         ], [
             "glossary with empty line",
             ["search", "space"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + ("     " + matchedColor('space') + "1:\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + ("     " + matchedColor('space') + "2:\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + `     ${matchedColor('space')}1:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + `     ${matchedColor('space')}2:\n`,
         ], [
             "glossary with parameters (1)",
             ["search", "category1 apple"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + (" " + matchedColor('category1') + ":    " + matchedColor('apple') + ": juice\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
         ], [
             "glossary with parameters (2)",
             ["search", "apple category1"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + (" " + matchedColor('category1') + ":    " + matchedColor('apple') + ": juice\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
         ], [
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ("     " + matchedColor('picture') + ":  " + refColor('#ref: path#hash') + "  #search: " + searchColor('keyword') + "\n") +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + `     ${matchedColor('picture')}:  ${refColor('#ref: path#hash')}  #search: ${searchColor('keyword')}\n` +
                 'path#hash\n' +
                 '    0.Folder\n',
         ], [
             "nested glossary tag",
             ["search", "turnip"],
             { folder: "test_data/search/glossary/2", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':33:') + (" level-2:        white " + matchedColor('turnip') + ":\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':34:') + (" level-1:    " + matchedColor('turnip') + " soup:\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':32:') + (" level-2:        red " + matchedColor('turnip') + ":\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':31:') + (" level-1:    " + matchedColor('turnip') + ": #glossary: level-2\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':33:') + ` level-2:        white ${matchedColor('turnip')}:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':34:') + ` level-1:    ${matchedColor('turnip')} soup:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':32:') + ` level-2:        red ${matchedColor('turnip')}:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':31:') + ` level-1:    ${matchedColor('turnip')}: #glossary: level-2\n`,
         ], [
             "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ("     " + matchedColor('ABC') + ": abc\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + (" #keyword: " + matchedColor('ABC') + ", \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + `     ${matchedColor('ABC')}: abc\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` #keyword: ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],
-    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, options)];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toBe(answer);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
 });
-describe("find >>", function () {
+describe("find >>", () => {
     test.each([
         [
             "1st",
             ["find", "not"],
             { folder: "test_data/search/1", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':2:') + (" " + matchedColor('Not') + " keyword  ABC, \"do it\", \"a,b\"\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':2:') + ` ${matchedColor('Not')} keyword  ABC, "do it", "a,b"\n`,
         ],
-    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, options)];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toBe(answer);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
 });
-describe("mutual search >>", function () {
+describe("mutual search >>", () => {
     test.each([
         [
             "1st",
             ["mutual-search", "AAA"],
             { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':1:') + (" Index: #search: " + matchedColor('AAA') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + (" Target: #keyword: " + matchedColor('AAA') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + ` Target: #keyword: ${matchedColor('AAA')}\n`,
         ], [
             "not mutual",
             ["search", "AAA"],
             { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + (" Target: #keyword: " + matchedColor('AAA') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + ` Target: #keyword: ${matchedColor('AAA')}\n`,
         ],
-    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, callMain(arguments_, options)];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toBe(answer);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
 });
-describe("where variable >>", function () {
+describe("where variable >>", () => {
     test.each([
         [
             "1st",
             ["where", "__VarA__"],
             { folder: "test_data/_search_target", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/sub/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/sub/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
         ],
         [
             "in the file",
             ["where", "__VarA__", "1.yaml"],
             { folder: "test_data/_search_target", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n") +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
         ],
         [
             "in the file near the line number (1)",
             ["where", "__VarA__", "1.yaml", "5"],
             { folder: "test_data/_search_target", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
         ],
         [
             "in the file near the line number (2)",
             ["where", "__VarA__", "1.yaml", "6"],
             { folder: "test_data/_search_target", test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + ("     " + '__VarA__' + ": " + valueColor('valueA') + "\n"),
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
         ],
-    ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-        var sourceFileContents, subSourceFileContents;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    sourceFileContents = lib.getSnapshot("where variable >> all : sourceFileContents 1");
-                    subSourceFileContents = lib.getSnapshot("where variable >> sub : sourceFileContents 1");
-                    fs.rmdirSync('test_data/_search_target', { recursive: true });
-                    writeFileSync("test_data/_search_target/1.yaml", sourceFileContents);
-                    writeFileSync("test_data/_search_target/sub/1.yaml", subSourceFileContents);
-                    return [4 /*yield*/, callMain(arguments_, options)];
-                case 1:
-                    _a.sent();
-                    expect(main.stdout).toBe(answer);
-                    fs.rmdirSync('test_data/_search_target', { recursive: true });
-                    return [2 /*return*/];
-            }
-        });
-    }); });
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        const sourceFileContents = lib.getSnapshot(`where variable >> all : sourceFileContents 1`);
+        const subSourceFileContents = lib.getSnapshot(`where variable >> sub : sourceFileContents 1`);
+        fs.rmdirSync('test_data/_search_target', { recursive: true });
+        writeFileSync(`test_data/_search_target/1.yaml`, sourceFileContents);
+        writeFileSync(`test_data/_search_target/sub/1.yaml`, subSourceFileContents);
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+        fs.rmdirSync('test_data/_search_target', { recursive: true });
+    });
 });
-describe("print reference >>", function () {
-    describe("basic >>", function () {
+describe("print reference >>", () => {
+    describe("basic >>", () => {
         test.each([
             [
                 "1st",
@@ -1179,19 +995,12 @@ describe("print reference >>", function () {
                 "\\\\pc\\folder\\file.txt\n" +
                     "    0.Folder\n",
             ],
-        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
-                    case 1:
-                        _a.sent();
-                        expect(main.stdout).toBe(answer);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
+        ])("%s", async (_caseName, arguments_, options, answer) => {
+            await callMain(arguments_, options);
+            expect(main.stdout).toBe(answer);
+        });
     });
-    describe("line number getter >>", function () {
+    describe("line number getter >>", () => {
         test.each([
             [
                 "lineNum",
@@ -1223,19 +1032,12 @@ describe("print reference >>", function () {
                 { locale: "en-US", test: "" },
                 'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n',
             ],
-        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
-                    case 1:
-                        _a.sent();
-                        expect(main.stdout).toBe(answer);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
+        ])("%s", async (_caseName, arguments_, options, answer) => {
+            await callMain(arguments_, options);
+            expect(main.stdout).toBe(answer);
+        });
     });
-    describe("recommend >>", function () {
+    describe("recommend >>", () => {
         test.each([
             [
                 "recommend",
@@ -1253,31 +1055,23 @@ describe("print reference >>", function () {
                     "    0.Folder\n",
             ], [
                 "Do not recommend reserved variables",
-                ["search", "#ref: TYPRM_FOLDER"],
+                ["search", `#ref: TYPRM_FOLDER`],
                 { locale: "en-US", test: "" },
                 "TYPRM_FOLDER\n" +
                     "    0.Folder\n",
             ],
-        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (arguments_[1].includes('TYPRM_FOLDER')) {
-                            process.env.TYPRM_FOLDER = 'TYPRM_FOLDER';
-                        }
-                        return [4 /*yield*/, callMain(arguments_, options)];
-                    case 1:
-                        _a.sent();
-                        expect(main.stdout).toBe(answer);
-                        if (arguments_[1].includes('TYPRM_FOLDER')) {
-                            delete process.env.TYPRM_FOLDER;
-                        }
-                        return [2 /*return*/];
-                }
-            });
-        }); });
+        ])("%s", async (_caseName, arguments_, options, answer) => {
+            if (arguments_[1].includes('TYPRM_FOLDER')) {
+                process.env.TYPRM_FOLDER = 'TYPRM_FOLDER';
+            }
+            await callMain(arguments_, options);
+            expect(main.stdout).toBe(answer);
+            if (arguments_[1].includes('TYPRM_FOLDER')) {
+                delete process.env.TYPRM_FOLDER;
+            }
+        });
     });
-    describe("verb >>", function () {
+    describe("verb >>", () => {
         test.each([
             [
                 "verb",
@@ -1368,29 +1162,22 @@ describe("print reference >>", function () {
                             "Error that verb number 4 is not defined\n",
             ],
             // Others test is "search_mode_ref_verb".
-        ])("%s", function (_caseName, arguments_, options, answer) { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, callMain(arguments_, options)];
-                    case 1:
-                        _a.sent();
-                        expect(main.stdout).toBe(answer);
-                        return [2 /*return*/];
-                }
-            });
-        }); });
+        ])("%s", async (_caseName, arguments_, options, answer) => {
+            await callMain(arguments_, options);
+            expect(main.stdout).toBe(answer);
+        });
     });
 });
-describe("test of test >>", function () {
-    test("checks snapshots files are confirmed", function () {
-        var activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
-        var backUpSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap.confirmed-ts').toString();
+describe("test of test >>", () => {
+    test("checks snapshots files are confirmed", () => {
+        const activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
+        const backUpSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap.confirmed-ts').toString();
         // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
         // ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです
         expect(activeSnapshots).toBe(backUpSnapshots);
     });
 });
-afterAll(function () {
+afterAll(() => {
     deleteFileSync('test_data/_output.txt');
     fs.rmdirSync('empty_folder', { recursive: true });
 });
@@ -1398,7 +1185,7 @@ afterAll(function () {
 // #keyword: writeFileSync
 // This also makes the copy target folder.
 function writeFileSync(filePath, fileContents) {
-    var destinationFolderPath = path.dirname(filePath);
+    const destinationFolderPath = path.dirname(filePath);
     fs.mkdirSync(destinationFolderPath, { recursive: true });
     fs.writeFileSync(filePath, fileContents);
 }
@@ -1423,19 +1210,19 @@ function getFullPath(relativePath, basePath) {
 }
 // printDifferentPaths
 function printDifferentPaths(path1, path2) {
-    console.log("Error: different between the following files");
-    console.log("  Path1: " + (testFolderFullPath + path1));
-    console.log("  Path2: " + (testFolderFullPath + path2));
+    console.log(`Error: different between the following files`);
+    console.log(`  Path1: ${testFolderFullPath + path1}`);
+    console.log(`  Path2: ${testFolderFullPath + path2}`);
 }
-var testFolderFullPath = getFullPath("../src/" + testFolderPath, __dirname);
+const testFolderFullPath = getFullPath(`../src/${testFolderPath}`, __dirname);
 expect.extend({
-    because: function (isPassed, errorMessage) {
+    because(isPassed, errorMessage) {
         return {
             pass: isPassed,
-            message: function () { return errorMessage; },
+            message: () => errorMessage,
         };
     },
 });
-var cutBOM = 1;
-var notFound = -1;
+const cutBOM = 1;
+const notFound = -1;
 //# sourceMappingURL=main.test.js.map

@@ -2,10 +2,12 @@ import * as fs from "fs";
 import * as path from "path";
 import globby from 'globby';
 import * as readline from 'readline';
+import { ReadLineOptions } from 'readline';
 import * as stream from 'stream';
-import csvParse from 'csv-parse';
-import { stringify } from "querystring";
-const  snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
+import * as csvParse from 'csv-parse';
+import { Readable, Writable } from 'stream';
+// @ts-ignore
+import { snapshots } from './lib-cjs.cjs';
 
 
 // File group
@@ -48,6 +50,77 @@ export function  replaceFileSync(sourceFilePath: string, replaceFunction: {(text
         destinationFilePath = sourceFilePath;
     }
     fs.writeFileSync(destinationFilePath, replacedText);
+}
+
+// replaceFileAsync
+// #keyword: lib.ts replaceFileAsync
+// replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
+export async function  replaceFileAsync(sourceFilePath: string, replaceFunction: {(text: string): Promise<string>}, destinationFilePath: string = '') {
+    const  text = fs.readFileSync(sourceFilePath, 'utf-8');
+    const  replacedText = await replaceFunction(text);
+    if (destinationFilePath === '') {
+        destinationFilePath = sourceFilePath;
+    }
+    fs.writeFileSync(destinationFilePath, replacedText);
+}
+
+// searchAsTextSub
+export async function  searchAsTextSub(readlineOptions: ReadLineOptions, keyword: string, csvOption: boolean): /* lineNum */ Promise<number> {
+    if (csvOption) {
+        var    keywords = await parseCSVColumns(keyword);
+        const  firstKeyword = keywords.shift();
+        if ( ! firstKeyword) {
+            throw Error(`ERROR: no keywords`);
+        }
+        var  currentKeyword = firstKeyword;
+    } else {
+        var  keywords = [keyword];
+        var  currentKeyword = keyword;
+    }
+
+    var  lineNum = 0;
+    var  breaking = false;
+    var  exception: any;
+    const  reader = readline.createInterface(addDefaultReadLineOptions(readlineOptions));
+
+    for await (const line1 of reader) {
+        if (breaking) {continue;}  // "reader" requests read all lines
+        try {
+            const  line: string = line1;
+            lineNum += 1;
+
+            if (line.includes(currentKeyword)) {
+                if ( ! csvOption) {
+                    breaking = true;  // return or break must not be written.
+                        // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                } else { // csvOption
+                    const  nextKeyword = keywords.shift();
+                    if ( ! nextKeyword) {
+                        breaking = true;  // return or break must not be written.
+                        currentKeyword = '';
+                    } else {
+                        currentKeyword = nextKeyword;
+                    }
+                }
+            }
+        } catch (e) {
+            exception = e;
+            breaking = true;
+        }
+    }
+    if (exception) {
+        throw exception;
+    }
+    if ( ! breaking) {
+        lineNum = 0;
+    }
+
+    return  lineNum;
+}
+
+// addDefaultReadLineOptions
+function  addDefaultReadLineOptions(localOptions: ReadLineOptions): ReadLineOptions {
+    return {crlfDelay: Infinity, ...localOptions};
 }
 
 // pathResolve
@@ -238,7 +311,7 @@ export async function  parseCSVColumns(columns: string): Promise<string[]> {
 
             stream.Readable.from(columns)
                 .pipe(
-                    csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
+                    csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
                 )
                 .on('data', (columns: string[]) => {
                     columnArray = columns;
@@ -276,19 +349,113 @@ export function  escapeRegularExpression(expression: string) {
 
 // replace
 export function  replace(input: string, replacers: ReplaceParameter[]): string {
-    var  replaced = input;
+    var  replacing = input;
     for (const replacer of replacers) {
-        replaced = replaced.replace(replacer.from, replacer.to);
+        var  optionCount = 0;
+        if (replacer.from) {
+            optionCount += 1;
+        }
+        if (replacer.fromCSV) {
+            throw new Error('"ReplaceParameter.fromCSV" must be called with replaceAsync function');
+        }
+        if (replacer.lineNum) {
+            throw new Error('"ReplaceParameter.lineNum" must be called with replaceAsync function');
+        }
+        if (optionCount !== 1) {
+            throw new Error('"ReplaceParameter" must set either "from", "fromCSV" or "lineNum" attribute');
+        }
+
+        if (replacer.from) {
+            replacing = replacing.replace(replacer.from, replacer.to);
+        }
     }
+    const  replaced = replacing;
+    return  replaced;
+}
+
+// replaceAsync
+export async function  replaceAsync(input: string, replacers: ReplaceParameter[]): Promise<string> {
+    var  replacing = input;
+    for (const replacer of replacers) {
+        var  optionCount = 0;
+        if (replacer.from) {
+            optionCount += 1;
+        }
+        if (replacer.fromCSV) {
+            optionCount += 1;
+        }
+        if (replacer.lineNum) {
+            optionCount += 1;
+        }
+        if (optionCount !== 1) {
+            throw new Error('"ReplaceParameter" must set either "from", "fromCSV" or "lineNum" attribute');
+        }
+
+        if (replacer.from) {
+            replacing = replacing.replace(replacer.from, replacer.to);
+        }
+
+        if (replacer.lineNum) {
+            const  stream = new Readable();
+            stream.push(replacing);
+            stream.push(null);
+            const  reader = readline.createInterface({
+                input: stream,
+                crlfDelay: Infinity
+            });
+            const  writer = new WritableMemoryStream();
+            var  lineNum = 0;
+
+            for await (const line1 of reader) {
+                const  line: string = line1;
+                lineNum += 1;
+
+                if (lineNum === replacer.lineNum) {
+                    writer.write(`${replacer.to}\n`);
+                } else {
+                    writer.write(`${line}\n`);
+                }
+            }
+            replacing = writer.toString();
+        }
+
+        if (replacer.fromCSV) {
+            const  inputStream = Readable.from(replacing);
+
+            const  lineNum = await searchAsTextSub({input: inputStream}, replacer.fromCSV, true);
+            replacing = await replaceAsync(replacing, [{ lineNum,  to: replacer.to }]);
+        }
+    }
+    const  replaced = replacing;
     return  replaced;
 }
 
 // ReplaceParameter
 interface ReplaceParameter {
-    from: string;
+    from?: string;
+    fromCSV?: string;
+    lineNum?: number;
     to: string;
 }
 
+// WritableMemoryStream
+class WritableMemoryStream extends Writable {
+    private array: string[];
+
+    constructor() {
+        super();
+        this.array = [];
+    }
+
+    _write(chunk: any, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
+        this.array.push(chunk);
+        callback();
+    }
+
+    toString(): string {
+        return this.array.join('');
+    }
+}
 
 // StandardInputBuffer
 class  StandardInputBuffer {
@@ -527,7 +694,7 @@ export function  pp(message: any) {
         }
     } else {
         if (typeof message === 'object') {
-            message = JSON.stringify(message);
+            message = JSON.stringify(message, null, '    ');
         } else if (message === undefined) {
             message = '(undefined)';
         } else if (message === null) {

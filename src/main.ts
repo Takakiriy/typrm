@@ -1,8 +1,8 @@
 import * as fs from 'fs'; // file system
-import * as path from "path";  // or path = require("path")
+import * as path from "path";
 import * as readline from 'readline';
 import globby from 'globby';
-import csvParse from 'csv-parse';
+import * as csvParse from 'csv-parse';
 import chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
@@ -2753,28 +2753,28 @@ function  checkLineNoConfilict(keyValue: {[key: string]: string}, key: string, n
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
-    const  cSearch = 1;
-    const  cPrintRef = 2;
-    const  cRunVerb = 3;
+    const  search_ = 1;
+    const  printRef_ = 2;
+    const  runVerb_ = 3;
 
     if (keyword !== '') {
         const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
         const  hasVerb = numberRegularExpression.test(lastWord);
-        var  command = cSearch;
+        var  command = search_;
         if (hasRefTag(keyword)) {
             if (hasVerb) {
-                command = cRunVerb;
+                command = runVerb_;
             } else {
-                command = cPrintRef;
+                command = printRef_;
             }
         }
-        if (command === cSearch) {
+        if (command === search_) {
 
             await  searchSub(keyword, false);
-        } else if (command === cPrintRef) {
+        } else if (command === printRef_) {
 
             await  printRef(keyword);
-        } else if (command === cRunVerb){
+        } else if (command === runVerb_){
             const  keywordWithoutVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
             const  ref = await printRef(keywordWithoutVerb, {print: false});
 
@@ -2799,22 +2799,22 @@ async function  search() {
                 previousPrint.hasVerbMenu = false;
                 previousPrint.hasFindMenu = false;
             } else {
-                var  command = cSearch;
+                var  command = search_;
                 if (previousPrint.hasVerbMenu  &&  numberRegularExpression.test(keyword)) {
-                    command = cRunVerb;
+                    command = runVerb_;
                 } else if (hasRefTag(keyword)) {
-                    command = cPrintRef;
+                    command = printRef_;
                 }
-                if (command === cSearch) {
+                if (command === search_) {
 
                     previousPrint = await searchSub(keyword, false);
                     if (previousPrint.hasFindMenu) {
                         console.log(translate`Not found. To do full text search, press Enter key.`);
                     }
-                } else if (command === cPrintRef) {
+                } else if (command === printRef_) {
 
                     previousPrint = await printRef(keyword);
-                } else if (command === cRunVerb) {
+                } else if (command === runVerb_) {
                     const  verbNumber = keyword;
 
                     runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
@@ -4835,7 +4835,7 @@ class Thesaurus {
 
             fs.createReadStream(csvFilePath)
                 .pipe(
-                    csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
+                    csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data',
                     (columns: string[]) => {
                         if (columns.length >= 1) {
@@ -4985,7 +4985,6 @@ interface  FilePathAndKeyword {
     filePath: string;
     keyword: string;
     csvOption: boolean;
-    targetMatchID: number;
 }
 
 // splitFilePathAndKeyword
@@ -5029,90 +5028,22 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
         }
     }
 
-    var  targetMatchID = 1;
-    if (parameters.length >= getter.targetMatchIdRegularExpressionIndex) {
-        targetMatchID = parseInt(parameters[getter.targetMatchIdRegularExpressionIndex]);
-        if ( ! targetMatchID  ||  targetMatchID < 1) {
-            targetMatchID = 1;
-        }
-    }
-
     return {
         filePath: parameters[getter.filePathRegularExpressionIndex],
         keyword:  parameters[getter.keywordRegularExpressionIndex],
         csvOption,
-        targetMatchID,
     } as FilePathAndKeyword;
 }
 
 // searchAsText
 async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<FilePathLineNum> {
-    const  { filePath, keyword, csvOption, targetMatchID } = splitFilePathAndKeyword(address,  getter);
+    const  { filePath, keyword, csvOption } = splitFilePathAndKeyword(address,  getter);
     if ( ! fs.existsSync(filePath)) {
         console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
         return  { filePath, lineNum: notFound };
     }
-    if (csvOption) {
-        var    keywords = await lib.parseCSVColumns(keyword);
-        const  firstKeyword = keywords.shift();
-        if ( ! firstKeyword) {
-            console.log(`ERROR: no keywords at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
-            return  { filePath, lineNum: notFound };
-        }
-        if (targetMatchID !== 1) {
-            console.log(`ERROR: both csvOption and targetMatchID must not be specified at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
-            return  { filePath, lineNum: notFound };
-        }
-        var  currentKeyword = firstKeyword;
-    } else {
-        var  keywords = [keyword];
-        var  currentKeyword = keyword;
-    }
 
-    const  reader = readline.createInterface({
-        input: fs.createReadStream(filePath),
-        crlfDelay: Infinity
-    });
-    var  lineNum = 0;
-    var  breaking = false;
-    var  exception: any;
-    var  foundCount = 0;
-
-    for await (const line1 of reader) {
-        if (breaking) {continue;}  // "reader" requests read all lines
-        try {
-            const  line: string = line1;
-            lineNum += 1;
-
-            if (line.includes(currentKeyword)) {
-                if ( ! csvOption) {
-                    foundCount += 1;
-                    if (foundCount >= targetMatchID) { // targetMatchID
-                        breaking = true;  // return or break must not be written.
-                        // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
-                    }
-                } else { // csvOption
-                    const  nextKeyword = keywords.shift();
-                    if ( ! nextKeyword) {
-                        breaking = true;  // return or break must not be written.
-                        currentKeyword = '';
-                    } else {
-                        currentKeyword = nextKeyword;
-                    }
-                }
-            }
-        } catch (e) {
-            exception = e;
-            breaking = true;
-        }
-    }
-    if (exception) {
-        throw exception;
-    }
-    if ( ! breaking) {
-        lineNum = 0;
-    }
-
+    const  lineNum = await lib.searchAsTextSub({input: fs.createReadStream(filePath)}, keyword, csvOption);
     return  { filePath, lineNum };
 }
 

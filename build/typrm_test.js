@@ -1,241 +1,152 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var fs = require("fs");
-var child_process = require("child_process");
-var path = require("path");
-var lib = require("./lib");
-var currentFolder = process.cwd();
-var snapshots = require(currentFolder + "/__snapshots__/main.test.ts.snap");
-var scriptPath = "../build/typrm.js";
-var testFolderPath = "test_data" + path.sep;
+import * as fs from 'fs';
+import * as child_process from 'child_process';
+import * as url from 'url';
+import * as path from 'path';
+import * as lib from './lib';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const scriptPath = `../build/typrm.js`;
+const testFolderPath = `test_data` + path.sep;
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
-process.env.TYPRM_LINE_NUM_GETTER = "\n    - #\n        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?$\n        type: text\n        filePathRegularExpressionIndex: 1\n        keywordRegularExpressionIndex: 4\n        address: \"${file}:${lineNum}\"\n";
-process.env.TYPRM_VERB = "\n    - #\n        label: 7.Test Echo\n        number: 7\n        regularExpression: .*\n        command: 'echo  \"ref:  ${ref}\";  echo  \"file: ${file}\";  echo  \"fragment: ${fragment}\";  echo  \"lineNum: ${lineNum}\"'\n";
+process.env.TYPRM_LINE_NUM_GETTER = `
+    - #
+        regularExpression: ^(.*\\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?\$
+        type: text
+        filePathRegularExpressionIndex: 1
+        keywordRegularExpressionIndex: 4
+        address: "\${file}:\${lineNum}"
+`;
+process.env.TYPRM_VERB = `
+    - #
+        label: 7.Test Echo
+        number: 7
+        regularExpression: .*
+        command: 'echo  "ref:  \${ref}";  echo  "file: \${file}";  echo  "fragment: \${fragment}";  echo  "lineNum: \${lineNum}"'
+`;
 if (process.env.windir) {
     var testingOS = 'Windows';
 }
 else {
     var testingOS = 'mac';
 }
-function main() {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!false) return [3 /*break*/, 2];
-                    return [4 /*yield*/, DoCustomDebug()];
-                case 1:
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 2: return [4 /*yield*/, TestOfCommandLine()];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4:
-                    console.log('Pass');
-                    return [2 /*return*/];
-            }
-        });
-    });
+async function main() {
+    if (false) {
+        await DoCustomDebug();
+    }
+    else {
+        await TestOfCommandLine();
+    }
+    console.log('Pass');
 }
 // DoCustomDebug
-function DoCustomDebug() {
-    return __awaiter(this, void 0, void 0, function () {
-        var returns;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, callChildProccess("node " + scriptPath + " r C:\\Users\\user1\\steps\\!Temp.yaml 7 \"__RepositoryName__: afa\"", {})];
-                case 1:
-                    returns = _a.sent();
-                    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});
-                    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" ~/GitProjects 0`, {});
-                    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
-                    // const  returns = await callChildProccess(`node ${scriptPath} --verbose c C:\\Users\\user1\\steps\\!Temp.yaml`, {});
-                    // const  returns = await callChildProccess(`node ${scriptPath} s DSL --folder /Users/totadashi/Documents/typrm`, {});
-                    console.log("(typrm_test.ts) " + returns.stdout);
-                    console.log('Done');
-                    return [2 /*return*/];
-            }
-        });
-    });
+async function DoCustomDebug() {
+    const returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
+    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});
+    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" ~/GitProjects 0`, {});
+    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
+    // const  returns = await callChildProccess(`node ${scriptPath} --verbose c C:\\Users\\user1\\steps\\!Temp.yaml`, {});
+    // const  returns = await callChildProccess(`node ${scriptPath} s DSL --folder /Users/totadashi/Documents/typrm`, {});
+    console.log(`(typrm_test.ts) ${returns.stdout}`);
+    console.log('Done');
 }
 // TestOfFileCheck
-function TestOfCommandLine() {
-    return __awaiter(this, void 0, void 0, function () {
-        var returns, cases, _i, cases_1, case_, noData, answer, answer2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    cases = [{
-                            "name": "version",
-                            "parameters": "--version",
-                            "check": "false",
-                            "inputLines": "",
-                        }, {
-                            "name": "locale",
-                            "parameters": "search ABC --folder test_data/search/1",
-                            "check": "true",
-                            "inputLines": "",
-                        }, {
-                            "name": "search_mode",
-                            "parameters": "search  --folder test_data/search/1",
-                            "check": "true",
-                            "inputLines": "ABC\nexit()\n",
-                        }, {
-                            "name": "search_mode_ref_verb",
-                            "parameters": "search",
-                            "check": "true",
-                            "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
-                        }, {
-                            "name": "search_mode_find",
-                            "parameters": "search  --folder test_data/search/1",
-                            "check": "true",
-                            "inputLines": "Not\n\nexit()\n",
-                        }, {
-                            "name": "search_mode_result_has_ref_verb",
-                            "parameters": "search  --folder test_data/search/2",
-                            "check": "true",
-                            "inputLines": "file_path\nexit()\n",
-                        }];
-                    _i = 0, cases_1 = cases;
-                    _a.label = 1;
-                case 1:
-                    if (!(_i < cases_1.length)) return [3 /*break*/, 4];
-                    case_ = cases_1[_i];
-                    if (!(true || case_.name === 'search_mode_ref_verb')) return [3 /*break*/, 3];
-                    console.log("\nTestCase: TestOfCommandLine >> " + case_.name);
-                    return [4 /*yield*/, callChildProccess("node " + scriptPath + " " + case_.parameters + " --test", { inputLines: case_.inputLines.split('\n') })];
-                case 2:
-                    // Test Main
-                    returns = _a.sent();
-                    // Check
-                    if (case_.check === 'true') {
-                        noData = 'no data';
-                        answer = lib.getSnapshot("typrm_test >> TestOfCommandLine >> " + case_.name + " >> " + testingOS + ": stdout 1");
-                        answer2 = lib.getSnapshot("typrm_test >> TestOfCommandLine >> " + case_.name + " >> " + testingOS + "2: stdout 1", noData);
-                        if (returns.stdout !== answer && returns.stdout !== answer2) {
-                            if (answer2 === noData) {
-                                printDifferentPaths('_output.txt', '_expected.txt');
-                            }
-                            else {
-                                printDifferentPaths('_output.txt', '_expected.txt', '_expected2.txt');
-                            }
-                            fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                            fs.writeFileSync(testFolderPath + "_expected.txt", answer);
-                            fs.writeFileSync(testFolderPath + "_expected2.txt", answer);
-                            throw new Error();
-                        }
+async function TestOfCommandLine() {
+    var returns;
+    var cases = [{
+            "name": "version",
+            "parameters": "--version",
+            "check": "false",
+            "inputLines": "",
+        }, {
+            "name": "locale",
+            "parameters": "search ABC --folder test_data/search/1",
+            "check": "true",
+            "inputLines": "",
+        }, {
+            "name": "search_mode",
+            "parameters": "search  --folder test_data/search/1",
+            "check": "true",
+            "inputLines": "ABC\nexit()\n",
+        }, {
+            "name": "search_mode_ref_verb",
+            "parameters": "search",
+            "check": "true",
+            "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
+        }, {
+            "name": "search_mode_find",
+            "parameters": "search  --folder test_data/search/1",
+            "check": "true",
+            "inputLines": "Not\n\nexit()\n",
+        }, {
+            "name": "search_mode_result_has_ref_verb",
+            "parameters": "search  --folder test_data/search/2",
+            "check": "true",
+            "inputLines": "file_path\nexit()\n",
+        }];
+    for (const case_ of cases) {
+        if (true || case_.name === 'search_mode_ref_verb') {
+            console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
+            // Test Main
+            returns = await callChildProccess(`node ${scriptPath} ${case_.parameters} --test`, { inputLines: case_.inputLines.split('\n') });
+            // Check
+            if (case_.check === 'true') {
+                const noData = 'no data';
+                const answer = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
+                const answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
+                if (returns.stdout !== answer && returns.stdout !== answer2) {
+                    if (answer2 === noData) {
+                        printDifferentPaths('_output.txt', '_expected.txt');
                     }
-                    _a.label = 3;
-                case 3:
-                    _i++;
-                    return [3 /*break*/, 1];
-                case 4:
-                    deleteFile(testFolderPath + "_output.txt");
-                    deleteFile(testFolderPath + "_expected.txt");
-                    deleteFile(testFolderPath + "_expected2.txt");
-                    return [2 /*return*/];
+                    else {
+                        printDifferentPaths('_output.txt', '_expected.txt', '_expected2.txt');
+                    }
+                    fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
+                    fs.writeFileSync(testFolderPath + "_expected.txt", answer);
+                    fs.writeFileSync(testFolderPath + "_expected2.txt", answer);
+                    throw new Error();
+                }
             }
-        });
-    });
+        }
+    }
+    deleteFile(testFolderPath + "_output.txt");
+    deleteFile(testFolderPath + "_expected.txt");
+    deleteFile(testFolderPath + "_expected2.txt");
 }
 // callChildProccess
-function callChildProccess(commandLine, option) {
-    return __awaiter(this, void 0, void 0, function () {
-        var _this = this;
-        return __generator(this, function (_a) {
-            return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) { return __awaiter(_this, void 0, void 0, function () {
-                    var returnValue, childProcess, _i, _a, inputLine, e_1;
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
-                            case 0:
-                                returnValue = new ProcessReturns();
-                                _b.label = 1;
-                            case 1:
-                                _b.trys.push([1, 8, , 9]);
-                                childProcess = child_process.exec(commandLine, 
-                                // on close the "childProcess" (2)
-                                function (error, stdout, stderr) {
-                                    returnValue.stdout = stdout;
-                                    returnValue.stderr = stderr;
-                                    resolveFunction(returnValue);
-                                });
-                                if (!(option && childProcess.stdin)) return [3 /*break*/, 7];
-                                if (!option.inputLines) return [3 /*break*/, 6];
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 300); })];
-                            case 2:
-                                _b.sent();
-                                _i = 0, _a = option.inputLines;
-                                _b.label = 3;
-                            case 3:
-                                if (!(_i < _a.length)) return [3 /*break*/, 6];
-                                inputLine = _a[_i];
-                                console.log(inputLine);
-                                childProcess.stdin.write(inputLine + "\n");
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 200); })];
-                            case 4:
-                                _b.sent();
-                                _b.label = 5;
-                            case 5:
-                                _i++;
-                                return [3 /*break*/, 3];
-                            case 6:
-                                childProcess.stdin.end();
-                                _b.label = 7;
-                            case 7:
-                                // on close the "childProcess" (1)
-                                childProcess.on('close', function (exitCode) {
-                                    returnValue.exitCode = exitCode;
-                                });
-                                childProcess.on('exit', function (exitCode) {
-                                    returnValue.exitCode = exitCode;
-                                });
-                                return [3 /*break*/, 9];
-                            case 8:
-                                e_1 = _b.sent();
-                                throw Error("Error in the command line " + commandLine);
-                            case 9: return [2 /*return*/];
-                        }
-                    });
-                }); })];
-        });
+async function callChildProccess(commandLine, option) {
+    return new Promise(async (resolveFunction, rejectFunction) => {
+        const returnValue = new ProcessReturns();
+        try {
+            const childProcess = child_process.exec(commandLine, 
+            // on close the "childProcess" (2)
+            (error, stdout, stderr) => {
+                returnValue.stdout = stdout;
+                returnValue.stderr = stderr;
+                resolveFunction(returnValue);
+            });
+            if (option && childProcess.stdin) {
+                if (option.inputLines) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    for (const inputLine of option.inputLines) {
+                        console.log(inputLine);
+                        childProcess.stdin.write(inputLine + "\n");
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                }
+                childProcess.stdin.end();
+            }
+            // on close the "childProcess" (1)
+            childProcess.on('close', (exitCode) => {
+                returnValue.exitCode = exitCode;
+            });
+            childProcess.on('exit', (exitCode) => {
+                returnValue.exitCode = exitCode;
+            });
+        }
+        catch (e) {
+            throw Error(`Error in the command line ${commandLine}`);
+        }
     });
 }
 // deleteFile
@@ -256,40 +167,35 @@ function getFullPath(relativePath, basePath) {
     return fullPath;
 }
 // printDifferentPaths
-function printDifferentPaths(path1, path2, path3) {
-    if (path3 === void 0) { path3 = undefined; }
-    console.log("Error: different between the following files");
-    console.log("  Path1: " + (testFolderFullPath + path1));
-    console.log("  Path2: " + (testFolderFullPath + path2));
+function printDifferentPaths(path1, path2, path3 = undefined) {
+    console.log(`Error: different between the following files`);
+    console.log(`  Path1: ${testFolderFullPath + path1}`);
+    console.log(`  Path2: ${testFolderFullPath + path2}`);
     if (path3) {
-        console.log("  Path3: " + (testFolderFullPath + path3));
+        console.log(`  Path3: ${testFolderFullPath + path3}`);
     }
 }
 // diffStrings
 function diffStrings(result, answer) {
-    var resultFilePath = '_output.txt';
-    var answerFilePath = '_answer.txt';
+    const resultFilePath = '_output.txt';
+    const answerFilePath = '_answer.txt';
     fs.writeFileSync(testFolderFullPath + resultFilePath, result);
     fs.writeFileSync(testFolderFullPath + answerFilePath, answer);
     printDifferentPaths(resultFilePath, answerFilePath);
 }
 // ProcessOption
-var ProcessOption = /** @class */ (function () {
-    function ProcessOption() {
-    }
-    return ProcessOption;
-}());
+class ProcessOption {
+}
 // ProcessReturns
-var ProcessReturns = /** @class */ (function () {
-    function ProcessReturns() {
+class ProcessReturns {
+    constructor() {
         this.exitCode = 0;
         this.stdout = '';
         this.stderr = '';
     }
-    return ProcessReturns;
-}());
-var testFolderFullPath = getFullPath("../src/" + testFolderPath, __dirname);
-var cutBOM = 1;
-var notFound = -1;
+}
+const testFolderFullPath = getFullPath(`../src/${testFolderPath}`, __dirname);
+const cutBOM = 1;
+const notFound = -1;
 main();
 //# sourceMappingURL=typrm_test.js.map

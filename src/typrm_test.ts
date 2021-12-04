@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import * as child_process from 'child_process';
+import * as url from 'url';
 import * as path from 'path';
-import * as lib from "./lib";
-const currentFolder = process.cwd();
-const snapshots = require(currentFolder +"/__snapshots__/main.test.ts.snap");
+import * as lib from './lib';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;

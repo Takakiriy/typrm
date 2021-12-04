@@ -1,127 +1,119 @@
-"use strict";
-var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
-    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-    return cooked;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.cc = exports.debugOut = exports.pp = exports.getSnapshot = exports.inputSkip = exports.inputPath = exports.getInputObject = exports.input = exports.hasInterfaceOf = exports.getCommonElements = exports.escapeRegularExpression = exports.parseCSVColumnPositions = exports.parseCSVColumns = exports.cutLeftOf = exports.getGlobbyParameters = exports.getHomePath = exports.getTestWorkFolderFullPath = exports.checkNotInGitWorking = exports.isFullPath = exports.getFullPath = exports.pathResolve = exports.copyFileSync = exports.copyFolderSync = void 0;
-var fs = require("fs");
-var path = require("path");
-var globby = require("globby");
-var readline = require("readline");
-var stream = require("stream");
-var csvParse = require("csv-parse");
-var snapshots = require(__dirname + "/../src/__snapshots__/main.test.ts.snap");
+import * as fs from "fs";
+import * as path from "path";
+import globby from 'globby';
+import * as readline from 'readline';
+import * as stream from 'stream';
+import * as csvParse from 'csv-parse';
+import { Readable, Writable } from 'stream';
+// @ts-ignore
+import { snapshots } from './lib-cjs.cjs';
 // File group
 // copyFolderSync
-// #keyword: copyFolderSync
+// #keyword: lib.ts copyFolderSync
 // sourceFolder/1.txt => destinationFolderPath/1.txt
-function copyFolderSync(sourceFolderPath, destinationFolderPath) {
-    var e_1, _a;
-    return __awaiter(this, void 0, void 0, function () {
-        var currentFolderPath, destinationFolderFullPath, paths, paths_1, paths_1_1, path_, sourceFilePath, destinationFilePath, e_1_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    currentFolderPath = process.cwd();
-                    destinationFolderFullPath = getFullPath(destinationFolderPath, currentFolderPath);
-                    process.chdir(sourceFolderPath);
-                    return [4 /*yield*/, globby(['**/*'])];
-                case 1:
-                    paths = _b.sent();
-                    _b.label = 2;
-                case 2:
-                    _b.trys.push([2, 7, 8, 13]);
-                    paths_1 = __asyncValues(paths);
-                    _b.label = 3;
-                case 3: return [4 /*yield*/, paths_1.next()];
-                case 4:
-                    if (!(paths_1_1 = _b.sent(), !paths_1_1.done)) return [3 /*break*/, 6];
-                    path_ = paths_1_1.value;
-                    sourceFilePath = path_;
-                    destinationFilePath = path.resolve(destinationFolderFullPath + '/' + path_);
-                    copyFileSync(sourceFilePath, destinationFilePath);
-                    _b.label = 5;
-                case 5: return [3 /*break*/, 3];
-                case 6: return [3 /*break*/, 13];
-                case 7:
-                    e_1_1 = _b.sent();
-                    e_1 = { error: e_1_1 };
-                    return [3 /*break*/, 13];
-                case 8:
-                    _b.trys.push([8, , 11, 12]);
-                    if (!(paths_1_1 && !paths_1_1.done && (_a = paths_1.return))) return [3 /*break*/, 10];
-                    return [4 /*yield*/, _a.call(paths_1)];
-                case 9:
-                    _b.sent();
-                    _b.label = 10;
-                case 10: return [3 /*break*/, 12];
-                case 11:
-                    if (e_1) throw e_1.error;
-                    return [7 /*endfinally*/];
-                case 12: return [7 /*endfinally*/];
-                case 13:
-                    process.chdir(currentFolderPath);
-                    return [2 /*return*/];
-            }
-        });
-    });
+export async function copyFolderSync(sourceFolderPath, destinationFolderPath) {
+    const currentFolderPath = process.cwd();
+    const destinationFolderFullPath = getFullPath(destinationFolderPath, currentFolderPath);
+    process.chdir(sourceFolderPath);
+    const paths = await globby(['**/*']);
+    for await (const path_ of paths) {
+        const sourceFilePath = path_;
+        const destinationFilePath = path.resolve(destinationFolderFullPath + '/' + path_);
+        copyFileSync(sourceFilePath, destinationFilePath);
+    }
+    process.chdir(currentFolderPath);
 }
-exports.copyFolderSync = copyFolderSync;
 // copyFileSync
-// #keyword: copyFileSync
+// #keyword: lib.ts copyFileSync
 // This also makes the copy target folder.
-function copyFileSync(sourceFilePath, destinationFilePath) {
-    var destinationFolderPath = path.dirname(destinationFilePath);
+export function copyFileSync(sourceFilePath, destinationFilePath) {
+    const destinationFolderPath = path.dirname(destinationFilePath);
     fs.mkdirSync(destinationFolderPath, { recursive: true });
     fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
-exports.copyFileSync = copyFileSync;
+// replaceFileSync
+// #keyword: lib.ts replaceFileSync
+// replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
+export function replaceFileSync(sourceFilePath, replaceFunction, destinationFilePath = '') {
+    const text = fs.readFileSync(sourceFilePath, 'utf-8');
+    const replacedText = replaceFunction(text);
+    if (destinationFilePath === '') {
+        destinationFilePath = sourceFilePath;
+    }
+    fs.writeFileSync(destinationFilePath, replacedText);
+}
+// replaceFileAsync
+// #keyword: lib.ts replaceFileAsync
+// replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
+export async function replaceFileAsync(sourceFilePath, replaceFunction, destinationFilePath = '') {
+    const text = fs.readFileSync(sourceFilePath, 'utf-8');
+    const replacedText = await replaceFunction(text);
+    if (destinationFilePath === '') {
+        destinationFilePath = sourceFilePath;
+    }
+    fs.writeFileSync(destinationFilePath, replacedText);
+}
+// searchAsTextSub
+export async function searchAsTextSub(readlineOptions, keyword, csvOption) {
+    if (csvOption) {
+        var keywords = await parseCSVColumns(keyword);
+        const firstKeyword = keywords.shift();
+        if (!firstKeyword) {
+            throw Error(`ERROR: no keywords`);
+        }
+        var currentKeyword = firstKeyword;
+    }
+    else {
+        var keywords = [keyword];
+        var currentKeyword = keyword;
+    }
+    var lineNum = 0;
+    var breaking = false;
+    var exception;
+    const reader = readline.createInterface(addDefaultReadLineOptions(readlineOptions));
+    for await (const line1 of reader) {
+        if (breaking) {
+            continue;
+        } // "reader" requests read all lines
+        try {
+            const line = line1;
+            lineNum += 1;
+            if (line.includes(currentKeyword)) {
+                if (!csvOption) {
+                    breaking = true; // return or break must not be written.
+                    // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
+                }
+                else { // csvOption
+                    const nextKeyword = keywords.shift();
+                    if (!nextKeyword) {
+                        breaking = true; // return or break must not be written.
+                        currentKeyword = '';
+                    }
+                    else {
+                        currentKeyword = nextKeyword;
+                    }
+                }
+            }
+        }
+        catch (e) {
+            exception = e;
+            breaking = true;
+        }
+    }
+    if (exception) {
+        throw exception;
+    }
+    if (!breaking) {
+        lineNum = 0;
+    }
+    return lineNum;
+}
+// addDefaultReadLineOptions
+function addDefaultReadLineOptions(localOptions) {
+    return { crlfDelay: Infinity, ...localOptions };
+}
 // pathResolve
-function pathResolve(path_) {
+export function pathResolve(path_) {
     // '/c/home' format to current OS format
     if (path_.length >= 3) {
         if (path_[0] === '/' && path_[2] === '/') {
@@ -132,17 +124,16 @@ function pathResolve(path_) {
     path_ = path.resolve(path_);
     return path_;
 }
-exports.pathResolve = pathResolve;
 // getFullPath
-// #keyword: JavaScript (js) library getFullPath
+// #keyword: lib.ts JavaScript (js) library getFullPath
 // If "basePath" is current directory, you can call "path.resolve"
 // If the variable has full path and litteral relative path, write `${___FullPath}/relative_path}`
-function getFullPath(relativePath, basePath) {
+export function getFullPath(relativePath, basePath) {
     var fullPath = '';
-    var slashRelativePath = relativePath.replace(/\\/g, '/');
-    var colonSlashIndex = slashRelativePath.indexOf(':/');
-    var slashFirstIndex = slashRelativePath.indexOf('/');
-    var withProtocol = (colonSlashIndex + 1 === slashFirstIndex); // e.g.) C:/, http://
+    const slashRelativePath = relativePath.replace(/\\/g, '/');
+    const colonSlashIndex = slashRelativePath.indexOf(':/');
+    const slashFirstIndex = slashRelativePath.indexOf('/');
+    const withProtocol = (colonSlashIndex + 1 === slashFirstIndex); // e.g.) C:/, http://
     if (relativePath.substr(0, 1) === '/') {
         fullPath = relativePath;
     }
@@ -157,13 +148,12 @@ function getFullPath(relativePath, basePath) {
     }
     return fullPath;
 }
-exports.getFullPath = getFullPath;
 // isFullPath
-// #keyword: JavaScript (js) library isFullPath
-function isFullPath(path) {
-    var colonPosition = path.indexOf(':');
-    var slashPosition = path.indexOf('/');
-    var backSlashPosition = path.indexOf('\\');
+// #keyword: lib.ts JavaScript (js) library isFullPath
+export function isFullPath(path) {
+    const colonPosition = path.indexOf(':');
+    const slashPosition = path.indexOf('/');
+    const backSlashPosition = path.indexOf('\\');
     if (slashPosition === notFound) {
         var separatorPosition = backSlashPosition;
     }
@@ -181,9 +171,8 @@ function isFullPath(path) {
     }
     return isFullPath;
 }
-exports.isFullPath = isFullPath;
 // checkNotInGitWorking
-function checkNotInGitWorking() {
+export function checkNotInGitWorking() {
     var path_ = process.cwd();
     if (!path_.includes('extract_git_branches')) {
         throw new Error('This is not in project folder.');
@@ -192,15 +181,14 @@ function checkNotInGitWorking() {
         path_ = path.dirname(path_);
     }
     while (path_ !== '/') {
-        if (fs.existsSync(path_ + "/.git")) {
+        if (fs.existsSync(`${path_}/.git`)) {
             throw new Error('This test is not supported with git submodule.');
         }
         path_ = path.dirname(path_);
     }
 }
-exports.checkNotInGitWorking = checkNotInGitWorking;
 // getTestWorkFolderFullPath
-function getTestWorkFolderFullPath() {
+export function getTestWorkFolderFullPath() {
     var path_ = process.cwd();
     if (!path_.includes('extract_git_branches')) {
         throw new Error('This is not in project folder.');
@@ -208,12 +196,11 @@ function getTestWorkFolderFullPath() {
     while (path_.includes('extract_git_branches')) {
         path_ = path.dirname(path_);
     }
-    return path_ + "/_test_of_extract_git_branches";
+    return `${path_}/_test_of_extract_git_branches`;
 }
-exports.getTestWorkFolderFullPath = getTestWorkFolderFullPath;
 // getHomePath
-// #keyword: getHomePath
-function getHomePath() {
+// #keyword: lib.ts getHomePath
+export function getHomePath() {
     if (process.env.HOME) {
         return process.env.HOME;
     }
@@ -224,20 +211,19 @@ function getHomePath() {
         throw new Error('unexpected');
     }
 }
-exports.getHomePath = getHomePath;
 // getGlobbyParameters
-// #keyword: getGlobbyParameters
-function getGlobbyParameters(targetPath, baseFullPath) {
-    var targetFullPath = getFullPath(targetPath, baseFullPath);
-    var fileName = path.basename(targetFullPath);
-    var filePath = 1;
-    var folderPath = 2;
+// #keyword: lib.ts getGlobbyParameters
+export function getGlobbyParameters(targetPath, baseFullPath) {
+    const targetFullPath = getFullPath(targetPath, baseFullPath);
+    const fileName = path.basename(targetFullPath);
+    const filePath = 1;
+    const folderPath = 2;
     var pathIs = 0;
     if (fileName.includes('*')) {
         pathIs = filePath;
     }
     else {
-        var fileExists = fs.lstatSync(targetFullPath).isFile(); // This raises an exception, if path has wildcard
+        const fileExists = fs.lstatSync(targetFullPath).isFile(); // This raises an exception, if path has wildcard
         if (fileExists) {
             pathIs = filePath;
         }
@@ -254,16 +240,16 @@ function getGlobbyParameters(targetPath, baseFullPath) {
         var wildcard = '*';
     }
     return {
-        targetFolderFullPath: targetFolderFullPath,
-        wildcard: wildcard,
+        targetFolderFullPath,
+        wildcard,
     };
 }
-exports.getGlobbyParameters = getGlobbyParameters;
 // String group
 // cutLeftOf
-// #keyword: cutLeftOf
-function cutLeftOf(input, keyword) {
-    var keywordPosition = input.indexOf(keyword);
+// #keyword: lib.ts cutLeftOf
+// cutLeftOf("abcde", "c") == "cde"
+export function cutLeftOf(input, keyword) {
+    const keywordPosition = input.indexOf(keyword);
     if (keywordPosition !== notFound) {
         return input.substr(keywordPosition);
     }
@@ -271,235 +257,349 @@ function cutLeftOf(input, keyword) {
         return input;
     }
 }
-exports.cutLeftOf = cutLeftOf;
-// parseCSVColumns
-function parseCSVColumns(columns) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            if (!columns) {
-                return [2 /*return*/, []]; // stream.Readable.from(undefined) occurs an error
-            }
-            // Prevent csv-parse module error, when a quote is found inside a field.
-            // A quote is always written at frist character.
-            // The inside quote should be parsed as a character data in the column.
-            if (columns[0] === '"' || columns.includes(',')) {
-                return [2 /*return*/, new Promise(function (resolveFunction, rejectFunction) {
-                        var columnArray = [];
-                        stream.Readable.from(columns)
-                            .pipe(csvParse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
-                            .on('data', function (columns) {
-                            columnArray = columns;
-                        })
-                            .on('end', function () {
-                            resolveFunction(columnArray);
-                        })
-                            .on('error', function (e) {
-                            e.message = "Error in csv-parse module. Parsing CSV is:\n" + columns + "\n" + e.message;
-                            rejectFunction(e);
-                        });
-                    })];
-            }
-            else {
-                return [2 /*return*/, [columns]];
-            }
-            return [2 /*return*/];
-        });
-    });
+// cutLast
+// #keyword: lib.ts cutLast
+// cutLast("ab/", "/") == "ab"
+// cutLast("abc", "/") == "abc"
+export function cutLast(input, keyword) {
+    if (input.endsWith(keyword)) {
+        return input.substr(0, input.length - keyword.length);
+    }
+    else {
+        return input;
+    }
 }
-exports.parseCSVColumns = parseCSVColumns;
+// parseCSVColumns
+export async function parseCSVColumns(columns) {
+    if (!columns) {
+        return []; // stream.Readable.from(undefined) occurs an error
+    }
+    // Prevent csv-parse module error, when a quote is found inside a field.
+    // A quote is always written at frist character.
+    // The inside quote should be parsed as a character data in the column.
+    if (columns[0] === '"' || columns.includes(',')) {
+        return new Promise((resolveFunction, rejectFunction) => {
+            var columnArray = [];
+            stream.Readable.from(columns)
+                .pipe(csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' }))
+                .on('data', (columns) => {
+                columnArray = columns;
+            })
+                .on('end', () => {
+                resolveFunction(columnArray);
+            })
+                .on('error', (e) => {
+                e.message = `Error in csv-parse module. Parsing CSV is:\n${columns}\n${e.message}`;
+                rejectFunction(e);
+            });
+        });
+    }
+    else {
+        return [columns];
+    }
+}
 // parseCSVColumnPositions
-function parseCSVColumnPositions(csv, columns) {
-    var positions = [];
+export function parseCSVColumnPositions(csv, columns) {
+    const positions = [];
     var searchPosition = 0;
-    for (var _i = 0, columns_1 = columns; _i < columns_1.length; _i++) {
-        var column = columns_1[_i];
-        var columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
+    for (const column of columns) {
+        const columnPosition = csv.indexOf(column.replace(/\"/g, '""'), searchPosition);
         positions.push(columnPosition);
         searchPosition = csv.indexOf(',', columnPosition + column.length) + 1;
     }
     return positions;
 }
-exports.parseCSVColumnPositions = parseCSVColumnPositions;
 // escapeRegularExpression
-function escapeRegularExpression(expression) {
+export function escapeRegularExpression(expression) {
     return expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
-exports.escapeRegularExpression = escapeRegularExpression;
+// replace
+export function replace(input, replacers) {
+    var replacing = input;
+    for (const replacer of replacers) {
+        var optionCount = 0;
+        if (replacer.from) {
+            optionCount += 1;
+        }
+        if (replacer.fromCSV) {
+            throw new Error('"ReplaceParameter.fromCSV" must be called with replaceAsync function');
+        }
+        if (replacer.lineNum) {
+            throw new Error('"ReplaceParameter.lineNum" must be called with replaceAsync function');
+        }
+        if (optionCount !== 1) {
+            throw new Error('"ReplaceParameter" must set either "from", "fromCSV" or "lineNum" attribute');
+        }
+        if (replacer.from) {
+            replacing = replacing.replace(replacer.from, replacer.to);
+        }
+    }
+    const replaced = replacing;
+    return replaced;
+}
+// replaceAsync
+export async function replaceAsync(input, replacers) {
+    var replacing = input;
+    for (const replacer of replacers) {
+        var optionCount = 0;
+        if (replacer.from) {
+            optionCount += 1;
+        }
+        if (replacer.fromCSV) {
+            optionCount += 1;
+        }
+        if (replacer.lineNum) {
+            optionCount += 1;
+        }
+        if (optionCount !== 1) {
+            throw new Error('"ReplaceParameter" must set either "from", "fromCSV" or "lineNum" attribute');
+        }
+        if (replacer.from) {
+            replacing = replacing.replace(replacer.from, replacer.to);
+        }
+        if (replacer.lineNum) {
+            const stream = new Readable();
+            stream.push(replacing);
+            stream.push(null);
+            const reader = readline.createInterface({
+                input: stream,
+                crlfDelay: Infinity
+            });
+            pp(41);
+            const writer = new WritableMemoryStream();
+            var lineNum = 0;
+            for await (const line1 of reader) {
+                const line = line1;
+                lineNum += 1;
+                pp(50 + lineNum);
+                if (lineNum === replacer.lineNum) {
+                    writer.write(`${replacer.to}\n`);
+                }
+                else {
+                    writer.write(`${line}\n`);
+                }
+            }
+            replacing = writer.toString();
+            pp(49);
+        }
+        if (replacer.fromCSV) {
+            const inputStream = Readable.from(replacing);
+            var d = pp(1);
+            const lineNum = await searchAsTextSub({ input: inputStream }, replacer.fromCSV, true);
+            pp(2);
+            replacing = await replaceAsync(replacing, [{ lineNum, to: replacer.to }]);
+            pp(3);
+        }
+    }
+    const replaced = replacing;
+    pp(99);
+    return replaced;
+}
+// WritableMemoryStream
+class WritableMemoryStream extends Writable {
+    constructor() {
+        super();
+        this.array = [];
+    }
+    _write(chunk, _encoding, callback) {
+        this.array.push(chunk);
+        callback();
+    }
+    toString() {
+        return this.array.join('');
+    }
+}
 // StandardInputBuffer
-var StandardInputBuffer = /** @class */ (function () {
-    function StandardInputBuffer() {
+class StandardInputBuffer {
+    constructor() {
         this.inputBuffer = [];
         this.inputResolver = undefined;
     }
-    StandardInputBuffer.prototype.delayedConstructor = function () {
-        var _this = this;
+    delayedConstructor() {
         this.readlines = readline.createInterface({
             input: process.stdin,
             output: process.stdout
         });
-        this.readlines.on('line', function (line) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (this.inputResolver) {
-                    this.inputResolver(line); // inputResolver() is resolve() in input()
-                    this.inputResolver = undefined;
-                }
-                else {
-                    this.inputBuffer.push(line);
-                }
-                return [2 /*return*/];
-            });
-        }); });
+        this.readlines.on('line', async (line) => {
+            if (this.inputResolver) {
+                this.inputResolver(line); // inputResolver() is resolve() in input()
+                this.inputResolver = undefined;
+            }
+            else {
+                this.inputBuffer.push(line);
+            }
+        });
         this.readlines.setPrompt('');
         this.readlines.prompt();
-    };
-    StandardInputBuffer.prototype.input = function (guide) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            return __generator(this, function (_a) {
-                if (!this.readlines) {
-                    this.delayedConstructor();
-                }
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        var nextLine = _this.inputBuffer.shift();
-                        if (nextLine) {
-                            console.log(guide + nextLine);
-                            resolve(nextLine);
-                        }
-                        else {
-                            process.stdout.write(guide);
-                            _this.inputResolver = resolve;
-                        }
-                    })];
-            });
+    }
+    async input(guide) {
+        if (!this.readlines) {
+            this.delayedConstructor();
+        }
+        return new Promise((resolve, reject) => {
+            const nextLine = this.inputBuffer.shift();
+            if (nextLine) {
+                console.log(guide + nextLine);
+                resolve(nextLine);
+            }
+            else {
+                process.stdout.write(guide);
+                this.inputResolver = resolve;
+            }
         });
-    };
-    StandardInputBuffer.prototype.close = function () {
+    }
+    close() {
         if (this.readlines) {
             this.readlines.close();
         }
-    };
-    return StandardInputBuffer;
-}());
+    }
+}
 // Data group
 // getCommonElements
-function getCommonElements(arrayA, arrayB) {
-    var commonElements = [];
-    for (var _i = 0, arrayA_1 = arrayA; _i < arrayA_1.length; _i++) {
-        var item = arrayA_1[_i];
+export function getCommonElements(arrayA, arrayB) {
+    const commonElements = [];
+    for (const item of arrayA) {
         if (arrayB.includes(item)) {
             commonElements.push(item);
         }
     }
     return commonElements;
 }
-exports.getCommonElements = getCommonElements;
+// isAlphabetIndex
+export function isAlphabetIndex(index) {
+    const lastCharacter = index.substr(-1);
+    const lastCharacterIsNumber = !isNaN(lastCharacter);
+    return !lastCharacterIsNumber && index !== '/';
+}
+// getAlphabetIndex
+// 1=>a, 2=>b, ..., 25=>y, 26=>z26z, 27=>z27z, ...
+// First charactor and last cahractor must be alphabet.
+export function getAlphabetIndex(num) {
+    const index = parseInt(num);
+    if (index >= 1 && index <= 25) {
+        const ascii_code_a_minus1 = 96;
+        return String.fromCharCode(index + ascii_code_a_minus1);
+    }
+    else {
+        return `z${num}z`;
+    }
+}
+// fromAlphabetIndex
+// a=>1, b=>2, ..., y=>25, z26z=>26, z27z=>27, ...
+export function fromAlphabetIndex(index) {
+    const code = index.charCodeAt(0);
+    const ascii_code_a_minus1 = 96;
+    const ascii_code_y = 121;
+    if (code > ascii_code_a_minus1 && code <= ascii_code_y) {
+        return code - ascii_code_a_minus1;
+    }
+    else if (isAlphabetIndex(index)) {
+        return parseInt(index.slice(1, -1));
+    }
+    else {
+        return NaN;
+    }
+}
 // hasInterfaceOf
-var hasInterfaceOf;
+export var hasInterfaceOf;
 (function (hasInterfaceOf) {
     function Error(object) {
         return (object.hasOwnProperty('message'));
     }
     hasInterfaceOf.Error = Error;
-})(hasInterfaceOf = exports.hasInterfaceOf || (exports.hasInterfaceOf = {}));
+})(hasInterfaceOf || (hasInterfaceOf = {}));
+// getObjectID
+// Exmaple:
+//    var  object1={}, object2={}
+//    console.log( objectId(object1) ) // 1
+//    console.log( objectId(object2) ) // 2
+export function getObjectID(object) {
+    if (!objectIDs.has(object)) {
+        objectCount += 1;
+        objectIDs.set(object, objectCount);
+    }
+    return objectIDs.get(object);
+}
+const objectIDs = new WeakMap;
+var objectCount = 0;
 // User interface group
 // InputOption
-var InputOption = /** @class */ (function () {
-    function InputOption(inputLines) {
+class InputOption {
+    constructor(inputLines) {
         this.inputLines = inputLines;
         this.nextLineIndex = 0;
         this.nextParameterIndex = 2;
     }
-    return InputOption;
-}());
-var testBaseFolder = String.raw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["R:homemem_cacheMyDocsrcTypeScript\typrm\test_data"], ["R:\\home\\mem_cache\\MyDoc\\src\\TypeScript\\typrm\\test_data"]))) + '\\';
+}
+const testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\typrm\test_data` + '\\';
 // inputOption
-var inputOption = new InputOption([
+const inputOption = new InputOption([
 /*
     testBaseFolder +`____.yaml`,
     String.raw `file`,
 */
 ]);
 // input
+// #keyword: lib.ts input
 // Example: const name = await input('What is your name? ');
-function input(guide) {
-    return __awaiter(this, void 0, void 0, function () {
-        var value, value;
-        return __generator(this, function (_a) {
-            // Input emulation
-            if (inputOption.inputLines) {
-                if (inputOption.nextLineIndex < inputOption.inputLines.length) {
-                    value = inputOption.inputLines[inputOption.nextLineIndex];
-                    inputOption.nextLineIndex += 1;
-                    console.log(guide + value);
-                    return [2 /*return*/, value];
-                }
-            }
-            // Read the starting process parameters
-            while (inputOption.nextParameterIndex < process.argv.length) {
-                value = process.argv[inputOption.nextParameterIndex];
-                inputOption.nextParameterIndex += 1;
-                if (value.substr(0, 1) !== '-') {
-                    console.log(guide + value);
-                    return [2 /*return*/, value];
-                }
-                if (value !== '--test') {
-                    inputOption.nextParameterIndex += 1;
-                }
-            }
-            // input
-            return [2 /*return*/, InputObject.input(guide)];
-        });
-    });
+export async function input(guide) {
+    // Input emulation
+    if (inputOption.inputLines) {
+        if (inputOption.nextLineIndex < inputOption.inputLines.length) {
+            const value = inputOption.inputLines[inputOption.nextLineIndex];
+            inputOption.nextLineIndex += 1;
+            console.log(guide + value);
+            return value;
+        }
+    }
+    // Read the starting process parameters
+    while (inputOption.nextParameterIndex < process.argv.length) {
+        const value = process.argv[inputOption.nextParameterIndex];
+        inputOption.nextParameterIndex += 1;
+        if (value.substr(0, 1) !== '-') {
+            console.log(guide + value);
+            return value;
+        }
+        if (value !== '--test') {
+            inputOption.nextParameterIndex += 1;
+        }
+    }
+    // input
+    return InputObject.input(guide);
 }
-exports.input = input;
-var InputObject = new StandardInputBuffer();
-function getInputObject() {
+const InputObject = new StandardInputBuffer();
+export function getInputObject() {
     return InputObject;
 }
-exports.getInputObject = getInputObject;
 // inputPath
 // Example: const name = await input('What is your name? ');
-function inputPath(guide) {
-    return __awaiter(this, void 0, void 0, function () {
-        var key;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, input(guide)];
-                case 1:
-                    key = _a.sent();
-                    if (key.endsWith('()')) {
-                        return [2 /*return*/, key];
-                    }
-                    else {
-                        return [2 /*return*/, pathResolve(key)];
-                    }
-                    return [2 /*return*/];
-            }
-        });
-    });
+export async function inputPath(guide) {
+    const key = await input(guide);
+    if (key.endsWith('()')) {
+        return key;
+    }
+    else {
+        return pathResolve(key);
+    }
 }
-exports.inputPath = inputPath;
 // inputSkip
-function inputSkip(count) {
+export function inputSkip(count) {
     inputOption.nextParameterIndex += count;
 }
-exports.inputSkip = inputSkip;
 // getSnapshot
-function getSnapshot(label, deafultSnapshot) {
-    if (deafultSnapshot === void 0) { deafultSnapshot = undefined; }
+export function getSnapshot(label, deafultSnapshot = undefined) {
     if (!(label in snapshots)) {
         if (!deafultSnapshot) {
-            throw new Error("not found snapshot label \"" + label + "\" in \"__Project__/src/__snapshots__/main.test.ts.snap\" file.");
+            throw new Error(`not found snapshot label "${label}" in "__Project__/src/__snapshots__/main.test.ts.snap" file.`);
         }
         return deafultSnapshot;
     }
-    var snapshot = snapshots[label];
+    const snapshot = snapshots[label];
     return snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');
 }
-exports.getSnapshot = getSnapshot;
 // pp
 // Debug print.
-// #keyword: pp
+// #keyword: lib.ts pp
 // Example:
 //    pp(var);
 // Example:
@@ -513,26 +613,31 @@ exports.getSnapshot = getSnapshot;
 //        var d = pp('');
 //        d = [];  // Set break point here and watch the variable d
 //    }
-function pp(message) {
+export function pp(message) {
     if (message instanceof Array) {
-        for (var _i = 0, message_1 = message; _i < message_1.length; _i++) {
-            var element = message_1[_i];
-            exports.debugOut.push(element.toString());
+        debugOut.push(`length: ${message.length}`);
+        for (const element of message) {
+            pp(element);
         }
     }
     else {
         if (typeof message === 'object') {
-            message = JSON.stringify(message);
+            message = JSON.stringify(message, null, '    ');
         }
-        exports.debugOut.push(message.toString());
+        else if (message === undefined) {
+            message = '(undefined)';
+        }
+        else if (message === null) {
+            message = '(null)';
+        }
+        debugOut.push(message.toString());
     }
-    return exports.debugOut;
+    return debugOut;
 }
-exports.pp = pp;
-exports.debugOut = [];
+export const debugOut = [];
 // cc
 // Through counter.
-// #keyword: cc
+// #keyword: lib.ts cc
 // Example:
 //   cc();
 // Example:
@@ -540,22 +645,18 @@ exports.debugOut = [];
 // Example:
 //   if ( cc(2).isTarget )
 //   var d = pp('');  // Set break point here and watch the variable d
-function cc(targetCount, label) {
-    if (targetCount === void 0) { targetCount = 9999999; }
-    if (label === void 0) { label = '0'; }
+export function cc(targetCount = 9999999, label = '0') {
     if (!(label in gCount)) {
         gCount[label] = 0;
     }
     gCount[label] += 1;
-    pp(label + ":countThrough[" + label + "] = " + gCount[label]);
-    var isTarget = (gCount[label] === targetCount);
+    pp(`${label}:countThrough[${label}] = ${gCount[label]}`);
+    const isTarget = (gCount[label] === targetCount);
     if (isTarget) {
         pp('    **** It is before the target! ****');
     }
-    return { isTarget: isTarget, debugOut: exports.debugOut };
+    return { isTarget, debugOut };
 }
-exports.cc = cc;
-var gCount = {};
-var notFound = -1;
-var templateObject_1;
+const gCount = {};
+const notFound = -1;
 //# sourceMappingURL=lib.js.map

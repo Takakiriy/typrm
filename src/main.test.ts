@@ -4,7 +4,6 @@ import * as main from "./main";
 import chalk from "chalk";
 import * as lib from "./lib";
 import { pp } from "./lib";
-const snapshots = require(`${__dirname}/../src/__snapshots__/main.test.ts.snap`);
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -66,7 +65,7 @@ beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
 });
 
-describe("checks template value >>", () => {
+describe.only("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -346,7 +345,7 @@ describe("replaces settings >>", () => {
         expect(errorMessage).toBe(expectedErrorMessage);
     });
 
-    describe.only("Multi folder >>", () => {
+    describe("Multi folder >>", () => {
         const  fileNameHead = '2_replace_1_ok';
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFile1Path  = changingFolderPath +'/1/'+ fileNameHead + "_1_changing.yaml";
@@ -361,7 +360,6 @@ describe("replaces settings >>", () => {
             ["same name error",  fileNameHead + "_same_name.yaml",   undefined],
             ["full path",        process.cwd() +"/"+ changingFile1Path,  changingFile1Path],
         ])("%s", async (caseName, changingFileName, changingFilePath) => {
-//if (caseName !== 'full path') {return;}  // || subCase !== '____'
             const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFile1Path,  sourceFileContents);
@@ -395,7 +393,6 @@ describe("replaces settings >>", () => {
                 expect(fileContents2).toBe(fileContentsBefore);
             }
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-//expect('test code').toBe('deleted skip code.');
         });
     });
 
@@ -404,64 +401,86 @@ describe("replaces settings >>", () => {
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',
                 `key1: value1changed`,
+                { replacers:[
+                    { fromCSV: '手順B:, key1: value11', to: 'key1: value11  #to: value1changed1' },
+                ]},
             ],[
                 '2_replace_6_if', ' in if block', 9, 'en-US',
                 `__Setting1__: replaced`,
+                { replacers:[
+                    { fromCSV: '__Setting1__: value1', to: '__Setting1__: value1  #to: replaced' },
+                ]},
             ],[
                 '2_replace_6_if', ' in if variable', 9, 'en-US',
                 `fruit: melon`,
+                null,
             ],[
                 '2_replace_6_if', ' both', 9, 'en-US',
                 `fruit: melon
                 __Setting1__: replaced`,
+                null,
             ],[
                 '2_replace_6_if', ' without line num', undefined, 'en-US',
                 `__Setting1__: replaced`,
+                null,
             ],[
                 '2_replace_6_if', ' setting name', 'set1', 'en-US',
                 `__Setting1__: replaced`,
+                null,
             ],[
                 '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
                 `__Full__: fo/fi
                 __Folder__: fo
                 __File__: fi`,
+                null,
             ],
 
-        ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues) => {
+        ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
+if (fileNameHead !== '2_replace_1_ok') {return;}  // || subCase !== '____'
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
             const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFilePath, sourceFileContents);
-            if (lineNum) {
-                await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                    folder: changingFolderPath, test: "", locale
-                });
-            } else {
-                await callMain(["replace", changingFileName, keyValues], {
-                    folder: changingFolderPath, test: "", locale
-                });
+            if (option) {
+                await lib.replaceFileAsync(changingFilePath, async (text) => (await lib.replaceAsync(text, option.replacers)));
             }
+            await callMain(["replace", changingFileName], {
+                folder: changingFolderPath, test: "", locale
+            });
+                // if (lineNum) {
+                //     await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
+                //         folder: changingFolderPath, test: "", locale
+                //     });
+                // } else {
+                //     await callMain(["replace", changingFileName, keyValues], {
+                //         folder: changingFolderPath, test: "", locale
+                //     });
+                // }
             const  updatedFileContents = fs.readFileSync(changingFilePath).toString();
             expect(updatedFileContents).not.toBe(sourceFileContents);
 
             // Test Main
-            if (lineNum) {
-                await callMain(["revert", changingFileName, lineNum.toString()], {
-                    folder: changingFolderPath, test: "", locale
-                });
-            } else {
-                await callMain(["revert", changingFileName], {
-                    folder: changingFolderPath, test: "", locale
-                });
-            }
+            await callMain(["reset", changingFileName], {
+                folder: changingFolderPath, test: "", locale
+            });
+                // if (lineNum) {
+                //     await callMain(["revert", changingFileName, lineNum.toString()], {
+                //         folder: changingFolderPath, test: "", locale
+                //     });
+                // } else {
+                //     await callMain(["revert", changingFileName], {
+                //         folder: changingFolderPath, test: "", locale
+                //     });
+                // }
             const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
             expect(revertedFileContents).toBe(sourceFileContents);
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
+expect('test code').toBe('deleted skip code.');
     });
 
     describe("replace to tag >>", () => {
@@ -536,7 +555,7 @@ describe("replaces settings >>", () => {
     });
 });
 
-describe("searches keyword tag >>", () => {
+describe.only("searches keyword tag >>", () => {
     test.skip('sharp (best)',()=>{});
     test.each([
         [
