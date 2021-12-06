@@ -65,7 +65,7 @@ beforeAll(()=>{
     fs.mkdirSync('empty_folder', {recursive: true});
 });
 
-describe.only("checks template value >>", () => {
+describe("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
         ["1_template_2_error"],
@@ -396,14 +396,18 @@ describe("replaces settings >>", () => {
         });
     });
 
-    describe("revert", () => {
+    describe.only("revert", () => {
         test.each([
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',
                 `key1: value1changed`,
-                { replacers:[
-                    { fromCSV: '手順B:, key1: value11', to: 'key1: value11  #to: value1changed1' },
-                ]},
+                {
+                    replacers:[
+                        { fromCSV: '手順B:, key1: value11', to: 'key1: value11  #to: value1changed1' },
+                        { from: '#original: oldValue3', to: '#to: value3changed' },
+                    ],
+                    resetAnswer: 'replaces settings >> in 2_replace_1_ok: resetFileContents 1',
+                },
             ],[
                 '2_replace_6_if', ' in if block', 9, 'en-US',
                 `__Setting1__: replaced`,
@@ -436,11 +440,11 @@ describe("replaces settings >>", () => {
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-if (fileNameHead !== '2_replace_1_ok') {return;}  // || subCase !== '____'
+//if (fileNameHead !== '2_replace_1_ok') {return;}  // || subCase !== '____'
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-            const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
+            let    sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFilePath, sourceFileContents);
             if (option) {
@@ -476,11 +480,16 @@ if (fileNameHead !== '2_replace_1_ok') {return;}  // || subCase !== '____'
                 // }
             const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
-            expect(revertedFileContents).toBe(sourceFileContents);
+            if ( ! ('resetAnswer' in option!)) {
+                expect(revertedFileContents).toBe(sourceFileContents);
+            } else {
+                const  resetFileContents = lib.getSnapshot(option.resetAnswer).toString();
+                expect(revertedFileContents).toBe(resetFileContents);
+            }
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
-expect('test code').toBe('deleted skip code.');
+//expect('test code').toBe('deleted skip code.');
     });
 
     describe("replace to tag >>", () => {
@@ -555,7 +564,7 @@ expect('test code').toBe('deleted skip code.');
     });
 });
 
-describe.only("searches keyword tag >>", () => {
+describe("searches keyword tag >>", () => {
     test.skip('sharp (best)',()=>{});
     test.each([
         [

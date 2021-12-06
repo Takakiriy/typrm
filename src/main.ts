@@ -91,7 +91,7 @@ var d = pp(programArguments);
                 await  replaceSettings(inputFilePath, replacingLineNum, keyValues, {}, false);
             }
         }
-        else if (programArguments[0] === 'revert') {
+        else if (programArguments[0] === 'revert'  ||  programArguments[0] === 'reset') {
             if (programArguments.length <= 2) {
                 if (programArguments.length === 1) {
                     var  inputFilePath = '';
@@ -1369,27 +1369,28 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
         if (isReadingSetting) {
             const  separator = line.indexOf(':');
             const  originalLabelIndex = line.indexOf(originalLabel);
-            var    key = '';
+            var    variableName = '';
             if (separator !== notFound) {
                 const  keyOrNot = line.substr(0, separator).trim();
                 if (keyOrNot[0] !== '#') {
-                    key = keyOrNot;
+                    variableName = keyOrNot;
                 }
             }
 
-            if (key !== ''  &&  originalLabelIndex != notFound) {
+            if (variableName !== ''  &&  originalLabelIndex != notFound) {
                 var  originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
                 if (parser.verbose) {
                     console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
-                    console.log(`Verbose:         ${key}: #original: ${originalValue}`);
+                    console.log(`Verbose:         ${variableName}: #original: ${originalValue}`);
                 }
 
-                toTagTree.replaceTo[currentSettingIndex][key] = {
+                toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: originalValue,
                     lineNum: [lineNum],
                     tag: 'original',
                     isReferenced: false,
                 };
+                console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #original: ${variableName}: ${originalValue}`);
             }
         }
     }
