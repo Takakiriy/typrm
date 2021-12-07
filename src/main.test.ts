@@ -412,35 +412,40 @@ describe("replaces settings >>", () => {
                 '2_replace_6_if', ' in if block', 9, 'en-US',
                 `__Setting1__: replaced`,
                 { replacers:[
-                    { fromCSV: '__Setting1__: value1', to: '__Setting1__: value1  #to: replaced' },
+                    { from: '__Setting1__: yes', to: '__Setting1__: yes  #to: replaced' },
                 ]},
             ],[
                 '2_replace_6_if', ' in if variable', 9, 'en-US',
                 `fruit: melon`,
-                null,
+                { replacers:[
+                    { from: 'fruit: banana', to: 'fruit: banana  #to: melon' },
+                ]},
             ],[
                 '2_replace_6_if', ' both', 9, 'en-US',
                 `fruit: melon
                 __Setting1__: replaced`,
-                null,
-            ],[
-                '2_replace_6_if', ' without line num', undefined, 'en-US',
-                `__Setting1__: replaced`,
-                null,
-            ],[
-                '2_replace_6_if', ' setting name', 'set1', 'en-US',
-                `__Setting1__: replaced`,
-                null,
+                {
+                    replacers:[
+                        { from: '__Setting1__: no', to: '__Setting1__: no  #to: replaced' },
+                        { from: 'fruit: banana', to: 'fruit: banana  #to: melon' },
+                    ],
+                },
             ],[
                 '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
                 `__Full__: fo/fi
                 __Folder__: fo
                 __File__: fi`,
-                null,
+                {
+                    replacers:[
+                        { from: '__Full__: folder/file', to: '__Full__: folder/file  #to: fo/fi' },
+                        { from: '__Folder__: folder',    to: '__Folder__: folder  #to: fo' },
+                        { from: '__File__: file',        to: '__File__: file  #to: fi' },
+                    ],
+                },
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-//if (fileNameHead !== '2_replace_1_ok') {return;}  // || subCase !== '____'
+if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {return;}
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -489,7 +494,7 @@ describe("replaces settings >>", () => {
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
-//expect('test code').toBe('deleted skip code.');
+expect('test code').toBe('deleted skip code.');
     });
 
     describe("replace to tag >>", () => {

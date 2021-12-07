@@ -3169,28 +3169,28 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> revert 2_replace_6_if in if block >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5:             __Setting1__: replaced  #original: yes
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> revert 2_replace_6_if in if variable >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3:         fruit: melon  #original: banana
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> revert 2_replace_6_if setting name >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5:             __Setting1__: replaced  #original: yes
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> revert 2_replace_6_if without line num >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5:             __Setting1__: replaced  #original: yes
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
