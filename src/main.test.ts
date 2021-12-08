@@ -445,7 +445,7 @@ describe("replaces settings >>", () => {
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {return;}
+//if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {return;}
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -458,15 +458,6 @@ if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {r
             await callMain(["replace", changingFileName], {
                 folder: changingFolderPath, test: "", locale
             });
-                // if (lineNum) {
-                //     await callMain(["replace", changingFileName, lineNum.toString(), keyValues], {
-                //         folder: changingFolderPath, test: "", locale
-                //     });
-                // } else {
-                //     await callMain(["replace", changingFileName, keyValues], {
-                //         folder: changingFolderPath, test: "", locale
-                //     });
-                // }
             const  updatedFileContents = fs.readFileSync(changingFilePath).toString();
             expect(updatedFileContents).not.toBe(sourceFileContents);
 
@@ -474,15 +465,6 @@ if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {r
             await callMain(["reset", changingFileName], {
                 folder: changingFolderPath, test: "", locale
             });
-                // if (lineNum) {
-                //     await callMain(["revert", changingFileName, lineNum.toString()], {
-                //         folder: changingFolderPath, test: "", locale
-                //     });
-                // } else {
-                //     await callMain(["revert", changingFileName], {
-                //         folder: changingFolderPath, test: "", locale
-                //     });
-                // }
             const  revertedFileContents = fs.readFileSync(changingFilePath).toString();
 
             if ( ! ('resetAnswer' in option!)) {
@@ -494,7 +476,7 @@ if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {r
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
-expect('test code').toBe('deleted skip code.');
+//expect('test code').toBe('deleted skip code.');
     });
 
     describe("replace to tag >>", () => {

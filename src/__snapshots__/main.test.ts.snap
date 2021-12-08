@@ -3197,9 +3197,9 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> revert 2_replace_10_double_check 1_OK >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: fo/fi  #original: folder/file
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: fo  #original: folder
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: fi  #original: file
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #original: __Full__: folder/file
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3: #original: __Folder__: folder
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #original: __File__: file
 
 Warning: 0, Error: 0
 "

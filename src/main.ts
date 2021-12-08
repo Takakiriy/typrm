@@ -2412,21 +2412,20 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                             const  conflictedTemplates: CheckedTemplateTag[] = [];
                             for (const template of lengthSortedTemplates) {
                                 var  i = 0;
-                                if ( ! maskedLine.includes(template.expected)) {
-                                    // replacedLine is not replaced
-                                    if ( ! replacedLine.includes(template.replaced)) {
+                                if ( ! replacedLine.includes(template.replaced)) {
+                                    if ( ! maskedLine.includes(template.expected)) {
                                         conflictedTemplates.push(template);
-                                    }
-                                } else {
-                                    for (;;) {
-                                        i = maskedLine.indexOf(template.expected, i);
-                                        if (i === notFound) {
-                                            break;
-                                        }
+                                    } else {
+                                        for (;;) {
+                                            i = maskedLine.indexOf(template.expected, i);
+                                            if (i === notFound) {
+                                                break;
+                                            }
 
-                                        replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
-                                        maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
-                                        i += template.expected.length;
+                                            replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                            maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                            i += template.expected.length;
+                                        }
                                     }
                                 }
                             }
