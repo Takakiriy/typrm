@@ -3161,8 +3161,8 @@ Warning: 0, Error: 0
 `;
 
 exports[`replaces settings >> revert 2_replace_6_if both >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3:         fruit: melon  #original: banana
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7:             __Setting1__: replaced  #original: no
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7: #original: __Setting1__: no
 
 Warning: 0, Error: 0
 "

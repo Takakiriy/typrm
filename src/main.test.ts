@@ -421,7 +421,7 @@ describe("replaces settings >>", () => {
                     { from: 'fruit: banana', to: 'fruit: banana  #to: melon' },
                 ]},
             ],[
-                '2_replace_6_if', ' both', 9, 'en-US',
+                '2_replace_6_if', ' both', 9, 'en-US',  // #search: typrm revert 2_replace_6_if both
                 `fruit: melon
                 __Setting1__: replaced`,
                 {
@@ -445,7 +445,7 @@ describe("replaces settings >>", () => {
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-//if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {return;}
+if (fileNameHead !== '2_replace_6_if' || _subCaseName !== ' both') {return;}
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -476,7 +476,7 @@ describe("replaces settings >>", () => {
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
-//expect('test code').toBe('deleted skip code.');
+expect('test code').toBe('deleted skip code.');
     });
 
     describe("replace to tag >>", () => {
