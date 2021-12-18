@@ -396,7 +396,7 @@ describe("replaces settings >>", () => {
         });
     });
 
-    describe.only("revert", () => {
+    describe("revert", () => {
         test.each([
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',
@@ -445,7 +445,6 @@ describe("replaces settings >>", () => {
             ],
 
         ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
-if (fileNameHead !== '2_replace_6_if' || _subCaseName !== ' both') {return;}
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -476,7 +475,6 @@ if (fileNameHead !== '2_replace_6_if' || _subCaseName !== ' both') {return;}
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
-expect('test code').toBe('deleted skip code.');
     });
 
     describe("replace to tag >>", () => {
