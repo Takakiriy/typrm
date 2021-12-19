@@ -1861,12 +1861,13 @@ class  TemplateTag {
         const  parentPath = path.dirname(parser.filePath);
         const  targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
         const  templateEndLineNum = parser.lineNum;
-        if (!fs.existsSync(targetFilePath)) {
+        if ( ! fs.existsSync(targetFilePath)) {
             const  templateLineNum = templateEndLineNum - this.templateLines.length;
             console.log("");
             console.log(`Error of not found the target file:`);
             console.log(`  ${translate('NotFound')}: ${getTestablePath(targetFilePath)}`);
             console.log(`  Template: ${getTestablePath(parser.filePath)}:${templateLineNum}`);
+            parser.errorCount += 1;
             return  false;
         }
         const  targetFileReader = readline.createInterface({
@@ -2175,6 +2176,7 @@ class  WordPositions {
 async function  replace(inputFileOrFolderPath: string) {
     var  errorCount = 0;
     try {
+var d = pp(inputFileOrFolderPath);
         for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
 
             if (newCode) {
@@ -2555,26 +2557,32 @@ async function  listUpFilePaths(checkingFilePath?: string) {
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
     if (checkingFilePath) {
-        targetFolders.push(currentFolder);
+var d = pp(checkingFilePath)
+        if (lib.isFullPath(checkingFilePath)) {
+            inputFileFullPaths.push(checkingFilePath);
+        } else {
+            targetFolders.push(currentFolder);
 
-        for (const folder of targetFolders) {
-            const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
+            for (const folder of targetFolders) {
+                const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
 
-            const  inputFileFullPath = lib.getFullPath(checkingFilePath, targetFolderFullPath);
-            if (fs.existsSync(inputFileFullPath)) {
-                inputFileFullPaths.push(inputFileFullPath);
-            } else {
-                notFoundPaths.push(inputFileFullPath);
+                const  inputFileFullPath = lib.getFullPath(checkingFilePath, targetFolderFullPath);
+                if (fs.existsSync(inputFileFullPath)) {
+                    inputFileFullPaths.push(inputFileFullPath);
+                } else {
+                    notFoundPaths.push(inputFileFullPath);
+                }
             }
-        }
-        if (inputFileFullPaths.length === 0) {
-            throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
-        } else if (inputFileFullPaths.length >= 2) {
-            console.log('');
-            console.log(`${translate('Error')}: ${translate('same file name exists.')}`);
-            console.log(`    FileName: ${getTestablePath(checkingFilePath)}`);
-            console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
-            throw new Error(`same file name exists "${JSON.stringify(checkingFilePath)}".`);
+            if (inputFileFullPaths.length === 0) {
+                throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
+            } else if (inputFileFullPaths.length >= 2) {
+var d = pp('')
+                console.log('');
+                console.log(`${translate('Error')}: ${translate('same file name exists.')}`);
+                console.log(`    FileName: ${getTestablePath(checkingFilePath)}`);
+                console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
+                throw new Error(`same file name exists "${JSON.stringify(checkingFilePath)}".`);
+            }
         }
     } else {
 

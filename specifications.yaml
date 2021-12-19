@@ -1,0 +1,62 @@
+テスト revert 2_replace_6_if both:  #keyword: typrm revert 2_replace_6_if both
+    replace command:
+        settingTree.currentSettings:
+            lineNum ==  1: banana, yes
+        toTagTree.currentOldSettingsInIfBlock:
+            lineNum ==  1: banana, yes
+            lineNum == 12: melon, no
+    reset command:
+        settingTree.currentSettings:  #// oldSetting
+            lineNum ==  1: melon, replaced
+        return_.currentOldSettingsInIfBlock:
+            lineNum ==  1: melon, replaced
+            lineNum ==  8: melon, replaced
+            lineNum == 10: {}
+            lineNum == 12: melon, replaced
+        return_.currentNewSettingsByOriginalTag:
+            lineNum ==  1: banana, yes
+        return_.currentNewSettingsByOriginalTagInIfBlock; outOfFalseBlockByOriginalTag:
+            lineNum ==  1: banana, yes;  true
+            lineNum ==  8: banana, yes;  true
+            lineNum == 10: "{};          false"
+            lineNum == 12: banana, yes;  true
+        return_.currentNewSettings:
+            （reset では対象外）
+    課題）複数の if ブロックの中に original タグがあるときの revert :  #keyword: typrm revert with if tag
+        revert する対象のファイルのサンプル:
+            settings:
+                fruit: banana
+                banana:  #if: $settings.fruit == banana
+                    __Setting1__: yes
+                not banana:  #if: $settings.fruit != banana
+                    __Setting1__: no
+        解決法:
+            - 一時的に if の条件を満たす設定に変えて、if ブロック内の定義を戻す
+            - # replace {fruit: banana}, revert {__Setting1__: yes}
+            - # replace {fruit: __not_banana}, revert {__Setting1__: no}
+            - # {fruit: banana}
+            - original タグが残っていたら警告する。別の設定セットに残っていても
+    課題）if で参照されている変数と if ブロック内で定義している変数を内部では同時に変更できない:  #keyword: typrm replace with if tag
+        置き換える対象のファイルのサンプル:
+            settings:
+                fruit: banana
+                banana:  #if: $settings.fruit == banana
+                    __Setting1__: yes
+                not banana:  #if: $settings.fruit != banana
+                    __Setting1__: no
+            check:
+                yes:  #template: __Setting1__
+                banana:  #if: $settings.fruit == banana
+                    yes  #template: __Setting1__
+                not banana:  #if: $settings.fruit != banana
+                    no  #template: __Setting1__
+        解決法:
+            if ブロック内で定義している変数は、if で参照されている変数が置き換えた後にすること
+        理由:
+            置き換えるときに指定するパラメーター: { fruit: melon, __Settings1__: replaced }
+            このとき、同時に置き換えると、置き換える前が [check/yes] と [check/not banana/no] の2種類(yes, no)あり、置き換える範囲が曖昧になって良くない:
+                サンプル）ある変数がとりうる値が aa, aaa だけのとき、置き換える前の値として 2種類を認めてしまうと aaa が aaaa に置き換わる可能性があり、良くない:
+            先に fruit を置き換えるときの置き換える前は、[check/yes] のみ:
+            次に __Settings1__ を置き換えるときの置き換える前は、(check/yesだった)[check/no] と [check/not banana/no] で 1種類（2箇所）:
+        コードの説明:
+            IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]

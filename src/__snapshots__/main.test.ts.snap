@@ -319,7 +319,7 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91:     #if: $env.value = value
     Error: if tag syntax
 
-Warning: 14, Error: 2
+Warning: 14, Error: 4
 template count = 34
 "
 `;
