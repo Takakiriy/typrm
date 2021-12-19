@@ -780,7 +780,7 @@ async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex:
                                         expected: before,
                                         replaced: after.replace(/\$/g,'$$')
                                     });
-                                    var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice();
+                                    var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice(); // copy
                                     lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
                                     var  replacedLine = replacingLine;
                                     var  maskedLine = replacingLine;
@@ -1252,10 +1252,11 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
             previousTemplateTag = templateTag;
         }
         if (toValue) {
+            const  hasTestTag = (line.indexOf(toTestLabel) !== notFound);
 
             // #to: tag in the settings
             if (isReadingSetting) {
-                if (parser.verbose) {
+                if (parser.verbose || hasTestTag) {
                     console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                     console.log(`Verbose:         ${variableName}: ${value}  #to: ${toValue}`);
                 }
@@ -1283,11 +1284,11 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
             // #to: tag after the #template:
             } else {
                 if (previousTemplateTag) {
-                    if (parser.verbose) {
+                    if (parser.verbose || hasTestTag) {
                         console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                     }
                     const  newKeyValues = await previousTemplateTag.scanKeyValues(
-                        toValue, Object.keys(settingTree.currentSettings), parser, false);
+                        toValue, Object.keys(settingTree.currentSettings), parser, hasTestTag);
 //                    parser.errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, parser.filePath);
                     if (parser.verbose) {
                         for (const [variableName, newValue] of Object.entries(newKeyValues)) {
@@ -2176,7 +2177,6 @@ class  WordPositions {
 async function  replace(inputFileOrFolderPath: string) {
     var  errorCount = 0;
     try {
-var d = pp(inputFileOrFolderPath);
         for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
 
             if (newCode) {
@@ -2295,7 +2295,6 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
             lines.push(line);
             lineNum += 1;
             parser.lineNum = lineNum;
-var d = pp(`${lineNum}: ${line}`)
 
             settingTree.moveToLine(parser);
             toTagTree.moveToLine(parser, settingTree);
@@ -2307,9 +2306,6 @@ var d = pp(`${lineNum}: ${line}`)
                 var  newSetting = toTagTree.currentNewSettingsInIfBlock;
                 // var  newSetting = {... oldSetting, ... toTagTree.currentNewSettings, ... toTagTree.currentNewSettingsByOriginalTag};
             }
-if (command === 'reset'  &&  lineNum === 13) {
-var d = pp('')
-}
             if (settingTree.wasChanged) {
                 replacingKeys = Object.keys(oldSetting);
                 replacingKeyValues = {};
@@ -2341,9 +2337,6 @@ var d = pp('')
                     if (key in oldSetting  &&  replacingKeys.includes(key)  &&  currentIsOutOfFalse) {
                         const  oldValue = getValue(line, separator);
                             // This is not "oldSetting[key].value", because it adds bad #original tag in #if tag block.
-if ( ! (key in newSetting)) {
-var d = pp('')
-}
                         var  newValue = newSetting[key].value;
                         if (newValue !== oldValue) {
 
@@ -2417,8 +2410,23 @@ var d = pp('')
                             const  mask = '\n';
                             const  conflictedTemplates: CheckedTemplateTag[] = [];
                             for (const template of lengthSortedTemplates) {
+                                if (template.expected.includes(template.replaced)) {
+                                    // e.g. expected == 'something', replaced = 'some'
+                                    if (replacedLine.includes(template.expected)) {
+                                        var  isReplaced = false;
+                                    } else {
+                                        var  isReplaced = replacedLine.includes(replaced);
+                                    }
+                                } else if (template.replaced.includes(template.expected)) {
+                                    // e.g. expected == 'some', replaced = 'something'
+                                    var  isReplaced = replacedLine.includes(template.replaced);
+                                } else {
+                                    // e.g. expected == 'anything', replaced = 'something'
+                                    var  isReplaced = replacedLine.includes(template.replaced);
+                                }
+
                                 var  i = 0;
-                                if ( ! replacedLine.includes(template.replaced)) {
+                                if ( ! isReplaced) {
                                     if ( ! maskedLine.includes(template.expected)) {
                                         conflictedTemplates.push(template);
                                     } else {
@@ -2428,8 +2436,8 @@ var d = pp('')
                                                 break;
                                             }
 
-                                            replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
-                                            maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                            replacedLine = replacedLine.substring(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                            maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
                                             i += template.expected.length;
                                         }
                                     }
@@ -2437,7 +2445,7 @@ var d = pp('')
                             }
 
                             writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
-                            if (conflictedTemplates.length >= 1) {
+                            if (conflictedTemplates.length >= 1  ||  outputTargetLineNum in conflictErrors) {
                                 var  errorMessage = '';
                                 errorMessage += '\n';
                                 errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}\n`;
@@ -2557,7 +2565,6 @@ async function  listUpFilePaths(checkingFilePath?: string) {
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
     if (checkingFilePath) {
-var d = pp(checkingFilePath)
         if (lib.isFullPath(checkingFilePath)) {
             inputFileFullPaths.push(checkingFilePath);
         } else {
@@ -2576,12 +2583,11 @@ var d = pp(checkingFilePath)
             if (inputFileFullPaths.length === 0) {
                 throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
             } else if (inputFileFullPaths.length >= 2) {
-var d = pp('')
                 console.log('');
                 console.log(`${translate('Error')}: ${translate('same file name exists.')}`);
                 console.log(`    FileName: ${getTestablePath(checkingFilePath)}`);
                 console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
-                throw new Error(`same file name exists "${JSON.stringify(checkingFilePath)}".`);
+                throw new Error(`same file name exists "${checkingFilePath}".`);
             }
         }
     } else {
@@ -4686,9 +4692,6 @@ if (false) {
                     return_.currentOldSettingsInIfBlock = {... r.currentNewSettings };
                     return_.currentNewSettingsInIfBlock = toTagTree.currentNewSettings;
                 } else {  // if (this.command === 'reset') {
-if (this.command === 'reset'  &&  (/*lineNum == 1 || lineNum == 8 || lineNum == 10 ||*/ lineNum == 12)) {
-var d = pp('')
-}
                     const  r = toTagTreeInIfBlock.addCurrentSettingsInIfBlock_Immutably(　// in if tag and out of if tag
                         settingsTree.currentSettingIndex, {}, currentSettingsInIfBlock,
                         settingsTree, parser);
@@ -4821,9 +4824,6 @@ var d = pp('')
                     outOfFalseBlocks.set(lineNumInSettings, falseIndexWhenNewSettings === disabledFalseIndex);
                 }
                 if (this.command === 'reset') {
-if (this.command === 'reset'  &&  currentIndex === '/1'  /*&&  indexInSettings == '/1/a'*/  &&  lineNumInSettings == 4) {
-var d = pp('');  // outOfFalseBlocksByOriginalTag  settingsTree.currentSettings
-}
                     var  condition = settingsTree.settingsInformation[indexInSettings].condition;
                     if (condition === '') {
                         condition = 'true';

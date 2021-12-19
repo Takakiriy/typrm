@@ -199,7 +199,7 @@ describe("checks file contents >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.only.each([
+    test.each([
         [
             '2_replace_1_ok', ' setting 1', 'en-US',
             { replacers:[
@@ -258,7 +258,6 @@ describe("replaces settings >>", () => {
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
-if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {return;}
         const  changingFolderPath = testFolderPath + '_changing';
         const  changingFileName = fileNameHead + "_1_changing.yaml";
         const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -278,7 +277,6 @@ if (fileNameHead !== '2_replace_10_double_check' || _subCaseName !== ' 1_OK') {r
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-expect('test code').toBe('deleted skip code.');
     });
 
     test.each([
@@ -362,6 +360,7 @@ expect('test code').toBe('deleted skip code.');
             ["same name error",  fileNameHead + "_same_name.yaml",   undefined],
             ["full path",        process.cwd() +"/"+ changingFile1Path,  changingFile1Path],
         ])("%s", async (caseName, changingFileName, changingFilePath) => {
+            var    errorMessage = '';
             const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
             writeFileSync(changingFile1Path,  sourceFileContents);
@@ -374,9 +373,20 @@ expect('test code').toBe('deleted skip code.');
             }
 
             // Test Main
-            await callMain(["replace", changingFileName], {
-                folder: `${changingFolderPath}/1, ${changingFolderPath}/2`, test: "", locale: "en-US"
-            });
+            if (caseName !== "same name error") {  // Case of relace 1, replace 2
+
+                await callMain(["replace", changingFileName], {
+                    folder: `${changingFolderPath}/1, ${changingFolderPath}/2`, test: "", locale: "en-US"
+                });
+            } else {
+                try {
+                    await callMain(["replace", changingFileName], {
+                        folder: `${changingFolderPath}/1, ${changingFolderPath}/2`, test: "", locale: "en-US"
+                    });
+                } catch (e: any) {
+                    errorMessage = e.message;
+                }
+            }
 
             // Check
             if (caseName !== "same name error") {  // Case of relace 1, replace 2
@@ -1054,7 +1064,7 @@ describe("print reference >>", () => {
                 "    0.Folder\n",
             ],[
                 "second match",
-                ["search", "#ref:", "test_data/search/2/2.yaml:id=2#lineNum"],
+                ["search", "#ref:", "test_data/search/2/2.yaml:csv#lineNum,lineNum"],
                 {locale: "en-US", test: ""},
                 "test_data/search/2/2.yaml:86\n" +
                 "    0.Folder\n",

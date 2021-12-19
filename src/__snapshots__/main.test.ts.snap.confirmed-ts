@@ -20,20 +20,20 @@ exports[`checks file contents >> First >> NG: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:7:             user: 'user2'  #template: __User__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:4:             user: 'user1'
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected:             user: 'user2'
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:10: login user2  #template: __User__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: login user2
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:12: login user2  #template: __User__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: login user2
 
-Warning: 0, Error: 3
+Warning: 3, Error: 0
 template count = 6
 "
 `;
@@ -110,15 +110,15 @@ exports[`checks file contents >> First >> any_lines: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:16: not fourth  #template: __Fourth__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:3:     second
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: not fourth
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:41:     3 NG not end
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:21:     3 NG start
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected:     3 NG not end
 
-Warning: 0, Error: 2
+Warning: 2, Error: 0
 template count = 9
 "
 `;
@@ -258,7 +258,7 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:15: Checks
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:28:             - check: 'yes'  #template: __Stage__
@@ -275,42 +275,42 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:48: Checks if develop  #template: __Stage__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if develop
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:57: Checks if not product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if not product
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:59: Checks if not product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if not product
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:61: Checks else part
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks else part
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:66: Checks if $env.typrm_aaa == aaa
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if $env.typrm_aaa == aaa
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:75: Checks if $env.typrm_aaa != bbb
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if $env.typrm_aaa != bbb
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:78: Checks if $env.typrm_aaa != \\"\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if $env.typrm_aaa != \\"\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:87: Checks if $env.undefined == \\"\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
-    Error: Not same as file contents
+    Warning: Not same as file contents
     Expected: Checks if $env.undefined == \\"\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:90:     #if: value == value
@@ -319,7 +319,7 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91:     #if: $env.value = value
     Error: if tag syntax
 
-Warning: 5, Error: 11
+Warning: 14, Error: 4
 template count = 34
 "
 `;
@@ -1209,6 +1209,7 @@ Error: same file name exists.
     FileName: 2_replace_1_ok_same_name.yaml
     Folder: test_data/_changing/1, test_data/_changing/2
 
+Exception: Error: same file name exists \\"2_replace_1_ok_same_name.yaml\\".
 Warning: 0, Error: 1
 "
 `;
@@ -2270,27 +2271,28 @@ exports[`replaces settings >> replace to tag >> 1_OK: replacedFileContents 1`] =
         __BodyAt2__: ValueAtAt2  #original: ValueAt2
         __BodyAt3__: ValueAtAt3  #original: ValueAt3
 new body:
-    ValueAA   #template: __BodyA__
-    ValueBB
-        #template: __BodyB__
-    ValueCC
-        #template: __BodyC__
-    ValueCC2
-        #template: __BodyC2__  #keyword: dummy
-    1. ValueAtAt1
-    2. ValueAtAt2
-    3. ValueAtAt3
-        #template-at(-3): 1. __BodyAt1__
-        #template-at(-3): 2. __BodyAt2__
-        #template-at(-3): 3. __BodyAt3__
-    #test of empty line
+    values:
+        - ValueAA   #template: __BodyA__
+        - ValueBB
+            #template: __BodyB__
+        - ValueCC
+            #template: __BodyC__
+        - ValueCC2
+            #template: __BodyC2__  #keyword: dummy
+        - 1. ValueAtAt1
+        - 2. ValueAtAt2
+        - 3. ValueAtAt3
+            #template-at(-3): 1. __BodyAt1__
+            #template-at(-3): 2. __BodyAt2__
+            #template-at(-3): 3. __BodyAt3__
+        #test of empty line
 
-    -(ValueDD)-             #template: (__BodyD__)
-    -(ValueEE)-             #template: (__BodyE__)
-    -(ValueFF1)-(ValueFF2)-  #template: (__BodyF1__)-(__BodyF2__)
-    -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
-    -\\"Valu\\"-'Valu'-
-        #template: \\"__BodyL__\\"-'__BodyL__'
+        - -(ValueDD)-             #template: (__BodyD__)
+        - -(ValueEE)-             #template: (__BodyE__)
+        - -(ValueFF1)-(ValueFF2)-  #template: (__BodyF1__)-(__BodyF2__)
+        - -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
+        - -\\"Valu\\"-'Valu'-
+            #template: \\"__BodyL__\\"-'__BodyL__'
     settings: #// in second setting
         __SubA__: SetSubAA  #original: SetSubA
     body:
@@ -2324,27 +2326,28 @@ exports[`replaces settings >> replace to tag >> 1_OK: revertedFileContents 1`] =
         __BodyAt2__: ValueAt2
         __BodyAt3__: ValueAt3
 new body:
-    ValueA   #template: __BodyA__
-    ValueB
-        #template: __BodyB__
-    ValueC
-        #template: __BodyC__
-    ValueC2
-        #template: __BodyC2__  #keyword: dummy
-    1. ValueAt1
-    2. ValueAt2
-    3. ValueAt3
-        #template-at(-3): 1. __BodyAt1__
-        #template-at(-3): 2. __BodyAt2__
-        #template-at(-3): 3. __BodyAt3__
-    #test of empty line
+    values:
+        - ValueA   #template: __BodyA__
+        - ValueB
+            #template: __BodyB__
+        - ValueC
+            #template: __BodyC__
+        - ValueC2
+            #template: __BodyC2__  #keyword: dummy
+        - 1. ValueAt1
+        - 2. ValueAt2
+        - 3. ValueAt3
+            #template-at(-3): 1. __BodyAt1__
+            #template-at(-3): 2. __BodyAt2__
+            #template-at(-3): 3. __BodyAt3__
+        #test of empty line
 
-    -(ValueD)-             #template: (__BodyD__)
-    -(ValueE)-             #template: (__BodyE__)
-    -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)
-    -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
-    -\\"ValueLength\\"-'ValueLength'-
-        #template: \\"__BodyL__\\"-'__BodyL__'
+        - -(ValueD)-             #template: (__BodyD__)
+        - -(ValueE)-             #template: (__BodyE__)
+        - -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)
+        - -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
+        - -\\"ValueLength\\"-'ValueLength'-
+            #template: \\"__BodyL__\\"-'__BodyL__'
     settings: #// in second setting
         __SubA__: SetSubA
     body:
@@ -2379,32 +2382,33 @@ exports[`replaces settings >> replace to tag >> 1_OK: sourceFileContents 1`] = `
         __BodyAt2__: ValueAt2
         __BodyAt3__: ValueAt3
 new body:
-    ValueA   #template: __BodyA__   #to: ValueAA
-    ValueB
-        #template: __BodyB__  #to: ValueBB
-    ValueC
-        #template: __BodyC__
-        #to: ValueCC
-    ValueC2
-        #template: __BodyC2__  #keyword: dummy
-        #to: ValueCC2
-    1. ValueAt1
-    2. ValueAt2
-    3. ValueAt3
-        #template-at(-3): 1. __BodyAt1__
-            #to: ValueAtAt1
-        #template-at(-3): 2. __BodyAt2__
-            #to: ValueAtAt2
-        #template-at(-3): 3. __BodyAt3__ #to: ValueAtAt3
-    #test of empty line
+    values:
+        - ValueA   #template: __BodyA__   #to: ValueAA
+        - ValueB
+            #template: __BodyB__  #to: ValueBB
+        - ValueC
+            #template: __BodyC__
+            #to: ValueCC
+        - ValueC2
+            #template: __BodyC2__  #keyword: dummy
+            #to: ValueCC2
+        - 1. ValueAt1
+        - 2. ValueAt2
+        - 3. ValueAt3
+            #template-at(-3): 1. __BodyAt1__
+                #to: ValueAtAt1
+            #template-at(-3): 2. __BodyAt2__
+                #to: ValueAtAt2
+            #template-at(-3): 3. __BodyAt3__ #to: ValueAtAt3
+        #test of empty line
 
-    -(ValueD)-             #template: (__BodyD__)  #to:  ValueDD
-    -(ValueE)-             #template: (__BodyE__)  #to: (ValueEE)
-    -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)  #to:  ValueFF1, ValueFF2
-    -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)  #to: (ValueGG1)-(ValueGG2)
-    -\\"ValueLength\\"-'ValueLength'-
-        #template: \\"__BodyL__\\"-'__BodyL__'
-        #to: \\"Valu\\"-'Valu'
+        - -(ValueD)-             #template: (__BodyD__)  #to:  ValueDD
+        - -(ValueE)-             #template: (__BodyE__)  #to: (ValueEE)
+        - -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)  #to:  ValueFF1, ValueFF2
+        - -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)  #to: (ValueGG1)-(ValueGG2)
+        - -\\"ValueLength\\"-'ValueLength'-
+            #template: \\"__BodyL__\\"-'__BodyL__'
+            #to: \\"Valu\\"-'Valu'
     settings: #// in second setting
         __SubA__: SetSubA  #to: SetSubAA
     body:
@@ -2420,21 +2424,21 @@ exports[`replaces settings >> replace to tag >> 1_OK: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:6: #to: __SettingE__: SetEE
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:7: #to: __SettingF__: SetFF
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:9: #to: __SettingG__: SetGG
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:27: #to: __BodyA__: ValueAA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:29: #to: __BodyB__: ValueBB
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:32: #to: __BodyC__: ValueCC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:35: #to: __BodyC2__: ValueCC2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:40: #to: __BodyAt1__: ValueAtAt1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:42: #to: __BodyAt2__: ValueAtAt2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:43: #to: __BodyAt3__: ValueAtAt3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:46: #to: __BodyD__: ValueDD
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:47: #to: __BodyE__: ValueEE
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:48: #to: __BodyF1__: ValueFF1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:48: #to: __BodyF2__: ValueFF2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyG1__: ValueGG1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyG2__: ValueGG2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:52: #to: __BodyL__: Valu
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:54: #to: __SubA__: SetSubAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:28: #to: __BodyA__: ValueAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:30: #to: __BodyB__: ValueBB
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:33: #to: __BodyC__: ValueCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:36: #to: __BodyC2__: ValueCC2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:41: #to: __BodyAt1__: ValueAtAt1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:43: #to: __BodyAt2__: ValueAtAt2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:44: #to: __BodyAt3__: ValueAtAt3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:47: #to: __BodyD__: ValueDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:48: #to: __BodyE__: ValueEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyF1__: ValueFF1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyF2__: ValueFF2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:50: #to: __BodyG1__: ValueGG1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:50: #to: __BodyG2__: ValueGG2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:53: #to: __BodyL__: Valu
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:55: #to: __SubA__: SetSubAA
 
 Warning: 0, Error: 0
 "
@@ -2969,9 +2973,9 @@ exports[`replaces settings >> replace to tag >> ToTestTag: sourceFileContents 1`
     __BodyC1__: ValueC1
     __BodyC2__: ValueC2
 body:
-    -(ValueA1)-(ValueA2)-  #template: (__BodyA1__)-(__BodyA2__)  #to-test:  ValueAA1, ValueAA2
-    -(ValueB1)-(ValueB2)-  #template: (__BodyB1__)-(__BodyB2__)  #to-test: (ValueBB1)-(ValueBB2)
-    -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
+    - -(ValueA1)-(ValueA2)-  #template: (__BodyA1__)-(__BodyA2__)  #to-test:  ValueAA1, ValueAA2
+    - -(ValueB1)-(ValueB2)-  #template: (__BodyB1__)-(__BodyB2__)  #to-test: (ValueBB1)-(ValueBB2)
+    - -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
 "
 `;
 
@@ -2981,15 +2985,15 @@ Verbose:         template: (__BodyA1__)-(__BodyA2__)
 Verbose:         templatePattern: (*)-(*)
 Verbose:         toValue: ValueAA1, ValueAA2
 Verbose:         toValueIsMatchedWithTemplate: false
-Verbose:         __BodyA1__: ValueAA1
-Verbose:         __BodyA2__: ValueAA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9: #to: __BodyA1__: ValueAA1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9: #to: __BodyA2__: ValueAA2
 Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10:
 Verbose:         template: (__BodyB1__)-(__BodyB2__)
 Verbose:         templatePattern: (*)-(*)
 Verbose:         toValue: (ValueBB1)-(ValueBB2)
 Verbose:         toValueIsMatchedWithTemplate: true
-Verbose:         __BodyB1__: ValueBB1
-Verbose:         __BodyB2__: ValueBB2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10: #to: __BodyB1__: ValueBB1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10: #to: __BodyB2__: ValueBB2
 Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:
 Verbose:         template: (__BodyC1__)-(__BodyC2__)
 Verbose:         templatePattern: (*)-(*)
@@ -2997,10 +3001,12 @@ Verbose:         toValue: (ValueCC1)-(ValueCC2
 Verbose:         toValueIsMatchedWithTemplate: false
 
 Error of the value count in #to tag:
-    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:    -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:    - -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
     Variable count in the template tag: 2
     Variable count in the to tag: 1
-Verbose:         __BodyC1__: (ValueCC1)-(ValueCC2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11: #to: __BodyC1__: (ValueCC1)-(ValueCC2
+
+Warning: 0, Error: 1
 "
 `;
 
