@@ -3158,7 +3158,7 @@ settings:
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_1_ok setting 2 >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_1_ok setting 2 >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #original: Key3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27: #original: key1: value11
 
@@ -3166,7 +3166,7 @@ Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_6_if both >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_6_if both >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7: #original: __Setting1__: no
 
@@ -3174,35 +3174,35 @@ Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_6_if in if block >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_6_if in if block >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_6_if in if variable >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_6_if in if variable >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_6_if setting name >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_6_if setting name >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_6_if without line num >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_6_if without line num >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> revert 2_replace_10_double_check 1_OK >>: stdout 1`] = `
+exports[`replaces settings >> reset 2_replace_10_double_check 1_OK >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #original: __Full__: folder/file
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3: #original: __Folder__: folder
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #original: __File__: file

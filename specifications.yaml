@@ -1,4 +1,4 @@
-テスト revert 2_replace_6_if both:  #keyword: typrm revert 2_replace_6_if both
+テスト reset 2_replace_6_if both:  #keyword: typrm reset 2_replace_6_if both
     replace command:
         settingTree.currentSettings:
             lineNum ==  1: banana, yes
@@ -22,8 +22,8 @@
             lineNum == 12: banana, yes;  true
         return_.currentNewSettings:
             （reset では対象外）
-    課題）複数の if ブロックの中に original タグがあるときの revert :  #keyword: typrm revert with if tag
-        revert する対象のファイルのサンプル:
+    課題）複数の if ブロックの中に original タグがあるときの reset :  #keyword: typrm reset with if tag
+        reset する対象のファイルのサンプル:
             settings:
                 fruit: banana
                 banana:  #if: $settings.fruit == banana
@@ -32,8 +32,8 @@
                     __Setting1__: no
         解決法:
             - 一時的に if の条件を満たす設定に変えて、if ブロック内の定義を戻す
-            - # replace {fruit: banana}, revert {__Setting1__: yes}
-            - # replace {fruit: __not_banana}, revert {__Setting1__: no}
+            - # replace {fruit: banana}, reset {__Setting1__: yes}
+            - # replace {fruit: __not_banana}, reset {__Setting1__: no}
             - # {fruit: banana}
             - original タグが残っていたら警告する。別の設定セットに残っていても
     課題）if で参照されている変数と if ブロック内で定義している変数を内部では同時に変更できない:  #keyword: typrm replace with if tag

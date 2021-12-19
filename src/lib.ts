@@ -524,6 +524,14 @@ class  StandardInputBuffer {
 
 // Data group
 
+// isSameArrayOf
+// T: string, nunmber
+export function  isSameArrayOf<T>(log: T[], answer: T[]): boolean {
+  const matched = log.filter( (item) => answer.includes( item ) );
+  const isSame = (matched.length === answer.length && log.length === answer.length);
+  return isSame;
+}
+
 // getCommonElements
 export function  getCommonElements<T>(arrayA: T[], arrayB: T[]): T[] {
     const  commonElements = [] as T[];

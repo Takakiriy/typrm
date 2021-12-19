@@ -21,16 +21,8 @@ export async function  main() {
     }
 
     if (programArguments.length === 0) {
-        if (programOptions.replaceMode) {
 
-            await checkRoutine(true, '', new Parser());
-            if (programOptions.test) {  // Scan last input command line for the test
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-        } else {
-
-            await  search();
-        }
+        await  search();
     } else if (programArguments.length >= 1 ) {
 
         if (programArguments[0] === 's'  ||  programArguments[0] === 'search') {
@@ -67,45 +59,22 @@ export async function  main() {
             if (verboseMode) {
                 console.log('Verbose: typrm command: replace');
             }
-            if (programArguments.length <= 2) {
-                if (programArguments.length === 1) {
-                    var  inputFilePath = '';
-                } else {
-                    var  inputFilePath = programArguments[1];
-                }
-
-                await  replace(inputFilePath);
+            if (programArguments.length === 1) {
+                var  inputFilePath = '';
             } else {
-                varidateReplaceCommandArguments();
-                if (programArguments.length === 3) {
-                    var  inputFilePath = programArguments[1];
-                    var  replacingLineNum = '';  // isOneSetting
-                    var  keyValues = programArguments[2];
-                } else {
-                    var  inputFilePath = programArguments[1];
-                    var  replacingLineNum = programArguments[2];
-                    var  keyValues = programArguments[3];
-                }
-
-                await  replaceSettings(inputFilePath, replacingLineNum, keyValues, {}, false);
+                var  inputFilePath = programArguments[1];
             }
+
+            await  replace(inputFilePath);
         }
-        else if (programArguments[0] === 'revert'  ||  programArguments[0] === 'reset') {
-            if (programArguments.length <= 2) {
-                if (programArguments.length === 1) {
-                    var  inputFilePath = '';
-                } else {
-                    var  inputFilePath = programArguments[1];
-                }
-
-                await  revert(inputFilePath);
+        else if (programArguments[0] === 'reset') {
+            if (programArguments.length === 1) {
+                var  inputFilePath = '';
             } else {
-                varidateRevertCommandArguments();
-                const  inputFilePath = programArguments[1];
-                const  replacingLineNum = programArguments[2];
-
-                await  revertSettings(inputFilePath, replacingLineNum);
+                var  inputFilePath = programArguments[1];
             }
+
+            await  revert(inputFilePath);
         }
         else if (programArguments[0] === 'where') {
             const  variableName = programArguments[1];
@@ -135,777 +104,225 @@ export async function  main() {
 }
 
 // checkRoutine
-async function  checkRoutine(isModal: boolean, inputFilePath: string, parser: Parser) {
-    if (isModal) {
-        var  inputFilePath = await lib.inputPath( translate('YAML UTF-8 file path>') );
-    }
+async function  checkRoutine(inputFilePath: string, parser: Parser) {
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
-    var  previousTemplateCount = 0;
-    for(;;) {
-        parser.command = CommandEnum.check;
-        parser.verbose = ('verbose' in programOptions);
-        parser.filePath = inputFilePath;
+    parser.command = CommandEnum.check;
+    parser.verbose = ('verbose' in programOptions);
+    parser.filePath = inputFilePath;
 
-        const  settingTree = await makeSettingTree(parser);
-        if (parser.verbose) {
-            console.log(`Verbose: Phase 2: check ...`);
+    const  settingTree = await makeSettingTree(parser);
+    if (parser.verbose) {
+        console.log(`Verbose: Phase 2: check ...`);
+    }
+    var  reader = readline.createInterface({
+        input: fs.createReadStream(inputFilePath),
+        crlfDelay: Infinity
+    });
+    var  setting: Settings = {};
+    var  settingLineNum = 0;
+    var  lineNum = 0;
+    var  fileTemplateTag: TemplateTag | null = null;
+    var  secretLabelCount = 0;
+    const  lines = [];
+    const  keywords: SearchKeyword[] = [];
+    const  ifTagParser = new IfTagParser(parser);
+
+    for await (const line1 of reader) {
+        const  line: string = line1;
+        lines.push(line);
+        lineNum += 1;
+        parser.lineNum = lineNum;
+
+        // Set condition by "#if:" tag.
+        ifTagParser.evaluate(line, setting);
+
+        // setting = ...
+        settingTree.moveToLine(parser);
+        setting = settingTree.currentSettings;
+
+        if (settingTree.outOfScopeSettingIndices.length >= 1) {
+            parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+                inputFilePath);
         }
-        var  reader = readline.createInterface({
-            input: fs.createReadStream(inputFilePath),
-            crlfDelay: Infinity
-        });
-        var  isReadingSetting = false;
-        var  setting: Settings = {};
-        var  settingCount = 0;
-        var  settingLineNum = 0;
-        var  settingIndentLength = 0;
-        var  lineNum = 0;
-        var  fileTemplateTag: TemplateTag | null = null;
-        var  secretLabelCount = 0;
-        const  lines = [];
-        const  keywords: SearchKeyword[] = [];
-        const  ifTagParser = new IfTagParser(parser);
 
-        for await (const line1 of reader) {
-            const  line: string = line1;
-            lines.push(line);
-            lineNum += 1;
-            parser.lineNum = lineNum;
+        // Check the condition by "#expect:" tag.
+        if (line.includes(expectLabel)  &&  ifTagParser.thisIsOutOfFalseBlock) {
+            const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
 
-            // Set condition by "#if:" tag.
-            const  parsed = ifTagParser.evaluate(line, setting);
-            if (parsed.errorCount >= 1) {
-                console.log('');
-                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                parser.errorCount += parsed.errorCount;
-            }
-
-            // setting = ...
-            if (newCode) {
-
-                settingTree.moveToLine(parser);
-                setting = settingTree.currentSettings;
-
-                if (settingTree.outOfScopeSettingIndices.length >= 1) {
-                    parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
-                        inputFilePath);
-                }
-            } else {
-                if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                    if (settingCount >= 1) {
-                        parser.warningCount += onEndOfSettingScope(setting, inputFilePath);
-                    }
-                    if (parser.verbose) {
-                        console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: settings`);
-                    }
-                    isReadingSetting = true;
-
-                    setting = {};
-                    settingCount += 1;
-                    settingLineNum = lineNum;
-                    settingIndentLength = indentRegularExpression.exec(line)![0].length;
-                } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-                    isReadingSetting = false;
-                }
-                if (isReadingSetting  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                    const  separator = line.indexOf(':');
-                    if (separator !== notFound) {
-                        const  key = line.substr(0, separator).trim();
-                        const  value = getValue(line, separator);
-                        if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
-                            if (key in setting) {
-                                const  previous = setting[key];
-                                console.log('');
-                                console.log(translate('Error of duplicated variable name:'));
-                                console.log(`  ${translate('typrmFile')}A: ${getTestablePath(inputFilePath)}:${previous.lineNum}`);
-                                console.log(`  ContentsA: ${key}: ${previous.value}`);
-                                console.log(`  ${translate('typrmFile')}B: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                                console.log(`  ContentsB: ${key}: ${value}`);
-                                parser.errorCount += 1;
-                            }
-                            if (parser.verbose) {
-                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}:     ${key}: ${value}`);
-                            }
-
-                            setting[key] = {value, lineNum: [lineNum], tag: 'settings', isReferenced: false};
-                        }
-                    }
-                }
-            }
-
-            // Check the condition by "#expect:" tag.
-            if (line.includes(expectLabel)  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                const  condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
-
-                const  evaluatedContidion = evaluateIfCondition(condition, setting, parser);
-                if (typeof evaluatedContidion === 'boolean') {
-                    if ( ! evaluatedContidion) {
-                        console.log('');
-                        console.log(translate('Error of not expected condition:'));
-                        console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
-                        console.log(`  Contents: ${condition}`);
-                        parser.errorCount += 1;
-                    }
-                } else {
+            const  evaluatedContidion = evaluateIfCondition(condition, setting, parser);
+            if (typeof evaluatedContidion === 'boolean') {
+                if ( ! evaluatedContidion) {
                     console.log('');
-                    console.log('Error of expect tag syntax:');
+                    console.log(translate('Error of not expected condition:'));
                     console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
                     console.log(`  Contents: ${condition}`);
                     parser.errorCount += 1;
                 }
-            }
-
-            // Check if previous line has "template" replaced contents.
-            const  templateTag = parseTemplateTag(line, parser);
-            if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
-                console.log("");
-                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line.trim()}`);
-                console.log(`    ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
-                templateTag.isFound = false;
-                parser.templateCount += 1;
+            } else {
+                console.log('');
+                console.log('Error of expect tag syntax:');
+                console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
+                console.log(`  Contents: ${condition}`);
                 parser.errorCount += 1;
             }
-            if (templateTag.isFound) {
-                parser.templateCount += 1;
-                const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                const  commonCase = (templateTag.label !== templateIfLabel);
-                if (commonCase) {
-                    var  expected = getExpectedLine(setting, templateTag.template);
-                } else { // if (templateTag.label === templateIfLabel)
-                    templateTag.evaluate(setting);
-                    var  expected = getExpectedLine(setting, templateTag.newTemplate);
-                }
-                if (templateTag.lineNumOffset === 0) {
-                    var  checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
-                } else {
-                    var  checkingLineWithoutTemplate = checkingLine;
-                }
+        }
 
-                if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                    console.log("");
-                    console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${checkingLine}`);
-                    if (templateTag.lineNumOffset !== 0) {
-                        console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);  // template
-                    }
-                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
-                    console.log(`    ${translate('Expected')}: ${expected}`);
-                    parser.warningCount += 1;
-                }
+        // Check if previous line has "template" replaced contents.
+        const  templateTag = parseTemplateTag(line, parser);
+        if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
+            console.log("");
+            console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line.trim()}`);
+            console.log(`    ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
+            templateTag.isFound = false;
+            parser.templateCount += 1;
+            parser.errorCount += 1;
+        }
+        if (templateTag.isFound) {
+            parser.templateCount += 1;
+            const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+            const  commonCase = (templateTag.label !== templateIfLabel);
+            if (commonCase) {
+                var  expected = getExpectedLine(setting, templateTag.template);
+            } else { // if (templateTag.label === templateIfLabel)
+                templateTag.evaluate(setting);
+                var  expected = getExpectedLine(setting, templateTag.newTemplate);
+            }
+            if (templateTag.lineNumOffset === 0) {
+                var  checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
+            } else {
+                var  checkingLineWithoutTemplate = checkingLine;
             }
 
-            // Check target file contents by "#file-template:" tag.
-            if (fileTemplateTag) {
-                const continue_ = fileTemplateTag.onReadLine(line);
-                if (!continue_) {
-
-                    await fileTemplateTag.checkTargetFileContents(setting, parser);
-                    fileTemplateTag = null;
+            if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                console.log("");
+                console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${checkingLine}`);
+                if (templateTag.lineNumOffset !== 0) {
+                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);  // template
                 }
+                console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                console.log(`    ${translate('Expected')}: ${expected}`);
+                parser.warningCount += 1;
             }
-            if (templateTag.label === fileTemplateLabel  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                fileTemplateTag = templateTag;
-            }
+        }
 
-            // Check if there is not "#★Now:".
-            for (let temporaryLabel of temporaryLabels) {
-                if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  ifTagParser.thisIsOutOfFalseBlock) {
+        // Check target file contents by "#file-template:" tag.
+        if (fileTemplateTag) {
+            const continue_ = fileTemplateTag.onReadLine(line);
+            if (!continue_) {
+
+                await fileTemplateTag.checkTargetFileContents(setting, parser);
+                fileTemplateTag = null;
+            }
+        }
+        if (templateTag.label === fileTemplateLabel  &&  ifTagParser.thisIsOutOfFalseBlock) {
+            fileTemplateTag = templateTag;
+        }
+
+        // Check if there is not "#★Now:".
+        for (let temporaryLabel of temporaryLabels) {
+            if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                console.log("");
+                console.log(`${translate('WarningLine')}: ${lineNum}`);
+                console.log(`  ${translate('Contents')}: ${line.trim()}`);
+                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                parser.warningCount += 1;
+            }
+        }
+
+        // Check if there is not secret tag.
+        if (line.includes( secretLabel )  ||  line.includes( secretLabelEn )) {
+            if ( ! line.includes( secretExamleLabel )  &&  ! line.includes( secretExamleLabelEn )) {
+                if (secretLabelCount === 0) {  // Because there will be many secret data.
                     console.log("");
                     console.log(`${translate('WarningLine')}: ${lineNum}`);
-                    console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
+                    console.log(`  ${translate('This is a secret value.')}`);
+                    console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
+                    console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
                     parser.warningCount += 1;
                 }
-            }
-
-            // Check if there is not secret tag.
-            if (line.includes( secretLabel )  ||  line.includes( secretLabelEn )) {
-                if ( ! line.includes( secretExamleLabel )  &&  ! line.includes( secretExamleLabelEn )) {
-                    if (secretLabelCount === 0) {  // Because there will be many secret data.
-                        console.log("");
-                        console.log(`${translate('WarningLine')}: ${lineNum}`);
-                        console.log(`  ${translate('This is a secret value.')}`);
-                        console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
-                        console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
-                        parser.warningCount += 1;
-                    }
-                    secretLabelCount += 1;
-                }
-            }
-
-            // Get titles above or following.
-            var  match: RegExpExecArray | null;
-            referPattern.lastIndex = 0;
-
-            while ( (match = referPattern.exec( line )) !== null ) {
-                const  keyword = new SearchKeyword();
-                const  label = match[1];
-                keyword.keyword = match[3];
-                if (label === "上記"  ||  label === "above") {
-                    keyword.startLineNum = lineNum - 1;
-                    keyword.direction = Direction.Above;
-                } else if (label === "下記"  ||  label === "following") {
-                    keyword.startLineNum = lineNum + 1;
-                    keyword.direction = Direction.Following;
-                }
-                keywords.push(keyword);
+                secretLabelCount += 1;
             }
         }
-        if (newCode) {
-            settingTree.moveToEndOfFile();
-            if (settingTree.outOfScopeSettingIndices.length >= 1) {
-                parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
-                    inputFilePath);
+
+        // Get titles above or following.
+        var  match: RegExpExecArray | null;
+        referPattern.lastIndex = 0;
+
+        while ( (match = referPattern.exec( line )) !== null ) {
+            const  keyword = new SearchKeyword();
+            const  label = match[1];
+            keyword.keyword = match[3];
+            if (label === "上記"  ||  label === "above") {
+                keyword.startLineNum = lineNum - 1;
+                keyword.direction = Direction.Above;
+            } else if (label === "下記"  ||  label === "following") {
+                keyword.startLineNum = lineNum + 1;
+                keyword.direction = Direction.Following;
             }
-        } else {
-            if (settingCount >= 1) {
-                parser.warningCount += onEndOfSettingScope(setting, inputFilePath);
-            }
+            keywords.push(keyword);
         }
-        parser.lineNum += 1;
+    }
+    settingTree.moveToEndOfFile();
+    if (settingTree.outOfScopeSettingIndices.length >= 1) {
+        parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
+            inputFilePath);
+    }
+    parser.lineNum += 1;
 
-        // Check target file contents by "#file-template:" tag (2).
-        if (fileTemplateTag) {
-            fileTemplateTag.onReadLine('');  // Cut indent
+    // Check target file contents by "#file-template:" tag (2).
+    if (fileTemplateTag) {
+        fileTemplateTag.onReadLine('');  // Cut indent
 
-            await fileTemplateTag.checkTargetFileContents(setting, parser);
-        }
+        await fileTemplateTag.checkTargetFileContents(setting, parser);
+    }
 
-        // Check if there is the title above or following.
-        reader = readline.createInterface({
-            input: fs.createReadStream(inputFilePath),
-            crlfDelay: Infinity
-        });
-        lineNum = 0;
+    // Check if there is the title above or following.
+    reader = readline.createInterface({
+        input: fs.createReadStream(inputFilePath),
+        crlfDelay: Infinity
+    });
+    lineNum = 0;
 
-        for await (const line1 of reader) {
-            const  line: string = line1;
-            lineNum += 1;
+    for await (const line1 of reader) {
+        const  line: string = line1;
+        lineNum += 1;
 
-            for (const keyword of keywords) {
-                if (keyword.direction === Direction.Above) {
-                    if (lineNum <= keyword.startLineNum) {
-
-                        if (line.includes(keyword.keyword)) {
-                            keyword.startLineNum = foundForAbove;
-                        }
-                    }
-                } else if (keyword.direction === Direction.Following) {
-                    if (lineNum >= keyword.startLineNum) {
-
-                        if (line.includes(keyword.keyword)) {
-                            keyword.startLineNum = foundForFollowing;
-                        }
-                    }
-                }
-            }
-        }
         for (const keyword of keywords) {
             if (keyword.direction === Direction.Above) {
-                if (keyword.startLineNum !== foundForAbove) {
-                    console.log('');
-                    console.log(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
-                    console.log('  ' + translate`Not found "${keyword.keyword}" above`);
-                    parser.errorCount += 1;
+                if (lineNum <= keyword.startLineNum) {
+
+                    if (line.includes(keyword.keyword)) {
+                        keyword.startLineNum = foundForAbove;
+                    }
                 }
             } else if (keyword.direction === Direction.Following) {
-                if (keyword.startLineNum !== foundForFollowing) {
-                    console.log('');
-                    console.log(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
-                    console.log('  ' + translate`Not found "${keyword.keyword}" following`);
-                    parser.errorCount += 1;
-                }
-            }
-        }
+                if (lineNum >= keyword.startLineNum) {
 
-        if (!isModal) {
-            break;
-        }
-
-        // Show the result
-        console.log('');
-        console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
-        if (previousTemplateCount) {
-            console.log(`${translate('template count')} = ${previousTemplateCount} (${translate('in previous check')})`);
-        }
-        console.log(`${translate('template count')} = ${parser.templateCount}`);
-
-        // Rescan or replace a value
-        var  loop = true;
-        var  errorCount = 0;
-        while (loop) {
-            console.log(translate('Press Enter key to retry checking.'));
-
-            const  key = await lib.input(translate('The line number to replace the variable value >'));
-            errorCount = 0;
-            if (key === 'exit') {
-                return;
-            } else if (key !== '') {
-                const  settingNameOrLineNum = key;
-                const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFilePath, settingNameOrLineNum);
-                if ( ! replacingSettingIndex) {
-                    console.log('');
-                    console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
-                    errorCount += 1;
-                } else {
-                    console.log(`${translate('SettingIndex')}: ${replacingSettingIndex}`);
-                    console.log(translate('Enter only: finish to input setting'));
-                    for (;;) {
-                        const  keyValue = await lib.input(translate('key: new_value>'));
-                        if (keyValue === '') {
-                            break;
-                        }
-                        errorCount += await replaceSettingsSub(
-                            inputFilePath, replacingSettingIndex, parseKeyValueLines(keyValue), {}, true, false, false);
+                    if (line.includes(keyword.keyword)) {
+                        keyword.startLineNum = foundForFollowing;
                     }
                 }
             }
-            loop = (errorCount >= 1);
-        }
-
-        // Rescan
-        console.log('========================================');
-        previousTemplateCount = parser.templateCount
-        for (const key of Object.keys(setting)) {
-            setting[key].isReferenced = false;
         }
     }
-}
-
-// replaceSettings
-async function  replaceSettings(inputFilePath: string, settingNameOrLineNum: string,
-        keyValueLines: string, toTagLineNums: {[key: string]: number[]}, cutReplaceToTagEnabled: boolean) {
-    const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
-    var  errorCount = 0;
-    if (inputFileFullPath === '') {
-        errorCount += 1;
-    } else {
-        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, settingNameOrLineNum);
-        if ( ! replacingSettingIndex) {
-            console.log('');
-            console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
-            errorCount += 1;
-        } else {
-
-            errorCount += await replaceSettingsSub(
-                inputFileFullPath, replacingSettingIndex, parseKeyValueLines(keyValueLines), toTagLineNums, true, false, cutReplaceToTagEnabled);
-        }
-    }
-}
-
-// revertSettings
-async function  revertSettings(inputFilePath: string, settingNameOrLineNum: string) {
-    const  inputFileFullPath = await getInputFileFullPath(inputFilePath);
-    var  errorCount = 0;
-    if (inputFileFullPath === '') {
-        errorCount += 1;
-    } else {
-        const  replacingSettingIndex = await getSettingIndexFromLineNum(inputFileFullPath, settingNameOrLineNum);
-        if ( ! replacingSettingIndex) {
-            console.log('');
-            console.log(`${translate(`Error of not found specified setting name`)}: ${settingNameOrLineNum}`);
-            errorCount += 1;
-        } else {
-
-            const  revertSettings_ = await makeRevertSettings(inputFileFullPath, replacingSettingIndex);
-            for (const revertSetting of revertSettings_) {
-            
-                errorCount += await replaceSettingsSub(inputFileFullPath, replacingSettingIndex,
-                    parseKeyValueLines(revertSetting), {}, false, true, false);
+    for (const keyword of keywords) {
+        if (keyword.direction === Direction.Above) {
+            if (keyword.startLineNum !== foundForAbove) {
+                console.log('');
+                console.log(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
+                console.log('  ' + translate`Not found "${keyword.keyword}" above`);
+                parser.errorCount += 1;
+            }
+        } else if (keyword.direction === Direction.Following) {
+            if (keyword.startLineNum !== foundForFollowing) {
+                console.log('');
+                console.log(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
+                console.log('  ' + translate`Not found "${keyword.keyword}" following`);
+                parser.errorCount += 1;
             }
         }
     }
-    console.log('');
-    console.log(`${translate('Warning')}: 0, ${translate('Error')}: ${errorCount}`);
-}
-
-// getInputFileFullPath
-async function  getInputFileFullPath(inputFilePath: string): Promise<string> {
-    const  currentFolder = process.cwd();
-    const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
-    const  fileFullPaths: string[] = [];
-    if (lib.isFullPath(inputFilePath)) {
-        const  inputFileFullPath = inputFilePath;
-        if (fs.existsSync(inputFileFullPath)) {
-            fileFullPaths.push(inputFileFullPath);
-        }
-    } else if (targetFolders.length === 0) {
-        const  inputFileFullPath = lib.getFullPath(inputFilePath, currentFolder);
-        if (fs.existsSync(inputFileFullPath)) {
-            fileFullPaths.push(inputFileFullPath);
-        }
-    } else {
-        for (const folder of targetFolders) {
-            const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);
-            const  inputFileFullPath = lib.getFullPath(inputFilePath, targetFolderFullPath);
-            if (fs.existsSync(inputFileFullPath)) {
-                fileFullPaths.push(inputFileFullPath);
-            }
-        }
-        if (fileFullPaths.length >= 2) {
-            console.log('');
-            console.log(`${translate('Error of same file name exists.')}`);
-            console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
-            console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
-            return  '';
-        }
-    }
-    if (fileFullPaths.length === 0) {
-        console.log('');
-        console.log(`${translate('Error of not found the specified file.')}`);
-        console.log(`    FileName: ${getTestablePath(inputFilePath)}`);
-        console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
-        return  '';
-    }
-
-    return  fileFullPaths[0];
-}
-
-// replaceSettingsSub
-async function  replaceSettingsSub(inputFilePath: string, replacingSettingIndex: number,
-        keyValues: {[key: string]: string},  toTagLineNums: {[key: string]: number[]},
-        addOriginalTag: boolean, cutOriginalTag: boolean, cutReplaceToTagEnabled: boolean
-): Promise<number>/*errorCount*/ {
-    var    errorCount = 0;
-    var    replacingKeyValues = keyValues;
-    var    previousEvalatedKeyValues: {[key: string]: string} = {};
-    var    reducedErrorWasOccurred = false;
-    var    loop = true;  // Loops until isAllReplacable == true. Loops until all ifTagParser.isReplacable == true
-    var    loopCount = 0;
-    const  updatingFilePath = inputFilePath +".updating";
-    const  previousUpdatingFilePath = inputFilePath +".previous.updating";
-    const  conflictErrors: {[lineNum: number]: string} = {};
-    const  replacedKeys: string[] = [];
-    const  parser = new Parser();
-    parser.command = CommandEnum.replace;
-    parser.verbose = ('verbose' in programOptions);
-    parser.filePath = inputFilePath;
-    if (parser.verbose) {
-        console.log(`Verbose: replaceSettingsSub:`);
-        console.log(`Verbose:     inputFilePath: ${getTestablePath(inputFilePath)}`);
-        console.log(`Verbose:     replacingSettingIndex: ${replacingSettingIndex}`)
-        console.log(`Verbose:     keyValues: ${JSON.stringify(replacingKeyValues)}`);
-    }
-    try {
-//        const  settingTree = await makeSettingTree(inputFilePath, CommandEnum.check);
-        while (loop) {
-            loopCount += 1;
-            const  oldFilePath = (loopCount === 1) ? inputFilePath : previousUpdatingFilePath;
-            const  writer = new WriteBuffer(fs.createWriteStream(updatingFilePath));
-            const  readStream = fs.createReadStream(oldFilePath);
-            const  reader = readline.createInterface({
-                input: readStream,
-                crlfDelay: Infinity
-            });
-            const  lines = [];
-            var  isReadingSetting = false;
-            var  setting: Settings = {};
-            var  settingCount = 0;
-            var  settingIndentLength = 0;
-            var  settingLineNum = -1;
-            var  oldSetting: Settings = {};
-            var  lineNum = 0;
-            var  isReplacing = false;
-            var  isAllReplacable = true;
-            var  isCheckingTemplateIfKey = false;
-            var  templateIfKeyError = false;
-            const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
-            const  evalatedKeyValues: {[key: string]: string} = {};  // for checking infinite loop
-            const  ifTagParser = new IfTagParser(parser);
-            const  oldIfTagParser = new IfTagParser(parser);
-            const  previousEvalatedKeyValuesLength = Object.keys(previousEvalatedKeyValues).length;
-            if (parser.verbose) {
-                console.log(`Verbose: loopCount: ${loopCount}`);
-                console.log(`Verbose: previousEvalatedKeyValuesLength: ${previousEvalatedKeyValuesLength}`);
-            }
-
-            for await (const line1 of reader) {
-                const  line: string = line1;
-                lines.push(line);
-                lineNum += 1;
-                var  output = false;
-                parser.lineNum = lineNum;
-
-                // isReadingSetting = ...
-                if (false /*newCode*/) {
-
-//                    settingTree.moveToLine(parser);
-//                    setting = settingTree.currentSettings;
-                } else {
-                    if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
-                        isReadingSetting = true;
-                        setting = {};
-                        settingCount += 1;
-                        settingIndentLength = indentRegularExpression.exec(line)![0].length;
-                        settingLineNum = lineNum;
-                        oldSetting = {};
-                        if (replacingSettingIndex === allSetting) {
-                            isReplacing = true;
-                        } else {
-                            isReplacing = (settingCount === replacingSettingIndex);
-                        }
-                        if ( ! templateIfKeyError) {
-                            isCheckingTemplateIfKey = true;
-                        }
-                    } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-
-                        isReadingSetting = false;
-                        if ( ! reducedErrorWasOccurred) {
-                            const  settingNames = Object.keys(setting);
-                            const  oldSettingNames = Object.keys(oldSetting);
-                            const  undefinedVariableNames = oldSettingNames.filter((oldName)=>( ! settingNames.includes(oldName)));
-                            if (undefinedVariableNames.length >= 1) {
-                                console.log('');
-                                console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                                console.log(`    ${translate('Error')}: ${translate('The number of variable declarations has decreased')}`);
-                                console.log(`  ${translate('Solution')}: ${translate('Add variable declarations')}`);
-                                console.log(`  ${translate('Variables')}: ${undefinedVariableNames}`);
-                                reducedErrorWasOccurred = true;
-                                errorCount += 1;
-                            }
-                        }
-                    }
-                }
-                ifTagParser.evaluate(line, setting, Object.keys(previousEvalatedKeyValues));
-                oldIfTagParser.evaluate(line, oldSetting, Object.keys(previousEvalatedKeyValues));
-
-                if (isReplacing) {
-                    if ( ! ifTagParser.isReplacable) {
-                        isAllReplacable = false;
-                    }
-
-                    // In settings tag
-                    if (isReadingSetting) {
-                        const  separator = line.indexOf(':');
-                        if (separator !== notFound) {
-                            const  key = line.substr(0, separator).trim();
-                            const  oldValue = getValue(line, separator);
-                            if (ifTagParser.isReplacable  &&  oldValue !== '') {
-                                if (key in replacingKeyValues) {
-                                    evalatedKeyValues[key] = replacingKeyValues[key];
-                                } else {
-                                    evalatedKeyValues[key] = oldValue;
-                                }
-                                if (parser.verbose) {
-                                    if ( ! replacedKeys.includes(key)) {
-                                        replacedKeys.push(key)
-                                        console.log(`Verbose:     evaluated setting: ${key}`)
-                                    }
-                                }
-                            }
-
-                            if (oldValue !== ''  &&  oldIfTagParser.thisIsOutOfFalseBlock) {
-
-                                oldSetting[key] = {value: oldValue, lineNum: [lineNum], tag: 'settings', isReferenced: false};
-                            }
-                            if (ifTagParser.thisIsOutOfFalseBlock) {
-                                const  replacingKeys = Object.keys(replacingKeyValues);
-                                if (replacingKeys.includes(key)  &&  ifTagParser.isReplacable) {
-                                    const  replacedValue = replacingKeyValues[key];
-
-                                    // Change a settings value
-                                    const  {original, spaceAndComment} = getReplacedLineInSettings(
-                                        line, separator, oldValue, replacedValue,
-                                        addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
-
-                                    writer.write(line.substr(0, separator + 1) +' '+ replacedValue + original + spaceAndComment + "\n");
-                                    output = true;
-                                    setting[key] = {value: replacedValue, lineNum: [lineNum], tag: 'settings', isReferenced: false};
-                                    if (parser.verbose  &&  oldValue !== replacedValue) {
-                                        console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${replacedValue}"`);
-                                        console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
-                                    }
-                                }
-                                else {
-                                    if (oldValue !== '') {
-                                        setting[key] = {value: oldValue, lineNum: [lineNum], tag: 'settings', isReferenced: false};
-                                    }
-                                }
-                            } else {
-                                if (loopCount === 1  &&  key in toTagLineNums) {
-                                    if (toTagLineNums[key].includes(lineNum)) {
-                                        console.log(`\nError: ${getTestablePath(inputFilePath)}:${lineNum}: ` +
-                                            `"#to:" tag cannot write in false condition block. Write "#to:" tags to be true condition.`);
-                                        errorCount += 1;
-                                    }
-                                }
-                            }
-                        }
-
-                    // Out of settings
-                    } else {
-                        const  templateTag = parseTemplateTag(line, parser);
-                        if (templateTag.isFound  &&  templateTag.includesKey(Object.keys(setting))
-                                &&  ifTagParser.thisIsOutOfFalseBlock  &&  ifTagParser.isReplacable) {
-                            var  replacingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
-                            const  commonCase = (templateTag.label !== templateIfLabel);
-                            if (commonCase) {
-                                var  expected = getExpectedLine(oldSetting, templateTag.template);
-                                var  replaced = getReplacedLine(setting, templateTag.template, replacingKeyValues);
-                            } else { // if (templateTag.label === templateIfLabel)
-                                templateTag.evaluate(setting);
-                                var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                                var  replaced = getReplacedLine(setting, templateTag.newTemplate, replacingKeyValues);
-                            }
-
-                            if (replacingLine.includes(expected)) {
-                                const  before = expected;
-                                const  after = replaced;
-                                if (templateTag.lineNumOffset === 0) {
-                                    var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
-                                    if (cutReplaceToTagEnabled) {
-                                        replacedLine = cutReplaceToTag(replacedLine);
-                                    }
-
-                                    writer.write(replacedLine +"\n");
-                                    output = true;
-                                    checkedTemplateTags[lineNum] = [];
-                                    checkedTemplateTags[lineNum].push({
-                                        templateLineNum: lineNum,
-                                        template: templateTag.template,
-                                        targetLineNum: lineNum + templateTag.lineNumOffset,
-                                        expected: before,
-                                        replaced: after.replace(/\$/g,'$$')
-                                    })
-                                } else if (templateTag.lineNumOffset <= -1) {
-                                    const  targetLineNum = lineNum + templateTag.lineNumOffset;
-                                    if ( !(targetLineNum in checkedTemplateTags)) {
-                                        checkedTemplateTags[targetLineNum] = [];
-                                    }
-                                    checkedTemplateTags[targetLineNum].push({
-                                        templateLineNum: lineNum,
-                                        template: templateTag.template,
-                                        targetLineNum,
-                                        expected: before,
-                                        replaced: after.replace(/\$/g,'$$')
-                                    });
-                                    var  lengthSortedTemplates = checkedTemplateTags[targetLineNum].slice(); // copy
-                                    lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
-                                    var  replacedLine = replacingLine;
-                                    var  maskedLine = replacingLine;
-                                    const  mask = '\n';
-                                    const  conflictedTemplates: CheckedTemplateTag[] = [];
-                                    for (const template of lengthSortedTemplates) {
-                                        var  i = 0;
-                                        if ( ! maskedLine.includes(template.expected)) {
-                                            if ( ! replacedLine.includes(template.replaced)) {
-                                                conflictedTemplates.push(template);
-                                            }
-                                        } else {
-                                            for (;;) {
-                                                i = maskedLine.indexOf(template.expected, i);
-                                                if (i === notFound) {
-                                                    break;
-                                                }
-
-                                                replacedLine = replacedLine.substr(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
-                                                maskedLine = maskedLine.substr(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
-                                                i += template.expected.length;
-                                            }
-                                        }
-                                    }
-
-                                    writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
-                                    if (conflictedTemplates.length >= 1) {
-                                        var  errorMessage = '';
-                                        errorMessage += '\n';
-                                        errorMessage += `${getTestablePath(inputFilePath)}:${targetLineNum}\n`;
-                                        errorMessage += `  ${translate('Error')}: ${translate('template values after replace are conflicted.')}\n`;
-                                        errorMessage += `  ${translate('Contents')}: ${replacingLine.trim()}\n`;
-                                        for (const template of checkedTemplateTags[targetLineNum]) {
-                                            errorMessage += `  ${translate('in ')}: ${getTestablePath(inputFilePath)}:${template.templateLineNum}\n`;
-                                            errorMessage += `    ${translate('Before Editing')}: ${template.expected.trim()}\n`;
-                                            errorMessage += `    ${translate('After  Editing')}: ${template.replaced.trim()}\n`;
-                                            errorMessage += `    ${translate('Template')}: ${template.template.trim()}\n`;
-                                        }
-                                        errorMessage += `  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`;
-                                        conflictErrors[targetLineNum] = errorMessage;
-                                    }
-                                }
-                                if (parser.verbose  &&  before !== after) {
-                                    console.log(`Verbose: replaced a line:`);
-                                    console.log(`Verbose:     from: ${before}`);
-                                    console.log(`Verbose:     to:   ${after}`);
-                                    console.log(`Verbose:     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
-                                }
-                            } else if (replacingLine.includes(replaced)) {
-                                // Do nothing
-                            } else {
-                                if (errorCount === 0) { // Since only one old value can be replaced at a time
-                                    console.log('');
-                                    console.log(`${translate('ErrorLine')}: ${lineNum}`);
-                                    console.log(`  ${translate('Error')}: ${translate('Not found any replacing target.')}`);
-                                    console.log(`  ${translate('Solution')}: ${translate('Set old value at settings in the replacing file')}`);
-                                    console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                                    console.log(`  ${translate('Expected')}: ${expected.trim()}`);
-                                    console.log(`  ${translate('Template')}: ${templateTag.template.trim()}`);
-                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                                    errorCount += 1;
-                                }
-                            }
-                        } else {
-                            if (isCheckingTemplateIfKey  &&  templateTag.label === templateIfLabel) {
-                                isCheckingTemplateIfKey = false;
-                                const  necessaryVariableNames = getNotSetTemplateIfTagVariableNames(Object.keys(setting));
-                                if (necessaryVariableNames !== '') {
-                                    console.log('');
-                                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                                    console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
-                                    console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
-                                    console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                                    errorCount += 1;
-                                    templateIfKeyError = true;
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!output) {
-                    if ( ! cutReplaceToTagEnabled) {
-
-                        writer.write(line +"\n");
-                    } else {
-                        if (line.trim() === '') {
-                            writer.write(line +"\n");
-                        } else {
-                            const  cutLine = cutReplaceToTag(line);
-                            if (cutLine.trim() === '') {
-                                lines.pop();  // for template-at tag
-                            } else {
-                                writer.write(cutLine +"\n");
-                            }
-                        }
-                    }
-                }
-            }
-            for (const conflictError of Object.values(conflictErrors)) {
-                console.log(conflictError);
-                errorCount += 1;
-            }
-
-            // ...
-            writer.end();
-            await new Promise( (resolve) => {
-                writer.on('finish', () => {
-                    if (errorCount === 0) {
-                        if (loop) {
-                            fs.copyFileSync(updatingFilePath, previousUpdatingFilePath);
-                        } else {
-                            fs.copyFileSync(updatingFilePath, inputFilePath);
-                        }
-                    } else {
-                        loop = false;
-                    }
-                    resolve(errorCount);
-                });
-            });
-        }
-    } finally {
-        deleteFileSync(previousUpdatingFilePath);
-        deleteFileSync(updatingFilePath);
-    }
-    return  errorCount;
 }
 
 // makeSettingTree
@@ -1088,22 +505,20 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
                     if (key in setting) {
 // ToDo: check with parent settings
-                        if (newCode) {
-                            const  previous = setting[key];
-                            console.log('');
-                            console.log(translate('Error of duplicated variable name:'));
-                            console.log(`  ${translate('typrmFile')}A: ${getTestablePath(parser.filePath)}:${previous.lineNum}`);
-                            console.log(`  ContentsA: ${key}: ${previous.value}`);
-                            console.log(`  ${translate('typrmFile')}B: ${getTestablePath(parser.filePath)}:${lineNum}`);
-                            console.log(`  ContentsB: ${key}: ${value}`);
-                            parser.errorCount += 1;
-                        }
+                        const  previous = setting[key];
+                        console.log('');
+                        console.log(translate('Error of duplicated variable name:'));
+                        console.log(`  ${translate('typrmFile')}A: ${getTestablePath(parser.filePath)}:${previous.lineNum}`);
+                        console.log(`  ContentsA: ${key}: ${previous.value}`);
+                        console.log(`  ${translate('typrmFile')}B: ${getTestablePath(parser.filePath)}:${lineNum}`);
+                        console.log(`  ContentsB: ${key}: ${value}`);
+                        parser.errorCount += 1;
                     }
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
                     }
 
-                    setting[key] = {value, lineNum: [lineNum], tag: 'settings', isReferenced: false};
+                    setting[key] = {value, lineNum, tag: 'settings', isReferenced: false};
                 }
             }
         }
@@ -1275,7 +690,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
 
                 toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: toValue,
-                    lineNum: [lineNum],
+                    lineNum: lineNum,
                     tag: 'toInSettings',
                     isReferenced: false,
                 };
@@ -1386,7 +801,7 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
 
                 toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: originalValue,
-                    lineNum: [lineNum],
+                    lineNum: lineNum,
                     tag: 'original',
                     isReferenced: false,
                 };
@@ -1547,77 +962,6 @@ function  cutReplaceToTag(line: string): string {
         }
     }
     return  line;
-}
-
-// makeRevertSettings
-async function  makeRevertSettings(inputFilePath: string, replacingSettingIndex: number
-        ): /* "key: value\n" */ Promise<string[]> {
-
-    const  readStream = fs.createReadStream(inputFilePath);
-    const  reader = readline.createInterface({
-        input: readStream,
-        crlfDelay: Infinity
-    });
-    var  isReadingSetting = false;
-    var  revertKeyValues: string = '';
-    var  revertKeyValuesWithCondition: {[condition: string]: string} = {};
-    var  settingCount = 0;
-    var  settingIndentLength = 0;
-    var  lineNum = 0;
-    var  isReadingOriginal = false;
-    const  ifTrueScanner = new IfTrueConditionScanner();
-
-    for await (const line1 of reader) {
-        const  line: string = line1;
-        lineNum += 1;
-
-        // setting = ...
-        if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
-            isReadingSetting = true;
-            settingCount += 1;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            if (replacingSettingIndex === allSetting) {
-                isReadingOriginal = true;
-            } else {
-                isReadingOriginal = (settingCount === replacingSettingIndex);
-            }
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength
-                &&  isReadingSetting) {
-            isReadingSetting = false;
-            isReadingOriginal = false;
-        }
-
-        if (isReadingOriginal) {
-            ifTrueScanner.evaluate(line);
-
-            // Parse #original tag
-            if (line.includes(originalLabel)) {
-                const  separator = line.indexOf(':');
-                if (separator !== notFound) {
-                    const  key = line.substr(0, separator).trim();
-                    const  originalLabelSeparator = line.indexOf(originalLabel) + originalLabel.length - 1;
-                    const  originalValue = getValue(line, originalLabelSeparator);
-                    if (ifTrueScanner.condition === '') {
-
-                        revertKeyValues += `${key}: ${originalValue}\n`;
-                    } else {
-                        if ( ! (ifTrueScanner.condition in revertKeyValuesWithCondition)) {
-                            revertKeyValuesWithCondition[ifTrueScanner.condition] = '';
-                        }
-                        revertKeyValuesWithCondition[ifTrueScanner.condition] += `${key}: ${originalValue}\n`;
-                    }
-                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                }
-            }
-        }
-    }
-
-    const  revertSettings: string[] = [];
-    for (const [condition, revertKeyValues_] of Object.entries(revertKeyValuesWithCondition)) {
-        revertSettings.push(`${condition}\n${revertKeyValues_}`);
-    }
-    revertSettings.push(revertKeyValues);
-    return  revertSettings;
 }
 
 // TemplateTag
@@ -1824,7 +1168,7 @@ class  TemplateTag {
         for (const key of Object.keys(keyValues)) {
             returnKeyValues[key] =  {
                 value: keyValues[key],
-                lineNum: [parser.lineNum],
+                lineNum: parser.lineNum,
                 tag: 'toAfterTemplate',
                 isReferenced: false,
             };
@@ -2023,9 +1367,8 @@ class  IfTagParser {
     }
 
     // evaluate
-    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = []): IfTagParserResult {
+    evaluate(line: string, setting: Settings, previsousEvalatedKeys: string[] = []) {
         var    expression = '';
-        var    errorCount = 0;
         const  indentLength = indentRegularExpression.exec(line)![0].length;
         if (line.trim() !== '') {
             while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
@@ -2040,7 +1383,7 @@ class  IfTagParser {
         }
 
         if (line.includes(ifLabel)) {
-            expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
+            expression = line.substring(line.indexOf(ifLabel) + ifLabel.length).trim();
 
             const  evaluatedContidion = evaluateIfCondition(expression, setting, this.parser, previsousEvalatedKeys);
             if (typeof evaluatedContidion === 'boolean') {
@@ -2050,7 +1393,10 @@ class  IfTagParser {
                 var  resultOfIf = evaluatedContidion.result;
                 var  isReplacable = evaluatedContidion.isReplacable;
             } else {
-                errorCount += 1;
+                console.log('');
+                console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
+                console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
+                this.parser.errorCount += 1;
                 var  resultOfIf = true;
                 var  isReplacable = false;
             }
@@ -2060,52 +1406,6 @@ class  IfTagParser {
             this.indentLengthsOfIfTag.push({indentLength, resultOfIf,
                 enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_});
             this.isReplacable_ = isReplacable;
-        }
-        return  { condition: expression, errorCount };
-    }
-}
-
-// IfTagParserResult
-interface  IfTagParserResult {
-    condition: string;
-    errorCount: number;
-}
-
-// IfTrueConditionScanner
-class  IfTrueConditionScanner {
-    get       condition(): string {return this.condition_;}
-    private   condition_: string = '';
-    get       isUpdated(): boolean {return this.isUpdated_;}
-    private   isUpdated_: boolean = false;
-    readonly  indentLengthsOfIfTag: IfTagForConditionScanner[] = [
-        {indentLength: -1, trueCondition: ''}
-    ];
-
-    // evaluate
-    evaluate(line: string) {
-        const  indentLength = indentRegularExpression.exec(line)![0].length;
-        this.isUpdated_ = false;
-        if (line.trim() !== '') {
-            while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
-
-                const  previousBlock = this.indentLengthsOfIfTag.pop();
-                if (previousBlock  &&  previousBlock.trueCondition) {
-                    this.isUpdated_ = true;
-                }
-            }
-        }
-        if (line.includes(ifLabel)) {
-            const  expression = line.substr(line.indexOf(ifLabel) + ifLabel.length).trim();
-
-            const  trueCondition = getTrueCondition(expression);
-            if (trueCondition) {
-                this.isUpdated_ = true;
-            }
-            this.indentLengthsOfIfTag.push({indentLength, trueCondition});
-        }
-        if (this.isUpdated_) {
-            this.condition_ = this.indentLengthsOfIfTag.map((block)=>(block.trueCondition))
-                .filter((trueCondition)=>(trueCondition)).join('\n');
         }
     }
 }
@@ -2178,27 +1478,7 @@ async function  replace(inputFileOrFolderPath: string) {
     var  errorCount = 0;
     try {
         for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
-
-            if (newCode) {
-                await replaceSub(inputFilePath, 'replace');
-            } else {
-                const  inputFileFullPath = inputFilePath;
-                const  replaceKeyValuesSet = await makeReplaceSettingsFromToTags(inputFileFullPath);
-                for (const replaceKeyValues of replaceKeyValuesSet) {
-                    if ( ! replaceKeyValues.testMode) {
-                        const  toTagLineNums: {[key: string]: number[]} = {};
-                        for (const [key, value] of Object.entries( replaceKeyValues.keyValues )) {
-                            toTagLineNums[key] = value.lineNum.slice(); // copy
-                            for (const lineNum of value.lineNum) {
-                                console.log(`${getTestablePath(inputFileFullPath)}:${lineNum}: ${toLabel} ${key}: ${value.value}`);
-                            }
-                        }
-
-                        await  replaceSettings(inputFileFullPath,
-                            replaceKeyValues.settingNameOrLineNum, replaceKeyValues.keyValueLines, toTagLineNums, true);
-                    }
-                }
-            }
+            await replaceSub(inputFilePath, 'replace');
         }
     } catch (e: any) {
         console.log('');
@@ -2213,34 +1493,7 @@ async function  revert(inputFilePath: string) {
     var  errorCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
-
-            if (newCode) {
-                await replaceSub(inputFileFullPath, 'reset');
-            } else {
-                const  text = fs.readFileSync(inputFileFullPath, "utf-8");
-                if (text.includes(originalLabel)) {
-                    const  readStream = fs.createReadStream(inputFileFullPath);
-                    const  reader = readline.createInterface({
-                        input: readStream,
-                        crlfDelay: Infinity
-                    });
-                    var  lineNum = 0;
-                    var  reverted = false;
-
-                    for await (const line1 of reader) {
-                        const  line: string = line1;
-                        lineNum += 1;
-                        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                            reverted = false;
-                        }
-                        if (line.includes(originalLabel)  &&  ! reverted) {
-
-                            await  revertSettings(inputFileFullPath, lineNum.toString());
-                            reverted = true;
-                        }
-                    }
-                }
-            }
+            await replaceSub(inputFileFullPath, 'reset');
         }
     } catch (e: any) {
         console.log('');
@@ -2551,7 +1804,7 @@ async function  check(checkingFilePath?: string) {
     const  parser = new Parser();
     for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
 
-        await checkRoutine(false, inputFileFullPath, parser);
+        await checkRoutine(inputFileFullPath, parser);
     }
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
@@ -2608,149 +1861,6 @@ async function  listUpFilePaths(checkingFilePath?: string) {
     }
 
     return  inputFileFullPaths;
-}
-
-// makeReplaceSettingsFromToTags (old specifications)
-async function  makeReplaceSettingsFromToTags(inputFilePath: string): Promise<ReplaceKeyValues[]> {
-    const  reader = readline.createInterface({
-        input: fs.createReadStream(inputFilePath),
-        crlfDelay: Infinity
-    });
-    var  lineNum = 0;
-    var  isReadingSetting = false;
-    var  setting: Settings = {};
-    var  settingCount = 0;
-    var  settingIndentLength = 0;
-    var  key = '';
-    var  previousTemplateTag: TemplateTag | null = null;
-    var  replaceKeyValues = new ReplaceKeyValues();
-    var  errorCount = 0;
-    var  replaceKeyValuesSet: ReplaceKeyValues[] = [];
-    const  parser = new Parser();
-    parser.command = CommandEnum.replace;
-    parser.verbose = ('verbose' in programOptions);
-    parser.filePath = inputFilePath;
-    if (parser.verbose) {
-        console.log(`Verbose: makeReplaceSettingsFromToTags:`);
-    }
-
-    for await (const line1 of reader) {
-        const  line: string = line1;
-        lineNum += 1;
-        parser.line = line;
-        parser.lineNum = lineNum;
-
-        // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-            isReadingSetting = true;
-
-            setting = {};
-            settingCount += 1;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            previousTemplateTag = null;
-            replaceKeyValues = new ReplaceKeyValues();
-            replaceKeyValues.settingNameOrLineNum = lineNum.toString();
-            replaceKeyValuesSet.push(replaceKeyValues);
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-            isReadingSetting = false;
-            key = '';
-        }
-        if (isReadingSetting) {
-            const  separator = line.indexOf(':');
-            if (separator !== notFound) {
-                const  keyOrNot = line.substr(0, separator).trim();
-                if (keyOrNot[0] !== '#') {
-
-                    key = keyOrNot;
-                    const  value = getValue(line, separator);
-                    setting[key] = {value, lineNum: [lineNum], tag: 'toInSettings', isReferenced: false};
-                }
-            }
-        }
-        var  toLabelIndex = line.indexOf(toLabel)
-        if (toLabelIndex !== notFound) {
-            var  toValue = getValue(line, toLabelIndex + toLabel.length - 1);
-        } else {
-            toLabelIndex = line.indexOf(toTestLabel);
-            if (toLabelIndex !== notFound) {
-                var  toValue = getValue(line, toLabelIndex + toTestLabel.length - 1);
-            } else {
-                var  toValue = '';
-            }
-        }
-        const  templateTag = parseTemplateTag(line, parser);
-        if (templateTag.isFound) {
-            previousTemplateTag = templateTag;
-        }
-
-        if (toValue) {
-            const  hasTestTag = (line.indexOf(toTestLabel) !== notFound);
-            if (hasTestTag) {
-                replaceKeyValues.testMode = true;
-            }
-
-            // #to: tag in the settings
-            if (isReadingSetting) {
-                if (parser.verbose || hasTestTag) {
-                    console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
-                    console.log(`Verbose:         ${key}: ${toValue}`);
-                }
-
-                replaceKeyValues.pushKeyValue(key, {
-                        value: toValue,
-                        lineNum: [lineNum],
-                    } as Setting);
-
-            // #to: tag after the #template:
-            } else {
-                if (previousTemplateTag) {
-                    if (parser.verbose || hasTestTag) {
-                        console.log(`Verbose:     ${getTestablePath(inputFilePath)}:${lineNum}:`);
-                    }
-                    const  newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(setting), parser, hasTestTag);
-                    errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, inputFilePath);
-                    if (parser.verbose || hasTestTag) {
-                        for (const [key_, newValue] of Object.entries(newKeyValues)) {
-                            console.log(`Verbose:         ${key_}: ${newValue.value}`);
-                        }
-                    }
-                    for (const [key_, newValue] of Object.entries(newKeyValues)) {
-
-                        replaceKeyValues.pushKeyValue(key_, newValue);
-                    }
-                    previousTemplateTag = null;
-                }
-            }
-        }
-    }
-    errorCount += parser.errorCount;
-    if (errorCount >= 1) {
-        replaceKeyValuesSet = [];
-    } else {
-        replaceKeyValuesSet = replaceKeyValuesSet.filter((replaceKeyValues)=>(Object.keys(replaceKeyValues.keyValues).length >= 1));
-    }
-    return  replaceKeyValuesSet;
-}
-
-// checkNoConfilict
-function  checkNoConfilict(
-        keyValueA: {[key: string]: Setting},
-        keyValueB: {[key: string]: Setting},
-        filePath: string): number /* error count */ {
-    const  commonKeys = lib.getCommonElements(Object.keys( keyValueA ), Object.keys( keyValueB ));
-    var  errorCount = 0;
-
-    for (const key of commonKeys) {
-        if (keyValueA[key].value !== keyValueB[key].value) {
-            console.log('');
-            console.log('Error of conflict #to: tag:');
-            console.log(`    variableName: ${key}`);
-            console.log(`    valueA: ${keyValueA[key].value} in ${getTestablePath(filePath)}:${keyValueA[key].lineNum}`);
-            console.log(`    valueB: ${keyValueB[key].value} in ${getTestablePath(filePath)}:${keyValueB[key].lineNum}`);
-            errorCount += 1;
-        }
-    }
-    return  errorCount;
 }
 
 // checkLineNoConfilict
@@ -3661,24 +2771,6 @@ function  varidateMutualSearchCommandArguments() {
     }
 }
 
-// varidateUpdateCommandArguments
-function  varidateReplaceCommandArguments() {
-    if (programArguments.length < 2) {
-        throw new Error('Error: Too few argurments.\n' +
-            'Parameters1: typrm replace  __FilePath__  "__KeyColonValue__"\n' +
-            'Parameters2: typrm replace  __FilePath__  __NearbyLineNumOrSettingName__  "__KeyColonValue__"')
-    }
-}
-
-// varidateRevertCommandArguments
-function  varidateRevertCommandArguments() {
-    if (programArguments.length < 2) {
-        throw new Error('Error: Too few argurments.\n' +
-            'Parameters1: typrm revert  __FilePath__\n' +
-            'Parameters2: typrm revert  __FilePath__  __NearbyLineNumOrSettingName__')
-    }
-}
-
 // onEndOfSettingScope
 function onEndOfSettingScope(setting: Settings, inputFilePath: string): /* warningCount */ number {
     var  warningCount = 0;
@@ -3804,115 +2896,6 @@ namespace  instanceOf {
     }
 }
 
-// getTrueCondition
-function  getTrueCondition(expression: string): /* '' or 'key: value' */ string {
-    const  settingsDot = '$settings.';
-    if (expression.startsWith(settingsDot)) {
-
-        // e.g. $settings.__Stage__ == develop
-        // e.g. $settings.__Stage__ != develop
-        const  match = /\$settings.([^ ]*) *(==|!=) *([^ ].*)/.exec(expression);
-        if (match) {
-            const  name = match[1];
-            const  operator = match[2];
-            const  rightValue = match[3];
-            if (rightValue !== '') {
-                var  trueCondition: string | undefined;
-                if (operator === '==') {
-
-                    trueCondition = `${name}: ${rightValue}`;
-                } else if (operator === '!=') {
-                    trueCondition = `${name}: __not_${rightValue}`;
-                }
-                if (trueCondition) {
-
-                    return  trueCondition;
-                }
-            }
-        }
-    }
-    return  '';
-}
-
-// getSettingIndexFromLineNum
-async function  getSettingIndexFromLineNum(inputFilePath: string, settingNameOrLineNum: string): Promise<number | null> {
-    const  reader = readline.createInterface({
-        input: fs.createReadStream(inputFilePath),
-        crlfDelay: Infinity
-    });
-    var  settingCount = 0;
-    var  lineNum = 0;
-    var  breaking = false;
-    var  isFound = false;
-    var  exception: any;
-    var  targetLineNum: number | undefined;
-    var  targetSettingName: string | undefined;
-    const  isOneSetting = (settingNameOrLineNum === '');
-    if (numberRegularExpression.test(settingNameOrLineNum)) {
-        targetLineNum = parseInt(settingNameOrLineNum);
-    } else {
-        targetSettingName = (targetLineNum) ? undefined : settingNameOrLineNum;
-    }
-
-    for await (const line1 of reader) {
-        if (breaking) {continue;}  // "reader" requests read all lines
-        try {
-            const  line: string = line1;
-            lineNum += 1;
-            var  currentSettingName: string | undefined = undefined;
-
-            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                settingCount += 1;
-                if (settingStartLabel.test(line.trim())) {
-                    currentSettingName = settingStartLabel.exec(line.trim())![3];
-                        // If setting name is empty, currentSettingName = undefined;
-                } else {
-                    currentSettingName = settingStartLabelEn.exec(line.trim())![3];
-                }
-            }
-
-            if (lineNum === targetLineNum) {
-                breaking = true;  // return or break must not be written.
-                    // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
-                isFound = true;
-            }
-            if (targetSettingName  &&  currentSettingName === targetSettingName) {
-                breaking = true;  // return or break must not be written.
-                isFound = true;
-            }
-        } catch (e) {
-            exception = e;
-            breaking = true;
-        }
-    }
-    if (exception) {
-        throw exception;
-    }
-    var  settingIndex: number | null = null;
-    if (isOneSetting) {
-        settingIndex = 1;
-        if (settingCount !== 1) {
-            throw  new Error(translate('Settings cannot be identified, because the file has 2 or more settings. ' +
-                'Add line number parameter.'))
-        }
-    } else {
-        if (isFound) {
-            if (settingCount >= 1) {
-                settingIndex = settingCount;
-            } else {
-                settingIndex = 1;
-            }
-        } else if (targetLineNum !== undefined  &&  targetLineNum < lineNum) {
-            settingIndex = 1;
-        } else if (targetLineNum !== undefined  &&  targetLineNum >= lineNum) {
-            settingIndex = settingCount;
-        } else {
-            settingIndex = null;
-        }
-    }
-    return  settingIndex;
-}
-
 // getTestablePath
 function  getTestablePath(path_: string) {
     if ('test' in programOptions) {
@@ -3985,23 +2968,10 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
         } else {
             var  value = setting[key].value;
         }
-        replacedSetting[key] = { value,  isReferenced: true /*dummy*/, tag: 'toAfterTemplate', lineNum: [] /*dummy*/ };
+        replacedSetting[key] = { value,  isReferenced: true /*dummy*/, tag: 'toAfterTemplate', lineNum: 0 /*dummy*/ };
     }
 
     return  getExpectedLine(replacedSetting, template);
-}
-
-// parseKeyValues
-function  parseKeyValueLines(keyValueLines: string): {[key:string]: string} {
-    const  keyValues: {[key:string]: string} = {};
-    for (const keyValueString of keyValueLines.split('\n')) {
-        const  separator = keyValueString.indexOf(':');
-        const  key = keyValueString.substr(0, separator).trim();
-        const  value = getValue(keyValueString, separator);
-
-        keyValues[key] = value;
-    }
-    return  keyValues;
 }
 
 // getValue
@@ -4179,140 +3149,90 @@ class SettingsTree {
         };
         const  lineNum = parser.lineNum;
 
-        if (newCodeMode === 'compatible') {
-            if (lineNum === settingsTree.nextSettingsLineNum) {
-                const  index = settingsTree.indices.get(lineNum)!;  // e.g. "/a/b"
+        var  outOfFalseBlocks: Map</*lineNum*/ number, boolean> = settingsTree.outOfFalseBlocks;
 
-                if (settingsTree.currentSettingIndex) {
-                    return_.outOfScopeSettingIndices = [ settingsTree.currentSettingIndex ];
-                }
-                return_.currentSettings = settingsTree.settings[index];
-                return_.currentSettingIndex = index;
-                const  startLineNums = Object.keys(settingsTree.indices);
-                if (settingsTree.nextLineNumIndex < startLineNums.length) {
-                    return_.nextLineNumIndex += 1;
+        if (lineNum === 1  ||  lineNum === settingsTree.nextSettingsLineNum) {
+            const  previousSettingIndex = settingsTree.currentSettingIndex;
+            const  currentSettingIndex = settingsTree.indices.get(parser.lineNum)!;  // e.g. "/a/bc"
+            const  currentSettingIndexSlash = `${currentSettingIndex}/`;  // e.g. "/a/bc/"
+            return_.currentSettingIndex = currentSettingIndex;
+            outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
 
-                    return_.nextSettingsLineNum = parseInt(startLineNums[settingsTree.nextLineNumIndex]);
-                } else {
-                    return_.nextSettingsLineNum = 0;
+            var  outOfScopeSettingIndices = [];
+            var  previousParentIndex = previousSettingIndex;  // e.g. "/a/b/d/e"
+            while ( ! currentSettingIndexSlash.startsWith(`${previousParentIndex}/`)  &&  previousParentIndex !== '/') {
+                    // e.g. previousParentIndex == "/a", not "/a/b"
+                    // The last slash is in order not to match a part of folder name.
+
+                outOfScopeSettingIndices.push(previousParentIndex);
+                previousParentIndex = path.dirname(previousParentIndex);
+            }
+            return_.outOfScopeSettingIndices = outOfScopeSettingIndices;
+
+            var  currentSettings: {[name: string]: Setting} = {};
+            var  parentIndex = '/';
+            var  separatorPosition = 0;
+            const  parentIndices: string[] = [];
+            for (;;) {  // parentIndex loop
+                parentIndices.push(parentIndex);
+                separatorPosition = currentSettingIndex.indexOf('/', separatorPosition + 1);
+                if (separatorPosition === notFound) {
+                    break;
                 }
-                return_.wasChanged = true;
+                parentIndex = currentSettingIndex.substring(0, separatorPosition);
+            }
+            if (currentSettingIndex !== '/') {
+                parentIndices.push(currentSettingIndex);
             }
 
-            return  return_;
+            for (parentIndex of parentIndices) {
+                const  parentSetting = settingsTree.settings[parentIndex];
 
-        } else { // if (newCodeMode === 'tree')
-            var  outOfFalseBlocks: Map</*lineNum*/ number, boolean> = settingsTree.outOfFalseBlocks;
+                currentSettings = { ... currentSettings, ... parentSetting };
 
-            if (lineNum === 1  ||  lineNum === settingsTree.nextSettingsLineNum) {
-                const  previousSettingIndex = settingsTree.currentSettingIndex;
-                const  currentSettingIndex = settingsTree.indices.get(parser.lineNum)!;  // e.g. "/a/bc"
-                const  currentSettingIndexSlash = `${currentSettingIndex}/`;  // e.g. "/a/bc/"
-                return_.currentSettingIndex = currentSettingIndex;
-                outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
-
-                var  outOfScopeSettingIndices = [];
-                var  previousParentIndex = previousSettingIndex;  // e.g. "/a/b/d/e"
-                while ( ! currentSettingIndexSlash.startsWith(`${previousParentIndex}/`)  &&  previousParentIndex !== '/') {
-                        // e.g. previousParentIndex == "/a", not "/a/b"
-                        // The last slash is in order not to match a part of folder name.
-
-                    outOfScopeSettingIndices.push(previousParentIndex);
-                    previousParentIndex = path.dirname(previousParentIndex);
-                }
-                return_.outOfScopeSettingIndices = outOfScopeSettingIndices;
-
-                var  currentSettings: {[name: string]: Setting} = {};
-                var  parentIndex = '/';
-                var  separatorPosition = 0;
-if (false) {
-                for (;;) {
-                    const  parentSetting = settingsTree.settings[parentIndex];
-
-                    currentSettings = { ... currentSettings, ... parentSetting };
-
-                    const  r = settingsTree.addCurrentSettingsInIfTag_Immutably(
-                        parentIndex, currentSettings, parser);
-                    currentSettings = { ... currentSettings, ... r.currentSettings };
-                    outOfFalseBlocks = new Map([... outOfFalseBlocks, ... r.outOfFalseBlocks]);
-                    separatorPosition = currentSettingIndex.indexOf('/', separatorPosition + 1);
-                    if (separatorPosition === notFound) {
-                        break;
-                    }
-                    parentIndex = currentSettingIndex.substring(0, separatorPosition);
-                }
-                if (currentSettingIndex !== '/') {
-
-                    currentSettings = { ... currentSettings, ... settingsTree.settings[currentSettingIndex] };
-
-                    const  r = settingsTree.addCurrentSettingsInIfTag_Immutably(currentSettingIndex, currentSettings, parser);
-                    currentSettings = { ... currentSettings, ... r.currentSettings };
-                    outOfFalseBlocks = new Map([... outOfFalseBlocks, ... r.outOfFalseBlocks]);
-                }
-} else {
-                const  parentIndices: string[] = [];
-                for (;;) {  // parentIndex loop
-                    parentIndices.push(parentIndex);
-                    separatorPosition = currentSettingIndex.indexOf('/', separatorPosition + 1);
-                    if (separatorPosition === notFound) {
-                        break;
-                    }
-                    parentIndex = currentSettingIndex.substring(0, separatorPosition);
-                }
-                if (currentSettingIndex !== '/') {
-                    parentIndices.push(currentSettingIndex);
-                }
-
-                for (parentIndex of parentIndices) {
-                    const  parentSetting = settingsTree.settings[parentIndex];
-
-                    currentSettings = { ... currentSettings, ... parentSetting };
-
-                    const  r = settingsTree.addCurrentSettingsInIfTag_Immutably(
-                        parentIndex, currentSettings, parser);
-                    currentSettings = { ... currentSettings, ... r.currentSettings };
-                    outOfFalseBlocks = new Map([... outOfFalseBlocks, ... r.outOfFalseBlocks]);
-                }
-}
-                return_.currentSettings = currentSettings;
-                const  startLineNums = Array.from(settingsTree.indices.keys());
-                if (lineNum === 1) {
-                    return_.nextLineNumIndex = 0;
-                }
-                if (return_.nextLineNumIndex < startLineNums.length) {
-                    return_.nextLineNumIndex += 1;
-
-                    return_.nextSettingsLineNum = startLineNums[return_.nextLineNumIndex];
-                } else {
-                    return_.nextSettingsLineNum = 0;
-                }
-                if (parser.verbose) {
-                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings are changed to ${currentSettingIndex} settings:`);
-                    for (const [key, setting] of Object.entries(currentSettings)) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
-                    }
-                }
-                return_.wasChanged = true;
+                const  r = settingsTree.addCurrentSettingsInIfTag_Immutably(
+                    parentIndex, currentSettings, parser);
+                currentSettings = { ... currentSettings, ... r.currentSettings };
+                outOfFalseBlocks = new Map([... outOfFalseBlocks, ... r.outOfFalseBlocks]);
             }
-            if (lineNum === 1  ||  lineNum === settingsTree.nextIfLineNum) {
+            return_.currentSettings = currentSettings;
+            const  startLineNums = Array.from(settingsTree.indices.keys());
+            if (lineNum === 1) {
+                return_.nextLineNumIndex = 0;
+            }
+            if (return_.nextLineNumIndex < startLineNums.length) {
+                return_.nextLineNumIndex += 1;
 
-                return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;
-                const  startLineNums = Array.from(settingsTree.indicesWithIf.keys());
-                if (lineNum === 1) {
-                    return_.nextIfLineNumIndex = 0;
-                }
-                if (return_.nextIfLineNumIndex < startLineNums.length) {
-                    return_.nextIfLineNumIndex += 1;
-
-                    return_.nextIfLineNum = startLineNums[return_.nextIfLineNumIndex];
-                } else {
-                    return_.nextIfLineNum = 0;
+                return_.nextSettingsLineNum = startLineNums[return_.nextLineNumIndex];
+            } else {
+                return_.nextSettingsLineNum = 0;
+            }
+            if (parser.verbose) {
+                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings are changed to ${currentSettingIndex} settings:`);
+                for (const [key, setting] of Object.entries(currentSettings)) {
+                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                 }
             }
-            return_.outOfFalseBlocks = outOfFalseBlocks;
-
-            return  return_;
+            return_.wasChanged = true;
         }
+        if (lineNum === 1  ||  lineNum === settingsTree.nextIfLineNum) {
+
+            return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;
+            const  startLineNums = Array.from(settingsTree.indicesWithIf.keys());
+            if (lineNum === 1) {
+                return_.nextIfLineNumIndex = 0;
+            }
+            if (return_.nextIfLineNumIndex < startLineNums.length) {
+                return_.nextIfLineNumIndex += 1;
+
+                return_.nextIfLineNum = startLineNums[return_.nextIfLineNumIndex];
+            } else {
+                return_.nextIfLineNum = 0;
+            }
+        }
+        return_.outOfFalseBlocks = outOfFalseBlocks;
+
+        return  return_;
     }
 
     addCurrentSettingsInIfTag_Immutably(
@@ -4369,14 +3289,7 @@ if (false) {
                         condition = 'true';
                     }
 
-                    const  parsed = ifTagParser.evaluate(`#if: ${condition}`, currentSettings);
-                    if (parsed.errorCount >= 1) {
-                        console.log('');
-                        console.log(`${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${condition}`);
-                        console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                        parser.errorCount += parsed.errorCount;
-                    }
-
+                    ifTagParser.evaluate(`#if: ${condition}`, currentSettings);
                     if (ifTagParser.thisIsOutOfFalseBlock) {  // #if: true
                         currentSettings = {... currentSettings, ... settingsTree.settings[index]};
                         falseIndex = disabledFalseIndex;
@@ -4390,24 +3303,21 @@ if (false) {
         }
         return_.currentSettings = currentSettings;
         return_.outOfFalseBlocks = outOfFalseBlocks;
+        parser.errorCount = notVerboseParser.errorCount;
+        parser.warningCount = notVerboseParser.warningCount;
         return  return_;
     }
 
     moveToEndOfFile() {
+        this.outOfScopeSettingIndices = [];
+        const  previousSettingIndex = this.currentSettingIndex;
+        var    previousParentIndex = previousSettingIndex;
+        while (previousParentIndex !== '/') {
 
-        if (newCodeMode === 'compatible') {
-            this.outOfScopeSettingIndices = [ this.currentSettingIndex ];
-        } else { // if (newCodeMode === 'tree')
-            this.outOfScopeSettingIndices = [];
-            const  previousSettingIndex = this.currentSettingIndex;
-            var    previousParentIndex = previousSettingIndex;
-            while (previousParentIndex !== '/') {
-
-                this.outOfScopeSettingIndices.push(previousParentIndex);
-                previousParentIndex = path.dirname(previousParentIndex);
-            }
-            this.outOfScopeSettingIndices.push('/');
+            this.outOfScopeSettingIndices.push(previousParentIndex);
+            previousParentIndex = path.dirname(previousParentIndex);
         }
+        this.outOfScopeSettingIndices.push('/');
         this.currentSettings = {};
         this.currentSettingIndex = '';
         this.nextSettingsLineNum = 0;
@@ -4790,14 +3700,7 @@ if (false) {
                         }
                         var  settingsForIf = newSettings;
 
-                        const  parsed = ifTagParserForNewSettings.evaluate(`#if: ${condition}`, settingsForIf);
-                        if (parsed.errorCount >= 1) {
-                            console.log('');
-                            console.log(`${getTestablePath(parser.filePath)}:${lineNumInSettings}: #if: ${condition}`);
-                            console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                            parser.errorCount += parsed.errorCount;
-                        }
-
+                        ifTagParserForNewSettings.evaluate(`#if: ${condition}`, settingsForIf);
                         if (ifTagParserForNewSettings.thisIsOutOfFalseBlock) {  // #if: true
 
                             newSettings = {... newSettings, ... settingsTree.settings[indexInSettings]};
@@ -4809,7 +3712,7 @@ if (false) {
                                     for (const toTag of Object.values(toTagTree.replaceTo[indexInSettings])) {
                                         if (toTag.tag === 'toInSettings') {
                                             console.log('');
-                                            console.log(`Error: ${getTestablePath(parser.filePath)}:${toTag.lineNum[0]}: ` +
+                                            console.log(`Error: ${getTestablePath(parser.filePath)}:${toTag.lineNum}: ` +
                                                 `"#to:" tag cannot write in false condition block. Write "#to:" tags to be true condition.`);
                                             parser.errorCount += 1;
                                         }
@@ -4835,13 +3738,7 @@ if (false) {
                         // newSettingsByOriginalTag = ...
                         var  settingsForIf: Readonly<{[name: string]: Setting}> = newSettingsByOriginalTag;
 
-                        var  parsed = ifTagParserForNewSettings.evaluate(`#if: ${condition}`, settingsForIf);
-                        if (parsed.errorCount >= 1) {
-                            console.log('');
-                            console.log(`${getTestablePath(parser.filePath)}:${lineNumInSettings}: #if: ${condition}`);
-                            console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                            parser.errorCount += parsed.errorCount;
-                        }
+                        ifTagParserForNewSettings.evaluate(`#if: ${condition}`, settingsForIf);
                         if (ifTagParserForNewSettings.thisIsOutOfFalseBlock) {
 
                             newSettingsByOriginalTag = {... newSettingsByOriginalTag, ... settingsTree.settings[indexInSettings]};
@@ -4859,13 +3756,7 @@ if (false) {
                         const  oldSettings: Readonly<{[name: string]: Setting}> = settingsTree.currentSettings;
                         var  settingsForIf = oldSettings;
 
-                        var  parsed = ifTagParserForOldSettings.evaluate(`#if: ${condition}`, settingsForIf);
-                        if (parsed.errorCount >= 1) {
-                            console.log('');
-                            console.log(`${getTestablePath(parser.filePath)}:${lineNumInSettings}: #if: ${condition}`);
-                            console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                            parser.errorCount += parsed.errorCount;
-                        }
+                        ifTagParserForOldSettings.evaluate(`#if: ${condition}`, settingsForIf);
                         if (ifTagParserForOldSettings.thisIsOutOfFalseBlock) {
 
                             falseIndexWhenOldSettings = disabledFalseIndex;
@@ -4873,7 +3764,7 @@ if (false) {
                             if (indexInSettings in toTagTree.replaceTo) {
                                 for (const originalTag of Object.values(toTagTree.replaceTo[indexInSettings])) {
                                     console.log('');
-                                    console.log(`Warning: ${getTestablePath(parser.filePath)}:${originalTag.lineNum[0]}: ` +
+                                    console.log(`Warning: ${getTestablePath(parser.filePath)}:${originalTag.lineNum}: ` +
                                         `"#original: ${originalTag.tag}" tag will be remained.`);
                                     parser.warningCount += 1;
                                 }
@@ -4912,7 +3803,6 @@ interface  ReplaceToTagTree_for_addCurrentSettingsInIfBlock {
     outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
     outOfFalseBlocksByOriginalTag: Map</*lineNum*/ number, boolean>;
 };
-var isDebug = false;  // pp
 
 // SettingsInformation
 interface SettingsInformation {
@@ -4927,12 +3817,8 @@ type Settings = {[name: string]: Setting}
 
 // Setting
 interface Setting {
-//(ToDo)    name?: string;
     value: string;
-    lineNum: number[];  // This count is the same as #to: tag count
-//(ToDo)
-//    StartLineNum?: number;
-//    LastLineNum?: number;
+    lineNum: number;  // This count is the same as #to: tag count
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original';
     isReferenced: boolean;
 }
@@ -4982,30 +3868,6 @@ function  searchDefinedSettingIndexInCurrentLevel(
             }
         }
         return  foundIndices;
-    }
-}
-
-// ReplaceKeyValues
-class ReplaceKeyValues {
-
-    settingNameOrLineNum: string = '';
-    keyValues: {[name: string]: Setting} = {};
-    testMode: boolean = false;
-
-    get  keyValueLines(): string {
-        var  lines = '';
-        for (const [key, setting] of Object.entries(this.keyValues)) {
-            lines += `${key}: ${setting.value}\n`;
-        }
-        return  lines;
-    }
-
-    pushKeyValue(key: string, keyValue: Setting) {
-        if ( ! (key in this.keyValues)) {
-            this.keyValues[key] = keyValue;
-        } else {
-            this.keyValues[key].lineNum.push(keyValue.lineNum[0]);
-        }
     }
 }
 
@@ -5348,14 +4210,6 @@ class  WriteBuffer {
     }
 }
 
-// isSameArrayOf
-// T: string, nunmber
-function isSameArrayOf<T>(log: T[], answer: T[]): boolean {
-  const matched = log.filter( (item) => answer.includes( item ) );
-  const isSame = (matched.length === answer.length && log.length === answer.length);
-  return isSame;
-}
-
 // getStdOut
 // Example:
 //    var d = getStdOut();  // Set break point here and watch the variable d
@@ -5383,22 +4237,6 @@ console.log = println;
 // lastOf
 function  lastOf<T>(array: Array<T>): T {
     return  array[array.length - 1];
-}
-
-// pathResolve
-function  pathResolve(path_: string) {
-
-    // '/c/home' format to current OS format
-    if (path_.length >= 3) {
-        if (path_[0] === '/'  &&  path_[2] === '/') {
-            path_ = path_[1] +':'+ path_.substr(2);
-        }
-    }
-
-    // Replace separators to OS format
-    path_ = path.resolve(path_);
-
-    return path_
 }
 
 // translate
@@ -5514,9 +4352,6 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     }
 }
 
-const  newSpecification = false;
-const  newCode = true;
-const  newCodeMode: 'compatible' | 'tree' = 'tree';
 if (process.env.windir) {
     var  runningOS = 'Windows';
 } else {

@@ -11,7 +11,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
-  - [First replace example - replace command, revert command](#first-replace-example---replace-command-revert-command)
+  - [First replace example - replace command, reset command](#first-replace-example---replace-command-revert-command)
     - [Replace with #to tag](#replace-with-to-tag)
   - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
   - [Install](#install)
@@ -43,7 +43,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 <!-- /TOC -->
 
 
-## First replace example - replace command, revert command
+## First replace example - replace command, reset command
 
 The manual that tells you to create a new folder and run shell commands in it will tell you to type in the shell as follows:
 
@@ -105,10 +105,10 @@ It replaces `work1` in the settings and document body to `work2`.
 `#original:` tag with the value before replacement is added to the same line.
 If the `#original:` tag already exists, it will not be added.
 
-To return to the value written in the `#original:` tag, use the revert command.
-Also, the revert command removes the `#original:` tag.
+To return to the value written in the `#original:` tag, use the reset command.
+Also, the reset command removes the `#original:` tag.
 
-    typrm revert  new_folder.yaml  4
+    typrm reset  new_folder.yaml  4
 
 4 is the line number, similar to the replace command.
 You can also specify the setting name.
@@ -683,7 +683,7 @@ List of variables defined in the above settings:
 
 If you wrote a setting name, you can specify the setting name
 instead of the line number to be replaced
-by the replace command or revert command.
+by the replace command or reset command.
 You must write the setting name in parentheses
 before the colon of `settings:` in the text you will be replacing.
 

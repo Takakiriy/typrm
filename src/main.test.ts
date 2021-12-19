@@ -279,72 +279,6 @@ describe("replaces settings >>", () => {
         fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
     });
 
-    test.each([
-        [
-            '2_replace_1_ok', ' one setting', undefined, 'en-US',
-            `key1: changed1`,
-            'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
-        ],
-
-    ])("Exception case >> in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) => {
-        const  changingFolderPath = testFolderPath + '_changing';
-        const  changingFileName = fileNameHead + "_1_changing.yaml";
-        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-        const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
-        var    errorMessage = '';
-        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-        writeFileSync(changingFilePath, sourceFileContents);
-
-        // Test Main
-        if (lineNum) {
-            try {
-                await callMain(["replace", changingFileName, String(lineNum), keyValues], {
-                    folder: changingFolderPath, test: "", locale,
-                });
-            } catch (e: any) {
-                errorMessage = e.message;
-            }
-        } else {
-            try {
-                await callMain(["replace", changingFileName, keyValues], {
-                    folder: changingFolderPath, test: "", locale,
-                });
-            } catch (e: any) {
-                errorMessage = e.message;
-            }
-        }
-
-        expect(errorMessage).toBe(expectedErrorMessage);
-    });
-
-    test.each([
-        [
-            '2_replace_1_ok', ' without folder option', undefined, 'en-US',
-            `key1: changed1`,
-            'Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.',
-        ],
-
-    ])("Exception case >> in %s%s", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, expectedErrorMessage) => {
-        const  changingFolderPath = testFolderPath + '_changing';
-        const  changingFileName = fileNameHead + "_1_changing.yaml";
-        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-        const  sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
-        var    errorMessage = '';
-        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-        writeFileSync(changingFilePath, sourceFileContents);
-
-        // Test Main
-        try {
-            await callMain(["replace", changingFilePath, keyValues], {
-                folder: "", test: "", locale,
-            });
-        } catch (e: any) {
-            errorMessage = e.message;
-        }
-
-        expect(errorMessage).toBe(expectedErrorMessage);
-    });
-
     describe("Multi folder >>", () => {
         const  fileNameHead = '2_replace_1_ok';
         const  changingFolderPath = testFolderPath + '_changing';
@@ -408,7 +342,7 @@ describe("replaces settings >>", () => {
         });
     });
 
-    describe("revert", () => {
+    describe("reset", () => {
         test.each([
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',
@@ -433,7 +367,7 @@ describe("replaces settings >>", () => {
                     { from: 'fruit: banana', to: 'fruit: banana  #to: melon' },
                 ]},
             ],[
-                '2_replace_6_if', ' both', 9, 'en-US',  // #search: typrm revert 2_replace_6_if both
+                '2_replace_6_if', ' both', 9, 'en-US',  // #search: typrm reset 2_replace_6_if both
                 `fruit: melon
                 __Setting1__: replaced`,
                 {
@@ -525,11 +459,11 @@ describe("replaces settings >>", () => {
             if ( ! options.includes('ErrorCase')) {
                 expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
 
-                // Test Main >> revert
+                // Test Main >> reset
                 if (caseName.includes('FileParameter')) {
-                    var  parameters = ["revert", changingFilePath];
+                    var  parameters = ["reset", changingFilePath];
                 } else {
-                    var  parameters = ["revert"];
+                    var  parameters = ["reset"];
                 }
                 await callMain(parameters, {
                     folder: changingFolderPath, test: "", locale: "en-US"
