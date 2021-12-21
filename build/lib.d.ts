@@ -42,6 +42,7 @@ declare class StandardInputBuffer {
     input(guide: string): Promise<string>;
     close(): void;
 }
+export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
 export declare function getCommonElements<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function isAlphabetIndex(index: string): boolean;
 export declare function getAlphabetIndex(num: number | string): string;

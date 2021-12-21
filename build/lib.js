@@ -342,19 +342,22 @@ export async function replaceAsync(input, replacers) {
     var replacing = input;
     for (const replacer of replacers) {
         var optionCount = 0;
-        if (replacer.from) {
-            optionCount += 1;
-        }
         if (replacer.fromCSV) {
             optionCount += 1;
         }
         if (replacer.lineNum) {
             optionCount += 1;
         }
-        if (optionCount !== 1) {
-            throw new Error('"ReplaceParameter" must set either "from", "fromCSV" or "lineNum" attribute');
+        if (optionCount >= 2) {
+            throw new Error('"ReplaceParameter" must set either "fromCSV" or "lineNum" attribute');
+            // OK patterns are:
+            // - replacer.from
+            // - replacer.fromCSV
+            // - replacer.fromCSV, replacer.from
+            // - replacer.lineNum
+            // - replacer.lineNum, replacer.from
         }
-        if (replacer.from) {
+        if (replacer.from && optionCount === 0) {
             replacing = replacing.replace(replacer.from, replacer.to);
         }
         if (replacer.lineNum) {
@@ -365,34 +368,40 @@ export async function replaceAsync(input, replacers) {
                 input: stream,
                 crlfDelay: Infinity
             });
-            pp(41);
             const writer = new WritableMemoryStream();
             var lineNum = 0;
             for await (const line1 of reader) {
                 const line = line1;
                 lineNum += 1;
-                pp(50 + lineNum);
                 if (lineNum === replacer.lineNum) {
-                    writer.write(`${replacer.to}\n`);
+                    if (replacer.from) {
+                        var replacedLine = line.replace(replacer.from, replacer.to);
+                    }
+                    else {
+                        var replacedLine = replacer.to;
+                    }
+                    writer.write(`${replacedLine}\n`);
                 }
                 else {
                     writer.write(`${line}\n`);
                 }
             }
             replacing = writer.toString();
-            pp(49);
         }
         if (replacer.fromCSV) {
             const inputStream = Readable.from(replacing);
-            var d = pp(1);
+            const keywords = await parseCSVColumns(replacer.fromCSV);
+            if (replacer.from) {
+                var replaceFrom = replacer.from;
+            }
+            else {
+                var replaceFrom = keywords[keywords.length - 1];
+            }
             const lineNum = await searchAsTextSub({ input: inputStream }, replacer.fromCSV, true);
-            pp(2);
-            replacing = await replaceAsync(replacing, [{ lineNum, to: replacer.to }]);
-            pp(3);
+            replacing = await replaceAsync(replacing, [{ from: replaceFrom, lineNum, to: replacer.to }]);
         }
     }
     const replaced = replacing;
-    pp(99);
     return replaced;
 }
 // WritableMemoryStream
@@ -455,6 +464,13 @@ class StandardInputBuffer {
     }
 }
 // Data group
+// isSameArrayOf
+// T: string, nunmber
+export function isSameArrayOf(log, answer) {
+    const matched = log.filter((item) => answer.includes(item));
+    const isSame = (matched.length === answer.length && log.length === answer.length);
+    return isSame;
+}
 // getCommonElements
 export function getCommonElements(arrayA, arrayB) {
     const commonElements = [];

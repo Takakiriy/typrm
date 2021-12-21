@@ -41,12 +41,7 @@ async function main() {
 }
 // DoCustomDebug
 async function DoCustomDebug() {
-    const returns = await callChildProccess(`node ${scriptPath} r C:\\Users\\user1\\steps\\!Temp.yaml 7 "__RepositoryName__: afa"`, {});
-    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" \${GitHub}/MyPrivateCode/UsingWatchConnectivity/SimpleWatchConnectivity/AppDelegate.swift#activate 7`, {});
-    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose "#ref:" ~/GitProjects 0`, {});
-    // const  returns = await callChildProccess(`node ${scriptPath} s --verbose`, {inputLines: ["#ref: ~/GitProjects", "0"]});
-    // const  returns = await callChildProccess(`node ${scriptPath} --verbose c C:\\Users\\user1\\steps\\!Temp.yaml`, {});
-    // const  returns = await callChildProccess(`node ${scriptPath} s DSL --folder /Users/totadashi/Documents/typrm`, {});
+    const returns = await callChildProccess(`node ${scriptPath} replace C:\\Users\\user1\\steps\\!Temp.yaml`, {});
     console.log(`(typrm_test.ts) ${returns.stdout}`);
     console.log('Done');
 }
@@ -87,8 +82,9 @@ async function TestOfCommandLine() {
     for (const case_ of cases) {
         if (true || case_.name === 'search_mode_ref_verb') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
+            const optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
             // Test Main
-            returns = await callChildProccess(`node ${scriptPath} ${case_.parameters} --test`, { inputLines: case_.inputLines.split('\n') });
+            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test`, { inputLines: case_.inputLines.split('\n') });
             // Check
             if (case_.check === 'true') {
                 const noData = 'no data';
@@ -115,6 +111,8 @@ async function TestOfCommandLine() {
 }
 // callChildProccess
 async function callChildProccess(commandLine, option) {
+    console.log(`CommandLine: ${commandLine}`);
+    console.log(option);
     return new Promise(async (resolveFunction, rejectFunction) => {
         const returnValue = new ProcessReturns();
         try {
