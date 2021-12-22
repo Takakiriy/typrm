@@ -821,6 +821,169 @@ exports[`checks template value >> secret_1_error: sourceFileContents 1`] = `
     Key4: value4  #★秘密:あり"
 `;
 
+exports[`checks template value >> settings >> 1 same values: answer 1`] = `
+"
+Warning: 0, Error: 0
+template count = 1
+"
+`;
+
+exports[`checks template value >> settings >> 1 same values: sourceFileContents 1`] = `
+"settings:
+    var1: value1
+    var2: value2
+    var1: value1
+    var2: value2
+value1, value2  #template: var1, var2
+"
+`;
+
+exports[`checks template value >> settings >> 2 not same values error: answer 1`] = `
+"
+Error of duplicated variable name:
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
+  ContentsA: var1: value1
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4
+  ContentsB: var1: value111
+
+Error of duplicated variable name:
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3
+  ContentsA: var2: value2
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5
+  ContentsB: var2: value222
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: value1, value2  #template: var1, var2
+    Warning: Not matched with the template.
+    Expected: value111, value222
+
+Warning: 1, Error: 2
+template count = 1
+"
+`;
+
+exports[`checks template value >> settings >> 2 not same values error: sourceFileContents 1`] = `
+"settings:
+    var1: value1
+    var2: value2
+    var1: value111
+    var2: value222
+value1, value2  #template: var1, var2
+"
+`;
+
+exports[`checks template value >> settings >> 3 overwrite: answer 1`] = `
+"
+Warning: 0, Error: 0
+template count = 8
+"
+`;
+
+exports[`checks template value >> settings >> 3 overwrite: sourceFileContents 1`] = `
+"value1, value2, value3  #template: var1, var2, var3
+settings:
+    var1: value1
+    var2: value2
+    var3: value3
+value1, value2, value3  #template: var1, var2, var3
+level 1:
+    value1, value22, value33  #template: var1, var2, var3
+    settings:
+        var2: value22
+        var3: value33
+    value1, value22, value33  #template: var1, var2, var3
+    level 2:
+        value1, value22, value333  #template: var1, var2, var3
+        settings:
+            var3: value333
+        value1, value22, value333  #template: var1, var2, var3
+    value1, value22, value33  #template: var1, var2, var3
+value1, value2, value3  #template: var1, var2, var3
+"
+`;
+
+exports[`checks template value >> settings >> 3e overwrite error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: .....1, .....2, .....3  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value2, value3
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: .....1, .....2, .....3  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value2, value3
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8:     .....1, .....22, .....33  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value33
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12:     .....1, .....22, .....33  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value33
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14:         .....1, .....22, .....333  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value333
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17:         .....1, .....22, .....333  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value333
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18:     .....1, .....22, .....33  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value33
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: .....1, .....2, .....3  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value2, value3
+
+Warning: 8, Error: 0
+template count = 8
+"
+`;
+
+exports[`checks template value >> settings >> 3e overwrite error: sourceFileContents 1`] = `
+".....1, .....2, .....3  #template: var1, var2, var3
+settings:
+    var1: value1
+    var2: value2
+    var3: value3
+.....1, .....2, .....3  #template: var1, var2, var3
+level 1:
+    .....1, .....22, .....33  #template: var1, var2, var3
+    settings:
+        var2: value22
+        var3: value33
+    .....1, .....22, .....33  #template: var1, var2, var3
+    level 2:
+        .....1, .....22, .....333  #template: var1, var2, var3
+        settings:
+            var3: value333
+        .....1, .....22, .....333  #template: var1, var2, var3
+    .....1, .....22, .....33  #template: var1, var2, var3
+.....1, .....2, .....3  #template: var1, var2, var3
+"
+`;
+
+exports[`checks template value >> settings >> 4 neighbor error: answer 1`] = `
+"
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6
+  Not referenced: var4
+
+Warning: 1, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks template value >> settings >> 4 neighbor error: sourceFileContents 1`] = `
+"settings:
+    var1: value1
+    var2: value2
+    var3: value3
+value1, value2, value3, value4  #template: var1, var2, var3, var4
+settings:
+    var4: value4
+"
+`;
+
 exports[`checks template value >> settings_tree: answer 1`] = `
 "
 Warning: 0, Error: 0
@@ -3158,7 +3321,7 @@ settings:
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_1_ok setting 2 >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_1_ok setting 2 >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #original: Key3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27: #original: key1: value11
 
@@ -3166,7 +3329,7 @@ Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_6_if both >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_6_if both >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7: #original: __Setting1__: no
 
@@ -3174,35 +3337,35 @@ Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_6_if in if block >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_6_if in if block >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_6_if in if variable >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_6_if in if variable >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_6_if setting name >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_6_if setting name >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_6_if without line num >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_6_if without line num >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
-exports[`replaces settings >> reset 2_replace_10_double_check 1_OK >>: stdout 1`] = `
+exports[`replaces settings >> reset >> 2_replace_10_double_check 1_OK >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #original: __Full__: folder/file
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3: #original: __Folder__: folder
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #original: __File__: file

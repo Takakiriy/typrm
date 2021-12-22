@@ -125,6 +125,29 @@ describe("checks template value >>", () => {
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
+    describe("settings >>", () => {
+        test.only.each([
+            ["1 same values"],
+            ["2 not same values error"],
+            ["3 overwrite"],
+            ["3e overwrite error"],
+            ["4 neighbor error"],
+
+        ])("%s", async (caseName) => {
+if (caseName !== '4 neighbor error') {return;}  // || subCase !== '____'
+            const  sourceFileContents = lib.getSnapshot(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
+            fs.rmdirSync('test_data/_checking', {recursive: true});
+            writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
+
+            await callMain(["check", "_checking/check_verbose.yaml"], {
+                folder: 'test_data', test: "", locale: "en-US",
+            });
+            expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
+            fs.rmdirSync('test_data/_checking', {recursive: true});
+expect('test code').toBe('deleted skip code.');
+        });
+    });
+
     test("verbose", async () => {
         const  sourceFileContents = lib.getSnapshot(`checks template value >> verbose: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', {recursive: true});
@@ -342,7 +365,7 @@ describe("replaces settings >>", () => {
         });
     });
 
-    describe("reset", () => {
+    describe("reset >>", () => {
         test.each([
             [
                 '2_replace_1_ok', ' setting 2', 29, 'en-US',

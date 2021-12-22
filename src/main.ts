@@ -458,6 +458,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
             isReadingSetting = true;
+// ToDo: 4 neighbor error
 
             setting = {};
             settingIndentLength = indent.length;
@@ -491,7 +492,6 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 console.log(`Verbose: settings ${currentSettingIndex}`);
                 console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
             }
-// ToDo: if (index in tree.settings) { error }
         } else if (indent.length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
 
@@ -503,9 +503,8 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 const  key = line.substr(0, separator).trim();
                 const  value = getValue(line, separator);
                 if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
-                    if (key in setting) {
-// ToDo: check with parent settings
-                        const  previous = setting[key];
+                    const  previous = setting[key];
+                    if (key in setting  &&  value !== previous.value) {
                         console.log('');
                         console.log(translate('Error of duplicated variable name:'));
                         console.log(`  ${translate('typrmFile')}A: ${getTestablePath(parser.filePath)}:${previous.lineNum}`);
@@ -571,7 +570,6 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         const  setting_ = settingStack[settingStack.length - 2];
         tree.settings[currentSettingIndex] = {... tree.settings[currentSettingIndex], ... setting};
         tree.indices.set(setting_.startLineNum, currentSettingIndex);
-// ToDo        tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
         if ( ! (currentSettingIndex in tree.settingsInformation)) {
             tree.settingsInformation[currentSettingIndex] = {
                 index: currentSettingIndex,
