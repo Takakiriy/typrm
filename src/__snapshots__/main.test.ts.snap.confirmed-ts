@@ -963,6 +963,51 @@ level 1:
 "
 `;
 
+exports[`checks template value >> settings >> 4 neighbor error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6
+    Warning: double settings are not supported.
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1
+
+Warning: 1, Error: 0
+template count = 1
+"
+`;
+
+exports[`checks template value >> settings >> 4 neighbor error: sourceFileContents 1`] = `
+"settings:
+    var1: value1
+    var2: value2
+    var3: value3
+value1, value2, value3, value4  #template: var1, var2, var3, var4
+settings:
+    var4: value4
+"
+`;
+
+exports[`checks template value >> settings >> 4-2 neighbor level 2 error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7
+    Warning: double settings are not supported.
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
+
+Warning: 1, Error: 0
+template count = 1
+"
+`;
+
+exports[`checks template value >> settings >> 4-2 neighbor level 2 error: sourceFileContents 1`] = `
+"rot:
+    settings:
+        var1: value1
+        var2: value2
+        var3: value3
+    value1, value2, value3, value4  #template: var1, var2, var3, var4
+    settings:
+        var4: value4
+"
+`;
+
 exports[`checks template value >> settings_tree: answer 1`] = `
 "
 Warning: 0, Error: 0

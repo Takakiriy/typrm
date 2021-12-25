@@ -126,15 +126,15 @@ describe("checks template value >>", () => {
     });
 
     describe("settings >>", () => {
-        test.only.each([
+        test.each([
             ["1 same values"],
             ["2 not same values error"],
             ["3 overwrite"],
             ["3e overwrite error"],
             ["4 neighbor error"],
+            ["4-2 neighbor level 2 error"],
 
         ])("%s", async (caseName) => {
-if (caseName !== '4 neighbor error') {return;}  // || subCase !== '____'
             const  sourceFileContents = lib.getSnapshot(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
             fs.rmdirSync('test_data/_checking', {recursive: true});
             writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
@@ -144,7 +144,6 @@ if (caseName !== '4 neighbor error') {return;}  // || subCase !== '____'
             });
             expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
             fs.rmdirSync('test_data/_checking', {recursive: true});
-expect('test code').toBe('deleted skip code.');
         });
     });
 

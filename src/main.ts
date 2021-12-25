@@ -458,36 +458,61 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         // setting = ...
         if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
             isReadingSetting = true;
-// ToDo: 4 neighbor error
 
-            setting = {};
-            settingIndentLength = indent.length;
             if (indent === '') {
                 settingStack[0].lineNum = lineNum;
                 currentSettingIndex = '/';
+                if (currentSettingIndex in tree.settingsInformation) {
+                    console.log('');
+                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
+                    console.log(`    Warning: double settings are not supported.`);
+                    console.log(`    First settings at: ${getTestablePath(parser.filePath)}:` +
+                        `${tree.settingsInformation[currentSettingIndex].lineNum}`);
+                    parser.warningCount += 1;
+                    var  isNewSettings = false;
+                } else {
+                    var  isNewSettings = true;
+                }
             } else {
-                const  setting_ = settingStack[settingStack.length - 1];
-                setting_.lineNum = lineNum;
-                setting_.indentLevel = settingIndentLength;
-                setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
-                setting_.startIndentLevel = indentStack[indentStack.length - 2].indent.length;
-                currentSettingIndex = setting_.index;
-                settingStack.push({
-                    lineNum: 0,
-                    index: setting_.index + '/1',
-                    indentLevel: 0,
-                    startLineNum: 0,
-                    startIndentLevel: -1
-                });
-                tree.indices.set(setting_.startLineNum, currentSettingIndex);
-                tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
+                const  currentSetting = settingStack[settingStack.length - 2];
+                if (currentSetting.indentLevel === indent.length) {
+                    console.log('');
+                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
+                    console.log(`    Warning: double settings are not supported.`);
+                    console.log(`    First settings at: ${getTestablePath(parser.filePath)}:` +
+                        `${tree.settingsInformation[currentSettingIndex].lineNum}`);
+                    parser.warningCount += 1;
+                    var  isNewSettings = false;
+                } else {
+                    const  setting_ = settingStack[settingStack.length - 1];
+                    setting_.lineNum = lineNum;
+                    setting_.indentLevel = indent.length;
+                    setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
+                    setting_.startIndentLevel = indentStack[indentStack.length - 2].indent.length;
+                    currentSettingIndex = setting_.index;
+                    settingStack.push({
+                        lineNum: 0,
+                        index: setting_.index + '/1',
+                        indentLevel: 0,
+                        startLineNum: 0,
+                        startIndentLevel: -1
+                    });
+                    tree.indices.set(setting_.startLineNum, currentSettingIndex);
+                    tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
+                    var  isNewSettings = true;
+                }
             }
-            tree.settingsInformation[currentSettingIndex] = {
-                index: currentSettingIndex,
-                lineNum,
-                condition: '',
-                inSettings: isReadingSetting,
-            };
+            if (isNewSettings) {
+
+                setting = {};
+                settingIndentLength = indent.length;
+                tree.settingsInformation[currentSettingIndex] = {
+                    index: currentSettingIndex,
+                    lineNum,
+                    condition: '',
+                    inSettings: isReadingSetting,
+                };
+            }
             if (parser.verbose) {
                 console.log(`Verbose: settings ${currentSettingIndex}`);
                 console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
