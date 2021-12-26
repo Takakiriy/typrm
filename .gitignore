@@ -3,6 +3,7 @@ node_modules
 
 **/*.backup
 **/_checking
+**/_changing
 **/*_changing.yml
 **/*_changing.yaml
 bin/chmod+x.command

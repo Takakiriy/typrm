@@ -1844,7 +1844,9 @@ async function  listUpFilePaths(checkingFilePath?: string) {
         if (lib.isFullPath(checkingFilePath)) {
             inputFileFullPaths.push(checkingFilePath);
         } else {
-            targetFolders.push(currentFolder);
+            if ( ! targetFolders.includes(currentFolder)) {
+                targetFolders.push(currentFolder);
+            }
 
             for (const folder of targetFolders) {
                 const  targetFolderFullPath = lib.getFullPath(folder, currentFolder);

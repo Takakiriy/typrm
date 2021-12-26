@@ -4,6 +4,7 @@ import * as main from "./main";
 import chalk from "chalk";
 import * as lib from "./lib";
 import { pp } from "./lib";
+import { chdir } from "process";
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -110,19 +111,35 @@ describe("checks template value >>", () => {
         fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
-    test("check files in multi folder", async () => {
-        const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
-        fs.rmdirSync('test_data/_checking', {recursive: true});
-        writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
-        writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
-        process.chdir('empty_folder');
+    describe("check files in multi folder >>", () => {
+        test.each([
+            [
+                "1st",
+                "empty_folder",
+                ["check"],
+            ],[
+                "with current folder",
+                "test_data/_checking/1",
+                ["check", "one_error_1.yaml"],
+            ],
 
-        await callMain(["check"], {
-            folder: '../test_data/_checking/1, ../test_data/_checking/2/*.yaml', test: "", locale: "en-US",
+        ])("%s", async (_caseName, currentFolder, command) => {
+            chdirInProject('src');
+            const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
+            fs.rmdirSync('test_data/_checking', {recursive: true});
+            writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
+            writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
+            const  srcPath = process.cwd();
+            process.chdir(currentFolder);
+
+            await callMain(command, {
+                folder: `${srcPath}/test_data/_checking/1, ${srcPath}/test_data/_checking/2/*.yaml`,
+                test: "",  locale: "en-US",
+            });
+            chdirInProject('src');
+            expect(main.stdout).toMatchSnapshot(`answer`);
+            fs.rmdirSync('test_data/_checking', {recursive: true});
         });
-        process.chdir('..');
-        expect(main.stdout).toMatchSnapshot(`answer`);
-        fs.rmdirSync('test_data/_checking', {recursive: true});
     });
 
     describe("settings >>", () => {
@@ -1199,6 +1216,14 @@ afterAll(()=>{
     deleteFileSync('test_data/_output.txt')
     fs.rmdirSync('empty_folder', {recursive: true});
 });
+
+// chdirInProject
+// #keyword: chdirInProject
+function  chdirInProject(relativePath: string) {
+    const  projectPath = path.dirname(__dirname);
+    process.chdir(projectPath);
+    process.chdir(relativePath);
+}
 
 // writeFileSync
 // #keyword: writeFileSync
