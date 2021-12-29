@@ -1,4 +1,4 @@
-テスト reset 2_replace_6_if both:  #keyword: typrm reset 2_replace_6_if both
+Test >> reset 2_replace_6_if both:  #keyword: typrm reset 2_replace_6_if both
     replace command:
         settingTree.currentSettings:
             lineNum ==  1: banana, yes
@@ -60,3 +60,27 @@
             次に __Settings1__ を置き換えるときの置き換える前は、(check/yesだった)[check/no] と [check/not banana/no] で 1種類（2箇所）:
         コードの説明:
             IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
+settingStack of typrm makeSettingTree: #keyword:
+    overview: |
+        'settingStack' has parent indentLevel.
+    example:
+        YAML: |
+            1:  A:
+            2:      setting:
+            :
+            15:     A:
+            16:         setting:
+            31:     B:
+            32:         setting:
+        lineNum = 16 >> settingStack: |
+            { lineNum:  0, index: '/',    indentLevel: 0, ...}
+            { lineNum:  2, index: '/1',   indentLevel: 4, ...}
+            { lineNum: 16, index: '/1/1', indentLevel: 8, ...}
+        lineNum = 31 >> settingStack: |  #focus: /1/2
+            { lineNum:  0, index: '/', ...}
+            { lineNum:  2, index: '/1', ...}
+            { lineNum:  0, index: '/1/2', ...}
+        lineNum = 32 >> settingStack: |
+            { lineNum:  0, index: '/', ...}
+            { lineNum:  2, index: '/1', ...}
+            { lineNum: 32, index: '/1/2', ...}

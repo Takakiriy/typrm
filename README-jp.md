@@ -450,7 +450,7 @@ typrm を使うには Node.js のインストールが必要です。
 
                 echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
-                echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
                 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// スクリプトを実行できるようにします
 
@@ -471,7 +471,7 @@ typrm を使うには Node.js のインストールが必要です。
 
                 echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
                 echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-                echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
 
     typrm が使えることを確認します:
         PowerShell または Git bash を新しく開いて:
@@ -505,7 +505,7 @@ typrm を使うには Node.js のインストールが必要です。
         rm -f "${script}"  #// 更新するとき
         echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
         echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
-        echo "node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        echo "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
         chmod +x "${script}"
         unset script
 
@@ -557,7 +557,7 @@ typrm を使うには Node.js のインストールが必要です。
 
         echo  "export NODE_PATH=\"$(pwd)/node_modules\"" > ${script}
         echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-        echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
+        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x "${script}"
         unset script
         mkdir -p "${HOME}/Documents/typrm"
@@ -1031,13 +1031,13 @@ Windows の PS1 スクリプト ファイル の場合:
 ${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
 
     ${env:TYPRM_books} = "C:\Users\____\Documents\books"
-    node  ____\build\typrm.js $PsBoundParameters.Values $args
+    node --experimental-modules --es-module-specifier-resolution=node  ____\build\typrm.js $PsBoundParameters.Values $args
 
 Linux の bash や mac の zsh の スクリプト ファイル の場合:
 ${HOME}/bin/typrm:
 
     export TYPRM_books="/home/____/Documents/books"
-    node  ____/build/typrm.js "$@"
+    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 typrm の search コマンドに `#ref:` タグと環境変数のないパスを指定すると、
 マニュアルに書くべき `#ref:` タグのパラメーターも一緒に表示されます。
@@ -1111,7 +1111,7 @@ Windows の PowerShell の場合:
             regularExpression: .*
             command: 'echo  "ref:  `${ref}";  echo  "file: `${file}";  echo  "windowsFile: `${windowsFile}";  echo  "fragment: `${fragment}"'
     "@
-    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --experimental-modules --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 mac の zsh の場合:
 
@@ -1133,7 +1133,7 @@ mac の zsh の場合:
             command: 'code --goto "${ref}"'
     __HERE_DOCUMENT__
     )
-    node  ____/build/typrm.js "$@"
+    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 `command` には command 固有の変数参照を含めることができます。
 
@@ -1179,7 +1179,7 @@ Windows の PowerShell の場合:
             address: "`${file}:`${lineNum}"
     "@
 
-    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --experimental-modules --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 bash, zsh の場合:
 
@@ -1195,7 +1195,7 @@ bash, zsh の場合:
     __HERE_DOCUMENT__
     )
 
-    node  ____/build/typrm.js "$@"
+    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 `type` には、`text` を指定します。
 

@@ -11,7 +11,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
-  - [First replace example - replace command, reset command](#first-replace-example---replace-command-revert-command)
+  - [First replace example - replace command, reset command](#first-replace-example---replace-command-reset-command)
     - [Replace with #to tag](#replace-with-to-tag)
   - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
   - [Install](#install)
@@ -464,7 +464,7 @@ To use typrm, you must install Node.js.
 
                 echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
-                echo  "node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
                 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// Make the script run
 
@@ -485,7 +485,7 @@ To use typrm, you must install Node.js.
 
                 echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
                 echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-                echo  "node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
 
     Check to use typrm command:
         Open new PowerShell or new Git bash:
@@ -519,7 +519,7 @@ To use typrm, you must install Node.js.
         rm -f "${script}"  #// When you are updating
         echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
         echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
-        echo "node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        echo "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
         chmod +x "${script}"
         unset script
 
@@ -571,7 +571,7 @@ To use typrm, you must install Node.js.
 
         echo  "export NODE_PATH=\"$(pwd)/node_modules\"" > ${script}
         echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
-        echo  "node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
+        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x "${script}"
         unset script
         mkdir -p "${HOME}/Documents/typrm"
@@ -1078,13 +1078,13 @@ Case of Windows PS1 script file:
 ${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
 
     ${env:TYPRM_books} = "C:\Users\____\Documents\books"
-    node  ____\build\typrm.js $PsBoundParameters.Values $args
+    node --experimental-modules --es-module-specifier-resolution=node  ____\build\typrm.js $PsBoundParameters.Values $args
 
 Case of Linux bash or mac zsh script file:
 ${HOME}/bin/typrm:
 
     export TYPRM_books="/home/____/Documents/books"
-    node  ____/build/typrm.js "$@"
+    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 If you specify the `#ref:` tag and a path without environment variables
 in the search command, typrm displays the parameters of the `#ref:` tag
@@ -1162,7 +1162,7 @@ Case of Windows PowerShell:
             regularExpression: .*
             command: 'echo  "ref:  `${ref}";  echo  "file: `${file}";  echo  "windowsFile: `${windowsFile}";  echo  "fragment: `${fragment}"'
     "@
-    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --experimental-modules --es-module-specifier-resolution=node   C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 Case of mac zsh:
 
@@ -1184,7 +1184,7 @@ Case of mac zsh:
             command: 'code --goto "${ref}"'
     __HERE_DOCUMENT__
     )
-    node  ____/build/typrm.js "$@"
+    node --experimental-modules --es-module-specifier-resolution=node   ____/build/typrm.js "$@"
 
 You can write variable references in the `command` parameter.
 
@@ -1235,7 +1235,7 @@ Case of Windows PowerShell:
             address: "`${file}:`${lineNum}"
     "@
 
-    node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --experimental-modules --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 Case of bash or zsh:
 
@@ -1251,7 +1251,7 @@ Case of bash or zsh:
     __HERE_DOCUMENT__
     )
 
-    node  ____/build/typrm.js "$@"
+    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 For `type`, specify `text`.
 

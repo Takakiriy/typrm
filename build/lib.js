@@ -622,6 +622,9 @@ export function getSnapshot(label, deafultSnapshot = undefined) {
 //    var d = pp(var);
 //    d = d;  // Set break point here and watch the variable d
 // Example:
+//    var d = ppClear();
+//    pp(var);
+// Example:
 //    try {
 //
 //        await main();
@@ -638,7 +641,16 @@ export function pp(message) {
     }
     else {
         if (typeof message === 'object') {
-            message = JSON.stringify(message, null, '    ');
+            if (message instanceof Map) {
+                const messageObject = Object.create(null);
+                for (let [k, v] of message) {
+                    messageObject[k] = v;
+                }
+                message = JSON.stringify(messageObject, null, '    ');
+            }
+            else {
+                message = JSON.stringify(message, null, '    ');
+            }
         }
         else if (message === undefined) {
             message = '(undefined)';
@@ -651,6 +663,12 @@ export function pp(message) {
     return debugOut;
 }
 export const debugOut = [];
+// ppClear
+// #keyword: ppClear
+export function ppClear() {
+    debugOut.length = 0;
+    return debugOut;
+}
 // cc
 // Through counter.
 // #keyword: lib.ts cc

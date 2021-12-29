@@ -2443,6 +2443,459 @@ check:
 "
 `;
 
+exports[`replaces settings >> in 2_replace_11_nested_if AB: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:59: #to: __Switch_02__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if AB: updatedFileContents 1`] = `
+"nested if:
+    settings:
+        __Switch1__: A
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        AB:   #template: __Set1__
+        C:    #template: __Set2__
+        ab:   #template: __Set22__
+    AB:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+AB:   #template: __Set_01__
+settings:
+    __Switch_01__: A
+    __Switch_02__: B  #original: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+AB:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if BA: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:58: #to: __Switch_01__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if BA: updatedFileContents 1`] = `
+"nested if:
+    settings:
+        __Switch1__: B  #original: A
+        __Switch2__: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        BA:   #template: __Set1__
+        C:    #template: __Set2__
+        ba:   #template: __Set22__
+    BA:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+BA:   #template: __Set_01__
+settings:
+    __Switch_01__: B  #original: A
+    __Switch_02__: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+BA:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if BB: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:58: #to: __Switch_01__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:59: #to: __Switch_02__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if BB: updatedFileContents 1`] = `
+"nested if:
+    settings:
+        __Switch1__: B  #original: A
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        BB:   #template: __Set1__
+        C:    #template: __Set2__
+        bb:   #template: __Set22__
+    BB:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+BB:   #template: __Set_01__
+settings:
+    __Switch_01__: B  #original: A
+    __Switch_02__: B  #original: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+BB:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if C: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:17: #to: __Set2__: CC
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if C: updatedFileContents 1`] = `
+"nested if:
+    settings:
+        __Switch1__: A
+        __Switch2__: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings:
+            __Set2__: CC  #original: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        AA:   #template: __Set1__
+        CC:    #template: __Set2__
+        aa:   #template: __Set22__
+    AA:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+AA:   #template: __Set_01__
+settings:
+    __Switch_01__: A
+    __Switch_02__: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+AA:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`] = `
+"nested if:
+    settings:
+        __Switch1__: A
+        __Switch2__: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        AA:   #template: __Set1__
+        C:    #template: __Set2__
+        aa:   #template: __Set22__
+    AA:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+AA:   #template: __Set_01__
+settings:
+    __Switch_01__: A
+    __Switch_02__: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+AA:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
 exports[`replaces settings >> replace to tag >> 1_OK: replacedFileContents 1`] = `
 "settings:
     __SettingA__: SetAA  #original: SetA
@@ -3404,6 +3857,35 @@ exports[`replaces settings >> reset >> 2_replace_10_double_check 1_OK >>: stdout
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #original: __Full__: folder/file
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3: #original: __Folder__: folder
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #original: __File__: file
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> reset >> 2_replace_11_nested_if AB >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #original: __Switch2__: A
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> reset >> 2_replace_11_nested_if BA >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #original: __Switch1__: A
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> reset >> 2_replace_11_nested_if BB >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #original: __Switch1__: A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #original: __Switch2__: A
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> reset >> 2_replace_11_nested_if C >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:17: #original: __Set2__: C
 
 Warning: 0, Error: 0
 "

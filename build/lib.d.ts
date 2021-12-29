@@ -58,6 +58,7 @@ export declare function inputSkip(count: number): void;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
 export declare function pp(message: any): string[];
 export declare const debugOut: string[];
+export declare function ppClear(): string[];
 export declare function cc(targetCount?: number, label?: string): {
     isTarget: boolean;
     debugOut: string[];

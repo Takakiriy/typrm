@@ -294,6 +294,29 @@ describe("replaces settings >>", () => {
                 { from: '__Full__: folder/file',  to: '__Full__: folder/file  #to: fo/fi' },
                 { from: '__File__: file',  to: '__File__: file  #to: fi' },
             ]},
+        ],[
+            '2_replace_11_nested_if', ' AB', 'en-US',
+            { replacers:[
+                { from: '__Switch2__: A',  to: '__Switch2__: A  #to:B' },
+                { from: '__Switch_02__: A',  to: '__Switch_02__: A  #to:B' },
+            ]},
+        ],[
+            '2_replace_11_nested_if', ' BA', 'en-US',
+            { replacers:[
+                { from: '__Switch1__: A',  to: '__Switch1__: A  #to:B' },
+                { from: '__Switch_01__: A',  to: '__Switch_01__: A  #to:B' },
+            ]},
+        ],[
+            '2_replace_11_nested_if', ' BB', 'en-US',
+            { replacers:[
+                { from: '__Switch1__: A',  to: '__Switch1__: A  #to:B' },
+                { from: '__Switch2__: A',  to: '__Switch2__: A  #to:B' },
+                { from: '__Switch_01__: A',  to: '__Switch_01__: A  #to:B' },
+                { from: '__Switch_02__: A',  to: '__Switch_02__: A  #to:B' },
+            ]},
+        ],[
+            '2_replace_11_nested_if', ' C', 'en-US',
+                { replacers:[{ from: '__Set2__: C',  to: '__Set2__: C  #to:CC' }]},
         ],
 
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
@@ -384,8 +407,7 @@ describe("replaces settings >>", () => {
     describe("reset >>", () => {
         test.each([
             [
-                '2_replace_1_ok', ' setting 2', 29, 'en-US',
-                `key1: value1changed`,
+                '2_replace_1_ok', ' setting 2', 'en-US',
                 {
                     replacers:[
                         { fromCSV: '手順B:, key1: value11', to: 'key1: value11  #to: value1changed1' },
@@ -394,21 +416,17 @@ describe("replaces settings >>", () => {
                     resetAnswer: 'replaces settings >> in 2_replace_1_ok: resetFileContents 1',
                 },
             ],[
-                '2_replace_6_if', ' in if block', 9, 'en-US',
-                `__Setting1__: replaced`,
+                '2_replace_6_if', ' in if block', 'en-US',
                 { replacers:[
                     { from: '__Setting1__: yes', to: '__Setting1__: yes  #to: replaced' },
                 ]},
             ],[
-                '2_replace_6_if', ' in if variable', 9, 'en-US',
-                `fruit: melon`,
+                '2_replace_6_if', ' in if variable', 'en-US',
                 { replacers:[
                     { from: 'fruit: banana', to: 'fruit: banana  #to: melon' },
                 ]},
             ],[
-                '2_replace_6_if', ' both', 9, 'en-US',  // #search: typrm reset 2_replace_6_if both
-                `fruit: melon
-                __Setting1__: replaced`,
+                '2_replace_6_if', ' both', 'en-US',  // #search: typrm reset 2_replace_6_if both
                 {
                     replacers:[
                         { from: '__Setting1__: no', to: '__Setting1__: no  #to: replaced' },
@@ -416,10 +434,7 @@ describe("replaces settings >>", () => {
                     ],
                 },
             ],[
-                '2_replace_10_double_check', ' 1_OK', undefined, 'en-US',
-                `__Full__: fo/fi
-                __Folder__: fo
-                __File__: fi`,
+                '2_replace_10_double_check', ' 1_OK', 'en-US',
                 {
                     replacers:[
                         { from: '__Full__: folder/file', to: '__Full__: folder/file  #to: fo/fi' },
@@ -427,9 +442,24 @@ describe("replaces settings >>", () => {
                         { from: '__File__: file',        to: '__File__: file  #to: fi' },
                     ],
                 },
+            ],[
+                '2_replace_11_nested_if', ' AB', 'en-US',
+                { replacers:[{ from: '__Switch2__: A',  to: '__Switch2__: A  #to:B' }]},
+            ],[
+                '2_replace_11_nested_if', ' BA', 'en-US',
+                { replacers:[{ from: '__Switch1__: A',  to: '__Switch1__: A  #to:B' }]},
+            ],[
+                '2_replace_11_nested_if', ' BB', 'en-US',
+                { replacers:[
+                    { from: '__Switch1__: A',  to: '__Switch1__: A  #to:B' },
+                    { from: '__Switch2__: A',  to: '__Switch2__: A  #to:B' },
+                ]},
+            ],[
+                '2_replace_11_nested_if', ' C', 'en-US',
+                { replacers:[{ from: '__Set2__: C',  to: '__Set2__: C  #to:CC' }]},
             ],
 
-        ])("%s%s >>", async (fileNameHead, _subCaseName, lineNum, locale, keyValues, option) => {
+        ])("%s%s >>", async (fileNameHead, _subCaseName, locale, option) => {
             const  changingFolderPath = testFolderPath + '_changing';
             const  changingFileName = fileNameHead + "_1_changing.yaml";
             const  changingFilePath = changingFolderPath +'/'+ changingFileName;
@@ -518,6 +548,7 @@ describe("replaces settings >>", () => {
             fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
         });
     });
+
     test("replace to tag >> ToTestTag", async () => {
         const  caseName = 'ToTestTag';
         const  changingFolderPath = testFolderPath + '_changing';
