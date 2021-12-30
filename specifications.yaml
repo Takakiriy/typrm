@@ -84,3 +84,16 @@ settingStack of typrm makeSettingTree: #keyword:
             { lineNum:  0, index: '/', ...}
             { lineNum:  2, index: '/1', ...}
             { lineNum: 32, index: '/1/2', ...}
+outOfFalseBlocks:  #focus: outOfFalseBlocks, indicesWithIf
+    moveToLine (SettingsTree):
+        moveToLine_Immutably:
+            addCurrentSettingsInIfTag_Immutably:
+                # class SettingsTree {
+                #     addCurrentSettingsInIfTag_Immutably(
+                #         for (const [lineNum, index] of Array.from(settingsTree.indicesWithIf.entries())) {
+                #             outOfFalseBlocks.set(lineNum, falseIndex == disabledFalseIndex);
+    moveToLine (ReplaceToTagTree):
+        moveToLine_Immutably:
+            # class ReplaceToTagTree {
+            #     moveToLine_Immutably(parser: Parser, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_for_moveToLine {
+            #         return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;

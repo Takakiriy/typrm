@@ -545,7 +545,7 @@ export function  getCommonElements<T>(arrayA: T[], arrayB: T[]): T[] {
 
 // isAlphabetIndex
 export function  isAlphabetIndex(index: string): boolean {
-    const  lastCharacter = index.substr(-1);
+    const  lastCharacter = index.slice(-1);
     const  lastCharacterIsNumber = ! isNaN(lastCharacter as any);
     return  ! lastCharacterIsNumber  &&  index !== '/';
 }
@@ -576,6 +576,18 @@ export function  fromAlphabetIndex(index: string): number {
     } else {
         return  NaN;
     }
+}
+
+// cutAlphabetInIndex
+export function  cutAlphabetInIndex(index: string): string {
+    for (var  parentIndex = index;  parentIndex !== '/';  parentIndex = path.dirname(parentIndex)) {
+        const  lastCharacter = parentIndex.slice(-1);
+        const  lastCharacterIsNumber = ! isNaN(lastCharacter as any);
+        if (lastCharacterIsNumber) {
+            break;
+        }
+    }
+    return  parentIndex;
 }
 
 // hasInterfaceOf

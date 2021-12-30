@@ -124,13 +124,15 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
     var  lineNum = 0;
     var  fileTemplateTag: TemplateTag | null = null;
     var  secretLabelCount = 0;
-    const  lines = [];
+    const  lines: string[] = [];
     const  keywords: SearchKeyword[] = [];
     const  ifTagParser = new IfTagParser(parser);
-
     for await (const line1 of reader) {
         const  line: string = line1;
         lines.push(line);
+    }
+
+    for (const line of lines) {
         lineNum += 1;
         parser.lineNum = lineNum;
 
@@ -180,7 +182,7 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
         }
         if (templateTag.isFound) {
             parser.templateCount += 1;
-            const  checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+            const  checkingLine = lines[lineNum - 1 + templateTag.lineNumOffset];
             const  commonCase = (templateTag.label !== templateIfLabel);
             if (commonCase) {
                 var  expected = getExpectedLine(setting, templateTag.template);
@@ -189,17 +191,14 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
                 var  expected = getExpectedLine(setting, templateTag.newTemplate);
             }
             if (templateTag.lineNumOffset === 0) {
-                var  checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
+                var  checkingLineWithoutTemplate = checkingLine.substring(0, templateTag.indexInLine);
             } else {
                 var  checkingLineWithoutTemplate = checkingLine;
             }
 
             if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
                 console.log("");
-                console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${checkingLine}`);
-                if (templateTag.lineNumOffset !== 0) {
-                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);  // template
-                }
+                consoleLogOfNotMatchedWithTemplate(templateTag, settingTree, lines, parser);
                 console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                 console.log(`    ${translate('Expected')}: ${expected}`);
                 parser.warningCount += 1;
@@ -322,6 +321,36 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
                 parser.errorCount += 1;
             }
         }
+    }
+}
+
+function  consoleLogOfNotMatchedWithTemplate(templateTag: TemplateTag, settingTree: SettingsTree, lines: string[], parser: Parser) {
+    var  settingIndices: string[] = [];
+    for (let settingIndex = settingTree.currentSettingIndex;  settingIndex !== '/';  settingIndex = path.dirname(settingIndex)) {
+        settingIndices.push(settingIndex);
+    }
+    settingIndices.push('/');
+    settingIndices = settingIndices.reverse();
+    const  variableNames = templateTag.scanKeys(Object.keys(settingTree.currentSettings));
+
+    for (const parentSettingIndex of settingIndices) {
+        if (parentSettingIndex in settingTree.settingsInformation) {
+            const  settings = settingTree.settingsInformation[parentSettingIndex];
+
+            console.log(`${getTestablePath(parser.filePath)}:${settings.lineNum}: ${lines[settings.lineNum - 1]}`);  // settings
+            for (const variableName of variableNames) {
+                const  variable = settingTree.currentSettings[variableName];
+                if (lib.cutAlphabetInIndex(variable.settingsIndex) === parentSettingIndex) {
+
+                    console.log(`${getTestablePath(parser.filePath)}:${variable.lineNum}: ${lines[variable.lineNum - 1]}`);  // variable
+                }
+            }
+        }
+    }
+    const  targetLineNum = parser.lineNum + templateTag.lineNumOffset;
+    console.log(`${getTestablePath(parser.filePath)}:${targetLineNum}: ${lines[targetLineNum - 1]}`);  // target line
+    if (templateTag.lineNumOffset !== 0) {
+        console.log(`${getTestablePath(parser.filePath)}:${parser.lineNum}: ${lines[parser.lineNum - 1]}`);  // template
     }
 }
 
@@ -529,7 +558,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         if (isReadingSetting) {
             const  separator = line.indexOf(':');
             if (separator !== notFound) {
-                const  key = line.substr(0, separator).trim();
+                const  key = line.substring(0, separator).trim();
                 const  value = getValue(line, separator);
                 if (value !== ''  &&  key.length >= 1  &&  key[0] !== '#') {
                     const  previous = setting[key];
@@ -545,8 +574,15 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
                     }
+                    const  currentSetting = settingStack[settingStack.length - 2];
 
-                    setting[key] = {value, lineNum, tag: 'settings', isReferenced: false};
+                    setting[key] = {
+                        value,
+                        lineNum,
+                        settingsIndex: currentSetting.index,
+                        tag: 'settings',
+                        isReferenced: false
+                    };
                 }
             }
         }
@@ -719,6 +755,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
                 toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: toValue,
                     lineNum: lineNum,
+                    settingsIndex: currentSettingIndex,
                     tag: 'toInSettings',
                     isReferenced: false,
                 };
@@ -830,6 +867,7 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
                 toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: originalValue,
                     lineNum: lineNum,
+                    settingsIndex: currentSettingIndex,
                     tag: 'original',
                     isReferenced: false,
                 };
@@ -1113,6 +1151,25 @@ class  TemplateTag {
         }
     }
 
+    // scanKeys
+    scanKeys(allKeys: string[]): string[] {
+        const  keysSortedByLength: string[] = allKeys.slice(); // copy
+        keysSortedByLength.sort((b,a)=>(a.length, b.length));
+        const  scanedKeys: string[] = [];
+        const  replaced = '\n';
+        var  template = this.template;
+        for (const key of keysSortedByLength) {
+            const  keyRE = new RegExp(lib.escapeRegularExpression(key),'g');
+
+            if (keyRE.test(template)) {
+                scanedKeys.push(key);
+                template = template.replace(keyRE, replaced);
+            }
+        }
+
+        return  scanedKeys;
+    }
+
     // scanKeyValues
     async  scanKeyValues(toValue: string, allKeys: string[], parser: Parser, hasTestTag: boolean
             ):  Promise<{[name: string]: Setting}> {
@@ -1137,7 +1194,7 @@ class  TemplateTag {
                 template =
                     template.substr(0, index) +
                     ' '.repeat(key.length) +
-                    template.substr(index + key.length);
+                    template.substring(index + key.length);
                     // erase the key
                 index += 1;
             }
@@ -1197,6 +1254,7 @@ class  TemplateTag {
             returnKeyValues[key] =  {
                 value: keyValues[key],
                 lineNum: parser.lineNum,
+                settingsIndex: '___?1___',
                 tag: 'toAfterTemplate',
                 isReferenced: false,
             };
@@ -1748,10 +1806,7 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                     } else {
                         if (parser.errorCount === 0) { // Since only one old value can be replaced at a time
                             console.log('');
-                            console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${replacingLine}`);
-                            if (templateTag.lineNumOffset !== 0) {
-                                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                            }
+                            consoleLogOfNotMatchedWithTemplate(templateTag, settingTree, lines, parser);
                             if (expected === replaced) {
                                 console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                                 parser.warningCount += 1;
@@ -1761,8 +1816,6 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                                 parser.errorCount += 1;
                             }
                             console.log(`    ${translate('Expected')}: ${expected.trim()}`);
-                            console.log(`    ${translate('Settings')}: ${getTestablePath(inputFilePath)}:${
-                                settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`);
                         }
                     }
                 } else {
@@ -2992,7 +3045,8 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
         } else {
             var  value = setting[key].value;
         }
-        replacedSetting[key] = { value,  isReferenced: true /*dummy*/, tag: 'toAfterTemplate', lineNum: 0 /*dummy*/ };
+        replacedSetting[key] = { value,  isReferenced: true /*dummy*/,  tag: 'toAfterTemplate',
+            lineNum: 0 /*dummy*/,  settingsIndex: '' };
     }
 
     return  getExpectedLine(replacedSetting, template);
@@ -3001,7 +3055,7 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
 // getValue
 function  getValue(line: string, separatorIndex: number = -1) {
 
-    var  value = line.substr(separatorIndex + 1).trim();
+    var  value = line.substring(separatorIndex + 1).trim();
     if (value[0] === '#') {
         var  comment = 0;
     } else {
@@ -3137,7 +3191,7 @@ enum CommandEnum {
 class SettingsTree {
     indices = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
     indicesWithIf = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
-    outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
+    outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();  // #search: outOfFalseBlocks
     settings: {[index: string]: {[name: string]: Setting}} = {};
     settingsInformation: {[index: string]: SettingsInformation} = {};
 
@@ -3803,6 +3857,7 @@ type Settings = {[name: string]: Setting}
 interface Setting {
     value: string;
     lineNum: number;  // This count is the same as #to: tag count
+    settingsIndex: string;
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original';
     isReferenced: boolean;
 }

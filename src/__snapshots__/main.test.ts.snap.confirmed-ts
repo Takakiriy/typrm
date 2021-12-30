@@ -132,6 +132,8 @@ nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
 
 exports[`checks file contents >> First >> file name: stdout 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:1: 設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:2:     __Base__: sub
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:3: nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
     Warning: Not matched with the template.
     Expected: sub/dummy.txt
@@ -248,10 +250,14 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:1: #if: $env.value = value
     Error: if tag syntax
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:9:         user: 'user1'  #template: __Stage__
     Warning: Not matched with the template.
     Expected: develop
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:13:             user: 'user1'  #template: __Stage__
     Warning: Not matched with the template.
     Expected: develop
@@ -261,14 +267,20 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
     Warning: Not same as file contents
     Expected: Checks
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:28:             - check: 'yes'  #template: __Stage__
     Warning: Not matched with the template.
     Expected: develop
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:33:             - check: 'yes'  #template: __Stage__
     Warning: Not matched with the template.
     Expected: develop
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:43:         - check: 'yes'  #template: __Stage__
     Warning: Not matched with the template.
     Expected: develop
@@ -431,50 +443,70 @@ exports[`checks template value >> 1_template_1_ok: sourceFileContents 1`] = `
 
 exports[`checks template value >> 1_template_2_error: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:6:         __Key2__: value2  #コメント
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:12:         - echo  \\"value  2\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:13:             #template: - echo  \\"__Key2__\\"
     Warning: Not matched with the template.
     Expected: - echo  \\"value2\\"
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:5:         key1: value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:14:         - v1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:15:             #template: - key1
     Warning: Not matched with the template.
     Expected: - value1
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:8:         Key3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:16:         - __ \\"value3\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:17:             #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:8:         Key3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:18:         - __ \\"value3\\"  #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:25:         - value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:26:             #template: - key1
     Warning: Not matched with the template.
     Expected: - value11
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:27:         - １行に２つのケース： value1, value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:28:             #template: key1, key1
     Warning: Not matched with the template.
     Expected: value11, value11
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:29:         - １行に２つのケース： value11, value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:30:             #template: key1, key1
     Warning: Not matched with the template.
     Expected: value11, value11
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:31:         - ２行上のケース： \\"value11x\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:33:             #template-at(-2): \\"key1\\"
     Warning: Not matched with the template.
     Expected: \\"value11\\"
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:34:         - ３行上のケース： \\"value11x\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:37:             #template-at(-3): \\"key1\\"
     Warning: Not matched with the template.
     Expected: \\"value11\\"
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:38:         - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
     Warning: Not matched with the template.
     Expected: \\"value11\\"
@@ -485,6 +517,7 @@ exports[`checks template value >> 1_template_2_error: answer 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:42: #template-at(2): \\"key1\\"
     Error: The parameter must be less than 0
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:43:         - value  #template: __Undefined__
     Warning: Not matched with the template.
     Expected: __Undefined__
@@ -550,34 +583,50 @@ Error of duplicated variable name:
   typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:84
   ContentsB: target1: yellow
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:6:             __Setting1__: yes
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:27:         - no  #template: __Setting1__
     Warning: Not matched with the template.
     Expected: yes
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:12:             __Setting2__: yes
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:28:         - no  #template: __Setting2__
     Warning: Not matched with the template.
     Expected: yes
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:14:             __Env1__: yes
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:29:         - no  #template: __Env1__
     Warning: Not matched with the template.
     Expected: yes
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:20:             __Env2__: yes
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:30:         - no  #template: __Env2__
     Warning: Not matched with the template.
     Expected: yes
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:3:         fruit: banana
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:31:         - no  #template: fruit
     Warning: Not matched with the template.
     Expected: banana
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:4:         bird: swan
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:32:         - no  #template: bird
     Warning: Not matched with the template.
     Expected: swan
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:35:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:39:         fish: yes
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:41:         - no  #template: fish
     Warning: Not matched with the template.
     Expected: yes
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:44:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:45:         fruit: banana
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50:         - 💤  #template-if: $settings.fruit == banana
     Warning: Not matched with the template.
     Expected: 🌟
@@ -704,10 +753,14 @@ test_of_duplicated_variable_name_error:
 
 exports[`checks template value >> check files in multi folder >> 1st: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:3:         var: value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
     Warning: Not matched with the template.
     Expected: value1
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:3:         var: value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5:         value2  #template: var
     Warning: Not matched with the template.
     Expected: value1
@@ -719,6 +772,8 @@ template count = 2
 
 exports[`checks template value >> check files in multi folder >> with current folder: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:3:         var: value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
     Warning: Not matched with the template.
     Expected: value1
@@ -863,6 +918,9 @@ Error of duplicated variable name:
   typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5
   ContentsB: var2: value222
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var1: value111
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value222
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: value1, value2  #template: var1, var2
     Warning: Not matched with the template.
     Expected: value111, value222
@@ -914,34 +972,73 @@ value1, value2, value3  #template: var1, var2, var3
 
 exports[`checks template value >> settings >> 3e overwrite error: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: .....1, .....2, .....3  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value2, value3
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: .....1, .....2, .....3  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value2, value3
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11:         var3: value33
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8:     .....1, .....22, .....33  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value33
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11:         var3: value33
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12:     .....1, .....22, .....33  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value33
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15:         settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16:             var3: value333
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14:         .....1, .....22, .....333  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value333
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15:         settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16:             var3: value333
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17:         .....1, .....22, .....333  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value333
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11:         var3: value33
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18:     .....1, .....22, .....33  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value33
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var3: value3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: .....1, .....2, .....3  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value2, value3
@@ -1102,38 +1199,64 @@ __1A__-2:  #template: __1A__-2
 
 exports[`checks template value >> settings_tree_error: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:22:     __A__: ValueA
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:1: BadA:  #template: __A__
     Warning: Not matched with the template.
     Expected: ValueA
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:3:     BadA:  #template: __A__
     Warning: Not matched with the template.
     Expected: ValueA
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:7:         __1A__: Value1A
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:4:     Bad1A:  #template: __1A__
     Warning: Not matched with the template.
     Expected: Value1A
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:5:     Bad11A:  #template: __11A__
     Warning: Not matched with the template.
     Expected: __11A__
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:9:         settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:10:             __11A__: Value11A
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:11:         Bad11A:  #template: __11A__
     Warning: Not matched with the template.
     Expected: Value11A
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:12:     BadA:  #template: __A__
     Warning: Not matched with the template.
     Expected: ValueA
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:7:         __1A__: Value1A
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:13:     Bad1A:  #template: __1A__
     Warning: Not matched with the template.
     Expected: Value1A
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:14:     Bad11A:  #template: __11A__
     Warning: Not matched with the template.
     Expected: __11A__
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:18:                 settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:19:                     __111A__: Value111A
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:20:                 Bad111A:  #template: __111A__
     Warning: Not matched with the template.
     Expected: Value111A
@@ -1171,6 +1294,9 @@ settings:
 
 exports[`checks template value >> settings_tree_if: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:26: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:10:         settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:15:                     __C__: ValueC
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:7:             test error  #template: __C__
     Warning: Not matched with the template.
     Expected: ValueC
@@ -1239,10 +1365,14 @@ settings:
 
 exports[`checks template value >> template_if_1_error: answer 1`] = `
 "
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:1: 設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:2:     __Stage__: develop
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:6:     🌟 case product:  #template-if: $settings.__Stage__ == product
     Warning: Not matched with the template.
     Expected: 💤
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:1: 設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:2:     __Stage__: develop
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:7:     💤 case product:  #template-if: $settings.__Stage__ == develop
     Warning: Not matched with the template.
     Expected: 🌟
@@ -1345,11 +1475,15 @@ Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:         var1: value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8:     bad  #template: var1
     Warning: Not matched with the template.
     Expected: value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:             var2: value2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
@@ -1358,6 +1492,8 @@ Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:             var2: value2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
@@ -1366,6 +1502,8 @@ Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:             var2: value2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
@@ -1538,16 +1676,18 @@ exports[`replaces settings >> in 2_replace_1_ok setting 2 lineNum: updatedFileCo
 exports[`replaces settings >> in 2_replace_1_ok setting 2: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27: #to: key1: value1changed
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8:         Key3: value3  #original: oldValue3  #コメント
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:18:         - \\"value3changed\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:19:             #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
-    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8:         Key3: value3  #original: oldValue3  #コメント
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:21:         - \\"value3changed\\"  #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
-    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4
 
 Warning: 2, Error: 0
 "
@@ -1763,10 +1903,11 @@ exports[`replaces settings >> in 2_replace_2_error: sourceFileContents 1`] = `
 exports[`replaces settings >> in 2_replace_2_error: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:8: #to: Key3: value3changed
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:8:         Key3: value3  #to: value3changed
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
     Error: Not found any replacing target. Modify the template target to old or new value.
     Expected: - \\"value3\\"
-    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -1857,10 +1998,11 @@ Process B:
 exports[`replaces settings >> in 2_replace_3_English: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:8: #to: Key3: value3changed
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4:     settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:8:         Key3: value3  #コメント  #to: value3changed
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:21:         - \\"value3_bad\\"  #template: - \\"Key3\\"
     Error: Not found any replacing target. Modify the template target to old or new value.
     Expected: - \\"value3\\"
-    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4
 
 Warning: 0, Error: 1
 "
@@ -1951,10 +2093,11 @@ exports[`replaces settings >> in 2_replace_4_Japanese: sourceFileContents 1`] = 
 exports[`replaces settings >> in 2_replace_4_Japanese: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:8: #to: Key3: value3changed
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4:     設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:8:         Key3: value3  #to: value3changed
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
     エラー: 置き換える対象が見つかりません。 テンプレートの対象を古い値または新しい値に修正してください。
     期待: - \\"value3\\"
-    設定: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4
 
 警告: 0, エラー: 1
 "
@@ -2230,10 +2373,11 @@ exports[`replaces settings >> in 2_replace_9_template_if_2_NG: sourceFileContent
 exports[`replaces settings >> in 2_replace_9_template_if_2_NG: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:2: #to: __Stage__: develop
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:1: 設定:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:2:     __Stage__: product  #to: develop
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:6:     case product:  #template-if: $settings.__Stage__ == product
     Error: Not found any replacing target. Modify the template target to old or new value.
     Expected: 🌟
-    Settings: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:1
 
 Warning: 0, Error: 1
 "

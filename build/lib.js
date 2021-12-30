@@ -483,7 +483,7 @@ export function getCommonElements(arrayA, arrayB) {
 }
 // isAlphabetIndex
 export function isAlphabetIndex(index) {
-    const lastCharacter = index.substr(-1);
+    const lastCharacter = index.slice(-1);
     const lastCharacterIsNumber = !isNaN(lastCharacter);
     return !lastCharacterIsNumber && index !== '/';
 }
@@ -515,6 +515,17 @@ export function fromAlphabetIndex(index) {
     else {
         return NaN;
     }
+}
+// cutAlphabetInIndex
+export function cutAlphabetInIndex(index) {
+    for (var parentIndex = index; parentIndex !== '/'; parentIndex = path.dirname(parentIndex)) {
+        const lastCharacter = parentIndex.slice(-1);
+        const lastCharacterIsNumber = !isNaN(lastCharacter);
+        if (lastCharacterIsNumber) {
+            break;
+        }
+    }
+    return parentIndex;
 }
 // hasInterfaceOf
 export var hasInterfaceOf;

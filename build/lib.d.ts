@@ -47,6 +47,7 @@ export declare function getCommonElements<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function isAlphabetIndex(index: string): boolean;
 export declare function getAlphabetIndex(num: number | string): string;
 export declare function fromAlphabetIndex(index: string): number;
+export declare function cutAlphabetInIndex(index: string): string;
 export declare namespace hasInterfaceOf {
     function Error(object: any): object is Error;
 }

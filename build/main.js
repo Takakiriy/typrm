@@ -122,6 +122,8 @@ async function checkRoutine(inputFilePath, parser) {
     for await (const line1 of reader) {
         const line = line1;
         lines.push(line);
+    }
+    for (const line of lines) {
         lineNum += 1;
         parser.lineNum = lineNum;
         // Set condition by "#if:" tag.
@@ -165,7 +167,7 @@ async function checkRoutine(inputFilePath, parser) {
         }
         if (templateTag.isFound) {
             parser.templateCount += 1;
-            const checkingLine = lines[lines.length - 1 + templateTag.lineNumOffset];
+            const checkingLine = lines[lineNum - 1 + templateTag.lineNumOffset];
             const commonCase = (templateTag.label !== templateIfLabel);
             if (commonCase) {
                 var expected = getExpectedLine(setting, templateTag.template);
@@ -175,17 +177,14 @@ async function checkRoutine(inputFilePath, parser) {
                 var expected = getExpectedLine(setting, templateTag.newTemplate);
             }
             if (templateTag.lineNumOffset === 0) {
-                var checkingLineWithoutTemplate = checkingLine.substr(0, templateTag.indexInLine);
+                var checkingLineWithoutTemplate = checkingLine.substring(0, templateTag.indexInLine);
             }
             else {
                 var checkingLineWithoutTemplate = checkingLine;
             }
             if (!checkingLineWithoutTemplate.includes(expected) && ifTagParser.thisIsOutOfFalseBlock) {
                 console.log("");
-                console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${checkingLine}`);
-                if (templateTag.lineNumOffset !== 0) {
-                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`); // template
-                }
+                consoleLogOfNotMatchedWithTemplate(templateTag, settingTree, lines, parser);
                 console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                 console.log(`    ${translate('Expected')}: ${expected}`);
                 parser.warningCount += 1;
@@ -297,6 +296,32 @@ async function checkRoutine(inputFilePath, parser) {
                 parser.errorCount += 1;
             }
         }
+    }
+}
+function consoleLogOfNotMatchedWithTemplate(templateTag, settingTree, lines, parser) {
+    var settingIndices = [];
+    for (let settingIndex = settingTree.currentSettingIndex; settingIndex !== '/'; settingIndex = path.dirname(settingIndex)) {
+        settingIndices.push(settingIndex);
+    }
+    settingIndices.push('/');
+    settingIndices = settingIndices.reverse();
+    const variableNames = templateTag.scanKeys(Object.keys(settingTree.currentSettings));
+    for (const parentSettingIndex of settingIndices) {
+        if (parentSettingIndex in settingTree.settingsInformation) {
+            const settings = settingTree.settingsInformation[parentSettingIndex];
+            console.log(`${getTestablePath(parser.filePath)}:${settings.lineNum}: ${lines[settings.lineNum - 1]}`); // settings
+            for (const variableName of variableNames) {
+                const variable = settingTree.currentSettings[variableName];
+                if (lib.cutAlphabetInIndex(variable.settingsIndex) === parentSettingIndex) {
+                    console.log(`${getTestablePath(parser.filePath)}:${variable.lineNum}: ${lines[variable.lineNum - 1]}`); // variable
+                }
+            }
+        }
+    }
+    const targetLineNum = parser.lineNum + templateTag.lineNumOffset;
+    console.log(`${getTestablePath(parser.filePath)}:${targetLineNum}: ${lines[targetLineNum - 1]}`); // target line
+    if (templateTag.lineNumOffset !== 0) {
+        console.log(`${getTestablePath(parser.filePath)}:${parser.lineNum}: ${lines[parser.lineNum - 1]}`); // template
     }
 }
 // makeSettingTree
@@ -494,7 +519,7 @@ async function makeSettingTree(parser) {
         if (isReadingSetting) {
             const separator = line.indexOf(':');
             if (separator !== notFound) {
-                const key = line.substr(0, separator).trim();
+                const key = line.substring(0, separator).trim();
                 const value = getValue(line, separator);
                 if (value !== '' && key.length >= 1 && key[0] !== '#') {
                     const previous = setting[key];
@@ -510,7 +535,14 @@ async function makeSettingTree(parser) {
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
                     }
-                    setting[key] = { value, lineNum, tag: 'settings', isReferenced: false };
+                    const currentSetting = settingStack[settingStack.length - 2];
+                    setting[key] = {
+                        value,
+                        lineNum,
+                        settingsIndex: currentSetting.index,
+                        tag: 'settings',
+                        isReferenced: false
+                    };
                 }
             }
         }
@@ -676,6 +708,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
                 toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: toValue,
                     lineNum: lineNum,
+                    settingsIndex: currentSettingIndex,
                     tag: 'toInSettings',
                     isReferenced: false,
                 };
@@ -779,6 +812,7 @@ async function makeOriginalTagTree(parser, settingTree) {
                 toTagTree.replaceTo[currentSettingIndex][variableName] = {
                     value: originalValue,
                     lineNum: lineNum,
+                    settingsIndex: currentSettingIndex,
                     tag: 'original',
                     isReferenced: false,
                 };
@@ -1019,6 +1053,22 @@ class TemplateTag {
             return keys.includes(templateIfYesKey) && keys.includes(templateIfNoKey);
         }
     }
+    // scanKeys
+    scanKeys(allKeys) {
+        const keysSortedByLength = allKeys.slice(); // copy
+        keysSortedByLength.sort((b, a) => (a.length, b.length));
+        const scanedKeys = [];
+        const replaced = '\n';
+        var template = this.template;
+        for (const key of keysSortedByLength) {
+            const keyRE = new RegExp(lib.escapeRegularExpression(key), 'g');
+            if (keyRE.test(template)) {
+                scanedKeys.push(key);
+                template = template.replace(keyRE, replaced);
+            }
+        }
+        return scanedKeys;
+    }
     // scanKeyValues
     async scanKeyValues(toValue, allKeys, parser, hasTestTag) {
         const keysSortedByLength = allKeys.slice(); // copy
@@ -1040,7 +1090,7 @@ class TemplateTag {
                 template =
                     template.substr(0, index) +
                         ' '.repeat(key.length) +
-                        template.substr(index + key.length);
+                        template.substring(index + key.length);
                 // erase the key
                 index += 1;
             }
@@ -1096,6 +1146,7 @@ class TemplateTag {
             returnKeyValues[key] = {
                 value: keyValues[key],
                 lineNum: parser.lineNum,
+                settingsIndex: '___?1___',
                 tag: 'toAfterTemplate',
                 isReferenced: false,
             };
@@ -1638,10 +1689,7 @@ async function replaceSub(inputFilePath, command) {
                     else {
                         if (parser.errorCount === 0) { // Since only one old value can be replaced at a time
                             console.log('');
-                            console.log(`${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${replacingLine}`);
-                            if (templateTag.lineNumOffset !== 0) {
-                                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                            }
+                            consoleLogOfNotMatchedWithTemplate(templateTag, settingTree, lines, parser);
                             if (expected === replaced) {
                                 console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                                 parser.warningCount += 1;
@@ -1652,7 +1700,6 @@ async function replaceSub(inputFilePath, command) {
                                 parser.errorCount += 1;
                             }
                             console.log(`    ${translate('Expected')}: ${expected.trim()}`);
-                            console.log(`    ${translate('Settings')}: ${getTestablePath(inputFilePath)}:${settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`);
                         }
                     }
                 }
@@ -2783,13 +2830,14 @@ function getReplacedLine(setting, template, replacedValues) {
         else {
             var value = setting[key].value;
         }
-        replacedSetting[key] = { value, isReferenced: true /*dummy*/, tag: 'toAfterTemplate', lineNum: 0 /*dummy*/ };
+        replacedSetting[key] = { value, isReferenced: true /*dummy*/, tag: 'toAfterTemplate',
+            lineNum: 0 /*dummy*/, settingsIndex: '' };
     }
     return getExpectedLine(replacedSetting, template);
 }
 // getValue
 function getValue(line, separatorIndex = -1) {
-    var value = line.substr(separatorIndex + 1).trim();
+    var value = line.substring(separatorIndex + 1).trim();
     if (value[0] === '#') {
         var comment = 0;
     }
@@ -2924,7 +2972,7 @@ class SettingsTree {
     constructor() {
         this.indices = new Map(); // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
         this.indicesWithIf = new Map(); // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
-        this.outOfFalseBlocks = new Map();
+        this.outOfFalseBlocks = new Map(); // #search: outOfFalseBlocks
         this.settings = {};
         this.settingsInformation = {};
         // current: current line moved by "moveToLine" method
