@@ -660,6 +660,16 @@ When specifying a template that contains `"%`, write`""%25"`.
 - Variables for which no value is specified cannot be defined.
   Lines with only `variable name:` do not define any variables
 - Variable names and values cannot contain #
+- (version 0.x) Settings cannot be nested.
+    Variables defined by `setting:` above `setting:` cannot be referenced
+- (version 1.x) You can nest settings.
+    In the space character indent tree structure,
+    it can be referenced from the descendants of
+    the parent node of `setting:` that defines the variable.
+    If a variable with the same name as the variable defined
+    in `Setting:` in the parent direction is also defined
+    in `Setting:` in the child direction,
+    the value defined in the child direction is referenced.
 
 Example:
 
@@ -801,6 +811,10 @@ After:
 
 
 ## where command - finds the definition of the setting (variable) value
+
+(This command cannot be used after version 1.0.0.
+If you want to look for the definition position of the variable referenced by `#template:`,
+please raise an error that does not match the template.)
 
 To find the location of the variable definitions
 (variable name: value) listed in `Settings:`,
