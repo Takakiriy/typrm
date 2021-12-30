@@ -4163,20 +4163,3 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> m
     7.Test Echo, 0.Folder
 keyword or number: "
 `;
-
-exports[`where variable >> all : sourceFileContents 1`] = `
-"settings:
-    __VarA__: valueA
-    a__VarA__: valueAa
-body:
-    __VarA__: x
-settings:
-    __VarA__: valueA
-"
-`;
-
-exports[`where variable >> sub : sourceFileContents 1`] = `
-"settings:
-    __VarA__: valueA
-"
-`;

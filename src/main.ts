@@ -76,19 +76,6 @@ export async function  main() {
 
             await  revert(inputFilePath);
         }
-        else if (programArguments[0] === 'where') {
-            const  variableName = programArguments[1];
-            var  inputFilePath = '';
-            var  lineNum = 0;
-            if (programArguments.length >= 3) {
-                inputFilePath = programArguments[2];
-            }
-            if (programArguments.length >= 4) {
-                lineNum = parseInt(programArguments[3]);
-            }
-
-            await  lookUpVariable(variableName, inputFilePath, lineNum);
-        }
         else {
             await  search();
         }
@@ -2438,64 +2425,6 @@ async function  mutualSearch() {
     const  keyword = programArguments.slice(1).join(' ');
 
     await  searchSub(keyword, true);
-}
-
-// lookUpVariable
-async function  lookUpVariable(variableName: string, inputFilePath: string, referenceLineNum: number) {
-    const  valueColor = chalk.yellow;
-    for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
-        const  reader = readline.createInterface({
-            input: fs.createReadStream(inputFileFullPath),
-            crlfDelay: Infinity
-        });
-        var  lineNum = 0;
-        var  isReferenceFound = false;
-        var  isReadingSetting = false;
-        var  settingIndentLength = 0;
-        var  foundLine = '';
-
-        for await (const line1 of reader) {
-            const  line: string = line1;
-            lineNum += 1;
-
-            // setting = ...
-            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
-                isReadingSetting = true;
-                settingIndentLength = indentRegularExpression.exec(line)![0].length;
-                foundLine = '';
-            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-                isReadingSetting = false;
-                isReferenceFound = false;
-            }
-            if (isReadingSetting) {
-                const  separator = line.indexOf(':');
-                if (separator !== notFound) {
-                    const  keyOrNot = line.substr(0, separator).trim();
-                    if (keyOrNot[0] !== '#') {
-                        const  key = keyOrNot;
-
-                        if (key === variableName) {
-                            const  value = getValue(line, separator);
-                            const  valueIndex = line.indexOf(value, separator);
-
-                            foundLine = `${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
-                                line.substr(0, valueIndex) + valueColor(value) + line.substr(valueIndex + value.length);
-                            if (referenceLineNum === 0  ||  isReferenceFound) {
-                                console.log(foundLine);
-                            }
-                        }
-                    }
-                }
-            }
-            if (lineNum === referenceLineNum) {
-                if (foundLine) {
-                    console.log(foundLine);
-                } else if (isReadingSetting) {
-                    isReferenceFound = true;
-                }
-            }
-        }
-    }
 }
 
 // PrintRefOption

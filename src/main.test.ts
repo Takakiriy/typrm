@@ -975,48 +975,6 @@ describe("mutual search >>", () => {
     });
 });
 
-describe("where variable >>", () => {
-  test.each([
-    [
-        "1st",
-        ["where", "__VarA__"],
-        { folder: "test_data/_search_target", test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/sub/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
-    ],
-    [
-        "in the file",
-        ["where", "__VarA__", "1.yaml"],
-        { folder: "test_data/_search_target", test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
-    ],
-    [
-        "in the file near the line number (1)",
-        ["where", "__VarA__", "1.yaml", "5"],
-        { folder: "test_data/_search_target", test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':2:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
-    ],
-    [
-        "in the file near the line number (2)",
-        ["where", "__VarA__", "1.yaml", "6"],
-        { folder: "test_data/_search_target", test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_search_target/1.yaml') + lineNumColor(':7:') + `     ${'__VarA__'}: ${valueColor('valueA')}\n`,
-    ],
-    ])("%s", async (_caseName, arguments_, options, answer) => {
-        const  sourceFileContents = lib.getSnapshot(`where variable >> all : sourceFileContents 1`);
-        const  subSourceFileContents = lib.getSnapshot(`where variable >> sub : sourceFileContents 1`);
-        fs.rmdirSync('test_data/_search_target', {recursive: true});
-        writeFileSync(`test_data/_search_target/1.yaml`, sourceFileContents);
-        writeFileSync(`test_data/_search_target/sub/1.yaml`, subSourceFileContents);
-
-        await callMain(arguments_, options);
-        expect(main.stdout).toBe(answer);
-        fs.rmdirSync('test_data/_search_target', {recursive: true});
-    });
-});
-
 describe("print reference >>", () => {
     describe("basic >>", () => {
         test.each([
