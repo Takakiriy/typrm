@@ -471,15 +471,19 @@ export function isSameArrayOf(log, answer) {
     const isSame = (matched.length === answer.length && log.length === answer.length);
     return isSame;
 }
-// getCommonElements
-export function getCommonElements(arrayA, arrayB) {
-    const commonElements = [];
+// getCommonItems
+export function getCommonItems(arrayA, arrayB) {
+    const commonItems = [];
     for (const item of arrayA) {
         if (arrayB.includes(item)) {
-            commonElements.push(item);
+            commonItems.push(item);
         }
     }
-    return commonElements;
+    return commonItems;
+}
+// cutSameItems
+export function cutSameItems(array) {
+    return Array.from(new Set(array));
 }
 // isAlphabetIndex
 export function isAlphabetIndex(index) {

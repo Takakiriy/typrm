@@ -2497,47 +2497,43 @@ exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`]
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #to: __Full__: fo/fi
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #to: __File__: fi
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9
-  Error: template values after replace are conflicted.
-  Contents: - \\"folder/file\\"
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10
-    Before Editing: \\"folder/file\\"
-    After  Editing: \\"fo/fi\\"
-    Template: \\"__Full__\\"
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11
-    Before Editing: folder/file
-    After  Editing: folder/fi
-    Template: __Folder__/__File__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12
-    Before Editing: folder
-    After  Editing: folder
-    Template: __Folder__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13
-    Before Editing: file
-    After  Editing: fi
-    Template: __File__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    Error: template target values after replace are conflicted.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1: settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: folder/file  #to: fo/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: file  #to: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10:         #template: \\"__Full__\\"
+        Before Replacing: \\"folder/file\\"
+        After  Replacing: \\"fo/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11:         #template-at(-2): __Folder__/__File__
+        Before Replacing: folder/file
+        After  Replacing: folder/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12:         #template-at(-3): __Folder__
+        Before Replacing: folder
+        After  Replacing: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13:         #template-at(-4): __File__
+        Before Replacing: file
+        After  Replacing: fi
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14
-  Error: template values after replace are conflicted.
-  Contents: - \\"folder/file\\"
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15
-    Before Editing: file
-    After  Editing: fi
-    Template: __File__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16
-    Before Editing: folder
-    After  Editing: folder
-    Template: __Folder__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17
-    Before Editing: folder/file
-    After  Editing: folder/fi
-    Template: __Folder__/__File__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18
-    Before Editing: \\"folder/file\\"
-    After  Editing: \\"fo/fi\\"
-    Template: \\"__Full__\\"
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    Error: template target values after replace are conflicted.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1: settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: folder/file  #to: fo/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: file  #to: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15:         #template-at(-1): __File__
+        Before Replacing: file
+        After  Replacing: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16:         #template-at(-2): __Folder__
+        Before Replacing: folder
+        After  Replacing: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17:         #template-at(-3): __Folder__/__File__
+        Before Replacing: folder/file
+        After  Replacing: folder/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18:         #template-at(-4): \\"__Full__\\"
+        Before Replacing: \\"folder/file\\"
+        After  Replacing: \\"fo/fi\\"
 
 Warning: 0, Error: 2
 "
@@ -2548,6 +2544,34 @@ exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: updatedFil
     __Full__: folder/file  #to: fo/fi
     __Folder__: folder
     __File__: file  #to: fi
+check:
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"folder/file\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
+exports[`replaces settings >> in 2_replace_10_double_check 3_NoReplace: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_10_double_check 3_NoReplace: updatedFileContents 1`] = `
+"settings:
+    __Full__: folder/file
+    __Folder__: folder
+    __File__: file
 check:
     - \\"folder/file\\"
         #template-at(-1): __File__
@@ -3742,18 +3766,17 @@ check:
 exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_Error: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:12: #to: __Full__: ValueB9_ValueB9
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10
-  Error: template values after replace are conflicted.
-  Contents: ValueB1_ValueB2
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:11
-    Before Editing: ValueB1_ValueB2
-    After  Editing: ValueB9_ValueB9
-    Template: __Full__
-  in : \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:13
-    Before Editing: ValueB1
-    After  Editing: ValueB1
-    Template: __Part__
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
+    Error: template target values after replace are conflicted.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:1: settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:7:         __Full__: ValueB1_ValueB2
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:8:         __Part__: ValueB1
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:11:         #template: __Full__
+        Before Replacing: ValueB1_ValueB2
+        After  Replacing: ValueB9_ValueB9
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:13:         #template-at(-2): __Part__
+        Before Replacing: ValueB1
+        After  Replacing: ValueB1
 
 Warning: 0, Error: 1
 "

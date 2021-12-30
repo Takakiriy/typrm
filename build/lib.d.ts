@@ -43,7 +43,8 @@ declare class StandardInputBuffer {
     close(): void;
 }
 export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
-export declare function getCommonElements<T>(arrayA: T[], arrayB: T[]): T[];
+export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
+export declare function cutSameItems<T>(array: T[]): T[];
 export declare function isAlphabetIndex(index: string): boolean;
 export declare function getAlphabetIndex(num: number | string): string;
 export declare function fromAlphabetIndex(index: string): number;

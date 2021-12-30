@@ -273,6 +273,9 @@ describe("replaces settings >>", () => {
                     { from: '__File__: file', to: '__File__: file  #to: fi' },
                 ] },
         ], [
+            '2_replace_10_double_check', ' 3_NoReplace', 'en-US',
+            { replacers: [] },
+        ], [
             '2_replace_11_nested_if', ' AB', 'en-US',
             { replacers: [
                     { from: '__Switch2__: A', to: '__Switch2__: A  #to:B' },

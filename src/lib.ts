@@ -532,15 +532,20 @@ export function  isSameArrayOf<T>(log: T[], answer: T[]): boolean {
   return isSame;
 }
 
-// getCommonElements
-export function  getCommonElements<T>(arrayA: T[], arrayB: T[]): T[] {
-    const  commonElements = [] as T[];
+// getCommonItems
+export function  getCommonItems<T>(arrayA: T[], arrayB: T[]): T[] {
+    const  commonItems = [] as T[];
     for (const item of arrayA) {
         if (arrayB.includes(item)){
-            commonElements.push(item);
+            commonItems.push(item);
         }
     }
-    return  commonElements;
+    return  commonItems;
+}
+
+// cutSameItems
+export function  cutSameItems<T>(array: T[]): T[] {
+    return  Array.from(new Set<T>(array));
 }
 
 // isAlphabetIndex

@@ -41,7 +41,8 @@ async function main() {
 }
 // DoCustomDebug
 async function DoCustomDebug() {
-    const returns = await callChildProccess(`node ${scriptPath} replace C:\\Users\\user1\\steps\\!Temp.yaml`, {});
+    const returns = await callChildProccess(`node --experimental-modules --es-module-specifier-resolution=node ` +
+        `${scriptPath} replace C:\\Users\\user1\\steps\\!Temp.yaml`, {});
     console.log(`(typrm_test.ts) ${returns.stdout}`);
     console.log('Done');
 }
