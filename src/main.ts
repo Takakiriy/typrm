@@ -1914,10 +1914,11 @@ async function  check(checkingFilePath?: string) {
 
 // listUpFilePaths
 async function  listUpFilePaths(checkingFilePath?: string) {
-    const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
+    var    targetFolders = await lib.parseCSVColumns(programOptions.folder);
+    targetFolders = targetFolders.map((path)=>(lib.pathResolve(path)));  // Normalize path separators
     if (checkingFilePath) {
         if (lib.isFullPath(checkingFilePath)) {
             inputFileFullPaths.push(checkingFilePath);
