@@ -309,15 +309,34 @@ typrm search コマンドの書式:
 コマンド名（search または s）を省略できません。
 
 検索キーワードに `#keyword:` または `#search:` を入力しても無視されます。
-検索するときは、grep など一般的な全文検索ツールを使ってください。
 
 search コマンドにキーワードを指定しないと、検索キーワード入力モードになります。
 このモードを終了するには、Ctrl+C キーを押します。
 
-    $ typrm s
+    $ typrm
     keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
     keyword:
+
+Visual Studio Code のターミナルで実行した場合、見つかった場所（パス）を
+Ctrl キーを押しながらクリックすると開くことができます。
+
+検索した後で # と数字（例：#1）を入力すると、
+`TYPRM_OPEN_DOCUMENT` 環境変数に設定したコマンドを実行します。
+入力する数字は検索結果の下から数えた番号です。
+環境変数の値の `${ref}` の部分はフルパスに置き換わります。
+
+bash
+
+    $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
+    $ typrm
+    keyword: csv
+    /home/user1/text.txt:1: #keyword: CSV, comma separated values
+    keyword: #1
+
+実行されるコマンド
+
+    code -g "/home/user1/text.txt:1"
 
 検索キーワード入力モードで何も見つからなかったときは、
 Enter キーを押すことで全文検索ができます。
@@ -450,6 +469,9 @@ typrm を使うには Node.js のインストールが必要です。
 
                 echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
+                echo  "`${env:TYPRM_OPEN_DOCUMENT} = `"code -g `"`"`${ref}`"" >> "${script}"
+                echo  "" > ${script}
+
                 echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
                 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// スクリプトを実行できるようにします
@@ -469,15 +491,18 @@ typrm を使うには Node.js のインストールが必要です。
                 script="${HOME}/bin/typrm"
                 mkdir -p "${HOME}/bin"
 
-                echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
-                echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+                echo  "export  NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+                echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+                echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
+                echo  "" >> "${script}"
+
                 echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
 
     typrm が使えることを確認します:
         PowerShell または Git bash を新しく開いて:
             typrm --version
 
-    必要に応じて環境変数 TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
 ### mac の場合
 
@@ -501,18 +526,23 @@ typrm を使うには Node.js のインストールが必要です。
 
     PATH が通ったフォルダーに typrm を起動する スクリプト ファイル を作ります:
         cd typrm  #// Zip ファイルを展開したフォルダー
+        typrm_folder="${HOME}/Documents/typrm"
         script="$HOME/bin/typrm"
-        rm -f "${script}"  #// 更新するとき
-        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
-        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
-        echo "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
-        chmod +x "${script}"
+        rm -f  "${script}"  #// 更新するとき
+
+        echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
+        echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
+        echo  "" >> "${script}"
+        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        chmod +x  "${script}"
         unset script
+        mkdir -p  "${HOME}/Documents/typrm"
 
     typrm が使えることを確認します:
         typrm --version
 
-    必要に応じて環境変数 TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
 ### CentOS 7 の場合
 
@@ -555,17 +585,19 @@ typrm を使うには Node.js のインストールが必要です。
         script="${HOME}/bin/typrm"
         mkdir -p "${HOME}/bin"
 
-        echo  "export NODE_PATH=\"$(pwd)/node_modules\"" > ${script}
-        echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
+        echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
+        echo  "" >> "${script}"
         echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
-        chmod +x "${script}"
+        chmod +x  "${script}"
         unset script
-        mkdir -p "${HOME}/Documents/typrm"
+        mkdir -p  "${HOME}/Documents/typrm"
 
     typrm が使えることを確認します:
         typrm --version
 
-    必要に応じて環境変数 TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     （使わなくなったら）typrm を削除します:
         - rm ~/bin/typrm

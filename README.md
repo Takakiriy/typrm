@@ -317,16 +317,37 @@ If the search keyword was the same as the command name of typrm,
 the command name (search or s) cannot be omitted.
 
 Entering `#keyword:` or `#search:` in the search keyword will be ignored.
-When searching, use a common full-text search tool such as grep.
 
 If you do not specify any keywords with the search command,
 search keyword input mode is started.
 Press Ctrl + C to exit this mode.
 
-    $ typrm s
+    $ typrm
     keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
     keyword:
+
+When running in Visual Studio Code terminal,
+you can open the file at the found location (path)
+by holding down the Ctrl key and clicking.
+
+If you enter # and a number (e.g. #1) after searching,
+the command you set for the 'TYPRM_OPEN_DOCUMENT' environment variable
+will be executed.
+The input number is the number counted from the bottom of the search results.
+The '${ref}' in the environment variable value will be replaced to the full path.
+
+bash
+
+    $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
+    $ typrm
+    keyword: csv
+    /home/user1/text.txt:1: #keyword: CSV, comma separated values
+    keyword: #1
+
+Commands executed
+
+    code -g "/home/user1/text.txt:1"
 
 If you cannot find anything in the search keyword input mode,
 you can do the full-text search by pressing the Enter key.
@@ -464,6 +485,9 @@ To use typrm, you must install Node.js.
 
                 echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
+                echo  "`${env:TYPRM_OPEN_DOCUMENT} = `"code -g `"`"`${ref}`"" >> "${script}"
+                echo  "" > ${script}
+
                 echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
                 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// Make the script run
@@ -483,15 +507,18 @@ To use typrm, you must install Node.js.
                 script="${HOME}/bin/typrm"
                 mkdir -p "${HOME}/bin"
 
-                echo  "export NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
-                echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+                echo  "export  NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
+                echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+                echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
+                echo  "" >> "${script}"
+
                 echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
 
     Check to use typrm command:
         Open new PowerShell or new Git bash:
             typrm --version
 
-    Set the environment variables TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
 ### For mac
 
@@ -515,18 +542,23 @@ To use typrm, you must install Node.js.
 
     Make the script file in the PATH folder to start typrm:
         cd typrm  #// The folder extracted from the Zip file
+        typrm_folder="${HOME}/Documents/typrm"
         script="$HOME/bin/typrm"
-        rm -f "${script}"  #// When you are updating
-        echo "export  NODE_PATH=$(pwd)/node_modules" >> "${script}"
-        echo "export  TYPRM_FOLDER=$HOME/Documents/typrm" >> "${script}"
-        echo "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
-        chmod +x "${script}"
+        rm -f  "${script}"  #// When you are updating
+
+        echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
+        echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
+        echo  "" >> "${script}"
+        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        chmod +x  "${script}"
         unset script
+        mkdir -p  "${HOME}/Documents/typrm"
 
     Check to use typrm command:
         typrm --version
 
-    Set the environment variables TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
 ### For CentOS 7
 
@@ -569,22 +601,24 @@ To use typrm, you must install Node.js.
         script="${HOME}/bin/typrm"
         mkdir -p "${HOME}/bin"
 
-        echo  "export NODE_PATH=\"$(pwd)/node_modules\"" > ${script}
-        echo  "export TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
+        echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
+        echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
+        echo  "" >> "${script}"
         echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
-        chmod +x "${script}"
+        chmod +x  "${script}"
         unset script
-        mkdir -p "${HOME}/Documents/typrm"
+        mkdir -p  "${HOME}/Documents/typrm"
 
     Check to use typrm command:
         typrm --version
+
+    Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     (If you do not use) delete typrm:
         - rm ~/bin/typrm
         - rm ~/Downloads/typrm.zip
         - rm -rf ~/Downloads/typrm/
-
-    Set the environment variables TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
 
 ## settings tag and #template tag: replaces settings values
