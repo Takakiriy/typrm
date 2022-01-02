@@ -7,3 +7,4 @@ node_modules
 **/*_changing.yml
 **/*_changing.yaml
 bin/chmod+x.command
+*.log

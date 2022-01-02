@@ -4138,7 +4138,8 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: std
 "keyword: Recommend: #ref: ../README.md#parameters
 ../README.md:3
     7.Test Echo, 0.Folder
-keyword or number:  \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
+keyword or number: 7
+ \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
 keyword or number: keyword: 見つかりません。全文検索するときは Enter キーを押してください。
 keyword: "
 `;
@@ -4148,7 +4149,7 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows2: st
 ../README.md:3
     7.Test Echo, 0.Folder
 keyword or number: 7
-\\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
+ \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
 keyword or number:  \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
 keyword or number: "
 `;
@@ -4185,4 +4186,9 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> m
 ../README.md:1
     7.Test Echo, 0.Folder
 keyword or number: "
+`;
+
+exports[`typrm_test >> TestOfCommandLine >> search_mode_select_by_number >> _out.txt 1`] = `
+"code -g \\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:4\\"
+"
 `;

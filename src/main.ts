@@ -1986,8 +1986,9 @@ async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
     const  search_ = 1;
-    const  printRef_ = 2;
-    const  runVerb_ = 3;
+    const  openDocument_ = 2;
+    const  printRef_ = 3;
+    const  runVerb_ = 4;
 
     if (keyword !== '') {
         const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
@@ -2034,6 +2035,8 @@ async function  search() {
                 var  command = search_;
                 if (previousPrint.hasVerbMenu  &&  numberRegularExpression.test(keyword)) {
                     command = runVerb_;
+                } else if (hasNumberTag(keyword)) {
+                    command = openDocument_;
                 } else if (hasRefTag(keyword)) {
                     command = printRef_;
                 }
@@ -2042,6 +2045,14 @@ async function  search() {
                     previousPrint = await searchSub(keyword, false);
                     if (previousPrint.hasFindMenu) {
                         console.log(translate`Not found. To do full text search, press Enter key.`);
+                    }
+                } else if (command === openDocument_) {
+                    const  foundLines = previousPrint.foundLines;
+                    const  foundIndex = parseInt( keyword.substring(1) );
+                    if (foundIndex >= 1  &&  foundIndex <= foundLines.length) {
+                        const  foundLine = foundLines[foundLines.length - foundIndex];
+
+                        openDocument(`${foundLine.path}:${foundLine.lineNum}`);
                     }
                 } else if (command === printRef_) {
 
@@ -2248,9 +2259,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
         const  refTagPosition = foundLine.indexOf(refLabel);
         const  nextTagPosition = foundLine.indexOf(' #', refTagPosition + 1);
         if (nextTagPosition === notFound) {
-            var  refTagAndAddress = foundLine.substr(refTagPosition);
+            var  refTagAndAddress = foundLine.substring(refTagPosition);
         } else {
-            var  refTagAndAddress = foundLine.substr(refTagPosition,  nextTagPosition - refTagPosition);
+            var  refTagAndAddress = foundLine.substring(refTagPosition,  nextTagPosition);
         }
 
         return  await printRef(refTagAndAddress);
@@ -2260,6 +2271,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             normalReturn.previousKeyword = keyword;
             normalReturn.hasFindMenu = true;
         }
+        normalReturn.foundLines = foundLines;
         return  normalReturn;
     }
 }
@@ -2479,6 +2491,7 @@ const  printRefOptionDefault = {
 
 // PrintRefResult
 interface  PrintRefResult {
+    foundLines: FoundLine[];
     hasVerbMenu: boolean;
     verbs: Verb[];
     address: string;
@@ -2490,12 +2503,41 @@ interface  PrintRefResult {
 // getEmptyOfPrintRefResult
 function  getEmptyOfPrintRefResult(): PrintRefResult {
     return  {
+        foundLines: [],
         hasVerbMenu: false,
         verbs: [],
         address: '',
         addressLineNum: 0,
         hasFindMenu: false,
         previousKeyword: '',
+    }
+}
+
+// openDocument
+function  openDocument(ref: string) {
+    if ( ! process.env.TYPRM_OPEN_DOCUMENT) {
+        console.log(`${translate('Error')}: ${translate('Not defined TYPRM_OPEN_DOCUMENT environment variable.')}`);
+        return;
+    }
+
+    const  command = process.env.TYPRM_OPEN_DOCUMENT.replace('${ref}', ref);
+    var    stdout_ = '';
+    try {
+        if ('verbose' in programOptions) {
+            console.log(`Verbose: command: ${command}`);
+        }
+
+        stdout_ = child_process.execSync( command ).toString();
+        if (runningOS === 'Windows') {
+            stdout_ = stdout_.substring(0, stdout_.length - 2);  // Cut last '\r\n'
+        } else {
+            stdout_ = stdout_.substring(0, stdout_.length - 1);  // Cut last '\n'
+        }
+    } catch (e: any) {
+        stdout_ = e.toString();
+    }
+    if (stdout_) {
+        console.log(stdout_);
     }
 }
 
@@ -2745,9 +2787,9 @@ function  runVerb(verbs: Verb[], address: string, lineNum: number, verbNum: stri
 
             stdout_ = child_process.execSync( command ).toString();
             if (runningOS === 'Windows') {
-                stdout_ = stdout_.substr(0, stdout_.length - 2);  // Cut last '\r\n'
+                stdout_ = stdout_.substring(0, stdout_.length - 2);  // Cut last '\r\n'
             } else {
-                stdout_ = stdout_.substr(0, stdout_.length - 1);  // Cut last '\n'
+                stdout_ = stdout_.substring(0, stdout_.length - 1);  // Cut last '\n'
             }
         } catch (e: any) {
             stdout_ = e.toString();
@@ -3073,6 +3115,14 @@ function  unscapePercentByte(value: string): string {
 // hasRefTag
 function  hasRefTag(keywords: string) {
     return  keywords.trim().startsWith(refLabel);
+}
+
+// hasNumberTag
+function  hasNumberTag(keywords: string) {
+    const  numberRegularExpression = /^[0-9]+$/;
+    keywords = keywords.trim();
+
+    return  keywords[0] === '#'  &&  numberRegularExpression.test( keywords.substring(1) );
 }
 
 // getNotSetTemplateIfTagVariableNames

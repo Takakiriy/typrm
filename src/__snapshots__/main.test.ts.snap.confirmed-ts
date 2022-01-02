@@ -4134,6 +4134,11 @@ keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not 
 keyword: "
 `;
 
+exports[`typrm_test >> TestOfCommandLine >> search_mode_select_by_number >> _out.txt 1`] = `
+code -g "C:\Users\ts-ne\GitProjects\GitHub\typrm\src\test_data\search\1\1.yaml:4
+"
+`;
+
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
 "keyword: Recommend: #ref: ../README.md#parameters
 ../README.md:3
