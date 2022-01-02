@@ -421,9 +421,11 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     if (isReadingSetting) {
                         tree.settings[currentSettingIndex] = {... tree.settings[currentSettingIndex], ... setting};
                     }
+
+                    currentSettingStackIndex -= 1;
+
                     setting = {}
                     settingStack.pop();
-                    currentSettingStackIndex -= 1;
                     if (parser.verbose) {
                         console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:`);
                     }
@@ -440,7 +442,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     currentSettingIndex = settingStack[currentSettingStackIndex].index;
                     tree.indicesWithIf.set(lineNum, currentSettingIndex);
                     if (lastEndIf) {
-                        if (indent.length <= settingStack[currentSettingStackIndex].indentLevel) {
+                        if (indent.length <= settingStack[currentSettingStackIndex + 1].indentLevel) {
                             nextSetting.nextAlphabetIndex = path.basename(nextSetting.index);
                             nextSetting.index = `${parentSettingIndex}/1`;
                         }
@@ -4410,6 +4412,13 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
         d = [];  // Set break point here and watch the variable d
     }
 }
+
+// private_
+// For the unit test
+export const  private_ = {
+    Parser,
+    makeSettingTree,
+};
 
 if (process.env.windir) {
     var  runningOS = 'Windows';

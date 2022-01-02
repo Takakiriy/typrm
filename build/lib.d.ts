@@ -45,6 +45,7 @@ declare class StandardInputBuffer {
 export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
 export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function cutSameItems<T>(array: T[]): T[];
+export declare function parseMap<keyT, valueT>(mapString: string): Promise<Map<keyT, valueT>>;
 export declare function isAlphabetIndex(index: string): boolean;
 export declare function getAlphabetIndex(num: number | string): string;
 export declare function fromAlphabetIndex(index: string): number;

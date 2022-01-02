@@ -548,6 +548,92 @@ export function  cutSameItems<T>(array: T[]): T[] {
     return  Array.from(new Set<T>(array));
 }
 
+// parseMap
+export async function  parseMap<keyT, valueT>(mapString: string): Promise<Map<keyT, valueT>> {
+    const  startIndex = mapString.indexOf('{');
+    const  lastIndex = mapString.lastIndexOf('}');
+    if ( ! startIndex  ||  ! lastIndex) {
+        throw new Error('in lib.ts parseMap')
+    }
+    type  KeyType = (undefined | 'number' | 'string' | 'object');
+    var  keyType: KeyType;
+    var  valueType: KeyType;
+
+    function  parseValue(value: string): any {
+        value = value.trim();
+        if ( ! valueType) {
+            if (value.substring(0,1) === '"'  &&  value.slice(-1) === '"') {
+                valueType = 'string';
+            } else {
+                const  isNumber = ! isNaN(value as any);
+                valueType = isNumber ? 'string' : 'object';
+            }
+        }
+
+        if (valueType === 'number') {
+            return  parseFloat(value);
+        } else if (valueType === 'string') {
+            if (value.substring(0,1) === '"'  &&  value.slice(-1) === '"') {
+                return  value.substring(1, value.length - 1);
+            } else {
+                throw new Error('in lib.ts parseValue');
+            }
+        } else if (valueType === 'object') {
+            return  JSON.parse(value);
+        }
+    }
+
+    const stream = new Readable();
+    stream.push(mapString);
+    stream.push(null);
+    const  reader = readline.createInterface({
+        input: stream,
+        crlfDelay: Infinity
+    });
+
+    const  map = new Map<keyT, valueT>();
+    for await (const line of reader) {
+        if ( ! keyType) {
+            const  matchNumber = /([0-9]+) *=>(.*),/.exec(line);
+            const  matchString = /"(.*)" *=>(.*),/.exec(line);
+            if (matchNumber) {
+                keyType = 'number';
+            } else if (matchString) {
+                keyType = 'string';
+            }
+        }
+
+        if (keyType === 'number') {
+            const  match = /([0-9]+) *=>(.*),/.exec(line);
+            if (match) {
+                map.set(parseInt( match[1] ) as any,  parseValue( match[2] ));
+            }
+        } else {  // if (keyType === 'string') {
+            const  match = /"(.*)" *=>(.*),/.exec(line);
+            if (match) {
+                map.set( match[1] as any,  parseValue( match[2] ));
+            }
+        }
+    }
+
+    // // This code sorts keys
+    // const  keyIsNumber = /[0-9]+ *=>/.test(mapString);
+    // var  itemsString = mapString.substring(startIndex, lastIndex + 1).trim();
+    // itemsString = itemsString.replace(/([0-9]+) *=>/g, '"n-$1":');
+    // const  stringOfJSON = itemsString.replace(/,[ \t\n]*}$/, '}');  // cut last ','
+    // const  object = JSON.parse(stringOfJSON)
+    // const  map = new Map<keyT, valueT>();
+    // for (const [key, value] of Object.entries(object)) {
+    //     if (keyIsNumber) {
+    //         map.set(parseInt(key) as any, value as any);
+    //     } else {
+    //         map.set(key as any, value as any);
+    //     }
+    // }
+
+    return  map;
+}
+
 // isAlphabetIndex
 export function  isAlphabetIndex(index: string): boolean {
     const  lastCharacter = index.slice(-1);

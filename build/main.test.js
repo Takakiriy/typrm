@@ -63,6 +63,7 @@ else {
 }
 beforeAll(() => {
     fs.mkdirSync('empty_folder', { recursive: true });
+    chdirInProject('src');
 });
 describe("checks template value >>", () => {
     test.each([
@@ -80,6 +81,7 @@ describe("checks template value >>", () => {
         ["settings_tree_if"],
         ["settings_tree_error"],
     ])("%s", async (fileNameHead) => {
+        chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', { recursive: true });
         writeFileSync(`test_data/_checking/${fileNameHead}_1.yaml`, sourceFileContents);
@@ -87,11 +89,12 @@ describe("checks template value >>", () => {
         await callMain(["check"], {
             folder: '../test_data/_checking', test: "", locale: "en-US",
         });
-        process.chdir('..');
+        chdirInProject('src');
         expect(main.stdout).toMatchSnapshot(`answer`);
         fs.rmdirSync('test_data/_checking', { recursive: true });
     });
     test("check one file only", async () => {
+        chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks template value >> 1_template_1_ok: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', { recursive: true });
         writeFileSync(`test_data/_checking/1_template_1_ok_1.yaml`, sourceFileContents);
@@ -140,17 +143,20 @@ describe("checks template value >>", () => {
             ["4 neighbor error"],
             ["4-2 neighbor level 2 error"],
         ])("%s", async (caseName) => {
+            chdirInProject('src');
             const sourceFileContents = lib.getSnapshot(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
             fs.rmdirSync('test_data/_checking', { recursive: true });
             writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
             await callMain(["check", "_checking/check_verbose.yaml"], {
                 folder: 'test_data', test: "", locale: "en-US",
             });
+            chdirInProject('src');
             expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
             fs.rmdirSync('test_data/_checking', { recursive: true });
         });
     });
     test("verbose", async () => {
+        chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks template value >> verbose: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', { recursive: true });
         writeFileSync(`test_data/_checking/check_verbose.yaml`, sourceFileContents);
@@ -158,7 +164,7 @@ describe("checks template value >>", () => {
         await callMain(["check", "_checking/check_verbose.yaml"], {
             folder: '../test_data', test: "", locale: "en-US", verbose: "",
         });
-        process.chdir('..');
+        chdirInProject('src');
         expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
         fs.rmdirSync('test_data/_checking', { recursive: true });
     });
@@ -177,6 +183,7 @@ describe("checks file contents >>", () => {
             "any_lines", "file_8_others",
         ]
     ])("First >> %s", async (caseName, fileNameHead) => {
+        chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
         fs.rmdirSync('test_data/_checking', { recursive: true });
@@ -186,7 +193,7 @@ describe("checks file contents >>", () => {
         await callMain(["check"], {
             folder: '../test_data/_checking/document', test: "", locale: "en-US",
         });
-        process.chdir('..');
+        chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
         fs.rmdirSync('test_data/_checking', { recursive: true });
     });
@@ -201,6 +208,7 @@ describe("checks file contents >>", () => {
             "full path", ["check", getFullPath("test_data/_checking/2/file_2.yaml", process.cwd())],
         ]
     ])("Multi folder >> %s", async (caseName, parameters) => {
+        chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks file contents >> file_0_one_error: sourceFileContents 1`);
         fs.rmdirSync('test_data/_checking', { recursive: true });
         writeFileSync(`test_data/_checking/1/file_1.yaml`, sourceFileContents);
@@ -210,7 +218,7 @@ describe("checks file contents >>", () => {
         await callMain(parameters, {
             folder: '../test_data/_checking/1, ../test_data/_checking/2', test: "", locale: "en-US",
         });
-        process.chdir('..');
+        chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
         fs.rmdirSync('test_data/_checking', { recursive: true });
     });
@@ -300,6 +308,7 @@ describe("replaces settings >>", () => {
             { replacers: [{ from: '__Set2__: C', to: '__Set2__: C  #to:CC' }] },
         ],
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
+        chdirInProject('src');
         const changingFolderPath = testFolderPath + '_changing';
         const changingFileName = fileNameHead + "_1_changing.yaml";
         const changingFilePath = changingFolderPath + '/' + changingFileName;
@@ -314,6 +323,7 @@ describe("replaces settings >>", () => {
             folder: changingFolderPath, test: "", locale,
         });
         const updatedFileContents = fs.readFileSync(changingFilePath).toString();
+        chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
@@ -333,6 +343,7 @@ describe("replaces settings >>", () => {
             ["same name error", fileNameHead + "_same_name.yaml", undefined],
             ["full path", process.cwd() + "/" + changingFile1Path, changingFile1Path],
         ])("%s", async (caseName, changingFileName, changingFilePath) => {
+            chdirInProject('src');
             var errorMessage = '';
             const sourceFileContents = lib.getSnapshot(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
             fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
@@ -359,6 +370,7 @@ describe("replaces settings >>", () => {
                     errorMessage = e.message;
                 }
             }
+            chdirInProject('src');
             // Check
             if (caseName !== "same name error") { // Case of relace 1, replace 2
                 if (!changingFilePath) {
@@ -434,6 +446,7 @@ describe("replaces settings >>", () => {
                 { replacers: [{ from: '__Set2__: C', to: '__Set2__: C  #to:CC' }] },
             ],
         ])("%s%s >>", async (fileNameHead, _subCaseName, locale, option) => {
+            chdirInProject('src');
             const changingFolderPath = testFolderPath + '_changing';
             const changingFileName = fileNameHead + "_1_changing.yaml";
             const changingFilePath = changingFolderPath + '/' + changingFileName;
@@ -452,6 +465,7 @@ describe("replaces settings >>", () => {
             await callMain(["reset", changingFileName], {
                 folder: changingFolderPath, test: "", locale
             });
+            chdirInProject('src');
             const revertedFileContents = fs.readFileSync(changingFilePath).toString();
             if (!('resetAnswer' in option)) {
                 expect(revertedFileContents).toBe(sourceFileContents);
@@ -478,6 +492,7 @@ describe("replaces settings >>", () => {
             ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {
+            chdirInProject('src');
             const changingFolderPath = testFolderPath + '_changing';
             const changingFileName = caseName + "_1_changing.yaml";
             const changingFilePath = changingFolderPath + '/' + changingFileName;
@@ -494,6 +509,7 @@ describe("replaces settings >>", () => {
             await callMain(parameters, {
                 folder: changingFolderPath, test: "", locale: "en-US"
             });
+            chdirInProject('src');
             const replacedFileContents = fs.readFileSync(changingFilePath).toString();
             expect(main.stdout).toMatchSnapshot('stdout');
             if (!options.includes('ErrorCase')) {
@@ -519,6 +535,7 @@ describe("replaces settings >>", () => {
         });
     });
     test("replace to tag >> ToTestTag", async () => {
+        chdirInProject('src');
         const caseName = 'ToTestTag';
         const changingFolderPath = testFolderPath + '_changing';
         const changingFileName = caseName + "_1_changing.yaml";
@@ -529,6 +546,7 @@ describe("replaces settings >>", () => {
         await callMain(["replace"], {
             folder: changingFolderPath, test: "", locale: "en-US"
         });
+        chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
     });
 });
@@ -792,12 +810,14 @@ describe("searches keyword tag >>", () => {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` #keyword: ${matchedColor('PowerShell')}\n`,
             ],
         ])("%s", async (caseName, arguments_, options, answer) => {
+            chdirInProject('src');
             const sourceFileContents = lib.getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: sourceFileContents 1`);
             const thesaurusFileContents = lib.getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: thesaurus 1`);
             fs.rmdirSync('test_data/_checking', { recursive: true });
             writeFileSync(`test_data/_checking/thesaurus/1.yaml`, sourceFileContents);
             writeFileSync(`test_data/_checking/thesaurus/thesaurus.csv`, thesaurusFileContents);
             await callMain(arguments_, options);
+            chdirInProject('src');
             expect(main.stdout).toBe(answer);
             fs.rmdirSync('test_data/_checking', { recursive: true });
         });
@@ -967,6 +987,7 @@ describe("print reference >>", () => {
                     "    0.Folder\n",
             ],
         ])("%s", async (_caseName, arguments_, options, answer) => {
+            chdirInProject('src');
             await callMain(arguments_, options);
             expect(main.stdout).toBe(answer);
         });
@@ -1139,6 +1160,27 @@ describe("print reference >>", () => {
         });
     });
 });
+describe("unit test >>", () => {
+    test.each([
+        ["makeSettingTree"],
+        ["makeSettingTree bug case"],
+    ])("%s", async (caseName) => {
+        const Parser = main.private_.Parser;
+        const makeSettingTree = main.private_.makeSettingTree;
+        chdirInProject('src');
+        const sourceFileContents = lib.getSnapshot(`unit test >> ${caseName}: sourceFileContents 1`);
+        const answerIndicesWithIf = Array.from(await lib.parseMap(lib.getSnapshot(`unit test >> ${caseName}: answer indicesWithIf 1`)));
+        fs.rmdirSync('test_data/_checking', { recursive: true });
+        writeFileSync(`test_data/_checking/makeSettingTree.yaml`, sourceFileContents);
+        if (caseName === 'makeSettingTree') {
+            expect(sourceFileContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
+        }
+        const parser = new Parser();
+        parser.filePath = `test_data/_checking/makeSettingTree.yaml`;
+        const settingsTree = await makeSettingTree(parser);
+        expect(Array.from(settingsTree.indicesWithIf)).toStrictEqual(answerIndicesWithIf);
+    });
+});
 describe("test of test >>", () => {
     test("checks snapshots files are confirmed", () => {
         const activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
@@ -1149,6 +1191,7 @@ describe("test of test >>", () => {
     });
 });
 afterAll(() => {
+    chdirInProject('src');
     deleteFileSync('test_data/_output.txt');
     fs.rmdirSync('empty_folder', { recursive: true });
 });

@@ -3,8 +3,10 @@ import * as path from "path";
 import * as main from "./main";
 import chalk from "chalk";
 import * as lib from "./lib";
+// import rewire from 'rewire';
 import { pp } from "./lib";
 import { chdir } from "process";
+import { Parser } from "csv-parse/.";
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -1211,6 +1213,30 @@ describe("print reference >>", () => {
             await callMain(arguments_, options);
             expect(main.stdout).toBe(answer);
         });
+    });
+});
+
+describe("unit test >>", () => {
+    test.each([
+        ["makeSettingTree"],
+        ["makeSettingTree bug case"],
+    ])("%s", async (caseName) => {
+        const  Parser = main.private_.Parser;
+        const  makeSettingTree = main.private_.makeSettingTree;
+        chdirInProject('src');
+        const  sourceFileContents = lib.getSnapshot(`unit test >> ${caseName}: sourceFileContents 1`);
+        const  answerIndicesWithIf = Array.from(await lib.parseMap(
+            lib.getSnapshot(`unit test >> ${caseName}: answer indicesWithIf 1`)));
+        fs.rmdirSync('test_data/_checking', {recursive: true});
+        writeFileSync(`test_data/_checking/makeSettingTree.yaml`, sourceFileContents);
+        if (caseName === 'makeSettingTree') {
+            expect(sourceFileContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
+        }
+        const  parser = new Parser();
+        parser.filePath = `test_data/_checking/makeSettingTree.yaml`;
+
+        const  settingsTree = await makeSettingTree(parser);
+        expect(Array.from( settingsTree.indicesWithIf )).toStrictEqual(answerIndicesWithIf);
     });
 });
 

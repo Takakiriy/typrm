@@ -1,5 +1,28 @@
 ﻿import * as lib from "./lib";
 
+describe("Map >>", () => {
+    test("parseMap >>", async () => {
+        const  resultMap = await lib.parseMap<number,string>(`Map {
+            1 =>  "a",
+            5 =>  "bb",
+            3  => "cc",
+            22 => "ddd",
+        }`);
+        expect(Array.from(resultMap)).toStrictEqual([
+            [1, "a"],
+            [5, "bb"],
+            [3, "cc"],
+            [22, "ddd"],
+        ]);
+        expect(Array.from(resultMap)).not.toStrictEqual([
+            [1, "a"],
+            [3, "cc"],  // Bad order
+            [5, "bb"],
+            [22, "ddd"],
+        ]);
+    });
+});
+
 describe("alphabetIndex >>", () => {
 
     test("isAlphabetIndex >>", () => {

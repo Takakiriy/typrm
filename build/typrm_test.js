@@ -26,9 +26,11 @@ process.env.TYPRM_VERB = `
 `;
 if (process.env.windir) {
     var testingOS = 'Windows';
+    process.env.TYPRM_OPEN_DOCUMENT = `powershell -Command "Write-Output  'code -g ""\${ref}"""' > test_data\\_out.log"`;
 }
 else {
-    var testingOS = 'mac';
+    var testingOS = 'mac'; // or Linux
+    process.env.TYPRM_OPEN_DOCUMENT = `echo  "code -g \\"\${ref}\\"" > test_data/_out.log`;
 }
 async function main() {
     if (false) {
@@ -41,8 +43,8 @@ async function main() {
 }
 // DoCustomDebug
 async function DoCustomDebug() {
-    const returns = await callChildProccess(`node --experimental-modules --es-module-specifier-resolution=node ` +
-        `${scriptPath} replace C:\\Users\\user1\\steps\\!Temp.yaml`, {});
+    const returns = await callChildProccess(`node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
+        `search  --folder test_data/search/1`, { inputLines: ['Not', '', 'exit()'] });
     console.log(`(typrm_test.ts) ${returns.stdout}`);
     console.log('Done');
 }
@@ -65,6 +67,12 @@ async function TestOfCommandLine() {
             "check": "true",
             "inputLines": "ABC\nexit()\n",
         }, {
+            "name": "search_mode_select_by_number",
+            "parameters": "--folder test_data/search/1",
+            "check": "false",
+            "checkFile": "_out.log",
+            "inputLines": "double quotation is\n#1\nexit()\n",
+        }, {
             "name": "search_mode_ref_verb",
             "parameters": "search",
             "check": "true",
@@ -73,7 +81,7 @@ async function TestOfCommandLine() {
             "name": "search_mode_find",
             "parameters": "search  --folder test_data/search/1",
             "check": "true",
-            "inputLines": "Not\n\nexit()\n",
+            "inputLines": "Not\n\n\nexit()\n",
         }, {
             "name": "search_mode_result_has_ref_verb",
             "parameters": "search  --folder test_data/search/2",
@@ -81,7 +89,7 @@ async function TestOfCommandLine() {
             "inputLines": "file_path\nexit()\n",
         }];
     for (const case_ of cases) {
-        if (true || case_.name === 'search_mode_ref_verb') {
+        if (true || case_.name === 'search_mode_find') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
             // Test Main
@@ -93,22 +101,34 @@ async function TestOfCommandLine() {
                 const answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
                 if (returns.stdout !== answer && returns.stdout !== answer2) {
                     if (answer2 === noData) {
-                        printDifferentPaths('_output.txt', '_expected.txt');
+                        printDifferentPaths('_output.log', '_expected.log');
                     }
                     else {
-                        printDifferentPaths('_output.txt', '_expected.txt', '_expected2.txt');
+                        printDifferentPaths('_output.log', '_expected.log', '_expected2.log');
                     }
-                    fs.writeFileSync(testFolderPath + "_output.txt", returns.stdout);
-                    fs.writeFileSync(testFolderPath + "_expected.txt", answer);
-                    fs.writeFileSync(testFolderPath + "_expected2.txt", answer);
-                    throw new Error();
+                    fs.writeFileSync(testFolderPath + "_output.log", returns.stdout);
+                    fs.writeFileSync(testFolderPath + "_expected.log", answer);
+                    fs.writeFileSync(testFolderPath + "_expected2.log", answer2);
+                    throw new Error(`in typrm_test >> TestOfCommandLine >> ${case_.name}`);
+                }
+            }
+            if (case_.checkFile) {
+                const snapShotName = `typrm_test >> TestOfCommandLine >> ${case_.name} >> ${case_.checkFile} 1`;
+                const result = fs.readFileSync(testFolderPath + case_.checkFile, 'utf-8')
+                    .replace(/\r/g, '').replace(lib.getHomePath(), '${HOME}');
+                const answer = lib.getSnapshot(snapShotName);
+                if (result !== answer) {
+                    fs.writeFileSync(testFolderPath + '_expected.log', answer);
+                    printDifferentPaths(case_.checkFile, '_expected.log');
+                    throw new Error(`in typrm_test >> TestOfCommandLine >> ${case_.name}`);
                 }
             }
         }
     }
-    deleteFile(testFolderPath + "_output.txt");
-    deleteFile(testFolderPath + "_expected.txt");
-    deleteFile(testFolderPath + "_expected2.txt");
+    deleteFile(testFolderPath + "_out.log");
+    deleteFile(testFolderPath + "_output.log");
+    deleteFile(testFolderPath + "_expected.log");
+    deleteFile(testFolderPath + "_expected2.log");
 }
 // callChildProccess
 async function callChildProccess(commandLine, option) {
@@ -117,13 +137,24 @@ async function callChildProccess(commandLine, option) {
     return new Promise(async (resolveFunction, rejectFunction) => {
         const returnValue = new ProcessReturns();
         try {
-            const childProcess = child_process.exec(commandLine, 
+            // if (commandLine.includes('Not')) {
+            //             var  childProcess = child_process.spawn(... commandLine.split(' '),
+            //                 // on close the "childProcess" (2)
+            //                 (error: child_process.ExecException | null, stdout: string, stderr: string) => {
+            //                     returnValue.stdout = stdout;
+            //                     returnValue.stderr = stderr;
+            //                     resolveFunction(returnValue);
+            //                 },
+            //             );
+            // } else {
+            var childProcess = child_process.exec(commandLine, { maxBuffer: 2000 * 1024, timeout: 1000 }, 
             // on close the "childProcess" (2)
             (error, stdout, stderr) => {
                 returnValue.stdout = stdout;
                 returnValue.stderr = stderr;
                 resolveFunction(returnValue);
             });
+            // }
             if (option && childProcess.stdin) {
                 if (option.inputLines) {
                     await new Promise(resolve => setTimeout(resolve, 300));
@@ -176,8 +207,8 @@ function printDifferentPaths(path1, path2, path3 = undefined) {
 }
 // diffStrings
 function diffStrings(result, answer) {
-    const resultFilePath = '_output.txt';
-    const answerFilePath = '_answer.txt';
+    const resultFilePath = '_output.log';
+    const answerFilePath = '_answer.log';
     fs.writeFileSync(testFolderFullPath + resultFilePath, result);
     fs.writeFileSync(testFolderFullPath + answerFilePath, answer);
     printDifferentPaths(resultFilePath, answerFilePath);

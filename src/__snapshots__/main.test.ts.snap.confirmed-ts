@@ -4192,3 +4192,167 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_select_by_number >> _out
 "code -g \\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:4\\"
 "
 `;
+
+exports[`unit test >> makeSettingTree bug case: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    8 => "/1/a",
+    9 => "/1/a/a",
+    10 => "/1/a",
+    11 => "/1",
+    12 => "/1/1",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree bug case: sourceFileContents 1`] = `
+"bug case:
+    2:
+        settings:
+            __Switch1__: A
+            __Switch2__: A
+        6:
+            7:
+                8:  #if: $settings.__Switch1__ == A
+                    9:  #if: $settings.__Switch2__ == A
+                    10:
+                11:
+        12:
+            settings:
+                __Set3__: aa
+"
+`;
+
+exports[`unit test >> makeSettingTree: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/1",
+    5 => "/1/a",
+    6 => "/1/a/a",
+    8 => "/1/a/b",
+    10 => "/1/b",
+    11 => "/1/b/a",
+    13 => "/1/b/b",
+    15 => "/1/1",
+    18 => "/1/1/a",
+    19 => "/1/1/a/a",
+    21 => "/1/1/a/b",
+    23 => "/1/1/b",
+    24 => "/1/1/b/a",
+    26 => "/1/1/b/b",
+    28 => "/1/1",
+    31 => "/1",
+    34 => "/1/c",
+    35 => "/1/c/a",
+    37 => "/1/c/b",
+    39 => "/1/d",
+    40 => "/1/d/a",
+    42 => "/1/d/b",
+    45 => "/",
+    46 => "/a",
+    47 => "/a/a",
+    49 => "/a/b",
+    51 => "/b",
+    52 => "/b/a",
+    54 => "/b/b",
+    56 => "/",
+    60 => "/c",
+    61 => "/c/a",
+    63 => "/c/b",
+    65 => "/d",
+    66 => "/d/a",
+    68 => "/d/b",
+    70 => "/",
+    71 => "/e",
+    72 => "/e/a",
+    74 => "/e/b",
+    76 => "/f",
+    77 => "/f/a",
+    79 => "/f/b",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree: sourceFileContents 1`] = `
+"nested if:
+    settings:
+        __Switch1__: A
+        __Switch2__: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        AA:   #template: __Set1__
+        C:    #template: __Set2__
+        aa:   #template: __Set22__
+    AA:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+AA:   #template: __Set_01__
+settings:
+    __Switch_01__: A
+    __Switch_02__: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+AA:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
