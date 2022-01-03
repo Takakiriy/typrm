@@ -1421,6 +1421,7 @@ Jest を使うテストと Jest を使わないテストがあります。
 
 - Visual Studio Code >> Terminal >> New Terminal >>（＋の左の 1:__shell__）>> Create JavaScript Debug Terminal
 - npm test
+    - 特定のファイルをデバッグするときは、ファイル名の一部を指定します。例：npm test main  #// src/main.test.ts をデバッグします
 - テストを再起動します:
     - Continue ボタン:  #// 最後まで実行します
     - npm test が動いている Terminal で f キーを押します

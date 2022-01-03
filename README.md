@@ -1490,6 +1490,7 @@ You can set the break point, click at the left of line number of the source file
 
 - Visual Studio Code >> Terminal >> New Terminal >> (1:__shell__ at the left of +) >> Create JavaScript Debug Terminal
 - npm test
+    - To debug a particular file, specify part of the file name. e.g. npm test main  #// Debug src/main.test.ts
 - Restart the test:
     - Continue button:  #// Run to the end of program
     - Press `f` key in the terminal running `npm test`

@@ -1621,6 +1621,9 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
         var  cutOriginalTag = true
         var  cutReplaceToTagEnabled = false
     }
+    if (parser.verbose) {
+        console.log(`Verbose: Phase 3: replace ...`);
+    }
     var    isSetting = false;
     const  conflictErrors: {[lineNum: number]: string} = {};
     var    replacingKeys: string[] = [];
@@ -1642,11 +1645,13 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
     try {
         for await (const line1 of reader) {
             const  line: string = line1;
-            var    output = false;
             lines.push(line);
-            linesWithoutToTagOnlyLine.push(line);
+        }
+        for (const line of lines) {
+            var    output = false;
             lineNum += 1;
             parser.lineNum = lineNum;
+            linesWithoutToTagOnlyLine.push(line);
 
             settingTree.moveToLine(parser);
             toTagTree.moveToLine(parser, settingTree);
@@ -1685,17 +1690,23 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                             // This is not "oldSetting[key].value", because it adds bad #original tag in #if tag block.
                         var  newValue = newSetting[key].value;
                         if (newValue !== oldValue) {
+                            if (parser.verbose) {
+                                console.log(`Verbose: replace a setting`);
+                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                                console.log(`Verbose:     replace from: ${oldValue}`);
+                                console.log(`Verbose:     replace to  : ${newValue}`);
+                            }
 
                             // Change a settings value
                             const  {original, spaceAndComment} = getReplacedLineInSettings(
                                 line, separator, oldValue, newValue,
                                 addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
 
-                            writer.write(line.substring(0, separator + 1) +' '+ newValue + original + spaceAndComment + "\n");
+                            const  newLine = line.substring(0, separator + 1) +' '+ newValue + original + spaceAndComment;
+                            writer.write(newLine + "\n");
                             output = true;
-                            if (parser.verbose  &&  oldValue !== newValue) {
-                                console.log(`Verbose: replaced "${key}" value from "${oldValue}" to "${newValue}"`);
-                                console.log(`Verbose:     at: ${inputFilePath}:${lineNum}:`);
+                            if (parser.verbose) {
+                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${newLine}`);
                             }
                         }
                     }
@@ -1720,6 +1731,16 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                     if (replacingLine.includes(expected)) {
                         const  before = expected;
                         const  after = replaced;
+                        if (parser.verbose  &&  before !== after) {
+                            if (templateTag.lineNumOffset === 0) {
+                                console.log(`Verbose: replace template variables`);
+                            } else {
+                                console.log(`Verbose: replace template-at(${templateTag.lineNumOffset}) variables`);
+                            }
+                            console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                            console.log(`Verbose:     replace from: ${before}`);
+                            console.log(`Verbose:     replace to  : ${after}`);
+                        }
                         if (templateTag.lineNumOffset === 0) {
                             var  replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before),'g'), after.replace(/\$/g,'$$'));
                             if (cutReplaceToTagEnabled) {
@@ -1738,6 +1759,9 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                                 expected: before,
                                 replaced: after.replace(/\$/g,'$$')
                             })
+                            if (parser.verbose  &&  before !== after) {
+                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${replacedLine}`);
+                            }
                         } else if (templateTag.lineNumOffset <= -1) {
                             const  outputTargetLineNum = writer.lineBuffer.length + 1 + templateTag.lineNumOffset;
                             if ( !(outputTargetLineNum in checkedTemplateTags)) {
@@ -1753,31 +1777,44 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                             });
                             var  lengthSortedTemplates = checkedTemplateTags[outputTargetLineNum].slice();
                             lengthSortedTemplates = lengthSortedTemplates.sort( (b, a) => (a.expected.length - b.expected.length) ); 
-                            var  replacedLine = lib.cutLast(writer.getWrittenLine(linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset), '\n');
-                            var  maskedLine = replacedLine;
+                            let  replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset - 1];
+                            var  maskedLine = replacingLine;
                             const  mask = '\n';
                             var  conflictedTemplates: CheckedTemplateTag[] = [];
+                            if (parser.verbose) {
+                                console.log(`Verbose:         check not conflicted`);
+                                console.log(`Verbose:         replacingLine: ${replacingLine}`);
+                                console.log(`Verbose:         maskedLine   : ${maskedLine}`);
+                            }
 
                             for (const template of lengthSortedTemplates) {
                                 if (template.expected !== template.replaced) {
+                                    if (parser.verbose) {
+                                        console.log(`Verbose:         replace from: ${template.expected}`);
+                                        console.log(`Verbose:         replace to  : ${template.replaced}`);
+                                    }
 
                                     if (template.expected.includes(template.replaced)) {
                                         // e.g. expected == 'something', replaced = 'some'
-                                        if (replacedLine.includes(template.expected)) {
+                                        if (replacingLine.includes(template.expected)) {
                                             var  wasReplaced = false;
                                         } else {
-                                            var  wasReplaced = replacedLine.includes(replaced);
+                                            var  wasReplaced = replacingLine.includes(replaced);
                                         }
                                     } else if (template.replaced.includes(template.expected)) {
                                         // e.g. expected == 'some', replaced = 'something'
-                                        var  wasReplaced = replacedLine.includes(template.replaced);
+                                        var  wasReplaced = replacingLine.includes(template.replaced);
                                     } else {
                                         // e.g. expected == 'anything', replaced = 'something'
-                                        var  wasReplaced = replacedLine.includes(template.replaced);
+                                        var  wasReplaced = replacingLine.includes(template.replaced);
                                     }
 
                                     var  i = 0;
-                                    if ( ! wasReplaced) {
+                                    if (wasReplaced) {
+                                        if (parser.verbose) {
+                                            console.log(`Verbose:         wasReplaced = true`);
+                                        }
+                                    } else {
                                         if ( ! maskedLine.includes(template.expected)) {
                                             conflictedTemplates.push(template);
                                         } else {
@@ -1787,22 +1824,26 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
                                                     break;
                                                 }
 
-                                                replacedLine = replacedLine.substring(0, i) + template.replaced + replacedLine.substr(i + template.expected.length);
+                                                replacingLine = replacingLine.replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
                                                 maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
                                                 i += template.expected.length;
+                                            }
+                                            if (parser.verbose) {
+                                                console.log(`Verbose:         replacingLine: ${replacingLine}`);
+                                                console.log(`Verbose:         maskedLine   : ${maskedLine.replace(/\n/g, '_')}`);
                                             }
                                         }
                                     }
                                 }
                             }
                             for (const template of lengthSortedTemplates) {
-                                if ( ! replacedLine.includes(template.replaced)) {
+                                if ( ! replacingLine.includes(template.replaced)) {
                                     conflictedTemplates.push(template);
                                 }
                             }
                             conflictedTemplates = lib.cutSameItems(conflictedTemplates);
 
-                            writer.replaceAboveLine(templateTag.lineNumOffset, replacedLine +"\n");
+                            writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine +"\n");
                             if (conflictedTemplates.length >= 1  ||  outputTargetLineNum in conflictErrors) {
                                 var  variableNames: string[] = [];
                                 for (const template of checkedTemplateTags[outputTargetLineNum]) {
@@ -1812,22 +1853,25 @@ async function  replaceSub(inputFilePath: string, command: 'replace' | 'reset') 
 
                                 var  errorMessage = '';
                                 errorMessage += '\n';
-                                errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacingLine}\n`;
+                                errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
                                 errorMessage += `    ${translate('Error')}: ${translate('template target values after replace are conflicted.')}\n`;
                                 errorMessage += getVariablesForErrorMessage('    ', variableNames, settingTree, lines, parser.filePath) +'\n';
                                 for (const template of checkedTemplateTags[outputTargetLineNum]) {
+                                    const  replacedLine = lines[outputTargetLineNum - 1].replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
+
+                                    errorMessage += `    replace\n`;
                                     errorMessage += `    ${getTestablePath(inputFilePath)}:${template.templateLineNum}: ${lines[template.templateLineNum - 1]}\n`;
+                                    errorMessage += `    ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
                                     errorMessage += `        ${translate('Before Replacing')}: ${template.expected.trim()}\n`;
                                     errorMessage += `        ${translate('After  Replacing')}: ${template.replaced.trim()}\n`;
+                                    errorMessage += `    ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacedLine}\n`;
                                 }
                                 conflictErrors[outputTargetLineNum] = lib.cutLast( errorMessage, '\n');
                             }
-                        }
-                        if (parser.verbose  &&  before !== after) {
-                            console.log(`Verbose: replaced a line:`);
-                            console.log(`Verbose:     from: ${before}`);
-                            console.log(`Verbose:     to:   ${after}`);
-                            console.log(`Verbose:     at: ${inputFilePath}:${lineNum - templateTag.lineNumOffset}:`);
+                            if (parser.verbose  &&  before !== after) {
+                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${replacingLine}`);
+                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                            }
                         }
                     } else if (replacingLine.includes(replaced)) {
                         // Do nothing
@@ -3307,7 +3351,8 @@ class SettingsTree {
                 return_.nextSettingsLineNum = 0;
             }
             if (parser.verbose) {
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings are changed to ${currentSettingIndex} settings:`);
+                console.log(`Verbose: settings ${currentSettingIndex}${currentSettingIndex === '/' ? ' (root)' : ''}`);
+                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings:`);
                 for (const [key, setting] of Object.entries(currentSettings)) {
                     console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                 }
@@ -3565,12 +3610,6 @@ class ReplaceToTagTree {
                 return_.nextSettingsLineNum = startLineNums[return_.nextLineNumIndex];
             } else {
                 return_.nextSettingsLineNum = 0;
-            }
-            if (parser.verbose) {
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings are changed to ${settingsTree.currentSettingIndex} settings:`);
-                for (const [key, setting] of Object.entries(settingsTree.currentSettings)) {
-                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
-                }
             }
         }
 

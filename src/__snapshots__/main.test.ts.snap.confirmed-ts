@@ -1467,7 +1467,8 @@ Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose
 Verbose: settings /1/h
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
 Verbose: Phase 2: check ...
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings are changed to /1 settings:
+Verbose: settings /1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings:
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
@@ -2503,18 +2504,30 @@ exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`]
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: folder/file  #to: fo/fi
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: folder
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: file  #to: fi
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10:         #template: \\"__Full__\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
         Before Replacing: \\"folder/file\\"
         After  Replacing: \\"fo/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"fo/fi\\"
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11:         #template-at(-2): __Folder__/__File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
         Before Replacing: folder/file
         After  Replacing: folder/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/fi\\"
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12:         #template-at(-3): __Folder__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
         Before Replacing: folder
         After  Replacing: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13:         #template-at(-4): __File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
         Before Replacing: file
         After  Replacing: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/fi\\"
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
     Error: template target values after replace are conflicted.
@@ -2522,18 +2535,30 @@ exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`]
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: folder/file  #to: fo/fi
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: folder
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: file  #to: fi
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15:         #template-at(-1): __File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
         Before Replacing: file
         After  Replacing: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/fi\\"
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16:         #template-at(-2): __Folder__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
         Before Replacing: folder
         After  Replacing: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17:         #template-at(-3): __Folder__/__File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
         Before Replacing: folder/file
         After  Replacing: folder/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/fi\\"
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18:         #template-at(-4): \\"__Full__\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
         Before Replacing: \\"folder/file\\"
         After  Replacing: \\"fo/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"fo/fi\\"
 
 Warning: 0, Error: 2
 "
@@ -3771,12 +3796,18 @@ exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_E
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:1: settings:
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:7:         __Full__: ValueB1_ValueB2
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:8:         __Part__: ValueB1
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:11:         #template: __Full__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
         Before Replacing: ValueB1_ValueB2
         After  Replacing: ValueB9_ValueB9
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB9_ValueB9
+    replace
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:13:         #template-at(-2): __Part__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
         Before Replacing: ValueB1
         After  Replacing: ValueB1
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
 
 Warning: 0, Error: 1
 "
@@ -4053,6 +4084,129 @@ Warning: 0, Error: 0
 
 exports[`replaces settings >> reset >> 2_replace_11_nested_if C >>: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:17: #original: __Set2__: C
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> verbose >> conflict: sourceFileContents 1`] = `
+"settings:
+    __Variable1__: 1.2  #to: 2.00
+    __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+body:
+    (version 1.2 beta)  #template: __Variable1__
+    #//
+    #template-at(-2): __Variable2__
+"
+`;
+
+exports[`replaces settings >> verbose >> conflict: verbose 1`] = `
+"Verbose: Phase 3: replace ...
+Verbose: settings / (root)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta
+Verbose: replace a setting
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2  #to: 2.00
+Verbose:     replace from: 1.2
+Verbose:     replace to  : 2.00
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 2.00  #original: 1.2
+Verbose: replace a setting
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+Verbose:     replace from: version 1.2 beta
+Verbose:     replace to  : ver. 2.4 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+Verbose: replace template variables
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+Verbose:     replace from: 1.2
+Verbose:     replace to  : 2.00
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+Verbose: replace template-at(-2) variables
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+Verbose:     replace from: version 1.2 beta
+Verbose:     replace to  : ver. 2.4 beta
+Verbose:         check not conflicted
+Verbose:         replacingLine:     (version 1.2 beta)  #template: __Variable1__
+Verbose:         maskedLine   :     (version 1.2 beta)  #template: __Variable1__
+Verbose:         replace from: version 1.2 beta
+Verbose:         replace to  : ver. 2.4 beta
+Verbose:         replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
+Verbose:         maskedLine   :     (_____________)  #template: __Variable1__
+Verbose:         replace from: 1.2
+Verbose:         replace to  : 2.00
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+    Error: template target values after replace are conflicted.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2  #to: 2.00
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    replace
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Before Replacing: 1.2
+        After  Replacing: 2.00
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+    replace
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Before Replacing: version 1.2 beta
+        After  Replacing: ver. 2.4 beta
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces settings >> verbose >> no conflict: sourceFileContents 1`] = `
+"settings:
+    __Variable1__: 1.2  #to: 2.4
+    __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+body:
+    (version 1.2 beta)  #template: __Variable1__
+    #//
+    #template-at(-2): __Variable2__
+"
+`;
+
+exports[`replaces settings >> verbose >> no conflict: verbose 1`] = `
+"Verbose: Phase 3: replace ...
+Verbose: settings / (root)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta
+Verbose: replace a setting
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2  #to: 2.4
+Verbose:     replace from: 1.2
+Verbose:     replace to  : 2.4
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 2.4  #original: 1.2
+Verbose: replace a setting
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+Verbose:     replace from: version 1.2 beta
+Verbose:     replace to  : ver. 2.4 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+Verbose: replace template variables
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+Verbose:     replace from: 1.2
+Verbose:     replace to  : 2.4
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 2.4 beta)  #template: __Variable1__
+Verbose: replace template-at(-2) variables
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+Verbose:     replace from: version 1.2 beta
+Verbose:     replace to  : ver. 2.4 beta
+Verbose:         check not conflicted
+Verbose:         replacingLine:     (version 1.2 beta)  #template: __Variable1__
+Verbose:         maskedLine   :     (version 1.2 beta)  #template: __Variable1__
+Verbose:         replace from: version 1.2 beta
+Verbose:         replace to  : ver. 2.4 beta
+Verbose:         replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
+Verbose:         maskedLine   :     (_____________)  #template: __Variable1__
+Verbose:         replace from: 1.2
+Verbose:         replace to  : 2.4
+Verbose:         wasReplaced = true
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
 
 Warning: 0, Error: 0
 "

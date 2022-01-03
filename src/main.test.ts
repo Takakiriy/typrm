@@ -586,6 +586,43 @@ describe("replaces settings >>", () => {
         chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
     });
+
+    describe("verbose >>", () => {
+        test("no conflict", async () => {
+            chdirInProject('src');
+            const  changingFolderPath = testFolderPath + '_changing';
+            const  changingFileName = "1_changing.yaml";
+            const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+            const  sourceFileContents = lib.getSnapshot(`replaces settings >> verbose >> no conflict: sourceFileContents 1`);
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+            writeFileSync(changingFilePath, sourceFileContents);
+
+            await callMain(["replace"], {
+                folder: changingFolderPath, test: "", locale: "en-US", verbose: ""
+            });
+            chdirInProject('src');
+            const  verboseOutput = main.stdout.substring(main.stdout.indexOf('Verbose: Phase 3: replace ...'));
+            expect(verboseOutput).toMatchSnapshot('verbose');
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        });
+        test("conflict", async () => {
+            chdirInProject('src');
+            const  changingFolderPath = testFolderPath + '_changing';
+            const  changingFileName = "1_changing.yaml";
+            const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+            const  sourceFileContents = lib.getSnapshot(`replaces settings >> verbose >> conflict: sourceFileContents 1`);
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+            writeFileSync(changingFilePath, sourceFileContents);
+
+            await callMain(["replace"], {
+                folder: changingFolderPath, test: "", locale: "en-US", verbose: ""
+            });
+            chdirInProject('src');
+            const  verboseOutput = main.stdout.substring(main.stdout.indexOf('Verbose: Phase 3: replace ...'));
+            expect(verboseOutput).toMatchSnapshot('verbose');
+            fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        });
+    });
 });
 
 describe("searches keyword tag >>", () => {
