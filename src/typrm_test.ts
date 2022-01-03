@@ -46,7 +46,7 @@ async function  main() {
 async function  DoCustomDebug() {
     const  returns = await callChildProccess(
         `node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, {inputLines: ['Not', '', 'exit()']});
+        `search  --folder test_data/search/1`, {});
     console.log(`(typrm_test.ts) ${returns.stdout}`);
     console.log('Done');
 }
@@ -85,7 +85,7 @@ async function  TestOfCommandLine() {
         "name": "search_mode_find",
         "parameters": "search  --folder test_data/search/1",
         "check": "true",
-        "inputLines": "Not\n\n\nexit()\n",
+        "inputLines": "Not\n\nexit()\n",
     },{
         "name": "search_mode_result_has_ref_verb",
         "parameters": "search  --folder test_data/search/2",
@@ -129,7 +129,7 @@ async function  TestOfCommandLine() {
                     fs.writeFileSync(testFolderPath + '_expected.log', answer);
                     printDifferentPaths(case_.checkFile, '_expected.log');
                     throw new Error(`in typrm_test >> TestOfCommandLine >> ${case_.name}`);
-                }               
+                }
             }
         }
     }

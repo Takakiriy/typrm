@@ -4285,7 +4285,7 @@ keyword: exit()
 exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> mac: stdout 1`] = `
 "keyword: Not found. To do full text search, press Enter key.
 keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
-keyword: keyword: "
+keyword: "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
