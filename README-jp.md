@@ -77,6 +77,22 @@ new_folder.yaml
 変更する部分と同じ行の末尾に `#template:` タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
+（バージョン 1.x の場合）
+
+設定の中の変数の値の右に `#to:` タグと置き換えた後の値を書きます。
+
+    設定:
+        __Name__: work1  #to: work2
+
+（`#to:` タグは設定以外にも書くことができます。）
+
+typrm をインストールして、
+bash や PowerShell から以下のように `replace` コマンドを入力します。短いコマンド名は `r` です。
+
+    typrm replace  new_folder.yaml  #// または typrm r  new_folder.yaml
+
+（バージョン 0.x の場合）
+
 typrm をインストールして、
 bash や PowerShell から以下のように `replace` コマンドを入力します。短いコマンド名は `r` です。
 
@@ -93,6 +109,8 @@ bash や PowerShell から以下のように `replace` コマンドを入力し�
 ファイルの中に `設定:` が 1つだけのときは行番号を省略できます。
 行番号の代わりに設定名を指定する方法は後で説明します。
 
+（すべてのバージョン）
+
 new_folder.yaml ファイルは次のような内容に変わり、コピー＆ペーストできるようになります。
 コメントの付いたテキストはそのまま貼り付けることができます。# は
 多くのシェルでコメントとして扱われるからです。
@@ -108,6 +126,15 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 置き換える前の値が書かれた `#original:` タグが同じ行に追加されます。
 `#original:` タグがすでにあるときは追加されません。
 
+（バージョン 1.x の場合）
+
+`#original:` タグに書かれた値に戻すときは、reset コマンドを使います。
+また、reset コマンドを使うと `#original:` タグは削除されます。
+
+    typrm reset  new_folder.yaml
+
+（バージョン 0.x の場合）
+
 `#original:` タグに書かれた値に戻すときは、reset コマンドを使います。
 また、reset コマンドを使うと `#original:` タグは削除されます。
 
@@ -122,12 +149,10 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
     typrm replace  new_folder.yaml  4  "__Name1__: work1
         __Name2__: work2"
 
+
 ### #to タグを使って置き換えます
 
-`#to:` タグを書くと、replace コマンドのパラメーターを省略して
-置き換えることができます。
-
-設定に `#to:` タグを書くときは、変数の名前と値が書かれた行の値より右に
+設定に `#to:` タグを書く場合、変数の名前と値が書かれた行の値より右に
 `#to:` と置き換えた後の値を書きます。
 
 `#to:` タグを追加する前のサンプル:
@@ -146,9 +171,13 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
 タグを追加したらファイルを保存してください。
 
+下記のコマンドを入力すると、カレント フォルダー および
+`TYPRM_FOLDER` 環境変数に設定したフォルダーの中にあるすべてのファイルの
+`#to:` タグを置き換えます。
+
 入力するコマンド:
 
-    typrm replace
+    typrm replace    #// または typrm r
 
 コマンド実行後の内容:
 
@@ -157,7 +186,7 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
         __Name__: workB2  #original: workB1  #// comment
         __Name__: workC2  #original: workC1  #// comment
 
-本文に `#to:` タグを書くときは、
+本文に `#to:` タグを書く場合、
 `#template:` タグの右に `#to:` タグと置き換えた後の値を書きます。
 または、対象の `#template:` タグの行から、次の `#template:` タグの行の間に、
 `#to:` タグだけの行を追加します。
@@ -194,11 +223,43 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 複数の変数があるときは、`#to:` タグに CSV 形式で書くか、
 テンプレートを置き換えた後の内容を書きます。
 
-    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: workA2, workB2
+    (workA1 : workB1)  #template: (__NameA__ : __NameB__)  #to: workA2, workB2
 
 または
 
-    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
+    (workA1 : workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
+
+（バージョン 1.x の場合）
+
+`#template:` タグが参照する変数が何かを調べるには、
+一時的にテンプレートにマッチしないように書き換えて check コマンドを実行します。
+
+書き換える前:
+
+    (workA1 : workB1)  #template: (__NameA__ : __NameB__)
+
+一時的に書き換えた後の例:
+
+    (workA1 : @@@ workB1)  #template: (__NameA__ : __NameB__)
+
+入力するコマンド:
+
+    typrm check    #// または typrm c
+
+コマンド実行後の内容:
+
+    example.yaml:64:     設定:
+    example.yaml:65:         __NameA__: workA1
+    example.yaml:66:         __NameB__: workB1
+    example.yaml:68:         (workA1 : @@@ workB1)  #template: (__NameA__ : __NameB__)
+        警告: テンプレートと一致しません。
+        期待: (workA1 : workB1)
+
+警告の内容から、`#template:` タグが参照する変数が
+`__NameA__` と `__NameB__` であることが分かります。
+また、それぞれの変数の定義位置も分かります。
+
+（バージョン 0.x の場合）
 
 `#to:` タグの代わりに `#to-test:` タグを書くと、
 置き換えた後の変数の値がどうなるかをテストすることができます。
@@ -226,6 +287,8 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
     Verbose:         toValueIsMatchedWithTemplate: true  ... true = #to-test: タグの値をテンプレートを置き換えた後の内容として解釈します
     Verbose:         __NameC__: workC2
     Verbose:         __NameD__: workD2
+
+（すべてのバージョン）
 
 typrm replace コマンドを実行すると、すべてのファイルにある `#to:` タグに従って
 ファイルの内容を置き換えます。 すべてのファイルとは、
@@ -321,6 +384,8 @@ search コマンドにキーワードを指定しないと、検索キーワー�
 Visual Studio Code のターミナルで実行した場合、見つかった場所（パス）を
 Ctrl キーを押しながらクリックすると開くことができます。
 
+（バージョン 1.x の場合）
+
 検索した後で # と数字（例：#1）を入力すると、
 `TYPRM_OPEN_DOCUMENT` 環境変数に設定したコマンドを実行します。
 入力する数字は検索結果の下から数えた番号です。
@@ -348,6 +413,8 @@ Enter キーを押すことで全文検索ができます。
     keyword:
     .../text.txt:1: Game:
     keyword:
+
+（すべてのバージョン）
 
 複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
 複数の単語を指定すると AND 検索になります。

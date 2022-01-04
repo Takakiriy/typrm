@@ -76,6 +76,24 @@ Write "variable_name: value" at `settings:` for the part you want to change to.
 Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
+(For version 1.x)
+
+Write the `#to:` tag and the value after replacing
+at the right of the value of the variable in the setting.
+
+    settings:
+        __Name__: work1  #to: work2
+
+(You can write `#to:` tag out of settings.)
+
+Install typrm and
+type the following `replace` command from bash or PowerShell. The short command name is `r`.
+
+    typrm replace  new_folder.yaml  #// or typrm r  new_folder.yaml
+
+
+(For version 0.x)
+
 Install typrm and
 type the following `replace` command from bash or PowerShell. The short command name is `r`.
 
@@ -89,6 +107,8 @@ You can drag and drop a file to enter the file without having to type it from th
 or above the line where the next `settings:` is written.
 You can omit the line number if there is only one `setting:` in the file.
 See the below about the way of specify the setting name instead of the line number.
+
+(For all versions)
 
 new_folder.yaml file will be chaned to the following contents and you can copy and paste.
 You can paste the text with the comment as it is,
@@ -104,6 +124,15 @@ It replaces `work1` in the settings and document body to `work2`.
 
 `#original:` tag with the value before replacement is added to the same line.
 If the `#original:` tag already exists, it will not be added.
+
+(For version 1.x)
+
+To return to the value written in the `#original:` tag, use the reset command.
+Also, the reset command removes the `#original:` tag.
+
+    typrm reset  new_folder.yaml
+
+(For version 0.x)
 
 To return to the value written in the `#original:` tag, use the reset command.
 Also, the reset command removes the `#original:` tag.
@@ -122,10 +151,7 @@ you can copy and paste multiple linees and enter them continuously.
 
 ### Replace with #to tag
 
-You can omit almost parameters of the replace command
-and replace it by writing the `#to:` tag.
-
-When writing `#to:` tag in the settings,
+If writing `#to:` tag in the settings,
 write `#to:` tag and the value after replacing
 at the right of the variable value.
 
@@ -143,11 +169,14 @@ Example after adding the `#to:` tag:
         __Name__: workB1  #to: workB2  #// comment
         __Name__: workC1  #// comment  #to: workC2
 
-Save the file after adding tagｓ.
+Save the file after adding tags.
+
+Entering the following command replaces the `#to:` tag in all files
+in the current folder and the folder set in the `TYPRM_FOLDER` environment variable.
 
 Input command:
 
-    typrm replace
+    typrm replace  #// or typrm r
 
 Contents after command execution:
 
@@ -156,8 +185,8 @@ Contents after command execution:
         __Name__: workB2  #original: workB1  #// comment
         __Name__: workC2  #original: workC1  #// comment
 
-When writing `#to:` tag in the body,
-write `#to:` tag and the value after replacing
+If writing `#to:` tag in the body,
+write `#to:` tag and the value after replacing
 to the right of the `#template:` tag.
 Also, add a line with only the `#to:` tag
 between the line of the target `#template:` tag
@@ -198,11 +227,45 @@ If there are multiple variables,
 write `#to:` tag and values in CSV format,
 or write the contents after replacing the template.
 
-    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: workA2, workB2
+    (workA1 : workB1)  #template: (__NameA__ : __NameB__)  #to: workA2, workB2
 
 or
 
-    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
+    (workA1 : workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
+
+(For version 1.x)
+
+To find out what variable the `#template:` tag refers to,
+rewrite contents temporarily it doesn't match the template
+and run the check command.
+
+Before rewriting:
+
+    (workA1 : workB1)  #template: (__NameA__ : __NameB__)
+
+After rewriting temporarily:
+
+    (workA1 : @@@ workB1)  #template: (__NameA__ : __NameB__)
+
+Input command:
+
+    typrm check  #// or typrm c
+
+Contents after command execution:
+
+    example.yaml:64:     settings:
+    example.yaml:65:         __NameA__: workA1
+    example.yaml:66:         __NameB__: workB1
+    example.yaml:68:         (workA1 : @@@ workB1)  #template: (__NameA__ : __NameB__)
+        Warning: Not matched with the template.
+        Expected: (workA1 : workB1)
+
+From the content of the warning,
+you can see that the variables referenced by the `#template:` tag are
+`__NameA__` and` __NameB__`.
+You can also see the definition position of each variable.
+
+(For version 0.x)
 
 You can write `#to-test:` tag instead of the `#to:` tag
 to test the value of the variable after the replacement.
@@ -229,6 +292,8 @@ Example of displaying test results:
     Verbose:         toValueIsMatchedWithTemplate: true  ... true = typrm treats #to-test: tag value as the content that replaced from template
     Verbose:         __NameC__: workC2
     Verbose:         __NameD__: workD2
+
+(For all versions)
 
 The typrm replace command replaces the contents of a file according
 to the `#to:` tag found in all files.
@@ -331,6 +396,8 @@ When running in Visual Studio Code terminal,
 you can open the file at the found location (path)
 by holding down the Ctrl key and clicking.
 
+(For version 1.x)
+
 If you enter # and a number (e.g. #1) after searching,
 the command you set for the 'TYPRM_OPEN_DOCUMENT' environment variable
 will be executed.
@@ -360,6 +427,8 @@ Also, word-based search is not possible.
     keyword:
     .../text.txt:1: Game:
     keyword:
+
+(For all versions)
 
 If specifying a search keyword consisting of multiple words,
 it is not necessary to enclose it in " ".
