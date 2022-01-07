@@ -4,7 +4,7 @@
     "description": "",
     "scripts": {
         "setup": "npm ci",
-        "test": "ts-node node_modules/jest/bin/jest.js --watchAll",
+        "test": "jest --watchAll",
         "clean": "powershell rm -r -fo node_modules"
     },
     "author": "",

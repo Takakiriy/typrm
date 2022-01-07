@@ -93,14 +93,23 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( false  ||  case_.name === 'search_mode_find') {
+        if ( true  ||  case_.name === 'search_mode_find') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 
             // Test Main
-            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test > test_data/_stdout.log`,
+            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test  --stdout-buffer`,
                 {inputLines: case_.inputLines.split('\n')});
-            returns.stdout = fs.readFileSync('test_data/_stdout.log').toString();
+                // Redirect is also lost some outputs.
+                //    callChildProccess(`... > test_data/_stdout.log`);
+                //    returns.stdout = fs.readFileSync('test_data/_stdout.log').toString();
+                // To flush stdout is also lost some outputs.
+                //     console.log('This text will be lost')
+                //     process.stdout.write('some data', () => {
+                //         process.stdout.write('The data has been flushed');
+                //     });
+                //     https://stackoverflow.com/questions/12510835/stdout-flush-for-nodejs
+                // --stdout-buffer option solves the problem.
 
             // Check
             if (case_.check === 'true') {
@@ -148,19 +157,8 @@ async function  callChildProccess(commandLine: string,  option?: ProcessOption):
     return   new Promise( async (resolveFunction, rejectFunction) => {
         const  returnValue = new ProcessReturns();
         try {
-// if (commandLine.includes('Not')) {
-//             var  childProcess = child_process.spawn(... commandLine.split(' '),
-
-//                 // on close the "childProcess" (2)
-//                 (error: child_process.ExecException | null, stdout: string, stderr: string) => {
-//                     returnValue.stdout = stdout;
-//                     returnValue.stderr = stderr;
-//                     resolveFunction(returnValue);
-//                 },
-//             );
-// } else {
             var  childProcess = child_process.exec( commandLine,
-                { maxBuffer: 2000*1024, /*timeout:5000*/ },
+                { /* maxBuffer: 2000*1024, timeout:5000*/ },
 
                 // on close the "childProcess" (2)
                 (error: child_process.ExecException | null, stdout: string, stderr: string) => {
@@ -169,7 +167,6 @@ async function  callChildProccess(commandLine: string,  option?: ProcessOption):
                     resolveFunction(returnValue);
                 },
             );
-// }
             if (option && childProcess.stdin) {
 
                 if (option.inputLines) {

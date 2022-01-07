@@ -749,7 +749,7 @@ export async function  input( guide: string ): Promise<string> {
     while (inputOption.nextParameterIndex < process.argv.length) {
         const  value = process.argv[inputOption.nextParameterIndex];
         inputOption.nextParameterIndex += 1;
-        if (value.substr(0,1) !== '-') {
+        if (value.substring(0,1) !== '-') {
             console.log(guide + value);
 
             return  value;
