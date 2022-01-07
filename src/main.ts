@@ -4368,12 +4368,14 @@ const  processStdoutWrite = process.stdout.write;
 export function  startRedirect() {
     console.log = println;
     process.stdout.write = writeToStdout;
+    lib.setInputEchoBack(true);
 }
 
 // endRedirect
 export function  endRedirect() {
-    process.stdout.write = processStdoutWrite;
     console.log = consoleLog;
+    process.stdout.write = processStdoutWrite;
+    lib.setInputEchoBack(false);
 }
 
 // lastOf

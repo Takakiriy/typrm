@@ -471,56 +471,6 @@ class WritableMemoryStream extends Writable {
     }
 }
 
-// StandardInputBuffer
-class  StandardInputBuffer {
-    readlines: readline.Interface | undefined;
-    inputBuffer: string[] = [];
-    inputResolver?: (answer:string)=>void = undefined;
-
-    delayedConstructor() {  // It is not constructor, because "createInterface" stops the program, if stdin was not used.
-        this.readlines = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        this.readlines.on('line', async (line: string) => {
-            if (this.inputResolver) {
-                this.inputResolver(line);  // inputResolver() is resolve() in input()
-                this.inputResolver = undefined;
-            } else {
-                this.inputBuffer.push(line);
-            }
-        });
-
-        this.readlines.setPrompt('');
-        this.readlines.prompt();
-    }
-
-    async  input(guide: string): Promise<string> {
-        if (!this.readlines) {
-            this.delayedConstructor();
-        }
-
-        return  new Promise(
-            (resolve: (answer:string)=>void,  reject: (answer:string)=>void ) =>
-        {
-            const  nextLine = this.inputBuffer.shift();
-            if (nextLine) {
-                console.log(guide + nextLine);
-                resolve(nextLine);
-            } else {
-                process.stdout.write(guide);
-                this.inputResolver = resolve;
-            }
-        });
-    }
-
-    close() {
-        if (this.readlines) {
-            this.readlines.close();
-        }
-    }
-}
-
 
 // Data group
 
@@ -764,10 +714,6 @@ pp(`12; ${guide}, ${value}`)
     // input
     return  InputObject.input(guide);
 }
-const  InputObject = new StandardInputBuffer();
-export function  getInputObject(): StandardInputBuffer {
-    return  InputObject;
-}
 
 // inputPath
 // Example: const name = await input('What is your name? ');
@@ -783,6 +729,77 @@ export async function  inputPath( guide: string ) {
 // inputSkip
 export function  inputSkip(count: number) {
     inputOption.nextParameterIndex += count;
+}
+
+// setInputEchoBack
+export function setInputEchoBack(isEnabled: boolean) {
+    inputEchoBack = isEnabled;
+}
+var  inputEchoBack = false;
+
+// getInputEchoBack
+export function getInputEchoBack(): boolean {
+    return  inputEchoBack;
+}
+
+// StandardInputBuffer
+class  StandardInputBuffer {
+    readlines: readline.Interface | undefined;
+    inputBuffer: string[] = [];
+    inputResolver?: (answer:string)=>void = undefined;
+
+    delayedConstructor() {  // It is not constructor, because "createInterface" stops the program, if stdin was not used.
+        this.readlines = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        this.readlines.on('line', async (line: string) => {
+pp(`read: ${line}`)
+            if (this.inputResolver) {
+pp(`inputResolver`)
+                if (inputEchoBack) {
+                    console.log(line);
+                }
+                this.inputResolver(line);  // inputResolver() is resolve() in input()
+                this.inputResolver = undefined;
+            } else {
+pp(`inputBuffer.push`)
+                this.inputBuffer.push(line);
+            }
+        });
+
+        this.readlines.setPrompt('');
+        this.readlines.prompt();
+    }
+
+    async  input(guide: string): Promise<string> {
+        if (!this.readlines) {
+            this.delayedConstructor();
+        }
+
+        return  new Promise(
+            (resolve: (answer:string)=>void,  reject: (answer:string)=>void ) =>
+        {
+            const  nextLine = this.inputBuffer.shift();
+            if (nextLine) {
+                console.log(guide + nextLine);
+                resolve(nextLine);
+            } else {
+                process.stdout.write(guide);
+                this.inputResolver = resolve;
+            }
+        });
+    }
+
+    close() {
+        if (this.readlines) {
+            this.readlines.close();
+        }
+    }
+}
+const  InputObject = new StandardInputBuffer();
+export function  getInputObject(): StandardInputBuffer {
+    return  InputObject;
 }
 
 // getSnapshot

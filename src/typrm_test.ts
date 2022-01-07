@@ -93,7 +93,7 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( false  ||  case_.name === 'search_mode_ref_verb') {
+        if ( true  ||  case_.name === 'search_mode_ref_verb') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 

@@ -4255,8 +4255,10 @@ keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode >> mac: stdout 1`] = `
-"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-keyword: "
+"keyword: ABC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+keyword: exit()
+"
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> Windows: stdout 1`] = `
@@ -4267,9 +4269,12 @@ keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> mac: stdout 1`] = `
-"keyword: Not found. To do full text search, press Enter key.
-keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
-keyword: "
+"keyword: Not
+Not found. To do full text search, press Enter key.
+keyword: 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
+keyword: exit()
+"
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
@@ -4285,15 +4290,20 @@ keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
-"keyword: Recommend: #ref: ../README.md#parameters
+"keyword: #ref: "../README.md#parameters"
+Recommend: #ref: ../README.md#parameters
 ../README.md:3
     7.Test Echo, 0.Folder
-keyword or number: ref:  ../README.md#parameters
+keyword or number: 7
+ref:  ../README.md#parameters
 file: ../README.md
 fragment: parameters
 lineNum: 3
-keyword or number: keyword: Not found. To do full text search, press Enter key.
-keyword: "
+keyword or number: 
+keyword: 7
+Not found. To do full text search, press Enter key.
+keyword: exit()
+"
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
@@ -4305,10 +4315,12 @@ keyword or number: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
-"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
+"keyword: file_path
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder
-keyword or number: "
+keyword or number: exit()
+"
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_select_by_number >> _out.log 1`] = `
