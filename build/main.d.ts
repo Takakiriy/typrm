@@ -80,8 +80,8 @@ declare class Parser {
     lineNum: number;
     line: string;
 }
-export declare function startRedirect(): void;
-export declare function endRedirect(): void;
+export declare function startTestRedirect(): void;
+export declare function endTestRedirect(): void;
 export declare function callMainFromJest(parameters?: string[], options?: {
     [name: string]: string;
 }): Promise<void>;

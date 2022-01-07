@@ -10,13 +10,12 @@ import * as lib from "./lib";
 import { pp } from "./lib";
 // main
 export async function main() {
-    startRedirect();
+    startTestRedirect();
     try {
         await mainMain();
     }
     finally {
-        var s = stdout;
-        endRedirect();
+        endTestRedirect();
         if (programOptions.stdoutBuffer) {
             process.stdout.write(stdout);
         }
@@ -1999,6 +1998,9 @@ async function search() {
                     runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
                 }
             }
+            if (keyword === 'q' || keyword === 'quit' || keyword === 'exit') {
+                console.log('Use exit() or Ctrl-C to exit');
+            }
         }
     }
 }
@@ -3915,15 +3917,15 @@ function getStdOut() {
 // Output any text to standard output or buffer.
 // delayedExpanding: The debugger or the browswr watch view expands objects
 function println(message, delayedExpanding = false) {
-    if (typeof message === 'object' && !delayedExpanding) {
-        message = JSON.stringify(message);
-    }
-    if ((withJest || programOptions.stdoutBuffer) && !delayedExpanding) {
-        stdout += message.toString() + '\n';
-        pp(message.toString());
+    if (delayedExpanding) {
+        consoleLog(message);
     }
     else {
-        consoleLog(message);
+        if (typeof message === 'object') {
+            message = JSON.stringify(message);
+        }
+        stdout += message.toString() + '\n';
+        pp(message.toString());
     }
 }
 const consoleLog = console.log;
@@ -3931,27 +3933,26 @@ const consoleLog = console.log;
 // #keyword: writeToStdout
 // Output any text to standard output or buffer.
 function writeToStdout(message, a2, a3) {
-    if (withJest || programOptions.stdoutBuffer) {
-        stdout += message.toString();
-        pp(message.toString());
-    }
-    else {
-        processStdoutWrite(message, a2, a3);
-    }
+    stdout += message.toString();
+    pp(message.toString());
     return true;
 }
 const processStdoutWrite = process.stdout.write;
-// startRedirect
-export function startRedirect() {
-    console.log = println;
-    process.stdout.write = writeToStdout;
-    lib.setInputEchoBack(true);
+// startTestRedirect
+export function startTestRedirect() {
+    if (withJest || programOptions.stdoutBuffer) {
+        console.log = println;
+        process.stdout.write = writeToStdout;
+        lib.setInputEchoBack(true);
+    }
 }
-// endRedirect
-export function endRedirect() {
-    console.log = consoleLog;
-    process.stdout.write = processStdoutWrite;
-    lib.setInputEchoBack(false);
+// endTestRedirect
+export function endTestRedirect() {
+    if (withJest || programOptions.stdoutBuffer) {
+        console.log = consoleLog;
+        process.stdout.write = processStdoutWrite;
+        lib.setInputEchoBack(false);
+    }
 }
 // lastOf
 function lastOf(array) {
@@ -4058,11 +4059,11 @@ export async function callMainFromJest(parameters, options) {
         programOptions = {};
     }
     try {
-        startRedirect();
+        startTestRedirect();
         await mainMain();
     }
     finally {
-        endRedirect();
+        endTestRedirect();
         var d = pp('');
         const s = getStdOut();
         d = []; // Set break point here and watch the variable d
