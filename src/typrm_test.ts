@@ -93,7 +93,7 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( true  ||  case_.name === 'search_mode_find') {
+        if ( false  ||  case_.name === 'search_mode_ref_verb') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 
@@ -117,7 +117,7 @@ async function  TestOfCommandLine() {
                 const  answer  = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
                 const  answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
 
-                if (returns.stdout !== answer  &&  returns.stdout !== answer2) {
+                if (returns.stdout !== answer) {
                     if (answer2 === noData) {
                         printDifferentPaths('_output.log', '_expected.log');
                     } else {

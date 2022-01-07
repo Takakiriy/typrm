@@ -740,6 +740,7 @@ export async function  input( guide: string ): Promise<string> {
             const  value = inputOption.inputLines[inputOption.nextLineIndex];
             inputOption.nextLineIndex += 1;
             console.log(guide + value);
+pp(`11; ${guide}, ${value}`)
 
             return  value;
         }
@@ -751,6 +752,7 @@ export async function  input( guide: string ): Promise<string> {
         inputOption.nextParameterIndex += 1;
         if (value.substring(0,1) !== '-') {
             console.log(guide + value);
+pp(`12; ${guide}, ${value}`)
 
             return  value;
         }

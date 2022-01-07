@@ -4243,22 +4243,12 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> Windows: stdout 1`] = `
 "
 `;
 
-exports[`typrm_test >> TestOfCommandLine >> locale >> Windows2: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-"
-`;
-
 exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode >> Windows: stdout 1`] = `
-"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-keyword: "
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode >> Windows2: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 keyword: exit()
 "
@@ -4270,12 +4260,6 @@ keyword: "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> Windows: stdout 1`] = `
-"keyword: 見つかりません。全文検索するときは Enter キーを押してください。
-keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
-keyword: "
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> Windows2: stdout 1`] = `
 "keyword: 見つかりません。全文検索するときは Enter キーを押してください。
 keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
 keyword: exit()
@@ -4294,18 +4278,10 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: std
     7.Test Echo, 0.Folder
 keyword or number: 7
  \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
-keyword or number: keyword: 見つかりません。全文検索するときは Enter キーを押してください。
-keyword: "
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows2: stdout 1`] = `
-"keyword: Recommend: #ref: ../README.md#parameters
-../README.md:3
-    7.Test Echo, 0.Folder
-keyword or number: 7
- \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
-keyword or number:  \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
-keyword or number: "
+keyword or number: keyword: 7
+見つかりません。全文検索するときは Enter キーを押してください。
+keyword: exit()
+"
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
@@ -4321,13 +4297,6 @@ keyword: "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
-"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
-../README.md:1
-    7.Test Echo, 0.Folder
-keyword or number: "
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows2: stdout 1`] = `
 "keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder

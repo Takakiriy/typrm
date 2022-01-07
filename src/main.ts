@@ -16,6 +16,7 @@ export async function  main() {
         await  mainMain();
     }
     finally {
+var s = stdout;
         endRedirect();
         if (programOptions.stdoutBuffer) {
             process.stdout.write(stdout);
