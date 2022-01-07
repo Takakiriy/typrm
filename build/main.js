@@ -10,6 +10,27 @@ import * as lib from "./lib";
 import { pp } from "./lib";
 // main
 export async function main() {
+    startRedirect();
+    try {
+        await mainMain();
+    }
+    finally {
+        var s = stdout;
+        endRedirect();
+        if (programOptions.stdoutBuffer) {
+            process.stdout.write(stdout);
+        }
+        // debug
+        if (true) {
+            var d = pp('');
+            d = d;
+            // If exception was raised, this code does not execute.
+            // Set a break point at the catch block of calling "main.main"
+        }
+    }
+}
+// mainMain
+export async function mainMain() {
     locale = Intl.NumberFormat().resolvedOptions().locale;
     if ('locale' in programOptions) {
         locale = programOptions.locale;
@@ -75,13 +96,6 @@ export async function main() {
         else {
             await search();
         }
-    }
-    // debug
-    if (true) {
-        var d = pp('');
-        d = d;
-        // If exception was raised, this code does not execute.
-        // Set a break point at the catch block of calling "main.main"
     }
 }
 // checkRoutine
@@ -2171,7 +2185,9 @@ async function searchSub(keyword, isMutual) {
         else {
             var refTagAndAddress = foundLine.substring(refTagPosition, nextTagPosition);
         }
-        return await printRef(refTagAndAddress);
+        const verbReturn = await printRef(refTagAndAddress);
+        verbReturn.foundLines = foundLines;
+        return verbReturn;
     }
     else {
         const normalReturn = getEmptyOfPrintRefResult();
@@ -2405,7 +2421,7 @@ function openDocument(ref) {
 }
 // printRef
 async function printRef(refTagAndAddress, option = printRefOptionDefault) {
-    const addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
+    const addressBefore = refTagAndAddress.trim().substring(refLabel.length).trim();
     const variableRe = new RegExp(variablePattern, 'g'); // variableRegularExpression
     const variables = {};
     variableRe.lastIndex = 0;
@@ -3896,12 +3912,13 @@ function getStdOut() {
 }
 // println
 // #keyword: println, console.log, consoleLog
-// Output any text to standard output.
+// Output any text to standard output or buffer.
+// delayedExpanding: The debugger or the browswr watch view expands objects
 function println(message, delayedExpanding = false) {
     if (typeof message === 'object' && !delayedExpanding) {
         message = JSON.stringify(message);
     }
-    if (withJest && !delayedExpanding) {
+    if ((withJest || programOptions.stdoutBuffer) && !delayedExpanding) {
         stdout += message.toString() + '\n';
         pp(message.toString());
     }
@@ -3910,7 +3927,32 @@ function println(message, delayedExpanding = false) {
     }
 }
 const consoleLog = console.log;
-console.log = println;
+// writeToStdout
+// #keyword: writeToStdout
+// Output any text to standard output or buffer.
+function writeToStdout(message, a2, a3) {
+    if (withJest || programOptions.stdoutBuffer) {
+        stdout += message.toString();
+        pp(message.toString());
+    }
+    else {
+        processStdoutWrite(message, a2, a3);
+    }
+    return true;
+}
+const processStdoutWrite = process.stdout.write;
+// startRedirect
+export function startRedirect() {
+    console.log = println;
+    process.stdout.write = writeToStdout;
+    lib.setInputEchoBack(true);
+}
+// endRedirect
+export function endRedirect() {
+    console.log = consoleLog;
+    process.stdout.write = processStdoutWrite;
+    lib.setInputEchoBack(false);
+}
 // lastOf
 function lastOf(array) {
     return array[array.length - 1];
@@ -4016,11 +4058,13 @@ export async function callMainFromJest(parameters, options) {
         programOptions = {};
     }
     try {
-        await main();
+        startRedirect();
+        await mainMain();
     }
     finally {
+        endRedirect();
         var d = pp('');
-        var s = getStdOut();
+        const s = getStdOut();
         d = []; // Set break point here and watch the variable d
     }
 }
@@ -4088,7 +4132,6 @@ const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 const matchedColor = chalk.green.bold;
 const notFound = -1;
-const allSetting = 0;
 var inputFileParentPath = '';
 var locale = '';
 var withJest = false;

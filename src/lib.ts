@@ -690,7 +690,6 @@ export async function  input( guide: string ): Promise<string> {
             const  value = inputOption.inputLines[inputOption.nextLineIndex];
             inputOption.nextLineIndex += 1;
             console.log(guide + value);
-pp(`11; ${guide}, ${value}`)
 
             return  value;
         }
@@ -702,7 +701,6 @@ pp(`11; ${guide}, ${value}`)
         inputOption.nextParameterIndex += 1;
         if (value.substring(0,1) !== '-') {
             console.log(guide + value);
-pp(`12; ${guide}, ${value}`)
 
             return  value;
         }
@@ -754,16 +752,13 @@ class  StandardInputBuffer {
             output: process.stdout
         });
         this.readlines.on('line', async (line: string) => {
-pp(`read: ${line}`)
             if (this.inputResolver) {
-pp(`inputResolver`)
                 if (inputEchoBack) {
                     console.log(line);
                 }
                 this.inputResolver(line);  // inputResolver() is resolve() in input()
                 this.inputResolver = undefined;
             } else {
-pp(`inputBuffer.push`)
                 this.inputBuffer.push(line);
             }
         });
@@ -781,10 +776,10 @@ pp(`inputBuffer.push`)
             (resolve: (answer:string)=>void,  reject: (answer:string)=>void ) =>
         {
             const  nextLine = this.inputBuffer.shift();
-            if (nextLine) {
+            if (typeof nextLine === 'string') {
                 console.log(guide + nextLine);
                 resolve(nextLine);
-            } else {
+            } else {  // nextLine === undefnied
                 process.stdout.write(guide);
                 this.inputResolver = resolve;
             }

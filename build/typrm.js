@@ -15,6 +15,7 @@ async function callMain() {
         .option("--color")
         .option("--thesaurus <>", "The thesaurus CSV file path", process.env.TYPRM_THESAURUS)
         .option("--replace-mode")
+        .option("--stdout-buffer")
         .option("--verbose")
         .parse(process.argv);
     for (const arg of commander.program.args) {

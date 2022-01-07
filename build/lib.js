@@ -418,51 +418,6 @@ class WritableMemoryStream extends Writable {
         return this.array.join('');
     }
 }
-// StandardInputBuffer
-class StandardInputBuffer {
-    constructor() {
-        this.inputBuffer = [];
-        this.inputResolver = undefined;
-    }
-    delayedConstructor() {
-        this.readlines = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        this.readlines.on('line', async (line) => {
-            if (this.inputResolver) {
-                this.inputResolver(line); // inputResolver() is resolve() in input()
-                this.inputResolver = undefined;
-            }
-            else {
-                this.inputBuffer.push(line);
-            }
-        });
-        this.readlines.setPrompt('');
-        this.readlines.prompt();
-    }
-    async input(guide) {
-        if (!this.readlines) {
-            this.delayedConstructor();
-        }
-        return new Promise((resolve, reject) => {
-            const nextLine = this.inputBuffer.shift();
-            if (nextLine) {
-                console.log(guide + nextLine);
-                resolve(nextLine);
-            }
-            else {
-                process.stdout.write(guide);
-                this.inputResolver = resolve;
-            }
-        });
-    }
-    close() {
-        if (this.readlines) {
-            this.readlines.close();
-        }
-    }
-}
 // Data group
 // isSameArrayOf
 // T: string, nunmber
@@ -670,7 +625,7 @@ export async function input(guide) {
     while (inputOption.nextParameterIndex < process.argv.length) {
         const value = process.argv[inputOption.nextParameterIndex];
         inputOption.nextParameterIndex += 1;
-        if (value.substr(0, 1) !== '-') {
+        if (value.substring(0, 1) !== '-') {
             console.log(guide + value);
             return value;
         }
@@ -680,10 +635,6 @@ export async function input(guide) {
     }
     // input
     return InputObject.input(guide);
-}
-const InputObject = new StandardInputBuffer();
-export function getInputObject() {
-    return InputObject;
 }
 // inputPath
 // Example: const name = await input('What is your name? ');
@@ -699,6 +650,67 @@ export async function inputPath(guide) {
 // inputSkip
 export function inputSkip(count) {
     inputOption.nextParameterIndex += count;
+}
+// setInputEchoBack
+export function setInputEchoBack(isEnabled) {
+    inputEchoBack = isEnabled;
+}
+var inputEchoBack = false;
+// getInputEchoBack
+export function getInputEchoBack() {
+    return inputEchoBack;
+}
+// StandardInputBuffer
+class StandardInputBuffer {
+    constructor() {
+        this.inputBuffer = [];
+        this.inputResolver = undefined;
+    }
+    delayedConstructor() {
+        this.readlines = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        this.readlines.on('line', async (line) => {
+            if (this.inputResolver) {
+                if (inputEchoBack) {
+                    console.log(line);
+                }
+                this.inputResolver(line); // inputResolver() is resolve() in input()
+                this.inputResolver = undefined;
+            }
+            else {
+                this.inputBuffer.push(line);
+            }
+        });
+        this.readlines.setPrompt('');
+        this.readlines.prompt();
+    }
+    async input(guide) {
+        if (!this.readlines) {
+            this.delayedConstructor();
+        }
+        return new Promise((resolve, reject) => {
+            const nextLine = this.inputBuffer.shift();
+            if (typeof nextLine === 'string') {
+                console.log(guide + nextLine);
+                resolve(nextLine);
+            }
+            else { // nextLine === undefnied
+                process.stdout.write(guide);
+                this.inputResolver = resolve;
+            }
+        });
+    }
+    close() {
+        if (this.readlines) {
+            this.readlines.close();
+        }
+    }
+}
+const InputObject = new StandardInputBuffer();
+export function getInputObject() {
+    return InputObject;
 }
 // getSnapshot
 export function getSnapshot(label, deafultSnapshot = undefined) {

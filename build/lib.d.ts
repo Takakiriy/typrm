@@ -34,14 +34,6 @@ interface ReplaceParameter {
     lineNum?: number;
     to: string;
 }
-declare class StandardInputBuffer {
-    readlines: readline.Interface | undefined;
-    inputBuffer: string[];
-    inputResolver?: (answer: string) => void;
-    delayedConstructor(): void;
-    input(guide: string): Promise<string>;
-    close(): void;
-}
 export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
 export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function cutSameItems<T>(array: T[]): T[];
@@ -55,9 +47,19 @@ export declare namespace hasInterfaceOf {
 }
 export declare function getObjectID(object: any): any;
 export declare function input(guide: string): Promise<string>;
-export declare function getInputObject(): StandardInputBuffer;
 export declare function inputPath(guide: string): Promise<string>;
 export declare function inputSkip(count: number): void;
+export declare function setInputEchoBack(isEnabled: boolean): void;
+export declare function getInputEchoBack(): boolean;
+declare class StandardInputBuffer {
+    readlines: readline.Interface | undefined;
+    inputBuffer: string[];
+    inputResolver?: (answer: string) => void;
+    delayedConstructor(): void;
+    input(guide: string): Promise<string>;
+    close(): void;
+}
+export declare function getInputObject(): StandardInputBuffer;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
 export declare function pp(message: any): string[];
 export declare const debugOut: string[];

@@ -44,8 +44,8 @@ async function main() {
 // DoCustomDebug
 async function DoCustomDebug() {
     const returns = await callChildProccess(`node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, { inputLines: ['Not', '', 'exit()'] });
-    console.log(`(typrm_test.ts) ${returns.stdout}`);
+        `search  --folder test_data/search/1`, { inputLines: [ /*exit()*/] });
+    console.log(`(typrm_test.ts stdout) ${returns.stdout}`);
     console.log('Done');
 }
 // TestOfFileCheck
@@ -81,7 +81,7 @@ async function TestOfCommandLine() {
             "name": "search_mode_find",
             "parameters": "search  --folder test_data/search/1",
             "check": "true",
-            "inputLines": "Not\n\n\nexit()\n",
+            "inputLines": "Not\n\nexit()\n",
         }, {
             "name": "search_mode_result_has_ref_verb",
             "parameters": "search  --folder test_data/search/2",
@@ -93,13 +93,23 @@ async function TestOfCommandLine() {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
             // Test Main
-            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test`, { inputLines: case_.inputLines.split('\n') });
+            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test  --stdout-buffer`, { inputLines: case_.inputLines.split('\n') });
+            // Redirect is also lost some outputs.
+            //    callChildProccess(`... > test_data/_stdout.log`);
+            //    returns.stdout = fs.readFileSync('test_data/_stdout.log').toString();
+            // To flush stdout is also lost some outputs.
+            //     console.log('This text will be lost')
+            //     process.stdout.write('some data', () => {
+            //         process.stdout.write('The data has been flushed');
+            //     });
+            //     https://stackoverflow.com/questions/12510835/stdout-flush-for-nodejs
+            // --stdout-buffer option solves the problem.
             // Check
             if (case_.check === 'true') {
                 const noData = 'no data';
                 const answer = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
                 const answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
-                if (returns.stdout !== answer && returns.stdout !== answer2) {
+                if (returns.stdout !== answer) {
                     if (answer2 === noData) {
                         printDifferentPaths('_output.log', '_expected.log');
                     }
@@ -137,24 +147,13 @@ async function callChildProccess(commandLine, option) {
     return new Promise(async (resolveFunction, rejectFunction) => {
         const returnValue = new ProcessReturns();
         try {
-            // if (commandLine.includes('Not')) {
-            //             var  childProcess = child_process.spawn(... commandLine.split(' '),
-            //                 // on close the "childProcess" (2)
-            //                 (error: child_process.ExecException | null, stdout: string, stderr: string) => {
-            //                     returnValue.stdout = stdout;
-            //                     returnValue.stderr = stderr;
-            //                     resolveFunction(returnValue);
-            //                 },
-            //             );
-            // } else {
-            var childProcess = child_process.exec(commandLine, { maxBuffer: 2000 * 1024, timeout: 1000 }, 
+            var childProcess = child_process.exec(commandLine, { /* maxBuffer: 2000*1024, timeout:5000*/}, 
             // on close the "childProcess" (2)
             (error, stdout, stderr) => {
                 returnValue.stdout = stdout;
                 returnValue.stderr = stderr;
                 resolveFunction(returnValue);
             });
-            // }
             if (option && childProcess.stdin) {
                 if (option.inputLines) {
                     await new Promise(resolve => setTimeout(resolve, 300));

@@ -1,4 +1,5 @@
 export declare function main(): Promise<void>;
+export declare function mainMain(): Promise<void>;
 declare function makeSettingTree(parser: Parser): Promise<SettingsTree>;
 declare enum CommandEnum {
     unknown = 0,
@@ -79,6 +80,8 @@ declare class Parser {
     lineNum: number;
     line: string;
 }
+export declare function startRedirect(): void;
+export declare function endRedirect(): void;
 export declare function callMainFromJest(parameters?: string[], options?: {
     [name: string]: string;
 }): Promise<void>;

@@ -4249,7 +4249,8 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode >> Windows: stdout 1`] = `
-"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+"keyword: ABC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
 keyword: exit()
 "
 `;
@@ -4262,8 +4263,10 @@ keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> Windows: stdout 1`] = `
-"keyword: 見つかりません。全文検索するときは Enter キーを押してください。
-keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
+"keyword: Not
+見つかりません。全文検索するときは Enter キーを押してください。
+keyword: 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
 keyword: exit()
 "
 `;
@@ -4278,12 +4281,14 @@ keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
-"keyword: Recommend: #ref: ../README.md#parameters
+"keyword: #ref: "../README.md#parameters"
+Recommend: #ref: ../README.md#parameters
 ../README.md:3
     7.Test Echo, 0.Folder
 keyword or number: 7
- \\"ref:  ../README.md#parameters\\";  echo  \\"file: ../README.md\\";  echo  \\"fragment: parameters\\";  echo  \\"lineNum: 3\\"
-keyword or number: keyword: 7
+ "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 3"
+keyword or number: 
+keyword: 7
 見つかりません。全文検索するときは Enter キーを押してください。
 keyword: exit()
 "
@@ -4307,7 +4312,8 @@ keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
-"keyword: \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
+"keyword: file_path
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder
 keyword or number: exit()
