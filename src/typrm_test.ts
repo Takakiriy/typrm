@@ -46,8 +46,8 @@ async function  main() {
 async function  DoCustomDebug() {
     const  returns = await callChildProccess(
         `node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, {});
-    console.log(`(typrm_test.ts) ${returns.stdout}`);
+        `search  --folder test_data/search/1`, {inputLines: [ /*exit()*/ ]});
+    console.log(`(typrm_test.ts stdout) ${returns.stdout}`);
     console.log('Done');
 }
 
@@ -93,13 +93,14 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( true  ||  case_.name === 'search_mode_find') {
+        if ( false  ||  case_.name === 'search_mode_find') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 
             // Test Main
-            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test`,
+            returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test > test_data/_stdout.log`,
                 {inputLines: case_.inputLines.split('\n')});
+            returns.stdout = fs.readFileSync('test_data/_stdout.log').toString();
 
             // Check
             if (case_.check === 'true') {
@@ -159,7 +160,7 @@ async function  callChildProccess(commandLine: string,  option?: ProcessOption):
 //             );
 // } else {
             var  childProcess = child_process.exec( commandLine,
-                { maxBuffer: 2000*1024, timeout:1000 },
+                { maxBuffer: 2000*1024, /*timeout:5000*/ },
 
                 // on close the "childProcess" (2)
                 (error: child_process.ExecException | null, stdout: string, stderr: string) => {

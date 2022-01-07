@@ -83,6 +83,12 @@ export async function  main() {
 
     // debug
     if (true) {
+        if (programOptions.test) {
+            console.log(stdout);
+        }
+process.stdout.write('some data', () => {
+  process.stdout.write('The data has been flushed');
+});
         var d = pp('');
         d=d;
         // If exception was raised, this code does not execute.
@@ -2310,7 +2316,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             var  refTagAndAddress = foundLine.substring(refTagPosition,  nextTagPosition);
         }
 
-        return  await printRef(refTagAndAddress);
+        const  verbReturn = await printRef(refTagAndAddress);
+        verbReturn.foundLines = foundLines;
+        return  verbReturn;
     } else {
         const  normalReturn = getEmptyOfPrintRefResult();
         if (foundLines.length === 0) {
@@ -2589,7 +2597,7 @@ function  openDocument(ref: string) {
 
 // printRef
 async function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Promise<PrintRefResult> {
-    const  addressBefore = refTagAndAddress.trim().substr(refLabel.length).trim();
+    const  addressBefore = refTagAndAddress.trim().substring(refLabel.length).trim();
     const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
     const  variables: {[key: string]: undefined} = {};
     variableRe.lastIndex = 0;
@@ -4319,15 +4327,20 @@ function  getStdOut(): string[] {
 // println
 // #keyword: println, console.log, consoleLog
 // Output any text to standard output.
+// delayedExpanding: The debugger or the browswr watch view expands objects
 function  println(message: any, delayedExpanding: boolean = false) {
-    if (typeof message === 'object' && !delayedExpanding) {
+    if (typeof message === 'object'  &&  ! delayedExpanding) {
         message = JSON.stringify(message);
     }
-    if (withJest && !delayedExpanding) {
+    if ((withJest  ||  programOptions.test)  &&  ! delayedExpanding) {
         stdout += message.toString() + '\n';
         pp(message.toString());
     } else {
-        consoleLog(message);
+        // consoleLog(message);
+        var  f = process.stdout.write(message + '\n');
+        if ( ! f ) {
+            throw new Error('no flush');
+        }
     }
 }
 const  consoleLog = console.log;
