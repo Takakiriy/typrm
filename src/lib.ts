@@ -474,12 +474,27 @@ class WritableMemoryStream extends Writable {
 
 // Data group
 
+// isSameArray
+export function  isSameArray<T>(log: T[], answer: T[]): boolean {
+    if (log.length !== answer.length) {
+        return  false;
+    } else {
+        for (var i = 0; i < log.length; i += 1) {
+            if (log[i] !== answer[i]) {
+                return  false;
+            }
+        }
+        return  true;
+    }
+}
+
 // isSameArrayOf
 // T: string, nunmber
+// If only order had difference, this returns true
 export function  isSameArrayOf<T>(log: T[], answer: T[]): boolean {
-  const matched = log.filter( (item) => answer.includes( item ) );
-  const isSame = (matched.length === answer.length && log.length === answer.length);
-  return isSame;
+    const matched = log.filter( (item) => answer.includes( item ) );
+    const isSame = (matched.length === answer.length && log.length === answer.length);
+    return isSame;
 }
 
 // getCommonItems

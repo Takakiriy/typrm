@@ -1540,6 +1540,19 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
 "
 `;
 
+exports[`replaces settings >> CR LF >>: sourceFileContents 1`] = `
+"(BOM)settings:\\r
+    var1: value1
+value1: #template: var1
+CR LF:\\r"
+`;
+
+exports[`replaces settings >> CR LF >>: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces settings >> Multi folder >> same name error: stdout 1`] = `
 "
 Error: same file name exists.

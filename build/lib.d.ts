@@ -34,6 +34,7 @@ interface ReplaceParameter {
     lineNum?: number;
     to: string;
 }
+export declare function isSameArray<T>(log: T[], answer: T[]): boolean;
 export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
 export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function cutSameItems<T>(array: T[]): T[];

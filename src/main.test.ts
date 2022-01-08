@@ -628,6 +628,28 @@ describe("replaces settings >>", () => {
         expect(main.stdout).toMatchSnapshot('stdout');
     });
 
+    test("CR LF >>", async () => {
+        chdirInProject('src');
+        const  caseName = 'CR LF';
+        const  changingFolderPath = testFolderPath + '_changing';
+        const  changingFileName = caseName + "_1_changing.yaml";
+        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
+        var  sourceFileContents = lib.getSnapshot(`replaces settings >> ${caseName} >>: sourceFileContents 1`);
+        sourceFileContents = sourceFileContents.replace(/\\r/g, '\r');
+        sourceFileContents = sourceFileContents.replace('(BOM)', '\uFEFF');
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
+        writeFileSync(changingFilePath, sourceFileContents);
+
+        await callMain(["replace"], {
+            folder: changingFolderPath, test: "", locale: "en-US"
+        });
+        const  updatedFileContents = fs.readFileSync(changingFilePath).toString();
+
+        chdirInProject('src');
+        expect(main.stdout).toMatchSnapshot('stdout');
+        expect(updatedFileContents).toBe(sourceFileContents);
+    });
+
     describe("verbose >>", () => {
         test("no conflict", async () => {
             chdirInProject('src');

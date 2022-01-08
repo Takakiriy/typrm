@@ -1648,12 +1648,12 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
     var    replacingKeyValues: {[key: string]: string} = {};
     const  updatingFilePath = inputFilePath +".updating";
     const  writer = new WriteBuffer(fs.createWriteStream(updatingFilePath));
-    const  readStream = fs.createReadStream(inputFilePath);
-    const  reader = readline.createInterface({
-        input: readStream,
-        crlfDelay: Infinity
-    });
-    const  lines: string[] = [];
+    const  fileContents = fs.readFileSync(inputFilePath, 'utf-8');
+    const  hasLastLF = (fileContents.slice(-1) === '\n');
+    const  lines: string[] = fileContents.split('\n');
+    if (hasLastLF) {
+        lines.pop();  // cut last empty line
+    }
     const  linesWithoutToTagOnlyLine: string[] = [];
     var  settingIndentLength = 0;
     var  lineNum = 0;
@@ -1661,10 +1661,6 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
     var  templateIfKeyError = false;
     const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
     try {
-        for await (const line1 of reader) {
-            const  line: string = line1;
-            lines.push(line);
-        }
         for (const line of lines) {
             var    output = false;
             lineNum += 1;
@@ -1951,11 +1947,19 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
             parser.errorCount += 1;
         }
 
+        if ( ! hasLastLF) {
+            writer.cutLastLF();
+        }
         writer.end();
         await new Promise( (resolve) => {
             writer.on('finish', () => {
                 if (parser.errorCount === 0) {
-                    fs.copyFileSync(updatingFilePath, inputFilePath);
+                    const  newFileContents = writer.getAllLines();
+                    const  oldFileContents = fileContents;
+                    if (newFileContents !== oldFileContents) {
+
+                        fs.copyFileSync(updatingFilePath, inputFilePath);
+                    }
                 }
                 resolve(parser.errorCount);
             });
@@ -4374,11 +4378,22 @@ class  WriteBuffer {
         this.lineBuffer = [];
     }
 
+    cutLastLF() {
+        const  lastLine = this.lineBuffer[this.lineBuffer.length-1];
+        if (lastLine.slice(-1) === '\n') {
+            this.lineBuffer[this.lineBuffer.length-1] = lastLine.substring(0, lastLine.length - 1);
+        }
+    }
+
     end() {
         for (const line  of  this.lineBuffer) {
             this.stream.write(line);
         }
         this.stream.end();
+    }
+
+    getAllLines(): string {
+        return  this.lineBuffer.join('');
     }
 
     on(event: string, callback: () => void) {

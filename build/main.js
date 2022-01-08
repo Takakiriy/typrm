@@ -1526,12 +1526,12 @@ async function replaceSub(inputFilePath, parser, command) {
     var replacingKeyValues = {};
     const updatingFilePath = inputFilePath + ".updating";
     const writer = new WriteBuffer(fs.createWriteStream(updatingFilePath));
-    const readStream = fs.createReadStream(inputFilePath);
-    const reader = readline.createInterface({
-        input: readStream,
-        crlfDelay: Infinity
-    });
-    const lines = [];
+    const fileContents = fs.readFileSync(inputFilePath, 'utf-8');
+    const hasLastLF = (fileContents.slice(-1) === '\n');
+    const lines = fileContents.split('\n');
+    if (hasLastLF) {
+        lines.pop(); // cut last empty line
+    }
     const linesWithoutToTagOnlyLine = [];
     var settingIndentLength = 0;
     var lineNum = 0;
@@ -1539,10 +1539,6 @@ async function replaceSub(inputFilePath, parser, command) {
     var templateIfKeyError = false;
     const checkedTemplateTags = {};
     try {
-        for await (const line1 of reader) {
-            const line = line1;
-            lines.push(line);
-        }
         for (const line of lines) {
             var output = false;
             lineNum += 1;
@@ -1827,11 +1823,18 @@ async function replaceSub(inputFilePath, parser, command) {
             console.log(conflictError);
             parser.errorCount += 1;
         }
+        if (!hasLastLF) {
+            writer.cutLastLF();
+        }
         writer.end();
         await new Promise((resolve) => {
             writer.on('finish', () => {
                 if (parser.errorCount === 0) {
-                    fs.copyFileSync(updatingFilePath, inputFilePath);
+                    const newFileContents = writer.getAllLines();
+                    const oldFileContents = fileContents;
+                    if (newFileContents !== oldFileContents) {
+                        fs.copyFileSync(updatingFilePath, inputFilePath);
+                    }
                 }
                 resolve(parser.errorCount);
             });
@@ -3960,11 +3963,20 @@ class WriteBuffer {
         this.stream = stream;
         this.lineBuffer = [];
     }
+    cutLastLF() {
+        const lastLine = this.lineBuffer[this.lineBuffer.length - 1];
+        if (lastLine.slice(-1) === '\n') {
+            this.lineBuffer[this.lineBuffer.length - 1] = lastLine.substring(0, lastLine.length - 1);
+        }
+    }
     end() {
         for (const line of this.lineBuffer) {
             this.stream.write(line);
         }
         this.stream.end();
+    }
+    getAllLines() {
+        return this.lineBuffer.join('');
     }
     on(event, callback) {
         this.stream.on(event, callback);
