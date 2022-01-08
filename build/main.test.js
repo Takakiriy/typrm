@@ -65,6 +65,46 @@ beforeAll(() => {
     fs.mkdirSync('empty_folder', { recursive: true });
     chdirInProject('src');
 });
+describe("typrm shell >>", () => {
+    test.each([
+        ['replace', 'replace', ['#r', '#replace', '#r 1_changing.yaml', '#replace 1_changing.yaml'], undefined],
+        ['replaceNotFound', 'replace', ['#r not_found.yaml'], { error: '' }],
+        ['reset', 'reset', ['#reset', '#reset 1_changing.yaml'], undefined],
+        ['resetNotFound', 'reset', ['#reset not_found.yaml'], { error: '' }],
+        ['check', 'check', ['#c', '#check', '#c 1_changing.yaml', '#check 1_changing.yaml'], undefined],
+        ['checkNotFound', 'check', ['#c not_found.yaml'], { error: '' }],
+    ])("%s", async (_caseName, fileName, inputs, _options) => {
+        chdirInProject('src');
+        const changingFolderPath = testFolderPath + '_changing';
+        const changingFileName = "1_changing.yaml";
+        const changingFilePath = changingFolderPath + '/' + changingFileName;
+        const sourceFileContents = lib.getSnapshot(`typrm shell >> ${fileName}: sourceFileContents 1`);
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+        var inputIndex = 0;
+        var updatedFileContentsAnswer = '?';
+        for (const input of inputs) {
+            writeFileSync(changingFilePath, sourceFileContents);
+            const inputPattern = `${input}\n${input}\nexit()\n`;
+            // The reason to run twice is to check that the file is closed correctly
+            await callMain([], {
+                folder: 'test_data/_changing', test: "", locale: "en-US", input: inputPattern,
+            });
+            const updatedFileContents = fs.readFileSync(changingFilePath).toString();
+            chdirInProject('src');
+            if (inputIndex === 0) {
+                expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout');
+                expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
+                updatedFileContentsAnswer = updatedFileContents;
+            }
+            else {
+                expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout');
+                expect(updatedFileContents).toBe(updatedFileContentsAnswer);
+            }
+            inputIndex += 1;
+        }
+        fs.rmdirSync(testFolderPath + '_changing', { recursive: true });
+    });
+});
 describe("checks template value >>", () => {
     test.each([
         ["1_template_1_ok"],
@@ -226,6 +266,8 @@ describe("checks file contents >>", () => {
 describe("replaces settings >>", () => {
     test.each([
         [
+            '1_replace', '', 'en-US', null,
+        ], [
             '2_replace_1_ok', ' setting 1', 'en-US',
             { replacers: [
                     { from: 'key1: value1', to: 'key1: value1  #to: value1changed' },
@@ -1219,8 +1261,8 @@ describe("test of test >>", () => {
     test("checks snapshots files are confirmed", () => {
         const activeSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap').toString();
         const backUpSnapshots = fs.readFileSync('__snapshots__/main.test.ts.snap.confirmed-ts').toString();
-        // 拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです
-        // ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです
+        // You muse edit "main.test.ts.snap.confirmed-ts" file using the text file comparison tool.
+        // #search: typrm checks snapshots files are confirmed
         expect(activeSnapshots).toBe(backUpSnapshots);
     });
 });

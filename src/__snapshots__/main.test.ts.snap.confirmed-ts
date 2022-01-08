@@ -1547,7 +1547,29 @@ Error: same file name exists.
     Folder: test_data/_changing/1, test_data/_changing/2
 
 Exception: Error: same file name exists \\"2_replace_1_ok_same_name.yaml\\".
+
 Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces settings >> in 1_replace: sourceFileContents 1`] = `
+"settings:
+    key1: value1  #to: value1_replaced
+value1: #template: key1
+"
+`;
+
+exports[`replaces settings >> in 1_replace: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_replace_1_changing.yaml:2: #to: key1: value1_replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 1_replace: updatedFileContents 1`] = `
+"settings:
+    key1: value1_replaced  #original: value1
+value1_replaced: #template: key1
 "
 `;
 
@@ -4235,6 +4257,288 @@ exports[`searches keyword tag >> thesaurus >> ignore case: thesaurus 1`] = `
 PowerShell, PS
 PowerShell, PS
 PowerShell, PS
+"
+`;
+
+exports[`typrm shell >> check: sourceFileContents 1`] = `
+"settings:
+    key1: value1  #to: value1_replaced
+val__ue1: #template: key1
+"
+`;
+
+exports[`typrm shell >> check: stdout 1`] = `
+"keyword: #c
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: #c
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> check: stdout 2`] = `
+"keyword: #check
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: #check
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> check: stdout 3`] = `
+"keyword: #c 1_changing.yaml
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: #c 1_changing.yaml
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> check: stdout 4`] = `
+"keyword: #check 1_changing.yaml
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: #check 1_changing.yaml
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+template count = 1
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> check: updatedFileContents 1`] = `
+"settings:
+    key1: value1  #to: value1_replaced
+val__ue1: #template: key1
+"
+`;
+
+exports[`typrm shell >> checkNotFound: stdout 1`] = `
+"keyword: #c not_found.yaml
+
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+
+Warning: 0, Error: 1
+template count = 0
+keyword: #c not_found.yaml
+
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+
+Warning: 0, Error: 1
+template count = 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> checkNotFound: updatedFileContents 1`] = `
+"settings:
+    key1: value1  #to: value1_replaced
+val__ue1: #template: key1
+"
+`;
+
+exports[`typrm shell >> replace: sourceFileContents 1`] = `
+"settings:
+    key1: value1  #to: value1_replaced
+value1: #template: key1
+"
+`;
+
+exports[`typrm shell >> replace: stdout 1`] = `
+"keyword: #r
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+
+Warning: 0, Error: 0
+keyword: #r
+
+Warning: 0, Error: 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> replace: stdout 2`] = `
+"keyword: #replace
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+
+Warning: 0, Error: 0
+keyword: #replace
+
+Warning: 0, Error: 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> replace: stdout 3`] = `
+"keyword: #r 1_changing.yaml
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+
+Warning: 0, Error: 0
+keyword: #r 1_changing.yaml
+
+Warning: 0, Error: 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> replace: stdout 4`] = `
+"keyword: #replace 1_changing.yaml
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+
+Warning: 0, Error: 0
+keyword: #replace 1_changing.yaml
+
+Warning: 0, Error: 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> replace: updatedFileContents 1`] = `
+"settings:
+    key1: value1_replaced  #original: value1
+value1_replaced: #template: key1
+"
+`;
+
+exports[`typrm shell >> replaceNotFound: stdout 1`] = `
+"keyword: #r not_found.yaml
+
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+
+Warning: 0, Error: 1
+keyword: #r not_found.yaml
+
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+
+Warning: 0, Error: 1
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> replaceNotFound: updatedFileContents 1`] = `
+"settings:
+    key1: value1  #to: value1_replaced
+value1: #template: key1
+"
+`;
+
+exports[`typrm shell >> reset: sourceFileContents 1`] = `
+"settings:
+    key1: value1_replaced  #original: value1
+value1_replaced: #template: key1
+"
+`;
+
+exports[`typrm shell >> reset: stdout 1`] = `
+"keyword: #reset
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #original: key1: value1
+
+Warning: 0, Error: 0
+keyword: #reset
+
+Warning: 0, Error: 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> reset: stdout 2`] = `
+"keyword: #reset 1_changing.yaml
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #original: key1: value1
+
+Warning: 0, Error: 0
+keyword: #reset 1_changing.yaml
+
+Warning: 0, Error: 0
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> reset: updatedFileContents 1`] = `
+"settings:
+    key1: value1
+value1: #template: key1
+"
+`;
+
+exports[`typrm shell >> resetNotFound: stdout 1`] = `
+"keyword: #reset not_found.yaml
+
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+
+Warning: 0, Error: 1
+keyword: #reset not_found.yaml
+
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+
+Warning: 0, Error: 1
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> resetNotFound: updatedFileContents 1`] = `
+"settings:
+    key1: value1_replaced  #original: value1
+value1_replaced: #template: key1
 "
 `;
 

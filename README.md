@@ -384,7 +384,7 @@ the command name (search or s) cannot be omitted.
 Entering `#keyword:` or `#search:` in the search keyword will be ignored.
 
 If you do not specify any keywords with the search command,
-search keyword input mode is started.
+the search keyword input mode (typrm shell) is started.
 Press Ctrl + C to exit this mode.
 
     $ typrm
@@ -416,7 +416,7 @@ Commands executed
 
     code -g "/home/user1/text.txt:1"
 
-If you cannot find anything in the search keyword input mode,
+If you cannot find anything in typrm shell,
 you can do the full-text search by pressing the Enter key.
 The full-text search is not case sensitive.
 Also, word-based search is not possible.
@@ -427,6 +427,11 @@ Also, word-based search is not possible.
     keyword:
     .../text.txt:1: Game:
     keyword:
+
+In typrm shell, if you inputed starts with `#r`, `#replace`, `#reset`, `#c` or `#check`, typrm runs replace, reset or check command.
+
+    #r                // replace all files
+    #r example.yaml
 
 (For all versions)
 
@@ -1211,7 +1216,7 @@ Note, you must add the prefix `TYPRM_` to the environment variable name
 when you set the define of the environment variable.
 If you do not add the prefix, you can refer to it with `$`
 which is not escaped with `\` on the command line,
-but you cannot refer to it in the search keyword input mode.
+but you cannot refer to it in typrm shell.
 The definition of the environment variable is usually written in the script file
 that starts typrm.
 
@@ -1259,7 +1264,7 @@ additionally specified in the parameter of the search command.
 
     $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'  0  #// Folder command
 
-When you enter search keyword input mode and display the file path
+When you enter typrm shell and display the file path
 with the `#ref:` tag, the prompt changes to `keyword or number:`.
 If you enter only numbers in this state, the command will be executed.
 If you enter a non-numeric number, you can do the same as

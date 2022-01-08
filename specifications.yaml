@@ -1,3 +1,7 @@
+Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
+    main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
+    拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:
+    ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです:
 Test >> reset 2_replace_6_if both:  #keyword: typrm reset 2_replace_6_if both
     replace command:
         settingTree.currentSettings:

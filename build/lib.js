@@ -593,7 +593,7 @@ const objectIDs = new WeakMap;
 var objectCount = 0;
 // User interface group
 // InputOption
-class InputOption {
+export class InputOption {
     constructor(inputLines) {
         this.inputLines = inputLines;
         this.nextLineIndex = 0;
@@ -608,6 +608,10 @@ const inputOption = new InputOption([
     String.raw `file`,
 */
 ]);
+// setInputOption
+export function setInputOption(option) {
+    Object.assign(inputOption, option);
+}
 // input
 // #keyword: lib.ts input
 // Example: const name = await input('What is your name? ');
@@ -711,6 +715,9 @@ class StandardInputBuffer {
 const InputObject = new StandardInputBuffer();
 export function getInputObject() {
     return InputObject;
+}
+export function cutEscapeSequence(textWithEscapeSequence) {
+    return textWithEscapeSequence.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
 // getSnapshot
 export function getSnapshot(label, deafultSnapshot = undefined) {

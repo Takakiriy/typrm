@@ -46,6 +46,13 @@ export declare namespace hasInterfaceOf {
     function Error(object: any): object is Error;
 }
 export declare function getObjectID(object: any): any;
+export declare class InputOption {
+    inputLines: string[];
+    nextLineIndex: number;
+    nextParameterIndex: number;
+    constructor(inputLines: string[]);
+}
+export declare function setInputOption(option: InputOption): void;
 export declare function input(guide: string): Promise<string>;
 export declare function inputPath(guide: string): Promise<string>;
 export declare function inputSkip(count: number): void;
@@ -60,6 +67,7 @@ declare class StandardInputBuffer {
     close(): void;
 }
 export declare function getInputObject(): StandardInputBuffer;
+export declare function cutEscapeSequence(textWithEscapeSequence: string): string;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
 export declare function pp(message: any): string[];
 export declare const debugOut: string[];

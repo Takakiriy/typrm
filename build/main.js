@@ -38,6 +38,9 @@ export async function mainMain() {
     if (verboseMode) {
         printConfig();
     }
+    if ('input' in programOptions) {
+        lib.setInputOption(new lib.InputOption(programOptions.input.split('\n')));
+    }
     if (programArguments.length === 0) {
         await search();
     }
@@ -90,7 +93,7 @@ export async function mainMain() {
             else {
                 var inputFilePath = programArguments[1];
             }
-            await revert(inputFilePath);
+            await reset(inputFilePath);
         }
         else {
             await search();
@@ -959,13 +962,13 @@ function cutReplaceToTag(line) {
             // added tag: SetB    #to: NewSetB  #template: __B__
             // replaced:  NewSetB    #template: __B__
             // reverted:  SetB    #template: __B__
-            line = line.substr(0, toLabelIndex) + line.substr(commentIndex + 1);
+            line = line.substring(0, toLabelIndex) + line.substring(commentIndex + 1);
         }
         else {
             // added tag: SetB    #to: NewSetB
             // replaced:  NewSetB
             // reverted:  SetB
-            line = line.substr(0, toLabelIndex).trimRight();
+            line = line.substring(0, toLabelIndex).trimRight();
         }
     }
     return line;
@@ -1466,35 +1469,34 @@ class WordPositions {
 }
 // replace
 async function replace(inputFileOrFolderPath) {
-    var errorCount = 0;
+    await replaceMain(inputFileOrFolderPath, 'replace');
+}
+// reset
+async function reset(inputFileOrFolderPath) {
+    await replaceMain(inputFileOrFolderPath, 'reset');
+}
+// replaceMain
+async function replaceMain(inputFileOrFolderPath, command) {
+    const parser = new Parser();
+    const currentFolderBackUp = process.cwd();
     try {
-        for (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
-            await replaceSub(inputFilePath, 'replace');
+        for await (const inputFilePath of await listUpFilePaths(inputFileOrFolderPath)) {
+            await replaceSub(inputFilePath, parser, command);
         }
     }
     catch (e) {
         console.log('');
         console.log('Exception: ' + e.toString());
-        console.log(`${translate('Warning')}: 0, ${translate('Error')}: 1`);
-        throw e;
+        parser.errorCount += 1;
     }
-}
-// revert
-async function revert(inputFilePath) {
-    var errorCount = 0;
-    try {
-        for (const inputFileFullPath of await listUpFilePaths(inputFilePath)) {
-            await replaceSub(inputFileFullPath, 'reset');
-        }
+    finally {
+        process.chdir(currentFolderBackUp);
     }
-    catch (e) {
-        console.log('');
-        console.log(`${translate('Warning')}: 0, ${translate('Error')}: 1`);
-    }
+    console.log('');
+    console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
 }
 // replaceSub
-async function replaceSub(inputFilePath, command) {
-    const parser = new Parser();
+async function replaceSub(inputFilePath, parser, command) {
     parser.command = CommandEnum.replace;
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
@@ -1604,6 +1606,9 @@ async function replaceSub(inputFilePath, command) {
             }
             else {
                 const templateTag = parseTemplateTag(line, parser);
+                if (templateTag.isFound) {
+                    parser.templateCount += 1;
+                }
                 if (templateTag.isFound && templateTag.includesKey(replacingKeys)
                     && toTagTree.currentIsOutOfFalseBlock) {
                     const replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
@@ -1835,14 +1840,23 @@ async function replaceSub(inputFilePath, command) {
     finally {
         deleteFileSync(updatingFilePath);
     }
-    console.log('');
-    console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
 }
 // check
 async function check(checkingFilePath) {
     const parser = new Parser();
-    for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
-        await checkRoutine(inputFileFullPath, parser);
+    const currentFolderBackUp = process.cwd();
+    try {
+        for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
+            await checkRoutine(inputFileFullPath, parser);
+        }
+    }
+    catch (e) {
+        console.log('');
+        console.log('Exception: ' + e.toString());
+        parser.errorCount += 1;
+    }
+    finally {
+        process.chdir(currentFolderBackUp);
     }
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
@@ -1870,7 +1884,7 @@ async function listUpFilePaths(checkingFilePath) {
                     inputFileFullPaths.push(inputFileFullPath);
                 }
                 else {
-                    notFoundPaths.push(inputFileFullPath);
+                    notFoundPaths.push(getTestablePath(inputFileFullPath));
                 }
             }
             if (inputFileFullPaths.length === 0) {
@@ -1889,7 +1903,7 @@ async function listUpFilePaths(checkingFilePath) {
         for (const folder of targetFolders) {
             const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder);
             if (!fs.existsSync(targetFolderFullPath)) {
-                throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
+                throw new Error(`Not found target folder at "${getTestablePath(targetFolderFullPath)}".`);
             }
             process.chdir(targetFolderFullPath);
             const scanedPaths = await globby([`**/${wildcard}`]);
@@ -1914,6 +1928,9 @@ function checkLineNoConfilict(keyValue, key, newValue, parser) {
         }
     }
 }
+// shell
+async function shell() {
+}
 // search
 async function search() {
     const startIndex = (programArguments[0] === 's' || programArguments[0] === 'search') ? 1 : 0;
@@ -1922,6 +1939,9 @@ async function search() {
     const openDocument_ = 2;
     const printRef_ = 3;
     const runVerb_ = 4;
+    const check_ = 5;
+    const replace_ = 6;
+    const reset_ = 7;
     if (keyword !== '') {
         const lastWord = programArguments.length === 0 ? '' : programArguments[programArguments.length - 1];
         const hasVerb = numberRegularExpression.test(lastWord);
@@ -1946,7 +1966,7 @@ async function search() {
             runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
         }
     }
-    else { // keyword === ''
+    else { // if keyword === ''
         lib.inputSkip(startIndex);
         var previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
@@ -1954,6 +1974,7 @@ async function search() {
             if (previousPrint.hasVerbMenu) {
                 var prompt = 'keyword or number:';
             }
+            // typrm shell
             const keyword = await lib.input(chalk.yellow(prompt) + ' ');
             if (keyword === 'exit()') {
                 break;
@@ -1976,6 +1997,15 @@ async function search() {
                 else if (hasRefTag(keyword)) {
                     command = printRef_;
                 }
+                else if (hasCheckTag(keyword)) {
+                    command = check_;
+                }
+                else if (hasReplaceTag(keyword)) {
+                    command = replace_;
+                }
+                else if (hasResetTag(keyword)) {
+                    command = reset_;
+                }
                 if (command === search_) {
                     previousPrint = await searchSub(keyword, false);
                     if (previousPrint.hasFindMenu) {
@@ -1996,6 +2026,36 @@ async function search() {
                 else if (command === runVerb_) {
                     const verbNumber = keyword;
                     runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
+                }
+                else if (command === check_) {
+                    const spaceIndex = keyword.indexOf(' ');
+                    if (spaceIndex === notFound) {
+                        var filePath = '';
+                    }
+                    else {
+                        var filePath = keyword.substring(spaceIndex + 1).trim();
+                    }
+                    await check(filePath);
+                }
+                else if (command === replace_) {
+                    const spaceIndex = keyword.indexOf(' ');
+                    if (spaceIndex === notFound) {
+                        var filePath = '';
+                    }
+                    else {
+                        var filePath = keyword.substring(spaceIndex + 1).trim();
+                    }
+                    await replace(filePath);
+                }
+                else if (command === reset_) {
+                    const spaceIndex = keyword.indexOf(' ');
+                    if (spaceIndex === notFound) {
+                        var filePath = '';
+                    }
+                    else {
+                        var filePath = keyword.substring(spaceIndex + 1).trim();
+                    }
+                    await reset(filePath);
                 }
             }
             if (keyword === 'q' || keyword === 'quit' || keyword === 'exit') {
@@ -2958,6 +3018,23 @@ function unscapePercentByte(value) {
 // hasRefTag
 function hasRefTag(keywords) {
     return keywords.trim().startsWith(refLabel);
+}
+// hasCheckTag
+function hasCheckTag(keywords) {
+    keywords = keywords.trim();
+    return keywords === '#c' || keywords.startsWith('#c ') ||
+        keywords === '#check' || keywords.startsWith('#check ');
+}
+// hasReplaceTag
+function hasReplaceTag(keywords) {
+    keywords = keywords.trim();
+    return keywords === '#r' || keywords.startsWith('#r ') ||
+        keywords === '#replace' || keywords.startsWith('#replace ');
+}
+// hasResetTag
+function hasResetTag(keywords) {
+    keywords = keywords.trim();
+    return keywords === '#reset' || keywords.startsWith('#reset ');
 }
 // hasNumberTag
 function hasNumberTag(keywords) {

@@ -658,7 +658,7 @@ var  objectCount = 0;
 // User interface group
 
 // InputOption
-class InputOption {
+export class InputOption {
     inputLines: string[];
     nextLineIndex: number;
     nextParameterIndex: number;  // The index of the starting process parameters
@@ -679,6 +679,11 @@ const inputOption = new InputOption([
     String.raw `file`,
 */
 ]);
+
+// setInputOption
+export function  setInputOption(option: InputOption) {
+    Object.assign(inputOption, option);
+}
 
 // input
 // #keyword: lib.ts input
@@ -795,6 +800,10 @@ class  StandardInputBuffer {
 const  InputObject = new StandardInputBuffer();
 export function  getInputObject(): StandardInputBuffer {
     return  InputObject;
+}
+
+export function  cutEscapeSequence(textWithEscapeSequence: string) {
+    return  textWithEscapeSequence.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
 
 // getSnapshot
