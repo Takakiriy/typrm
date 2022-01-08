@@ -616,7 +616,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
 
         // Set condition by "#if:" tag.
         const  ifPosition = ifLabelRE.exec(line);
-        if (ifPosition) {
+        if (ifPosition  &&  ! line.includes(disableLabel)) {
             const  condition = getValue(line, ifPosition.index + ifPosition[0].length);
 
             tree.settings[currentSettingIndex] = {... tree.settings[currentSettingIndex], ... setting};
@@ -1496,7 +1496,7 @@ class  IfTagParser {
             }
         }
 
-        if (line.includes(ifLabel)) {
+        if (ifLabelRE.exec(line)  &&  ! line.includes(disableLabel)) {
             expression = line.substring(line.indexOf(ifLabel) + ifLabel.length).trim();
 
             const  evaluatedContidion = evaluateIfCondition(expression, setting, this.parser, previsousEvalatedKeys);
@@ -1521,6 +1521,13 @@ class  IfTagParser {
                 enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_});
             this.isReplacable_ = isReplacable;
         }
+    }
+
+    // setPosition
+    setPosition(filePath: string, line: string, lineNum: number) {
+        this.parser.filePath = filePath;
+        this.parser.lineNum = lineNum;
+        this.parser.line = line;
     }
 }
 
@@ -3531,6 +3538,7 @@ class SettingsTree {
                     if (condition === '') {
                         condition = 'true';
                     }
+                    ifTagParser.setPosition(parser.filePath, condition, lineNum);
 
                     ifTagParser.evaluate(`#if: ${condition}`, currentSettings);
                     if (ifTagParser.thisIsOutOfFalseBlock) {  // #if: true

@@ -34,7 +34,7 @@ if (process.env.windir) {
 }
 
 async function  main() {
-    if (false) {
+    if (true) {
         await DoCustomDebug();
     } else {
         await TestOfCommandLine();
@@ -46,7 +46,8 @@ async function  main() {
 async function  DoCustomDebug() {
     const  returns = await callChildProccess(
         `node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, {inputLines: [ /*exit()*/ ]});
+        `c /Users/totadashi/Documents/typrm/JavaScript.yaml`, {inputLines: [ /*exit()*/ ]});
+//        `search  --folder test_data/search/1`, {inputLines: [ /*exit()*/ ]});
     console.log(`(typrm_test.ts stdout) ${returns.stdout}`);
     console.log('Done');
 }

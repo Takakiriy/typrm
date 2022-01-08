@@ -122,6 +122,7 @@ describe("checks template value >>", () => {
         ["settings_tree_deep"],
         ["settings_tree_position"],
         ["settings_tree_if"],
+        ["settings_tree_if_disable"],
         ["settings_tree_error"],
 
     ])("%s", async (fileNameHead) => {

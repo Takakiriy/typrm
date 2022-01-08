@@ -1342,6 +1342,15 @@ settings:
 "
 `;
 
+exports[`replaces settings >> replace to tag >> settings_tree_if_disable: sourceFileContents 1`] = `
+"settings:
+    variable1: value1
+    #if: var1 != value1  #disable-tag-tool:
+        variable2: value2
+val__ue2: #template: variable2
+"
+`;
+
 exports[`checks template value >> settings_tree_position: answer 1`] = `
 "
 Warning: 0, Error: 0
