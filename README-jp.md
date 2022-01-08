@@ -518,21 +518,25 @@ typrm を使うには Node.js のインストールが必要です。
 
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
         Windows スタート >> PowerShell（と入力）:
-            cd  ${env:USERPROFILE}\Downloads
-            Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
-            rm -r -fo  "typrm-master"  #// 更新するとき
-            Expand-Archive -Path typrm.zip -DestinationPath "."
+            cd  "${env:USERPROFILE}\Downloads"
+            Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile "typrm.zip"
+                #// develop ブランチの場合は、master.zip を develop.zip に変更して実行してください
+            rm -r -fo  "typrm-master"  #// 初めてインストールするときは実行不要です
+                #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
+            Expand-Archive  -Path "typrm.zip"  -DestinationPath "."
             cd  "typrm-master"
+                #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
 
             npm install --only=production
 
     PowerShell を使う場合:
         PowerShell の PATH が通ったフォルダーに typrm を起動する PS1 スクリプト ファイル を作ります:
             Windows スタート >> PowerShell（と入力） :
+                ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
                 cd  ${env:USERPROFILE}\Downloads\typrm-master
+                    #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
                 ${current_folder} = Convert-Path "."
                 ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
-                ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
                 echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
@@ -552,10 +556,11 @@ typrm を使うには Node.js のインストールが必要です。
             - 他のインストール オプションはデフォルトを使用
         PATH が通ったフォルダーに typrm を起動する bash スクリプト ファイル を作ります:
             フォルダーを右クリック >> Git bash :
+                script="${HOME}/bin/typrm"
                 cd  ${HOME}/Downloads/typrm-master
+                    #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
                 current_folder="$(pwd)"
                 typrm_folder="${HOME}/Documents/typrm"
-                script="${HOME}/bin/typrm"
                 mkdir -p "${HOME}/bin"
 
                 echo  "export  NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
@@ -571,6 +576,12 @@ typrm を使うには Node.js のインストールが必要です。
 
     必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
+    アンインストールする場合、下記のファイルやフォルダーを削除し、不要なら Node.js をアンインストールします。
+        - ${HOME}/bin/typrm （固有の設定はバックアップしてください）
+        - ${HOME}/Downloads/typrm.zip
+        - ${HOME}/Downloads/typrm-master
+        - ${HOME}/Downloads/typrm-develop（存在する場合のみ）
+
 ### mac の場合
 
     Node.js をインストールします:
@@ -580,22 +591,26 @@ typrm を使うには Node.js のインストールが必要です。
 
     typrm をダウンロードして展開し、typrm が使う Node.js パッケージをインストールします:
         #// Launchpad >> Terminal
-        cd  ~/Downloads
+        cd  "${HOME}/Downloads"
         setopt interactivecomments
             #// enables comment symbol (#)
-        curl -o typrm.zip -kL https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip 
-        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// 更新するとき
-        unzip -o typrm.zip
-        mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
-        cd  typrm
+        curl -o "typrm.zip"  -kL https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip 
+            #// develop ブランチの場合は、master.zip を develop.zip に変更して実行してください
+        rm -rf  "typrm-master"  #// 初めてインストールするときは実行不要です
+            #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
+        unzip -o  "typrm.zip"
+        cd  "typrm-master"
+            #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
 
         npm install --only=production
 
     PATH が通ったフォルダーに typrm を起動する スクリプト ファイル を作ります:
-        cd typrm  #// Zip ファイルを展開したフォルダー
+        script="${HOME}/bin/typrm"
+        cd  "${HOME}/Downloads/typrm-master"  #// Zip ファイルを展開したフォルダー
+            #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
         typrm_folder="${HOME}/Documents/typrm"
-        script="$HOME/bin/typrm"
-        rm -f  "${script}"  #// 更新するとき
+        mkdir -p "${HOME}/bin"
+        rm -f  "${script}"  #// 初めてインストールするときは実行不要です
 
         echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
@@ -610,6 +625,12 @@ typrm を使うには Node.js のインストールが必要です。
         typrm --version
 
     必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+
+    アンインストールする場合、下記のファイルやフォルダーを削除し、不要なら Node.js をアンインストールします。
+        - rm  "${HOME}/bin/typrm" （固有の設定はバックアップしてください）
+        - rm  "${HOME}/Downloads/typrm.zip"
+        - rm -rf  "${HOME}/Downloads/typrm-master"
+        - rm -rf  "${HOME}/Downloads/typrm-develop"（存在する場合のみ）
 
 ### CentOS 7 の場合
 
@@ -638,19 +659,24 @@ typrm を使うには Node.js のインストールが必要です。
         mkdir -p ~/Downloads
         cd  ~/Downloads
         curl -L -O https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        mv  master.zip  typrm.zip
-        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// 更新するとき
-        unzip -o typrm.zip
-        mv  typrm-master  typrm  #// Zip ファイルを展開したフォルダー
-        cd  typrm
+            #// develop ブランチの場合は、master.zip を develop.zip に変更して実行してください
+        rm -f  "typrm.zip"  #// 初めてインストールするときは実行不要です
+        mv  "master.zip"  "typrm.zip"
+        rm -rf  "typrm-master"  #// 初めてインストールするときは実行不要です
+            #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
+        unzip -o  "typrm.zip"
+        cd  "typrm-master"
+            #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
 
         npm install --only=production
 
     PATH が通ったフォルダーに typrm を起動する bash スクリプト ファイル を作ります:
-        cd  ${HOME}/Downloads/typrm
-        typrm_folder="${HOME}/Documents/typrm"
         script="${HOME}/bin/typrm"
+        cd  "${HOME}/Downloads/typrm-master"  #// Zip ファイルを展開したフォルダー
+            #// develop ブランチの場合は、typrm-master を typrm-develop に変更して実行してください
+        typrm_folder="${HOME}/Documents/typrm"
         mkdir -p "${HOME}/bin"
+        rm -f  "${script}"  #// 初めてインストールするときは実行不要です
 
         echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
@@ -667,9 +693,10 @@ typrm を使うには Node.js のインストールが必要です。
     必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     （使わなくなったら）typrm を削除します:
-        - rm ~/bin/typrm
-        - rm ~/Downloads/typrm.zip
-        - rm -rf ~/Downloads/typrm/
+        - rm  "${HOME}/bin/typrm"   （固有の設定はバックアップしてください）
+        - rm  "${HOME}/Downloads/typrm.zip"
+        - rm -rf  "${HOME}/Downloads/typrm-master"
+        - rm -rf  "${HOME}/Downloads/typrm-develop"  （存在する場合のみ）
 
 
 ## 設定タグと #template タグを使って設定値を置き換えます

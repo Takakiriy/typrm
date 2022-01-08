@@ -536,21 +536,25 @@ To use typrm, you must install Node.js.
 
     Download and expand typrm and install Node.js packages used by typrm:
         Windows Start >> (Input) PowerShell :
-            cd  ${env:USERPROFILE}\Downloads
-            Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile typrm.zip
-            rm -r -fo  "typrm-master"  #// When you are updating
-            Expand-Archive -Path typrm.zip -DestinationPath "."
+            cd  "${env:USERPROFILE}\Downloads"
+            Invoke-WebRequest  https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip -OutFile "typrm.zip"
+                #// For the develop branch, change master.zip to develop.zip
+            rm -r -fo  "typrm-master"  #// No need to run when installing for the first time
+                #// For the develop branch, change typrm-master to typrm-develop
+            Expand-Archive  -Path "typrm.zip"  -DestinationPath "."
             cd  "typrm-master"
+                #// For the develop branch, change typrm-master to typrm-develop
 
             npm install --only=production
 
     If you use PowerShell:
         Create a PS1 script file that launches typrm into the folder where PATH of PowerShell:
             Windows Start >> (Input) PowerShell :
+                ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
                 cd  ${env:USERPROFILE}\Downloads\typrm-master
+                    #// For the develop branch, change typrm-master to typrm-develop
                 ${current_folder} = Convert-Path "."
                 ${typrm_folder} = "${env:USERPROFILE}\Documents\typrm"
-                ${script} = "${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1"
 
                 echo  "`${env:NODE_PATH} = `"${current_folder}\node_modules`"" > ${script}
                 echo  "`${env:TYPRM_FOLDER} = `"${typrm_folder}`"" >> "${script}"
@@ -570,10 +574,11 @@ To use typrm, you must install Node.js.
             - Other installation options are defaults
         Create a bash script file that launches typrm into the folder where PATH passed:
             Right click at any folder >> Git bash :
+                script="${HOME}/bin/typrm"
                 cd  ${HOME}/Downloads/typrm-master
+                    #// For the develop branch, change typrm-master to typrm-develop
                 current_folder="$(pwd)"
                 typrm_folder="${HOME}/Documents/typrm"
-                script="${HOME}/bin/typrm"
                 mkdir -p "${HOME}/bin"
 
                 echo  "export  NODE_PATH=\"${HOME}/AppData/Roaming/npm/node_modules\"" > ${script}
@@ -589,6 +594,12 @@ To use typrm, you must install Node.js.
 
     Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
+    To uninstall, delete the following files and folders, and uninstall Node.js if you don't need it.
+        - ${HOME}/bin/typrm  (Back up your unique settings)
+        - ${HOME}/Downloads/typrm.zip
+        - ${HOME}/Downloads/typrm-master
+        - ${HOME}/Downloads/typrm-develop  (If it exists)
+
 ### For mac
 
     Install Node.js:
@@ -598,22 +609,26 @@ To use typrm, you must install Node.js.
 
     Download and expand typrm and install Node.js packages used by typrm:
         #// Launchpad >> Terminal
-        cd  ~/Downloads
+        cd  "${HOME}/Downloads"
         setopt interactivecomments
             #// enables comment symbol (#)
-        curl -o typrm.zip -kL https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip 
-        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you are updating
-        unzip -o typrm.zip
-        mv  typrm-master  typrm  #// The folder extracted from the Zip file
-        cd  typrm
+        curl -o "typrm.zip"  -kL https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip 
+            #// For the develop branch, change master.zip to develop.zip
+        rm -rf  "typrm-master"  #// No need to run when installing for the first time
+            #// For the develop branch, change typrm-master to typrm-develop
+        unzip -o  "typrm.zip"
+        cd  "typrm-master"
+            #// For the develop branch, change typrm-master to typrm-develop
 
         npm install --only=production
 
     Make the script file in the PATH folder to start typrm:
-        cd typrm  #// The folder extracted from the Zip file
+        script="${HOME}/bin/typrm"
+        cd  "${HOME}/Downloads/typrm-master"  #// The folder extracted from the Zip file
+            #// For the develop branch, change typrm-master to typrm-develop
         typrm_folder="${HOME}/Documents/typrm"
-        script="$HOME/bin/typrm"
-        rm -f  "${script}"  #// When you are updating
+        mkdir -p "${HOME}/bin"
+        rm -f  "${script}"  #// No need to run when installing for the first time
 
         echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
@@ -628,6 +643,12 @@ To use typrm, you must install Node.js.
         typrm --version
 
     Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+
+    To uninstall, delete the following files and folders, and uninstall Node.js if you don't need it.
+        - rm  "${HOME}/bin/typrm"  (Back up your unique settings)
+        - rm  "${HOME}/Downloads/typrm.zip"
+        - rm -rf  "${HOME}/Downloads/typrm-master"
+        - rm -rf  "${HOME}/Downloads/typrm-develop"  (If it exists)
 
 ### For CentOS 7
 
@@ -656,19 +677,24 @@ To use typrm, you must install Node.js.
         mkdir -p ~/Downloads
         cd  ~/Downloads
         curl -L -O https://github.com/Takakiriy/typrm/archive/refs/heads/master.zip
-        mv  master.zip  typrm.zip
-        rm -rf  typrm-old  &&  mv  typrm  typrm-old  #// When you are updating
-        unzip -o typrm.zip
-        mv  typrm-master  typrm  #// The folder extracted from the Zip file
-        cd  typrm
+            #// For the develop branch, change master.zip to develop.zip
+        rm -f  "typrm.zip"  #// No need to run when installing for the first time
+        mv  "master.zip"  "typrm.zip"
+        rm -rf  "typrm-master"  #// No need to run when installing for the first time
+            #// For the develop branch, change typrm-master to typrm-develop
+        unzip -o  "typrm.zip"
+        cd  "typrm-master"
+            #// For the develop branch, change typrm-master to typrm-develop
 
         npm install --only=production
 
     Create a bash script file that launches typrm into the folder where PATH passed:
-        cd  ${HOME}/Downloads/typrm
-        typrm_folder="${HOME}/Documents/typrm"
         script="${HOME}/bin/typrm"
+        cd  "${HOME}/Downloads/typrm-master"  #// The folder extracted from the Zip file
+            #// For the develop branch, change typrm-master to typrm-develop
+        typrm_folder="${HOME}/Documents/typrm"
         mkdir -p "${HOME}/bin"
+        rm -f  "${script}"  #// No need to run when installing for the first time
 
         echo  "export  NODE_PATH=\"$(pwd)/node_modules\"" >> "${script}"
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
@@ -685,10 +711,10 @@ To use typrm, you must install Node.js.
     Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     (If you do not use) delete typrm:
-        - rm ~/bin/typrm
-        - rm ~/Downloads/typrm.zip
-        - rm -rf ~/Downloads/typrm/
-
+        - rm  "${HOME}/bin/typrm"  (Back up your unique settings)
+        - rm  "${HOME}/Downloads/typrm.zip"
+        - rm -rf  "${HOME}/Downloads/typrm-master"
+        - rm -rf  "${HOME}/Downloads/typrm-develop"  (If it exists)
 
 ## settings tag and #template tag: replaces settings values
 
