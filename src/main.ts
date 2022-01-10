@@ -492,7 +492,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         }
 
         // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+        if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
             isReadingSetting = true;
 
             if (indent === '') {
@@ -699,7 +699,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
         }
 
         // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+        if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
             isReadingSetting = true;
             settingIndentLength = indentRegularExpression.exec(line)![0].length;
             previousTemplateTag = null;
@@ -844,7 +844,7 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
         }
 
         // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+        if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
             isReadingSetting = true;
             settingIndentLength = indentRegularExpression.exec(line)![0].length;
         } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
@@ -1663,7 +1663,7 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
                 }
             }
 
-            if (settingStartLabel.test(line.trim())  ||  settingStartLabelEn.test(line.trim())) {
+            if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
                 isSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)![0].length;
                 if ( ! templateIfKeyError) {
@@ -4583,8 +4583,7 @@ if (process.env.windir) {
 } else {
     var  runningOS = 'Linux';
 }
-const  settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
-const  settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
+const  settingLabel = /(^| )#settings:/;
 const  originalLabel = "#original:";
 const  toLabel = "#to:";  // replace to tag
 const  toTestLabel = "#to-test:";

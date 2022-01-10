@@ -66,13 +66,13 @@ To enable typrm, make the file as follows:
 
 new_folder.yaml
 
-    settings:
+    settings: #settings:
         __Name__: work1
     shell:
         - mkdir work1  #template: __Name__
         - cd    work1  #template: __Name__
 
-Write "variable_name: value" at `settings:` for the part you want to change to.
+Write "variable_name: value" at `#settings:` for the part you want to change to.
 Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
@@ -81,7 +81,7 @@ Write the `#template:` tag at the end of the same line as the part you want to c
 Write the `#to:` tag and the value after replacing
 at the right of the value of the variable in the setting.
 
-    settings:
+    settings: #settings:
         __Name__: work1  #to: work2
 
 (You can write `#to:` tag out of settings.)
@@ -114,7 +114,7 @@ new_folder.yaml file will be chaned to the following contents and you can copy a
 You can paste the text with the comment as it is,
 because  # is treated as a comment in many shells.
 
-    settings:
+    settings: #settings:
         __Name__: work2  #original: work1
     shell:
         - mkdir work2  #template: __Name__
@@ -157,14 +157,14 @@ at the right of the variable value.
 
 Example before adding the `#to:` tag:
 
-    settings:
+    settings: #settings:
         __Name__: workA1
         __Name__: workB1  #// comment
         __Name__: workC1  #// comment
 
 Example after adding the `#to:` tag:
 
-    settings:
+    settings: #settings:
         __Name__: workA1  #to: workA2
         __Name__: workB1  #to: workB2  #// comment
         __Name__: workC1  #// comment  #to: workC2
@@ -180,7 +180,7 @@ Input command:
 
 Contents after command execution:
 
-    settings:
+    settings: #settings:
         __Name__: workA2  #original: workA1
         __Name__: workB2  #original: workB1  #// comment
         __Name__: workC2  #original: workC1  #// comment
@@ -192,7 +192,7 @@ Also, add a line with only the `#to:` tag
 between the line of the target `#template:` tag
 and the line of the next `#template:` tag.
 
-    settings:
+    settings: #settings:
         __NameA__: workA1
         __NameB__: workB1
     shell:
@@ -253,7 +253,7 @@ Input command:
 
 Contents after command execution:
 
-    example.yaml:64:     settings:
+    example.yaml:64:     settings: #settings:
     example.yaml:65:         __NameA__: workA1
     example.yaml:66:         __NameB__: workB1
     example.yaml:68:         (workA1 : @@@ workB1)  #template: (__NameA__ : __NameB__)
@@ -723,12 +723,25 @@ To use typrm, you must install Node.js.
 
 ## settings tag and #template tag: replaces settings values
 
+(For 1.1.x version)
+
+About the text you want to replace, write `variable name: value`
+with deeper indentation below `#settings:`.
+
+    settings: #settings:
+        __ProjectName__: react1
+        __npxOption__: --template typescript
+
+(For 0.x, 1.0.x version)
+
 About the text you want to replace, write `variable name: value`
 with deeper indentation below `settings:`.
 
     settings:
         __ProjectName__: react1
         __npxOption__: --template typescript
+
+(For all versions)
 
 Also, write `#template:` tag at the right of the same line as the text that replaces,
 or write `#template:` tag to the entire next line.
@@ -759,25 +772,25 @@ If neither match is matched, an error occurs.
 
 The sample to match before replacing, when replacing `__ProjectName__` with react2:
 
-    settings:
+    settings: #settings:
         __ProjectName__: react1
     cd  "react1"  #template: "__ProjectName__"
 
 The sample that match after replacement, when replacing `__ProjectName__` with react2:
 
-    settings:
+    settings: #settings:
         __ProjectName__: react1
     cd  "react2"  #template: "__ProjectName__"
 
 The sample that an error occurs, because `"react1"` is not matched:
 
-    settings:
+    settings: #settings:
         __ProjectName__: react1
     cd  "react11"  #template: "__ProjectName__"
 
 In the above case, if you do not enclose the value of the `#template:` tag in " ", the error will not occur, but if you can visually judge that it is correct, you do not need to enclose it.
 
-    settings:
+    settings: #settings:
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
 
@@ -799,15 +812,15 @@ When specifying a template that contains `"%`, write`""%25"`.
 - (version 1.x) You can nest settings.
     In the space character indent tree structure,
     it can be referenced from the descendants of
-    the parent node of `setting:` that defines the variable.
+    the parent node of `#settings:` that defines the variable.
     If a variable with the same name as the variable defined
-    in `Setting:` in the parent direction is also defined
-    in `Setting:` in the child direction,
+    in `#settings:` in the parent direction is also defined
+    in `#settings:` in the child direction,
     the value defined in the child direction is referenced.
 
 Example:
 
-    settings:
+    settings: #settings:
         __Name__: project1
         main:
             __MainID__: 123      #// Define __MainID__ not main.__MainID__
@@ -824,6 +837,8 @@ List of variables defined in the above settings:
 
 
 ### Setting name
+
+(For 0.x version only)
 
 If you wrote a setting name, you can specify the setting name
 instead of the line number to be replaced
@@ -861,7 +876,7 @@ by seeing the symbol or other words only, if you use the `#template-if:` tag.
 Also, set the symbol or other word to the value of `template-if(yes)` variable
 and `template-if(no)` variable.
 
-    settings:
+    settings: #settings:
         OS: Windows  #// Windows or mac
         template-if(yes): 🌟
         template-if(no):  💤
@@ -878,7 +893,7 @@ To replace it, type the below command with the replace command.
 Replacing the value of OS variable from Windows to mac for the above file,
 symbols that guide to read or not read the phrase will be replaced.
 
-    settings:
+    settings: #settings:
         OS: mac  #// Windows or mac
         template-if(yes): 🌟
         template-if(no):  💤
@@ -999,7 +1014,7 @@ when you run the check command.
 
 `__Project__/root.yaml file`:
 
-    settings:
+    settings: #settings:
         __Stage__: develop
     a part of ./my.json:  #file-template: ./my.json
         "stage": "develop"  #template: "__Stage__"
@@ -1014,7 +1029,7 @@ If you change the settings as below, an error will occur.
 
 __Project__/root.yaml file:
 
-    settings:
+    settings: #settings:
         __Stage__: product
     a part of ./my.json:  #file-template: ./my.json
         "stage": "product"  #template: "__Stage__"
@@ -1067,10 +1082,10 @@ the check content written on the next line is searched in the target file.
 ## #if tag: set conditions
 
 When there is a relationship between one setting and another,
-write the `#if:` tag inside the `settings:`.
+write the `#if:` tag inside the `#settings:`.
 You can set the value according to the conditions.
 
-    settings:
+    settings: #settings:
         target: banana
         banana:  #if: $settings.target == banana
             __Color__:  yellow
@@ -1101,7 +1116,7 @@ that meet the following format.
     #if: true
     #if: false
 
-`__SettingsName__` is the variable name written in `Settings:`.
+`__SettingsName__` is the variable name written in `#settings:`.
 `__EnvName__` is the name of the environment variable.
 If no environment variable is defined, it will be "".
 For example, the condition that it is Windows is written as follows
@@ -1114,7 +1129,7 @@ If you write a `#if:` tag out of setting,
 it will check whether the contents of the `#template:` tag and the
 `#file-template:` tag match only when the conditions are met.
 
-    settings:
+    settings: #settings:
         __Stage__: develop
     command:
         when release:  #if: $settings.__Stage__ != develop
@@ -1140,7 +1155,7 @@ Usually used at the same time as the `#if:` tag.
 
 Example:
 
-    settings:
+    settings: #settings:
         __Write__: yes    #// yes or no
         __BackUp__: yes   #// yes or no
     write method:  #if: $settings.__Write__ == yes
@@ -1614,6 +1629,7 @@ You can set the break point, click at the left of line number of the source file
 - `#ref:` Path of linked file
 - `#search:` Keywords when searching for links
 - `#(search)if:` Conditions for enabling search
+- `#settings:` setting variables
 - `#template:` Template for replacing the body
 - `#template-at():` Template for replacing the body above two or more lines
 - `#template-if:` Conditions that determine the content to be included in the text

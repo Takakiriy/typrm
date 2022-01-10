@@ -67,13 +67,13 @@ typrm が使えるようにするには、ファイルを以下のようにし�
 
 new_folder.yaml
 
-    設定:
+    設定: #settings:
         __Name__: work1
     shell:
         - mkdir work1  #template: __Name__
         - cd    work1  #template: __Name__
 
-`設定:` に変更する部分に関する 変数名: 値 を書きます。
+`#settings:` に変更する部分に関する 変数名: 値 を書きます。
 変更する部分と同じ行の末尾に `#template:` タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
@@ -81,7 +81,7 @@ new_folder.yaml
 
 設定の中の変数の値の右に `#to:` タグと置き換えた後の値を書きます。
 
-    設定:
+    設定: #settings:
         __Name__: work1  #to: work2
 
 （`#to:` タグは設定以外にも書くことができます。）
@@ -103,10 +103,10 @@ bash や PowerShell から以下のように `replace` コマンドを入力し�
 ファイル パス は、キーボードから入力しなくても、
 ファイルをドラッグ＆ドロップして入力できます。
 
-4 は行番号の例です。`設定:` が書いてある行、またはそれより下、
-または次の `設定:` が書いてある行より上であれば、
+4 は行番号の例です。`#settings:` が書いてある行、またはそれより下、
+または次の `#settings:` が書いてある行より上であれば、
 どの行番号を入力しても構いません。
-ファイルの中に `設定:` が 1つだけのときは行番号を省略できます。
+ファイルの中に `#settings:` が 1つだけのときは行番号を省略できます。
 行番号の代わりに設定名を指定する方法は後で説明します。
 
 （すべてのバージョン）
@@ -115,7 +115,7 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 コメントの付いたテキストはそのまま貼り付けることができます。# は
 多くのシェルでコメントとして扱われるからです。
 
-    設定:
+    設定: #settings:
         __Name__: work2  #original: work1
     shell:
         - mkdir work2  #template: __Name__
@@ -157,14 +157,14 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
 `#to:` タグを追加する前のサンプル:
 
-    設定:
+    設定: #settings:
         __Name__: workA1
         __Name__: workB1  #// comment
         __Name__: workC1  #// comment
 
 `#to:` タグを追加した後のサンプル:
 
-    設定:
+    設定: #settings:
         __Name__: workA1  #to: workA2
         __Name__: workB1  #to: workB2  #// comment
         __Name__: workC1  #// comment  #to: workC2
@@ -181,7 +181,7 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
 コマンド実行後の内容:
 
-    設定:
+    設定: #settings:
         __Name__: workA2  #original: workA1
         __Name__: workB2  #original: workB1  #// comment
         __Name__: workC2  #original: workC1  #// comment
@@ -191,7 +191,7 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 または、対象の `#template:` タグの行から、次の `#template:` タグの行の間に、
 `#to:` タグだけの行を追加します。
 
-    設定:
+    設定: #settings:
         __NameA__: workA1
         __NameB__: workB1
     shell:
@@ -248,7 +248,7 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 
 コマンド実行後の内容:
 
-    example.yaml:64:     設定:
+    example.yaml:64:     設定: #settings:
     example.yaml:65:         __NameA__: workA1
     example.yaml:66:         __NameB__: workB1
     example.yaml:68:         (workA1 : @@@ workB1)  #template: (__NameA__ : __NameB__)
@@ -707,12 +707,25 @@ typrm を使うには Node.js のインストールが必要です。
 
 ## 設定タグと #template タグを使って設定値を置き換えます
 
-置き換えるテキストは、`設定:` または `setting:` が書かれた行の下に、
+（バージョン 1.1.0 以降の場合）
+
+置き換えるテキストは、`#settings:` が書かれた行の下に、
+インデントを深くして `変数名: 値` を書きます。
+
+    設定: #settings:
+        __ProjectName__: react1
+        __npxOption__: --template typescript
+
+（バージョン 1.0.x 以前の場合）
+
+置き換えるテキストは、`設定:` または `settings:` が書かれた行の下に、
 インデントを深くして `変数名: 値` を書きます。
 
     設定:
         __ProjectName__: react1
         __npxOption__: --template typescript
+
+（すべてのバージョン）
 
 また、`#template:` タグを置き換えるテキストと同じ行の右、または、次の行全体に書きます。
 
@@ -742,25 +755,25 @@ typrm を使うには Node.js のインストールが必要です。
 
 `__ProjectName__` を react2 に置き換えるときに、置き換える前にマッチするサンプル:
 
-    設定:
+    設定: #settings:
         __ProjectName__: react1
     cd  "react1"  #template: "__ProjectName__"
 
 `__ProjectName__` を react2 に置き換えるときに、置き換えた後にマッチするサンプル:
 
-    設定:
+    設定: #settings:
         __ProjectName__: react1
     cd  "react2"  #template: "__ProjectName__"
 
 `"react1"` にマッチしないために、エラーになるサンプル:
 
-    設定:
+    設定: #settings:
         __ProjectName__: react1
     cd  "react11"  #template: "__ProjectName__"
 
 なお、上記の場合、`#template:` タグの値を " " で囲まないとエラーになりませんが、目視で正しいと判断できれば囲む必要はありません。
 
-    設定:
+    設定: #settings:
         __ProjectName__: react1
     cd  "react1"  #template: __ProjectName__
 
@@ -780,13 +793,13 @@ typrm を使うには Node.js のインストールが必要です。
     `設定:` より上の `設定:` で定義された変数は参照できません
 - (version 1.x) 設定をネストできます。
     空白文字によるインデントのツリー構造において、
-    変数を定義した `設定:` の親ノードの子孫…ノードから参照できます。
-    親方向にある `設定:` で定義した変数と同じ名前の変数が
-    子方向にある `設定:` でも定義されていたら、子方向で定義した値が参照されます。
+    変数を定義した `#settings:` の親ノードの子孫…ノードから参照できます。
+    親方向にある `#settings:` で定義した変数と同じ名前の変数が
+    子方向にある `#settings:` でも定義されていたら、子方向で定義した値が参照されます。
 
 サンプル
 
-    設定:
+    設定: #settings:
         __Name__: project1
         main:
             __MainID__: 123      #// main.__MainID__ ではなく __MainID__ の定義
@@ -802,6 +815,8 @@ typrm を使うには Node.js のインストールが必要です。
 `__Name__`, `__MainID__`, `__MainValue__`, `__SubID__`, `__SubValue__`
 
 ### 設定名
+
+（バージョン 1.0.x 以前のみ）
 
 設定名を付けると replace コマンドや reset コマンドで置き換える対象の設定を
 行番号の代わりに設定名で指定できるようになります。
@@ -837,7 +852,7 @@ typrm を使うには Node.js のインストールが必要です。
 記号を見るだけで判断できるようになります。
 その記号などは `template-if(yes)` 変数の値と `template-if(no)` 変数の値に設定します。
 
-    設定:
+    設定: #settings:
         OS: Windows  #// Windows または mac
         template-if(yes): 🌟
         template-if(no):  💤
@@ -854,7 +869,7 @@ typrm を使うには Node.js のインストールが必要です。
 OS 変数の値を Windows から mac に置き換えると、
 読むべきかどうかを表す記号も置き変わります。
 
-    設定:
+    設定: #settings:
         OS: mac  #original: Windows  #// Windows または mac
         template-if(yes): 🌟
         template-if(no):  💤
@@ -964,12 +979,12 @@ example.yaml:
     typrm check __FileName__
 
 たとえば、下記にように書くと、`my.json` ファイルの中の設定値が、
-`設定:` タグに書かれた設定値と同じことをチェックするようになります。
+`#settings:` タグに書かれた設定値と同じことをチェックするようになります。
 同じでなければ check コマンドを実行したときにエラーが表示されます。
 
 `__Project__/root.yaml` ファイル:
 
-    設定:
+    設定: #settings:
         __Stage__: develop
     ./my.json の一部:  #file-template: ./my.json
         "stage": "develop"  #template: "__Stage__"
@@ -984,7 +999,7 @@ example.yaml:
 
 `__Project__/root.yaml` ファイル:
 
-    設定:
+    設定: #settings:
         __Stage__: product
     ./my.json の一部:  #file-template: ./my.json
         "stage": "product"  #template: "__Stage__"
@@ -1030,10 +1045,10 @@ example.yaml:
 ## #if タグを使って条件を設定します
 
 ある設定値と別の設定値の間に関連があるときは、
-`設定:` または `settings:` の中に `#if:` タグを書いて、
+`#settings:` の中に `#if:` タグを書いて、
 条件に応じた値を設定することができます。
 
-    設定:
+    設定: #settings:
         target: banana
         banana:  #if: $settings.target == banana
             __Color__:  yellow
@@ -1061,7 +1076,7 @@ crow の次の行の `__Color__` は置き換えません。
     #if: true
     #if: false
 
-`__SettingsName__` は、`設定:` に書かれている変数名です。
+`__SettingsName__` は、`#settings:` に書かれている変数名です。
 `__EnvName__` は、環境変数名です。
 環境変数が定義されていないときは "" になります。
 たとえば、Windows であるという条件は、Windows でデフォルトで定義されていて
@@ -1073,7 +1088,7 @@ Windows 以外では定義しない環境変数 `windir` を使って下記の�
 `#template:` タグや `#file-template:` タグによる内容が
 合っているかどうかのチェックをするようになります。
 
-    設定:
+    設定: #settings:
         __Stage__: develop
     コマンド:
         リリース時:  #if: $settings.__Stage__ != develop
@@ -1096,7 +1111,7 @@ Windows 以外では定義しない環境変数 `windir` を使って下記の�
 
 サンプル:
 
-    設定:
+    設定: #settings:
         __Write__: yes    #// yes or no
         __BackUp__: yes   #// yes or no
     write メソッド:  #if: $settings.__Write__ == yes
@@ -1545,6 +1560,7 @@ Jest を使うテストと Jest を使わないテストがあります。
 - `#ref:` リンク先のファイルのパス
 - `#search:` リンク先を検索するときのキーワード
 - `#(search)if:` 検索を有効にする条件
+- `#settings:` 変数の設定
 - `#template:` 本文を置き換えるときのテンプレート
 - `#template-at():` 2行以上上の本文を置き換えるときのテンプレート
 - `#template-if:` 本文に入れる内容を決める条件
