@@ -13,6 +13,7 @@ async function  callMain() {
         .option("-l, --locale <s>")
         .option("-t, --test")
         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
+        .option("-n, --found-count-max <i>", "Max number of showing found lines in search", main.foundCountMaxDefault)
         .option("--color")
         .option("--thesaurus <>", "The thesaurus CSV file path", process.env.TYPRM_THESAURUS)
         .option("--replace-mode")

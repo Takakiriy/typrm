@@ -2154,8 +2154,20 @@ async function searchSub(keyword, isMutual) {
     const keyphraseWordCount = keyword.split(' ').length;
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
     foundLines.sort(compareScore);
+    const foundCountMax = parseInt(programOptions.foundCountMax);
+    if (foundLines.length > foundCountMax) {
+        console.log(`... (` + translate(`To show more result, restart typrm with --found-count-max option`) + ')');
+        var startFoundIndex = foundLines.length - foundCountMax;
+    }
+    else {
+        var startFoundIndex = 0;
+    }
+    var foundCount = 0;
     for (const foundLineInformation of foundLines) {
-        console.log(foundLineInformation.toString());
+        if (foundCount >= startFoundIndex) {
+            console.log(foundLineInformation.toString());
+        }
+        foundCount += 1;
     }
     if (foundLines.length >= 1 && lastOf(foundLines).line.includes(refLabel)) {
         const foundLine = lastOf(foundLines).line;
@@ -4002,6 +4014,7 @@ function translate(englishLiterals, ...values) {
             "${0}a quote is found inside a field${1}": "${0}フィールド内に引用符があります${1}",
             "Not found. To do full text search, press Enter key.": "見つかりません。全文検索するときは Enter キーを押してください。",
             "template target values after replace are conflicted.": "変数の値を置き換えた後のテンプレートのターゲットが矛盾しています",
+            "To show more result, restart typrm with --found-count-max option": "もっと多くの結果を表示するときは --found-count-max オプションを指定して typrm を再起動します",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -4060,6 +4073,9 @@ export async function callMainFromJest(parameters, options) {
     }
     else {
         programOptions = {};
+    }
+    if (!('foundCountMax' in programOptions)) {
+        programOptions.foundCountMax = foundCountMaxDefault.toString();
     }
     try {
         startTestRedirect();
@@ -4130,4 +4146,5 @@ var withJest = false;
 export var stdout = '';
 export var programArguments = [];
 export var programOptions = {};
+export const foundCountMaxDefault = "10";
 //# sourceMappingURL=main.js.map

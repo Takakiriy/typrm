@@ -794,7 +794,7 @@ describe("searches keyword tag >>", () => {
         ],[
             "output order (3)",  // word count > word length > different case
             ["search", "grape"],
-            { folder: "test_data/search/2", test: "" },
+            { folder: "test_data/search/2", test: "", foundCountMax: "99" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + `     #keyword: ${matchedColor('GRAPE')}fruit juice\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + `     #keyword: ${matchedColor('GRAPE')}fruit juice\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + `     #keyword: ${matchedColor('grape')}fruit juice\n` +
@@ -836,6 +836,21 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + `     #keyword: ${matchedColor('Tool')} ${matchedColor('release')} now\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + `     #keyword: ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + `     #keyword: ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n`,
+        ],[
+            "many result",
+            ["search", "hello"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            '... (To show more result, restart typrm with --found-count-max option)\n' +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':99:') + `     #keyword: ${matchedColor('hello')} world\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':101:') + `     #keyword: ${matchedColor('hello')} world\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':103:') + `     #keyword: ${matchedColor('hello')} world\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':105:') + `     #keyword: ${matchedColor('hello')} world\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':96:') + `     #keyword: ${matchedColor('hello')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':98:') + `     #keyword: ${matchedColor('hello')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':100:') + `     #keyword: ${matchedColor('hello')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':102:') + `     #keyword: ${matchedColor('hello')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':104:') + `     #keyword: ${matchedColor('hello')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':106:') + `     #keyword: ${matchedColor('hello')}\n`,
         ],[
             "without tag parameter",  // test_of_without_tag_parameter
             ["search", "specular"],
@@ -884,7 +899,7 @@ describe("searches keyword tag >>", () => {
             return;
         }
 
-        await callMain(arguments_, options);
+        await  callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
     });
 

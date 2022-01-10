@@ -94,4 +94,5 @@ export declare var programArguments: string[];
 export declare var programOptions: {
     [key: string]: any;
 };
+export declare const foundCountMaxDefault = "10";
 export {};
