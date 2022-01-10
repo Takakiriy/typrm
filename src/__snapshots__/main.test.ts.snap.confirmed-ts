@@ -443,82 +443,82 @@ exports[`checks template value >> 1_template_1_ok: sourceFileContents 1`] = `
 
 exports[`checks template value >> 1_template_2_error: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:6:         __Key2__: value2  #コメント
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:12:         - echo  \\"value  2\\"
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:13:             #template: - echo  \\"__Key2__\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         __Key2__: value2  #コメント
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:         - echo  \\"value  2\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:             #template: - echo  \\"__Key2__\\"
     Warning: Not matched with the template.
     Expected: - echo  \\"value2\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:5:         key1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:14:         - v1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:15:             #template: - key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:         key1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         - v1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:             #template: - key1
     Warning: Not matched with the template.
     Expected: - value1
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:8:         Key3: value3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:16:         - __ \\"value3\\"
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:17:             #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:         - __ \\"value3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:             #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:8:         Key3: value3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:18:         - __ \\"value3\\"  #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         - __ \\"value3\\"  #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:25:         - value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:26:             #template: - key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:25:         - value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:             #template: - key1
     Warning: Not matched with the template.
     Expected: - value11
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:27:         - １行に２つのケース： value1, value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:28:             #template: key1, key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         - １行に２つのケース： value1, value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             #template: key1, key1
     Warning: Not matched with the template.
     Expected: value11, value11
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:29:         - １行に２つのケース： value11, value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:30:             #template: key1, key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29:         - １行に２つのケース： value11, value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:             #template: key1, key1
     Warning: Not matched with the template.
     Expected: value11, value11
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:31:         - ２行上のケース： \\"value11x\\"
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:33:             #template-at(-2): \\"key1\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         - ２行上のケース： \\"value11x\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:             #template-at(-2): \\"key1\\"
     Warning: Not matched with the template.
     Expected: \\"value11\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:34:         - ３行上のケース： \\"value11x\\"
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:37:             #template-at(-3): \\"key1\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         - ３行上のケース： \\"value11x\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37:             #template-at(-3): \\"key1\\"
     Warning: Not matched with the template.
     Expected: \\"value11\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:22:         key1: value11
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:38:         - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38:         - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
     Warning: Not matched with the template.
     Expected: \\"value11\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:40: #template-at(1): \\"key1\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:40: #template-at(1): \\"key1\\"
     Error: The parameter must be less than 0
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:42: #template-at(2): \\"key1\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42: #template-at(2): \\"key1\\"
     Error: The parameter must be less than 0
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:21:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_2_error_1.yaml:43:         - value  #template: __Undefined__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:43:         - value  #template: __Undefined__
     Warning: Not matched with the template.
     Expected: __Undefined__
 
@@ -578,84 +578,84 @@ exports[`checks template value >> 1_template_2_error: sourceFileContents 1`] = `
 exports[`checks template value >> 1_template_3_if: answer 1`] = `
 "
 Error of duplicated variable name:
-  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:82
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:82
   ContentsA: target1: banana
-  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:84
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:84
   ContentsB: target1: yellow
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:6:             __Setting1__: yes
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:27:         - no  #template: __Setting1__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:             __Setting1__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         - no  #template: __Setting1__
     Warning: Not matched with the template.
     Expected: yes
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:12:             __Setting2__: yes
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:28:         - no  #template: __Setting2__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:             __Setting2__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:         - no  #template: __Setting2__
     Warning: Not matched with the template.
     Expected: yes
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:14:             __Env1__: yes
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:29:         - no  #template: __Env1__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:             __Env1__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29:         - no  #template: __Env1__
     Warning: Not matched with the template.
     Expected: yes
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:20:             __Env2__: yes
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:30:         - no  #template: __Env2__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:             __Env2__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:         - no  #template: __Env2__
     Warning: Not matched with the template.
     Expected: yes
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:3:         fruit: banana
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:31:         - no  #template: fruit
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:         fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         - no  #template: fruit
     Warning: Not matched with the template.
     Expected: banana
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:2:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:4:         bird: swan
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:32:         - no  #template: bird
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         bird: swan
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         - no  #template: bird
     Warning: Not matched with the template.
     Expected: swan
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:35:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:39:         fish: yes
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:41:         - no  #template: fish
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:35:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39:         fish: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:         - no  #template: fish
     Warning: Not matched with the template.
     Expected: yes
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:44:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:45:         fruit: banana
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:50:         - 💤  #template-if: $settings.fruit == banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:45:         fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50:         - 💤  #template-if: $settings.fruit == banana
     Warning: Not matched with the template.
     Expected: 🌟
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:58
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58
   Contents: $settings.color1 == black
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:59
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59
   Contents: $settings.color1 != yellow
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:62
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:62
   Contents: false
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:70
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:70
   Contents: $settings.color1 == black
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:71
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:71
   Contents: $settings.color1 != yellow
 
 Error of not expected condition:
-  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:74
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:74
   Contents: false
 
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1_template_3_if_1.yaml:84
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:84
   Not referenced: target1
 
 Warning: 9, Error: 7
@@ -819,21 +819,21 @@ value1, value2  #template: var1, var2
 exports[`checks template value >> settings >> 2 not same values error: answer 1`] = `
 "
 Error of duplicated variable name:
-  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
   ContentsA: var1: value1
-  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4
   ContentsB: var1: value111
 
 Error of duplicated variable name:
-  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3
   ContentsA: var2: value2
-  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5
   ContentsB: var2: value222
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var1: value111
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value222
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: value1, value2  #template: var1, var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var1: value111
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value222
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: value1, value2  #template: var1, var2
     Warning: Not matched with the template.
     Expected: value111, value222
 
@@ -884,74 +884,74 @@ value1, value2, value3  #template: var1, var2, var3
 
 exports[`checks template value >> settings >> 3e overwrite error: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var3: value3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: .....1, .....2, .....3  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: .....1, .....2, .....3  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value2, value3
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var3: value3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: .....1, .....2, .....3  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: .....1, .....2, .....3  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value2, value3
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11:         var3: value33
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8:     .....1, .....22, .....33  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     .....1, .....22, .....33  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value33
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11:         var3: value33
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12:     .....1, .....22, .....33  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:     .....1, .....22, .....33  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value33
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15:         settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16:             var3: value333
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14:         .....1, .....22, .....333  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:             var3: value333
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         .....1, .....22, .....333  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value333
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15:         settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16:             var3: value333
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17:         .....1, .....22, .....333  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:             var3: value333
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         .....1, .....22, .....333  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value333
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         var2: value22
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11:         var3: value33
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18:     .....1, .....22, .....33  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:     .....1, .....22, .....33  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value22, value33
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4:     var2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var3: value3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: .....1, .....2, .....3  #template: var1, var2, var3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: .....1, .....2, .....3  #template: var1, var2, var3
     Warning: Not matched with the template.
     Expected: value1, value2, value3
 
@@ -985,9 +985,9 @@ level 1:
 
 exports[`checks template value >> settings >> 4 neighbor error: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
     Warning: double settings are not supported.
-    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
 
 Warning: 1, Error: 0
 template count = 1
@@ -1007,9 +1007,9 @@ settings: #settings:
 
 exports[`checks template value >> settings >> 4-2 neighbor level 2 error: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7
     Warning: double settings are not supported.
-    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
 
 Warning: 1, Error: 0
 template count = 1
@@ -1069,7 +1069,7 @@ main:
 
 exports[`checks template value >> settings_tree_deep: answer 1`] = `
 "
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_deep_1.yaml:36
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36
   Not referenced: __11A__
 
 Warning: 1, Error: 0
@@ -1127,65 +1127,65 @@ __1A__-2:  #template: __1A__-2
 
 exports[`checks template value >> settings_tree_error: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:22:     __A__: ValueA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:1: BadA:  #template: __A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: BadA:  #template: __A__
     Warning: Not matched with the template.
     Expected: ValueA
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:22:     __A__: ValueA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:3:     BadA:  #template: __A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     BadA:  #template: __A__
     Warning: Not matched with the template.
     Expected: ValueA
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:7:         __1A__: Value1A
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:4:     Bad1A:  #template: __1A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __1A__: Value1A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     Bad1A:  #template: __1A__
     Warning: Not matched with the template.
     Expected: Value1A
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:5:     Bad11A:  #template: __11A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     Bad11A:  #template: __11A__
     Warning: Not matched with the template.
     Expected: __11A__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:9:         settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:10:             __11A__: Value11A
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:11:         Bad11A:  #template: __11A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:             __11A__: Value11A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         Bad11A:  #template: __11A__
     Warning: Not matched with the template.
     Expected: Value11A
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:22:     __A__: ValueA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:12:     BadA:  #template: __A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:     BadA:  #template: __A__
     Warning: Not matched with the template.
     Expected: ValueA
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:7:         __1A__: Value1A
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:13:     Bad1A:  #template: __1A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __1A__: Value1A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:     Bad1A:  #template: __1A__
     Warning: Not matched with the template.
     Expected: Value1A
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:14:     Bad11A:  #template: __11A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     Bad11A:  #template: __11A__
     Warning: Not matched with the template.
     Expected: __11A__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:21: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:6:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:18:                 settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:19:                     __111A__: Value111A
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_error_1.yaml:20:                 Bad111A:  #template: __111A__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:                 settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:                     __111A__: Value111A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:                 Bad111A:  #template: __111A__
     Warning: Not matched with the template.
     Expected: Value111A
 
@@ -1222,10 +1222,10 @@ settings: #settings:
 
 exports[`checks template value >> settings_tree_if: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:26: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:10:         settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:15:                     __C__: ValueC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_1.yaml:7:             test error  #template: __C__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:                     __C__: ValueC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:             test error  #template: __C__
     Warning: Not matched with the template.
     Expected: ValueC
 
@@ -1272,13 +1272,13 @@ settings: #settings:
 
 exports[`checks template value >> settings_tree_if_disable: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:4:         variable2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:5: val__ue2: #template: variable2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         variable2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: val__ue2: #template: variable2
     Warning: Not matched with the template.
     Expected: value2
 
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:2
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
   Not referenced: variable1
 
 Warning: 2, Error: 0
@@ -1318,15 +1318,15 @@ settings: #settings:
 
 exports[`checks template value >> template_if_1_error: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:1: 設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:2:     __Stage__: develop
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:6:     🌟 case product:  #template-if: $settings.__Stage__ == product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     🌟 case product:  #template-if: $settings.__Stage__ == product
     Warning: Not matched with the template.
     Expected: 💤
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:1: 設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:2:     __Stage__: develop
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/template_if_1_error_1.yaml:7:     💤 case product:  #template-if: $settings.__Stage__ == develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     💤 case product:  #template-if: $settings.__Stage__ == develop
     Warning: Not matched with the template.
     Expected: 🌟
 
@@ -1350,16 +1350,16 @@ exports[`checks template value >> template_if_1_error: sourceFileContents 1`] = 
 
 exports[`checks template value >> var_not_ref_1_error: answer 1`] = `
 "
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:3
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3
   Not referenced: key1
 
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:6
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
   Not referenced: Key3
 
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:13
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13
   Not referenced: key1
 
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/var_not_ref_1_error_1.yaml:14
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14
   Not referenced: __Key2__
 
 Warning: 4, Error: 0
@@ -1392,77 +1392,77 @@ exports[`checks template value >> verbose: answer 1`] = `
 "Verbose: typrm command: check
 Verbose: Phase 1: parse settings ...
 Verbose: settings /1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2: settings
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
 Verbose: settings /1/a
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
 Verbose: settings /1/b
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7:     var2: not value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     var2: not value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
 Verbose: settings /1/c
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
 Verbose: settings /1/d
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
 Verbose: settings /1/e
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
 Verbose: settings /1/f
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
 Verbose: settings /1/g
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
 Verbose: settings /1/h
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
 Verbose: Phase 2: check ...
 Verbose: settings /1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:1: settings:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:     var1: value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:     var2: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:7: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:3:         var1: value1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:8:     bad  #template: var1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:         var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     bad  #template: var1
     Warning: Not matched with the template.
     Expected: value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:             var2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10:         bad2  #template: var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:10: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:12: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:             var2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14:         bad2  #template: var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:14: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:16: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:17: #if: true
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:2:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:5:             var2: value2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18:         bad2  #template: var2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:18: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/check_verbose.yaml:19: #if: false
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
 
 Warning: 4, Error: 0
 template count = 7
@@ -1526,7 +1526,7 @@ value1: #template: key1
 `;
 
 exports[`replaces settings >> in 1_replace: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_replace_1_changing.yaml:2: #to: key1: value1_replaced
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
 "
@@ -1540,9 +1540,9 @@ value1_replaced: #template: key1
 `;
 
 exports[`replaces settings >> in 2_replace_1_ok setting 1: answer 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_changing/2_replace_1_ok_1_changing.yaml:5: #to: key1: value1changed
-\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_changing/2_replace_1_ok_1_changing.yaml:6: #to: __Key2__: value2changed
-\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #to: Key3: value3changed
+"\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_tmp/_tmp.yaml:5: #to: key1: value1changed
+\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_tmp/_tmp.yaml:6: #to: __Key2__: value2changed
+\${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
 
 Warning: 0, Error: 0
 template count = 8
@@ -1550,9 +1550,9 @@ template count = 8
 `;
 
 exports[`replaces settings >> in 2_replace_1_ok setting 1: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:5: #to: key1: value1changed
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:6: #to: __Key2__: value2changed
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #to: Key3: value3changed
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: key1: value1changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __Key2__: value2changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
 
 Warning: 0, Error: 0
 "
@@ -1663,18 +1663,18 @@ exports[`replaces settings >> in 2_replace_1_ok setting 2 lineNum: updatedFileCo
 `;
 
 exports[`replaces settings >> in 2_replace_1_ok setting 2: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27: #to: key1: value1changed
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27: #to: key1: value1changed
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8:         Key3: value3  #original: oldValue3  #コメント
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:18:         - \\"value3changed\\"
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:19:             #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #original: oldValue3  #コメント
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         - \\"value3changed\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:             #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8:         Key3: value3  #original: oldValue3  #コメント
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:21:         - \\"value3changed\\"  #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #original: oldValue3  #コメント
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:         - \\"value3changed\\"  #template: - \\"Key3\\"
     Warning: Not matched with the template.
     Expected: - \\"value3\\"
 
@@ -1840,7 +1840,7 @@ value1%#: #template: key1\\"%25\\"#
 `;
 
 exports[`replaces settings >> in 2_replace_1A_end_of_template: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1A_end_of_template_1_changing.yaml:2: #to: key1: value1changed
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1changed
 
 Warning: 0, Error: 0
 "
@@ -1890,11 +1890,11 @@ exports[`replaces settings >> in 2_replace_2_error: sourceFileContents 1`] = `
 `;
 
 exports[`replaces settings >> in 2_replace_2_error: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:8: #to: Key3: value3changed
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:8:         Key3: value3  #to: value3changed
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_2_error_1_changing.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #to: value3changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
     Error: Not found any replacing target. Modify the template target to old or new value.
     Expected: - \\"value3\\"
 
@@ -1985,11 +1985,11 @@ Process B:
 `;
 
 exports[`replaces settings >> in 2_replace_3_English: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:8: #to: Key3: value3changed
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:4:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:8:         Key3: value3  #コメント  #to: value3changed
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_3_English_1_changing.yaml:21:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #コメント  #to: value3changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:         - \\"value3_bad\\"  #template: - \\"Key3\\"
     Error: Not found any replacing target. Modify the template target to old or new value.
     Expected: - \\"value3\\"
 
@@ -2080,11 +2080,11 @@ exports[`replaces settings >> in 2_replace_4_Japanese: sourceFileContents 1`] = 
 `;
 
 exports[`replaces settings >> in 2_replace_4_Japanese: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:8: #to: Key3: value3changed
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:4:     設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:8:         Key3: value3  #to: value3changed
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_4_Japanese_1_changing.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #to: value3changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
     エラー: 置き換える対象が見つかりません。 テンプレートの対象を古い値または新しい値に修正してください。
     期待: - \\"value3\\"
 
@@ -2145,8 +2145,8 @@ exports[`replaces settings >> in 2_replace_6_if both (2): inputFile 1`] = `
 `;
 
 exports[`replaces settings >> in 2_replace_6_if both: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #to: fruit: melon
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7: #to: __Setting1__: replaced
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: fruit: melon
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #to: __Setting1__: replaced
 
 Warning: 0, Error: 0
 "
@@ -2172,7 +2172,7 @@ exports[`replaces settings >> in 2_replace_6_if both: updatedFileContents 1`] = 
 `;
 
 exports[`replaces settings >> in 2_replace_6_if in if block: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #to: __Setting1__: replaced
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __Setting1__: replaced
 
 Warning: 0, Error: 0
 "
@@ -2198,7 +2198,7 @@ exports[`replaces settings >> in 2_replace_6_if in if block: updatedFileContents
 `;
 
 exports[`replaces settings >> in 2_replace_6_if in if variable: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #to: fruit: melon
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: fruit: melon
 
 Warning: 0, Error: 0
 "
@@ -2260,9 +2260,9 @@ exports[`replaces settings >> in 2_replace_7_undefined_if: sourceFileContents 1`
 `;
 
 exports[`replaces settings >> in 2_replace_7_undefined_if: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_7_undefined_if_1_changing.yaml:3: #to: fruit: apple
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: fruit: apple
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_7_undefined_if_1_changing.yaml:2: settings
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
     Error: Defined variables are decreased
     Not defined variables: __Setting1__
 
@@ -2288,7 +2288,7 @@ exports[`replaces settings >> in 2_replace_7_undefined_if: updatedFileContents 1
 `;
 
 exports[`replaces settings >> in 2_replace_8_one_setting without line num: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_8_one_setting_1_changing.yaml:3: #to: key1: changed1
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: key1: changed1
 
 Warning: 0, Error: 0
 "
@@ -2330,7 +2330,7 @@ exports[`replaces settings >> in 2_replace_9_template_if_1_OK: sourceFileContent
 `;
 
 exports[`replaces settings >> in 2_replace_9_template_if_1_OK: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_1_OK_1_changing.yaml:2: #to: __Stage__: develop
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
 
 Warning: 0, Error: 0
 "
@@ -2360,11 +2360,11 @@ exports[`replaces settings >> in 2_replace_9_template_if_2_NG: sourceFileContent
 `;
 
 exports[`replaces settings >> in 2_replace_9_template_if_2_NG: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:2: #to: __Stage__: develop
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:1: 設定: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:2:     __Stage__: product  #to: develop
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_2_NG_1_changing.yaml:6:     case product:  #template-if: $settings.__Stage__ == product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: product  #to: develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     case product:  #template-if: $settings.__Stage__ == product
     Error: Not found any replacing target. Modify the template target to old or new value.
     Expected: 🌟
 
@@ -2391,12 +2391,12 @@ exports[`replaces settings >> in 2_replace_9_template_if_3_not_set: sourceFileCo
 `;
 
 exports[`replaces settings >> in 2_replace_9_template_if_3_not_set: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_3_not_set_1_changing.yaml:2: #to: __Stage__: develop
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_3_not_set_1_changing.yaml:4:     🌟 case product:  #template-if: $settings.__Stage__ == product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     🌟 case product:  #template-if: $settings.__Stage__ == product
   Error: template-if tag related settings are not defined
   Solution: Set the variable template-if(yes) and template-if(no)
-  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_3_not_set_1_changing.yaml:1
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
 
 Warning: 0, Error: 1
 "
@@ -2428,7 +2428,7 @@ exports[`replaces settings >> in 2_replace_9_template_if_4_operators: sourceFile
 `;
 
 exports[`replaces settings >> in 2_replace_9_template_if_4_operators: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_9_template_if_4_operators_1_changing.yaml:2: #to: __Stage__: develop
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
 
 Warning: 0, Error: 0
 "
@@ -2452,9 +2452,9 @@ exports[`replaces settings >> in 2_replace_9_template_if_4_operators: updatedFil
 `;
 
 exports[`replaces settings >> in 2_replace_10_double_check 1_OK: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #to: __Full__: fo/fi
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3: #to: __Folder__: fo
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #to: __File__: fi
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Full__: fo/fi
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Folder__: fo
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __File__: fi
 
 Warning: 0, Error: 0
 "
@@ -2483,70 +2483,70 @@ check:
 `;
 
 exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #to: __Full__: fo/fi
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #to: __File__: fi
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Full__: fo/fi
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __File__: fi
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
     Error: template target values after replace are conflicted.
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1: settings: #settings:
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: folder/file  #to: fo/fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: folder
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: file  #to: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Full__: folder/file  #to: fo/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Folder__: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     __File__: file  #to: fi
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:10:         #template: \\"__Full__\\"
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         #template: \\"__Full__\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
         Before Replacing: \\"folder/file\\"
         After  Replacing: \\"fo/fi\\"
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"fo/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"fo/fi\\"
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:11:         #template-at(-2): __Folder__/__File__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         #template-at(-2): __Folder__/__File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
         Before Replacing: folder/file
         After  Replacing: folder/fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/fi\\"
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:12:         #template-at(-3): __Folder__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:         #template-at(-3): __Folder__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
         Before Replacing: folder
         After  Replacing: folder
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:13:         #template-at(-4): __File__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         #template-at(-4): __File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
         Before Replacing: file
         After  Replacing: fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:9:     - \\"folder/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/fi\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
     Error: template target values after replace are conflicted.
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:1: settings: #settings:
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2:     __Full__: folder/file  #to: fo/fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3:     __Folder__: folder
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4:     __File__: file  #to: fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Full__: folder/file  #to: fo/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Folder__: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     __File__: file  #to: fi
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:15:         #template-at(-1): __File__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         #template-at(-1): __File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
         Before Replacing: file
         After  Replacing: fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/fi\\"
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:16:         #template-at(-2): __Folder__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:         #template-at(-2): __Folder__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
         Before Replacing: folder
         After  Replacing: folder
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:17:         #template-at(-3): __Folder__/__File__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         #template-at(-3): __Folder__/__File__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
         Before Replacing: folder/file
         After  Replacing: folder/fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/fi\\"
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:18:         #template-at(-4): \\"__Full__\\"
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"folder/file\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         #template-at(-4): \\"__Full__\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
         Before Replacing: \\"folder/file\\"
         After  Replacing: \\"fo/fi\\"
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:14:     - \\"fo/fi\\"
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"fo/fi\\"
 
 Warning: 0, Error: 2
 "
@@ -2625,8 +2625,8 @@ check:
 `;
 
 exports[`replaces settings >> in 2_replace_11_nested_if AB: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:59: #to: __Switch_02__: B
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_02__: B
 
 Warning: 0, Error: 0
 "
@@ -2717,8 +2717,8 @@ case B after:  #if: $settings.__Switch_01__ == B
 `;
 
 exports[`replaces settings >> in 2_replace_11_nested_if BA: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #to: __Switch1__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:58: #to: __Switch_01__: B
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58: #to: __Switch_01__: B
 
 Warning: 0, Error: 0
 "
@@ -2809,10 +2809,10 @@ case B after:  #if: $settings.__Switch_01__ == B
 `;
 
 exports[`replaces settings >> in 2_replace_11_nested_if BB: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #to: __Switch1__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:58: #to: __Switch_01__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:59: #to: __Switch_02__: B
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58: #to: __Switch_01__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_02__: B
 
 Warning: 0, Error: 0
 "
@@ -2903,7 +2903,7 @@ case B after:  #if: $settings.__Switch_01__ == B
 `;
 
 exports[`replaces settings >> in 2_replace_11_nested_if C: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:17: #to: __Set2__: CC
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Set2__: CC
 
 Warning: 0, Error: 0
 "
@@ -3249,28 +3249,28 @@ new body:
 `;
 
 exports[`replaces settings >> replace to tag >> 1_OK: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:2: #to: __SettingA__: SetAA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:3: #to: __SettingB__: SetB#
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:4: #to: __SettingC__: SetCCCC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:5: #to: __SettingD__: SetDD
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:6: #to: __SettingE__: SetEE
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:7: #to: __SettingF__: SetFF
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:9: #to: __SettingG__: SetGG
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:28: #to: __BodyA__: ValueAA
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:30: #to: __BodyB__: ValueBB
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:33: #to: __BodyC__: ValueCC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:36: #to: __BodyC2__: ValueCC2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:41: #to: __BodyAt1__: ValueAtAt1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:43: #to: __BodyAt2__: ValueAtAt2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:44: #to: __BodyAt3__: ValueAtAt3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:47: #to: __BodyD__: ValueDD
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:48: #to: __BodyE__: ValueEE
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyF1__: ValueFF1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:49: #to: __BodyF2__: ValueFF2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:50: #to: __BodyG1__: ValueGG1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:50: #to: __BodyG2__: ValueGG2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:53: #to: __BodyL__: Valu
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_OK_1_changing.yaml:55: #to: __SubA__: SetSubAA
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __SettingA__: SetAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __SettingB__: SetB#
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __SettingC__: SetCCCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __SettingD__: SetDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __SettingE__: SetEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #to: __SettingF__: SetFF
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #to: __SettingG__: SetGG
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28: #to: __BodyA__: ValueAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30: #to: __BodyB__: ValueBB
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33: #to: __BodyC__: ValueCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36: #to: __BodyC2__: ValueCC2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41: #to: __BodyAt1__: ValueAtAt1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:43: #to: __BodyAt2__: ValueAtAt2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44: #to: __BodyAt3__: ValueAtAt3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:47: #to: __BodyD__: ValueDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:48: #to: __BodyE__: ValueEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: #to: __BodyF1__: ValueFF1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: #to: __BodyF2__: ValueFF2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __BodyG1__: ValueGG1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __BodyG2__: ValueGG2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:53: #to: __BodyL__: Valu
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:55: #to: __SubA__: SetSubAA
 
 Warning: 0, Error: 0
 "
@@ -3295,7 +3295,7 @@ exports[`replaces settings >> replace to tag >> 2_FileParameter: sourceFileConte
 `;
 
 exports[`replaces settings >> replace to tag >> 2_FileParameter: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_FileParameter_1_changing.yaml:2: #to: __SettingA__: SetAA
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __SettingA__: SetAA
 
 Warning: 0, Error: 0
 "
@@ -3326,7 +3326,7 @@ exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: sourceFileConte
 `;
 
 exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/3_SimpleOneLoop_1_changing.yaml:4: #to: __SimpleA__: ValueAA
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __SimpleA__: ValueAA
 
 Warning: 0, Error: 0
 "
@@ -3474,12 +3474,12 @@ in body:
 `;
 
 exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:3: #to: __Switch0__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:16: #to: __Set1__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:25: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:29: #to: __Set2__: bb
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:42: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4_IfBlock_OK_1_changing.yaml:43: #to: __Set2__: bb
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch0__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:25: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: #to: __Set2__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:43: #to: __Set2__: bb
 
 Warning: 0, Error: 0
 "
@@ -3548,32 +3548,32 @@ E:
 `;
 
 exports[`replaces settings >> replace to tag >> 4E_IfBlock_Error: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:7: #to: __Set1__: bb
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:14: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:16: #to: __Set2__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:27: #to: __Set1__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:29: #to: __Set1__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:36: #to: __Switch1__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:38: #to: __Set1__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:40: #to: __Set1__: bb
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:47: #to: __Switch1__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:50: #to: __Switch2__: D
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:52: #to: __Set1__: aa
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:54: #to: __Set1__: bb
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:56: #to: __Set2__: cc
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:58: #to: __Set2__: dd
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: #to: __Set2__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:40: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:47: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __Switch2__: D
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:52: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:54: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:56: #to: __Set2__: cc
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58: #to: __Set2__: dd
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:7: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:16: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:29: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:38: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:52: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:52: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
-Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/4E_IfBlock_Error_1_changing.yaml:56: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:56: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
 
 Warning: 0, Error: 6
 "
@@ -3602,26 +3602,26 @@ C:
 `;
 
 exports[`replaces settings >> replace to tag >> 5_Conflict_Error: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:5: #to: __Set1__: B
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __Set1__: B
 
 Error of conflict #to: tag:
     variableName: __Set1__
-    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:5
-    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:6
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:6: #to: __Set1__: b
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10: #to: __Set1__: B
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __Set1__: b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: #to: __Set1__: B
 
 Error of conflict #to: tag:
     variableName: __Set1__
-    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:10
-    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:12
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:12: #to: __Set1__: b
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __Set1__: b
 
 Error of conflict #to: tag:
     variableName: __Set1__
-    valueA: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:18
-    valueB: c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:18
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/5_Conflict_Error_1_changing.yaml:18: #to: __Set1__: c
+    valueA: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18
+    valueB: c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: #to: __Set1__: c
 
 Warning: 0, Error: 3
 "
@@ -3652,7 +3652,7 @@ body:
 `;
 
 exports[`replaces settings >> replace to tag >> 6_VariousTags: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/6_VariousTags_1_changing.yaml:2: #to: __WithOriginalTag__: B
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __WithOriginalTag__: B
 
 Warning: 0, Error: 0
 "
@@ -3707,10 +3707,10 @@ body:
 `;
 
 exports[`replaces settings >> replace to tag >> 7_VariableCount: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:10: #to: __Set1A__: a
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:10: #to: __Set1B__: b
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:12: #to: __Set2A__: a
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7_VariableCount_1_changing.yaml:14: #to: __Set3B__: b
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: #to: __Set1A__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: #to: __Set1B__: b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __Set2A__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: #to: __Set3B__: b
 
 Warning: 0, Error: 0
 "
@@ -3733,25 +3733,25 @@ body:
 exports[`replaces settings >> replace to tag >> 7E_VariableCount_Error: stdout 1`] = `
 "
 Error of the value count in #to tag:
-    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6:        #to: a
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:        #to: a
     Variable count in the template tag: 2
     Variable count in the to tag: 1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6: #to: __SetA__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __SetA__: a
 
 Error of the value count in #to tag:
-    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8:        #to: a, b, c
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:        #to: a, b, c
     Variable count in the template tag: 2
     Variable count in the to tag: 3
 
 Error of conflict #to: tag:
     variableName: __SetA__
-    valueA: a in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:6
-    valueB: a, b, c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8: #to: __SetA__: a
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:8: #to: __SetB__: b
+    valueA: a in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
+    valueB: a, b, c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetA__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetB__: b
 
 Error of the value count in #to tag:
-    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/7E_VariableCount_Error_1_changing.yaml:10:        #to: a
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:        #to: a
     Variable count in the template tag: 0
     Variable count in the to tag: 1
 
@@ -3777,25 +3777,25 @@ check:
 `;
 
 exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_Error: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:12: #to: __Full__: ValueB9_ValueB9
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __Full__: ValueB9_ValueB9
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
     Error: template target values after replace are conflicted.
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:1: settings: #settings:
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:7:         __Full__: ValueB1_ValueB2
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:8:         __Part__: ValueB1
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __Full__: ValueB1_ValueB2
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         __Part__: ValueB1
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:11:         #template: __Full__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         #template: __Full__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
         Before Replacing: ValueB1_ValueB2
         After  Replacing: ValueB9_ValueB9
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB9_ValueB9
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB9_ValueB9
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:13:         #template-at(-2): __Part__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         #template-at(-2): __Part__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
         Before Replacing: ValueB1
         After  Replacing: ValueB1
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/E1_BugCase_IfBlock_DoubleCheck_Error_1_changing.yaml:10:     ValueB1_ValueB2
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
 
 Warning: 0, Error: 1
 "
@@ -3907,8 +3907,8 @@ settings: #settings:
 `;
 
 exports[`replaces settings >> replace to tag >> settings_tree_if: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/settings_tree_if_1_changing.yaml:20: #to: __C__: ValueC_Next
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/settings_tree_if_1_changing.yaml:30: #to: __A__: ValueA_Next
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20: #to: __C__: ValueC_Next
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30: #to: __A__: ValueA_Next
 
 Warning: 0, Error: 0
 "
@@ -3950,82 +3950,82 @@ settings: #settings:
 `;
 
 exports[`replaces settings >> reset >> 2_replace_1_ok setting 2 >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:8: #original: Key3: value3
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_1_ok_1_changing.yaml:27: #original: key1: value11
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #original: Key3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27: #original: key1: value11
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_6_if both >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:7: #original: __Setting1__: no
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #original: __Setting1__: no
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_6_if in if block >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_6_if in if variable >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:3: #original: fruit: banana
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: fruit: banana
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_6_if setting name >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_6_if without line num >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_6_if_1_changing.yaml:5: #original: __Setting1__: yes
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #original: __Setting1__: yes
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_10_double_check 1_OK >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:2: #original: __Full__: folder/file
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:3: #original: __Folder__: folder
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_10_double_check_1_changing.yaml:4: #original: __File__: file
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: __Full__: folder/file
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: __Folder__: folder
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #original: __File__: file
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_11_nested_if AB >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #original: __Switch2__: A
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #original: __Switch2__: A
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_11_nested_if BA >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #original: __Switch1__: A
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: __Switch1__: A
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_11_nested_if BB >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:3: #original: __Switch1__: A
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:4: #original: __Switch2__: A
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: __Switch1__: A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #original: __Switch2__: A
 
 Warning: 0, Error: 0
 "
 `;
 
 exports[`replaces settings >> reset >> 2_replace_11_nested_if C >>: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/2_replace_11_nested_if_1_changing.yaml:17: #original: __Set2__: C
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #original: __Set2__: C
 
 Warning: 0, Error: 0
 "
@@ -4045,26 +4045,26 @@ body:
 exports[`replaces settings >> verbose >> conflict: verbose 1`] = `
 "Verbose: Phase 3: replace ...
 Verbose: settings / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta
 Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2  #to: 2.00
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.00
 Verbose:     replace from: 1.2
 Verbose:     replace to  : 2.00
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 2.00  #original: 1.2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.00  #original: 1.2
 Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
 Verbose:     replace from: version 1.2 beta
 Verbose:     replace to  : ver. 2.4 beta
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
 Verbose: replace template variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
 Verbose:     replace from: 1.2
 Verbose:     replace to  : 2.00
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.00 beta)  #template: __Variable1__
 Verbose: replace template-at(-2) variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
 Verbose:     replace from: version 1.2 beta
 Verbose:     replace to  : ver. 2.4 beta
 Verbose:         check not conflicted
@@ -4076,26 +4076,26 @@ Verbose:         replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
 Verbose:         maskedLine   :     (_____________)  #template: __Variable1__
 Verbose:         replace from: 1.2
 Verbose:         replace to  : 2.00
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
     Error: template target values after replace are conflicted.
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2  #to: 2.00
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.00
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
         Before Replacing: 1.2
         After  Replacing: 2.00
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.00 beta)  #template: __Variable1__
     replace
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
         Before Replacing: version 1.2 beta
         After  Replacing: ver. 2.4 beta
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
 
 Warning: 0, Error: 1
 "
@@ -4115,26 +4115,26 @@ body:
 exports[`replaces settings >> verbose >> no conflict: verbose 1`] = `
 "Verbose: Phase 3: replace ...
 Verbose: settings / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta
 Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 1.2  #to: 2.4
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.4
 Verbose:     replace from: 1.2
 Verbose:     replace to  : 2.4
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     __Variable1__: 2.4  #original: 1.2
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.4  #original: 1.2
 Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
 Verbose:     replace from: version 1.2 beta
 Verbose:     replace to  : ver. 2.4 beta
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
 Verbose: replace template variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
 Verbose:     replace from: 1.2
 Verbose:     replace to  : 2.4
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (version 2.4 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.4 beta)  #template: __Variable1__
 Verbose: replace template-at(-2) variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
 Verbose:     replace from: version 1.2 beta
 Verbose:     replace to  : ver. 2.4 beta
 Verbose:         check not conflicted
@@ -4147,8 +4147,8 @@ Verbose:         maskedLine   :     (_____________)  #template: __Variable1__
 Verbose:         replace from: 1.2
 Verbose:         replace to  : 2.4
 Verbose:         wasReplaced = true
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:7:     #template-at(-2): __Variable2__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
 
 Warning: 0, Error: 0
 "
@@ -4190,9 +4190,9 @@ val__ue1: #template: key1
 exports[`typrm shell >> check: stdout 1`] = `
 "keyword: #c
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
@@ -4200,9 +4200,9 @@ Warning: 1, Error: 0
 template count = 1
 keyword: #c
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
@@ -4215,9 +4215,9 @@ keyword: exit()
 exports[`typrm shell >> check: stdout 2`] = `
 "keyword: #check
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
@@ -4225,9 +4225,9 @@ Warning: 1, Error: 0
 template count = 1
 keyword: #check
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
@@ -4238,21 +4238,21 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> check: stdout 3`] = `
-"keyword: #c 1_changing.yaml
+"keyword: #c _tmp.yaml
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #c 1_changing.yaml
+keyword: #c _tmp.yaml
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
@@ -4263,21 +4263,21 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> check: stdout 4`] = `
-"keyword: #check 1_changing.yaml
+"keyword: #check _tmp.yaml
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #check 1_changing.yaml
+keyword: #check _tmp.yaml
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:1: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2:     key1: value1  #to: value1_replaced
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:3: val__ue1: #template: key1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
     Warning: Not matched with the template.
     Expected: value1
 
@@ -4297,13 +4297,13 @@ val__ue1: #template: key1
 exports[`typrm shell >> checkNotFound: stdout 1`] = `
 "keyword: #c not_found.yaml
 
-Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 template count = 0
 keyword: #c not_found.yaml
 
-Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 template count = 0
@@ -4327,7 +4327,7 @@ value1: #template: key1
 
 exports[`typrm shell >> replace: stdout 1`] = `
 "keyword: #r
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
 keyword: #r
@@ -4339,7 +4339,7 @@ keyword: exit()
 
 exports[`typrm shell >> replace: stdout 2`] = `
 "keyword: #replace
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
 keyword: #replace
@@ -4350,11 +4350,11 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace: stdout 3`] = `
-"keyword: #r 1_changing.yaml
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+"keyword: #r _tmp.yaml
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #r 1_changing.yaml
+keyword: #r _tmp.yaml
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4362,11 +4362,11 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace: stdout 4`] = `
-"keyword: #replace 1_changing.yaml
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #to: key1: value1_replaced
+"keyword: #replace _tmp.yaml
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #replace 1_changing.yaml
+keyword: #replace _tmp.yaml
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4383,12 +4383,12 @@ value1_replaced: #template: key1
 exports[`typrm shell >> replaceNotFound: stdout 1`] = `
 "keyword: #r not_found.yaml
 
-Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 keyword: #r not_found.yaml
 
-Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 keyword: exit()
@@ -4411,7 +4411,7 @@ value1_replaced: #template: key1
 
 exports[`typrm shell >> reset: stdout 1`] = `
 "keyword: #reset
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #original: key1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
 Warning: 0, Error: 0
 keyword: #reset
@@ -4422,11 +4422,11 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> reset: stdout 2`] = `
-"keyword: #reset 1_changing.yaml
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/1_changing.yaml:2: #original: key1: value1
+"keyword: #reset _tmp.yaml
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
 Warning: 0, Error: 0
-keyword: #reset 1_changing.yaml
+keyword: #reset _tmp.yaml
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4443,12 +4443,12 @@ value1: #template: key1
 exports[`typrm shell >> resetNotFound: stdout 1`] = `
 "keyword: #reset not_found.yaml
 
-Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 keyword: #reset not_found.yaml
 
-Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
+Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 keyword: exit()
