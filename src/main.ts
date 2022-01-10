@@ -221,17 +221,6 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
             fileTemplateTag = templateTag;
         }
 
-        // Check if there is not "#★Now:".
-        for (let temporaryLabel of temporaryLabels) {
-            if (line.toLowerCase().includes(temporaryLabel.toLowerCase())  &&  ifTagParser.thisIsOutOfFalseBlock) {
-                console.log("");
-                console.log(`${translate('WarningLine')}: ${lineNum}`);
-                console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                parser.warningCount += 1;
-            }
-        }
-
         // Get titles above or following.
         var  match: RegExpExecArray | null;
         referPattern.lastIndex = 0;
@@ -4617,7 +4606,6 @@ const  expectLabel = "#expect:";
 const  ignoredKeywords = [ /#search:/g, /: +#keyword:/g, /#keyword:/g ];
 const  searchLabel = "#search:";
 const  refLabel = "#ref:";
-const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  typrmEnvPrefix = 'TYPRM_';
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
