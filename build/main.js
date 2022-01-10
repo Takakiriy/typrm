@@ -419,7 +419,12 @@ async function makeSettingTree(parser) {
                     if (lastEndIf) {
                         if (indent.length <= settingStack[currentSettingStackIndex + 1].indentLevel) {
                             nextSetting.nextAlphabetIndex = path.basename(nextSetting.index);
-                            nextSetting.index = `${parentSettingIndex}/1`;
+                            if (parentSettingIndex === '/') {
+                                nextSetting.index = `/1`;
+                            }
+                            else {
+                                nextSetting.index = `${parentSettingIndex}/1`;
+                            }
                         }
                         break;
                     }
@@ -570,7 +575,7 @@ async function makeSettingTree(parser) {
         }
         // Set condition by "#if:" tag.
         const ifPosition = ifLabelRE.exec(line);
-        if (ifPosition) {
+        if (ifPosition && !line.includes(disableLabel)) {
             const condition = getValue(line, ifPosition.index + ifPosition[0].length);
             tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
             setting = {};
@@ -1378,7 +1383,7 @@ class IfTagParser {
                 }
             }
         }
-        if (line.includes(ifLabel)) {
+        if (ifLabelRE.exec(line) && !line.includes(disableLabel)) {
             expression = line.substring(line.indexOf(ifLabel) + ifLabel.length).trim();
             const evaluatedContidion = evaluateIfCondition(expression, setting, this.parser, previsousEvalatedKeys);
             if (typeof evaluatedContidion === 'boolean') {
@@ -1404,6 +1409,12 @@ class IfTagParser {
                 enabled: this.thisIsOutOfFalseBlock, isReplacable: this.isReplacable_ });
             this.isReplacable_ = isReplacable;
         }
+    }
+    // setPosition
+    setPosition(filePath, line, lineNum) {
+        this.parser.filePath = filePath;
+        this.parser.lineNum = lineNum;
+        this.parser.line = line;
     }
 }
 // BlockDisableTagParser
@@ -3249,49 +3260,50 @@ class SettingsTree {
         const notVerboseParser = { ...parser, verbose: false };
         const ifTagParser = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
-            var firstIndex = '/a';
+            // var  nextIndex = '/a';
             var currentIndexSlash = '/';
         }
         else {
-            var firstIndex = currentIndex + '/a'; // e.g. '/1/a', '/2/1/a'
+            // var  nextIndex = currentIndex + '/a';  // e.g. '/1/a', '/2/1/a'
             var currentIndexSlash = currentIndex + '/';
         }
         const disabledFalseIndex = '!'; // startsWith(falseIndex) returns false
         var falseIndex = disabledFalseIndex;
         var isInCurrentSetting = false;
-        for (const [lineNum, index] of Array.from(settingsTree.indicesWithIf.entries())) {
+        for (const [lineNumInBlock, indexInBlock] of Array.from(settingsTree.indicesWithIf.entries())) {
             // isInCurrentSetting = ( index === currentIndex + '/*' )
             if (!isInCurrentSetting) {
-                if (index === currentIndex) { // at current index without alphabet
-                    outOfFalseBlocks.set(lineNum, true);
+                if (indexInBlock === currentIndex) { // at current index without alphabet
+                    outOfFalseBlocks.set(lineNumInBlock, true);
                 }
-                isInCurrentSetting = (index === firstIndex);
+                isInCurrentSetting = (path.dirname(indexInBlock) === currentIndex &&
+                    lib.isAlphabetIndex(indexInBlock));
             }
             else {
-                isInCurrentSetting = ((index.startsWith(currentIndexSlash) &&
-                    lib.isAlphabetIndex(index.substr(currentIndexSlash.length, 1))) || (index === currentIndex));
+                isInCurrentSetting = ((indexInBlock.startsWith(currentIndexSlash) &&
+                    lib.isAlphabetIndex(indexInBlock.substr(currentIndexSlash.length, 1))));
                 if (!isInCurrentSetting) { // at next index without alphabet
-                    outOfFalseBlocks.set(lineNum, true);
-                    break;
+                    outOfFalseBlocks.set(lineNumInBlock, true);
                 }
             }
             if (isInCurrentSetting) {
-                const outOfFalseBock = !index.startsWith(falseIndex);
+                const outOfFalseBock = !indexInBlock.startsWith(falseIndex);
                 if (outOfFalseBock) {
-                    var condition = settingsTree.settingsInformation[index].condition;
+                    var condition = settingsTree.settingsInformation[indexInBlock].condition;
                     if (condition === '') {
                         condition = 'true';
                     }
+                    ifTagParser.setPosition(parser.filePath, condition, lineNumInBlock);
                     ifTagParser.evaluate(`#if: ${condition}`, currentSettings);
                     if (ifTagParser.thisIsOutOfFalseBlock) { // #if: true
-                        currentSettings = { ...currentSettings, ...settingsTree.settings[index] };
+                        currentSettings = { ...currentSettings, ...settingsTree.settings[indexInBlock] };
                         falseIndex = disabledFalseIndex;
                     }
                     else { // #if: false
-                        falseIndex = index + '/';
+                        falseIndex = indexInBlock + '/';
                     }
                 }
-                outOfFalseBlocks.set(lineNum, falseIndex == disabledFalseIndex);
+                outOfFalseBlocks.set(lineNumInBlock, falseIndex == disabledFalseIndex);
             }
         }
         return_.currentSettings = currentSettings;
@@ -3567,56 +3579,57 @@ class ReplaceToTagTree {
         const ifTagParserForNewSettings = new IfTagParser(notVerboseParser);
         const ifTagParserForOldSettings = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
-            var firstIndex = '/a';
+            // var  nextIndex = '/a';
             var currentIndexSlash = '/';
         }
         else {
-            var firstIndex = currentIndex + '/a'; // e.g. '/1/a', '/2/1/a'
+            // var  nextIndex = currentIndex + '/a';  // e.g. '/1/a', '/2/1/a'
             var currentIndexSlash = currentIndex + '/';
         }
         const disabledFalseIndex = '!'; // startsWith(falseIndex) returns false
         var falseIndexWhenOldSettings = disabledFalseIndex;
         var falseIndexWhenNewSettings = disabledFalseIndex;
         var isInCurrentSetting = false;
-        for (const [lineNumInSettings, indexInSettings] of Array.from(settingsTree.indicesWithIf.entries())) {
+        for (const [lineNumInBlock, indexInBlock] of Array.from(settingsTree.indicesWithIf.entries())) {
             // If isInCurrentSetting == true  &&  currentIndex = '/1'
-            // then  indexInSettings = [ '/1/a', '/1/b', '/1/c', ... ].
+            // then  indexInBlock = [ '/1/a', '/1/b', '/1/c', ... ].
             // isInCurrentSetting = ( index === currentIndex + '/*' )
             if (!isInCurrentSetting) {
-                if (indexInSettings === currentIndex) { // at current index without alphabet
-                    outOfFalseBlocks.set(lineNumInSettings, true);
-                    outOfFalseBlocksByOriginalTag.set(lineNumInSettings, true);
+                if (indexInBlock === currentIndex) { // at current index without alphabet
+                    outOfFalseBlocks.set(lineNumInBlock, true);
+                    outOfFalseBlocksByOriginalTag.set(lineNumInBlock, true);
                 }
-                isInCurrentSetting = (indexInSettings === firstIndex);
+                isInCurrentSetting = (path.dirname(indexInBlock) === currentIndex &&
+                    lib.isAlphabetIndex(indexInBlock));
             }
             else {
-                isInCurrentSetting = ((indexInSettings.startsWith(currentIndexSlash) &&
-                    lib.isAlphabetIndex(indexInSettings.substr(currentIndexSlash.length, 1))) || (indexInSettings === currentIndex));
+                isInCurrentSetting = ((indexInBlock.startsWith(currentIndexSlash) &&
+                    lib.isAlphabetIndex(indexInBlock.substr(currentIndexSlash.length, 1))));
                 if (!isInCurrentSetting) { // at next index without alphabet
-                    outOfFalseBlocks.set(lineNumInSettings, true);
-                    outOfFalseBlocksByOriginalTag.set(lineNumInSettings, true);
+                    outOfFalseBlocks.set(lineNumInBlock, true);
+                    outOfFalseBlocksByOriginalTag.set(lineNumInBlock, true);
                 }
             }
             if (isInCurrentSetting) {
                 if (this.command === 'replace') {
-                    const outOfFalseBlock = !indexInSettings.startsWith(falseIndexWhenNewSettings);
+                    const outOfFalseBlock = !indexInBlock.startsWith(falseIndexWhenNewSettings);
                     if (outOfFalseBlock) {
                         // newSettings = ...
-                        var condition = settingsTree.settingsInformation[indexInSettings].condition;
+                        var condition = settingsTree.settingsInformation[indexInBlock].condition;
                         if (condition === '') {
                             condition = 'true';
                         }
                         var settingsForIf = newSettings;
                         ifTagParserForNewSettings.evaluate(`#if: ${condition}`, settingsForIf);
                         if (ifTagParserForNewSettings.thisIsOutOfFalseBlock) { // #if: true
-                            newSettings = { ...newSettings, ...settingsTree.settings[indexInSettings] };
-                            newSettings = { ...newSettings, ...toTagTree.replaceTo[indexInSettings] };
+                            newSettings = { ...newSettings, ...settingsTree.settings[indexInBlock] };
+                            newSettings = { ...newSettings, ...toTagTree.replaceTo[indexInBlock] };
                             falseIndexWhenNewSettings = disabledFalseIndex;
                         }
                         else { // #if: false
                             if (toTagTree.command === 'replace') {
-                                if (indexInSettings in toTagTree.replaceTo) {
-                                    for (const toTag of Object.values(toTagTree.replaceTo[indexInSettings])) {
+                                if (indexInBlock in toTagTree.replaceTo) {
+                                    for (const toTag of Object.values(toTagTree.replaceTo[indexInBlock])) {
                                         if (toTag.tag === 'toInSettings') {
                                             console.log('');
                                             console.log(`Error: ${getTestablePath(parser.filePath)}:${toTag.lineNum}: ` +
@@ -3626,31 +3639,31 @@ class ReplaceToTagTree {
                                     }
                                 }
                             }
-                            falseIndexWhenNewSettings = indexInSettings + '/';
+                            falseIndexWhenNewSettings = indexInBlock + '/';
                         }
                     }
-                    outOfFalseBlocks.set(lineNumInSettings, falseIndexWhenNewSettings === disabledFalseIndex);
+                    outOfFalseBlocks.set(lineNumInBlock, falseIndexWhenNewSettings === disabledFalseIndex);
                 }
                 if (this.command === 'reset') {
-                    var condition = settingsTree.settingsInformation[indexInSettings].condition;
+                    var condition = settingsTree.settingsInformation[indexInBlock].condition;
                     if (condition === '') {
                         condition = 'true';
                     }
-                    const outOfFalseBlockWhenNewSettings = !indexInSettings.startsWith(falseIndexWhenNewSettings);
+                    const outOfFalseBlockWhenNewSettings = !indexInBlock.startsWith(falseIndexWhenNewSettings);
                     if (outOfFalseBlockWhenNewSettings) {
                         // newSettingsByOriginalTag = ...
                         var settingsForIf = newSettingsByOriginalTag;
                         ifTagParserForNewSettings.evaluate(`#if: ${condition}`, settingsForIf);
                         if (ifTagParserForNewSettings.thisIsOutOfFalseBlock) {
-                            newSettingsByOriginalTag = { ...newSettingsByOriginalTag, ...settingsTree.settings[indexInSettings] };
-                            newSettingsByOriginalTag = { ...newSettingsByOriginalTag, ...toTagTree.replaceTo[indexInSettings] };
+                            newSettingsByOriginalTag = { ...newSettingsByOriginalTag, ...settingsTree.settings[indexInBlock] };
+                            newSettingsByOriginalTag = { ...newSettingsByOriginalTag, ...toTagTree.replaceTo[indexInBlock] };
                             falseIndexWhenNewSettings = disabledFalseIndex;
                         }
                         else {
-                            falseIndexWhenNewSettings = indexInSettings + '/';
+                            falseIndexWhenNewSettings = indexInBlock + '/';
                         }
                     }
-                    const outOfFalseBlockWhenOldSettings = !indexInSettings.startsWith(falseIndexWhenOldSettings);
+                    const outOfFalseBlockWhenOldSettings = !indexInBlock.startsWith(falseIndexWhenOldSettings);
                     if (outOfFalseBlockWhenOldSettings) {
                         // falseIndexWhenOldSettings = ...
                         const oldSettings = settingsTree.currentSettings;
@@ -3660,18 +3673,18 @@ class ReplaceToTagTree {
                             falseIndexWhenOldSettings = disabledFalseIndex;
                         }
                         else {
-                            if (indexInSettings in toTagTree.replaceTo) {
-                                for (const originalTag of Object.values(toTagTree.replaceTo[indexInSettings])) {
+                            if (indexInBlock in toTagTree.replaceTo) {
+                                for (const originalTag of Object.values(toTagTree.replaceTo[indexInBlock])) {
                                     console.log('');
                                     console.log(`Warning: ${getTestablePath(parser.filePath)}:${originalTag.lineNum}: ` +
                                         `"#original: ${originalTag.tag}" tag will be remained.`);
                                     parser.warningCount += 1;
                                 }
                             }
-                            falseIndexWhenOldSettings = indexInSettings + '/';
+                            falseIndexWhenOldSettings = indexInBlock + '/';
                         }
                     }
-                    outOfFalseBlocksByOriginalTag.set(lineNumInSettings, falseIndexWhenOldSettings === disabledFalseIndex);
+                    outOfFalseBlocksByOriginalTag.set(lineNumInBlock, falseIndexWhenOldSettings === disabledFalseIndex);
                 }
             }
         }

@@ -195,6 +195,8 @@ describe("checks template value >>", () => {
             ["3e overwrite error"],
             ["4 neighbor error"],
             ["4-2 neighbor level 2 error"],
+            ["b1_bug_case_no_root_settings"],
+            // There are other settings tests in "unit test >>"
 
         ])("%s", async (caseName) => {
             chdirInProject('src');
@@ -240,7 +242,7 @@ describe("checks file contents >>", () => {
         ],[
             "any_lines", "file_8_others",
         ]
-    ])("First >> %s", async (caseName, fileNameHead) => {
+    ])("First >> %s", async (caseName, _fileNameHead) => {
         chdirInProject('src');
         const  sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const  changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
@@ -1320,7 +1322,8 @@ describe("print reference >>", () => {
 describe("unit test >>", () => {
     test.each([
         ["makeSettingTree"],
-        ["makeSettingTree bug case"],
+        ["makeSettingTree_bug_case"],
+        ["makeSettingTree_if_and_no_indent"],
     ])("%s", async (caseName) => {
         const  Parser = main.private_.Parser;
         const  makeSettingTree = main.private_.makeSettingTree;

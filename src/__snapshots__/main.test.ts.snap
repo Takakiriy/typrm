@@ -244,10 +244,10 @@ syntax error:
 
 exports[`checks file contents >> First >> if: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:1: #if: value == value
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:90: #if: value == value
     Error: if tag syntax
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:1: #if: $env.value = value
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91: #if: $env.value = value
     Error: if tag syntax
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings:
@@ -1105,7 +1105,7 @@ template count = 1
 `;
 
 exports[`checks template value >> settings >> 4-2 neighbor level 2 error: sourceFileContents 1`] = `
-"rot:
+"root:
     settings:
         var1: value1
         var2: value2
@@ -1113,6 +1113,22 @@ exports[`checks template value >> settings >> 4-2 neighbor level 2 error: source
     value1, value2, value3, value4  #template: var1, var2, var3, var4
     settings:
         var4: value4
+"
+`;
+
+exports[`checks template value >> settings >> b1_bug_case_no_root_settings: answer 1`] = `
+"
+Warning: 0, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks template value >> settings >> b1_bug_case_no_root_settings: sourceFileContents 1`] = `
+"body:
+    #if: true
+no indent:
+no indent:
+    settings:
 "
 `;
 
@@ -1342,7 +1358,23 @@ settings:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> settings_tree_if_disable: sourceFileContents 1`] = `
+exports[`checks template value >> settings_tree_if_disable: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:1: settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:4:         variable2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:5: val__ue2: #template: variable2
+    Warning: Not matched with the template.
+    Expected: value2
+
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/settings_tree_if_disable_1.yaml:2
+  Not referenced: variable1
+
+Warning: 2, Error: 0
+template count = 1
+"
+`;
+
+exports[`checks template value >> settings_tree_if_disable: sourceFileContents 1`] = `
 "settings:
     variable1: value1
     #if: var1 != value1  #disable-tag-tool:
@@ -4660,37 +4692,6 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_select_by_number >> _out
 "
 `;
 
-exports[`unit test >> makeSettingTree bug case: answer indicesWithIf 1`] = `
-"Map {
-    1 => "/",
-    2 => "/1",
-    8 => "/1/a",
-    9 => "/1/a/a",
-    10 => "/1/a",
-    11 => "/1",
-    12 => "/1/1",
-}
-"
-`;
-
-exports[`unit test >> makeSettingTree bug case: sourceFileContents 1`] = `
-"bug case:
-    2:
-        settings:
-            __Switch1__: A
-            __Switch2__: A
-        6:
-            7:
-                8:  #if: $settings.__Switch1__ == A
-                    9:  #if: $settings.__Switch2__ == A
-                    10:
-                11:
-        12:
-            settings:
-                __Set3__: aa
-"
-`;
-
 exports[`unit test >> makeSettingTree: answer indicesWithIf 1`] = `
 "Map {
     1 => "/1",
@@ -4821,5 +4822,55 @@ case B after:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    8 => "/1/a",
+    9 => "/1/a/a",
+    10 => "/1/a",
+    11 => "/1",
+    12 => "/1/1",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case: sourceFileContents 1`] = `
+"bug case:
+    2:
+        settings:
+            __Switch1__: A
+            __Switch2__: A
+        6:
+            7:
+                8:  #if: $settings.__Switch1__ == A
+                    9:  #if: $settings.__Switch2__ == A
+                    10:
+                11:
+        12:
+            settings:
+                __Set3__: aa
+"
+`;
+
+exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/a",
+    3 => "/",
+    4 => "/1",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_if_and_no_indent: sourceFileContents 1`] = `
+"body:
+    #if: true
+no indent:
+no indent:
+    settings:
 "
 `;

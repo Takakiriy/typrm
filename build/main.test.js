@@ -119,6 +119,7 @@ describe("checks template value >>", () => {
         ["settings_tree_deep"],
         ["settings_tree_position"],
         ["settings_tree_if"],
+        ["settings_tree_if_disable"],
         ["settings_tree_error"],
     ])("%s", async (fileNameHead) => {
         chdirInProject('src');
@@ -182,6 +183,8 @@ describe("checks template value >>", () => {
             ["3e overwrite error"],
             ["4 neighbor error"],
             ["4-2 neighbor level 2 error"],
+            ["e1_no_root_settings_error"],
+            // There are other settings tests in "unit test >>"
         ])("%s", async (caseName) => {
             chdirInProject('src');
             const sourceFileContents = lib.getSnapshot(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
@@ -222,7 +225,7 @@ describe("checks file contents >>", () => {
         ], [
             "any_lines", "file_8_others",
         ]
-    ])("First >> %s", async (caseName, fileNameHead) => {
+    ])("First >> %s", async (caseName, _fileNameHead) => {
         chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
@@ -1258,7 +1261,8 @@ describe("print reference >>", () => {
 describe("unit test >>", () => {
     test.each([
         ["makeSettingTree"],
-        ["makeSettingTree bug case"],
+        ["makeSettingTree_bug_case"],
+        ["makeSettingTree_if_and_no_indent"],
     ])("%s", async (caseName) => {
         const Parser = main.private_.Parser;
         const makeSettingTree = main.private_.makeSettingTree;
@@ -1267,9 +1271,9 @@ describe("unit test >>", () => {
         const answerIndicesWithIf = Array.from(await lib.parseMap(lib.getSnapshot(`unit test >> ${caseName}: answer indicesWithIf 1`)));
         fs.rmdirSync('test_data/_checking', { recursive: true });
         writeFileSync(`test_data/_checking/makeSettingTree.yaml`, sourceFileContents);
-        if (caseName === 'makeSettingTree') {
-            expect(sourceFileContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
-        }
+        // if (caseName === 'makeSettingTree') {
+        //     expect(sourceFileContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
+        // }
         const parser = new Parser();
         parser.filePath = `test_data/_checking/makeSettingTree.yaml`;
         const settingsTree = await makeSettingTree(parser);
