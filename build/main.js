@@ -614,23 +614,16 @@ async function makeReplaceToTagTree(parser, settingTree) {
             var toValue = getValue(line, toLabelIndex + toLabel.length - 1);
         }
         else {
-            toLabelIndex = line.indexOf(toTestLabel);
-            if (toLabelIndex !== notFound) {
-                var toValue = getValue(line, toLabelIndex + toTestLabel.length - 1);
-            }
-            else {
-                var toValue = '';
-            }
+            var toValue = '';
         }
         const templateTag = parseTemplateTag(line, parser);
         if (templateTag.isFound) {
             previousTemplateTag = templateTag;
         }
         if (toValue) {
-            const hasTestTag = (line.indexOf(toTestLabel) !== notFound);
             // #to: tag in the settings
             if (isReadingSetting) {
-                if (parser.verbose || hasTestTag) {
+                if (parser.verbose) {
                     console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                     console.log(`Verbose:         ${variableName}: ${value}  #to: ${toValue}`);
                 }
@@ -658,11 +651,10 @@ async function makeReplaceToTagTree(parser, settingTree) {
             }
             else {
                 if (previousTemplateTag) {
-                    if (parser.verbose || hasTestTag) {
+                    if (parser.verbose) {
                         console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                     }
-                    const newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(settingTree.currentSettings), parser, hasTestTag);
-                    //                    parser.errorCount += checkNoConfilict(replaceKeyValues.keyValues, newKeyValues, parser.filePath);
+                    const newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(settingTree.currentSettings), parser);
                     if (parser.verbose) {
                         for (const [variableName, newValue] of Object.entries(newKeyValues)) {
                             console.log(`Verbose:         ${variableName}: ${newValue.value}`);
@@ -1011,11 +1003,11 @@ class TemplateTag {
         return scanedKeys;
     }
     // scanKeyValues
-    async scanKeyValues(toValue, allKeys, parser, hasTestTag) {
+    async scanKeyValues(toValue, allKeys, parser) {
         const keysSortedByLength = allKeys.slice(); // copy
         keysSortedByLength.sort((b, a) => (a.length, b.length));
         const foundIndices = new Map();
-        const verboseMode = parser.verbose || hasTestTag;
+        const verboseMode = parser.verbose;
         var template = this.template;
         // Set variable names to "key" from "#template:" tag's value
         //     key = [ __A__, __B__ ]
@@ -4095,7 +4087,6 @@ else {
 const settingLabel = /(^| )#settings:/;
 const originalLabel = "#original:";
 const toLabel = "#to:"; // replace to tag
-const toTestLabel = "#to-test:";
 const templateLabel = "#template:";
 const templateAtStartLabel = "#template-at(";
 const templateAtEndLabel = "):";

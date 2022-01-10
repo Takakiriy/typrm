@@ -611,23 +611,6 @@ describe("replaces settings >>", () => {
         });
     });
 
-    test("replace to tag >> ToTestTag", async () => {
-        chdirInProject('src');
-        const  caseName = 'ToTestTag';
-        const  changingFolderPath = testFolderPath + '_changing';
-        const  changingFileName = caseName + "_1_changing.yaml";
-        const  changingFilePath = changingFolderPath +'/'+ changingFileName;
-        var  sourceFileContents = lib.getSnapshot(`replaces settings >> replace to tag >> ${caseName}: sourceFileContents 1`);
-        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
-        writeFileSync(changingFilePath, sourceFileContents);
-
-        await callMain(["replace"], {
-            folder: changingFolderPath, test: "", locale: "en-US"
-        });
-        chdirInProject('src');
-        expect(main.stdout).toMatchSnapshot('stdout');
-    });
-
     test("CR LF >>", async () => {
         chdirInProject('src');
         const  caseName = 'CR LF';

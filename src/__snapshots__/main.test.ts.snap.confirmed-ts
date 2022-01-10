@@ -3801,52 +3801,6 @@ Warning: 0, Error: 1
 "
 `;
 
-exports[`replaces settings >> replace to tag >> ToTestTag: sourceFileContents 1`] = `
-"settings: #settings:
-    __BodyA1__: ValueA1
-    __BodyA2__: ValueA2
-    __BodyB1__: ValueB1
-    __BodyB2__: ValueB2
-    __BodyC1__: ValueC1
-    __BodyC2__: ValueC2
-body:
-    - -(ValueA1)-(ValueA2)-  #template: (__BodyA1__)-(__BodyA2__)  #to-test:  ValueAA1, ValueAA2
-    - -(ValueB1)-(ValueB2)-  #template: (__BodyB1__)-(__BodyB2__)  #to-test: (ValueBB1)-(ValueBB2)
-    - -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
-"
-`;
-
-exports[`replaces settings >> replace to tag >> ToTestTag: stdout 1`] = `
-"Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9:
-Verbose:         template: (__BodyA1__)-(__BodyA2__)
-Verbose:         templatePattern: (*)-(*)
-Verbose:         toValue: ValueAA1, ValueAA2
-Verbose:         toValueIsMatchedWithTemplate: false
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9: #to: __BodyA1__: ValueAA1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:9: #to: __BodyA2__: ValueAA2
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10:
-Verbose:         template: (__BodyB1__)-(__BodyB2__)
-Verbose:         templatePattern: (*)-(*)
-Verbose:         toValue: (ValueBB1)-(ValueBB2)
-Verbose:         toValueIsMatchedWithTemplate: true
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10: #to: __BodyB1__: ValueBB1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:10: #to: __BodyB2__: ValueBB2
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:
-Verbose:         template: (__BodyC1__)-(__BodyC2__)
-Verbose:         templatePattern: (*)-(*)
-Verbose:         toValue: (ValueCC1)-(ValueCC2
-Verbose:         toValueIsMatchedWithTemplate: false
-
-Error of the value count in #to tag:
-    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11:    - -(ValueC1)-(ValueC2)-  #template: (__BodyC1__)-(__BodyC2__)  #to-test: (ValueCC1)-(ValueCC2
-    Variable count in the template tag: 2
-    Variable count in the to tag: 1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_changing/ToTestTag_1_changing.yaml:11: #to: __BodyC1__: (ValueCC1)-(ValueCC2
-
-Warning: 0, Error: 1
-"
-`;
-
 exports[`replaces settings >> replace to tag >> settings_tree_if: replacedFileContents 1`] = `
 "section:
     table:
