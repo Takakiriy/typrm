@@ -4180,14 +4180,14 @@ PowerShell, PS
 "
 `;
 
-exports[`typrm shell >> check: sourceFileContents 1`] = `
+exports[`typrm shell >> replace >> check: sourceFileContents 1`] = `
 "settings: #settings:
     key1: value1  #to: value1_replaced
 val__ue1: #template: key1
 "
 `;
 
-exports[`typrm shell >> check: stdout 1`] = `
+exports[`typrm shell >> replace >> check: stdout 1`] = `
 "keyword: #c
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
@@ -4212,7 +4212,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> check: stdout 2`] = `
+exports[`typrm shell >> replace >> check: stdout 2`] = `
 "keyword: #check
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
@@ -4237,7 +4237,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> check: stdout 3`] = `
+exports[`typrm shell >> replace >> check: stdout 3`] = `
 "keyword: #c _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
@@ -4262,7 +4262,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> check: stdout 4`] = `
+exports[`typrm shell >> replace >> check: stdout 4`] = `
 "keyword: #check _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
@@ -4287,14 +4287,14 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> check: updatedFileContents 1`] = `
+exports[`typrm shell >> replace >> check: updatedFileContents 1`] = `
 "settings: #settings:
     key1: value1  #to: value1_replaced
 val__ue1: #template: key1
 "
 `;
 
-exports[`typrm shell >> checkNotFound: stdout 1`] = `
+exports[`typrm shell >> replace >> checkNotFound: stdout 1`] = `
 "keyword: #c not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
@@ -4311,21 +4311,21 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> checkNotFound: updatedFileContents 1`] = `
+exports[`typrm shell >> replace >> checkNotFound: updatedFileContents 1`] = `
 "settings: #settings:
     key1: value1  #to: value1_replaced
 val__ue1: #template: key1
 "
 `;
 
-exports[`typrm shell >> replace: sourceFileContents 1`] = `
+exports[`typrm shell >> replace >> replace: sourceFileContents 1`] = `
 "settings: #settings:
     key1: value1  #to: value1_replaced
 value1: #template: key1
 "
 `;
 
-exports[`typrm shell >> replace: stdout 1`] = `
+exports[`typrm shell >> replace >> replace: stdout 1`] = `
 "keyword: #r
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
@@ -4337,7 +4337,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> replace: stdout 2`] = `
+exports[`typrm shell >> replace >> replace: stdout 2`] = `
 "keyword: #replace
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
@@ -4349,7 +4349,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> replace: stdout 3`] = `
+exports[`typrm shell >> replace >> replace: stdout 3`] = `
 "keyword: #r _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
@@ -4361,7 +4361,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> replace: stdout 4`] = `
+exports[`typrm shell >> replace >> replace: stdout 4`] = `
 "keyword: #replace _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
@@ -4373,14 +4373,14 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> replace: updatedFileContents 1`] = `
+exports[`typrm shell >> replace >> replace: updatedFileContents 1`] = `
 "settings: #settings:
     key1: value1_replaced  #original: value1
 value1_replaced: #template: key1
 "
 `;
 
-exports[`typrm shell >> replaceNotFound: stdout 1`] = `
+exports[`typrm shell >> replace >> replaceNotFound: stdout 1`] = `
 "keyword: #r not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
@@ -4395,21 +4395,21 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> replaceNotFound: updatedFileContents 1`] = `
+exports[`typrm shell >> replace >> replaceNotFound: updatedFileContents 1`] = `
 "settings: #settings:
     key1: value1  #to: value1_replaced
 value1: #template: key1
 "
 `;
 
-exports[`typrm shell >> reset: sourceFileContents 1`] = `
+exports[`typrm shell >> replace >> reset: sourceFileContents 1`] = `
 "settings: #settings:
     key1: value1_replaced  #original: value1
 value1_replaced: #template: key1
 "
 `;
 
-exports[`typrm shell >> reset: stdout 1`] = `
+exports[`typrm shell >> replace >> reset: stdout 1`] = `
 "keyword: #reset
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
@@ -4421,7 +4421,7 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> reset: stdout 2`] = `
+exports[`typrm shell >> replace >> reset: stdout 2`] = `
 "keyword: #reset _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
@@ -4433,14 +4433,14 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> reset: updatedFileContents 1`] = `
+exports[`typrm shell >> replace >> reset: updatedFileContents 1`] = `
 "settings: #settings:
     key1: value1
 value1: #template: key1
 "
 `;
 
-exports[`typrm shell >> resetNotFound: stdout 1`] = `
+exports[`typrm shell >> replace >> resetNotFound: stdout 1`] = `
 "keyword: #reset not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
@@ -4455,10 +4455,26 @@ keyword: exit()
 "
 `;
 
-exports[`typrm shell >> resetNotFound: updatedFileContents 1`] = `
+exports[`typrm shell >> replace >> resetNotFound: updatedFileContents 1`] = `
 "settings: #settings:
     key1: value1_replaced  #original: value1
 value1_replaced: #template: key1
+"
+`;
+
+exports[`typrm shell >> search >> search_mode: stdout 1`] = `
+"keyword: ABC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
+keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> search_mode_find: stdout 1`] = `
+"keyword: Not
+Not found. To do full text search, press Enter key.
+keyword: 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
+keyword: exit()
 "
 `;
 
@@ -4469,38 +4485,6 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> Windows: stdout 1`] = `
 
 exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-"
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode >> Windows: stdout 1`] = `
-"keyword: ABC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-keyword: exit()
-"
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode >> mac: stdout 1`] = `
-"keyword: ABC
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
-keyword: exit()
-"
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> Windows: stdout 1`] = `
-"keyword: Not
-見つかりません。全文検索するときは Enter キーを押してください。
-keyword: 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
-keyword: exit()
-"
-`;
-
-exports[`typrm_test >> TestOfCommandLine >> search_mode_find >> mac: stdout 1`] = `
-"keyword: Not
-Not found. To do full text search, press Enter key.
-keyword: 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, "do it", "a,b"
-keyword: exit()
 "
 `;
 

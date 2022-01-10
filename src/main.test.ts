@@ -67,38 +67,54 @@ beforeAll(()=>{
 });
 
 describe("typrm shell >>", () => {
-    test.each([
-        ['replace', 'replace', ['#r', '#replace', '#r _tmp.yaml', '#replace _tmp.yaml'], undefined],
-        ['replaceNotFound', 'replace', ['#r not_found.yaml'], {error: ''}],
-        ['reset', 'reset', ['#reset', '#reset _tmp.yaml'], undefined],
-        ['resetNotFound', 'reset', ['#reset not_found.yaml'], {error: ''}],
-        ['check', 'check', ['#c', '#check', '#c _tmp.yaml', '#check _tmp.yaml'], undefined],
-        ['checkNotFound', 'check', ['#c not_found.yaml'], {error: ''}],
-    ])("%s", async (_caseName, fileName, inputs, _options) => {
-        var  inputIndex = 0;
-        var  updatedFileContentsAnswer = '?';
-        for (const input of inputs) {
-            const {filePath} = initializeTestInputFile(`typrm shell >> ${fileName}: sourceFileContents 1`);
-            const  inputPattern = `${input}\n${input}\nexit()\n`;
-                // The reason to run twice is to check that the file is closed correctly
+    describe("search >>", () => {
+        test.each([
+            ['search_mode', 'test_data/search/1', 'ABC\nexit()', {}],
+            ['search_mode_find', 'test_data/search/1', 'Not\n\nexit()', {}],
+        ])("%s", async (_caseName, folder, input, _options) => {
+            chdirInProject('src');
+            var  inputPattern = `${input}\nexit()\n`;
 
             await callMain([], {
-                folder: 'test_data/_tmp', test: "", locale: "en-US", input: inputPattern,
+                folder, test: "", locale: "en-US", input: inputPattern,
             });
-            const  updatedFileContents = fs.readFileSync(filePath).toString();
+            expect(lib.cutEscapeSequence( main.stdout )).toMatchSnapshot('stdout');
+        });
+    });
+    describe("replace >>", () => {
+        test.each([
+            ['replace', 'replace', ['#r', '#replace', '#r _tmp.yaml', '#replace _tmp.yaml'], {}],
+            ['replaceNotFound', 'replace', ['#r not_found.yaml'], {error:''}],
+            ['reset', 'reset', ['#reset', '#reset _tmp.yaml'], {}],
+            ['resetNotFound', 'reset', ['#reset not_found.yaml'], {error:''}],
+            ['check', 'check', ['#c', '#check', '#c _tmp.yaml', '#check _tmp.yaml'], {}],
+            ['checkNotFound', 'check', ['#c not_found.yaml'], {error:''}],
+        ])("%s", async (_caseName, fileName, inputs, _options) => {
+            var  inputIndex = 0;
+            var  updatedFileContentsAnswer = '?';
+            for (const input of inputs) {
+                var {filePath} = initializeTestInputFile(`typrm shell >> replace >> ${fileName}: sourceFileContents 1`);
+                var  inputPattern = `${input}\n${input}\nexit()\n`;
+                    // The reason to run twice is to check that the file is closed correctly
 
-            chdirInProject('src');
-            if (inputIndex === 0) {
-                expect(lib.cutEscapeSequence( main.stdout )).toMatchSnapshot('stdout');
-                expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
-                updatedFileContentsAnswer = updatedFileContents;
-            } else {
-                expect(lib.cutEscapeSequence( main.stdout )).toMatchSnapshot('stdout');
-                expect(updatedFileContents).toBe(updatedFileContentsAnswer);
+                await callMain([], {
+                    folder: 'test_data/_tmp', test: "", locale: "en-US", input: inputPattern,
+                });
+                var  updatedFileContents = fs.readFileSync(filePath).toString();
+
+                chdirInProject('src');
+                if (inputIndex === 0) {
+                    expect(lib.cutEscapeSequence( main.stdout )).toMatchSnapshot('stdout');
+                    expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
+                    updatedFileContentsAnswer = updatedFileContents;
+                } else {
+                    expect(lib.cutEscapeSequence( main.stdout )).toMatchSnapshot('stdout');
+                    expect(updatedFileContents).toBe(updatedFileContentsAnswer);
+                }
+                inputIndex += 1;
             }
-            inputIndex += 1;
-        }
-        fs.rmdirSync(testFolderPath + '_tmp', {recursive: true});
+            fs.rmdirSync(testFolderPath + '_tmp', {recursive: true});
+        });
     });
 });
 

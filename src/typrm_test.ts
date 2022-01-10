@@ -65,12 +65,9 @@ async function  TestOfCommandLine() {
         "parameters": "search ABC --folder test_data/search/1",
         "check": "true",
         "inputLines": "",
-    },{
-        "name": "search_mode",
-        "parameters": "search  --folder test_data/search/1",
-        "check": "true",
-        "inputLines": "ABC\nexit()\n",
-    },{
+    },
+        // There are search_mode, search_mode_find test in "main.test.ts".
+    {
         "name": "search_mode_select_by_number",
         "parameters": "--folder test_data/search/1",
         "check": "false",
@@ -81,11 +78,6 @@ async function  TestOfCommandLine() {
         "parameters": "search",
         "check": "true",
         "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
-    },{
-        "name": "search_mode_find",
-        "parameters": "search  --folder test_data/search/1",
-        "check": "true",
-        "inputLines": "Not\n\nexit()\n",
     },{
         "name": "search_mode_result_has_ref_verb",
         "parameters": "search  --folder test_data/search/2",
