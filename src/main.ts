@@ -220,24 +220,6 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
         if (templateTag.label === fileTemplateLabel  &&  ifTagParser.thisIsOutOfFalseBlock) {
             fileTemplateTag = templateTag;
         }
-
-        // Get titles above or following.
-        var  match: RegExpExecArray | null;
-        referPattern.lastIndex = 0;
-
-        while ( (match = referPattern.exec( line )) !== null ) {
-            const  keyword = new SearchKeyword();
-            const  label = match[1];
-            keyword.keyword = match[3];
-            if (label === "上記"  ||  label === "above") {
-                keyword.startLineNum = lineNum - 1;
-                keyword.direction = Direction.Above;
-            } else if (label === "下記"  ||  label === "following") {
-                keyword.startLineNum = lineNum + 1;
-                keyword.direction = Direction.Following;
-            }
-            keywords.push(keyword);
-        }
     }
     settingTree.moveToEndOfFile();
     if (settingTree.outOfScopeSettingIndices.length >= 1) {
@@ -251,53 +233,6 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
         fileTemplateTag.onReadLine('');  // Cut indent
 
         await fileTemplateTag.checkTargetFileContents(setting, parser);
-    }
-
-    // Check if there is the title above or following.
-    reader = readline.createInterface({
-        input: fs.createReadStream(inputFilePath),
-        crlfDelay: Infinity
-    });
-    lineNum = 0;
-
-    for await (const line1 of reader) {
-        const  line: string = line1;
-        lineNum += 1;
-
-        for (const keyword of keywords) {
-            if (keyword.direction === Direction.Above) {
-                if (lineNum <= keyword.startLineNum) {
-
-                    if (line.includes(keyword.keyword)) {
-                        keyword.startLineNum = foundForAbove;
-                    }
-                }
-            } else if (keyword.direction === Direction.Following) {
-                if (lineNum >= keyword.startLineNum) {
-
-                    if (line.includes(keyword.keyword)) {
-                        keyword.startLineNum = foundForFollowing;
-                    }
-                }
-            }
-        }
-    }
-    for (const keyword of keywords) {
-        if (keyword.direction === Direction.Above) {
-            if (keyword.startLineNum !== foundForAbove) {
-                console.log('');
-                console.log(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
-                console.log('  ' + translate`Not found "${keyword.keyword}" above`);
-                parser.errorCount += 1;
-            }
-        } else if (keyword.direction === Direction.Following) {
-            if (keyword.startLineNum !== foundForFollowing) {
-                console.log('');
-                console.log(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
-                console.log('  ' + translate`Not found "${keyword.keyword}" following`);
-                parser.errorCount += 1;
-            }
-        }
     }
 }
 
@@ -4606,7 +4541,6 @@ const  ignoredKeywords = [ /#search:/g, /: +#keyword:/g, /#keyword:/g ];
 const  searchLabel = "#search:";
 const  refLabel = "#ref:";
 const  typrmEnvPrefix = 'TYPRM_';
-const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]+$/;
 const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
@@ -4620,11 +4554,7 @@ const  notNormalizedScore = 1;
 const  caseIgnoredWordMatchScore = 16;
 const  caseIgnoredPartMatchScore = 14;
 const  orderMatchScoreWeight = 2;
-const  minLineNum = 0;
-const  maxLineNum = 999999999;
 const  maxNumber = 999999999;
-const  foundForAbove = minLineNum;
-const  foundForFollowing = maxLineNum;
 const  pathColor = chalk.cyan;
 const  lineNumColor = chalk.keyword('gray');
 const  matchedColor = chalk.green.bold;

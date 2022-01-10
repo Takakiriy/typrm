@@ -119,7 +119,6 @@ async function checkRoutine(inputFilePath, parser) {
     var settingLineNum = 0;
     var lineNum = 0;
     var fileTemplateTag = null;
-    var secretLabelCount = 0;
     const lines = [];
     const keywords = [];
     const ifTagParser = new IfTagParser(parser);
@@ -205,47 +204,6 @@ async function checkRoutine(inputFilePath, parser) {
         if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock) {
             fileTemplateTag = templateTag;
         }
-        // Check if there is not "#★Now:".
-        for (let temporaryLabel of temporaryLabels) {
-            if (line.toLowerCase().includes(temporaryLabel.toLowerCase()) && ifTagParser.thisIsOutOfFalseBlock) {
-                console.log("");
-                console.log(`${translate('WarningLine')}: ${lineNum}`);
-                console.log(`  ${translate('Contents')}: ${line.trim()}`);
-                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
-                parser.warningCount += 1;
-            }
-        }
-        // Check if there is not secret tag.
-        if (line.includes(secretLabel) || line.includes(secretLabelEn)) {
-            if (!line.includes(secretExamleLabel) && !line.includes(secretExamleLabelEn)) {
-                if (secretLabelCount === 0) { // Because there will be many secret data.
-                    console.log("");
-                    console.log(`${translate('WarningLine')}: ${lineNum}`);
-                    console.log(`  ${translate('This is a secret value.')}`);
-                    console.log('  ' + translate `Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
-                    console.log('  ' + translate `Replace "${secretLabel}" to "${secretExamleLabel}".'`);
-                    parser.warningCount += 1;
-                }
-                secretLabelCount += 1;
-            }
-        }
-        // Get titles above or following.
-        var match;
-        referPattern.lastIndex = 0;
-        while ((match = referPattern.exec(line)) !== null) {
-            const keyword = new SearchKeyword();
-            const label = match[1];
-            keyword.keyword = match[3];
-            if (label === "上記" || label === "above") {
-                keyword.startLineNum = lineNum - 1;
-                keyword.direction = Direction.Above;
-            }
-            else if (label === "下記" || label === "following") {
-                keyword.startLineNum = lineNum + 1;
-                keyword.direction = Direction.Following;
-            }
-            keywords.push(keyword);
-        }
     }
     settingTree.moveToEndOfFile();
     if (settingTree.outOfScopeSettingIndices.length >= 1) {
@@ -256,50 +214,6 @@ async function checkRoutine(inputFilePath, parser) {
     if (fileTemplateTag) {
         fileTemplateTag.onReadLine(''); // Cut indent
         await fileTemplateTag.checkTargetFileContents(setting, parser);
-    }
-    // Check if there is the title above or following.
-    reader = readline.createInterface({
-        input: fs.createReadStream(inputFilePath),
-        crlfDelay: Infinity
-    });
-    lineNum = 0;
-    for await (const line1 of reader) {
-        const line = line1;
-        lineNum += 1;
-        for (const keyword of keywords) {
-            if (keyword.direction === Direction.Above) {
-                if (lineNum <= keyword.startLineNum) {
-                    if (line.includes(keyword.keyword)) {
-                        keyword.startLineNum = foundForAbove;
-                    }
-                }
-            }
-            else if (keyword.direction === Direction.Following) {
-                if (lineNum >= keyword.startLineNum) {
-                    if (line.includes(keyword.keyword)) {
-                        keyword.startLineNum = foundForFollowing;
-                    }
-                }
-            }
-        }
-    }
-    for (const keyword of keywords) {
-        if (keyword.direction === Direction.Above) {
-            if (keyword.startLineNum !== foundForAbove) {
-                console.log('');
-                console.log(`${translate('ErrorLine')}: ${keyword.startLineNum + 1}`);
-                console.log('  ' + translate `Not found "${keyword.keyword}" above`);
-                parser.errorCount += 1;
-            }
-        }
-        else if (keyword.direction === Direction.Following) {
-            if (keyword.startLineNum !== foundForFollowing) {
-                console.log('');
-                console.log(`${translate('ErrorLine')}: ${keyword.startLineNum - 1}`);
-                console.log('  ' + translate `Not found "${keyword.keyword}" following`);
-                parser.errorCount += 1;
-            }
-        }
     }
 }
 // getErrorMessageOfNotMatchedWithTemplate
@@ -475,7 +389,7 @@ async function makeSettingTree(parser) {
             }
         }
         // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+        if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
             isReadingSetting = true;
             if (indent === '') {
                 settingStack[0].lineNum = lineNum;
@@ -675,7 +589,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
             toTagTree.replaceTo[currentSettingIndex] = {};
         }
         // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+        if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
             isReadingSetting = true;
             settingIndentLength = indentRegularExpression.exec(line)[0].length;
             previousTemplateTag = null;
@@ -813,7 +727,7 @@ async function makeOriginalTagTree(parser, settingTree) {
             toTagTree.replaceTo[currentSettingIndex] = {};
         }
         // setting = ...
-        if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+        if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
             isReadingSetting = true;
             settingIndentLength = indentRegularExpression.exec(line)[0].length;
         }
@@ -1566,7 +1480,7 @@ async function replaceSub(inputFilePath, parser, command) {
                     replacingKeyValues[key] = value.value;
                 }
             }
-            if (settingStartLabel.test(line.trim()) || settingStartLabelEn.test(line.trim())) {
+            if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
                 isSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)[0].length;
                 if (!templateIfKeyError) {
@@ -3260,11 +3174,9 @@ class SettingsTree {
         const notVerboseParser = { ...parser, verbose: false };
         const ifTagParser = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
-            // var  nextIndex = '/a';
             var currentIndexSlash = '/';
         }
         else {
-            // var  nextIndex = currentIndex + '/a';  // e.g. '/1/a', '/2/1/a'
             var currentIndexSlash = currentIndex + '/';
         }
         const disabledFalseIndex = '!'; // startsWith(falseIndex) returns false
@@ -3579,11 +3491,9 @@ class ReplaceToTagTree {
         const ifTagParserForNewSettings = new IfTagParser(notVerboseParser);
         const ifTagParserForOldSettings = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
-            // var  nextIndex = '/a';
             var currentIndexSlash = '/';
         }
         else {
-            // var  nextIndex = currentIndex + '/a';  // e.g. '/1/a', '/2/1/a'
             var currentIndexSlash = currentIndex + '/';
         }
         const disabledFalseIndex = '!'; // startsWith(falseIndex) returns false
@@ -4081,7 +3991,6 @@ function translate(englishLiterals, ...values) {
         dictionary = {
             "Error not same as file contents": "ファイルの内容と異なります",
             "YAML UTF-8 file path>": "YAML UTF-8 ファイル パス>",
-            "This is a secret value.": "これは秘密の値です。",
             "Replace \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に置き換えてください。",
             "Press Enter key to retry checking.": "Enter キーを押すと再チェックします。",
             "The line number to replace the variable value >": "置き換える変数値がある行番号 >",
@@ -4183,8 +4092,7 @@ if (process.env.windir) {
 else {
     var runningOS = 'Linux';
 }
-const settingStartLabel = /^設定((\(|（)([^\)]*)(\)|）))?:( |\t)*(#.*)?$/;
-const settingStartLabelEn = /^settings((\()([^\)]*)(\)))?:( |\t)*(#.*)?$/;
+const settingLabel = /(^| )#settings:/;
 const originalLabel = "#original:";
 const toLabel = "#to:"; // replace to tag
 const toTestLabel = "#to-test:";
@@ -4206,13 +4114,7 @@ const expectLabel = "#expect:";
 const ignoredKeywords = [/#search:/g, /: +#keyword:/g, /#keyword:/g];
 const searchLabel = "#search:";
 const refLabel = "#ref:";
-const temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const typrmEnvPrefix = 'TYPRM_';
-const secretLabel = "#★秘密";
-const secretLabelEn = "#secret";
-const secretExamleLabel = "#★秘密:仮";
-const secretExamleLabelEn = "#secret:example";
-const referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const indentRegularExpression = /^( |¥t)*/;
 const numberRegularExpression = /^[0-9]+$/;
 const variablePattern = "\\$\\{[^\\}]+\\}"; // ${__Name__}
@@ -4226,11 +4128,7 @@ const notNormalizedScore = 1;
 const caseIgnoredWordMatchScore = 16;
 const caseIgnoredPartMatchScore = 14;
 const orderMatchScoreWeight = 2;
-const minLineNum = 0;
-const maxLineNum = 999999999;
 const maxNumber = 999999999;
-const foundForAbove = minLineNum;
-const foundForFollowing = maxLineNum;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 const matchedColor = chalk.green.bold;

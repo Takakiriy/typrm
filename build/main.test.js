@@ -110,9 +110,6 @@ describe("checks template value >>", () => {
         ["1_template_1_ok"],
         ["1_template_2_error"],
         ["1_template_3_if"],
-        ["refer_1_ok"],
-        ["refer_2_error"],
-        ["secret_1_error"],
         ["var_not_ref_1_error"],
         ["template_if_1_error"],
         ["settings_tree"],
@@ -183,7 +180,7 @@ describe("checks template value >>", () => {
             ["3e overwrite error"],
             ["4 neighbor error"],
             ["4-2 neighbor level 2 error"],
-            ["e1_no_root_settings_error"],
+            ["b1_bug_case_no_root_settings"],
             // There are other settings tests in "unit test >>"
         ])("%s", async (caseName) => {
             chdirInProject('src');
@@ -1271,9 +1268,9 @@ describe("unit test >>", () => {
         const answerIndicesWithIf = Array.from(await lib.parseMap(lib.getSnapshot(`unit test >> ${caseName}: answer indicesWithIf 1`)));
         fs.rmdirSync('test_data/_checking', { recursive: true });
         writeFileSync(`test_data/_checking/makeSettingTree.yaml`, sourceFileContents);
-        // if (caseName === 'makeSettingTree') {
-        //     expect(sourceFileContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
-        // }
+        if (caseName === 'makeSettingTree') {
+            expect(sourceFileContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
+        }
         const parser = new Parser();
         parser.filePath = `test_data/_checking/makeSettingTree.yaml`;
         const settingsTree = await makeSettingTree(parser);

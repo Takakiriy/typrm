@@ -799,62 +799,6 @@ exports[`checks template value >> one_error: sourceFileContents 1`] = `
 "
 `;
 
-exports[`checks template value >> refer_1_ok: answer 1`] = `
-"
-Warning: 0, Error: 0
-template count = 0
-"
-`;
-
-exports[`checks template value >> refer_1_ok: sourceFileContents 1`] = `
-"パスするケース
-
-タイトル１
-
-上記「タイトル１」
-
-下記「タイトル２」
-
-（タイトル２）
-
-"
-`;
-
-exports[`checks template value >> refer_2_error: answer 1`] = `
-"
-ErrorLine: 5
-  Not found \\"タイトル１\\" above
-
-ErrorLine: 7
-  Not found \\"タイトル２\\" following
-
-ErrorLine: 7
-  Not found \\"タイトル３\\" following
-
-ErrorLine: 7
-  Not found \\"タイトル４\\" above
-
-ErrorLine: 7
-  Not found \\"タイトル５\\" above
-
-Warning: 0, Error: 5
-template count = 0
-"
-`;
-
-exports[`checks template value >> refer_2_error: sourceFileContents 1`] = `
-"エラーになるケース
-
-タイトル２
-
-上記「タイトル１」
-
-下記「タイトル２」と下記「タイトル３」と上記「タイトル４」と上記「タイトル５」を参照。
-
-（タイトル１）
-"
-`;
-
 exports[`checks template value >> settings >> 1 same values: answer 1`] = `
 "
 Warning: 0, Error: 0
