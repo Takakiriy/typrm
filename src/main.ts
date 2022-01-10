@@ -127,7 +127,6 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
     var  settingLineNum = 0;
     var  lineNum = 0;
     var  fileTemplateTag: TemplateTag | null = null;
-    var  secretLabelCount = 0;
     const  lines: string[] = [];
     const  keywords: SearchKeyword[] = [];
     const  ifTagParser = new IfTagParser(parser);
@@ -230,21 +229,6 @@ async function  checkRoutine(inputFilePath: string, parser: Parser) {
                 console.log(`  ${translate('Contents')}: ${line.trim()}`);
                 console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingLineNum}`);
                 parser.warningCount += 1;
-            }
-        }
-
-        // Check if there is not secret tag.
-        if (line.includes( secretLabel )  ||  line.includes( secretLabelEn )) {
-            if ( ! line.includes( secretExamleLabel )  &&  ! line.includes( secretExamleLabelEn )) {
-                if (secretLabelCount === 0) {  // Because there will be many secret data.
-                    console.log("");
-                    console.log(`${translate('WarningLine')}: ${lineNum}`);
-                    console.log(`  ${translate('This is a secret value.')}`);
-                    console.log('  '+ translate`Replace "${secretLabelEn}" to "${secretExamleLabelEn}".'`);
-                    console.log('  '+ translate`Replace "${secretLabel}" to "${secretExamleLabel}".'`);
-                    parser.warningCount += 1;
-                }
-                secretLabelCount += 1;
             }
         }
 
@@ -4505,7 +4489,6 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
         dictionary = {
             "Error not same as file contents": "ファイルの内容と異なります",
             "YAML UTF-8 file path>": "YAML UTF-8 ファイル パス>",
-            "This is a secret value.": "これは秘密の値です。",
             "Replace \"${0}\" to \"${1}\".": "\"${0}\" を \"${1}\" に置き換えてください。",
             "Press Enter key to retry checking.": "Enter キーを押すと再チェックします。",
             "The line number to replace the variable value >": "置き換える変数値がある行番号 >",
@@ -4636,10 +4619,6 @@ const  searchLabel = "#search:";
 const  refLabel = "#ref:";
 const  temporaryLabels = ["#★Now:", "#now:", "#★書きかけ", "#★未確認"];
 const  typrmEnvPrefix = 'TYPRM_';
-const  secretLabel = "#★秘密";
-const  secretLabelEn = "#secret";
-const  secretExamleLabel = "#★秘密:仮";
-const  secretExamleLabelEn = "#secret:example";
 const  referPattern = /(上記|下記|above|following)(「|\[)([^」]*)(」|\])/g;
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]+$/;

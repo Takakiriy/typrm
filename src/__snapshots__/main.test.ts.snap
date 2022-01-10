@@ -855,38 +855,6 @@ exports[`checks template value >> refer_2_error: sourceFileContents 1`] = `
 "
 `;
 
-exports[`checks template value >> secret_1_error: answer 1`] = `
-"
-WarningLine: 4
-  This is a secret value.
-  Replace \\"#secret\\" to \\"#secret:example\\".'
-  Replace \\"#★秘密\\" to \\"#★秘密:仮\\".'
-
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:2
-  Not referenced: key1
-
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:3
-  Not referenced: __Key2__
-
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:4
-  Not referenced: Key3
-
-Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/secret_1_error_1.yaml:5
-  Not referenced: Key4
-
-Warning: 5, Error: 0
-template count = 0
-"
-`;
-
-exports[`checks template value >> secret_1_error: sourceFileContents 1`] = `
-"設定:
-    key1: value1
-    __Key2__: value2  #★秘密:仮
-    Key3: value3  #★秘密
-    Key4: value4  #★秘密:あり"
-`;
-
 exports[`checks template value >> settings >> 1 same values: answer 1`] = `
 "
 Warning: 0, Error: 0
