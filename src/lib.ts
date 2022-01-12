@@ -139,6 +139,14 @@ export function  pathResolve(path_: string) {
     return path_
 }
 
+// UnexpectedLine
+export interface  UnexpectedLine {
+    contentsLineNum: number;
+    contentsLine: string;
+    partsLineNum: number;
+    partsLine: string;
+}
+
 // getFullPath
 // #keyword: lib.ts JavaScript (js) library getFullPath
 // If "basePath" is current directory, you can call "path.resolve"
@@ -295,6 +303,150 @@ export function  cutLast(input: string, keyword: string): string {
     } else {
         return  input;
     }
+}
+
+// cutIndent
+export function  cutIndent(lines: string[]) {
+    const  nullLength = 99999;
+    const  indentRegularExpression = /^( |\t)*/;
+
+    var  minIndentLength = nullLength;
+    for (const line of lines) {
+        if (line.trim() !== '') {
+            const  indentLength = indentRegularExpression.exec( line )![0].length;
+            minIndentLength = Math.min(minIndentLength, indentLength)
+        }
+    }
+
+    for (var lineNum = 1;  lineNum <= lines.length;  lineNum += 1 ) {
+        const  unindentedLine = lines[lineNum - 1].substring(minIndentLength);
+        const  indentBefore = indentRegularExpression.exec( unindentedLine )![0];
+        const  indentAfter = ' '.repeat(indentBefore.length);
+
+        lines[lineNum - 1] = indentAfter + unindentedLine.substring(indentBefore.length);
+    }
+
+    return  lines;
+}
+
+// checkTextContents
+// This ignores differents of indent depth and indent width.
+export function  checkTextContents(testingContents: string[], expectedParts: string[], anyLinesLabel: string
+        ): UnexpectedLine | null {
+    const  contents = testingContents;
+    const  parts = cutIndent(expectedParts.slice());
+    const  contentsLineCount = contents.length;
+    const  partsFirstLine = parts[0];
+    var  partsLineNum = 1;
+    var  indent = '';
+    enum Result { same, different, skipped };
+    var  result = Result.same;
+    var  unexpectedLine: UnexpectedLine | null = null;
+    var  skipTo = '';
+    var  skipFrom = '';
+    var  skipStartLineNum = 1;
+
+    for (var contentsLineNum = 1;  contentsLineNum <= contentsLineCount;  contentsLineNum += 1) {
+        const  contentsLine = contents[contentsLineNum-1];
+if (contentsLineNum == 3) {
+pp('')
+}
+        if (partsLineNum === 1) {
+
+            const  partColumnIndex = contentsLine.indexOf(partsFirstLine);
+            if (partColumnIndex !== notFound  &&  contentsLine.substring(0, partColumnIndex).trim() === '') {
+                result = Result.same;
+                indent = contentsLine.substring(0, partColumnIndex);
+            } else {
+                result = Result.different;
+            }
+        } else if (skipTo === '') {
+            const  partsLine = parts[partsLineNum-1];
+
+            if (contentsLine === indent + partsLine) {
+                result = Result.same;
+            } else if (partsLine.trim() === anyLinesLabel) {
+                result = Result.skipped;
+                partsLineNum += 1;
+                skipTo = parts[partsLineNum-1];
+                skipFrom = contentsLine;
+                skipStartLineNum = contentsLineNum;
+            } else {
+                result = Result.different;
+                if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
+                    unexpectedLine = {
+                        contentsLineNum: contentsLineNum,
+                        contentsLine: contentsLine,
+                        partsLineNum: partsLineNum,
+                        partsLine: expectedParts[partsLineNum - 1],
+                    };
+                }
+            }
+        } else { // skipTo
+            if (contentsLine === indent + skipTo) {
+                result = Result.same;
+            } else if (contentsLine.trim() === ''  ||  contentsLine.startsWith(indent)) {
+                result = Result.skipped;
+            } else {
+                result = Result.different;
+                unexpectedLine = {
+                    contentsLineNum: skipStartLineNum,
+                    contentsLine: skipFrom,
+                    partsLineNum: partsLineNum,
+                    partsLine: skipTo,
+                };
+            }
+        }
+
+        if (result === Result.same) {
+            partsLineNum += 1;
+            if (partsLineNum > expectedParts.length) {
+                break
+            }
+            skipTo = '';
+        } else if (result === Result.skipped) {
+            // Do nothing
+        } else {  // Result.different
+            partsLineNum = 1;
+            skipTo = '';
+        }
+    }
+
+    if (result === Result.same) {
+        unexpectedLine = null;
+    } else if (result === Result.different) {
+        if (unexpectedLine === null) {
+            if (partsLineNum === 1) {
+                unexpectedLine = {
+                    contentsLineNum: 0,
+                    contentsLine: '',
+                    partsLineNum: 1,
+                    partsLine: expectedParts[0],
+                };
+            } else {
+                unexpectedLine = {
+                    contentsLineNum: contentsLineNum,
+                    contentsLine: testingContents[contentsLineNum - 1],
+                    partsLineNum: partsLineNum,
+                    partsLine: expectedParts[partsLineNum - 1],
+                };
+            }
+        }
+    }
+    // if (result === Result.skipped) {
+    //     templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex;
+    //     errorContents = skipFrom;
+    //     errorExpected = skipTo;
+    //     errorTemplate = skipToTemplate;
+    //     errorTargetLineNum = skipStartLineNum;
+    // }
+    // if (errorContents === '') {
+    //     errorContents = '(Not found)';
+    //     errorExpected = expectedFirstLine;
+    //     errorTemplate = this.templateLines[0];
+    // }
+
+    return  unexpectedLine;
 }
 
 // parseCSVColumns
