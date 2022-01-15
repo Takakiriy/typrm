@@ -308,7 +308,6 @@ export function  cutLast(input: string, keyword: string): string {
 // cutIndent
 export function  cutIndent(lines: string[]) {
     const  nullLength = 99999;
-    const  indentRegularExpression = /^( |\t)*/;
 
     var  minIndentLength = nullLength;
     for (const line of lines) {
@@ -329,65 +328,195 @@ export function  cutIndent(lines: string[]) {
     return  lines;
 }
 
-// checkTextContents
-// This ignores differents of indent depth and indent width.
-export function  checkTextContents(testingContents: string[], expectedParts: string[], anyLinesLabel: string
-        ): UnexpectedLine | null {
-    const  contents = testingContents;
-    const  parts = cutIndent(expectedParts.slice());
-    const  contentsLineCount = contents.length;
-    const  partsFirstLine = parts[0];
-    var  partsLineNum = 1;
-    var  indent = '';
-    enum Result { same, different, skipped };
-    var  result = Result.same;
-    var  unexpectedLine: UnexpectedLine | null = null;
-    var  skipTo = '';
-    var  skipFrom = '';
-    var  skipStartLineNum = 1;
-
-    for (var contentsLineNum = 1;  contentsLineNum <= contentsLineCount;  contentsLineNum += 1) {
-        const  contentsLine = contents[contentsLineNum-1];
-if (contentsLineNum == 3) {
-pp('')
+// getIndentWithoutHyphen
+function  getIndentWithoutHyphen(line: string): string | null {
+    const  match = indentHyphenRegularExpression.exec(line);
+    if (match === null) {
+        return  null;
+    }
+    const  leftOfHyphen = match[1] || '';
+    const  rightOfHyphen = match[3] || '';
+    if (rightOfHyphen[0] === '\t') {
+        var  indentWithoutHyphen = leftOfHyphen + rightOfHyphen;
+    } else {
+        var  indentWithoutHyphen = leftOfHyphen + ' ' + rightOfHyphen;
+    }
+    return  indentWithoutHyphen;
 }
-        if (partsLineNum === 1) {
 
-            const  partColumnIndex = contentsLine.indexOf(partsFirstLine);
-            if (partColumnIndex !== notFound  &&  contentsLine.substring(0, partColumnIndex).trim() === '') {
-                result = Result.same;
-                indent = contentsLine.substring(0, partColumnIndex);
-            } else {
-                result = Result.different;
+// checkTextContents
+// This ignores different indent depth and different indent width.
+export function  checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string
+        ): UnexpectedLine | null {
+
+    return  main(testingContents, expectedParts, anyLinesTag);
+    function  main(testingContents: string[], expectedParts: string[], anyLinesTag: string
+            ): UnexpectedLine | null {
+
+        const  contents = testingContents;
+        const  contentsLineCount = contents.length;
+        var  contentsIndent = '';
+        var  contentsIndentStack: string[] = [];
+        const  parts = cutIndent(expectedParts.slice());
+        const  partsStartsWithHyphen = (parts[0].substring(0,1) === '-');
+        const  partsFirstLine = parts[0];
+        if ( ! partsStartsWithHyphen) {
+            var  partsFirstLineWithoutHyphen = parts[0];
+        } else {
+            var  partsFirstLineWithoutHyphen = parts[0].substring(1).trimStart();
+        }
+        var  partsIndent = '';
+        var  partsIndentStack: string[] = [];
+        var  partsLineNum = 1;
+        enum Result { same, different, skipped };
+        var  result = Result.same;
+        var  unexpectedLine: UnexpectedLine | null = null;
+        var  skipTo = '';
+        var  skipFrom = '';
+        var  skipStartLineNum = 1;
+
+        for (var contentsLineNum = 1;  contentsLineNum <= contentsLineCount;  contentsLineNum += 1) {
+            const  contentsLine = contents[contentsLineNum-1];
+// if (contentsLineNum == 5  &&  ! testingContents.includes('(unexpected)')) {
+// pp('')
+// }
+            if (partsLineNum === 1) {
+                if ( ! partsStartsWithHyphen) {
+                    var  partColumnIndex = contentsLine.indexOf(partsFirstLine);
+                } else { // if partsStartsWithHyphen
+                    const  contentsStartsWithHyphen = (contentsLine.trimStart()[0] === '-');
+                    if (contentsStartsWithHyphen) {
+                        var  partColumnIndex = contentsLine.indexOf('-');
+                    } else {
+                        var  partColumnIndex = notFound;
+                    }
+                }
+                const  contentsHasPartsFirstLine = (partColumnIndex !== notFound);
+                const  contentsAfterPartsFirstLine = contentsLine.substring(0, partColumnIndex).trim();
+
+                if (contentsHasPartsFirstLine  &&  contentsAfterPartsFirstLine === '') {
+                    result = Result.same;
+                    contentsIndent = contentsLine.substring(0, partColumnIndex);
+                    contentsIndentStack = [contentsIndent];
+                    partsIndent = indentRegularExpression.exec(partsFirstLine)![0];
+                    partsIndentStack = [partsIndent];
+                    if (partsStartsWithHyphen) {
+                        contentsIndent = getIndentWithoutHyphen(contentsLine)!;
+                        contentsIndentStack.push(contentsIndent);
+                        partsIndent = getIndentWithoutHyphen(partsFirstLine)!;
+                        partsIndentStack.push(partsIndent);
+                    }
+                } else {
+                    result = Result.different;
+                }
+            } else if (skipTo === '') {
+                const  partsLine = parts[partsLineNum-1];
+                const  contentsLineWithoutIndent = contentsLine.substring(contentsIndent.length);
+                const  partsLineWithoutIndent = partsLine.substring(partsIndent.length);
+                const  contentsLineHasNewIndent = contentsLine.startsWith(contentsIndent + ' ');
+                const  partsLineHasNewIndent = partsLine.startsWith(partsIndent + ' ');
+
+                if (contentsLineWithoutIndent === partsLineWithoutIndent  &&
+                        contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
+                    result = Result.same;
+                } else if (contentsLine.trim() === partsLine.trim()) {
+                    if (contentsLineHasNewIndent  &&  partsLineHasNewIndent) {
+                        result = Result.same;
+                    } else {
+                        for (;;) {
+                            if (contentsIndentStack.length === 0  ||  partsIndentStack.length === 0) {
+                                result = Result.different;
+                                if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
+                                    unexpectedLine = { contentsLineNum, contentsLine, partsLineNum,
+                                        partsLine: expectedParts[partsLineNum - 1]};
+                                }
+                                break;
+                            }
+                            contentsIndentStack.pop();
+                            partsIndentStack.pop();
+                            contentsIndent = contentsIndentStack[contentsIndentStack.length-1];
+                            partsIndent = partsIndentStack[partsIndentStack.length-1];
+
+                            if (contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
+                                if (contentsLine.substr(contentsIndent.length, 1) !== ' '  &&
+                                        partsLine.substr(partsIndent.length, 1) !== ' ') {
+                                    result = Result.same;
+                                } else {
+                                    result = Result.different;
+                                    if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
+                                        unexpectedLine = { contentsLineNum, contentsLine, partsLineNum,
+                                            partsLine: expectedParts[partsLineNum - 1]};
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                } else if (partsLine.trim() === anyLinesTag) {
+                    result = Result.skipped;
+                    partsLineNum += 1;
+                    skipTo = parts[partsLineNum-1];
+                    skipFrom = contentsLine;
+                    skipStartLineNum = contentsLineNum;
+                } else {
+                    result = Result.different;
+                    if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
+                        unexpectedLine = { contentsLineNum, contentsLine, partsLineNum,
+                            partsLine: expectedParts[partsLineNum - 1]};
+                    }
+                }
+
+                // contentsIndentStack, ... = ...
+                if (contentsLineHasNewIndent || partsLineHasNewIndent) {
+                    contentsIndent = indentRegularExpression.exec(contentsLine)![0];
+                    contentsIndentStack.push(contentsIndent);
+                    partsIndent = indentRegularExpression.exec(partsLine)![0];
+                    partsIndentStack.push(partsIndent);
+                }
+            } else { // skipTo
+                if (contentsLine === contentsIndent + skipTo) {
+                    result = Result.same;
+                } else {  // if (contentsLine.trim() === ''  ||  (contentsLine.startsWith(contentsIndent)  &&  contentsIndent !== '')) {
+                    result = Result.skipped;
+                }
             }
-        } else if (skipTo === '') {
-            const  partsLine = parts[partsLineNum-1];
 
-            if (contentsLine === indent + partsLine) {
-                result = Result.same;
-            } else if (partsLine.trim() === anyLinesLabel) {
-                result = Result.skipped;
+            if (result === Result.same) {
                 partsLineNum += 1;
-                skipTo = parts[partsLineNum-1];
-                skipFrom = contentsLine;
-                skipStartLineNum = contentsLineNum;
-            } else {
-                result = Result.different;
-                if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
+                if (partsLineNum > expectedParts.length) {
+                    break
+                }
+                skipTo = '';
+            } else if (result === Result.skipped) {
+                // Do nothing
+            } else {  // Result.different
+                partsLineNum = 1;
+                skipTo = '';
+            }
+        }
+
+        if (result === Result.same) {
+            unexpectedLine = null;
+        } else if (result === Result.different) {
+            if (unexpectedLine === null) {
+                if (partsLineNum === 1) {
+                    unexpectedLine = {
+                        contentsLineNum: 0,
+                        contentsLine: '',
+                        partsLineNum: 1,
+                        partsLine: expectedParts[0],
+                    };
+                } else {
                     unexpectedLine = {
                         contentsLineNum: contentsLineNum,
-                        contentsLine: contentsLine,
+                        contentsLine: testingContents[contentsLineNum - 1],
                         partsLineNum: partsLineNum,
                         partsLine: expectedParts[partsLineNum - 1],
                     };
                 }
             }
-        } else { // skipTo
-            if (contentsLine === indent + skipTo) {
-                result = Result.same;
-            } else if (contentsLine.trim() === ''  ||  contentsLine.startsWith(indent)) {
-                result = Result.skipped;
-            } else {
+        } else if (result === Result.skipped) {
+            if (unexpectedLine === null) {
                 result = Result.different;
                 unexpectedLine = {
                     contentsLineNum: skipStartLineNum,
@@ -398,55 +527,8 @@ pp('')
             }
         }
 
-        if (result === Result.same) {
-            partsLineNum += 1;
-            if (partsLineNum > expectedParts.length) {
-                break
-            }
-            skipTo = '';
-        } else if (result === Result.skipped) {
-            // Do nothing
-        } else {  // Result.different
-            partsLineNum = 1;
-            skipTo = '';
-        }
+        return  unexpectedLine;
     }
-
-    if (result === Result.same) {
-        unexpectedLine = null;
-    } else if (result === Result.different) {
-        if (unexpectedLine === null) {
-            if (partsLineNum === 1) {
-                unexpectedLine = {
-                    contentsLineNum: 0,
-                    contentsLine: '',
-                    partsLineNum: 1,
-                    partsLine: expectedParts[0],
-                };
-            } else {
-                unexpectedLine = {
-                    contentsLineNum: contentsLineNum,
-                    contentsLine: testingContents[contentsLineNum - 1],
-                    partsLineNum: partsLineNum,
-                    partsLine: expectedParts[partsLineNum - 1],
-                };
-            }
-        }
-    }
-    // if (result === Result.skipped) {
-    //     templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex;
-    //     errorContents = skipFrom;
-    //     errorExpected = skipTo;
-    //     errorTemplate = skipToTemplate;
-    //     errorTargetLineNum = skipStartLineNum;
-    // }
-    // if (errorContents === '') {
-    //     errorContents = '(Not found)';
-    //     errorExpected = expectedFirstLine;
-    //     errorTemplate = this.templateLines[0];
-    // }
-
-    return  unexpectedLine;
 }
 
 // parseCSVColumns
@@ -622,6 +704,17 @@ class WritableMemoryStream extends Writable {
         return this.array.join('');
     }
 }
+
+// indentRegularExpression
+// e.g. indent = indentRegularExpression.exec( line )![0];
+export const  indentRegularExpression = /^( |\t)*/;
+
+// indentHyphenRegularExpression
+// e.g. indentWithHyphen = indentHyphenRegularExpression.exec( line )![0];
+// e.g. match = indentHyphenRegularExpression.exec( line )!;
+//    const  leftOfHyphen = match[1];
+//    const  rightOfHyphen = match[3];
+export const  indentHyphenRegularExpression = /^(( |\t)*)-(( |\t)*)/;
 
 
 // Data group
