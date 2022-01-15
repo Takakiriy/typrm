@@ -10,6 +10,7 @@ const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
+process.env.TYPRM_COMMAND_FOLDER = __dirname;
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
         regularExpression: ^(.*\\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?\$

@@ -1848,39 +1848,72 @@ function checkLineNoConfilict(keyValue, key, newValue, parser) {
         }
     }
 }
-// shell
-async function shell() {
+// runShellCommand
+function runShellCommand(keyword) {
+    if (!keyword.startsWith(programOptions.commandPrefix)) {
+        console.log(`${translate('Error')}: ${translate(`Not found command prefix "${programOptions.commandPrefix} ".`)}`);
+        return;
+    }
+    const command = keyword.substring(programOptions.commandPrefix.length + 1);
+    execShellCommand(command);
+}
+// execShellCommand
+function execShellCommand(command) {
+    if (!programOptions.commandFolder) {
+        console.log(`${translate('Error')}: ${translate('To run shell command, TYPRM_COMMAND_FOLDER environment variable must be set.')}`);
+        return;
+    }
+    const currentFolder = process.cwd();
+    var stdout_ = '';
+    try {
+        if ('verbose' in programOptions) {
+            console.log(`Verbose: command: ${command}`);
+        }
+        process.chdir(programOptions.commandFolder);
+        stdout_ = cutLastLF(child_process.execSync(command).toString());
+    }
+    catch (e) {
+        stdout_ = e.toString();
+    }
+    if (stdout_) {
+        console.log(stdout_);
+    }
+    process.chdir(currentFolder);
 }
 // search
 async function search() {
     const startIndex = (programArguments[0] === 's' || programArguments[0] === 'search') ? 1 : 0;
     const keyword = programArguments.slice(startIndex).join(' ');
-    const search_ = 1;
-    const openDocument_ = 2;
-    const printRef_ = 3;
-    const runVerb_ = 4;
-    const check_ = 5;
-    const replace_ = 6;
-    const reset_ = 7;
+    let Command;
+    (function (Command) {
+        Command[Command["search"] = 0] = "search";
+        Command[Command["openDocument"] = 1] = "openDocument";
+        Command[Command["printRef"] = 2] = "printRef";
+        Command[Command["runVerb"] = 3] = "runVerb";
+        Command[Command["check"] = 4] = "check";
+        Command[Command["replace"] = 5] = "replace";
+        Command[Command["reset"] = 6] = "reset";
+        Command[Command["shellCommand"] = 7] = "shellCommand";
+    })(Command || (Command = {}));
     if (keyword !== '') {
         const lastWord = programArguments.length === 0 ? '' : programArguments[programArguments.length - 1];
         const hasVerb = numberRegularExpression.test(lastWord);
-        var command = search_;
+        var command = Command.search;
         if (hasRefTag(keyword)) {
             if (hasVerb) {
-                command = runVerb_;
+                command = Command.runVerb;
             }
             else {
-                command = printRef_;
+                command = Command.printRef;
             }
         }
-        if (command === search_) {
+        if (command === Command.search) {
             await searchSub(keyword, false);
         }
-        else if (command === printRef_) {
+        else if (command === Command.printRef) {
             await printRef(keyword);
         }
-        else if (command === runVerb_) {
+        else if (command === Command.runVerb) {
             const keywordWithoutVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
             const ref = await printRef(keywordWithoutVerb, { print: false });
             runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
@@ -1890,9 +1923,9 @@ async function search() {
         lib.inputSkip(startIndex);
         var previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
-            var prompt = 'keyword:';
+            var prompt = `keyword${programOptions.commandPrefix || ''}:`;
             if (previousPrint.hasVerbMenu) {
-                var prompt = 'keyword or number:';
+                var prompt = `keyword or number${programOptions.commandPrefix || ''}:`;
             }
             // typrm shell
             const keyword = await lib.input(chalk.yellow(prompt) + ' ');
@@ -1907,32 +1940,35 @@ async function search() {
                 previousPrint.hasFindMenu = false;
             }
             else {
-                var command = search_;
+                var command = Command.search;
                 if (previousPrint.hasVerbMenu && numberRegularExpression.test(keyword)) {
-                    command = runVerb_;
+                    command = Command.runVerb;
                 }
                 else if (hasNumberTag(keyword)) {
-                    command = openDocument_;
+                    command = Command.openDocument;
                 }
                 else if (hasRefTag(keyword)) {
-                    command = printRef_;
+                    command = Command.printRef;
                 }
                 else if (hasCheckTag(keyword)) {
-                    command = check_;
+                    command = Command.check;
                 }
                 else if (hasReplaceTag(keyword)) {
-                    command = replace_;
+                    command = Command.replace;
                 }
                 else if (hasResetTag(keyword)) {
-                    command = reset_;
+                    command = Command.reset;
                 }
-                if (command === search_) {
+                else if (hasShellCommandPrefix(keyword)) {
+                    command = Command.shellCommand;
+                }
+                if (command === Command.search) {
                     previousPrint = await searchSub(keyword, false);
                     if (previousPrint.hasFindMenu) {
                         console.log(translate `Not found. To do full text search, press Enter key.`);
                     }
                 }
-                else if (command === openDocument_) {
+                else if (command === Command.openDocument) {
                     const foundLines = previousPrint.foundLines;
                     const foundIndex = parseInt(keyword.substring(1));
                     if (foundIndex >= 1 && foundIndex <= foundLines.length) {
@@ -1940,14 +1976,14 @@ async function search() {
                         openDocument(`${foundLine.path}:${foundLine.lineNum}`);
                     }
                 }
-                else if (command === printRef_) {
+                else if (command === Command.printRef) {
                     previousPrint = await printRef(keyword);
                 }
-                else if (command === runVerb_) {
+                else if (command === Command.runVerb) {
                     const verbNumber = keyword;
                     runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
                 }
-                else if (command === check_) {
+                else if (command === Command.check) {
                     const spaceIndex = keyword.indexOf(' ');
                     if (spaceIndex === notFound) {
                         var filePath = '';
@@ -1957,7 +1993,7 @@ async function search() {
                     }
                     await check(filePath);
                 }
-                else if (command === replace_) {
+                else if (command === Command.replace) {
                     const spaceIndex = keyword.indexOf(' ');
                     if (spaceIndex === notFound) {
                         var filePath = '';
@@ -1967,7 +2003,7 @@ async function search() {
                     }
                     await replace(filePath);
                 }
-                else if (command === reset_) {
+                else if (command === Command.reset) {
                     const spaceIndex = keyword.indexOf(' ');
                     if (spaceIndex === notFound) {
                         var filePath = '';
@@ -1976,6 +2012,9 @@ async function search() {
                         var filePath = keyword.substring(spaceIndex + 1).trim();
                     }
                     await reset(filePath);
+                }
+                else if (command === Command.shellCommand) {
+                    runShellCommand(keyword);
                 }
             }
             if (keyword === 'q' || keyword === 'quit' || keyword === 'exit') {
@@ -2393,25 +2432,7 @@ function openDocument(ref) {
         return;
     }
     const command = process.env.TYPRM_OPEN_DOCUMENT.replace('${ref}', ref);
-    var stdout_ = '';
-    try {
-        if ('verbose' in programOptions) {
-            console.log(`Verbose: command: ${command}`);
-        }
-        stdout_ = child_process.execSync(command).toString();
-        if (runningOS === 'Windows') {
-            stdout_ = stdout_.substring(0, stdout_.length - 2); // Cut last '\r\n'
-        }
-        else {
-            stdout_ = stdout_.substring(0, stdout_.length - 1); // Cut last '\n'
-        }
-    }
-    catch (e) {
-        stdout_ = e.toString();
-    }
-    if (stdout_) {
-        console.log(stdout_);
-    }
+    execShellCommand(command);
 }
 // printRef
 async function printRef(refTagAndAddress, option = printRefOptionDefault) {
@@ -2629,23 +2650,7 @@ function runVerb(verbs, address, lineNum, verbNum) {
         }
     }
     if (command !== '') {
-        var stdout_ = '';
-        try {
-            if ('verbose' in programOptions) {
-                console.log(`Verbose: command: ${command}`);
-            }
-            stdout_ = child_process.execSync(command).toString();
-            if (runningOS === 'Windows') {
-                stdout_ = stdout_.substring(0, stdout_.length - 2); // Cut last '\r\n'
-            }
-            else {
-                stdout_ = stdout_.substring(0, stdout_.length - 1); // Cut last '\n'
-            }
-        }
-        catch (e) {
-            stdout_ = e.toString();
-        }
-        console.log(stdout_);
+        execShellCommand(command);
     }
     else {
         console.log(translate `Error that verb number ${verbNum} is not defined`);
@@ -2658,6 +2663,12 @@ function printConfig() {
     }
     if ('thesaurus' in programOptions) {
         console.log(`Verbose: --thesaurus, TYPRM_THESAURUS: ${programOptions.thesaurus}`);
+    }
+    if ('commandPrefix' in programOptions) {
+        console.log(`Verbose: --command-prefix, TYPRM_COMMAND_PREFIX: ${programOptions.commandPrefix}`);
+    }
+    if ('commandFolder' in programOptions) {
+        console.log(`Verbose: --command-folder, TYPRM_COMMAND_FOLDER: ${programOptions.commandFolder}`);
     }
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith('TYPRM_') && envName !== 'TYPRM_LINE_NUM_GETTER' && envName !== 'TYPRM_VERB') {
@@ -2973,6 +2984,10 @@ function hasNumberTag(keywords) {
     const numberRegularExpression = /^[0-9]+$/;
     keywords = keywords.trim();
     return keywords[0] === '#' && numberRegularExpression.test(keywords.substring(1));
+}
+// hasCommandPrefix
+function hasShellCommandPrefix(keywords) {
+    return keywords[0] === programOptions.commandPrefix && keywords[1] === ' ';
 }
 // getNotSetTemplateIfTagVariableNames
 function getNotSetTemplateIfTagVariableNames(settingKeys) {
@@ -3922,6 +3937,16 @@ class WriteBuffer {
         return this.lineBuffer[lineNum];
     }
 }
+// cutLastLF
+function cutLastLF(message) {
+    if (message.slice(-1) === '\n') {
+        message = message.substring(0, message.length - 1);
+    }
+    if (message.slice(-1) === '\r') {
+        message = message.substring(0, message.length - 1);
+    }
+    return message;
+}
 // getStdOut
 // Example:
 //    var d = getStdOut();  // Set break point here and watch the variable d
@@ -4015,6 +4040,7 @@ function translate(englishLiterals, ...values) {
             "Not found. To do full text search, press Enter key.": "見つかりません。全文検索するときは Enter キーを押してください。",
             "template target values after replace are conflicted.": "変数の値を置き換えた後のテンプレートのターゲットが矛盾しています",
             "To show more result, restart typrm with --found-count-max option": "もっと多くの結果を表示するときは --found-count-max オプションを指定して typrm を再起動します",
+            "To run shell command, TYPRM_COMMAND_FOLDER environment variable must be set.": "シェルのコマンドを実行するには、TYPRM_COMMAND_FOLDER 環境変数を設定してください。",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",

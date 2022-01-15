@@ -797,7 +797,7 @@ describe("searches keyword tag >>", () => {
             "many result",
             ["search", "hello"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            '... (more result will be shown by --found-count-max option)\n' +
+            '... (To show more result, restart typrm with --found-count-max option)\n' +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':99:') + `     #keyword: ${matchedColor('hello')} world\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':101:') + `     #keyword: ${matchedColor('hello')} world\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':103:') + `     #keyword: ${matchedColor('hello')} world\n` +

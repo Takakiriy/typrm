@@ -12,6 +12,7 @@ typrm は テキスト ファイル 形式のマニュアルに書かれたコ�
   - [最初のサンプル - replace コマンド, reset コマンド](#最初のサンプル---replace-コマンド-reset-コマンド)
     - [#to タグを使って置き換えます](#to-タグを使って置き換えます)
   - [強力な検索機能 - #keyword タグや #glossary タグを使って精度よく検索します](#強力な検索機能---keyword-タグや-glossary-タグを使って精度よく検索します)
+  - [任意のコマンドを実行します](#任意のコマンドを実行します)
   - [インストール](#インストール)
     - [Windows の場合](#windows-の場合)
     - [mac の場合](#mac-の場合)
@@ -506,6 +507,41 @@ thesaurus.csv のサンプル:
     string, 文字列
 
 
+## 任意のコマンドを実行します
+
+検索キーワード入力モード(typrm shell)からシェルで使える任意のコマンドを実行するには、
+接頭辞とスペースを入力してからコマンドを入力します。
+
+    $ typrm
+    keyword$: $ echo abc
+    abc
+    keyword$:
+
+任意のコマンドを実行できるようにするには、接頭辞を環境変数 `TYPRM_COMMAND_PREFIX`
+または typrm 起動時の --command-prefix オプションに設定し、
+作業用フォルダー（カレント フォルダー）を環境変数 `TYPRM_COMMAND_FOLDER`
+または typrm 起動時の --command-folder オプションに設定する必要があります。
+
+bash
+
+    export  TYPRM_COMMAND_PREFIX='$'
+    export  TYPRM_COMMAND_FOLDER=/Users/user1/bin/typrm_work
+
+PowerShell
+
+    ${env:TYPRM_COMMAND_PREFIX} = '$'
+    ${env:TYPRM_COMMAND_FOLDER} = /Home/user1/bin/typrm_work
+
+接頭辞は typrm shell のコロンの前に表示されます。
+
+    keyword$:
+
+typrm shell のコロンの前に接頭辞が表示されていない状態であれば、
+任意のコマンドを実行されることはありません。
+
+    keyword:
+
+
 ## インストール
 
 typrm を使うには Node.js のインストールが必要です。
@@ -580,7 +616,7 @@ typrm を使うには Node.js のインストールが必要です。
         PowerShell または Git bash を新しく開いて:
             typrm --version
 
-    必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     アンインストールする場合、下記のファイルやフォルダーを削除し、不要なら Node.js をアンインストールします。
         - ${HOME}/bin/typrm （固有の設定はバックアップしてください）
@@ -630,7 +666,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm が使えることを確認します:
         typrm --version
 
-    必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     アンインストールする場合、下記のファイルやフォルダーを削除し、不要なら Node.js をアンインストールします。
         - rm  "${HOME}/bin/typrm" （固有の設定はバックアップしてください）
@@ -696,7 +732,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm が使えることを確認します:
         typrm --version
 
-    必要に応じて環境変数 TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     （使わなくなったら）typrm を削除します:
         - rm  "${HOME}/bin/typrm"   （固有の設定はバックアップしてください）
@@ -1223,6 +1259,9 @@ search (s) コマンドに `#ref:` タグを付けてファイルのパスを表
 search コマンドのパラメーターにコマンドの数字を追加指定するとコマンドを実行します。
 
     $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'　0  #// Folder コマンド
+
+ただし、コマンドを実行するには、作業フォルダー（カレント フォルダー）を環境変数 `TYPRM_COMMAND_FOLDER`
+に設定する必要があります。
 
 typrm shell に入って `#ref:` タグでファイルのパスを表示したら、
 プロンプトが keyword or number: に変わります。

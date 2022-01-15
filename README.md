@@ -14,6 +14,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [First replace example - replace command, reset command](#first-replace-example---replace-command-reset-command)
     - [Replace with #to tag](#replace-with-to-tag)
   - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
+  - [Execute any command](#execute-any-command)
   - [Install](#install)
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
@@ -523,6 +524,42 @@ Exmple of thesaurus.csv:
     destination, dst, dest
 
 
+## Execute any command
+
+To execute any shell command in
+search keyword input mode (typrm shell),
+enter the prefix and space before entering the command.
+
+    $ typrm
+    keyword$: $ echo abc
+    abc
+    keyword$:
+
+To execute shell commands, set the prefix to the environment variable
+`TYPRM_COMMAND_PREFIX` or the --command-prefix option with typrm command,
+and set the working folder (current folder) to the environment variable
+`TYPRM_COMMAND_FOLDER` or the --command-folder option with typrm command.
+
+bash
+
+    export  TYPRM_COMMAND_PREFIX='$'
+    export  TYPRM_COMMAND_FOLDER=/Users/user1/bin/typrm_work
+
+PowerShell
+
+    ${env:TYPRM_COMMAND_PREFIX} = '$'
+    ${env:TYPRM_COMMAND_FOLDER} = /Home/user1/bin/typrm_work
+
+The prefix is shown before the colon in the typrm shell.
+
+    keyword$:
+
+Any command will not be executed if the prefix is not displayed
+before the colon in the typrm shell.
+
+    keyword:
+
+
 ## Install
 
 To use typrm, you must install Node.js.
@@ -597,7 +634,7 @@ To use typrm, you must install Node.js.
         Open new PowerShell or new Git bash:
             typrm --version
 
-    Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     To uninstall, delete the following files and folders, and uninstall Node.js if you don't need it.
         - ${HOME}/bin/typrm  (Back up your unique settings)
@@ -647,7 +684,7 @@ To use typrm, you must install Node.js.
     Check to use typrm command:
         typrm --version
 
-    Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     To uninstall, delete the following files and folders, and uninstall Node.js if you don't need it.
         - rm  "${HOME}/bin/typrm"  (Back up your unique settings)
@@ -713,7 +750,7 @@ To use typrm, you must install Node.js.
     Check to use typrm command:
         typrm --version
 
-    Set the environment variables TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     (If you do not use) delete typrm:
         - rm  "${HOME}/bin/typrm"  (Back up your unique settings)
@@ -1278,6 +1315,9 @@ The command is executed when the number of the command is
 additionally specified in the parameter of the search command.
 
     $ typrm s \#ref: '${books}/manual/red_book_2021.pdf'  0  #// Folder command
+
+To execute the command, the working folder (current folder) must be set to
+the environment variable `TYPRM_COMMAND_FOLDER`.
 
 When you enter typrm shell and display the file path
 with the `#ref:` tag, the prompt changes to `keyword or number:`.

@@ -11,6 +11,12 @@ export declare function replaceFileAsync(sourceFilePath: string, replaceFunction
 }, destinationFilePath?: string): Promise<void>;
 export declare function searchAsTextSub(readlineOptions: ReadLineOptions, keyword: string, csvOption: boolean): Promise<number>;
 export declare function pathResolve(path_: string): string;
+export interface UnexpectedLine {
+    contentsLineNum: number;
+    contentsLine: string;
+    partsLineNum: number;
+    partsLine: string;
+}
 export declare function getFullPath(relativePath: string, basePath: string): string;
 export declare function isFullPath(path: string): boolean;
 export declare function checkNotInGitWorking(): void;
@@ -23,6 +29,8 @@ interface GlobbyParameters {
 }
 export declare function cutLeftOf(input: string, keyword: string): string;
 export declare function cutLast(input: string, keyword: string): string;
+export declare function cutIndent(lines: string[]): string[];
+export declare function checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
 export declare function parseCSVColumns(columns: string): Promise<string[]>;
 export declare function parseCSVColumnPositions(csv: string, columns: string[]): number[];
 export declare function escapeRegularExpression(expression: string): string;
@@ -34,6 +42,8 @@ interface ReplaceParameter {
     lineNum?: number;
     to: string;
 }
+export declare const indentRegularExpression: RegExp;
+export declare const indentHyphenRegularExpression: RegExp;
 export declare function isSameArray<T>(log: T[], answer: T[]): boolean;
 export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
 export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
