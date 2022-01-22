@@ -4734,57 +4734,7 @@ case B after:  #if: $settings.__Switch_01__ == B
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case: answer indicesWithIf 1`] = `
-"Map {
-    1 => "/",
-    2 => "/1",
-    8 => "/1/a",
-    9 => "/1/a/a",
-    10 => "/1/a",
-    11 => "/1",
-    12 => "/1/1",
-}
-"
-`;
-
-exports[`unit test >> makeSettingTree_bug_case: sourceFileContents 1`] = `
-"bug case:
-    2:
-        settings: #settings:
-            __Switch1__: A
-            __Switch2__: A
-        6:
-            7:
-                8:  #if: $settings.__Switch1__ == A
-                    9:  #if: $settings.__Switch2__ == A
-                    10:
-                11:
-        12:
-            settings: #settings:
-                __Set3__: aa
-"
-`;
-
-exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`] = `
-"Map {
-    1 => "/",
-    2 => "/a",
-    3 => "/",
-    4 => "/1",
-}
-"
-`;
-
-exports[`unit test >> makeSettingTree_if_and_no_indent: sourceFileContents 1`] = `
-"body:
-    #if: true
-no indent:
-no indent:
-    settings: #settings:
-"
-`;
-
-exports[`unit test >> makeSettingTree_nest: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree_below_shallow_settings: answer indicesWithIf 1`] = `
 "Map {
     1 => "/1",
     2 => "/1/1",
@@ -4805,7 +4755,7 @@ exports[`unit test >> makeSettingTree_nest: answer indicesWithIf 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree_nest: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree_below_shallow_settings: sourceFileContents 1`] = `
 "root:  #// b2_bug_case_nest_settings
     1:  #// Test of 1
         settings: #settings:
@@ -4854,5 +4804,55 @@ root2:  #// Test of 211
                     __Var2123__: value2123
         settings: #settings:
             __Var21__: value21
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    8 => "/1/a",
+    9 => "/1/a/a",
+    10 => "/1/a",
+    11 => "/1",
+    12 => "/1/1",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case: sourceFileContents 1`] = `
+"bug case:
+    2:
+        settings: #settings:
+            __Switch1__: A
+            __Switch2__: A
+        6:
+            7:
+                8:  #if: $settings.__Switch1__ == A
+                    9:  #if: $settings.__Switch2__ == A
+                    10:
+                11:
+        12:
+            settings: #settings:
+                __Set3__: aa
+"
+`;
+
+exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/a",
+    3 => "/",
+    4 => "/1",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_if_and_no_indent: sourceFileContents 1`] = `
+"body:
+    #if: true
+no indent:
+no indent:
+    settings: #settings:
 "
 `;
