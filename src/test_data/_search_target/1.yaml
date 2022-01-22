@@ -1,7 +1,0 @@
-settings: #settings:
-    __VarA__: valueA
-    a__VarA__: valueAa
-body:
-    __VarA__: x
-settings: #settings:
-    __VarA__: valueA

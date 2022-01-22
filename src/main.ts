@@ -2386,7 +2386,6 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
 
         var  foundLineWithoutTags = await searchWithoutTags(keyword);
-
         foundLines = [... foundLineWithoutTags, ... foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) =>
             found1.path == found2.path  &&  found1.lineNum == found2.lineNum));
@@ -2592,9 +2591,13 @@ function  compareScore(a: FoundLine, b: FoundLine) {
 }
 
 // searchWithoutTags
-async function  searchWithoutTags(keyword: string): Promise<FoundLine[]> {
+async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     const  foundLines: FoundLine[] = [];
-    const  keywordLowerCase = keyword.toLowerCase();
+    const  keywordsLowerCase = keywords.replace(/\u{3000}/ug,' ').toLowerCase().split(' ').filter((keyword)=>(keyword !== ''));
+        // '\u{3000}': Japanese space
+    const  keyword1LowerCase = keywordsLowerCase[0];
+    const  keywords2LowerCase = keywordsLowerCase.slice(1);
+
     for (const inputFileFullPath of await listUpFilePaths()) {
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
@@ -2606,14 +2609,8 @@ async function  searchWithoutTags(keyword: string): Promise<FoundLine[]> {
             const  line: string = line1;
             lineNum += 1;
 
-            const  keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
+            var  keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
             if (keywordIndex !== notFound) {
-
-// pp
-                // console.log(`${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
-                //     line.substring(0, keywordIndex) +
-                //     matchedColor(line.substr(keywordIndex, keyword.length)) +
-                //     line.substring(keywordIndex + keyword.length));
 
                 const  found = new FoundLine();
                 found.path = getTestablePath(inputFileFullPath);
@@ -2621,16 +2618,32 @@ async function  searchWithoutTags(keyword: string): Promise<FoundLine[]> {
                 found.line = line;
                 found.matches.push({
                     position: keywordIndex,
-                    length: keyword.length,
+                    length: keyword1LowerCase.length,
                     testTargetIndex: -1,
-                    matchedString: line.substr(keywordIndex, keyword.length),
+                    matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
                 });
                 found.matchedKeywordCount = 1;
                 found.matchedTargetKeywordCount = 1;
                 found.testedWordCount = 0;
                 found.tagLabel = 'find all';
                 found.score = 1;
-                foundLines.push(found);
+
+                for (const keywordLowerCase of keywords2LowerCase) {
+                    keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
+                    if (keywordIndex === notFound) {
+                        break;
+                    }
+                    found.matches.push({
+                        position: keywordIndex,
+                        length: keywordLowerCase.length,
+                        testTargetIndex: -1,
+                        matchedString: line.substr(keywordIndex, keywordLowerCase.length),
+                    });
+                }
+                if (keywordIndex !== notFound) {
+
+                    foundLines.push(found);
+                }
             }
         }
     }

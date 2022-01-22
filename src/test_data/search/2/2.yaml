@@ -104,3 +104,14 @@ many result:
     #keyword: hello
     #keyword: hello world
     #keyword: hello
+find all >> 1st:
+    find_all_abc
+    find_all_def
+    find_all_abc
+    find_all_def
+find all >> shuffle:
+    find_all_1 find_all_2
+    find_all_2 find_all_1
+    find_all_1
+    find_all_2
+    find_all_1 find_all_3 find_all_2

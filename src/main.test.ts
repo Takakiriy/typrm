@@ -612,6 +612,7 @@ describe("replaces settings >>", () => {
         chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toBe(sourceFileContents);
+        fs.rmdirSync(testFolderPath + '_changing', {recursive: true});
     });
 
     describe("verbose >>", () => {
@@ -1031,6 +1032,36 @@ describe("searches glossary tag >>", () => {
     });
 });
 
+describe("find all >>", () => {
+  test.each([
+    [
+        "1st",
+            ["search", "find_all_abc"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':108:') + `     ${matchedColor('find_all_abc')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':110:') + `     ${matchedColor('find_all_abc')}\n`,
+    ],[
+        "shffle",
+            ["search", "find_all_1 find_all_2"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n`,
+    ],[
+        "shffle jp",
+            ["search", "find_all_1\u{3000}find_all_2"],  // '\u{3000}': Japanese space
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n`,
+    ],
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
+});
+
 describe("mutual search >>", () => {
   test.each([
     [
@@ -1288,6 +1319,7 @@ describe("unit test >>", () => {
 
         const  settingsTree = await makeSettingTree(parser);
         expect(Array.from( settingsTree.indicesWithIf )).toStrictEqual(answerIndicesWithIf);
+        fs.rmdirSync(testFolderPath + '_tmp', {recursive: true});
     });
 });
 
