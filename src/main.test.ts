@@ -368,6 +368,7 @@ describe("replaces settings >>", () => {
             '2_replace_11_nested_if', ' C', 'en-US',
                 { replacers:[{ from: '__Set2__: C',  to: '__Set2__: C  #to:CC' }]},
         ],
+        // There are other cases in "replace to tag" test.
 
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
         const {filePath} = initializeTestInputFile(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
@@ -548,6 +549,7 @@ describe("replaces settings >>", () => {
             ['6_VariousTags', ''],
             ['7_VariableCount', ''],
             ['7E_VariableCount_Error', 'ErrorCase'],
+            ['8_ParentSettings', ''],
             ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {

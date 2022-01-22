@@ -344,6 +344,7 @@ describe("replaces settings >>", () => {
             '2_replace_11_nested_if', ' C', 'en-US',
             { replacers: [{ from: '__Set2__: C', to: '__Set2__: C  #to:CC' }] },
         ],
+        // There are other cases in "replace to tag" test.
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
         const { filePath } = initializeTestInputFile(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
         if (option) {
@@ -514,6 +515,7 @@ describe("replaces settings >>", () => {
             ['6_VariousTags', ''],
             ['7_VariableCount', ''],
             ['7E_VariableCount_Error', 'ErrorCase'],
+            ['8_ParentSettings', ''],
             ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
         ])("%s", async (caseName, options) => {
@@ -1225,7 +1227,7 @@ describe("unit test >>", () => {
         ["makeSettingTree", "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"],
         ["makeSettingTree_bug_case", null],
         ["makeSettingTree_if_and_no_indent", null],
-        ["makeSettingTree_nest", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
+        ["makeSettingTree_below_shallow_settings", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
     ])("%s", async (caseName, sameInputSnapshotName) => {
         const Parser = main.private_.Parser;
         const makeSettingTree = main.private_.makeSettingTree;

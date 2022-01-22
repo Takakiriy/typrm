@@ -748,7 +748,8 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
                         console.log(`    variableName: ${variableName}`);
                         console.log(`    valueA: ${variable.value} ` +
                             `in ${getTestablePath(parser.filePath)}:${variable.lineNum}`);
-                        console.log(`    valueB: ${toValue} in ${getTestablePath(parser.filePath)}:${lineNum}`);
+                        console.log(`    valueB: ${toValue} ` +
+                            `in ${getTestablePath(parser.filePath)}:${lineNum}`);
                         parser.errorCount += 1;
                     }
                 }
@@ -780,7 +781,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
                         for (const index of indices) {
                             if (variableName in toTagTree.replaceTo[index]) {
                                 const  variable = toTagTree.replaceTo[index][variableName];
-                                if (toValue !== variable.value) {
+                                if (newKeyValues[variableName].value !== variable.value) {
                                     console.log('');
                                     console.log(`Error of conflict #to: tag:`);
                                     console.log(`    variableName: ${variableName}`);
@@ -1192,7 +1193,7 @@ class  TemplateTag {
 
                 foundIndices.set(index, key);
                 template =
-                    template.substr(0, index) +
+                    template.substring(0, index) +
                     ' '.repeat(key.length) +
                     template.substring(index + key.length);
                     // erase the key
@@ -1205,9 +1206,9 @@ class  TemplateTag {
         var    templatePattern = this.template;
         for (let i = indices.length - 1;  i >= 0;  i -= 1 ) {
             templatePattern =
-                templatePattern.substr(0, indices[i]) +
+                templatePattern.substring(0, indices[i]) +
                 placeholder +
-                templatePattern.substr(indices[i] + keys[i].length)
+                templatePattern.substring(indices[i] + keys[i].length)
         }
         const  templateRegularExpression = lib.escapeRegularExpression(templatePattern).replace(new RegExp( placeholder, "g"), '(.*)');
         const  toValueIsMatchedWithTemplate = new RegExp( templateRegularExpression ).exec( toValue );

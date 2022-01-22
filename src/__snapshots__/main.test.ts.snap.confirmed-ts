@@ -3801,11 +3801,6 @@ Error of the value count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:        #to: a, b, c
     Variable count in the template tag: 2
     Variable count in the to tag: 3
-
-Error of conflict #to: tag:
-    variableName: __SetA__
-    valueA: a in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
-    valueB: a, b, c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetA__: a
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetB__: b
 
@@ -3814,7 +3809,166 @@ Error of the value count in #to tag:
     Variable count in the template tag: 0
     Variable count in the to tag: 1
 
-Warning: 0, Error: 4
+Warning: 0, Error: 3
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 8_ParentSettings: replacedFileContents 1`] = `
+"case 1:
+    settings: #settings:
+        __Parent1__: parent_replaced  #original: parent
+    nest:
+        settings: #settings:
+            __Set1__: value_replaced  #original: value
+        ref:
+            parent_replaced, value_replaced
+                #template: __Parent1__, __Set1__
+case 2:
+    settings: #settings:
+        __Parent2__: parent_replaced  #original: parent
+    nest:
+        settings: #settings:
+            __Set2__: value_replaced  #original: value
+        ref:
+            parent_replaced, value_replaced
+                #template: __Parent2__, __Set2__
+case 3:
+    settings: #settings:
+        __Parent3__: parent_replaced  #original: parent
+    nest:
+        settings: #settings:
+            __Set3__: value
+        ref:
+            parent, value
+    ref:
+        parent_replaced
+            #template: __Parent3__
+case 4:
+    settings: #settings:
+        __Parent4__: parent_replaced  #original: parent
+    nestA:
+        settings: #settings:
+            __Set4__: value_replaced_A  #original: value
+        ref:
+            parent_replaced, value_replaced_A
+                #template: __Parent4__, __Set4__
+    nestB:
+        settings: #settings:
+            __Set4__: value_replaced_B  #original: value
+        ref:
+            parent_replaced, value_replaced_B
+                #template: __Parent4__, __Set4__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 8_ParentSettings: revertedFileContents 1`] = `
+"case 1:
+    settings: #settings:
+        __Parent1__: parent
+    nest:
+        settings: #settings:
+            __Set1__: value
+        ref:
+            parent, value
+                #template: __Parent1__, __Set1__
+case 2:
+    settings: #settings:
+        __Parent2__: parent
+    nest:
+        settings: #settings:
+            __Set2__: value
+        ref:
+            parent, value
+                #template: __Parent2__, __Set2__
+case 3:
+    settings: #settings:
+        __Parent3__: parent
+    nest:
+        settings: #settings:
+            __Set3__: value
+        ref:
+            parent, value
+    ref:
+        parent
+            #template: __Parent3__
+case 4:
+    settings: #settings:
+        __Parent4__: parent
+    nestA:
+        settings: #settings:
+            __Set4__: value
+        ref:
+            parent, value
+                #template: __Parent4__, __Set4__
+    nestB:
+        settings: #settings:
+            __Set4__: value
+        ref:
+            parent, value
+                #template: __Parent4__, __Set4__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 8_ParentSettings: sourceFileContents 1`] = `
+"case 1:
+    settings: #settings:
+        __Parent1__: parent  #to: parent_replaced
+    nest:
+        settings: #settings:
+            __Set1__: value  #to: value_replaced
+        ref:
+            parent, value
+                #template: __Parent1__, __Set1__
+case 2:
+    settings: #settings:
+        __Parent2__: parent
+    nest:
+        settings: #settings:
+            __Set2__: value
+        ref:
+            parent, value
+                #template: __Parent2__, __Set2__  #to: parent_replaced, value_replaced
+case 3:
+    settings: #settings:
+        __Parent3__: parent
+    nest:
+        settings: #settings:
+            __Set3__: value
+        ref:
+            parent, value
+    ref:
+        parent
+            #template: __Parent3__  #to: parent_replaced
+case 4:
+    settings: #settings:
+        __Parent4__: parent
+    nestA:
+        settings: #settings:
+            __Set4__: value
+        ref:
+            parent, value
+                #template: __Parent4__, __Set4__  #to: parent_replaced, value_replaced_A
+    nestB:
+        settings: #settings:
+            __Set4__: value
+        ref:
+            parent, value
+                #template: __Parent4__, __Set4__  #to: parent_replaced, value_replaced_B
+"
+`;
+
+exports[`replaces settings >> replace to tag >> 8_ParentSettings: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Parent1__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __Set1__: value_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: #to: __Parent2__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: #to: __Set2__: value_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: #to: __Parent3__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: #to: __Parent4__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: #to: __Set4__: value_replaced_A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44: #to: __Parent4__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44: #to: __Set4__: value_replaced_B
+
+Warning: 0, Error: 0
 "
 `;
 
