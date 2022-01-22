@@ -429,10 +429,12 @@ Also, word-based search is not possible.
     .../text.txt:1: Game:
     keyword:
 
-In typrm shell, if you inputed starts with `#r`, `#replace`, `#reset`, `#c` or `#check`, typrm runs replace, reset or check command.
+In typrm shell, if you inputed starts with `#r`, `#replace:`, `#reset:`, `#c`,
+`#check:` or `#mutual:`, typrm runs replace, reset, check or mutual-search command.
 
     #r                // replace all files
     #r example.yaml
+    #replace: example.yaml  // Requires a colon at the end when not abbreviated
 
 (For all versions)
 

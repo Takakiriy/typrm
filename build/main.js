@@ -51,12 +51,6 @@ export async function mainMain() {
             }
             await search();
         }
-        else if (programArguments[0] === 'f' || programArguments[0] === 'find') {
-            if (verboseMode) {
-                console.log('Verbose: typrm command: find');
-            }
-            await find();
-        }
         else if (programArguments[0] === 'm' || programArguments[0] === 'mutual-search') {
             varidateMutualSearchCommandArguments();
             if (verboseMode) {
@@ -722,7 +716,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
                     if (parser.verbose) {
                         console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                     }
-                    const newKeyValues = await previousTemplateTag.scanKeyValues(toValue, Object.keys(settingTree.currentSettings), parser);
+                    const newKeyValues = await previousTemplateTag.scanKeyValues(toValue, settingTree.currentSettings, parser);
                     if (parser.verbose) {
                         for (const [variableName, newValue] of Object.entries(newKeyValues)) {
                             console.log(`Verbose:         ${variableName}: ${newValue.value}`);
@@ -1072,7 +1066,7 @@ class TemplateTag {
     }
     // scanKeyValues
     async scanKeyValues(toValue, allKeys, parser) {
-        const keysSortedByLength = allKeys.slice(); // copy
+        const keysSortedByLength = Object.keys(allKeys).slice(); // copy
         keysSortedByLength.sort((b, a) => (a.length, b.length));
         const foundIndices = new Map();
         const verboseMode = parser.verbose;
@@ -1147,7 +1141,7 @@ class TemplateTag {
             returnKeyValues[key] = {
                 value: keyValues[key],
                 lineNum: parser.lineNum,
-                settingsIndex: '___?1___',
+                settingsIndex: allKeys[key].settingsIndex,
                 tag: 'toAfterTemplate',
                 isReferenced: false,
             };
@@ -1918,15 +1912,15 @@ function checkLineNoConfilict(keyValue, key, newValue, parser) {
 }
 // runShellCommand
 function runShellCommand(keyword) {
-    if (!programOptions.commandPrefix) {
-        console.log(`${translate('Error')}: ${translate(`To run shell command, TYPRM_COMMAND_PREFIX environment variable must be set.`)}`);
+    if (!programOptions.commandSymbol) {
+        console.log(`${translate('Error')}: ${translate(`To run shell command, TYPRM_COMMAND_SYMBOL environment variable must be set.`)}`);
         return;
     }
-    if (!keyword.startsWith(programOptions.commandPrefix)) {
-        console.log(`${translate('Error')}: ${translate(`Not found command prefix "${programOptions.commandPrefix} ".`)}`);
+    if (!keyword.startsWith(programOptions.commandSymbol)) {
+        console.log(`${translate('Error')}: ${translate(`Not found command prefix "${programOptions.commandSymbol} ".`)}`);
         return;
     }
-    const command = keyword.substring(programOptions.commandPrefix.length + 1);
+    const command = keyword.substring(programOptions.commandSymbol.length + 1);
     execShellCommand(command);
 }
 // execShellCommand
@@ -1967,8 +1961,10 @@ async function search() {
         Command[Command["check"] = 4] = "check";
         Command[Command["replace"] = 5] = "replace";
         Command[Command["reset"] = 6] = "reset";
-        Command[Command["shellCommand"] = 7] = "shellCommand";
+        Command[Command["mutualSearch"] = 7] = "mutualSearch";
+        Command[Command["shellCommand"] = 8] = "shellCommand";
     })(Command || (Command = {}));
+    ;
     if (keyword !== '') {
         const lastWord = programArguments.length === 0 ? '' : programArguments[programArguments.length - 1];
         const hasVerb = numberRegularExpression.test(lastWord);
@@ -1981,8 +1977,14 @@ async function search() {
                 command = Command.printRef;
             }
         }
+        else if (hasMutualTag(keyword)) {
+            command = Command.mutualSearch;
+        }
         if (command === Command.search) {
             await searchSub(keyword, false);
+        }
+        else if (command === Command.mutualSearch) {
+            await searchSub(keyword.replace(mutualTag, ''), true);
         }
         else if (command === Command.printRef) {
             await printRef(keyword);
@@ -1997,9 +1999,9 @@ async function search() {
         lib.inputSkip(startIndex);
         var previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
-            var prompt = `keyword${programOptions.commandPrefix || ''}:`;
+            var prompt = `keyword${programOptions.commandSymbol || ''}:`;
             if (previousPrint.hasVerbMenu) {
-                var prompt = `keyword or number${programOptions.commandPrefix || ''}:`;
+                var prompt = `keyword or number${programOptions.commandSymbol || ''}:`;
             }
             // typrm shell
             const keyword = await lib.input(chalk.yellow(prompt) + ' ');
@@ -2007,11 +2009,7 @@ async function search() {
                 break;
             }
             else if (keyword === '') {
-                if (previousPrint.hasFindMenu) {
-                    await findSub(previousPrint.previousKeyword);
-                }
                 previousPrint.hasVerbMenu = false;
-                previousPrint.hasFindMenu = false;
             }
             else {
                 var command = Command.search;
@@ -2033,14 +2031,17 @@ async function search() {
                 else if (hasResetTag(keyword)) {
                     command = Command.reset;
                 }
-                else if (hasShellCommandPrefix(keyword)) {
+                else if (hasMutualTag(keyword)) {
+                    command = Command.mutualSearch;
+                }
+                else if (hasShellCommandSymbol(keyword)) {
                     command = Command.shellCommand;
                 }
                 if (command === Command.search) {
                     previousPrint = await searchSub(keyword, false);
-                    if (previousPrint.hasFindMenu) {
-                        console.log(translate `Not found. To do full text search, press Enter key.`);
-                    }
+                }
+                else if (command === Command.mutualSearch) {
+                    await searchSub(cutTag(keyword), true);
                 }
                 else if (command === Command.openDocument) {
                     const foundLines = previousPrint.foundLines;
@@ -2058,33 +2059,15 @@ async function search() {
                     runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
                 }
                 else if (command === Command.check) {
-                    const spaceIndex = keyword.indexOf(' ');
-                    if (spaceIndex === notFound) {
-                        var filePath = '';
-                    }
-                    else {
-                        var filePath = keyword.substring(spaceIndex + 1).trim();
-                    }
+                    const filePath = cutTag(keyword);
                     await check(filePath);
                 }
                 else if (command === Command.replace) {
-                    const spaceIndex = keyword.indexOf(' ');
-                    if (spaceIndex === notFound) {
-                        var filePath = '';
-                    }
-                    else {
-                        var filePath = keyword.substring(spaceIndex + 1).trim();
-                    }
+                    const filePath = cutTag(keyword);
                     await replace(filePath);
                 }
                 else if (command === Command.reset) {
-                    const spaceIndex = keyword.indexOf(' ');
-                    if (spaceIndex === notFound) {
-                        var filePath = '';
-                    }
-                    else {
-                        var filePath = keyword.substring(spaceIndex + 1).trim();
-                    }
+                    const filePath = cutTag(keyword);
                     await reset(filePath);
                 }
                 else if (command === Command.shellCommand) {
@@ -2267,6 +2250,11 @@ async function searchSub(keyword, isMutual) {
     const keyphraseWordCount = keyword.split(' ').length;
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
     foundLines.sort(compareScore);
+    if (!('disableFindAll' in programOptions) && !isMutual) {
+        var foundLineWithoutTags = await searchWithoutTags(keyword);
+        foundLines = [...foundLineWithoutTags, ...foundLines];
+        foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) => found1.path == found2.path && found1.lineNum == found2.lineNum));
+    }
     const foundCountMax = parseInt(programOptions.foundCountMax);
     if (foundLines.length > foundCountMax) {
         console.log(`... (` + translate(`To show more result, restart typrm with --found-count-max option`) + ')');
@@ -2300,7 +2288,6 @@ async function searchSub(keyword, isMutual) {
         const normalReturn = getEmptyOfPrintRefResult();
         if (foundLines.length === 0) {
             normalReturn.previousKeyword = keyword;
-            normalReturn.hasFindMenu = true;
         }
         normalReturn.foundLines = foundLines;
         return normalReturn;
@@ -2446,19 +2433,13 @@ function compareScore(a, b) {
     }
     return different;
 }
-// find
-async function find() {
-    const keyword = programArguments.slice(1).join(' ');
-    if (keyword === '') {
-        search();
-    }
-    else {
-        await findSub(keyword);
-    }
-}
-// findSub
-async function findSub(keyword) {
-    const keywordLowerCase = keyword.toLowerCase();
+// searchWithoutTags
+async function searchWithoutTags(keywords) {
+    const foundLines = [];
+    const keywordsLowerCase = keywords.replace(/\u{3000}/ug, ' ').toLowerCase().split(' ').filter((keyword) => (keyword !== ''));
+    // '\u{3000}': Japanese space
+    const keyword1LowerCase = keywordsLowerCase[0];
+    const keywords2LowerCase = keywordsLowerCase.slice(1);
     for (const inputFileFullPath of await listUpFilePaths()) {
         const reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
@@ -2468,15 +2449,42 @@ async function findSub(keyword) {
         for await (const line1 of reader) {
             const line = line1;
             lineNum += 1;
-            const keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
+            var keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
             if (keywordIndex !== notFound) {
-                console.log(`${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
-                    line.substr(0, keywordIndex) +
-                    matchedColor(line.substr(keywordIndex, keyword.length)) +
-                    line.substr(keywordIndex + keyword.length));
+                const found = new FoundLine();
+                found.path = getTestablePath(inputFileFullPath);
+                found.lineNum = lineNum;
+                found.line = line;
+                found.matches.push({
+                    position: keywordIndex,
+                    length: keyword1LowerCase.length,
+                    testTargetIndex: -1,
+                    matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
+                });
+                found.matchedKeywordCount = 1;
+                found.matchedTargetKeywordCount = 1;
+                found.testedWordCount = 0;
+                found.tagLabel = 'find all';
+                found.score = 1;
+                for (const keywordLowerCase of keywords2LowerCase) {
+                    keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
+                    if (keywordIndex === notFound) {
+                        break;
+                    }
+                    found.matches.push({
+                        position: keywordIndex,
+                        length: keywordLowerCase.length,
+                        testTargetIndex: -1,
+                        matchedString: line.substr(keywordIndex, keywordLowerCase.length),
+                    });
+                }
+                if (keywordIndex !== notFound) {
+                    foundLines.push(found);
+                }
             }
         }
     }
+    return foundLines;
 }
 // mutualSearch
 async function mutualSearch() {
@@ -2495,7 +2503,6 @@ function getEmptyOfPrintRefResult() {
         verbs: [],
         address: '',
         addressLineNum: 0,
-        hasFindMenu: false,
         previousKeyword: '',
     };
 }
@@ -2738,8 +2745,8 @@ function printConfig() {
     if ('thesaurus' in programOptions) {
         console.log(`Verbose: --thesaurus, TYPRM_THESAURUS: ${programOptions.thesaurus}`);
     }
-    if ('commandPrefix' in programOptions) {
-        console.log(`Verbose: --command-prefix, TYPRM_COMMAND_PREFIX: ${programOptions.commandPrefix}`);
+    if ('commandSymbol' in programOptions) {
+        console.log(`Verbose: --command-symbol, TYPRM_COMMAND_SYMBOL: ${programOptions.commandSymbol}`);
     }
     if ('commandFolder' in programOptions) {
         console.log(`Verbose: --command-folder, TYPRM_COMMAND_FOLDER: ${programOptions.commandFolder}`);
@@ -3040,18 +3047,23 @@ function hasRefTag(keywords) {
 function hasCheckTag(keywords) {
     keywords = keywords.trim();
     return keywords === '#c' || keywords.startsWith('#c ') ||
-        keywords === '#check' || keywords.startsWith('#check ');
+        keywords === checkTag || keywords.startsWith(`${checkTag} `);
 }
 // hasReplaceTag
 function hasReplaceTag(keywords) {
     keywords = keywords.trim();
     return keywords === '#r' || keywords.startsWith('#r ') ||
-        keywords === '#replace' || keywords.startsWith('#replace ');
+        keywords === replaceTag || keywords.startsWith(`${replaceTag} `);
 }
 // hasResetTag
 function hasResetTag(keywords) {
     keywords = keywords.trim();
-    return keywords === '#reset' || keywords.startsWith('#reset ');
+    return keywords === resetTag || keywords.startsWith(`${resetTag} `);
+}
+// hasMutualTag
+function hasMutualTag(keywords) {
+    keywords = keywords.trim();
+    return keywords === mutualTag || keywords.startsWith(`${mutualTag} `);
 }
 // hasNumberTag
 function hasNumberTag(keywords) {
@@ -3059,9 +3071,9 @@ function hasNumberTag(keywords) {
     keywords = keywords.trim();
     return keywords[0] === '#' && numberRegularExpression.test(keywords.substring(1));
 }
-// hasCommandPrefix
-function hasShellCommandPrefix(keywords) {
-    return keywords[0] === programOptions.commandPrefix && keywords[1] === ' ';
+// hasCommandSymbol
+function hasShellCommandSymbol(keywords) {
+    return keywords[0] === programOptions.commandSymbol && keywords[1] === ' ';
 }
 // getNotSetTemplateIfTagVariableNames
 function getNotSetTemplateIfTagVariableNames(settingKeys) {
@@ -3115,6 +3127,22 @@ function cutQuotation(str) {
     }
     else {
         return str;
+    }
+}
+// cutTag
+function cutTag(line) {
+    if (line[0] === '#') {
+        var separatorIndex = line.indexOf(' ');
+        if (separatorIndex === notFound) {
+            separatorIndex = line.indexOf(':');
+        }
+        if (separatorIndex === notFound) {
+            return '';
+        }
+        return line.substring(separatorIndex + 1).trim();
+    }
+    else {
+        return line;
     }
 }
 // isBackSlashParameter
@@ -4203,6 +4231,9 @@ else {
 const settingLabel = /(^| )#settings:/;
 const originalLabel = "#original:";
 const toLabel = "#to:"; // replace to tag
+const checkTag = "#check:";
+const replaceTag = "#replace:";
+const resetTag = "#reset:";
 const templateLabel = "#template:";
 const templateAtStartLabel = "#template-at(";
 const templateAtEndLabel = "):";
@@ -4213,6 +4244,7 @@ const fileTemplateLabel = "#file-template:";
 const fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const keywordLabel = "#keyword:";
 const glossaryLabel = "#glossary:";
+const mutualTag = "#mutual:";
 const disableLabel = "#disable-tag-tool:";
 const searchIfLabel = "#(search)if: false";
 const ifLabel = "#if:";

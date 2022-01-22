@@ -695,6 +695,28 @@ export function getCommonItems(arrayA, arrayB) {
 export function cutSameItems(array) {
     return Array.from(new Set(array));
 }
+// stableUniqueFilterFunction
+// const  uniqueArray1 = array1.filter(lib.stableUniqueFilterFunction((element1, element2) =>
+//         element1.path == element2.path));
+export function stableUniqueFilterFunction(isSameFunction) {
+    return function (element, index, array) {
+        return index === array.findIndex((e) => isSameFunction(element, e));
+    };
+}
+// lastUniqueFilterFunction
+// const  uniqueArray1 = array1.filter(lib.lastUniqueFilterFunction((element1, element2) =>
+//         element1.path == element2.path));
+export function lastUniqueFilterFunction(isSameFunction) {
+    return function (element, index, array) {
+        const matchIndices = array.map((e, index) => isSameFunction(element, e) ? index : -1);
+        return index === Math.max(...matchIndices);
+    };
+}
+// fastUniqueFilter
+// const  uniqueArray1 = lib.fastUniqueFilter(array1, (element) => (element.path));
+export function fastUniqueFilter(array, getKeyFunction) {
+    return Array.from(new Map(array.map((element) => [getKeyFunction(element), element])).values());
+}
 // parseMap
 export async function parseMap(mapString) {
     const startIndex = mapString.indexOf('{');

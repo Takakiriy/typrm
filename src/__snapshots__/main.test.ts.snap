@@ -4426,7 +4426,7 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace >> check: stdout 2`] = `
-"keyword: #check
+"keyword: #check:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4436,7 +4436,7 @@ exports[`typrm shell >> replace >> check: stdout 2`] = `
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #check
+keyword: #check:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4476,7 +4476,7 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace >> check: stdout 4`] = `
-"keyword: #check _tmp.yaml
+"keyword: #check: _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4486,7 +4486,7 @@ exports[`typrm shell >> replace >> check: stdout 4`] = `
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #check _tmp.yaml
+keyword: #check: _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4551,11 +4551,11 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace >> replace: stdout 2`] = `
-"keyword: #replace
+"keyword: #replace:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #replace
+keyword: #replace:
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4575,11 +4575,11 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace >> replace: stdout 4`] = `
-"keyword: #replace _tmp.yaml
+"keyword: #replace: _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #replace _tmp.yaml
+keyword: #replace: _tmp.yaml
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4623,11 +4623,11 @@ value1_replaced: #template: key1
 `;
 
 exports[`typrm shell >> replace >> reset: stdout 1`] = `
-"keyword: #reset
+"keyword: #reset:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
 Warning: 0, Error: 0
-keyword: #reset
+keyword: #reset:
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4635,11 +4635,11 @@ keyword: exit()
 `;
 
 exports[`typrm shell >> replace >> reset: stdout 2`] = `
-"keyword: #reset _tmp.yaml
+"keyword: #reset: _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
 Warning: 0, Error: 0
-keyword: #reset _tmp.yaml
+keyword: #reset: _tmp.yaml
 
 Warning: 0, Error: 0
 keyword: exit()
@@ -4654,12 +4654,12 @@ value1: #template: key1
 `;
 
 exports[`typrm shell >> replace >> resetNotFound: stdout 1`] = `
-"keyword: #reset not_found.yaml
+"keyword: #reset: not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-keyword: #reset not_found.yaml
+keyword: #reset: not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 

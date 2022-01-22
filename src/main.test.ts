@@ -80,11 +80,11 @@ describe("typrm shell >>", () => {
     });
     describe("replace >>", () => {
         test.each([
-            ['replace', 'replace', ['#r', '#replace', '#r _tmp.yaml', '#replace _tmp.yaml'], {}],
+            ['replace', 'replace', ['#r', '#replace:', '#r _tmp.yaml', '#replace: _tmp.yaml'], {}],
             ['replaceNotFound', 'replace', ['#r not_found.yaml'], {error:''}],
-            ['reset', 'reset', ['#reset', '#reset _tmp.yaml'], {}],
-            ['resetNotFound', 'reset', ['#reset not_found.yaml'], {error:''}],
-            ['check', 'check', ['#c', '#check', '#c _tmp.yaml', '#check _tmp.yaml'], {}],
+            ['reset', 'reset', ['#reset:', '#reset: _tmp.yaml'], {}],
+            ['resetNotFound', 'reset', ['#reset: not_found.yaml'], {error:''}],
+            ['check', 'check', ['#c', '#check:', '#c _tmp.yaml', '#check: _tmp.yaml'], {}],
             ['checkNotFound', 'check', ['#c not_found.yaml'], {error:''}],
         ])("%s", async (_caseName, fileName, inputs, _options) => {
             var  inputIndex = 0;
@@ -1067,6 +1067,12 @@ describe("mutual search >>", () => {
     [
         "1st",
         ["mutual-search", "AAA"],
+        { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + ` Target: #keyword: ${matchedColor('AAA')}\n`,
+    ],[
+        "mutual_tag",
+        ["search", "#mutual: AAA"],
         { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/mutual/1/1.yaml') + lineNumColor(':2:') + ` Target: #keyword: ${matchedColor('AAA')}\n`,

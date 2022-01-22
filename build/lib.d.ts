@@ -48,6 +48,19 @@ export declare function isSameArray<T>(log: T[], answer: T[]): boolean;
 export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
 export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function cutSameItems<T>(array: T[]): T[];
+export declare function stableUniqueFilterFunction<T>(isSameFunction: {
+    (element1: T, element2: T): boolean;
+}): {
+    (element: T, index: number, array: T[]): boolean;
+};
+export declare function lastUniqueFilterFunction<T>(isSameFunction: {
+    (element1: T, element2: T): boolean;
+}): {
+    (element: T, index: number, array: T[]): boolean;
+};
+export declare function fastUniqueFilter<T>(array: T[], getKeyFunction: {
+    (element1: T): any;
+}): T[];
 export declare function parseMap<keyT, valueT>(mapString: string): Promise<Map<keyT, valueT>>;
 export declare function isAlphabetIndex(index: string): boolean;
 export declare function getAlphabetIndex(num: number | string): string;

@@ -415,11 +415,12 @@ Enter キーを押すことで全文検索ができます。
     .../text.txt:1: Game:
     keyword:
 
-typrm shell で `#r`, `#replace`, `#reset`, `#c`, `#check` から入力すると、
-replace, reset, check コマンドが使えます。
+typrm shell で `#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
+replace, reset, check, mutual-search コマンドが使えます。
 
     #r                // 全ファイル replace
     #r example.yaml
+    #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
 
 （すべてのバージョン）
 

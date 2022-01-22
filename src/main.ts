@@ -2079,16 +2079,7 @@ function  execShellCommand(command: string) {
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
-    enum Command {
-        search,
-        openDocument,
-        printRef,
-        runVerb,
-        check,
-        replace,
-        reset,
-        shellCommand,
-    }
+    enum Command { search, openDocument, printRef, runVerb, check, replace, reset, mutualSearch, shellCommand };
 
     if (keyword !== '') {
         const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
@@ -2100,10 +2091,16 @@ async function  search() {
             } else {
                 command = Command.printRef;
             }
+        } else if (hasMutualTag(keyword)) {
+            command = Command.mutualSearch;
         }
+
         if (command === Command.search) {
 
             await  searchSub(keyword, false);
+        } else if (command === Command.mutualSearch) {
+
+            await  searchSub(keyword.replace(mutualTag, ''), true);
         } else if (command === Command.printRef) {
 
             await  printRef(keyword);
@@ -2142,12 +2139,18 @@ async function  search() {
                     command = Command.replace;
                 } else if (hasResetTag(keyword)) {
                     command = Command.reset;
+                } else if (hasMutualTag(keyword)) {
+                    command = Command.mutualSearch;
                 } else if (hasShellCommandSymbol(keyword)) {
                     command = Command.shellCommand;
                 }
+
                 if (command === Command.search) {
 
                     previousPrint = await searchSub(keyword, false);
+                } else if (command === Command.mutualSearch) {
+
+                    await searchSub(cutTag(keyword), true);
                 } else if (command === Command.openDocument) {
                     const  foundLines = previousPrint.foundLines;
                     const  foundIndex = parseInt( keyword.substring(1) );
@@ -2164,30 +2167,15 @@ async function  search() {
 
                     runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
                 } else if (command === Command.check) {
-                    const  spaceIndex = keyword.indexOf(' ');
-                    if (spaceIndex === notFound) {
-                        var  filePath = '';
-                    } else {
-                        var  filePath = keyword.substring(spaceIndex+1).trim();
-                    }
+                    const  filePath = cutTag(keyword);
 
                     await  check(filePath);
                 } else if (command === Command.replace) {
-                    const  spaceIndex = keyword.indexOf(' ');
-                    if (spaceIndex === notFound) {
-                        var  filePath = '';
-                    } else {
-                        var  filePath = keyword.substring(spaceIndex+1).trim();
-                    }
+                    const  filePath = cutTag(keyword);
 
                     await  replace(filePath);
                 } else if (command === Command.reset) {
-                    const  spaceIndex = keyword.indexOf(' ');
-                    if (spaceIndex === notFound) {
-                        var  filePath = '';
-                    } else {
-                        var  filePath = keyword.substring(spaceIndex+1).trim();
-                    }
+                    const  filePath = cutTag(keyword);
 
                     await  reset(filePath);
                 } else if (command === Command.shellCommand) {
@@ -3271,20 +3259,26 @@ function  hasRefTag(keywords: string) {
 function  hasCheckTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === '#c'  ||  keywords.startsWith('#c ')  ||
-        keywords === '#check'  ||  keywords.startsWith('#check ');
+        keywords === checkTag  ||  keywords.startsWith(`${checkTag} `);
 }
 
 // hasReplaceTag
 function  hasReplaceTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === '#r'  ||  keywords.startsWith('#r ')  ||
-        keywords === '#replace'  ||  keywords.startsWith('#replace ');
+        keywords === replaceTag  ||  keywords.startsWith(`${replaceTag} `);
 }
 
 // hasResetTag
 function  hasResetTag(keywords: string) {
     keywords = keywords.trim();
-    return  keywords === '#reset'  ||  keywords.startsWith('#reset ');
+    return  keywords === resetTag  ||  keywords.startsWith(`${resetTag} `);
+}
+
+// hasMutualTag
+function  hasMutualTag(keywords: string) {
+    keywords = keywords.trim();
+    return  keywords === mutualTag  ||  keywords.startsWith(`${mutualTag} `);
 }
 
 // hasNumberTag
@@ -3351,6 +3345,23 @@ function  cutQuotation(str: string) {
         return  str.substr(1, str.length - 2);
     } else {
         return  str;
+    }
+}
+
+// cutTag
+function  cutTag(line: string): string {
+    if (line[0] === '#') {
+        var  separatorIndex = line.indexOf(' ');
+        if (separatorIndex === notFound) {
+            separatorIndex = line.indexOf(':');
+        }
+        if (separatorIndex === notFound) {
+            return  '';
+        }
+
+        return  line.substring(separatorIndex + 1).trim();
+    } else {
+        return  line;
     }
 }
 
@@ -4649,6 +4660,9 @@ if (process.env.windir) {
 const  settingLabel = /(^| )#settings:/;
 const  originalLabel = "#original:";
 const  toLabel = "#to:";  // replace to tag
+const  checkTag = "#check:";
+const  replaceTag = "#replace:";
+const  resetTag = "#reset:";
 const  templateLabel = "#template:";
 const  templateAtStartLabel = "#template-at(";
 const  templateAtEndLabel = "):";
@@ -4659,6 +4673,7 @@ const  fileTemplateLabel = "#file-template:";
 const  fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const  keywordLabel = "#keyword:";
 const  glossaryLabel = "#glossary:";
+const  mutualTag = "#mutual:";
 const  disableLabel = "#disable-tag-tool:";
 const  searchIfLabel = "#(search)if: false";
 const  ifLabel = "#if:";
