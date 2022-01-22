@@ -12,18 +12,15 @@ const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
 const refColor = chalk.yellow;
 const searchColor = chalk.yellow;
-const valueColor = chalk.yellow;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
-process.env.TYPRM_TEST_ENV = 'testEnv';
-process.env.TYPRM_TEST_PATH = 'C:\\Test';
 if (process.env.windir) {
     var  testingOS = 'Windows';
 } else {
     var  testingOS = 'Linux';
 }
-const  newSpecification = false;
-const  newCode = true;
+process.env.TYPRM_TEST_ENV = 'testEnv';
+process.env.TYPRM_TEST_PATH = 'C:\\Test';
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
         regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?\$
@@ -197,6 +194,7 @@ describe("checks template value >>", () => {
             ["4 neighbor error"],
             ["4-2 neighbor level 2 error"],
             ["b1_bug_case_no_root_settings"],
+            ["b2_bug_case_nest_settings"],
             // There are other settings tests in "unit test >>"
 
         ])("%s", async (caseName) => {
@@ -1189,12 +1187,12 @@ describe("print reference >>", () => {
             [
                 "verb",
                 ["search", "#ref:", "../README.md", "7"],  // 7 is echo command by "TYPRM_VERB"
-                {locale: "en-US", test: ""},
+                {commandFolder: ".", locale: "en-US", test: ""},
                 "{ref: ../README.md, windowsRef: ..\\README.md, file: ../README.md, windowsFile: ..\\README.md, fragment: }\n",
             ],[
                 "verb (2)",
                 ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
-                {locale: "en-US", test: ""},
+                {commandFolder: ".", locale: "en-US", test: ""},
                 "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
             ],[
                 "verb error",
@@ -1285,15 +1283,16 @@ describe("print reference >>", () => {
 
 describe("unit test >>", () => {
     test.each([
-        ["makeSettingTree"],
-        ["makeSettingTree_bug_case"],
-        ["makeSettingTree_if_and_no_indent"],
-    ])("%s", async (caseName) => {
+        ["makeSettingTree", "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"],
+        ["makeSettingTree_bug_case", null],
+        ["makeSettingTree_if_and_no_indent", null],
+        ["makeSettingTree_nest", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
+    ])("%s", async (caseName, sameInputSnapshotName) => {
         const  Parser = main.private_.Parser;
         const  makeSettingTree = main.private_.makeSettingTree;
         const {inputContents} = initializeTestInputFile(`unit test >> ${caseName}: sourceFileContents 1`);
-        if (caseName === 'makeSettingTree') {
-            expect(inputContents).toBe(lib.getSnapshot(`replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1`));
+        if (sameInputSnapshotName) {
+            expect(inputContents).toBe(lib.getSnapshot(sameInputSnapshotName));
         }
         const  answerIndicesWithIf = Array.from(await lib.parseMap(
             lib.getSnapshot(`unit test >> ${caseName}: answer indicesWithIf 1`)));

@@ -60,6 +60,7 @@ interface SettingsTree_addCurrentSettingsInIfTag {
 interface SettingsInformation {
     index: string;
     lineNum: number;
+    indent: string;
     condition: string;
     inSettings: boolean;
 }

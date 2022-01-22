@@ -294,9 +294,9 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         {lineNum: 1, indent: ''}
     ];
     const  settingStack:  // #search: settingStack of typrm makeSettingTree
-            {lineNum: number, index: string, nextAlphabetIndex: string, indentLevel: number, startLineNum: number, startIndentLevel: number}[] = [
-        {lineNum: 0, index: '/',  nextAlphabetIndex: 'a', indentLevel: 0, startLineNum: 1, startIndentLevel: -1},
-        {lineNum: 0, index: '/1', nextAlphabetIndex: 'a', indentLevel: 1, startLineNum: 0, startIndentLevel: 0}
+            {lineNum: number, index: string, nextAlphabetIndex: string, indent: string, startLineNum: number, startIndentLevel: number}[] = [
+        {lineNum: 0, index: '/',  nextAlphabetIndex: 'a', indent: '', startLineNum: 1, startIndentLevel: -1},
+        {lineNum: 0, index: '/1', nextAlphabetIndex: 'a', indent: '', startLineNum: 0, startIndentLevel: 0}
         // "parentIndentLevel" is a parent indent of a settings tag. It is not a indent of a settings tag.
     ];
     var  reader = readline.createInterface({
@@ -339,7 +339,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             // Pop "settingStack" in #if: block
             if (inIfBlock) {
 
-                while (indent.length <= settingStack[currentSettingStackIndex].indentLevel) {
+                while (indent.length <= settingStack[currentSettingStackIndex].indent.length) {
                     const  parentSettingStackIndex = currentSettingStackIndex - 1;
                     const  lastEndIf = ! lib.isAlphabetIndex(settingStack[parentSettingStackIndex].index);
 
@@ -367,7 +367,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     currentSettingIndex = settingStack[currentSettingStackIndex].index;
                     tree.indicesWithIf.set(lineNum, currentSettingIndex);
                     if (lastEndIf) {
-                        if (indent.length <= settingStack[currentSettingStackIndex + 1].indentLevel) {
+                        if (indent.length <= settingStack[currentSettingStackIndex + 1].indent.length) {
                             nextSetting.nextAlphabetIndex = path.basename(nextSetting.index);
                             if (parentSettingIndex === '/') {
                                 nextSetting.index = `/1`;
@@ -395,6 +395,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     tree.settingsInformation[currentSettingIndex] = {
                         index: currentSettingIndex,
                         lineNum: setting_.lineNum,
+                        indent: setting_.indent,
                         condition: '',
                         inSettings: isReadingSetting,
                     };
@@ -446,7 +447,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 }
             } else {
                 const  currentSetting = settingStack[settingStack.length - 2];
-                if (currentSetting.indentLevel === indent.length) {
+                if (currentSetting.indent.length === indent.length) {
                     console.log('');
                     console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
                     console.log(`    Warning: double settings are not supported.`);
@@ -455,22 +456,86 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     parser.warningCount += 1;
                     var  isNewSettings = false;
                 } else {
+                    const  parentSetting = currentSetting;
+                    const  parentIndex = parentSetting.index;
                     const  setting_ = settingStack[settingStack.length - 1];
+                    if (parentIndex === '/') {
+                        var  previousIndex = `/1`;
+                    } else {
+                        var  previousIndex = `${parentIndex}/1`;
+                    }
+                    var  previousIndentIsDeeper = false;
+                    if (previousIndex in tree.settingsInformation) {
+                        var  previousIndentIsDeeper = 
+                            tree.settingsInformation[previousIndex].indent.length > indent.length;
+                    }
+
+                    // insert parent settings
+                    if (previousIndentIsDeeper) {
+                        if (parentIndex === '/') {
+                            var  parentIndex0 = '';
+                        } else {
+                            var  parentIndex0 = parentIndex;
+                        }
+                        const  shiftingIndices: string[] = [];
+                        for (const index of Object.keys(tree.settingsInformation)) {
+                            if (index.startsWith(parentIndex0+'/')) {
+                                shiftingIndices.push(index);
+                            }
+                        }
+                        shiftingIndices.sort((a,b)=>(b.length - a.length));
+
+                        for (const [lineNum_, index] of tree.indices.entries()) {
+                            if (shiftingIndices.includes(index)) {
+                                const  indexBefore = index;
+                                const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                tree.indices.set(lineNum_, indexAfter);
+                            }
+                        }
+                        for (const [lineNum_, index] of tree.indicesWithIf.entries()) {
+                            if (shiftingIndices.includes(index)) {
+                                const  indexBefore = index;
+                                const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                tree.indicesWithIf.set(lineNum_, indexAfter);
+                            }
+                        }
+                        for (const shiftingIndex of shiftingIndices) {
+                            const  indexBefore = shiftingIndex;
+                            const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                            tree.settings[indexAfter] = tree.settings[indexBefore];
+                            delete  tree.settings[indexBefore];
+                            tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
+                            tree.settingsInformation[indexAfter].index = indexAfter;
+                            delete  tree.settingsInformation[indexBefore];
+                        }
+                        currentSettingIndex = previousIndex;
+                        const  lastLineNum = indentStack[indentStack.length - 1].lineNum;
+                        tree.indices.set(lastLineNum, `${currentSettingIndex}`);
+                        tree.indicesWithIf.set(lastLineNum, `${currentSettingIndex}`);
+                        settingStack[settingStack.length - 1].index = currentSettingIndex;
+                        var  nextNestedIndex = setting_.index + '/2';
+                    } else {
+                        var  nextNestedIndex = setting_.index + '/1';
+                    }
+
+                    // ...
                     setting_.lineNum = lineNum;
-                    setting_.indentLevel = indent.length;
+                    setting_.indent = indent;
                     setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
                     setting_.startIndentLevel = indentStack[indentStack.length - 2].indent.length;
                     currentSettingIndex = setting_.index;
                     settingStack.push({
                         lineNum: 0,
-                        index: setting_.index + '/1',
+                        index: nextNestedIndex,
                         nextAlphabetIndex: 'a',
-                        indentLevel: 0,
+                        indent: '',
                         startLineNum: 0,
                         startIndentLevel: -1
                     });
                     tree.indices.set(setting_.startLineNum, currentSettingIndex);
                     tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
+                    tree.indices = new Map([... tree.indices.entries()].sort(([key1,_item1], [key2,_item2]) => key1 - key2));
+                    tree.indicesWithIf = new Map([... tree.indicesWithIf.entries()].sort(([key1,_item1], [key2,_item2]) => key1 - key2));
                     var  isNewSettings = true;
                 }
             }
@@ -481,6 +546,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 tree.settingsInformation[currentSettingIndex] = {
                     index: currentSettingIndex,
                     lineNum,
+                    indent: indentStack[indentStack.length - 1].indent,
                     condition: '',
                     inSettings: isReadingSetting,
                 };
@@ -546,14 +612,14 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     nextSetting.index = setting_.index + '/' + nextSetting.nextAlphabetIndex;
                 }
             }
-            nextSetting.indentLevel = indent.length;
+            nextSetting.indent = indent;
             nextSetting.startLineNum = setting_.startLineNum;
             nextSetting.startIndentLevel = setting_.startIndentLevel;
             settingStack.push({
                 lineNum: 0,
                 index: nextSetting.index + '/a',
                 nextAlphabetIndex: 'a',
-                indentLevel: 0,
+                indent: '',
                 startLineNum: 0,
                 startIndentLevel: -1
             });
@@ -562,6 +628,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             tree.settingsInformation[currentSettingIndex] = {
                 index: currentSettingIndex,
                 lineNum,
+                indent,
                 condition,
                 inSettings: isReadingSetting,
             };
@@ -579,6 +646,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             tree.settingsInformation[currentSettingIndex] = {
                 index: currentSettingIndex,
                 lineNum : setting_.lineNum,
+                indent: setting_.indent,
                 condition: '',
                 inSettings: isReadingSetting,
             };
@@ -589,7 +657,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     }
     for (const index of Object.values(tree.indices)) {
         if ( ! (index in tree.settings)) {
-            throw new Error('parse error in makeSettingTree');
+            throw  new Error('parse error in makeSettingTree');
         }
     }
 
@@ -1329,7 +1397,7 @@ class  TemplateTag {
         }
         if (exception) {
             parser.errorCount += 1;
-            throw exception;
+            throw  exception;
         }
         if (result !== Result.same) {
             var  templateLineNum = 0;
@@ -1928,13 +1996,13 @@ async function  listUpFilePaths(checkingFilePath?: string) {
                 }
             }
             if (inputFileFullPaths.length === 0) {
-                throw new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
+                throw  new Error(`Not found specified target file at "${JSON.stringify(notFoundPaths)}".`);
             } else if (inputFileFullPaths.length >= 2) {
                 console.log('');
                 console.log(`${translate('Error')}: ${translate('same file name exists.')}`);
                 console.log(`    FileName: ${getTestablePath(checkingFilePath)}`);
                 console.log(`    Folder: ${getTestablePath(programOptions.folder)}`);
-                throw new Error(`same file name exists "${checkingFilePath}".`);
+                throw  new Error(`same file name exists "${checkingFilePath}".`);
             }
         }
     } else {
@@ -1942,7 +2010,7 @@ async function  listUpFilePaths(checkingFilePath?: string) {
         for (const folder of targetFolders) {
             const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
             if (!fs.existsSync(targetFolderFullPath)) {
-                throw new Error(`Not found target folder at "${getTestablePath(targetFolderFullPath)}".`);
+                throw  new Error(`Not found target folder at "${getTestablePath(targetFolderFullPath)}".`);
             }
             process.chdir(targetFolderFullPath);
             const scanedPaths = await globby([`**/${wildcard}`]);
@@ -1989,18 +2057,20 @@ function  runShellCommand(keyword: string) {
 // execShellCommand
 function  execShellCommand(command: string) {
     if ( ! programOptions.commandFolder) {
-        console.log(`${translate('Error')}: ${translate('To run shell command, TYPRM_COMMAND_FOLDER environment variable must be set.')}`);
+        console.log(`${translate('Error')}: ${translate('To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.')}`);
         return;
     }
     const  currentFolder = process.cwd();
     var    stdout_ = '';
     try {
         if ('verbose' in programOptions) {
+            console.log(`Verbose: current folder: ${getTestablePath(programOptions.commandFolder)}`);
             console.log(`Verbose: command: ${command}`);
         }
         process.chdir(programOptions.commandFolder);
 
-        stdout_ = cutLastLF(child_process.execSync( command ).toString());
+        const  stdoutBuffer = child_process.execSync( command );
+        stdout_ = cutLastLF(stdoutBuffer.toString());
     } catch (e: any) {
         stdout_ = e.toString();
     }
@@ -2156,7 +2226,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     for (const folder of targetFolders) {
         const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
         if (!fs.existsSync(targetFolderFullPath)) {
-            throw new Error(`Not found target folder at "${targetFolderFullPath}".`);
+            throw  new Error(`Not found target folder at "${targetFolderFullPath}".`);
         }
         process.chdir(targetFolderFullPath);
         const scanedPaths = await globby([`**/${wildcard}`]);
@@ -2918,7 +2988,7 @@ function  printConfig() {
 // varidateMutualSearchCommandArguments
 function  varidateMutualSearchCommandArguments() {
     if (programArguments.length < 2) {
-        throw new Error('Error: Too few argurments.\n' +
+        throw  new Error('Error: Too few argurments.\n' +
             'typrm mutual-search  __Keywords__"')
     }
 }
@@ -3943,6 +4013,7 @@ interface  ReplaceToTagTree_for_addCurrentSettingsInIfBlock {
 interface SettingsInformation {
     index: string;
     lineNum: number;
+    indent: string;
     condition: string;
     inSettings: boolean;
 }
@@ -3973,7 +4044,7 @@ function  searchDefinedSettingIndices(
             return  foundIndices;
         }
         if (index === '/') {
-            throw new Error(`Error of not found "${variableName}" in settings "${currentSettingIndex}"`);
+            throw  new Error(`Error of not found "${variableName}" in settings "${currentSettingIndex}"`);
         }
         index = path.dirname(index);
     }
@@ -4350,7 +4421,7 @@ class  WriteBuffer {
 
     getWrittenLine(lineNum: number): string {
         if (lineNum > this.lineBuffer.length) {
-            throw new Error('The line is not written yet.');
+            throw  new Error('The line is not written yet.');
         }
 
         return  this.lineBuffer[lineNum];
@@ -4470,7 +4541,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "Not found. To do full text search, press Enter key.": "見つかりません。全文検索するときは Enter キーを押してください。",
             "template target values after replace are conflicted.": "変数の値を置き換えた後のテンプレートのターゲットが矛盾しています",
             "To show more result, restart typrm with --found-count-max option": "もっと多くの結果を表示するときは --found-count-max オプションを指定して typrm を再起動します",
-            "To run shell command, TYPRM_COMMAND_FOLDER environment variable must be set.": "シェルのコマンドを実行するには、TYPRM_COMMAND_FOLDER 環境変数を設定してください。",
+            "To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.": "シェルのコマンドを実行するには、TYPRM_COMMAND_FOLDER 環境変数、または --command-folder オプションを設定してください。",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",

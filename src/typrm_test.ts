@@ -10,7 +10,7 @@ const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
-process.env.TYPRM_COMMAND_FOLDER = __dirname;
+process.env.TYPRM_COMMAND_FOLDER = process.cwd();
 process.env.TYPRM_LINE_NUM_GETTER = `
     - #
         regularExpression: ^(.*\\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(#(.*))?\$
@@ -86,7 +86,7 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( true  ||  case_.name === 'search_mode_find') {
+        if ( true  ||  case_.name === 'search_mode_select_by_number') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 

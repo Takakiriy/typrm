@@ -1044,6 +1044,65 @@ no indent:
 "
 `;
 
+exports[`checks template value >> settings >> b2_bug_case_nest_settings: answer 1`] = `
+"
+Warning: 0, Error: 0
+template count = 6
+"
+`;
+
+exports[`checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1`] = `
+"root:  #// b2_bug_case_nest_settings
+    1:  #// Test of 1
+        settings: #settings:
+            __Var11__: value11
+        ref:
+            value1, value11
+            #template: __Var1__, __Var11__
+    settings: #settings:
+        __Var1__: value1
+    body:  #// Test of 21
+        settings: #settings:
+            __Var12__: value12
+        sub:
+            sub:
+                settings: #settings:
+                    __Var1211__: value1211
+                ref:
+                    value1, value121, value1211
+                    #template: __Var1__, __Var121__, __Var1211__
+            settings: #settings:
+                __Var121__: value121
+root2:  #// Test of 211
+    settings: #settings:
+        __Var2__: value2
+    sub1:
+        sub1:
+            value211: #template: __Var211__
+            settings: #settings:
+                __Var211__: value211
+        sub2:
+            settings: #settings:
+                __Var212__: value212
+            sub1:
+                settings: #settings:
+                    __Var2121__: value2121
+                value2121: #template: __Var2121__
+            sub2:
+                settings: #settings:
+                    __Var2122__: value2122
+                ref:
+                    value21, value212, value2122
+                    #template: __Var21__, __Var212__, __Var2122__
+            sub3:
+                value2123: #template: __Var2123__
+                settings: #settings:
+                    __Var2123__: value2123
+        settings: #settings:
+            __Var21__: value21
+"
+`;
+
 exports[`checks template value >> settings_tree: answer 1`] = `
 "
 Warning: 0, Error: 0
@@ -4722,5 +4781,78 @@ exports[`unit test >> makeSettingTree_if_and_no_indent: sourceFileContents 1`] =
 no indent:
 no indent:
     settings: #settings:
+"
+`;
+
+exports[`unit test >> makeSettingTree_nest: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/1",
+    2 => "/1/1",
+    8 => "/1",
+    10 => "/1/2",
+    13 => "/1/2/1",
+    14 => "/1/2/1/1",
+    20 => "/1/2/1",
+    22 => "/2",
+    25 => "/2/1",
+    26 => "/2/1/1",
+    30 => "/2/1/2",
+    33 => "/2/1/2/1",
+    37 => "/2/1/2/2",
+    43 => "/2/1/2/3",
+    47 => "/2/1",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_nest: sourceFileContents 1`] = `
+"root:  #// b2_bug_case_nest_settings
+    1:  #// Test of 1
+        settings: #settings:
+            __Var11__: value11
+        ref:
+            value1, value11
+            #template: __Var1__, __Var11__
+    settings: #settings:
+        __Var1__: value1
+    body:  #// Test of 21
+        settings: #settings:
+            __Var12__: value12
+        sub:
+            sub:
+                settings: #settings:
+                    __Var1211__: value1211
+                ref:
+                    value1, value121, value1211
+                    #template: __Var1__, __Var121__, __Var1211__
+            settings: #settings:
+                __Var121__: value121
+root2:  #// Test of 211
+    settings: #settings:
+        __Var2__: value2
+    sub1:
+        sub1:
+            value211: #template: __Var211__
+            settings: #settings:
+                __Var211__: value211
+        sub2:
+            settings: #settings:
+                __Var212__: value212
+            sub1:
+                settings: #settings:
+                    __Var2121__: value2121
+                value2121: #template: __Var2121__
+            sub2:
+                settings: #settings:
+                    __Var2122__: value2122
+                ref:
+                    value21, value212, value2122
+                    #template: __Var21__, __Var212__, __Var2122__
+            sub3:
+                value2123: #template: __Var2123__
+                settings: #settings:
+                    __Var2123__: value2123
+        settings: #settings:
+            __Var21__: value21
 "
 `;
