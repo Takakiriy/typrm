@@ -56,12 +56,6 @@ export async function  mainMain() {
             }
             await  search();
         }
-        else if (programArguments[0] === 'f'  ||  programArguments[0] === 'find') {
-            if (verboseMode) {
-                console.log('Verbose: typrm command: find');
-            }
-            await  find();
-        }
         else if (programArguments[0] === 'm'  ||  programArguments[0] === 'mutual-search') {
             varidateMutualSearchCommandArguments();
             if (verboseMode) {
@@ -2133,11 +2127,7 @@ async function  search() {
             if (keyword === 'exit()') {
                 break;
             } else if (keyword === '') {
-                if (previousPrint.hasFindMenu) {
-                    await  findSub(previousPrint.previousKeyword);
-                }
                 previousPrint.hasVerbMenu = false;
-                previousPrint.hasFindMenu = false;
             } else {
                 var  command = Command.search;
                 if (previousPrint.hasVerbMenu  &&  numberRegularExpression.test(keyword)) {
@@ -2158,9 +2148,6 @@ async function  search() {
                 if (command === Command.search) {
 
                     previousPrint = await searchSub(keyword, false);
-                    if (previousPrint.hasFindMenu) {
-                        console.log(translate`Not found. To do full text search, press Enter key.`);
-                    }
                 } else if (command === Command.openDocument) {
                     const  foundLines = previousPrint.foundLines;
                     const  foundIndex = parseInt( keyword.substring(1) );
@@ -2395,8 +2382,16 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     const  keyphraseWordCount = keyword.split(' ').length;
 
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
-
     foundLines.sort(compareScore);
+    if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
+
+        var  foundLineWithoutTags = await searchWithoutTags(keyword);
+
+        foundLines = [... foundLineWithoutTags, ... foundLines];
+        foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) =>
+            found1.path == found2.path  &&  found1.lineNum == found2.lineNum));
+    }
+
     const  foundCountMax = parseInt(programOptions.foundCountMax);
     if (foundLines.length > foundCountMax) {
         console.log(`... (` + translate(`To show more result, restart typrm with --found-count-max option`) + ')');
@@ -2430,7 +2425,6 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
         const  normalReturn = getEmptyOfPrintRefResult();
         if (foundLines.length === 0) {
             normalReturn.previousKeyword = keyword;
-            normalReturn.hasFindMenu = true;
         }
         normalReturn.foundLines = foundLines;
         return  normalReturn;
@@ -2597,18 +2591,9 @@ function  compareScore(a: FoundLine, b: FoundLine) {
     return  different;
 }
 
-// find
-async function  find() {
-    const  keyword = programArguments.slice(1).join(' ');
-    if (keyword === '') {
-        search();
-    } else {
-        await  findSub(keyword);
-    }
-}
-
-// findSub
-async function  findSub(keyword: string) {
+// searchWithoutTags
+async function  searchWithoutTags(keyword: string): Promise<FoundLine[]> {
+    const  foundLines: FoundLine[] = [];
     const  keywordLowerCase = keyword.toLowerCase();
     for (const inputFileFullPath of await listUpFilePaths()) {
         const  reader = readline.createInterface({
@@ -2624,13 +2609,32 @@ async function  findSub(keyword: string) {
             const  keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
             if (keywordIndex !== notFound) {
 
-                console.log(`${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
-                    line.substr(0, keywordIndex) +
-                    matchedColor(line.substr(keywordIndex, keyword.length)) +
-                    line.substr(keywordIndex + keyword.length));
+// pp
+                // console.log(`${pathColor(getTestablePath(inputFileFullPath))}${lineNumColor(`:${lineNum}:`)} ` +
+                //     line.substring(0, keywordIndex) +
+                //     matchedColor(line.substr(keywordIndex, keyword.length)) +
+                //     line.substring(keywordIndex + keyword.length));
+
+                const  found = new FoundLine();
+                found.path = getTestablePath(inputFileFullPath);
+                found.lineNum = lineNum;
+                found.line = line;
+                found.matches.push({
+                    position: keywordIndex,
+                    length: keyword.length,
+                    testTargetIndex: -1,
+                    matchedString: line.substr(keywordIndex, keyword.length),
+                });
+                found.matchedKeywordCount = 1;
+                found.matchedTargetKeywordCount = 1;
+                found.testedWordCount = 0;
+                found.tagLabel = 'find all';
+                found.score = 1;
+                foundLines.push(found);
             }
         }
     }
+    return  foundLines;
 }
 
 // mutualSearch
@@ -2657,7 +2661,6 @@ interface  PrintRefResult {
     verbs: Verb[];
     address: string;
     addressLineNum: number;
-    hasFindMenu: boolean;
     previousKeyword: string;
 }
 
@@ -2669,7 +2672,6 @@ function  getEmptyOfPrintRefResult(): PrintRefResult {
         verbs: [],
         address: '',
         addressLineNum: 0,
-        hasFindMenu: false,
         previousKeyword: '',
     }
 }

@@ -675,6 +675,55 @@ describe("string >>", () => {
 });
 
 describe("data >>", () => {
+    test("stableUniqueFilterFunction >>", async () => {
+        const  array1 = [
+            {id: 1, value:'A'},
+            {id: 2, value:'B'},
+            {id: 3, value:'C'},
+            {id: 4, value:'B'},
+        ];
+
+        const  uniqueArray1 = array1.filter(lib.stableUniqueFilterFunction((found1, found2) =>
+            found1.value == found2.value));
+        expect(uniqueArray1).toStrictEqual([
+            {id: 1, value:'A'},
+            {id: 2, value:'B'},
+            {id: 3, value:'C'},
+        ]);
+    });
+
+    test("lastUniqueFilterFunction >>", async () => {
+        const  array1 = [
+            {id: 1, value:'A'},
+            {id: 2, value:'B'},
+            {id: 3, value:'C'},
+            {id: 4, value:'B'},
+        ];
+
+        const  uniqueArray1 = array1.filter(lib.lastUniqueFilterFunction((found1, found2) =>
+            found1.value == found2.value));
+        expect(uniqueArray1).toStrictEqual([
+            {id: 1, value:'A'},
+            {id: 3, value:'C'},
+            {id: 4, value:'B'},
+        ]);
+    });
+
+    test("fastUniqueFilter >>", async () => {
+        const  array1 = [
+            {id: 1, value:'A'},
+            {id: 2, value:'B'},
+            {id: 3, value:'C'},
+            {id: 4, value:'B'},
+        ];
+
+        const  uniqueArray1 = lib.fastUniqueFilter(array1, (element) => (element.value));
+        expect(uniqueArray1).toStrictEqual([
+            {id: 1, value:'A'},
+            {id: 4, value:'B'},
+            {id: 3, value:'C'},
+        ]);
+    });
     test("parseMap >>", async () => {
         const  resultMap = await lib.parseMap<number,string>(`Map {
             1 =>  "a",

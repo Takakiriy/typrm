@@ -18,6 +18,7 @@ async function  callMain() {
         .option("--command-folder <s>", "The charactor before shell command", process.env.TYPRM_COMMAND_FOLDER)
         .option("--color")
         .option("--thesaurus <>", "The thesaurus CSV file path", process.env.TYPRM_THESAURUS)
+        .option("--disable-find-all")
         .option("--replace-mode")
         .option("--stdout-buffer")
         .option("--verbose")

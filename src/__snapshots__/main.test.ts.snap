@@ -4677,27 +4677,28 @@ value1_replaced: #template: key1
 
 exports[`typrm shell >> search >> search_mode: stdout 1`] = `
 "keyword: ABC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
 keyword: exit()
 "
 `;
 
-exports[`typrm shell >> search >> search_mode_find: stdout 1`] = `
+exports[`typrm shell >> search >> search_mode_without_tags: stdout 1`] = `
 "keyword: Not
-Not found. To do full text search, press Enter key.
-keyword: 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
 keyword: exit()
 "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> locale >> Windows: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
 "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, "do it", "a,b"
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
 "
 `;
 
@@ -4710,7 +4711,6 @@ keyword or number: 7
  "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 3"
 keyword or number: 
 keyword: 7
-見つかりません。全文検索するときは Enter キーを押してください。
 keyword: exit()
 "
 `;
@@ -4727,7 +4727,6 @@ fragment: parameters
 lineNum: 3
 keyword or number: 
 keyword: 7
-Not found. To do full text search, press Enter key.
 keyword: exit()
 "
 `;

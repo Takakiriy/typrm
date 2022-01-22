@@ -758,6 +758,45 @@ export function  cutSameItems<T>(array: T[]): T[] {
     return  Array.from(new Set<T>(array));
 }
 
+// stableUniqueFilterFunction
+// const  uniqueArray1 = array1.filter(lib.stableUniqueFilterFunction((element1, element2) =>
+//         element1.path == element2.path));
+export function  stableUniqueFilterFunction<T>(
+    isSameFunction: {(element1:T, element2:T): boolean}
+): {(element: T, index: number, array: T[]): boolean} {
+
+    return  function (element: T, index: number, array: T[]): boolean {
+        return  index === array.findIndex(
+            (e) => isSameFunction(element, e));
+    };
+}
+
+// lastUniqueFilterFunction
+// const  uniqueArray1 = array1.filter(lib.lastUniqueFilterFunction((element1, element2) =>
+//         element1.path == element2.path));
+export function  lastUniqueFilterFunction<T>(
+    isSameFunction: {(element1:T, element2:T): boolean}
+): {(element: T, index: number, array: T[]): boolean} {
+
+    return  function (element: T, index: number, array: T[]): boolean {
+        const  matchIndices = array.map((e, index) => isSameFunction(element, e) ? index : -1);
+
+        return  index === Math.max(... matchIndices);
+    };
+}
+
+// fastUniqueFilter
+// const  uniqueArray1 = lib.fastUniqueFilter(array1, (element) => (element.path));
+export function  fastUniqueFilter<T>(
+    array: T[],
+	getKeyFunction: {(element1:T): any}
+): T[] {
+
+	return  Array.from<T>(
+		new Map(array.map((element) => [getKeyFunction(element), element])).values()
+	);
+}
+
 // parseMap
 export async function  parseMap<keyT, valueT>(mapString: string): Promise<Map<keyT, valueT>> {
     const  startIndex = mapString.indexOf('{');
