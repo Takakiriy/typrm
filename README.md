@@ -526,38 +526,44 @@ Exmple of thesaurus.csv:
 
 ## Execute any command
 
-To execute any shell command in
+To execute a shell command in
 search keyword input mode (typrm shell),
-enter the prefix and space before entering the command.
+enter the command symbol and space before entering the command.
 
     $ typrm
     keyword$: $ echo abc
     abc
     keyword$:
 
-To execute shell commands, set the prefix to the environment variable
-`TYPRM_COMMAND_PREFIX` or the --command-prefix option with typrm command,
+To execute a shell command, set the command symbol to the environment variable
+`TYPRM_COMMAND_SYMBOL` or the --command-symbol option with typrm command,
 and set the working folder (current folder) to the environment variable
 `TYPRM_COMMAND_FOLDER` or the --command-folder option with typrm command.
 
 bash
 
-    export  TYPRM_COMMAND_PREFIX='$'
+    export  TYPRM_COMMAND_SYMBOL='$'
     export  TYPRM_COMMAND_FOLDER=/Users/user1/bin/typrm_work
 
 PowerShell
 
-    ${env:TYPRM_COMMAND_PREFIX} = '$'
+    ${env:TYPRM_COMMAND_SYMBOL} = '$'
     ${env:TYPRM_COMMAND_FOLDER} = /Home/user1/bin/typrm_work
 
-The prefix is shown before the colon in the typrm shell.
+The command symbol is shown before the colon in the typrm shell.
 
     keyword$:
 
-Any command will not be executed if the prefix is not displayed
+Any command will not be executed if the command symbol is not displayed
 before the colon in the typrm shell.
 
     keyword:
+
+On Windows, you can input the cmd.exe commad.
+If you want to run PowerShell commands,
+start powershell.exe with the -Command option.
+
+    powershell -Command "Write-Output 'code A' > _out.txt"
 
 
 ## Install
@@ -634,7 +640,7 @@ To use typrm, you must install Node.js.
         Open new PowerShell or new Git bash:
             typrm --version
 
-    Set the environment variables TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_COMMAND_SYMBOL, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     To uninstall, delete the following files and folders, and uninstall Node.js if you don't need it.
         - ${HOME}/bin/typrm  (Back up your unique settings)
@@ -684,7 +690,7 @@ To use typrm, you must install Node.js.
     Check to use typrm command:
         typrm --version
 
-    Set the environment variables TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_COMMAND_SYMBOL, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     To uninstall, delete the following files and folders, and uninstall Node.js if you don't need it.
         - rm  "${HOME}/bin/typrm"  (Back up your unique settings)
@@ -750,7 +756,7 @@ To use typrm, you must install Node.js.
     Check to use typrm command:
         typrm --version
 
-    Set the environment variables TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
+    Set the environment variables TYPRM_COMMAND_SYMBOL, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER as needed
 
     (If you do not use) delete typrm:
         - rm  "${HOME}/bin/typrm"  (Back up your unique settings)
@@ -1264,9 +1270,9 @@ Note that the `#` and `$` specified on the command line must be escaped with `\`
     keyword or number:
 
 The value of the environment variable is set when you start typrm.
-Note, you must add the prefix `TYPRM_` to the environment variable name
+Note, you must add the command symbol `TYPRM_` to the environment variable name
 when you set the define of the environment variable.
-If you do not add the prefix, you can refer to it with `$`
+If you do not add the command symbol, you can refer to it with `$`
 which is not escaped with `\` on the command line,
 but you cannot refer to it in typrm shell.
 The definition of the environment variable is usually written in the script file

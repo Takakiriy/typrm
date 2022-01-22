@@ -770,7 +770,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
                         console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                     }
                     const  newKeyValues = await previousTemplateTag.scanKeyValues(
-                        toValue, Object.keys(settingTree.currentSettings), parser);
+                        toValue, settingTree.currentSettings, parser);
                     if (parser.verbose) {
                         for (const [variableName, newValue] of Object.entries(newKeyValues)) {
                             console.log(`Verbose:         ${variableName}: ${newValue.value}`);
@@ -1172,9 +1172,9 @@ class  TemplateTag {
     }
 
     // scanKeyValues
-    async  scanKeyValues(toValue: string, allKeys: string[], parser: Parser
+    async  scanKeyValues(toValue: string, allKeys: {[name: string]: Setting}, parser: Parser
             ):  Promise<{[name: string]: Setting}> {
-        const  keysSortedByLength: string[] = allKeys.slice(); // copy
+        const  keysSortedByLength: string[] = Object.keys(allKeys).slice(); // copy
         keysSortedByLength.sort((b,a)=>(a.length, b.length));
         const  foundIndices = new Map</*index*/ number, string>();
         const  verboseMode = parser.verbose;
@@ -1255,7 +1255,7 @@ class  TemplateTag {
             returnKeyValues[key] =  {
                 value: keyValues[key],
                 lineNum: parser.lineNum,
-                settingsIndex: '___?1___',
+                settingsIndex: allKeys[key].settingsIndex,
                 tag: 'toAfterTemplate',
                 isReferenced: false,
             };
@@ -2042,15 +2042,15 @@ function  checkLineNoConfilict(keyValue: {[key: string]: string}, key: string, n
 
 // runShellCommand
 function  runShellCommand(keyword: string) {
-    if ( ! programOptions.commandPrefix) {
-        console.log(`${translate('Error')}: ${translate(`To run shell command, TYPRM_COMMAND_PREFIX environment variable must be set.`)}`);
+    if ( ! programOptions.commandSymbol) {
+        console.log(`${translate('Error')}: ${translate(`To run shell command, TYPRM_COMMAND_SYMBOL environment variable must be set.`)}`);
         return;
     }
-    if ( ! keyword.startsWith(programOptions.commandPrefix)) {
-        console.log(`${translate('Error')}: ${translate(`Not found command prefix "${programOptions.commandPrefix} ".`)}`);
+    if ( ! keyword.startsWith(programOptions.commandSymbol)) {
+        console.log(`${translate('Error')}: ${translate(`Not found command prefix "${programOptions.commandSymbol} ".`)}`);
         return;
     }
-    const  command = keyword.substring(programOptions.commandPrefix.length + 1);
+    const  command = keyword.substring(programOptions.commandSymbol.length + 1);
 
     execShellCommand(command);
 }
@@ -2123,9 +2123,9 @@ async function  search() {
         lib.inputSkip(startIndex);
         var  previousPrint = getEmptyOfPrintRefResult();
         for (;;) {
-            var  prompt = `keyword${programOptions.commandPrefix || ''}:`;
+            var  prompt = `keyword${programOptions.commandSymbol || ''}:`;
             if (previousPrint.hasVerbMenu) {
-                var  prompt = `keyword or number${programOptions.commandPrefix || ''}:`;
+                var  prompt = `keyword or number${programOptions.commandSymbol || ''}:`;
             }
 
             // typrm shell
@@ -2152,7 +2152,7 @@ async function  search() {
                     command = Command.replace;
                 } else if (hasResetTag(keyword)) {
                     command = Command.reset;
-                } else if (hasShellCommandPrefix(keyword)) {
+                } else if (hasShellCommandSymbol(keyword)) {
                     command = Command.shellCommand;
                 }
                 if (command === Command.search) {
@@ -2937,8 +2937,8 @@ function  printConfig() {
     if ('thesaurus' in programOptions) {
         console.log(`Verbose: --thesaurus, TYPRM_THESAURUS: ${programOptions.thesaurus}`);
     }
-    if ('commandPrefix' in programOptions) {
-        console.log(`Verbose: --command-prefix, TYPRM_COMMAND_PREFIX: ${programOptions.commandPrefix}`);
+    if ('commandSymbol' in programOptions) {
+        console.log(`Verbose: --command-symbol, TYPRM_COMMAND_SYMBOL: ${programOptions.commandSymbol}`);
     }
     if ('commandFolder' in programOptions) {
         console.log(`Verbose: --command-folder, TYPRM_COMMAND_FOLDER: ${programOptions.commandFolder}`);
@@ -3280,9 +3280,9 @@ function  hasNumberTag(keywords: string) {
     return  keywords[0] === '#'  &&  numberRegularExpression.test( keywords.substring(1) );
 }
 
-// hasCommandPrefix
-function  hasShellCommandPrefix(keywords: string) {
-    return  keywords[0] === programOptions.commandPrefix  &&  keywords[1] === ' ';
+// hasCommandSymbol
+function  hasShellCommandSymbol(keywords: string) {
+    return  keywords[0] === programOptions.commandSymbol  &&  keywords[1] === ' ';
 }
 
 // getNotSetTemplateIfTagVariableNames

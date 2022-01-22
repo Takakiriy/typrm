@@ -3191,7 +3191,7 @@ new body:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 1_OK: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 1_OK: resetFileContents 1`] = `
 "settings: #settings:
     __SettingA__: SetA
     __SettingB__: SetB      #// SetB#....
@@ -3341,7 +3341,7 @@ exports[`replaces settings >> replace to tag >> 2_FileParameter: replacedFileCon
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 2_FileParameter: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 2_FileParameter: resetFileContents 1`] = `
 "settings: #settings:
     __SettingA__: SetA
 "
@@ -3368,7 +3368,7 @@ exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: replacedFileCon
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 3_SimpleOneLoop: resetFileContents 1`] = `
 "    settings: #settings: #// simple after template. This test must do one loop in replaceSettingsSub()
         __SimpleA__: ValueA
     body:
@@ -3438,7 +3438,7 @@ in body:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 4_IfBlock_OK: resetFileContents 1`] = `
 "A:
     settings: #settings:
         __Switch0__: A
@@ -3694,7 +3694,7 @@ body:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 6_VariousTags: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 6_VariousTags: resetFileContents 1`] = `
 "settings: #settings:
     __WithOriginalTag__: a
 body:
@@ -3732,7 +3732,7 @@ body:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 7_VariableCount: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 7_VariableCount: resetFileContents 1`] = `
 "settings: #settings:
     __Set1A__: A
     __Set1B__: B
@@ -3861,7 +3861,7 @@ case 4:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> 8_ParentSettings: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> 8_ParentSettings: resetFileContents 1`] = `
 "case 1:
     settings: #settings:
         __Parent1__: parent
@@ -4049,7 +4049,7 @@ settings: #settings:
 "
 `;
 
-exports[`replaces settings >> replace to tag >> settings_tree_if: revertedFileContents 1`] = `
+exports[`replaces settings >> replace to tag >> settings_tree_if: resetFileContents 1`] = `
 "section:
     table:
         cell:

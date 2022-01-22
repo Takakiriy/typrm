@@ -509,37 +509,43 @@ thesaurus.csv のサンプル:
 
 ## 任意のコマンドを実行します
 
-検索キーワード入力モード(typrm shell)からシェルで使える任意のコマンドを実行するには、
-接頭辞とスペースを入力してからコマンドを入力します。
+検索キーワード入力モード(typrm shell)からシェルで使えるコマンドを実行するには、
+コマンド記号とスペースを入力してからコマンドを入力します。
 
     $ typrm
     keyword$: $ echo abc
     abc
     keyword$:
 
-任意のコマンドを実行できるようにするには、接頭辞を環境変数 `TYPRM_COMMAND_PREFIX`
-または typrm 起動時の --command-prefix オプションに設定し、
+任意のコマンドを実行できるようにするには、コマンド記号を環境変数 `TYPRM_COMMAND_SYMBOL`
+または typrm 起動時の --command-symbol オプションに設定し、
 作業用フォルダー（カレント フォルダー）を環境変数 `TYPRM_COMMAND_FOLDER`
 または typrm 起動時の --command-folder オプションに設定する必要があります。
 
 bash
 
-    export  TYPRM_COMMAND_PREFIX='$'
+    export  TYPRM_COMMAND_SYMBOL='$'
     export  TYPRM_COMMAND_FOLDER=/Users/user1/bin/typrm_work
 
 PowerShell
 
-    ${env:TYPRM_COMMAND_PREFIX} = '$'
+    ${env:TYPRM_COMMAND_SYMBOL} = '$'
     ${env:TYPRM_COMMAND_FOLDER} = /Home/user1/bin/typrm_work
 
-接頭辞は typrm shell のコロンの前に表示されます。
+コマンド記号は typrm shell のコロンの前に表示されます。
 
     keyword$:
 
-typrm shell のコロンの前に接頭辞が表示されていない状態であれば、
+typrm shell のコロンの前にコマンド記号が表示されていない状態であれば、
 任意のコマンドを実行されることはありません。
 
     keyword:
+
+Windows では cmd.exe のコマンドを入力できます。
+PowerShell のコマンドを実行する場合は、
+powershell.exe に -Command オプションを付けて起動してください。
+
+    powershell -Command "Write-Output 'code A' > _out.txt"
 
 
 ## インストール
@@ -616,7 +622,7 @@ typrm を使うには Node.js のインストールが必要です。
         PowerShell または Git bash を新しく開いて:
             typrm --version
 
-    必要に応じて環境変数 TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_COMMAND_SYMBOL, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     アンインストールする場合、下記のファイルやフォルダーを削除し、不要なら Node.js をアンインストールします。
         - ${HOME}/bin/typrm （固有の設定はバックアップしてください）
@@ -666,7 +672,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm が使えることを確認します:
         typrm --version
 
-    必要に応じて環境変数 TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_COMMAND_SYMBOL, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     アンインストールする場合、下記のファイルやフォルダーを削除し、不要なら Node.js をアンインストールします。
         - rm  "${HOME}/bin/typrm" （固有の設定はバックアップしてください）
@@ -732,7 +738,7 @@ typrm を使うには Node.js のインストールが必要です。
     typrm が使えることを確認します:
         typrm --version
 
-    必要に応じて環境変数 TYPRM_COMMAND_PREFIX, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
+    必要に応じて環境変数 TYPRM_COMMAND_SYMBOL, TYPRM_COMMAND_FOLDER, TYPRM_THESAURUS, TYPRM_VERB, TYPRM_LINE_NUM_GETTER を設定します
 
     （使わなくなったら）typrm を削除します:
         - rm  "${HOME}/bin/typrm"   （固有の設定はバックアップしてください）
@@ -1214,7 +1220,7 @@ typrm の search コマンドのパラメーターや、typrm shell のプロン
     keyword or number:
 
 環境変数の値は typrm を起動するときに設定します。
-ただし、環境変数を設定するときの環境変数名に接頭辞 `TYPRM_` を追加する必要があります。
+ただし、環境変数を設定するときの環境変数名にコマンド記号 `TYPRM_` を追加する必要があります。
 追加しないとコマンドラインに `\` でエスケープしない `$` で参照することはできますが、
 typrm shell では参照できなくなります。
 環境変数の定義は、たとえば typrm を起動する スクリプト ファイル の中に書きます。

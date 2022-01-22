@@ -525,13 +525,13 @@ describe("replaces settings >>", () => {
                 folder: path.dirname(filePath), test: "", locale
             });
             chdirInProject('src');
-            const  revertedFileContents = fs.readFileSync(filePath).toString();
+            const  resetFileContents = fs.readFileSync(filePath).toString();
 
             if ( ! ('resetAnswer' in option!)) {
-                expect(revertedFileContents).toBe(inputContents);
+                expect(resetFileContents).toBe(inputContents);
             } else {
                 const  resetFileContents = lib.getSnapshot(option.resetAnswer).toString();
-                expect(revertedFileContents).toBe(resetFileContents);
+                expect(resetFileContents).toBe(resetFileContents);
             }
             expect(main.stdout).toMatchSnapshot('stdout');
             fs.rmdirSync(testFolderPath + '_tmp', {recursive: true});
@@ -580,9 +580,9 @@ describe("replaces settings >>", () => {
                 await callMain(parameters, {
                     folder: path.dirname(filePath), test: "", locale: "en-US"
                 });
-                const  revertedFileContents = fs.readFileSync(filePath).toString();
+                const  resetFileContents = fs.readFileSync(filePath).toString();
 
-                expect(revertedFileContents).toMatchSnapshot('revertedFileContents');
+                expect(resetFileContents).toMatchSnapshot('resetFileContents');
             } else {  // error case
                 const  sourceFileContents2 = fs.readFileSync(filePath).toString();
 
