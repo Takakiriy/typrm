@@ -42,6 +42,7 @@
         "transform": {
             "^.+\\.(ts|tsx)$": "ts-jest"
         },
-        "maxWorkers": 1
+        "maxWorkers": 1,
+        "setupFilesAfterEnv": ["./jest.setup.js"]
     }
 }
