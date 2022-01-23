@@ -1450,37 +1450,57 @@ B:
 exports[`checks template value >> verbose: answer 1`] = `
 "Verbose: typrm command: check
 Verbose: Phase 1: parse settings ...
-Verbose: settings /1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-Verbose: settings /1/a
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
-Verbose: settings /1/b
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     var2: not value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
-Verbose: settings /1/c
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
-Verbose: settings /1/d
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
-Verbose: settings /1/e
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
-Verbose: settings /1/f
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
-Verbose: settings /1/g
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
-Verbose: settings /1/h
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
+Verbose: settings tree:
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         settings /1/a define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         settings /1/b define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:         settings /1/c define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         settings /1/d define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         settings /1/e define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings /1/f define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         settings /1/g define
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: scope start
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         settings /1/h define
+Verbose: variables:
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings /1
+Verbose:         var1: value1
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: settings /1/a
+Verbose:         var2: value2
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
+Verbose:         var2: not value2
+Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:0: settings /
 Verbose: Phase 2: check ...
 Verbose: settings /1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: /1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
@@ -4258,7 +4278,7 @@ body:
 exports[`replaces settings >> verbose >> conflict: verbose 1`] = `
 "Verbose: Phase 3: replace ...
 Verbose: settings / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: / (root)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta
 Verbose: replace a setting
@@ -4328,7 +4348,7 @@ body:
 exports[`replaces settings >> verbose >> no conflict: verbose 1`] = `
 "Verbose: Phase 3: replace ...
 Verbose: settings / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings:
+Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: / (root)
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2
 Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta
 Verbose: replace a setting

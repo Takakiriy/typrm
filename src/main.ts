@@ -260,21 +260,23 @@ function  getVariablesForErrorMessage(indent: string, variableNames: string[], s
     for (const parentSettingIndex of settingIndices) {
         if (parentSettingIndex in settingTree.settingsInformation) {
             const  settings = settingTree.settingsInformation[parentSettingIndex];
-            const  variableMessages: {lineNum: number, message: string}[] = [];
-            for (const variableName of variableNames) {
-                const  variable = settingTree.currentSettings[variableName];
-                if (lib.cutAlphabetInIndex(variable.settingsIndex) === parentSettingIndex) {
-                    variableMessages.push({
-                        lineNum: variable.lineNum,
-                        message: `${getTestablePath(inputFilePath)}:${variable.lineNum}: ${lines[variable.lineNum - 1]}\n`,
-                    });
+            if (settings.lineNum !== 0) {
+                const  variableMessages: {lineNum: number, message: string}[] = [];
+                for (const variableName of variableNames) {
+                    const  variable = settingTree.currentSettings[variableName];
+                    if (lib.cutAlphabetInIndex(variable.settingsIndex) === parentSettingIndex) {
+                        variableMessages.push({
+                            lineNum: variable.lineNum,
+                            message: `${getTestablePath(inputFilePath)}:${variable.lineNum}: ${lines[variable.lineNum - 1]}\n`,
+                        });
+                    }
                 }
-            }
-            variableMessages.sort((a,b)=>( a.lineNum - b.lineNum ));
+                variableMessages.sort((a,b)=>( a.lineNum - b.lineNum ));
 
-            errorMessage += indent + `${getTestablePath(inputFilePath)}:${settings.lineNum}: ${lines[settings.lineNum - 1]}\n`;  // settings
-            for (const variableMessage of variableMessages) {
-                errorMessage += indent + variableMessage.message;  // variable
+                errorMessage += indent + `${getTestablePath(inputFilePath)}:${settings.lineNum}: ${lines[settings.lineNum - 1]}\n`;  // settings
+                for (const variableMessage of variableMessages) {
+                    errorMessage += indent + variableMessage.message;  // variable
+                }
             }
         }
     }
@@ -669,12 +671,12 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     if (parser.verbose) {
         console.log(`Verbose: settings tree:`);
         for (const [lineNum, index] of tree.indicesWithIf.entries()) {
-            console.log(`Verbose:     ${parser.filePath}:${lineNum}: scope start`);
-            console.log(`Verbose:     ${parser.filePath}:${tree.settingsInformation[index].lineNum}:         settings "${index}" define`);
+            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}: scope start`);
+            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${tree.settingsInformation[index].lineNum}:         settings ${index} define`);
         }
         console.log(`Verbose: variables:`);
         for (const [index, variables] of Object.entries(tree.settings)) {
-            console.log(`Verbose:     ${parser.filePath}:${tree.settingsInformation[index].lineNum}: settings "${index}"`);
+            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${tree.settingsInformation[index].lineNum}: settings ${index}`);
             for (const [name, value] of Object.entries(variables)) {
                 console.log(`Verbose:         ${name}: ${value.value}`);
             }

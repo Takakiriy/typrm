@@ -34,7 +34,7 @@ else {
     process.env.TYPRM_OPEN_DOCUMENT = `echo  "code -g \\"\${ref}\\"" > test_data/_out.log`;
 }
 async function main() {
-    if (false) {
+    if (true) {
         await DoCustomDebug();
     }
     else {
@@ -45,7 +45,8 @@ async function main() {
 // DoCustomDebug
 async function DoCustomDebug() {
     const returns = await callChildProccess(`node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, { inputLines: [ /*exit()*/] });
+        `check --verbose C:\\Users\\user1\\Documents\\typrm\\Cloud_bug.yaml`, { inputLines: [ /*exit()*/] });
+    //        `search  --folder test_data/search/1`, {inputLines: [ /*exit()*/ ]});
     console.log(`(typrm_test.ts stdout) ${returns.stdout}`);
     console.log('Done');
 }

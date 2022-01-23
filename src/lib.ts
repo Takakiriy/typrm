@@ -40,6 +40,15 @@ export function  copyFileSync(sourceFilePath: string, destinationFilePath: strin
 	fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
 
+// rmdirSync
+export function  rmdirSync(folderPath: string) {
+    if (fs.existsSync(folderPath)) {
+        fs.rmdirSync(folderPath, {recursive: true});
+            // (node:8328) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+            // Property 'rm' does not exist on type 'typeof import("fs")'.ts(2339)
+    }
+}
+
 // replaceFileSync
 // #keyword: lib.ts replaceFileSync
 // replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));

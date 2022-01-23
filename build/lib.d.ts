@@ -3,6 +3,7 @@ import * as readline from 'readline';
 import { ReadLineOptions } from 'readline';
 export declare function copyFolderSync(sourceFolderPath: string, destinationFolderPath: string): Promise<void>;
 export declare function copyFileSync(sourceFilePath: string, destinationFilePath: string): void;
+export declare function rmdirSync(folderPath: string): void;
 export declare function replaceFileSync(sourceFilePath: string, replaceFunction: {
     (text: string): string;
 }, destinationFilePath?: string): void;
