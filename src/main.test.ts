@@ -1311,6 +1311,7 @@ describe("unit test >>", () => {
         ["makeSettingTree_bug_case", null],
         ["makeSettingTree_if_and_no_indent", null],
         ["makeSettingTree_below_shallow_settings", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
+        ["makeSettingTree_bug_case_2", null],
     ])("%s", async (caseName, sameInputSnapshotName) => {
         const  Parser = main.private_.Parser;
         const  makeSettingTree = main.private_.makeSettingTree;
@@ -1365,7 +1366,9 @@ function  initializeTestInputFile(snapshotName: string): TestingFolder {
     chdirInProject('src');
     const  filePath = `${testFolderPath}_tmp/_tmp.yaml`;
     const  inputContents = lib.getSnapshot(snapshotName);
-    fs.rmdirSync(`${testFolderPath}_tmp`, {recursive: true});
+    if (fs.existsSync(`${testFolderPath}_tmp`)) {
+        fs.rmdirSync(`${testFolderPath}_tmp`, {recursive: true});
+    }
     writeFileSync(filePath, inputContents);
     return {filePath, inputContents};
 }

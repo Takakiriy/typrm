@@ -4991,6 +4991,35 @@ exports[`unit test >> makeSettingTree_bug_case: sourceFileContents 1`] = `
 "
 `;
 
+exports[`unit test >> makeSettingTree_bug_case_2: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    6 => "/1/1",
+    9 => "/1",
+    12 => "/",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case_2: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+        2:
+            31:
+                settings: #settings:
+                    __Variable11__: value11
+            32:
+                value1, value11, value0
+                    #template: __Variable1__, __Variable11__, __Variable0__
+root:
+    settings: #settings:
+        __Variable0__: value0
+"
+`;
+
 exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",

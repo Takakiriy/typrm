@@ -471,43 +471,49 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                         } else {
                             var  parentIndex0 = parentIndex;
                         }
+                        const  ceilingLineNum = indentStack[indentStack.length - 2].lineNum;
                         const  shiftingIndices: string[] = [];
-                        for (const index of Object.keys(tree.settingsInformation)) {
-                            if (index.startsWith(parentIndex0+'/')) {
+                        for (const [index, settingsInformation] of Object.entries(tree.settingsInformation)) {
+                            if (index.startsWith(parentIndex0+'/')  &&
+                                    settingsInformation.lineNum > ceilingLineNum ) {
                                 shiftingIndices.push(index);
                             }
                         }
-                        shiftingIndices.sort((a,b)=>(b.length - a.length));
+                        if (shiftingIndices.length >= 1) {
+                            shiftingIndices.sort((a,b)=>(b.length - a.length));
 
-                        for (const [lineNum_, index] of tree.indices.entries()) {
-                            if (shiftingIndices.includes(index)) {
-                                const  indexBefore = index;
-                                const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
-                                tree.indices.set(lineNum_, indexAfter);
+                            for (const [lineNum_, index] of tree.indices.entries()) {
+                                if (shiftingIndices.includes(index)) {
+                                    const  indexBefore = index;
+                                    const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                    tree.indices.set(lineNum_, indexAfter);
+                                }
                             }
-                        }
-                        for (const [lineNum_, index] of tree.indicesWithIf.entries()) {
-                            if (shiftingIndices.includes(index)) {
-                                const  indexBefore = index;
-                                const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
-                                tree.indicesWithIf.set(lineNum_, indexAfter);
+                            for (const [lineNum_, index] of tree.indicesWithIf.entries()) {
+                                if (shiftingIndices.includes(index)) {
+                                    const  indexBefore = index;
+                                    const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                    tree.indicesWithIf.set(lineNum_, indexAfter);
+                                }
                             }
+                            for (const shiftingIndex of shiftingIndices) {
+                                const  indexBefore = shiftingIndex;
+                                const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                tree.settings[indexAfter] = tree.settings[indexBefore];
+                                delete  tree.settings[indexBefore];
+                                tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
+                                tree.settingsInformation[indexAfter].index = indexAfter;
+                                delete  tree.settingsInformation[indexBefore];
+                            }
+                            currentSettingIndex = previousIndex;
+                            const  lastLineNum = indentStack[indentStack.length - 1].lineNum;
+                            tree.indices.set(lastLineNum, `${currentSettingIndex}`);
+                            tree.indicesWithIf.set(lastLineNum, `${currentSettingIndex}`);
+                            settingStack[settingStack.length - 1].index = currentSettingIndex;
+                            var  nextNestedIndex = setting_.index + '/2';
+                        } else {
+                            var  nextNestedIndex = setting_.index + '/1';
                         }
-                        for (const shiftingIndex of shiftingIndices) {
-                            const  indexBefore = shiftingIndex;
-                            const  indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
-                            tree.settings[indexAfter] = tree.settings[indexBefore];
-                            delete  tree.settings[indexBefore];
-                            tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
-                            tree.settingsInformation[indexAfter].index = indexAfter;
-                            delete  tree.settingsInformation[indexBefore];
-                        }
-                        currentSettingIndex = previousIndex;
-                        const  lastLineNum = indentStack[indentStack.length - 1].lineNum;
-                        tree.indices.set(lastLineNum, `${currentSettingIndex}`);
-                        tree.indicesWithIf.set(lastLineNum, `${currentSettingIndex}`);
-                        settingStack[settingStack.length - 1].index = currentSettingIndex;
-                        var  nextNestedIndex = setting_.index + '/2';
                     } else {
                         var  nextNestedIndex = setting_.index + '/1';
                     }
@@ -546,7 +552,8 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 };
             }
             if (parser.verbose) {
-                console.log(`Verbose: settings ${currentSettingIndex}`);
+                // console.log(`Verbose: settings ${currentSettingIndex}`);
+                //    "currentSettingIndex" should be not shown because it is sometimes changed.
                 console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
             }
         } else if (indent.length <= settingIndentLength  &&  isReadingSetting) {
@@ -627,7 +634,8 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 inSettings: isReadingSetting,
             };
             if (parser.verbose) {
-                console.log(`Verbose: settings ${currentSettingIndex}`);
+                // console.log(`Verbose: settings ${currentSettingIndex}`);
+                //    "currentSettingIndex" should be not shown because it is sometimes changed.
                 console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}`);
             }
         }
@@ -648,10 +656,28 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     }
     if ( ! ('/' in tree.settings)) {
         tree.settings['/'] = {};
+        tree.settingsInformation['/'] = {
+            index: '/', lineNum: 0, indent: '', condition: '', inSettings: false
+        };
     }
     for (const index of Object.values(tree.indices)) {
         if ( ! (index in tree.settings)) {
             throw  new Error('parse error in makeSettingTree');
+        }
+    }
+
+    if (parser.verbose) {
+        console.log(`Verbose: settings tree:`);
+        for (const [lineNum, index] of tree.indicesWithIf.entries()) {
+            console.log(`Verbose:     ${parser.filePath}:${lineNum}: scope start`);
+            console.log(`Verbose:     ${parser.filePath}:${tree.settingsInformation[index].lineNum}:         settings "${index}" define`);
+        }
+        console.log(`Verbose: variables:`);
+        for (const [index, variables] of Object.entries(tree.settings)) {
+            console.log(`Verbose:     ${parser.filePath}:${tree.settingsInformation[index].lineNum}: settings "${index}"`);
+            for (const [name, value] of Object.entries(variables)) {
+                console.log(`Verbose:         ${name}: ${value.value}`);
+            }
         }
     }
 
@@ -3491,8 +3517,9 @@ class SettingsTree {
                 return_.nextSettingsLineNum = 0;
             }
             if (parser.verbose) {
-                console.log(`Verbose: settings ${currentSettingIndex}${currentSettingIndex === '/' ? ' (root)' : ''}`);
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings:`);
+                const  index = `${currentSettingIndex}${currentSettingIndex === '/' ? ' (root)' : ''}`;
+                console.log(`Verbose: settings ${index}`);
+                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings: ${index}`);
                 for (const [key, setting] of Object.entries(currentSettings)) {
                     console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                 }
