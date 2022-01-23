@@ -431,51 +431,51 @@ async function makeSettingTree(parser) {
                     }
                     // insert parent settings
                     if (previousIndentIsDeeper) {
-                        if (parentIndex === '/') {
-                            var parentIndex0 = '';
-                        }
-                        else {
-                            var parentIndex0 = parentIndex;
-                        }
                         const ceilingLineNum = indentStack[indentStack.length - 2].lineNum;
                         const shiftingIndices = [];
                         for (const [index, settingsInformation] of Object.entries(tree.settingsInformation)) {
-                            if (index.startsWith(parentIndex0 + '/') &&
-                                settingsInformation.lineNum > ceilingLineNum) {
+                            if (settingsInformation.lineNum > ceilingLineNum) {
                                 shiftingIndices.push(index);
                             }
                         }
                         if (shiftingIndices.length >= 1) {
+                            const firstShiftingIndex = shiftingIndices[0];
                             shiftingIndices.sort((a, b) => (b.length - a.length));
                             for (const [lineNum_, index] of tree.indices.entries()) {
-                                if (shiftingIndices.includes(index)) {
+                                if (lineNum_ > ceilingLineNum) {
                                     const indexBefore = index;
-                                    const indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                    const indexAfter = insertParentIndexNum(indexBefore, firstShiftingIndex);
                                     tree.indices.set(lineNum_, indexAfter);
                                 }
                             }
+                            var lastIndexAfter = '';
                             for (const [lineNum_, index] of tree.indicesWithIf.entries()) {
-                                if (shiftingIndices.includes(index)) {
+                                if (lineNum_ > ceilingLineNum) {
                                     const indexBefore = index;
-                                    const indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                    const indexAfter = insertParentIndexNum(indexBefore, firstShiftingIndex);
+                                    lastIndexAfter = indexAfter;
                                     tree.indicesWithIf.set(lineNum_, indexAfter);
                                 }
                             }
+                            var lastSettingIndexAfter = '';
                             for (const shiftingIndex of shiftingIndices) {
                                 const indexBefore = shiftingIndex;
-                                const indexAfter = `${parentIndex0}/1${indexBefore.substring(parentIndex0.length)}`;
+                                const indexAfter = insertParentIndexNum(indexBefore, firstShiftingIndex);
+                                lastSettingIndexAfter = indexAfter;
                                 tree.settings[indexAfter] = tree.settings[indexBefore];
                                 delete tree.settings[indexBefore];
                                 tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
                                 tree.settingsInformation[indexAfter].index = indexAfter;
                                 delete tree.settingsInformation[indexBefore];
                             }
-                            currentSettingIndex = previousIndex;
-                            const lastLineNum = indentStack[indentStack.length - 1].lineNum;
-                            tree.indices.set(lastLineNum, `${currentSettingIndex}`);
-                            tree.indicesWithIf.set(lastLineNum, `${currentSettingIndex}`);
+                            currentSettingIndex = firstShiftingIndex;
+                            if (lastIndexAfter !== currentSettingIndex) {
+                                tree.indices.set(lineNum, `${currentSettingIndex}`);
+                                tree.indicesWithIf.set(lineNum, `${currentSettingIndex}`);
+                            }
                             settingStack[settingStack.length - 1].index = currentSettingIndex;
-                            var nextNestedIndex = setting_.index + '/2';
+                            var nextNestedIndex = currentSettingIndex + '/' +
+                                (parseInt(lastSettingIndexAfter.substring(currentSettingIndex.length + 1)) + 1).toString();
                         }
                         else {
                             var nextNestedIndex = setting_.index + '/1';
@@ -642,6 +642,17 @@ async function makeSettingTree(parser) {
         }
     }
     return tree;
+}
+// insertParentIndexNum
+function insertParentIndexNum(indexBefore, firstShiftingIndex) {
+    if (indexBefore === '/') {
+        return firstShiftingIndex;
+    }
+    // e.g. indexBefore = '/2/6/7', firstShiftingIndex = '/2/3'
+    const rightOfInsert = indexBefore.substring(firstShiftingIndex.length); // e.g. '/7'
+    const minus = parseInt(path.basename(firstShiftingIndex)) - 1; // e.g. 2
+    const beforeMinus = parseInt(path.basename(indexBefore.substring(0, indexBefore.length - rightOfInsert.length))); // e.g. 6
+    return `${firstShiftingIndex}/${beforeMinus - minus}${rightOfInsert}`; // e.g. '/2/3/4/7'
 }
 // makeReplaceToTagTree
 async function makeReplaceToTagTree(parser, settingTree) {

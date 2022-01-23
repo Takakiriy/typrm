@@ -5040,6 +5040,65 @@ root:
 "
 `;
 
+exports[`unit test >> makeSettingTree_bug_case_3: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    5 => "/2",
+    7 => "/2/1",
+    13 => "/2",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case_3: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+            ref:
+                value1, value2, value21
+                #template: __Variable1__, __Variable2__, __Variable21__
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case_4: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    5 => "/2",
+    7 => "/2/1",
+    13 => "/2",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree_bug_case_4: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+            ref:
+                value1, value2, value21
+                #template: __Variable1__, __Variable2__, __Variable21__
+        22:
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
 exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",

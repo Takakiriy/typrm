@@ -1312,6 +1312,8 @@ describe("unit test >>", () => {
         ["makeSettingTree_if_and_no_indent", null],
         ["makeSettingTree_below_shallow_settings", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
         ["makeSettingTree_bug_case_2", null],
+        ["makeSettingTree_bug_case_3", null],
+        ["makeSettingTree_bug_case_4", null],
     ])("%s", async (caseName, sameInputSnapshotName) => {
         const  Parser = main.private_.Parser;
         const  makeSettingTree = main.private_.makeSettingTree;
