@@ -718,127 +718,138 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
     var  blockStartLineNums = Array.from(settingTree.indicesWithIf.keys());
     var  nextBlockIndex = 0;
     var  nextBlockLineNum = 1;
+    let  breaking = false;
+    let  exception: any;
     if (parser.verbose) {
         console.log(`Verbose: Phase 2: parse "to" tags ...`);
     }
 
     var  lineNum = 0;
     for await (const line1 of reader) {
-        const  line: string = line1;
-        lineNum += 1;
-        parser.line = line;
-        parser.lineNum = lineNum;
+        if (breaking) {continue;}  // "reader" requests read all lines
+        try {
+            const  line: string = line1;
+            lineNum += 1;
+            parser.line = line;
+            parser.lineNum = lineNum;
 
-        settingTree.moveToLine(parser);
-        if (lineNum === nextBlockLineNum) {
-            currentSettingIndex = settingTree.indicesWithIf.get(lineNum)!;
-            nextBlockIndex += 1;
-            nextBlockLineNum = blockStartLineNums[nextBlockIndex];
-        }
-        if ( ! (currentSettingIndex in toTagTree.replaceTo)) {
-            toTagTree.replaceTo[currentSettingIndex] = {};
-        }
-
-        // setting = ...
-        if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
-            isReadingSetting = true;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-            previousTemplateTag = null;
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-            isReadingSetting = false;
-            variableName = '';
-            value = '';
-        }
-        if (isReadingSetting) {
-            const  separator = line.indexOf(':');
-            if (separator !== notFound) {
-                const  keyOrNot = line.substr(0, separator).trim();
-                if (keyOrNot[0] !== '#') {
-
-                    variableName = keyOrNot;
-                    value = getValue(line, separator);
-                }
+            settingTree.moveToLine(parser);
+            if (lineNum === nextBlockLineNum) {
+                currentSettingIndex = settingTree.indicesWithIf.get(lineNum)!;
+                nextBlockIndex += 1;
+                nextBlockLineNum = blockStartLineNums[nextBlockIndex];
             }
-        }
-        var  toLabelIndex = line.indexOf(toLabel);
-        if (toLabelIndex !== notFound) {
-            var  toValue = getValue(line, toLabelIndex + toLabel.length - 1);
-        } else {
-            var  toValue = '';
-        }
-        const  templateTag = parseTemplateTag(line, parser);
-        if (templateTag.isFound) {
-            previousTemplateTag = templateTag;
-        }
-        if (toValue) {
+            if ( ! (currentSettingIndex in toTagTree.replaceTo)) {
+                toTagTree.replaceTo[currentSettingIndex] = {};
+            }
 
-            // #to: tag in the settings
+            // setting = ...
+            if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
+                isReadingSetting = true;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
+                previousTemplateTag = null;
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                isReadingSetting = false;
+                variableName = '';
+                value = '';
+            }
             if (isReadingSetting) {
-                if (parser.verbose) {
-                    console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
-                    console.log(`Verbose:         ${variableName}: ${value}  #to: ${toValue}`);
-                }
-                if (variableName in toTagTree.replaceTo[currentSettingIndex]) {
-                    const  variable = toTagTree.replaceTo[currentSettingIndex][variableName];
-                    if (toValue !== variable.value) {
-                        console.log('');
-                        console.log(`Error of conflict #to: tag:`);
-                        console.log(`    variableName: ${variableName}`);
-                        console.log(`    valueA: ${variable.value} ` +
-                            `in ${getTestablePath(parser.filePath)}:${variable.lineNum}`);
-                        console.log(`    valueB: ${toValue} ` +
-                            `in ${getTestablePath(parser.filePath)}:${lineNum}`);
-                        parser.errorCount += 1;
+                const  separator = line.indexOf(':');
+                if (separator !== notFound) {
+                    const  keyOrNot = line.substr(0, separator).trim();
+                    if (keyOrNot[0] !== '#') {
+
+                        variableName = keyOrNot;
+                        value = getValue(line, separator);
                     }
                 }
-
-                toTagTree.replaceTo[currentSettingIndex][variableName] = {
-                    value: toValue,
-                    lineNum: lineNum,
-                    settingsIndex: currentSettingIndex,
-                    tag: 'toInSettings',
-                    isReferenced: false,
-                };
-                console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${toValue}`);
-
-            // #to: tag after the #template:
+            }
+            var  toLabelIndex = line.indexOf(toLabel);
+            if (toLabelIndex !== notFound) {
+                var  toValue = getValue(line, toLabelIndex + toLabel.length - 1);
             } else {
-                if (previousTemplateTag) {
+                var  toValue = '';
+            }
+            const  templateTag = parseTemplateTag(line, parser);
+            if (templateTag.isFound) {
+                previousTemplateTag = templateTag;
+            }
+            if (toValue) {
+
+                // #to: tag in the settings
+                if (isReadingSetting) {
                     if (parser.verbose) {
                         console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
+                        console.log(`Verbose:         ${variableName}: ${value}  #to: ${toValue}`);
                     }
-                    const  newKeyValues = await previousTemplateTag.scanKeyValues(
-                        toValue, settingTree.currentSettings, parser);
-                    if (parser.verbose) {
-                        for (const [variableName, newValue] of Object.entries(newKeyValues)) {
-                            console.log(`Verbose:         ${variableName}: ${newValue.value}`);
+                    if (variableName in toTagTree.replaceTo[currentSettingIndex]) {
+                        const  variable = toTagTree.replaceTo[currentSettingIndex][variableName];
+                        if (toValue !== variable.value) {
+                            console.log('');
+                            console.log(`Error of conflict #to: tag:`);
+                            console.log(`    variableName: ${variableName}`);
+                            console.log(`    valueA: ${variable.value} ` +
+                                `in ${getTestablePath(parser.filePath)}:${variable.lineNum}`);
+                            console.log(`    valueB: ${toValue} ` +
+                                `in ${getTestablePath(parser.filePath)}:${lineNum}`);
+                            parser.errorCount += 1;
                         }
                     }
-                    for (const [variableName, newValue] of Object.entries(newKeyValues)) {
-                        const  indices = searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree);
-                        for (const index of indices) {
-                            if (variableName in toTagTree.replaceTo[index]) {
-                                const  variable = toTagTree.replaceTo[index][variableName];
-                                if (newKeyValues[variableName].value !== variable.value) {
-                                    console.log('');
-                                    console.log(`Error of conflict #to: tag:`);
-                                    console.log(`    variableName: ${variableName}`);
-                                    console.log(`    valueA: ${variable.value} ` +
-                                        `in ${getTestablePath(parser.filePath)}:${variable.lineNum}`);
-                                    console.log(`    valueB: ${toValue} ` +
-                                        `in ${getTestablePath(parser.filePath)}:${lineNum}`);
-                                    parser.errorCount += 1;
-                                }
-                            }
 
-                            toTagTree.replaceTo[index][variableName] = newValue;
+                    toTagTree.replaceTo[currentSettingIndex][variableName] = {
+                        value: toValue,
+                        lineNum: lineNum,
+                        settingsIndex: currentSettingIndex,
+                        tag: 'toInSettings',
+                        isReferenced: false,
+                    };
+                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${toValue}`);
+
+                // #to: tag after the #template:
+                } else {
+                    if (previousTemplateTag) {
+                        if (parser.verbose) {
+                            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
                         }
-                        console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
+                        const  newKeyValues = await previousTemplateTag.scanKeyValues(
+                            toValue, settingTree.currentSettings, parser);
+                        if (parser.verbose) {
+                            for (const [variableName, newValue] of Object.entries(newKeyValues)) {
+                                console.log(`Verbose:         ${variableName}: ${newValue.value}`);
+                            }
+                        }
+                        for (const [variableName, newValue] of Object.entries(newKeyValues)) {
+                            const  indices = searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree);
+                            for (const index of indices) {
+                                if (variableName in toTagTree.replaceTo[index]) {
+                                    const  variable = toTagTree.replaceTo[index][variableName];
+                                    if (newKeyValues[variableName].value !== variable.value) {
+                                        console.log('');
+                                        console.log(`Error of conflict #to: tag:`);
+                                        console.log(`    variableName: ${variableName}`);
+                                        console.log(`    valueA: ${variable.value} ` +
+                                            `in ${getTestablePath(parser.filePath)}:${variable.lineNum}`);
+                                        console.log(`    valueB: ${toValue} ` +
+                                            `in ${getTestablePath(parser.filePath)}:${lineNum}`);
+                                        parser.errorCount += 1;
+                                    }
+                                }
+
+                                toTagTree.replaceTo[index][variableName] = newValue;
+                            }
+                            console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
+                        }
+                        previousTemplateTag = null;
                     }
-                    previousTemplateTag = null;
                 }
             }
+        } catch (e) {
+            exception = e;
+            breaking = true;
         }
+    }
+    if (exception) {
+        throw exception;
     }
 
     return  toTagTree;
@@ -857,62 +868,73 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
     var  blockStartLineNums = Array.from(settingTree.indicesWithIf.keys());
     var  nextBlockIndex = 0;
     var  nextBlockLineNum = 1;
+    let  breaking = false;
+    let  exception: any;
     if (parser.verbose) {
         console.log(`Verbose: Phase 2: parse "original" tags ...`);
     }
 
     var  lineNum = 0;
     for await (const line1 of reader) {
-        const  line: string = line1;
-        lineNum += 1;
-        parser.line = line;
-        parser.lineNum = lineNum;
+        if (breaking) {continue;}  // "reader" requests read all lines
+        try {
+            const  line: string = line1;
+            lineNum += 1;
+            parser.line = line;
+            parser.lineNum = lineNum;
 
-        settingTree.moveToLine(parser);
-        if (lineNum === nextBlockLineNum) {
-            currentSettingIndex = settingTree.indicesWithIf.get(lineNum)!;
-            nextBlockIndex += 1;
-            nextBlockLineNum = blockStartLineNums[nextBlockIndex];
-        }
-        if ( ! (currentSettingIndex in toTagTree.replaceTo)) {
-            toTagTree.replaceTo[currentSettingIndex] = {};
-        }
-
-        // setting = ...
-        if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
-            isReadingSetting = true;
-            settingIndentLength = indentRegularExpression.exec(line)![0].length;
-        } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
-            isReadingSetting = false;
-        }
-        if (isReadingSetting) {
-            const  separator = line.indexOf(':');
-            const  originalLabelIndex = line.indexOf(originalLabel);
-            var    variableName = '';
-            if (separator !== notFound) {
-                const  keyOrNot = line.substr(0, separator).trim();
-                if (keyOrNot[0] !== '#') {
-                    variableName = keyOrNot;
-                }
+            settingTree.moveToLine(parser);
+            if (lineNum === nextBlockLineNum) {
+                currentSettingIndex = settingTree.indicesWithIf.get(lineNum)!;
+                nextBlockIndex += 1;
+                nextBlockLineNum = blockStartLineNums[nextBlockIndex];
+            }
+            if ( ! (currentSettingIndex in toTagTree.replaceTo)) {
+                toTagTree.replaceTo[currentSettingIndex] = {};
             }
 
-            if (variableName !== ''  &&  originalLabelIndex != notFound) {
-                var  originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
-                if (parser.verbose) {
-                    console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
-                    console.log(`Verbose:         ${variableName}: #original: ${originalValue}`);
+            // setting = ...
+            if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
+                isReadingSetting = true;
+                settingIndentLength = indentRegularExpression.exec(line)![0].length;
+            } else if (indentRegularExpression.exec(line)![0].length <= settingIndentLength  &&  isReadingSetting) {
+                isReadingSetting = false;
+            }
+            if (isReadingSetting) {
+                const  separator = line.indexOf(':');
+                const  originalLabelIndex = line.indexOf(originalLabel);
+                var    variableName = '';
+                if (separator !== notFound) {
+                    const  keyOrNot = line.substr(0, separator).trim();
+                    if (keyOrNot[0] !== '#') {
+                        variableName = keyOrNot;
+                    }
                 }
 
-                toTagTree.replaceTo[currentSettingIndex][variableName] = {
-                    value: originalValue,
-                    lineNum: lineNum,
-                    settingsIndex: currentSettingIndex,
-                    tag: 'original',
-                    isReferenced: false,
-                };
-                console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #original: ${variableName}: ${originalValue}`);
+                if (variableName !== ''  &&  originalLabelIndex != notFound) {
+                    var  originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
+                    if (parser.verbose) {
+                        console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
+                        console.log(`Verbose:         ${variableName}: #original: ${originalValue}`);
+                    }
+
+                    toTagTree.replaceTo[currentSettingIndex][variableName] = {
+                        value: originalValue,
+                        lineNum: lineNum,
+                        settingsIndex: currentSettingIndex,
+                        tag: 'original',
+                        isReferenced: false,
+                    };
+                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #original: ${variableName}: ${originalValue}`);
+                }
             }
+        } catch (e) {
+            exception = e;
+            breaking = true;
         }
+    }
+    if (exception) {
+        throw exception;
     }
 
     toTagTree.command = 'reset';

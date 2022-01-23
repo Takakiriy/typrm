@@ -4034,6 +4034,30 @@ Warning: 0, Error: 1
 "
 `;
 
+exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: sourceFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Parent1__: parent1
+    1:
+        settings: #settings:
+            __Parent11__: parent11
+        11:
+            settings: #settings:
+                __Parent111__: parent111
+            111:
+                settings: #settings:
+                    __Parent111__: parent111
+            112:
+                settings: #settings:
+                    __Variable__: valueB
+        ref:
+            valueA  #template: __Variable__  #to: valueA_replaced
+root:
+settings: #settings:
+    __Variable__: valueA
+"
+`;
+
 exports[`replaces settings >> replace to tag >> settings_tree_if: replacedFileContents 1`] = `
 "section:
     table:
