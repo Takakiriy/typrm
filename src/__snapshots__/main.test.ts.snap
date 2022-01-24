@@ -4051,7 +4051,7 @@ exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: repla
                 settings: #settings:
                     __Variable__: valueB
         ref:
-            valueA_replaced  #template: __Variable__  #to: valueA_replaced
+            valueA_replaced  #template: __Variable__
         ref2:
             valueA_replaced  #template: __Variable__
 root:
@@ -4113,10 +4113,9 @@ settings: #settings:
 `;
 
 exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: stdout 1`] = `
-"
-Exception: TypeError: Cannot use 'in' operator to search for '__Variable__' in undefined
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable__: valueA_replaced
 
-Warning: 0, Error: 1
+Warning: 0, Error: 0
 "
 `;
 

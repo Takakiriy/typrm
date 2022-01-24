@@ -723,6 +723,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
     if (parser.verbose) {
         console.log(`Verbose: Phase 2: parse "to" tags ...`);
     }
+    toTagTree.replaceTo['/'] = {};
 
     var  lineNum = 0;
     for await (const line1 of reader) {
@@ -3690,7 +3691,7 @@ interface  SettingsTree_addCurrentSettingsInIfTag {
 };
 
 // ReplaceToTagTree
-class ReplaceToTagTree {
+class  ReplaceToTagTree {
     replaceTo: {[index: string]: {[name: string]: Setting}} = {};
     outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
     outOfFalseBlocksByOriginalTag = new Map</*lineNum*/ number, boolean>();

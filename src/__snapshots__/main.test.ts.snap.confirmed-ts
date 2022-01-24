@@ -4034,6 +4034,58 @@ Warning: 0, Error: 1
 "
 `;
 
+exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: replacedFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Parent1__: parent1
+    1:
+        settings: #settings:
+            __Parent11__: parent11
+        11:
+            settings: #settings:
+                __Parent111__: parent111
+            111:
+                settings: #settings:
+                    __Parent111__: parent111
+            112:
+                settings: #settings:
+                    __Variable__: valueB
+        ref:
+            valueA_replaced  #template: __Variable__
+        ref2:
+            valueA_replaced  #template: __Variable__
+root:
+settings: #settings:
+    __Variable__: valueA_replaced  #original: valueA
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: resetFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Parent1__: parent1
+    1:
+        settings: #settings:
+            __Parent11__: parent11
+        11:
+            settings: #settings:
+                __Parent111__: parent111
+            111:
+                settings: #settings:
+                    __Parent111__: parent111
+            112:
+                settings: #settings:
+                    __Variable__: valueB
+        ref:
+            valueA  #template: __Variable__
+        ref2:
+            valueA  #template: __Variable__
+root:
+settings: #settings:
+    __Variable__: valueA
+"
+`;
+
 exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: sourceFileContents 1`] = `
 "bug case:
     settings: #settings:
@@ -4052,9 +4104,18 @@ exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: sourc
                     __Variable__: valueB
         ref:
             valueA  #template: __Variable__  #to: valueA_replaced
+        ref2:
+            valueA  #template: __Variable__
 root:
 settings: #settings:
     __Variable__: valueA
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E2_BugCase_ParentSettings: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable__: valueA_replaced
+
+Warning: 0, Error: 0
 "
 `;
 

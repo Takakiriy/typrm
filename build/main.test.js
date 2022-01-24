@@ -505,7 +505,7 @@ describe("replaces settings >>", () => {
         });
     });
     describe("replace to tag >>", () => {
-        test.only.each([
+        test.each([
             ['1_OK', ''],
             ['2_FileParameter', 'FileParameter'],
             ['3_SimpleOneLoop', ''],
@@ -520,9 +520,6 @@ describe("replaces settings >>", () => {
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
             ['E2_BugCase_ParentSettings', ''],
         ])("%s", async (caseName, options) => {
-            if (caseName !== 'E2_BugCase_ParentSettings') {
-                return;
-            } // || subCase !== '____'
             const { filePath, inputContents } = initializeTestInputFile(`replaces settings >> replace to tag >> ${caseName}: sourceFileContents 1`);
             // Test Main >> replace
             if (options.includes('FileParameter')) {
@@ -557,7 +554,6 @@ describe("replaces settings >>", () => {
                 expect(sourceFileContents2).toBe(inputContents);
             }
             lib.rmdirSync(testFolderPath + '_tmp');
-            expect('test code').toBe('deleted skip code.');
         });
     });
     test("CR LF >>", async () => {
