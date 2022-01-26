@@ -693,7 +693,7 @@ typrm を使うには Node.js のインストールが必要です。
         - rm  node-v14.17.6-linux-x64.tar.xz
         - sudo mv  node-v14.17.6-linux-x64  /opt
         - cd /opt
-        - sudo ln -s  node-v14.17.6-linux-x64  node
+        - sudo ln -s  node-v14.17.6-linux-x64  node  #// 新旧バージョンと共存し、主に使わないときは不要
         - cd ${HOME}
         - PATH=/opt/node/bin:$PATH
         - node --version

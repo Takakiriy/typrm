@@ -2518,7 +2518,7 @@ async function searchWithoutTags(keywords) {
             const line = line1;
             lineNum += 1;
             var keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
-            if (keywordIndex !== notFound) {
+            if (keywordIndex !== notFound && !line.includes(keywordLabel)) {
                 const found = new FoundLine();
                 found.path = getTestablePath(inputFileFullPath);
                 found.lineNum = lineNum;
@@ -3884,7 +3884,7 @@ class FoundLine {
         this.matchedKeywordCount = 0;
         this.matchedTargetKeywordCount = 0;
         this.testedWordCount = 0;
-        this.tagLabel = ''; // keywordLabel, searchLabel
+        this.tagLabel = ''; // keywordLabel, searchLabel, glossaryLabel, find all
         this.score = 0;
     }
     toString() {
@@ -3907,25 +3907,25 @@ class FoundLine {
         var previousPosition = 0;
         for (const match of colorParts) {
             coloredLine +=
-                line.substr(previousPosition, match.position - previousPosition) +
+                line.substring(previousPosition, match.position) +
                     matchedColor(line.substr(match.position, match.length));
             previousPosition = match.position + match.length;
         }
-        coloredLine += line.substr(previousPosition);
+        coloredLine += line.substring(previousPosition);
         const refColor = chalk.yellow;
         const refIndex = coloredLine.indexOf(refLabel);
         if (refIndex !== notFound) {
             const commentIndex = coloredLine.indexOf(' #', refIndex + refLabel.length);
             if (commentIndex === notFound) {
-                var refTagAndParameter = coloredLine.substr(refIndex).trim();
+                var refTagAndParameter = coloredLine.substring(refIndex).trim();
             }
             else {
-                var refTagAndParameter = coloredLine.substr(refIndex, commentIndex - refIndex).trim();
+                var refTagAndParameter = coloredLine.substring(refIndex, commentIndex).trim();
             }
             coloredLine =
-                coloredLine.substr(0, refIndex) +
+                coloredLine.substring(0, refIndex) +
                     refColor(refTagAndParameter) +
-                    coloredLine.substr(refIndex + refTagAndParameter.length);
+                    coloredLine.substring(refIndex + refTagAndParameter.length);
         }
         if (this.tagLabel !== searchLabel) {
             const searchColor = chalk.yellow;
@@ -3935,15 +3935,28 @@ class FoundLine {
                 const parameterIndex = searchIndex + searchLabel.length + spaceCount;
                 const commentIndex = coloredLine.indexOf(' #', parameterIndex);
                 if (commentIndex === notFound) {
-                    var searchKeyword = coloredLine.substr(parameterIndex).trim();
+                    var searchKeyword = coloredLine.substring(parameterIndex).trim();
                 }
                 else {
-                    var searchKeyword = coloredLine.substr(parameterIndex, commentIndex - parameterIndex).trim();
+                    var searchKeyword = coloredLine.substring(parameterIndex, commentIndex).trim();
                 }
                 coloredLine =
-                    coloredLine.substr(0, parameterIndex) +
+                    coloredLine.substring(0, parameterIndex) +
                         searchColor(searchKeyword) +
-                        coloredLine.substr(parameterIndex + searchKeyword.length);
+                        coloredLine.substring(parameterIndex + searchKeyword.length);
+            }
+        }
+        if (this.tagLabel === keywordLabel || this.tagLabel === glossaryLabel) {
+            const keywordLabelColor = chalk.gray;
+            const keywordLabelIndex = coloredLine.indexOf(keywordLabel);
+            if (keywordLabelIndex !== notFound && (keywordLabelIndex === 0 || coloredLine[keywordLabelIndex - 1] === ' ')) {
+                coloredLine =
+                    coloredLine.substring(0, keywordLabelIndex) +
+                        keywordLabelColor(keywordLabel) +
+                        coloredLine.substring(keywordLabelIndex + keywordLabel.length);
+            }
+            if (this.tagLabel === glossaryLabel) {
+                coloredLine = keywordLabelColor(glossaryLabel) + ' ' + coloredLine;
             }
         }
         if (false) {

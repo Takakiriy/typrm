@@ -712,7 +712,7 @@ To use typrm, you must install Node.js.
         - rm  node-v14.17.6-linux-x64.tar.xz
         - sudo mv  node-v14.17.6-linux-x64  /opt
         - cd /opt
-        - sudo ln -s  node-v14.17.6-linux-x64  node
+        - sudo ln -s  node-v14.17.6-linux-x64  node  #// You can skip if you use old and new versions and not use primarily
         - cd ${HOME}
         - PATH=/opt/node/bin:$PATH
         - node --version
