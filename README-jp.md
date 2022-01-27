@@ -9,10 +9,10 @@ typrm は テキスト ファイル 形式のマニュアルに書かれたコ�
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
+  - [スニペット検索機能 - #keyword タグや #glossary タグを使って精度よくスニペットを検索します](#スニペット検索機能---keyword-タグや-glossary-タグを使って精度よくスニペットを検索します)
   - [リプレース機能 - replace コマンド, reset コマンド](#リプレース機能---replace-コマンド-reset-コマンド)
     - [#to タグを使って置き換えます](#to-タグを使って置き換えます)
-  - [スニペット検索機能 - #keyword タグや #glossary タグを使って精度よくスニペットを検索します](#スニペット検索機能---keyword-タグや-glossary-タグを使って精度よくスニペットを検索します)
-  - [任意のコマンドを実行します](#任意のコマンドを実行します)
+    - [任意のコマンドを実行します](#任意のコマンドを実行します)
   - [インストール](#インストール)
     - [Windows の場合](#windows-の場合)
     - [mac の場合](#mac-の場合)
@@ -40,6 +40,248 @@ typrm は テキスト ファイル 形式のマニュアルに書かれたコ�
   - [タグ一覧](#タグ一覧)
 
 <!-- /TOC -->
+
+
+## スニペット検索機能 - #keyword タグや #glossary タグを使って精度よくスニペットを検索します
+
+typrm の検索機能は、見つかったキーワードに関するスニペットを表示します。
+
+たとえば、`grep` というキーワードを検索すると、`grep` というキーワードがある場所と、
+スニペットが表示されます。
+Linux の `man grep` のように `typrm grep` を使えます。
+
+typrm コマンド:
+
+    $ typrm grep
+    /path/linux.yaml:100: grep: #keyword
+        サンプル: grep -r __keyword__ __FilePath__
+        含まないファイル:
+            grep -L __Keyword__ __Path__
+
+スニペットが表示されるようにするには、
+検索対象となる テキスト ファイル の中のキーワードに `#keyword:` タグを付けます。
+また、スニペットに表示させる内容は見つかった行より深い空白文字のインデントにします。
+表示される最大の行数は 8行です。
+ファイルの内容にジャンプするには、Visual Studio Code などで typrm コマンドを実行して
+表示されたパスと行番号を Ctrl キーを押しながらクリックします。
+
+テキスト ファイル の内容のサンプル:
+
+        ....
+    grep: #keyword:
+        サンプル: grep -r __keyword__ __FilePath__
+        含まないファイル:
+            grep -L __Keyword__ __Path__
+    sed: #keyword:
+        ....
+
+`#glossary:` タグによってヒットしたキーワードに関するスニペットも表示されます。
+ただし、スニペットが表示されるのは、最も優先的にヒットしたキーワードに関する
+スニペットだけです。
+
+検索結果に優先的に表示させるキーワードに対しても、`#keyword:` タグを付けます。
+
+テキスト ファイル の内容のサンプル:
+
+    Shows all files:  #keyword: ls
+    Example: ls -a sub_folder
+
+typrm コマンド:
+
+    $ typrm ls
+    .../text.yaml:2: Example: ls -a sub_folder
+    .../text.yaml:1: Shows all files:  #keyword: ls
+
+上記の場合、`#keyword:` タグがある行の `ls` が優先的に見つかります（下に表示されます）。
+`#keyword:` タグが付いていないキーワードも見つかります。
+
+`#keyword: git clone` と `#keyword: git status` があるときに
+`git` を検索したときは、`git clone` が最も優先的に表示されます。
+`git status` は、文字数の差が大きいため、2番目に表示されます。
+スニペットが表示されるのは、最も優先的にヒットしたキーワードに関するスニペットだけです。
+`git status` で検索すれば `git status` のスニペットを表示できます。
+
+`TYPRM_FOLDER` 環境変数、または `--folder` オプションに
+検索対象のファイルが入っているフォルダーのパスを指定します。
+
+PowerShell で環境変数を設定する場合:
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
+    typrm ls
+
+`--folder` オプションに指定する場合:
+
+    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
+
+`TYPRM_FOLDER` 環境変数の値は CSV 形式です。
+複数のフォルダーのパスを指定することができます。
+ファイル名のワイルドカードを指定することもできます。
+ファイルを指定することもできます。
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
+
+コロンまでをキーワードにするときは、`#keyword:` タグのパラメーターを省略できます。
+下記の場合、検索できるキーワードは ls です。
+
+    ls:  #keyword:
+
+行頭にハイフンがあるときは、キーワードにハイフンを含みません。
+下記の場合、検索できるキーワードは ls です。
+
+    - ls:  #keyword:
+
+typrm search コマンドのコマンド名（search）は省略できます。
+search コマンドの短いコマンド名は s です。
+
+typrm search コマンドの書式:
+
+    typrm __Keyword__
+
+または
+
+    typrm search __Keyword__
+
+または
+
+    typrm s __Keyword__
+
+検索キーワードが typrm のコマンド名と同じときは、
+コマンド名（search または s）を省略できません。
+
+検索キーワードに `#keyword:` または `#search:` を入力しても無視されます。
+
+search コマンドにキーワードを指定しないと、検索キーワード入力モード(typrm shell)になります。
+このモードを終了するには、Ctrl+C キーを押します。
+
+    $ typrm
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+Visual Studio Code のターミナルで実行した場合、見つかった場所（パス）を
+Ctrl キーを押しながらクリックすると開くことができます。
+
+（バージョン 1.x の場合）
+
+検索した後で # と数字（例：#1）を入力すると、
+`TYPRM_OPEN_DOCUMENT` 環境変数に設定したコマンドを実行します。
+入力する数字は検索結果の下から数えた番号です。
+環境変数の値の `${ref}` の部分はフルパスに置き換わります。
+
+bash
+
+    $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
+    $ typrm
+    keyword: csv
+    /home/user1/text.txt:1: #keyword: CSV, comma separated values
+    keyword: #1
+
+実行されるコマンド
+
+    code -g "/home/user1/text.txt:1"
+
+typrm shell で何も見つからなかったときは、
+Enter キーを押すことで全文検索ができます。
+その全文検索では、大文字小文字を区別しません。また、単語単位検索はできません。
+
+    $ typrm s
+    keyword: game
+    見つかりません。全文検索するときは Enter キーを押してください。
+    keyword:
+    .../text.txt:1: Game:
+    keyword:
+
+typrm shell で `#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
+replace, reset, check, mutual-search コマンドが使えます。
+
+    #r                // 全ファイル replace
+    #r example.yaml
+    #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
+
+（すべてのバージョン）
+
+複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
+複数の単語を指定すると AND 検索になります。
+単語数を増やすと絞り込めます。単語数を減らすと関連する内容もヒットします。
+OR 検索はできません。何度か検索してください。
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated values
+
+大文字小文字が違っていてもヒットしますが、
+大文字小文字が同じテキストが上位に表示されます。
+typrm では上位にヒットしたテキストが下側に表示されます。
+
+下記のうち、上に書かれた違いほど検索スコアを大きく落とします。
+- 語数の違い
+- 文字数の違い
+- 大文字小文字の違い
+
+テキスト ファイルに書くキーワードは、
+`#keyword:` タグに続けて CSV 形式（コンマ区切り）で
+複数指定することができます。
+
+    #keyword: CSV, comma separated values, "a,b"
+
+` #`（空白と#）を含むキーワードを指定するときは、`"%20"#` と書いてください。
+` #`（空白と#）は次のタグとして解釈されます。
+`"%` を含むキーワードを指定するときは、`""%25"` と書いてください。
+CSV の部分に文法の問題があるときに表示される警告を抑制するには、
+`#disable-tag-tool:` を書いてください。
+`#keyword:` タグとして処理されなくなります。
+
+    #keyword: abc"   #disable-tag-tool:
+
+`#(search)if: false` タグがある行の次の行から
+インデントが同じ深さの行の前までの、
+`#keyword:` タグと　`#glossary:` タグは検索対象外になります。
+
+    copy:  #(search)if: false
+        #keyword: abc  #// 検索対象外です
+        #keyword: def  #// 検索対象外です
+    original:
+        #keyword: abc  #// 検索対象です
+
+`#glossary:` （用語）タグを付けると、`#glossary:` タグを付けた行のインデントより
+1段深いインデントの行に書かれたコロンまでの部分が検索対象のキーワードになります。
+
+    用語:  #glossary:
+        CSV: comma separated values
+        SSV: space separated values
+        #comment: ここは検索されません
+
+上記の場合、CSV と SSV を検索できるようになります。
+2段以上深いインデントの行は対象外ですが、
+深い位置にも `#glossary:` タグを書けば対象になります。
+
+`#glossary:` タグにパラメーターをつけると、
+パラメーターとラベルからなるキーフレーズが検索対象になり、
+組み合わせ検索ができるようになります。
+
+    C++ 用語:  #glossary: C++
+        TLS: Thread Local Storage. スレッドごとに存在するメモリー領域
+
+    セキュリティ用語:  #glossary: security
+        TLS: Transport Layer Security. SSL の次のバージョン
+
+上記の場合、TLS で検索すると両方とも見つかります。
+C++ TLS で検索すると C++ 用語の TLS だけが見つかります。
+
+`--thesaurus` オプション、または TYPRM_THESAURUS 環境変数に、
+シソーラス ファイル のパスを指定することができます。
+シソーラス ファイル は、CSV 形式です。
+シソーラスは、同義語だけ指定できます。
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
+    .../script.yaml:1: #keyword: JavaScript
+
+thesaurus.csv のサンプル:
+
+    JavaScript, js
+    document, doc
+    source, src
+    destination, dst, dest
+    string, 文字列
 
 
 ## リプレース機能 - replace コマンド, reset コマンド
@@ -303,252 +545,14 @@ typrm replace コマンドを実行すると、すべてのファイルにある
     typrm r  __FileName__
 
 
-## スニペット検索機能 - #keyword タグや #glossary タグを使って精度よくスニペットを検索します
-
-typrm の検索機能は、見つかったキーワードに関するスニペットを表示します。
-
-たとえば、`grep` というキーワードを検索すると、`grep` というキーワードがある場所と、
-スニペットが表示されます。
-Linux の `man grep` のように `typrm grep` を使えます。
-
-typrm コマンド:
-
-    $ typrm grep
-    /path/linux.yaml:100: grep: #keyword
-        サンプル: grep -r __keyword__ __FilePath__
-        含まないファイル:
-            grep -L __Keyword__ __Path__
-
-スニペットが表示されるようにするには、
-検索対象となる テキスト ファイル の中のキーワードに `#keyword:` タグを付けます。
-また、スニペットに表示させる内容は見つかった行より深い空白文字のインデントにします。
-表示される最大の行数は 8行です。
-ファイルの内容にジャンプするには、Visual Studio Code などで typrm コマンドを実行して
-表示されたパスと行番号を Ctrl キーを押しながらクリックします。
-
-テキスト ファイル の内容のサンプル:
-
-        ....
-    grep: #keyword:
-        サンプル: grep -r __keyword__ __FilePath__
-        含まないファイル:
-            grep -L __Keyword__ __Path__
-    sed: #keyword:
-        ....
-
-`#glossary:` タグによってヒットしたキーワードに関するスニペットも表示されます。
-ただし、スニペットが表示されるのは、最も優先的にヒットしたキーワードに関する
-スニペットだけです。
-
-検索結果に優先的に表示させるキーワードに対しても、`#keyword:` タグを付けます。
-
-テキスト ファイル の内容のサンプル:
-
-    Shows all files:  #keyword: ls
-    Example: ls -a sub_folder
-
-typrm コマンド:
-
-    $ typrm ls
-    .../text.yaml:2: Example: ls -a sub_folder
-    .../text.yaml:1: Shows all files:  #keyword: ls
-
-上記の場合、`#keyword:` タグがある行の `ls` が優先的に見つかります（下に表示されます）。
-`#keyword:` タグが付いていないキーワードも見つかります。
-
-`#keyword: git clone` と `#keyword: git status` があるときに
-`git` を検索したときは、`git clone` が最も優先的に表示されます。
-`git status` は、文字数の差が大きいため、2番目に表示されます。
-スニペットが表示されるのは、最も優先的にヒットしたキーワードに関するスニペットだけです。
-`git status` で検索すれば `git status` のスニペットを表示できます。
-
-`TYPRM_FOLDER` 環境変数、または `--folder` オプションに
-検索対象のファイルが入っているフォルダーのパスを指定します。
-
-PowerShell で環境変数を設定する場合:
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
-    typrm ls
-
-`--folder` オプションに指定する場合:
-
-    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
-
-`TYPRM_FOLDER` 環境変数の値は CSV 形式です。
-複数のフォルダーのパスを指定することができます。
-ファイル名のワイルドカードを指定することもできます。
-ファイルを指定することもできます。
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
-
-コロンまでをキーワードにするときは、`#keyword:` タグのパラメーターを省略できます。
-下記の場合、検索できるキーワードは ls です。
-
-    ls:  #keyword:
-
-行頭にハイフンがあるときは、キーワードにハイフンを含みません。
-下記の場合、検索できるキーワードは ls です。
-
-    - ls:  #keyword:
-
-typrm search コマンドのコマンド名（search）は省略できます。
-search コマンドの短いコマンド名は s です。
-
-typrm search コマンドの書式:
-
-    typrm __Keyword__
-
-または
-
-    typrm search __Keyword__
-
-または
-
-    typrm s __Keyword__
-
-検索キーワードが typrm のコマンド名と同じときは、
-コマンド名（search または s）を省略できません。
-
-検索キーワードに `#keyword:` または `#search:` を入力しても無視されます。
-
-search コマンドにキーワードを指定しないと、検索キーワード入力モード(typrm shell)になります。
-このモードを終了するには、Ctrl+C キーを押します。
-
-    $ typrm
-    keyword: csv
-    .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
-
-Visual Studio Code のターミナルで実行した場合、見つかった場所（パス）を
-Ctrl キーを押しながらクリックすると開くことができます。
-
-（バージョン 1.x の場合）
-
-検索した後で # と数字（例：#1）を入力すると、
-`TYPRM_OPEN_DOCUMENT` 環境変数に設定したコマンドを実行します。
-入力する数字は検索結果の下から数えた番号です。
-環境変数の値の `${ref}` の部分はフルパスに置き換わります。
-
-bash
-
-    $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
-    $ typrm
-    keyword: csv
-    /home/user1/text.txt:1: #keyword: CSV, comma separated values
-    keyword: #1
-
-実行されるコマンド
-
-    code -g "/home/user1/text.txt:1"
-
-typrm shell で何も見つからなかったときは、
-Enter キーを押すことで全文検索ができます。
-その全文検索では、大文字小文字を区別しません。また、単語単位検索はできません。
-
-    $ typrm s
-    keyword: game
-    見つかりません。全文検索するときは Enter キーを押してください。
-    keyword:
-    .../text.txt:1: Game:
-    keyword:
-
-typrm shell で `#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
-replace, reset, check, mutual-search コマンドが使えます。
-
-    #r                // 全ファイル replace
-    #r example.yaml
-    #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
-
-（すべてのバージョン）
-
-複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
-複数の単語を指定すると AND 検索になります。
-単語数を増やすと絞り込めます。単語数を減らすと関連する内容もヒットします。
-OR 検索はできません。何度か検索してください。
-
-    $ typrm Comma Separated Value
-    .../text.txt:1: #keyword: CSV, comma separated values
-
-大文字小文字が違っていてもヒットしますが、
-大文字小文字が同じテキストが上位に表示されます。
-typrm では上位にヒットしたテキストが下側に表示されます。
-
-下記のうち、上に書かれた違いほど検索スコアを大きく落とします。
-- 語数の違い
-- 文字数の違い
-- 大文字小文字の違い
-
-テキスト ファイルに書くキーワードは、
-`#keyword:` タグに続けて CSV 形式（コンマ区切り）で
-複数指定することができます。
-
-    #keyword: CSV, comma separated values, "a,b"
-
-` #`（空白と#）を含むキーワードを指定するときは、`"%20"#` と書いてください。
-` #`（空白と#）は次のタグとして解釈されます。
-`"%` を含むキーワードを指定するときは、`""%25"` と書いてください。
-CSV の部分に文法の問題があるときに表示される警告を抑制するには、
-`#disable-tag-tool:` を書いてください。
-`#keyword:` タグとして処理されなくなります。
-
-    #keyword: abc"   #disable-tag-tool:
-
-`#(search)if: false` タグがある行の次の行から
-インデントが同じ深さの行の前までの、
-`#keyword:` タグと　`#glossary:` タグは検索対象外になります。
-
-    copy:  #(search)if: false
-        #keyword: abc  #// 検索対象外です
-        #keyword: def  #// 検索対象外です
-    original:
-        #keyword: abc  #// 検索対象です
-
-`#glossary:` （用語）タグを付けると、`#glossary:` タグを付けた行のインデントより
-1段深いインデントの行に書かれたコロンまでの部分が検索対象のキーワードになります。
-
-    用語:  #glossary:
-        CSV: comma separated values
-        SSV: space separated values
-        #comment: ここは検索されません
-
-上記の場合、CSV と SSV を検索できるようになります。
-2段以上深いインデントの行は対象外ですが、
-深い位置にも `#glossary:` タグを書けば対象になります。
-
-`#glossary:` タグにパラメーターをつけると、
-パラメーターとラベルからなるキーフレーズが検索対象になり、
-組み合わせ検索ができるようになります。
-
-    C++ 用語:  #glossary: C++
-        TLS: Thread Local Storage. スレッドごとに存在するメモリー領域
-
-    セキュリティ用語:  #glossary: security
-        TLS: Transport Layer Security. SSL の次のバージョン
-
-上記の場合、TLS で検索すると両方とも見つかります。
-C++ TLS で検索すると C++ 用語の TLS だけが見つかります。
-
-`--thesaurus` オプション、または TYPRM_THESAURUS 環境変数に、
-シソーラス ファイル のパスを指定することができます。
-シソーラス ファイル は、CSV 形式です。
-シソーラスは、同義語だけ指定できます。
-
-    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
-    .../script.yaml:1: #keyword: JavaScript
-
-thesaurus.csv のサンプル:
-
-    JavaScript, js
-    document, doc
-    source, src
-    destination, dst, dest
-    string, 文字列
-
-
-## 任意のコマンドを実行します
+### 任意のコマンドを実行します
 
 検索キーワード入力モード(typrm shell)からシェルで使えるコマンドを実行するには、
 コマンド記号とスペースを入力してからコマンドを入力します。
+ちなみに私は、YAML の中に見つかったコードのインデントを除く
+[indenter](https://github.com/Takakiriy/indenter) コマンドをよく使います。
+
+echo コマンドを実行するサンプル:
 
     $ typrm
     keyword$: $ echo abc

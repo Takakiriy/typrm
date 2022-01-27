@@ -11,10 +11,10 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
+  - [Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet](#snippet-search---keyword-tag-glossary-tag-make-highly-accurate-search-to-the-snippet)
   - [Replace - replace command, reset command](#replace---replace-command-reset-command)
     - [Replace with #to tag](#replace-with-to-tag)
-  - [Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet](#snippet-search---keyword-tag-glossary-tag-make-highly-accurate-search-to-the-snippet)
-  - [Execute any command](#execute-any-command)
+    - [Execute any command](#execute-any-command)
   - [Install](#install)
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
@@ -42,6 +42,263 @@ Also, typrm has powerful search assisted with your specified keyword tag.
   - [Tag list](#tag-list)
 
 <!-- /TOC -->
+
+
+## Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet
+
+typrm search displays the snippet for the keywords found.
+
+For example, if you search for the keyword `grep`,
+you'll see where the keyword `grep` is and the snippet.
+You can use `typrm grep` like Linux `man grep`.
+
+typrm command:
+
+    $ typrm grep
+    /path/linux.yaml:100: grep: #keyword
+        Example: grep -r __keyword__ __FilePath__
+        Files that do not contain keywords:
+            grep -L __Keyword__ __Path__
+
+To make the snippet show,
+tag `#keyword:` with the keywords in the text file you are searching for.
+Also, the content displayed in the snippet must be indented with
+whitespace deeper than the found line.
+The maximum number of lines displayed is 8.
+To jump to the contents of the file, run the typrm command
+and press Ctrl key and click the displayed path and line number
+in Visual Studio Code or other tools.
+
+Sample text file content:
+
+        ....
+    grep: #keyword:
+        Sample: grep -r __keyword__ __FilePath__
+        Files that do not contain keywords:
+            grep -L __Keyword__ __Path__
+    sed: #keyword:
+        ....
+
+Snippets for keywords hit by the `#glossary:` tag are also displayed.
+However, snippets are only displayed
+for the keywords that have the highest priority.
+
+Also tag `#keyword:` with the keyword that you want to prioritize
+in the search results.
+
+Sample text file content:
+
+    Shows all files:  #keyword: ls
+    Example: ls -a sub_folder
+
+typrm command:
+
+    $ typrm ls
+    .../text.yaml:2: Example: ls -a sub_folder
+    .../text.yaml:1: Shows all files:  #keyword: ls
+
+In the above case, `ls` on the line with the `#keyword:` tag is
+preferentially found (displayed below).
+You can also find keywords that are not tagged with `#keyword:`.
+
+If you have `#keyword: git clone` and `#keyword: git status`,
+when you search for `git`, `git clone` is displayed first.
+`git status` is displayed second because of the more difference
+in the number of characters.
+Snippets are only displayed for the keywords that have the first priority.
+You can see the snippet of `git status` by searching for `git status`.
+
+Specify the path of the folder containing the file to be searched
+in the `TYPRM_FOLDER` environment variable or the `--folder` option.
+
+Case of setting environment variables in PowerShell:
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
+    typrm ls
+
+Case of specifing to the `--folder` option:
+
+    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
+
+The value format of the `TYPRM_FOLDER` environment variable is CSV.
+You can specify multiple folder paths.
+You can also specify a wildcard for the file name.
+You can also specify a file path.
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
+
+You can omit the parameter in the `#keyword:` tag
+if the keyword was written up to the colon.
+In the following cases, the searchable keyword is ls.
+
+    ls:  #keyword:
+
+If there is a hyphen at the beginning of the line,
+the keyword does not include the hyphen.
+In the following cases, the searchable keyword is ls.
+
+    - ls:  #keyword:
+
+The typrm search command name (search) can be omitted.
+The short command name for the search command is s.
+
+typrm search command format:
+
+    typrm __Keyword__
+
+or
+
+    typrm search __Keyword__
+
+or
+
+    typrm s __Keyword__
+
+If the search keyword was the same as the command name of typrm,
+the command name (search or s) cannot be omitted.
+
+Entering `#keyword:` or `#search:` in the search keyword will be ignored.
+
+If you do not specify any keywords with the search command,
+the search keyword input mode (typrm shell) is started.
+Press Ctrl + C to exit this mode.
+
+    $ typrm
+    keyword: csv
+    .../text.txt:1: #keyword: CSV, comma separated values
+    keyword:
+
+When running in Visual Studio Code terminal,
+you can open the file at the found location (path)
+by holding down the Ctrl key and clicking.
+
+(For version 1.x)
+
+If you enter # and a number (e.g. #1) after searching,
+the command you set for the 'TYPRM_OPEN_DOCUMENT' environment variable
+will be executed.
+The input number is the number counted from the bottom of the search results.
+The '${ref}' in the environment variable value will be replaced to the full path.
+
+bash
+
+    $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
+    $ typrm
+    keyword: csv
+    /home/user1/text.txt:1: #keyword: CSV, comma separated values
+    keyword: #1
+
+Commands executed
+
+    code -g "/home/user1/text.txt:1"
+
+If you cannot find anything in typrm shell,
+you can do the full-text search by pressing the Enter key.
+The full-text search is not case sensitive.
+Also, word-based search is not possible.
+
+    $ typrm s
+    keyword: game
+    Not found. To do full text search, press Enter key.
+    keyword:
+    .../text.txt:1: Game:
+    keyword:
+
+In typrm shell, if you inputed starts with `#r`, `#replace:`, `#reset:`, `#c`,
+`#check:` or `#mutual:`, typrm runs replace, reset, check or mutual-search command.
+
+    #r                // replace all files
+    #r example.yaml
+    #replace: example.yaml  // Requires a colon at the end when not abbreviated
+
+(For all versions)
+
+If specifying a search keyword consisting of multiple words,
+it is not necessary to enclose it in " ".
+Specifying multiple words results in an AND search.
+If you increase the number of words, the search result will be refined.
+If you reduce the number of words, the related content will also be hit.
+OR search is not possible. You can OR search by several times search.
+
+    $ typrm Comma Separated Value
+    .../text.txt:1: #keyword: CSV, comma separated values
+
+Even if the case is different, it will be hit,
+but the text with the same case will be displayed at the top.
+In typrm, the text that hits the top is displayed at the bottom.
+
+The more upper in the following list, the lower search score.
+- Difference numbers of words
+- Difference numbers of characters
+- Lettercase difference
+
+You can specify multiple keywords to be written
+by CSV format (comma separated values) after the `#keyword:` tag
+in the text file.
+
+    #keyword: CSV, comma separated values, "a,b"
+
+When specifying keywords that include ` #` (blank and #), write `"%20"#`.
+` #` (blank and #) are interpreted as the next tags.
+When specifying a keyword that contains `"%`, write `""%25"`.
+If you want to suppress the warning of the CSV part that has syntax problem,
+write `#disable-tag-tool:`.
+The `#keyword:` tag parameter is not treated as a keyword.
+
+    #keyword: abc"   #disable-tag-tool:
+
+The `#keyword:` tag and the `#glossary:` tag from the next line
+that has the `#(search)if: false` tag
+to the previous line that has same indent length
+are not searched.
+
+    copy:  #(search)if: false
+        #keyword: abc  #// not searchable
+        #keyword: def  #// not searchable
+    original:
+        #keyword: abc  #// searchable
+
+If you add the `#glossary:` tag,
+words up to the colon is searchable keywords
+that written in the indent line one step deeper than
+the indent of the line tagged with `#glossary:`.
+
+    glossary:  #glossary:
+        CSV: comma separated values
+        SSV: space separated values
+        #comment: This is not search target. 
+
+In the above case, you will be able to search for CSV and SSV.
+Lines with indents that are two or more steps deep are not searchable,
+but if you write the `#glossary:` tag at deeper positions, they will be searchable.
+
+If you add parameters to the `#glossary:` tag,
+the key phrase consisting of the parameter and label will be searched,
+and you will be able to perform a combination search.
+
+    C++ glossary:  #glossary: C++
+        TLS: Thread Local Storage. Memory area that exists for each thread
+
+    security glossary:  #glossary: security
+        TLS: Transport Layer Security. The next version of SSL
+
+In the above case, if your input keyword was TLS, typrm shows both TLS.
+If your input keyword was C++ TLS, typrm shows only TLS in C++ glossary.
+
+`--thesaurus` option or in the TYPRM_THESAURUS environment variable is
+the path of the thesaurus file.
+The thesaurus file is in CSV format.
+Only synonyms can be specified for the thesaurus.
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
+    .../script.yaml:1: #keyword: JavaScript
+
+Exmple of thesaurus.csv:
+
+    JavaScript, js
+    document, doc
+    source, src
+    destination, dst, dest
 
 
 ## Replace - replace command, reset command
@@ -308,268 +565,13 @@ If you specify a file name, it processes the `#to:` tag in the specified file.
     typrm r  __FileName__
 
 
-## Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet
-
-typrm search displays the snippet for the keywords found.
-
-For example, if you search for the keyword `grep`,
-you'll see where the keyword `grep` is and the snippet.
-You can use `typrm grep` like Linux `man grep`.
-
-typrm command:
-
-    $ typrm grep
-    /path/linux.yaml:100: grep: #keyword
-        Example: grep -r __keyword__ __FilePath__
-        Files that do not contain keywords:
-            grep -L __Keyword__ __Path__
-
-To make the snippet show,
-tag `#keyword:` with the keywords in the text file you are searching for.
-Also, the content displayed in the snippet must be indented with
-whitespace deeper than the found line.
-The maximum number of lines displayed is 8.
-To jump to the contents of the file, run the typrm command
-and press Ctrl key and click the displayed path and line number
-in Visual Studio Code or other tools.
-
-Sample text file content:
-
-        ....
-    grep: #keyword:
-        Sample: grep -r __keyword__ __FilePath__
-        Files that do not contain keywords:
-            grep -L __Keyword__ __Path__
-    sed: #keyword:
-        ....
-
-Snippets for keywords hit by the `#glossary:` tag are also displayed.
-However, snippets are only displayed
-for the keywords that have the highest priority.
-
-Also tag `#keyword:` with the keyword that you want to prioritize
-in the search results.
-
-Sample text file content:
-
-    Shows all files:  #keyword: ls
-    Example: ls -a sub_folder
-
-typrm command:
-
-    $ typrm ls
-    .../text.yaml:2: Example: ls -a sub_folder
-    .../text.yaml:1: Shows all files:  #keyword: ls
-
-In the above case, `ls` on the line with the `#keyword:` tag is
-preferentially found (displayed below).
-You can also find keywords that are not tagged with `#keyword:`.
-
-If you have `#keyword: git clone` and `#keyword: git status`,
-when you search for `git`, `git clone` is displayed first.
-`git status` is displayed second because of the more difference
-in the number of characters.
-Snippets are only displayed for the keywords that have the first priority.
-You can see the snippet of `git status` by searching for `git status`.
-
-Specify the path of the folder containing the file to be searched
-in the `TYPRM_FOLDER` environment variable or the `--folder` option.
-
-Case of setting environment variables in PowerShell:
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
-    typrm ls
-
-Case of specifing to the `--folder` option:
-
-    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
-
-The value format of the `TYPRM_FOLDER` environment variable is CSV.
-You can specify multiple folder paths.
-You can also specify a wildcard for the file name.
-You can also specify a file path.
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
-
-You can omit the parameter in the `#keyword:` tag
-if the keyword was written up to the colon.
-In the following cases, the searchable keyword is ls.
-
-    ls:  #keyword:
-
-If there is a hyphen at the beginning of the line,
-the keyword does not include the hyphen.
-In the following cases, the searchable keyword is ls.
-
-    - ls:  #keyword:
-
-The typrm search command name (search) can be omitted.
-The short command name for the search command is s.
-
-typrm search command format:
-
-    typrm __Keyword__
-
-or
-
-    typrm search __Keyword__
-
-or
-
-    typrm s __Keyword__
-
-If the search keyword was the same as the command name of typrm,
-the command name (search or s) cannot be omitted.
-
-Entering `#keyword:` or `#search:` in the search keyword will be ignored.
-
-If you do not specify any keywords with the search command,
-the search keyword input mode (typrm shell) is started.
-Press Ctrl + C to exit this mode.
-
-    $ typrm
-    keyword: csv
-    .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
-
-When running in Visual Studio Code terminal,
-you can open the file at the found location (path)
-by holding down the Ctrl key and clicking.
-
-(For version 1.x)
-
-If you enter # and a number (e.g. #1) after searching,
-the command you set for the 'TYPRM_OPEN_DOCUMENT' environment variable
-will be executed.
-The input number is the number counted from the bottom of the search results.
-The '${ref}' in the environment variable value will be replaced to the full path.
-
-bash
-
-    $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
-    $ typrm
-    keyword: csv
-    /home/user1/text.txt:1: #keyword: CSV, comma separated values
-    keyword: #1
-
-Commands executed
-
-    code -g "/home/user1/text.txt:1"
-
-If you cannot find anything in typrm shell,
-you can do the full-text search by pressing the Enter key.
-The full-text search is not case sensitive.
-Also, word-based search is not possible.
-
-    $ typrm s
-    keyword: game
-    Not found. To do full text search, press Enter key.
-    keyword:
-    .../text.txt:1: Game:
-    keyword:
-
-In typrm shell, if you inputed starts with `#r`, `#replace:`, `#reset:`, `#c`,
-`#check:` or `#mutual:`, typrm runs replace, reset, check or mutual-search command.
-
-    #r                // replace all files
-    #r example.yaml
-    #replace: example.yaml  // Requires a colon at the end when not abbreviated
-
-(For all versions)
-
-If specifying a search keyword consisting of multiple words,
-it is not necessary to enclose it in " ".
-Specifying multiple words results in an AND search.
-If you increase the number of words, the search result will be refined.
-If you reduce the number of words, the related content will also be hit.
-OR search is not possible. You can OR search by several times search.
-
-    $ typrm Comma Separated Value
-    .../text.txt:1: #keyword: CSV, comma separated values
-
-Even if the case is different, it will be hit,
-but the text with the same case will be displayed at the top.
-In typrm, the text that hits the top is displayed at the bottom.
-
-The more upper in the following list, the lower search score.
-- Difference numbers of words
-- Difference numbers of characters
-- Lettercase difference
-
-You can specify multiple keywords to be written
-by CSV format (comma separated values) after the `#keyword:` tag
-in the text file.
-
-    #keyword: CSV, comma separated values, "a,b"
-
-When specifying keywords that include ` #` (blank and #), write `"%20"#`.
-` #` (blank and #) are interpreted as the next tags.
-When specifying a keyword that contains `"%`, write `""%25"`.
-If you want to suppress the warning of the CSV part that has syntax problem,
-write `#disable-tag-tool:`.
-The `#keyword:` tag parameter is not treated as a keyword.
-
-    #keyword: abc"   #disable-tag-tool:
-
-The `#keyword:` tag and the `#glossary:` tag from the next line
-that has the `#(search)if: false` tag
-to the previous line that has same indent length
-are not searched.
-
-    copy:  #(search)if: false
-        #keyword: abc  #// not searchable
-        #keyword: def  #// not searchable
-    original:
-        #keyword: abc  #// searchable
-
-If you add the `#glossary:` tag,
-words up to the colon is searchable keywords
-that written in the indent line one step deeper than
-the indent of the line tagged with `#glossary:`.
-
-    glossary:  #glossary:
-        CSV: comma separated values
-        SSV: space separated values
-        #comment: This is not search target. 
-
-In the above case, you will be able to search for CSV and SSV.
-Lines with indents that are two or more steps deep are not searchable,
-but if you write the `#glossary:` tag at deeper positions, they will be searchable.
-
-If you add parameters to the `#glossary:` tag,
-the key phrase consisting of the parameter and label will be searched,
-and you will be able to perform a combination search.
-
-    C++ glossary:  #glossary: C++
-        TLS: Thread Local Storage. Memory area that exists for each thread
-
-    security glossary:  #glossary: security
-        TLS: Transport Layer Security. The next version of SSL
-
-In the above case, if your input keyword was TLS, typrm shows both TLS.
-If your input keyword was C++ TLS, typrm shows only TLS in C++ glossary.
-
-`--thesaurus` option or in the TYPRM_THESAURUS environment variable is
-the path of the thesaurus file.
-The thesaurus file is in CSV format.
-Only synonyms can be specified for the thesaurus.
-
-    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
-    .../script.yaml:1: #keyword: JavaScript
-
-Exmple of thesaurus.csv:
-
-    JavaScript, js
-    document, doc
-    source, src
-    destination, dst, dest
-
-
-## Execute any command
+### Execute any command
 
 To execute a shell command in
 search keyword input mode (typrm shell),
 enter the command symbol and space before entering the command.
+By the way, I often use [indenter](https://github.com/Takakiriy/indenter)
+command that remove the indentation of the found example code in YAML.
 
     $ typrm
     keyword$: $ echo abc
