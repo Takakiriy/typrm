@@ -2154,6 +2154,7 @@ async function searchSub(keyword, isMutual) {
         keyword = keyword.replace(ignoredKeyword, '');
     }
     keyword = keyword.trim();
+    // fileFullPaths = ...
     const currentFolder = process.cwd();
     const fileFullPaths = [];
     const targetFolders = await lib.parseCSVColumns(programOptions.folder);
@@ -2169,9 +2170,10 @@ async function searchSub(keyword, isMutual) {
         });
     }
     process.chdir(currentFolder);
-    const thesaurus = new Thesaurus();
-    const glossaryTags = [];
+    // ...
     var foundLines = [];
+    const glossaryTags = [];
+    const thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
         const thesaurusFilePath = programOptions.thesaurus;
         if (!fs.existsSync(thesaurusFilePath)) {
@@ -2179,12 +2181,14 @@ async function searchSub(keyword, isMutual) {
         }
         await thesaurus.load(thesaurusFilePath);
     }
+    // search
     for (const inputFileFullPath of fileFullPaths) {
         const reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
         });
         const blockDisable = new BlockDisableTagParser();
+        const snippetScaning = [];
         var lineNum = 0;
         for await (const line1 of reader) {
             const line = line1;
@@ -2232,11 +2236,13 @@ async function searchSub(keyword, isMutual) {
                     found.path = getTestablePath(inputFileFullPath);
                     found.lineNum = lineNum;
                     found.line = unescapedLine;
+                    found.indentLength = indentRegularExpression.exec(line)[0].length;
                     found.tagLabel = label;
                     for (const match of found.matches) {
                         match.position += positionOfCSV + columnPositions[match.testTargetIndex];
                     }
                     foundLines.push(found);
+                    snippetScaning.push(found);
                 }
             }
             // glossary tag
@@ -2293,6 +2299,7 @@ async function searchSub(keyword, isMutual) {
                             found.score += glossaryMatchScore;
                             found.path = getTestablePath(inputFileFullPath);
                             found.lineNum = lineNum;
+                            found.indentLength = currentIndent.length;
                             found.tagLabel = glossaryLabel;
                             if (glossaryTag.glossaryWords === '') {
                                 found.line = line;
@@ -2309,6 +2316,37 @@ async function searchSub(keyword, isMutual) {
                                 }
                             }
                             foundLines.push(found);
+                            snippetScaning.push(found);
+                        }
+                    }
+                }
+            }
+            // found.snippet = ...
+            if (snippetScaning.length >= 1) {
+                if ('test' in programOptions) {
+                    snippetScaning.length = 0;
+                }
+                else {
+                    const currentIndent = indentRegularExpression.exec(line)[0];
+                    for (const found of snippetScaning) {
+                        if (lineNum > found.lineNum) {
+                            var remove = false;
+                            if (currentIndent.length > found.indentLength) {
+                                if (found.snippet.length < programOptions.snippetLineCount) {
+                                    found.snippet.push(line.substring(found.indentLength));
+                                }
+                                else {
+                                    found.snippet.pop();
+                                    found.snippet.push('    ....');
+                                    remove = true;
+                                }
+                            }
+                            else {
+                                remove = true;
+                            }
+                            if (remove) {
+                                snippetScaning.splice(snippetScaning.indexOf(found));
+                            }
                         }
                     }
                 }
@@ -2316,6 +2354,7 @@ async function searchSub(keyword, isMutual) {
         }
     }
     const keyphraseWordCount = keyword.split(' ').length;
+    // searchWithoutTags
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
     foundLines.sort(compareScore);
     if (!('disableFindAll' in programOptions) && !isMutual) {
@@ -2323,6 +2362,7 @@ async function searchSub(keyword, isMutual) {
         foundLines = [...foundLineWithoutTags, ...foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) => found1.path == found2.path && found1.lineNum == found2.lineNum));
     }
+    // console.log(foundLineInformation)
     const foundCountMax = parseInt(programOptions.foundCountMax);
     if (foundLines.length > foundCountMax) {
         console.log(`... (` + translate(`To show more result, restart typrm with --found-count-max option`) + ')');
@@ -2338,6 +2378,11 @@ async function searchSub(keyword, isMutual) {
         }
         foundCount += 1;
     }
+    // console.log(snippet)
+    if (foundLines.length >= 1 && foundLines[foundLines.length - 1].snippet.length >= 1) {
+        console.log(foundLines[foundLines.length - 1].snippet.join('\n'));
+    }
+    // printRef
     if (foundLines.length >= 1 && lastOf(foundLines).line.includes(refLabel)) {
         const foundLine = lastOf(foundLines).line;
         const refTagPosition = foundLine.indexOf(refLabel);
@@ -3880,6 +3925,8 @@ class FoundLine {
         this.path = '';
         this.lineNum = 0;
         this.line = '';
+        this.indentLength = 0;
+        this.snippet = [];
         this.matches = [];
         this.matchedKeywordCount = 0;
         this.matchedTargetKeywordCount = 0;
@@ -4361,4 +4408,5 @@ export var stdout = '';
 export var programArguments = [];
 export var programOptions = {};
 export const foundCountMaxDefault = "10";
+export const snippetLineCountDefault = "8";
 //# sourceMappingURL=main.js.map

@@ -11,9 +11,9 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
-  - [First replace example - replace command, reset command](#first-replace-example---replace-command-reset-command)
+  - [Replace - replace command, reset command](#replace---replace-command-reset-command)
     - [Replace with #to tag](#replace-with-to-tag)
-  - [Powerful search - #keyword tag, #glossary tag make highly accurate search](#powerful-search---keyword-tag-glossary-tag-make-highly-accurate-search)
+  - [Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet](#snippet-search---keyword-tag-glossary-tag-make-highly-accurate-search-to-the-snippet)
   - [Execute any command](#execute-any-command)
   - [Install](#install)
     - [For Windows](#for-windows)
@@ -44,7 +44,7 @@ Also, typrm has powerful search assisted with your specified keyword tag.
 <!-- /TOC -->
 
 
-## First replace example - replace command, reset command
+## Replace - replace command, reset command
 
 The manual that tells you to create a new folder and run shell commands in it will tell you to type in the shell as follows:
 
@@ -308,11 +308,47 @@ If you specify a file name, it processes the `#to:` tag in the specified file.
     typrm r  __FileName__
 
 
-## Powerful search - #keyword tag, #glossary tag make highly accurate search
+## Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet
 
-typrm searchs more accurately than full-text search (grep).
+typrm search displays the snippet for the keywords found.
 
-Write the keyword at the `#keyword:` tag.
+For example, if you search for the keyword `grep`,
+you'll see where the keyword `grep` is and the snippet.
+You can use `typrm grep` like Linux `man grep`.
+
+typrm command:
+
+    $ typrm grep
+    /path/linux.yaml:100: grep: #keyword
+        Example: grep -r __keyword__ __FilePath__
+        Files that do not contain keywords:
+            grep -L __Keyword__ __Path__
+
+To make the snippet show,
+tag `#keyword:` with the keywords in the text file you are searching for.
+Also, the content displayed in the snippet must be indented with
+whitespace deeper than the found line.
+The maximum number of lines displayed is 8.
+To jump to the contents of the file, run the typrm command
+and press Ctrl key and click the displayed path and line number
+in Visual Studio Code or other tools.
+
+Sample text file content:
+
+        ....
+    grep: #keyword:
+        Sample: grep -r __keyword__ __FilePath__
+        Files that do not contain keywords:
+            grep -L __Keyword__ __Path__
+    sed: #keyword:
+        ....
+
+Snippets for keywords hit by the `#glossary:` tag are also displayed.
+However, snippets are only displayed
+for the keywords that have the highest priority.
+
+Also tag `#keyword:` with the keyword that you want to prioritize
+in the search results.
 
 Sample text file content:
 
@@ -322,16 +358,19 @@ Sample text file content:
 typrm command:
 
     $ typrm ls
-    .../text.txt:1: Shows all files:  #keyword: ls
+    .../text.yaml:2: Example: ls -a sub_folder
+    .../text.yaml:1: Shows all files:  #keyword: ls
 
-In the case of the above example,
-`ls` with `#keyword:` tag will be found.
-Depending on the terminal,
-you can jump to the file contents by clicking the displayed path and line number.
-Although, the Example line will not be hit.
-Because there is no `#keyword:` tag.
-If you want to search for text that does not have the `#keyword:` tag,
-use a common full-text search tool such as grep.
+In the above case, `ls` on the line with the `#keyword:` tag is
+preferentially found (displayed below).
+You can also find keywords that are not tagged with `#keyword:`.
+
+If you have `#keyword: git clone` and `#keyword: git status`,
+when you search for `git`, `git clone` is displayed first.
+`git status` is displayed second because of the more difference
+in the number of characters.
+Snippets are only displayed for the keywords that have the first priority.
+You can see the snippet of `git status` by searching for `git status`.
 
 Specify the path of the folder containing the file to be searched
 in the `TYPRM_FOLDER` environment variable or the `--folder` option.

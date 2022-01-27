@@ -14,6 +14,7 @@ async function  callMain() {
         .option("-t, --test")
         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)
         .option("-n, --found-count-max <i>", "Max number of showing found lines in search", main.foundCountMaxDefault)
+        .option("-s, --snippet-line-count <i>", "Max number of snippet line count", main.snippetLineCountDefault)
         .option("--command-symbol <s>", "The charactor before shell command", process.env.TYPRM_COMMAND_SYMBOL)
         .option("--command-folder <s>", "The charactor before shell command", process.env.TYPRM_COMMAND_FOLDER)
         .option("--color")
