@@ -1,12 +1,11 @@
 # typrm
 
-typrm replaces parameters of the command in the text file format manual
-depending on your situations so that you can run commands only
-by the copy and paste.
+typrm searches snippets such as command options
+written in text file format manuals.
+Also, it replaces the parameters depending on your situations
+so that you can run commands only by the copy and paste.
 
-Also, typrm has powerful search assisted with your specified keyword tag.
-
-[日本語 README](./README-jp.md)
+[Japanese](./README-jp.md)
 
 <!-- TOC depthFrom:1 -->
 
