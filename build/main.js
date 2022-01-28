@@ -110,11 +110,9 @@ async function checkRoutine(inputFilePath, parser) {
         crlfDelay: Infinity
     });
     var setting = {};
-    var settingLineNum = 0;
     var lineNum = 0;
     var fileTemplateTag = null;
     const lines = [];
-    const keywords = [];
     const ifTagParser = new IfTagParser(parser);
     for await (const line1 of reader) {
         const line = line1;
@@ -133,7 +131,7 @@ async function checkRoutine(inputFilePath, parser) {
         }
         // Check the condition by "#expect:" tag.
         if (line.includes(expectLabel) && ifTagParser.thisIsOutOfFalseBlock) {
-            const condition = line.substr(line.indexOf(expectLabel) + expectLabel.length).trim();
+            const condition = line.substring(line.indexOf(expectLabel) + expectLabel.length).trim();
             const evaluatedContidion = evaluateIfCondition(condition, setting, parser);
             if (typeof evaluatedContidion === 'boolean') {
                 if (!evaluatedContidion) {
@@ -312,7 +310,7 @@ async function makeSettingTree(parser) {
                     setting = {};
                     settingStack.pop();
                     if (parser.verbose) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:`);
                     }
                     const nextSetting = settingStack[settingStack.length - 1];
                     const parentSettingIndex = path.dirname(nextSetting.index);
@@ -464,6 +462,9 @@ async function makeSettingTree(parser) {
                                 lastSettingIndexAfter = indexAfter;
                                 tree.settings[indexAfter] = tree.settings[indexBefore];
                                 delete tree.settings[indexBefore];
+                                for (const settings of Object.values(tree.settings[indexAfter])) {
+                                    settings.settingsIndex = indexAfter;
+                                }
                                 tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
                                 tree.settingsInformation[indexAfter].index = indexAfter;
                                 delete tree.settingsInformation[indexBefore];
@@ -519,7 +520,7 @@ async function makeSettingTree(parser) {
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
                 //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
+                console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
             }
         }
         else if (indent.length <= settingIndentLength && isReadingSetting) {
@@ -543,7 +544,7 @@ async function makeSettingTree(parser) {
                         parser.errorCount += 1;
                     }
                     if (parser.verbose) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
                     }
                     const currentSetting = settingStack[settingStack.length - 2];
                     setting[key] = {
@@ -598,7 +599,7 @@ async function makeSettingTree(parser) {
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
                 //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}`);
+                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}`);
             }
         }
     }
@@ -630,14 +631,14 @@ async function makeSettingTree(parser) {
     if (parser.verbose) {
         console.log(`Verbose: settings tree:`);
         for (const [lineNum, index] of tree.indicesWithIf.entries()) {
-            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}: scope start`);
-            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${tree.settingsInformation[index].lineNum}:         settings ${index} define`);
+            console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: scope start`);
+            console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${tree.settingsInformation[index].lineNum}:         settings ${index} define`);
         }
         console.log(`Verbose: variables:`);
         for (const [index, variables] of Object.entries(tree.settings)) {
-            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${tree.settingsInformation[index].lineNum}: settings ${index}`);
+            console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${tree.settingsInformation[index].lineNum}: settings ${index}`);
             for (const [name, value] of Object.entries(variables)) {
-                console.log(`Verbose:         ${name}: ${value.value}`);
+                console.log(`        Verbose: ${name}: ${value.value}`);
             }
         }
     }
@@ -657,6 +658,7 @@ function insertParentIndexNum(indexBefore, firstShiftingIndex) {
 // makeReplaceToTagTree
 async function makeReplaceToTagTree(parser, settingTree) {
     const toTagTree = new ReplaceToTagTree();
+    const verbose = parser.verbose;
     var reader = readline.createInterface({
         input: fs.createReadStream(parser.filePath),
         crlfDelay: Infinity
@@ -673,7 +675,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
     let breaking = false;
     let exception;
     if (parser.verbose) {
-        console.log(`Verbose: Phase 2: parse "to" tags ...`);
+        console.log(`Verbose: Phase 2: parse "#to:" tags ...`);
     }
     toTagTree.replaceTo['/'] = {};
     var lineNum = 0;
@@ -686,7 +688,9 @@ async function makeReplaceToTagTree(parser, settingTree) {
             lineNum += 1;
             parser.line = line;
             parser.lineNum = lineNum;
+            parser.verbose = false;
             settingTree.moveToLine(parser);
+            parser.verbose = verbose;
             if (lineNum === nextBlockLineNum) {
                 currentSettingIndex = settingTree.indicesWithIf.get(lineNum);
                 nextBlockIndex += 1;
@@ -731,8 +735,8 @@ async function makeReplaceToTagTree(parser, settingTree) {
                 // #to: tag in the settings
                 if (isReadingSetting) {
                     if (parser.verbose) {
-                        console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
-                        console.log(`Verbose:         ${variableName}: ${value}  #to: ${toValue}`);
+                        console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:`);
+                        console.log(`        Verbose: ${variableName}: ${value}  #to: ${toValue}`);
                     }
                     if (variableName in toTagTree.replaceTo[currentSettingIndex]) {
                         const variable = toTagTree.replaceTo[currentSettingIndex][variableName];
@@ -760,16 +764,20 @@ async function makeReplaceToTagTree(parser, settingTree) {
                 else {
                     if (previousTemplateTag) {
                         if (parser.verbose) {
-                            console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
+                            console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:`);
                         }
                         const newKeyValues = await previousTemplateTag.scanKeyValues(toValue, settingTree.currentSettings, parser);
                         if (parser.verbose) {
                             for (const [variableName, newValue] of Object.entries(newKeyValues)) {
-                                console.log(`Verbose:         ${variableName}: ${newValue.value}`);
+                                console.log(`        Verbose: A setting of replace to:`);
+                                console.log(`            Verbose: settings: ${newValue.settingsIndex}`);
+                                console.log(`            Verbose: tag: ${newValue.tag}`);
+                                console.log(`            Verbose: variableName: ${variableName}`);
+                                console.log(`            Verbose: to value: ${newValue.value}`);
                             }
                         }
                         for (const [variableName, newValue] of Object.entries(newKeyValues)) {
-                            const indices = searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree);
+                            const indices = searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree, parser);
                             for (const index of indices) {
                                 if (variableName in toTagTree.replaceTo[index]) {
                                     const variable = toTagTree.replaceTo[index][variableName];
@@ -784,7 +792,14 @@ async function makeReplaceToTagTree(parser, settingTree) {
                                         parser.errorCount += 1;
                                     }
                                 }
-                                toTagTree.replaceTo[index][variableName] = newValue;
+                                if (newValue.settingsIndex === index) {
+                                    toTagTree.replaceTo[index][variableName] = newValue;
+                                }
+                                else {
+                                    const newValueCopy = Object.assign({}, newValue);
+                                    newValueCopy.settingsIndex = index;
+                                    toTagTree.replaceTo[index][variableName] = newValueCopy;
+                                }
                             }
                             console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
                         }
@@ -796,6 +811,30 @@ async function makeReplaceToTagTree(parser, settingTree) {
         catch (e) {
             exception = e;
             breaking = true;
+        }
+    }
+    if (parser.verbose) {
+        console.log(`Verbose: to tag tree:`);
+        console.log(`    Verbose: replaceTo:`);
+        for (const [index, toSettings] of Object.entries(toTagTree.replaceTo)) {
+            console.log(`        Verbose: settings "${index}":`);
+            for (const [variableName, toSetting] of Object.entries(toSettings)) {
+                const setting = settingTree.settingsInformation[index];
+                console.log(`            Verbose: variable: ${variableName}`);
+                console.log(`            Verbose: before:`);
+                console.log(`                Verbose: value: ${settingTree.settings[index][variableName]}`);
+                console.log(`                Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:`);
+                console.log(`                Verbose: settings: ${setting.index}`);
+                console.log(`            Verbose: after:`);
+                console.log(`                Verbose: to value: ${toSetting.value}`);
+                console.log(`                Verbose: tag: ${toSetting.tag}`);
+                console.log(`                Verbose: ${getTestablePath(parser.filePath)}:${toSetting.lineNum}:`);
+                console.log(`                Verbose: settings: ${toSetting.settingsIndex}`);
+            }
+        }
+        console.log(`    Verbose: outOfFalseBlocks:`);
+        for (const [lineNum, trueOrFalse] of toTagTree.outOfFalseBlocks.entries()) {
+            console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: ${trueOrFalse}`);
         }
     }
     if (exception) {
@@ -861,8 +900,8 @@ async function makeOriginalTagTree(parser, settingTree) {
                 if (variableName !== '' && originalLabelIndex != notFound) {
                     var originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
                     if (parser.verbose) {
-                        console.log(`Verbose:     ${getTestablePath(parser.filePath)}:${lineNum}:`);
-                        console.log(`Verbose:         ${variableName}: #original: ${originalValue}`);
+                        console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:`);
+                        console.log(`    Verbose:     ${variableName}: #original: ${originalValue}`);
                     }
                     toTagTree.replaceTo[currentSettingIndex][variableName] = {
                         value: originalValue,
@@ -1172,17 +1211,19 @@ class TemplateTag {
         const toValueIsMatchedWithTemplate = new RegExp(templateRegularExpression).exec(toValue);
         const keyValues = {};
         if (verboseMode) {
-            console.log(`Verbose:         template: ${this.template}`);
-            console.log(`Verbose:         templatePattern: ${templatePattern.replace(new RegExp(placeholder, "g"), '*')}`);
-            console.log(`Verbose:         toValue: ${toValue}`);
-            console.log(`Verbose:         toValueIsMatchedWithTemplate: ${toValueIsMatchedWithTemplate != null}`);
+            console.log(`        Verbose: scanKeyValues:`);
+            console.log(`            Verbose: template: ${this.template}`);
+            console.log(`            Verbose: templatePattern: ${templatePattern.replace(new RegExp(placeholder, "g"), '*')}`);
+            console.log(`            Verbose: toValue: ${toValue}`);
+            console.log(`            Verbose: toValueIsMatchedWithTemplate: ${toValueIsMatchedWithTemplate != null}`);
         }
         if (toValueIsMatchedWithTemplate) {
             // Case that "#to:" tag is pattern of template
             //     (A:B)  #to: (a:b)  #template: (__A__:__B__)
             for (let i = 1; i < toValueIsMatchedWithTemplate.length; i += 1) {
-                checkLineNoConfilict(keyValues, keys[i - 1], toValueIsMatchedWithTemplate[i], parser);
-                keyValues[keys[i - 1]] = toValueIsMatchedWithTemplate[i];
+                const value = toValueIsMatchedWithTemplate[i].trim();
+                checkLineNoConfilict(keyValues, keys[i - 1], value, parser);
+                keyValues[keys[i - 1]] = value;
             }
         }
         else {
@@ -1415,7 +1456,7 @@ class IfTagParser {
                 this.thisIsOutOfFalseBlock_ = lastOf(this.indentLengthsOfIfTag).enabled;
                 this.isReplacable_ = lastOf(this.indentLengthsOfIfTag).isReplacable;
                 if (this.parser.verbose) {
-                    console.log(`Verbose: ${getTestablePath(this.parser.filePath)}:${this.parser.lineNum - 1}: end #if:`);
+                    console.log(`        Verbose: ${getTestablePath(this.parser.filePath)}:${this.parser.lineNum - 1}: end #if:`);
                 }
             }
         }
@@ -1548,8 +1589,8 @@ async function replaceSub(inputFilePath, parser, command) {
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
     if (parser.verbose) {
-        console.log(`Verbose: replaceSub:`);
-        console.log(`Verbose:     inputFilePath: ${getTestablePath(inputFilePath)}`);
+        console.log(`    Verbose: replaceSub:`);
+        console.log(`        Verbose: inputFilePath: ${getTestablePath(inputFilePath)}`);
     }
     const settingTree = await makeSettingTree(parser);
     if (command === 'replace') {
@@ -1567,8 +1608,9 @@ async function replaceSub(inputFilePath, parser, command) {
     if (parser.verbose) {
         console.log(`Verbose: Phase 3: replace ...`);
     }
-    var isSetting = false;
+    const verbose = parser.verbose;
     const conflictErrors = {};
+    var isSetting = false;
     var replacingKeys = [];
     var replacingKeyValues = {};
     const updatingFilePath = inputFilePath + ".updating";
@@ -1591,7 +1633,9 @@ async function replaceSub(inputFilePath, parser, command) {
             lineNum += 1;
             parser.lineNum = lineNum;
             linesWithoutToTagOnlyLine.push(line);
+            parser.verbose = false;
             settingTree.moveToLine(parser);
+            parser.verbose = verbose;
             toTagTree.moveToLine(parser, settingTree);
             const oldSetting = toTagTree.currentOldSettingsInIfBlock; // not settingTree.currentSettings
             const newSetting = toTagTree.currentNewSettingsInIfBlock;
@@ -1629,10 +1673,9 @@ async function replaceSub(inputFilePath, parser, command) {
                         var newValue = newSetting[key].value;
                         if (newValue !== oldValue) {
                             if (parser.verbose) {
-                                console.log(`Verbose: replace a setting`);
-                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                                console.log(`Verbose:     replace from: ${oldValue}`);
-                                console.log(`Verbose:     replace to  : ${newValue}`);
+                                console.log(`    Verbose: replace a setting: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                                console.log(`    Verbose:     replace from: ${oldValue}`);
+                                console.log(`    Verbose:     replace to  : ${newValue}`);
                             }
                             // Change a settings value
                             const { original, spaceAndComment } = getReplacedLineInSettings(line, separator, oldValue, newValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
@@ -1640,7 +1683,7 @@ async function replaceSub(inputFilePath, parser, command) {
                             writer.write(newLine + "\n");
                             output = true;
                             if (parser.verbose) {
-                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${newLine}`);
+                                console.log(`    Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${newLine}`);
                             }
                         }
                     }
@@ -1670,14 +1713,14 @@ async function replaceSub(inputFilePath, parser, command) {
                         const after = replaced;
                         if (parser.verbose && before !== after) {
                             if (templateTag.lineNumOffset === 0) {
-                                console.log(`Verbose: replace template variables`);
+                                console.log(`    Verbose: replace template variables`);
                             }
                             else {
-                                console.log(`Verbose: replace template-at(${templateTag.lineNumOffset}) variables`);
+                                console.log(`    Verbose: replace template-at(${templateTag.lineNumOffset}) variables`);
                             }
-                            console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                            console.log(`Verbose:     replace from: ${before}`);
-                            console.log(`Verbose:     replace to  : ${after}`);
+                            console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                            console.log(`        Verbose:     replace from: ${before}`);
+                            console.log(`        Verbose:     replace to  : ${after}`);
                         }
                         if (templateTag.lineNumOffset === 0) {
                             var replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before), 'g'), after.replace(/\$/g, '$$'));
@@ -1696,8 +1739,16 @@ async function replaceSub(inputFilePath, parser, command) {
                                 expected: before,
                                 replaced: after.replace(/\$/g, '$$')
                             });
-                            if (parser.verbose && before !== after) {
-                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${replacedLine}`);
+                            if (parser.verbose) {
+                                if (before !== after) {
+                                    console.log(`    Verbose: replaced`);
+                                    console.log(`        Verbose: before: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
+                                    console.log(`        Verbose: after:  ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
+                                }
+                                else {
+                                    console.log(`    Verbose: not replaced`);
+                                    console.log(`        Verbose: after:  ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
+                                }
                             }
                         }
                         else if (templateTag.lineNumOffset <= -1) {
@@ -1720,15 +1771,17 @@ async function replaceSub(inputFilePath, parser, command) {
                             const mask = '\n';
                             var conflictedTemplates = [];
                             if (parser.verbose) {
-                                console.log(`Verbose:         check not conflicted`);
-                                console.log(`Verbose:         replacingLine: ${replacingLine}`);
-                                console.log(`Verbose:         maskedLine   : ${maskedLine}`);
+                                console.log(`    Verbose: check not conflicted:`);
+                                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset}: ${replacingLine}`);
+                                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
+                                console.log(`        Verbose: replacingLine: ${replacingLine}`);
+                                console.log(`        Verbose: maskedLine   : ${maskedLine}`);
                             }
                             for (const template of lengthSortedTemplates) {
                                 if (template.expected !== template.replaced) {
                                     if (parser.verbose) {
-                                        console.log(`Verbose:         replace from: ${template.expected}`);
-                                        console.log(`Verbose:         replace to  : ${template.replaced}`);
+                                        console.log(`        Verbose: replace from: ${template.expected}`);
+                                        console.log(`        Verbose: replace to  : ${template.replaced}`);
                                     }
                                     if (template.expected.includes(template.replaced)) {
                                         // e.g. expected == 'something', replaced = 'some'
@@ -1750,7 +1803,7 @@ async function replaceSub(inputFilePath, parser, command) {
                                     var i = 0;
                                     if (wasReplaced) {
                                         if (parser.verbose) {
-                                            console.log(`Verbose:         wasReplaced = true`);
+                                            console.log(`        Verbose: wasReplaced = true`);
                                         }
                                     }
                                     else {
@@ -1768,8 +1821,8 @@ async function replaceSub(inputFilePath, parser, command) {
                                                 i += template.expected.length;
                                             }
                                             if (parser.verbose) {
-                                                console.log(`Verbose:         replacingLine: ${replacingLine}`);
-                                                console.log(`Verbose:         maskedLine   : ${maskedLine.replace(/\n/g, '_')}`);
+                                                console.log(`        Verbose: replacingLine: ${replacingLine}`);
+                                                console.log(`        Verbose: maskedLine   : ${maskedLine.replace(/\n/g, '_')}`);
                                             }
                                         }
                                     }
@@ -1804,9 +1857,17 @@ async function replaceSub(inputFilePath, parser, command) {
                                 }
                                 conflictErrors[outputTargetLineNum] = lib.cutLast(errorMessage, '\n');
                             }
-                            if (parser.verbose && before !== after) {
-                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum + templateTag.lineNumOffset}: ${replacingLine}`);
-                                console.log(`Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                            if (parser.verbose) {
+                                const replacedLine = replacingLine;
+                                if (before !== after) {
+                                    console.log(`    Verbose: replaced`);
+                                    console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset}: ${replacedLine}`);
+                                    console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
+                                }
+                                else {
+                                    console.log(`    Verbose: not replaced`);
+                                    console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
+                                }
                             }
                         }
                     }
@@ -2852,21 +2913,22 @@ function runVerb(verbs, address, lineNum, verbNum) {
 }
 // printConfig
 function printConfig() {
+    console.log(`Verbose: Option and environment variables:`);
     if ('folder' in programOptions) {
-        console.log(`Verbose: --folder, TYPRM_FOLDER: ${programOptions.folder}`);
+        console.log(`    Verbose: --folder, TYPRM_FOLDER: ${programOptions.folder}`);
     }
     if ('thesaurus' in programOptions) {
-        console.log(`Verbose: --thesaurus, TYPRM_THESAURUS: ${programOptions.thesaurus}`);
+        console.log(`    Verbose: --thesaurus, TYPRM_THESAURUS: ${programOptions.thesaurus}`);
     }
     if ('commandSymbol' in programOptions) {
-        console.log(`Verbose: --command-symbol, TYPRM_COMMAND_SYMBOL: ${programOptions.commandSymbol}`);
+        console.log(`    Verbose: --command-symbol, TYPRM_COMMAND_SYMBOL: ${programOptions.commandSymbol}`);
     }
     if ('commandFolder' in programOptions) {
-        console.log(`Verbose: --command-folder, TYPRM_COMMAND_FOLDER: ${programOptions.commandFolder}`);
+        console.log(`    Verbose: --command-folder, TYPRM_COMMAND_FOLDER: ${programOptions.commandFolder}`);
     }
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith('TYPRM_') && envName !== 'TYPRM_LINE_NUM_GETTER' && envName !== 'TYPRM_VERB') {
-            console.log(`Verbose: ${envName} = ${envValue}`);
+            console.log(`    Verbose: ${envName} = ${envValue}`);
         }
     }
     if (process.env.TYPRM_LINE_NUM_GETTER) {
@@ -2875,14 +2937,14 @@ function printConfig() {
             const getters = getterConfig;
             var index = 0;
             for (const getter of getters) {
-                console.log(`Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
-                console.log(`Verbose:     regularExpression: ${getter.regularExpression}`);
-                console.log(`Verbose:     type: ${getter.type}`);
-                console.log(`Verbose:     filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
-                console.log(`Verbose:     keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
-                console.log(`Verbose:     csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
-                console.log(`Verbose:     targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
-                console.log(`Verbose:     address: ${getter.address}`);
+                console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
+                console.log(`        Verbose: type: ${getter.type}`);
+                console.log(`        Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+                console.log(`        Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
+                console.log(`        Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
+                console.log(`        Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
+                console.log(`        Verbose: address: ${getter.address}`);
                 index += 1;
             }
         }
@@ -2893,11 +2955,11 @@ function printConfig() {
             const verbs = verbConfig;
             var index = 0;
             for (const verb of verbs) {
-                console.log(`Verbose: TYPRM_VERB[${index}]:`);
-                console.log(`Verbose:     regularExpression: ${verb.regularExpression}`);
-                console.log(`Verbose:     label: ${verb.label}`);
-                console.log(`Verbose:     number: ${verb.number}`);
-                console.log(`Verbose:     command: ${verb.command}`);
+                console.log(`    Verbose: TYPRM_VERB[${index}]:`);
+                console.log(`        Verbose: regularExpression: ${verb.regularExpression}`);
+                console.log(`        Verbose: label: ${verb.label}`);
+                console.log(`        Verbose: number: ${verb.number}`);
+                console.log(`        Verbose: command: ${verb.command}`);
                 index += 1;
             }
         }
@@ -2927,13 +2989,13 @@ function onEndOfSettingScope(setting, inputFilePath) {
 function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyValues = []) {
     if (expression === 'true') {
         if (parser.verbose) {
-            console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: true`);
+            console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: true`);
         }
         return true;
     }
     else if (expression === 'false') {
         if (parser.verbose) {
-            console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: false`);
+            console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: false`);
         }
         return false;
     }
@@ -2994,10 +3056,10 @@ function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyVa
             if (previsousEvalatedKeyValues.length === 0) {
                 if (parser.verbose) {
                     if (parser.command == CommandEnum.replace) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
                     }
                     else if (parser.command == CommandEnum.check) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name} = ${leftValue})`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name} = ${leftValue})`);
                     }
                 }
                 return result;
@@ -3006,10 +3068,10 @@ function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyVa
                 const isReplacable = previsousEvalatedKeyValues.includes(name) || parent !== settingsDot;
                 if (parser.verbose) {
                     if (!isReplacable) {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: skipped evaluation: #if: ${expression}`);
                     }
                     else {
-                        console.log(`Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name} = ${leftValue})`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${parser.lineNum}: #if: ${expression}  (${result}, ${name} = ${leftValue})`);
                     }
                 }
                 return {
@@ -3372,11 +3434,11 @@ class SettingsTree {
                 return_.nextSettingsLineNum = 0;
             }
             if (parser.verbose) {
-                const index = `${currentSettingIndex}${currentSettingIndex === '/' ? ' (root)' : ''}`;
-                console.log(`Verbose: settings ${index}`);
-                console.log(`Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings: ${index}`);
+                const indexLabel = `"${currentSettingIndex}"${currentSettingIndex === '/' ? ' (root)' : ''}`;
+                console.log(`    Verbose: settings ${indexLabel}`);
+                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings: ${indexLabel}`);
                 for (const [key, setting] of Object.entries(currentSettings)) {
-                    console.log(`Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
+                    console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${setting.lineNum}:     ${key}: ${setting.value}`);
                 }
             }
             return_.wasChanged = true;
@@ -3843,11 +3905,10 @@ class ReplaceToTagTree {
 ;
 ;
 // searchDefinedSettingIndices
-function searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree) {
-    const notFoundIndex = '';
+function searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree, parser) {
     var index = currentSettingIndex;
     for (;;) {
-        const foundIndices = searchDefinedSettingIndexInCurrentLevel(variableName, index, settingTree);
+        const foundIndices = searchDefinedSettingIndexInCurrentLevel(variableName, index, settingTree, parser);
         if (foundIndices.length >= 1) {
             return foundIndices;
         }
@@ -3858,7 +3919,7 @@ function searchDefinedSettingIndices(variableName, currentSettingIndex, settingT
     }
 }
 // searchDefinedSettingIndexInCurrentLevel
-function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, settingTree) {
+function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, settingTree, parser) {
     if (variableName in settingTree.settings[indexWithoutIf]) {
         return [indexWithoutIf]; // e.g. '/1'
     }
@@ -3872,8 +3933,17 @@ function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, s
         }
         for (const index of Object.keys(settingTree.settings)) {
             if (index.startsWith(targetIndexSlash)) {
-                if (lib.isAlphabetIndex(index.substr(0, targetIndexSlash.length + 1))) {
-                    foundIndices.push(index); // e.g. '/1/a'
+                if (lib.isAlphabetIndex(index.substring(0, targetIndexSlash.length + 1))) {
+                    if (variableName in settingTree.settings[index]) {
+                        // const  settings = settingTree.settingsInformation[index]
+                        // const  notVerboseParser = {... parser, verbose: false};
+                        // const  ifTagParser = new IfTagParser(notVerboseParser);
+                        // ifTagParser.setPosition(parser.filePath, settings.condition, settings.lineNum);
+                        // ifTagParser.evaluate(`#if: ${settings.condition}`, settingTree.currentSettings);
+                        // if (ifTagParser.thisIsOutOfFalseBlock) {
+                        foundIndices.push(index); // e.g. '/1/a'
+                        // }
+                    }
                 }
             }
         }
@@ -4038,12 +4108,12 @@ function splitFilePathAndKeyword(address, getter) {
     const verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
         console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
-        console.log(`Verbose:     address: ${address}`);
-        console.log(`Verbose:     regularExpression: ${getter.regularExpression}`);
-        console.log(`Verbose:     filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
-        console.log(`Verbose:     keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
-        console.log(`Verbose:     csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
-        console.log(`Verbose:     targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
+        console.log(`    Verbose: address: ${address}`);
+        console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
+        console.log(`    Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+        console.log(`    Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
+        console.log(`    Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
+        console.log(`    Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
     }
     const parameters = (new RegExp(getter.regularExpression)).exec(address);
     if (!parameters) {
@@ -4052,7 +4122,7 @@ function splitFilePathAndKeyword(address, getter) {
             `testing string is "${address}".`);
     }
     if (verboseMode) {
-        console.log(`Verbose:     matched: [${parameters.join(', ')}]`);
+        console.log(`    Verbose: matched: [${parameters.join(', ')}]`);
     }
     if (getter.filePathRegularExpressionIndex > parameters.length - 1) {
         throw new Error(`ERROR: filePathRegularExpressionIndex (${getter.filePathRegularExpressionIndex}) of regularExpression ` +
@@ -4350,6 +4420,7 @@ export async function callMainFromJest(parameters, options) {
 export const private_ = {
     Parser,
     makeSettingTree,
+    makeReplaceToTagTree,
 };
 if (process.env.windir) {
     var runningOS = 'Windows';

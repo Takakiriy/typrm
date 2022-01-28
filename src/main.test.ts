@@ -554,6 +554,7 @@ describe("replaces settings >>", () => {
             ['settings_tree_if', ''],
             ['E1_BugCase_IfBlock_DoubleCheck_Error', 'ErrorCase'],
             ['E2_BugCase_ParentSettings', ''],
+            ['bug_case_5', ''],
         ])("%s", async (caseName, options) => {
             const {filePath, inputContents} = initializeTestInputFile(`replaces settings >> replace to tag >> ${caseName}: sourceFileContents 1`);
 
@@ -1236,66 +1237,68 @@ describe("print reference >>", () => {
                 {locale: "en-US", test: "", verbose: ""},
                 (testingOS === 'Windows')
                 ? // Windows
-                    "Verbose: TYPRM_TEST_ENV = testEnv\n" +
-                    "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
-                    "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
-                    "Verbose:     type: text\n" +
-                    "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 7\n" +
-                    "Verbose:     csvOptionRegularExpressionIndex: 3\n" +
-                    "Verbose:     targetMatchIdRegularExpressionIndex: 5\n" +
-                    "Verbose:     address: ${file}:${lineNum}\n" +
-                    "Verbose: TYPRM_VERB[0]:\n" +
-                    "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                    "Verbose:     label: 7.Test Echo\n" +
-                    "Verbose:     number: 7\n" +
-                    "Verbose:     command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
-                    "Verbose: TYPRM_VERB[1]:\n" +
-                    "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
-                    "Verbose:     label: 1.View\n" +
-                    "Verbose:     number: 1\n" +
-                    "Verbose:     command: msedge \"file://\${file}\"\n" +
+                    "Verbose: Option and environment variables:\n" +
+                    "    Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                    "    Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
+                    "    Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                    "        Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                    "        Verbose: type: text\n" +
+                    "        Verbose: filePathRegularExpressionIndex: 1\n" +
+                    "        Verbose: keywordRegularExpressionIndex: 7\n" +
+                    "        Verbose: csvOptionRegularExpressionIndex: 3\n" +
+                    "        Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
+                    "        Verbose: address: ${file}:${lineNum}\n" +
+                    "    Verbose: TYPRM_VERB[0]:\n" +
+                    "        Verbose: regularExpression: ^.*\\.md(#.*)?\$\n" +
+                    "        Verbose: label: 7.Test Echo\n" +
+                    "        Verbose: number: 7\n" +
+                    "        Verbose: command: echo {ref: \${ref}, windowsRef: ${windowsRef}, file: \${file}, windowsFile: ${windowsFile}, fragment: \${fragment}}\n" +
+                    "    Verbose: TYPRM_VERB[1]:\n" +
+                    "        Verbose: regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                    "        Verbose: label: 1.View\n" +
+                    "        Verbose: number: 1\n" +
+                    "        Verbose: command: msedge \"file://\${file}\"\n" +
                     "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
-                    "Verbose:     address: ../README.md\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
-                    "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 7\n" +
-                    "Verbose:     csvOptionRegularExpressionIndex: 3\n" +
-                    "Verbose:     targetMatchIdRegularExpressionIndex: 5\n" +
-                    "Verbose:     matched: [../README.md, ../README.md, md, , , , , ]\n" +
+                    "    Verbose: address: ../README.md\n" +
+                    "    Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                    "    Verbose: filePathRegularExpressionIndex: 1\n" +
+                    "    Verbose: keywordRegularExpressionIndex: 7\n" +
+                    "    Verbose: csvOptionRegularExpressionIndex: 3\n" +
+                    "    Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
+                    "    Verbose: matched: [../README.md, ../README.md, md, , , , , ]\n" +
                     "Error that verb number 4 is not defined\n"
                 : // mac
-                    "Verbose: TYPRM_TEST_ENV = testEnv\n" +
-                    "Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
-                    "Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
-                    "Verbose:     type: text\n" +
-                    "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 7\n" +
-                    "Verbose:     csvOptionRegularExpressionIndex: 3\n" +
-                    "Verbose:     targetMatchIdRegularExpressionIndex: 5\n" +
-                    "Verbose:     address: ${file}:${lineNum}\n" +
-                    "Verbose: TYPRM_VERB[0]:\n" +
-                    "Verbose:     regularExpression: ^.*\\.md(#.*)?\$\n" +
-                    "Verbose:     label: 7.Test Echo\n" +
-                    "Verbose:     number: 7\n" +
-                    "Verbose:     command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
-                    "Verbose: TYPRM_VERB[1]:\n" +
-                    "Verbose:     regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
-                    "Verbose:     label: 1.View\n" +
-                    "Verbose:     number: 1\n" +
-                    "Verbose:     command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                    "Verbose: Option and environment variables:\n" +
+                    "    Verbose: TYPRM_TEST_ENV = testEnv\n" +
+                    "    Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
+                    "    Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                    "        Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                    "        Verbose: type: text\n" +
+                    "        Verbose: filePathRegularExpressionIndex: 1\n" +
+                    "        Verbose: keywordRegularExpressionIndex: 7\n" +
+                    "        Verbose: csvOptionRegularExpressionIndex: 3\n" +
+                    "        Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
+                    "        Verbose: address: ${file}:${lineNum}\n" +
+                    "    Verbose: TYPRM_VERB[0]:\n" +
+                    "        Verbose: regularExpression: ^.*\\.md(#.*)?\$\n" +
+                    "        Verbose: label: 7.Test Echo\n" +
+                    "        Verbose: number: 7\n" +
+                    "        Verbose: command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}\"\n" +
+                    "    Verbose: TYPRM_VERB[1]:\n" +
+                    "        Verbose: regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
+                    "        Verbose: label: 1.View\n" +
+                    "        Verbose: number: 1\n" +
+                    "        Verbose: command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
                     "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
-                    "Verbose:     address: ../README.md\n" +
-                    "Verbose:     regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
-                    "Verbose:     filePathRegularExpressionIndex: 1\n" +
-                    "Verbose:     keywordRegularExpressionIndex: 7\n" +
-                    "Verbose:     csvOptionRegularExpressionIndex: 3\n" +
-                    "Verbose:     targetMatchIdRegularExpressionIndex: 5\n" +
-                    "Verbose:     matched: [../README.md, ../README.md, md, , , , , ]\n" +
+                    "    Verbose: address: ../README.md\n" +
+                    "    Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                    "    Verbose: filePathRegularExpressionIndex: 1\n" +
+                    "    Verbose: keywordRegularExpressionIndex: 7\n" +
+                    "    Verbose: csvOptionRegularExpressionIndex: 3\n" +
+                    "    Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
+                    "    Verbose: matched: [../README.md, ../README.md, md, , , , , ]\n" +
                     "Error that verb number 4 is not defined\n",
             ],
             // Others test is "search_mode_ref_verb".
@@ -1310,19 +1313,19 @@ describe("print reference >>", () => {
 describe("unit test >>", () => {
     describe("makeSettingTree >>", () => {
         test.each([
-            ["1st", "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"],
-            ["bug_case", null],
-            ["if_and_no_indent", null],
-            ["below_shallow_settings", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
-            ["bug_case_2", null],
-            ["bug_case_3", null],
-            ["bug_case_4", null],
-        ])("%s", async (caseName, sameInputSnapshotName) => {
+            ["1st", { sameInput: "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"}],
+            ["bug_case", {}],
+            ["if_and_no_indent", {}],
+            ["below_shallow_settings", { sameInput: "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"}],
+            ["bug_case_2", {}],
+            ["bug_case_3", { checkSettings: true }],
+            ["bug_case_4", {}],
+        ])("%s", async (caseName, options) => {
             const  Parser = main.private_.Parser;
             const  makeSettingTree = main.private_.makeSettingTree;
             const {inputContents} = initializeTestInputFile(`unit test >> makeSettingTree >> ${caseName}: sourceFileContents 1`);
-            if (sameInputSnapshotName) {
-                expect(inputContents).toBe(lib.getSnapshot(sameInputSnapshotName));
+            if ('sameInput' in options) {
+                expect(inputContents).toBe(lib.getSnapshot(options.sameInput));
             }
             const  answerIndicesWithIf = Array.from(await lib.parseMap(
                 lib.getSnapshot(`unit test >> makeSettingTree >> ${caseName}: answer indicesWithIf 1`)));
@@ -1331,22 +1334,24 @@ describe("unit test >>", () => {
 
             const  settingsTree = await makeSettingTree(parser);
             expect(Array.from( settingsTree.indicesWithIf )).toStrictEqual(answerIndicesWithIf);
+            if ('checkSettings' in options) {
+                expect(settingsTree.settings).toMatchSnapshot('settings');
+            }
             lib.rmdirSync(testFolderPath + '_tmp');
         });
     });
-    describe.only("makeReplaceToTagTree >>", () => {
+    describe("makeReplaceToTagTree >>", () => {
         test.each([
-            ["1st", "replaces settings >> replace to tag >> E2_BugCase_ParentSettings: sourceFileContents 1"],
-            ["bug_case_3", null],
-// ["bug_case"],
-        ])("%s", async (caseName, sameInputSnapshotName) => {
-if (caseName !== 'bug_case_3') {return;}  // || subCase !== '____'
+            ["1st", { sameInput: "replaces settings >> replace to tag >> E2_BugCase_ParentSettings: sourceFileContents 1"}],
+            ["bug_case_3", {}],
+            ["bug_case_5", { sameInput: "replaces settings >> replace to tag >> bug_case_5: sourceFileContents 1"}],
+        ])("%s", async (caseName, options) => {
             const  Parser = main.private_.Parser;
             const  makeSettingTree = main.private_.makeSettingTree;
             const  makeReplaceToTagTree = main.private_.makeReplaceToTagTree;
             const {inputContents} = initializeTestInputFile(`unit test >> makeReplaceToTagTree >> ${caseName}: sourceFileContents 1`);
-            if (sameInputSnapshotName) {
-                expect(inputContents).toBe(lib.getSnapshot(sameInputSnapshotName));
+            if ('sameInput' in options) {
+                expect(inputContents).toBe(lib.getSnapshot(options.sameInput));
             }
             const  parser = new Parser();
             parser.filePath = `test_data/_tmp/_tmp.yaml`;
@@ -1355,7 +1360,6 @@ if (caseName !== 'bug_case_3') {return;}  // || subCase !== '____'
             const  toTagTree = await makeReplaceToTagTree(parser, settingsTree);
             expect(toTagTree.replaceTo).toMatchSnapshot('replaceTo');
             lib.rmdirSync(testFolderPath + '_tmp');
-expect('test code').toBe('deleted skip code.');
         });
     });
 });

@@ -1450,98 +1450,98 @@ B:
 exports[`checks template value >> verbose: answer 1`] = `
 "Verbose: typrm command: check
 Verbose: Phase 1: parse settings ...
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     var2: not value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     var2: not value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
 Verbose: settings tree:
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         settings /1/a define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         settings /1/b define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:         settings /1/c define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         settings /1/d define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         settings /1/e define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings /1/f define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         settings /1/g define
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: scope start
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         settings /1/h define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         settings /1/a define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         settings /1/b define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:         settings /1/c define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         settings /1/d define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         settings /1/e define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings /1/f define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         settings /1/g define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         settings /1/h define
 Verbose: variables:
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings /1
-Verbose:         var1: value1
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: settings /1/a
-Verbose:         var2: value2
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
-Verbose:         var2: not value2
-Verbose:     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:0: settings /
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings /1
+        Verbose: var1: value1
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: settings /1/a
+        Verbose: var2: value2
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
+        Verbose: var2: not value2
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:0: settings /
 Verbose: Phase 2: check ...
-Verbose: settings /1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: /1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
+    Verbose: settings \\"/1\\"
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: \\"/1\\"
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:         var1: value1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     bad  #template: var1
     Warning: Not matched with the template.
     Expected: value1
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         bad2  #template: var2
     Warning: Not matched with the template.
     Expected: value2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
 
 Warning: 4, Error: 0
 template count = 7
@@ -4119,6 +4119,121 @@ Warning: 0, Error: 0
 "
 `;
 
+exports[`replaces settings >> replace to tag >> bug_case_5: replacedFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21_replaced  #original: value21
+                #if: $settings.__Variable2__ == value2
+                    __Variable21A__: value21A
+                #if: $settings.__Variable2__ != value2
+                    __Variable21A__: value21A_replaced
+            ref:
+                value2_replaced, value21_replaced
+                #template: __Variable2__, __Variable21__
+            child:
+                settings: #settings:
+                    __Variable21__: value21_over  #// overwrite
+                    #if: $settings.__Variable2__ == value2
+                        __Variable211A__: value211A_1
+                    #if: $settings.__Variable2__ != value2
+                        __Variable211A__: value211A_replaced  #original: value211A_2
+                ref:
+                    [value2_replaced, value21_over, value21A_replaced, value211A_replaced]
+                    #template: [__Variable2__, __Variable21__, __Variable21A__, __Variable211A__]
+                ref in if:
+                    value211A_replaced
+                    #template: __Variable211A__
+    settings: #settings:
+        __Variable2__: value2_replaced  #original: value2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> bug_case_5: resetFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+                #if: $settings.__Variable2__ == value2
+                    __Variable21A__: value21A
+                #if: $settings.__Variable2__ != value2
+                    __Variable21A__: value21A_replaced
+            ref:
+                value2, value21
+                #template: __Variable2__, __Variable21__
+            child:
+                settings: #settings:
+                    __Variable21__: value21_over  #// overwrite
+                    #if: $settings.__Variable2__ == value2
+                        __Variable211A__: value211A_1
+                    #if: $settings.__Variable2__ != value2
+                        __Variable211A__: value211A_2
+                ref:
+                    [value2, value21_over, value21A, value211A_1]
+                    #template: [__Variable2__, __Variable21__, __Variable21A__, __Variable211A__]
+                ref in if:
+                    value211A_1
+                    #template: __Variable211A__
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> bug_case_5: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+                #if: $settings.__Variable2__ == value2
+                    __Variable21A__: value21A
+                #if: $settings.__Variable2__ != value2
+                    __Variable21A__: value21A_replaced
+            ref:
+                value2, value21
+                #template: __Variable2__, __Variable21__
+                    #to: value2_replaced,  value21_replaced
+            child:
+                settings: #settings:
+                    __Variable21__: value21_over  #// overwrite
+                    #if: $settings.__Variable2__ == value2
+                        __Variable211A__: value211A_1
+                    #if: $settings.__Variable2__ != value2
+                        __Variable211A__: value211A_2
+                ref:
+                    [value2, value21_over, value21A, value211A_1]
+                    #template: [__Variable2__, __Variable21__, __Variable21A__, __Variable211A__]
+                ref in if:
+                    value211A_1
+                    #template: __Variable211A__  #to: value211A_replaced
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
+exports[`replaces settings >> replace to tag >> bug_case_5: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable2__: value2_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable21__: value21_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30: #to: __Variable211A__: value211A_replaced
+
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces settings >> replace to tag >> settings_tree_if: replacedFileContents 1`] = `
 "section:
     table:
@@ -4362,40 +4477,39 @@ body:
 
 exports[`replaces settings >> verbose >> conflict: verbose 1`] = `
 "Verbose: Phase 3: replace ...
-Verbose: settings / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta
-Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.00
-Verbose:     replace from: 1.2
-Verbose:     replace to  : 2.00
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.00  #original: 1.2
-Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
-Verbose:     replace from: version 1.2 beta
-Verbose:     replace to  : ver. 2.4 beta
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
-Verbose: replace template variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
-Verbose:     replace from: 1.2
-Verbose:     replace to  : 2.00
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.00 beta)  #template: __Variable1__
-Verbose: replace template-at(-2) variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
-Verbose:     replace from: version 1.2 beta
-Verbose:     replace to  : ver. 2.4 beta
-Verbose:         check not conflicted
-Verbose:         replacingLine:     (version 1.2 beta)  #template: __Variable1__
-Verbose:         maskedLine   :     (version 1.2 beta)  #template: __Variable1__
-Verbose:         replace from: version 1.2 beta
-Verbose:         replace to  : ver. 2.4 beta
-Verbose:         replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
-Verbose:         maskedLine   :     (_____________)  #template: __Variable1__
-Verbose:         replace from: 1.2
-Verbose:         replace to  : 2.00
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.00
+    Verbose:     replace from: 1.2
+    Verbose:     replace to  : 2.00
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.00  #original: 1.2
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    Verbose:     replace from: version 1.2 beta
+    Verbose:     replace to  : ver. 2.4 beta
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+    Verbose: replace template variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose:     replace from: 1.2
+        Verbose:     replace to  : 2.00
+    Verbose: replaced
+        Verbose: before: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: after:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+    Verbose: replace template-at(-2) variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose:     replace from: version 1.2 beta
+        Verbose:     replace to  : ver. 2.4 beta
+    Verbose: check not conflicted:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose: replacingLine:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (version 1.2 beta)  #template: __Variable1__
+        Verbose: replace from: version 1.2 beta
+        Verbose: replace to  : ver. 2.4 beta
+        Verbose: replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (_____________)  #template: __Variable1__
+        Verbose: replace from: 1.2
+        Verbose: replace to  : 2.00
+    Verbose: replaced
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
     Error: template target values after replace are conflicted.
@@ -4432,41 +4546,40 @@ body:
 
 exports[`replaces settings >> verbose >> no conflict: verbose 1`] = `
 "Verbose: Phase 3: replace ...
-Verbose: settings / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: / (root)
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta
-Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.4
-Verbose:     replace from: 1.2
-Verbose:     replace to  : 2.4
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.4  #original: 1.2
-Verbose: replace a setting
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
-Verbose:     replace from: version 1.2 beta
-Verbose:     replace to  : ver. 2.4 beta
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
-Verbose: replace template variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
-Verbose:     replace from: 1.2
-Verbose:     replace to  : 2.4
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.4 beta)  #template: __Variable1__
-Verbose: replace template-at(-2) variables
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
-Verbose:     replace from: version 1.2 beta
-Verbose:     replace to  : ver. 2.4 beta
-Verbose:         check not conflicted
-Verbose:         replacingLine:     (version 1.2 beta)  #template: __Variable1__
-Verbose:         maskedLine   :     (version 1.2 beta)  #template: __Variable1__
-Verbose:         replace from: version 1.2 beta
-Verbose:         replace to  : ver. 2.4 beta
-Verbose:         replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
-Verbose:         maskedLine   :     (_____________)  #template: __Variable1__
-Verbose:         replace from: 1.2
-Verbose:         replace to  : 2.4
-Verbose:         wasReplaced = true
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
-Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.4
+    Verbose:     replace from: 1.2
+    Verbose:     replace to  : 2.4
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.4  #original: 1.2
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    Verbose:     replace from: version 1.2 beta
+    Verbose:     replace to  : ver. 2.4 beta
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+    Verbose: replace template variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose:     replace from: 1.2
+        Verbose:     replace to  : 2.4
+    Verbose: replaced
+        Verbose: before: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: after:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.4 beta)  #template: __Variable1__
+    Verbose: replace template-at(-2) variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose:     replace from: version 1.2 beta
+        Verbose:     replace to  : ver. 2.4 beta
+    Verbose: check not conflicted:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose: replacingLine:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (version 1.2 beta)  #template: __Variable1__
+        Verbose: replace from: version 1.2 beta
+        Verbose: replace to  : ver. 2.4 beta
+        Verbose: replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (_____________)  #template: __Variable1__
+        Verbose: replace from: 1.2
+        Verbose: replace to  : 2.4
+        Verbose: wasReplaced = true
+    Verbose: replaced
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
 
 Warning: 0, Error: 0
 "
@@ -4810,10 +4923,10 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
 "keyword: #ref: "../README.md#parameters"
 Recommend: #ref: ../README.md#parameters
-../README.md:3
+../README.md:5
     7.Test Echo, 0.Folder
 keyword or number: 7
- "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 3"
+ "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
 keyword or number: 
 keyword: 7
 keyword: exit()
@@ -4823,13 +4936,13 @@ keyword: exit()
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
 "keyword: #ref: "../README.md#parameters"
 Recommend: #ref: ../README.md#parameters
-../README.md:3
+../README.md:5
     7.Test Echo, 0.Folder
 keyword or number: 7
 ref:  ../README.md#parameters
 file: ../README.md
 fragment: parameters
-lineNum: 3
+lineNum: 5
 keyword or number: 
 keyword: 7
 keyword: exit()
@@ -4907,15 +5020,7 @@ settings: #settings:
 exports[`unit test >> makeReplaceToTagTree >> bug_case_3: replaceTo 1`] = `
 Object {
   "/": Object {},
-  "/1": Object {
-    "__Variable2__": Object {
-      "isReferenced": false,
-      "lineNum": 13,
-      "settingsIndex": "/1",
-      "tag": "toAfterTemplate",
-      "value": "value1_replaced",
-    },
-  },
+  "/1": Object {},
   "/2": Object {
     "__Variable2__": Object {
       "isReferenced": false,
@@ -4948,12 +5053,58 @@ root:
             settings: #settings:
                 __Variable21__: value21
             ref:
-                value1, value2, value21
-                #template: __Variable1__, __Variable2__, __Variable21__
-                    #to: value1_replaced,  value2_replaced,  value21_replaced
+                value2, value21
+                #template: __Variable2__, __Variable21__
+                    #to: value2_replaced,   value21_replaced
     settings: #settings:
         __Variable2__: value2
 "
+`;
+
+exports[`unit test >> makeReplaceToTagTree >> bug_case_5: replaceTo 1`] = `
+Object {
+  "/": Object {},
+  "/1": Object {},
+  "/2": Object {
+    "__Variable2__": Object {
+      "isReferenced": false,
+      "lineNum": 17,
+      "settingsIndex": "/2",
+      "tag": "toAfterTemplate",
+      "value": "value2_replaced",
+    },
+  },
+  "/2/1": Object {
+    "__Variable21__": Object {
+      "isReferenced": false,
+      "lineNum": 17,
+      "settingsIndex": "/2/1",
+      "tag": "toAfterTemplate",
+      "value": "value21_replaced",
+    },
+  },
+  "/2/1/1": Object {},
+  "/2/1/1/a": Object {
+    "__Variable211A__": Object {
+      "isReferenced": false,
+      "lineNum": 30,
+      "settingsIndex": "/2/1/1/a",
+      "tag": "toAfterTemplate",
+      "value": "value211A_replaced",
+    },
+  },
+  "/2/1/1/b": Object {
+    "__Variable211A__": Object {
+      "isReferenced": false,
+      "lineNum": 30,
+      "settingsIndex": "/2/1/1/b",
+      "tag": "toAfterTemplate",
+      "value": "value211A_replaced",
+    },
+  },
+  "/2/1/a": Object {},
+  "/2/1/b": Object {},
+}
 `;
 
 exports[`unit test >> makeReplaceToTagTree >> bug_case_5: sourceFileContents 1`] = `
@@ -4966,27 +5117,27 @@ root:
         21:
             settings: #settings:
                 __Variable21__: value21
-                #if: __Variable2__ == value2
+                #if: $settings.__Variable2__ == value2
                     __Variable21A__: value21A
-                #if: __Variable2__ != value2
+                #if: $settings.__Variable2__ != value2
                     __Variable21A__: value21A_replaced
             ref:
-                value1, value2, value21
-                #template: __Variable1__, __Variable2__, __Variable21__
-                    #to: value1_replaced,  value2_replaced,  value21_replaced
+                value2, value21
+                #template: __Variable2__, __Variable21__
+                    #to: value2_replaced,  value21_replaced
             child:
                 settings: #settings:
-                    __Variable211__: value211
-                    #if: __Variable2__ == value2
-                        __Variable211A__: value211A
-                    #if: __Variable2__ != value2
-                        __Variable211A__: value211A_replaced
+                    __Variable21__: value21_over  #// overwrite
+                    #if: $settings.__Variable2__ == value2
+                        __Variable211A__: value211A_1
+                    #if: $settings.__Variable2__ != value2
+                        __Variable211A__: value211A_2
                 ref:
-                    [value21A, value211, value211A]
-                    #template: [__Variable21A__, __Variable211__, __Variable211A__]
-                ref parent:
-                    value1, value2, value21
-                    #template: __Variable1__, __Variable2__, __Variable21__
+                    [value2, value21_over, value21A, value211A_1]
+                    #template: [__Variable2__, __Variable21__, __Variable21A__, __Variable211A__]
+                ref in if:
+                    value211A_1
+                    #template: __Variable211A__  #to: value211A_replaced
     settings: #settings:
         __Variable2__: value2
 "
@@ -5267,6 +5418,39 @@ exports[`unit test >> makeSettingTree >> bug_case_3: answer indicesWithIf 1`] = 
     13 => "/2",
 }
 "
+`;
+
+exports[`unit test >> makeSettingTree >> bug_case_3: settings 1`] = `
+Object {
+  "/": Object {},
+  "/1": Object {
+    "__Variable1__": Object {
+      "isReferenced": false,
+      "lineNum": 4,
+      "settingsIndex": "/1",
+      "tag": "settings",
+      "value": "value1",
+    },
+  },
+  "/2": Object {
+    "__Variable2__": Object {
+      "isReferenced": false,
+      "lineNum": 14,
+      "settingsIndex": "/2",
+      "tag": "settings",
+      "value": "value2",
+    },
+  },
+  "/2/1": Object {
+    "__Variable21__": Object {
+      "isReferenced": false,
+      "lineNum": 9,
+      "settingsIndex": "/2/1",
+      "tag": "settings",
+      "value": "value21",
+    },
+  },
+}
 `;
 
 exports[`unit test >> makeSettingTree >> bug_case_3: sourceFileContents 1`] = `

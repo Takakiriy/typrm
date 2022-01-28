@@ -1,6 +1,7 @@
 export declare function main(): Promise<void>;
 export declare function mainMain(): Promise<void>;
 declare function makeSettingTree(parser: Parser): Promise<SettingsTree>;
+declare function makeReplaceToTagTree(parser: Parser, settingTree: Readonly<SettingsTree>): Promise<ReplaceToTagTree>;
 declare enum CommandEnum {
     unknown = 0,
     check = 1,
@@ -57,6 +58,71 @@ interface SettingsTree_addCurrentSettingsInIfTag {
     };
     outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
 }
+declare class ReplaceToTagTree {
+    replaceTo: {
+        [index: string]: {
+            [name: string]: Setting;
+        };
+    };
+    outOfFalseBlocks: Map<number, boolean>;
+    outOfFalseBlocksByOriginalTag: Map<number, boolean>;
+    command: 'replace' | 'reset';
+    currentNewSettings: {
+        [name: string]: Setting;
+    };
+    currentNewSettingsByOriginalTag: {
+        [name: string]: Setting;
+    };
+    currentOldSettingsInIfBlock: {
+        [name: string]: Setting;
+    };
+    currentNewSettingsInIfBlock: {
+        [name: string]: Setting;
+    };
+    currentIsOutOfFalseBlock: boolean;
+    nextLineNumIndex: number;
+    nextSettingsLineNum: number;
+    nextIfLineNumIndex: number;
+    nextIfLineNum: number;
+    moveToLine(parser: Parser, settingsTree: SettingsTree): void;
+    moveToLine_Immutably(parser: Parser, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_for_moveToLine;
+    addCurrentSettingsInIfBlock_Immutably(currentIndex: string, currentNewSettings: Readonly<{
+        [name: string]: Setting;
+    }>, currentNewSettingsByOriginalTag: Readonly<{
+        [name: string]: Setting;
+    }>, settingsTree: Readonly<SettingsTree>, parser: Parser): ReplaceToTagTree_for_addCurrentSettingsInIfBlock;
+}
+interface ReplaceToTagTree_for_moveToLine {
+    currentNewSettings: {
+        [name: string]: Setting;
+    };
+    currentNewSettingsByOriginalTag: {
+        [name: string]: Setting;
+    };
+    currentOldSettingsInIfBlock: {
+        [name: string]: Setting;
+    };
+    currentNewSettingsInIfBlock: {
+        [name: string]: Setting;
+    };
+    nextLineNumIndex: number;
+    nextSettingsLineNum: number;
+    outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
+    outOfFalseBlocksByOriginalTag: Map</*lineNum*/ number, boolean>;
+    currentIsOutOfFalseBlock: boolean;
+    nextIfLineNumIndex: number;
+    nextIfLineNum: number;
+}
+interface ReplaceToTagTree_for_addCurrentSettingsInIfBlock {
+    currentNewSettings: {
+        [name: string]: Setting;
+    };
+    currentNewSettingsByOriginalTag: {
+        [name: string]: Setting;
+    };
+    outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
+    outOfFalseBlocksByOriginalTag: Map</*lineNum*/ number, boolean>;
+}
 interface SettingsInformation {
     index: string;
     lineNum: number;
@@ -89,6 +155,7 @@ export declare function callMainFromJest(parameters?: string[], options?: {
 export declare const private_: {
     Parser: typeof Parser;
     makeSettingTree: typeof makeSettingTree;
+    makeReplaceToTagTree: typeof makeReplaceToTagTree;
 };
 export declare var stdout: string;
 export declare var programArguments: string[];

@@ -5,7 +5,7 @@ written in text file format manuals.
 Also, it replaces the parameters depending on your situations
 so that you can run commands only by the copy and paste.
 
-[Japanese](./README-jp.md)
+( [Japanese](./README-jp.md) )
 
 <!-- TOC depthFrom:1 -->
 
