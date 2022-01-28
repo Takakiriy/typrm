@@ -4859,7 +4859,140 @@ exports[`typrm_test >> TestOfCommandLine >> search_mode_select_by_number >> _out
 "
 `;
 
-exports[`unit test >> makeSettingTree: answer indicesWithIf 1`] = `
+exports[`unit test >> makeReplaceToTagTree >> 1st: replaceTo 1`] = `
+Object {
+  "/": Object {
+    "__Variable__": Object {
+      "isReferenced": false,
+      "lineNum": 17,
+      "settingsIndex": "/",
+      "tag": "toAfterTemplate",
+      "value": "valueA_replaced",
+    },
+  },
+  "/1": Object {},
+  "/1/1": Object {},
+  "/1/1/1": Object {},
+  "/1/1/1/1": Object {},
+  "/1/1/1/2": Object {},
+}
+`;
+
+exports[`unit test >> makeReplaceToTagTree >> 1st: sourceFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Parent1__: parent1
+    1:
+        settings: #settings:
+            __Parent11__: parent11
+        11:
+            settings: #settings:
+                __Parent111__: parent111
+            111:
+                settings: #settings:
+                    __Parent111__: parent111
+            112:
+                settings: #settings:
+                    __Variable__: valueB
+        ref:
+            valueA  #template: __Variable__  #to: valueA_replaced
+        ref2:
+            valueA  #template: __Variable__
+root:
+settings: #settings:
+    __Variable__: valueA
+"
+`;
+
+exports[`unit test >> makeReplaceToTagTree >> bug_case_3: replaceTo 1`] = `
+Object {
+  "/": Object {},
+  "/1": Object {
+    "__Variable2__": Object {
+      "isReferenced": false,
+      "lineNum": 13,
+      "settingsIndex": "/1",
+      "tag": "toAfterTemplate",
+      "value": "value1_replaced",
+    },
+  },
+  "/2": Object {
+    "__Variable2__": Object {
+      "isReferenced": false,
+      "lineNum": 13,
+      "settingsIndex": "/2",
+      "tag": "toAfterTemplate",
+      "value": "value2_replaced",
+    },
+  },
+  "/2/1": Object {
+    "__Variable21__": Object {
+      "isReferenced": false,
+      "lineNum": 13,
+      "settingsIndex": "/2/1",
+      "tag": "toAfterTemplate",
+      "value": "value21_replaced",
+    },
+  },
+}
+`;
+
+exports[`unit test >> makeReplaceToTagTree >> bug_case_3: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+            ref:
+                value1, value2, value21
+                #template: __Variable1__, __Variable2__, __Variable21__
+                    #to: value1_replaced,  value2_replaced,  value21_replaced
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
+exports[`unit test >> makeReplaceToTagTree >> bug_case_5: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+                #if: __Variable2__ == value2
+                    __Variable21A__: value21A
+                #if: __Variable2__ != value2
+                    __Variable21A__: value21A_replaced
+            ref:
+                value1, value2, value21
+                #template: __Variable1__, __Variable2__, __Variable21__
+                    #to: value1_replaced,  value2_replaced,  value21_replaced
+            child:
+                settings: #settings:
+                    __Variable211__: value211
+                    #if: __Variable2__ == value2
+                        __Variable211A__: value211A
+                    #if: __Variable2__ != value2
+                        __Variable211A__: value211A_replaced
+                ref:
+                    [value21A, value211, value211A]
+                    #template: [__Variable21A__, __Variable211__, __Variable211A__]
+                ref parent:
+                    value1, value2, value21
+                    #template: __Variable1__, __Variable2__, __Variable21__
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
+exports[`unit test >> makeSettingTree >> 1st: answer indicesWithIf 1`] = `
 "Map {
     1 => "/1",
     5 => "/1/a",
@@ -4908,7 +5041,7 @@ exports[`unit test >> makeSettingTree: answer indicesWithIf 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> 1st: sourceFileContents 1`] = `
 "nested if:
     settings: #settings:
         __Switch1__: A
@@ -4992,7 +5125,7 @@ case B after:  #if: $settings.__Switch_01__ == B
 "
 `;
 
-exports[`unit test >> makeSettingTree_below_shallow_settings: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree >> below_shallow_settings: answer indicesWithIf 1`] = `
 "Map {
     1 => "/1",
     2 => "/1/1",
@@ -5013,7 +5146,7 @@ exports[`unit test >> makeSettingTree_below_shallow_settings: answer indicesWith
 "
 `;
 
-exports[`unit test >> makeSettingTree_below_shallow_settings: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> below_shallow_settings: sourceFileContents 1`] = `
 "root:  #// b2_bug_case_nest_settings
     1:  #// Test of 1
         settings: #settings:
@@ -5065,7 +5198,7 @@ root2:  #// Test of 211
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",
     2 => "/1",
@@ -5078,7 +5211,7 @@ exports[`unit test >> makeSettingTree_bug_case: answer indicesWithIf 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case: sourceFileContents 1`] = `
 "bug case:
     2:
         settings: #settings:
@@ -5096,7 +5229,7 @@ exports[`unit test >> makeSettingTree_bug_case: sourceFileContents 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case_2: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case_2: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",
     2 => "/1",
@@ -5107,7 +5240,7 @@ exports[`unit test >> makeSettingTree_bug_case_2: answer indicesWithIf 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case_2: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case_2: sourceFileContents 1`] = `
 "bug case:
     1:
         settings: #settings:
@@ -5125,7 +5258,7 @@ root:
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case_3: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case_3: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",
     2 => "/1",
@@ -5136,7 +5269,7 @@ exports[`unit test >> makeSettingTree_bug_case_3: answer indicesWithIf 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case_3: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case_3: sourceFileContents 1`] = `
 "bug case:
     1:
         settings: #settings:
@@ -5154,7 +5287,7 @@ root:
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case_4: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case_4: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",
     2 => "/1",
@@ -5165,7 +5298,7 @@ exports[`unit test >> makeSettingTree_bug_case_4: answer indicesWithIf 1`] = `
 "
 `;
 
-exports[`unit test >> makeSettingTree_bug_case_4: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> bug_case_4: sourceFileContents 1`] = `
 "bug case:
     1:
         settings: #settings:
@@ -5184,7 +5317,7 @@ root:
 "
 `;
 
-exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`] = `
+exports[`unit test >> makeSettingTree >> if_and_no_indent: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",
     2 => "/a",
@@ -5194,7 +5327,7 @@ exports[`unit test >> makeSettingTree_if_and_no_indent: answer indicesWithIf 1`]
 "
 `;
 
-exports[`unit test >> makeSettingTree_if_and_no_indent: sourceFileContents 1`] = `
+exports[`unit test >> makeSettingTree >> if_and_no_indent: sourceFileContents 1`] = `
 "body:
     #if: true
 no indent:

@@ -1308,29 +1308,55 @@ describe("print reference >>", () => {
 });
 
 describe("unit test >>", () => {
-    test.each([
-        ["makeSettingTree", "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"],
-        ["makeSettingTree_bug_case", null],
-        ["makeSettingTree_if_and_no_indent", null],
-        ["makeSettingTree_below_shallow_settings", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
-        ["makeSettingTree_bug_case_2", null],
-        ["makeSettingTree_bug_case_3", null],
-        ["makeSettingTree_bug_case_4", null],
-    ])("%s", async (caseName, sameInputSnapshotName) => {
-        const  Parser = main.private_.Parser;
-        const  makeSettingTree = main.private_.makeSettingTree;
-        const {inputContents} = initializeTestInputFile(`unit test >> ${caseName}: sourceFileContents 1`);
-        if (sameInputSnapshotName) {
-            expect(inputContents).toBe(lib.getSnapshot(sameInputSnapshotName));
-        }
-        const  answerIndicesWithIf = Array.from(await lib.parseMap(
-            lib.getSnapshot(`unit test >> ${caseName}: answer indicesWithIf 1`)));
-        const  parser = new Parser();
-        parser.filePath = `test_data/_tmp/_tmp.yaml`;
+    describe("makeSettingTree >>", () => {
+        test.each([
+            ["1st", "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"],
+            ["bug_case", null],
+            ["if_and_no_indent", null],
+            ["below_shallow_settings", "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"],
+            ["bug_case_2", null],
+            ["bug_case_3", null],
+            ["bug_case_4", null],
+        ])("%s", async (caseName, sameInputSnapshotName) => {
+            const  Parser = main.private_.Parser;
+            const  makeSettingTree = main.private_.makeSettingTree;
+            const {inputContents} = initializeTestInputFile(`unit test >> makeSettingTree >> ${caseName}: sourceFileContents 1`);
+            if (sameInputSnapshotName) {
+                expect(inputContents).toBe(lib.getSnapshot(sameInputSnapshotName));
+            }
+            const  answerIndicesWithIf = Array.from(await lib.parseMap(
+                lib.getSnapshot(`unit test >> makeSettingTree >> ${caseName}: answer indicesWithIf 1`)));
+            const  parser = new Parser();
+            parser.filePath = `test_data/_tmp/_tmp.yaml`;
 
-        const  settingsTree = await makeSettingTree(parser);
-        expect(Array.from( settingsTree.indicesWithIf )).toStrictEqual(answerIndicesWithIf);
-        lib.rmdirSync(testFolderPath + '_tmp');
+            const  settingsTree = await makeSettingTree(parser);
+            expect(Array.from( settingsTree.indicesWithIf )).toStrictEqual(answerIndicesWithIf);
+            lib.rmdirSync(testFolderPath + '_tmp');
+        });
+    });
+    describe.only("makeReplaceToTagTree >>", () => {
+        test.each([
+            ["1st", "replaces settings >> replace to tag >> E2_BugCase_ParentSettings: sourceFileContents 1"],
+            ["bug_case_3", null],
+// ["bug_case"],
+        ])("%s", async (caseName, sameInputSnapshotName) => {
+if (caseName !== 'bug_case_3') {return;}  // || subCase !== '____'
+            const  Parser = main.private_.Parser;
+            const  makeSettingTree = main.private_.makeSettingTree;
+            const  makeReplaceToTagTree = main.private_.makeReplaceToTagTree;
+            const {inputContents} = initializeTestInputFile(`unit test >> makeReplaceToTagTree >> ${caseName}: sourceFileContents 1`);
+            if (sameInputSnapshotName) {
+                expect(inputContents).toBe(lib.getSnapshot(sameInputSnapshotName));
+            }
+            const  parser = new Parser();
+            parser.filePath = `test_data/_tmp/_tmp.yaml`;
+
+            const  settingsTree = await makeSettingTree(parser);
+            const  toTagTree = await makeReplaceToTagTree(parser, settingsTree);
+            expect(toTagTree.replaceTo).toMatchSnapshot('replaceTo');
+            lib.rmdirSync(testFolderPath + '_tmp');
+expect('test code').toBe('deleted skip code.');
+        });
     });
 });
 
