@@ -2211,10 +2211,30 @@ async function search() {
 }
 // searchSub
 async function searchSub(keyword, isMutual) {
-    for (const ignoredKeyword of ignoredKeywords) {
-        keyword = keyword.replace(ignoredKeyword, '');
-    }
     keyword = keyword.trim();
+    // keywordWithTag = ...
+    const searchTagIndex = tagIndexOf(keyword, searchLabel);
+    if (searchTagIndex !== notFound) {
+        var keywordWithTag = getValue(keyword, searchTagIndex + searchLabel.length);
+    }
+    else {
+        const keywordTagIndex = tagIndexOf(keyword, keywordLabel);
+        if (keywordTagIndex !== notFound) {
+            var keywordWithTag = getValue(keyword, keywordTagIndex + keywordLabel.length);
+            if (keywordWithTag === '') {
+                const colonIndex = keyword.indexOf(':');
+                if (colonIndex !== notFound) {
+                    keywordWithTag = keyword.substring(0, colonIndex);
+                }
+                else {
+                    keywordWithTag = '';
+                }
+            }
+        }
+        else {
+            var keywordWithTag = keyword;
+        }
+    }
     // fileFullPaths = ...
     const currentFolder = process.cwd();
     const fileFullPaths = [];
@@ -2283,7 +2303,7 @@ async function searchSub(keyword, isMutual) {
                     console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
                     return [];
                 });
-                const found = getKeywordMatchingScore(columns, keyword, thesaurus);
+                const found = getKeywordMatchingScore(columns, keywordWithTag, thesaurus);
                 if (found.matchedKeywordCount >= 1) {
                     const unescapedLine = unscapePercentByte(line);
                     if (withParameter) {
@@ -2355,7 +2375,7 @@ async function searchSub(keyword, isMutual) {
                         const colonPosition = line.indexOf(':', currentIndent.length);
                         const wordInGlossary = glossaryTag.glossaryWords +
                             line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                        const found = getKeywordMatchingScore([wordInGlossary], keyword, thesaurus);
+                        const found = getKeywordMatchingScore([wordInGlossary], keywordWithTag, thesaurus);
                         if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
                             found.score += glossaryMatchScore;
                             found.path = getTestablePath(inputFileFullPath);
@@ -2414,12 +2434,15 @@ async function searchSub(keyword, isMutual) {
             }
         }
     }
-    const keyphraseWordCount = keyword.split(' ').length;
+    const keyphraseWordCount = keywordWithTag.split(' ').length;
     // searchWithoutTags
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
     foundLines.sort(compareScore);
     if (!('disableFindAll' in programOptions) && !isMutual) {
-        var foundLineWithoutTags = await searchWithoutTags(keyword);
+        const foundLineWithoutTags = await searchWithoutTags(keyword);
+        const foundLineHasScore = foundLineWithoutTags.filter((found) => (found.score >= 2));
+        foundLines = [...foundLineHasScore, ...foundLines];
+        foundLines.sort(compareScore);
         foundLines = [...foundLineWithoutTags, ...foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) => found1.path == found2.path && found1.lineNum == found2.lineNum));
     }
@@ -2610,52 +2633,94 @@ function compareScore(a, b) {
 // searchWithoutTags
 async function searchWithoutTags(keywords) {
     const foundLines = [];
-    const keywordsLowerCase = keywords.replace(/\u{3000}/ug, ' ').toLowerCase().split(' ').filter((keyword) => (keyword !== ''));
+    const fullMatchKeywords = keywords.trim();
+    const keywordsLowerCase = Array.from(new Set(keywords.replace(/\u{3000}/ug, ' ').toLowerCase()
+        .split(' ').filter((keyword) => (keyword !== ''))));
     // '\u{3000}': Japanese space
     const keyword1LowerCase = keywordsLowerCase[0];
     const keywords2LowerCase = keywordsLowerCase.slice(1);
+    var matchCount = 0;
+    var fullMatchCount = 0;
     for (const inputFileFullPath of await listUpFilePaths()) {
         const reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
         });
         var lineNum = 0;
+        let breaking = false;
+        let exception;
         for await (const line1 of reader) {
-            const line = line1;
-            lineNum += 1;
-            var keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
-            if (keywordIndex !== notFound && !line.includes(keywordLabel)) {
-                const found = new FoundLine();
-                found.path = getTestablePath(inputFileFullPath);
-                found.lineNum = lineNum;
-                found.line = line;
-                found.matches.push({
-                    position: keywordIndex,
-                    length: keyword1LowerCase.length,
-                    testTargetIndex: -1,
-                    matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
-                });
-                found.matchedKeywordCount = 1;
-                found.matchedTargetKeywordCount = 1;
-                found.testedWordCount = 0;
-                found.tagLabel = 'find all';
-                found.score = 1;
-                for (const keywordLowerCase of keywords2LowerCase) {
-                    keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
-                    if (keywordIndex === notFound) {
-                        break;
-                    }
+            if (breaking) {
+                continue;
+            } // "reader" requests read all lines
+            try {
+                const line = line1;
+                lineNum += 1;
+                // full match
+                if (fullMatchCount < programOptions.foundCountMax && line.trim() === fullMatchKeywords) {
+                    fullMatchCount += 1;
+                    const found = new FoundLine();
+                    found.path = getTestablePath(inputFileFullPath);
+                    found.lineNum = lineNum;
+                    found.line = line;
                     found.matches.push({
-                        position: keywordIndex,
-                        length: keywordLowerCase.length,
+                        position: line.indexOf(fullMatchKeywords),
+                        length: fullMatchKeywords.length,
                         testTargetIndex: -1,
-                        matchedString: line.substr(keywordIndex, keywordLowerCase.length),
+                        matchedString: fullMatchKeywords,
                     });
-                }
-                if (keywordIndex !== notFound) {
+                    found.matchedKeywordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
+                    found.matchedTargetKeywordCount = found.matchedKeywordCount;
+                    found.testedWordCount = found.matchedKeywordCount;
+                    found.tagLabel = 'find all';
+                    found.score = lineFullMatchScore + fullMatchCount;
                     foundLines.push(found);
                 }
+                // shuffled keywords match
+                else if (matchCount < programOptions.foundCountMax) {
+                    var keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
+                    if (keywordIndex !== notFound && !line.includes(keywordLabel)) {
+                        const found = new FoundLine();
+                        found.path = getTestablePath(inputFileFullPath);
+                        found.lineNum = lineNum;
+                        found.line = line;
+                        found.matches.push({
+                            position: keywordIndex,
+                            length: keyword1LowerCase.length,
+                            testTargetIndex: -1,
+                            matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
+                        });
+                        found.matchedKeywordCount = keywordsLowerCase.length;
+                        found.matchedTargetKeywordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
+                        found.testedWordCount = found.matchedTargetKeywordCount;
+                        found.tagLabel = 'find all';
+                        found.score = 1;
+                        for (const keywordLowerCase of keywords2LowerCase) {
+                            keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
+                            if (keywordIndex === notFound) {
+                                break;
+                            }
+                            found.matches.push({
+                                position: keywordIndex,
+                                length: keywordLowerCase.length,
+                                testTargetIndex: -1,
+                                matchedString: line.substr(keywordIndex, keywordLowerCase.length),
+                            });
+                        }
+                        if (keywordIndex !== notFound) {
+                            matchCount += 1;
+                            foundLines.push(found);
+                        }
+                    }
+                }
             }
+            catch (e) {
+                exception = e;
+                breaking = true;
+            }
+        }
+        if (exception) {
+            throw exception;
         }
     }
     return foundLines;
@@ -3164,6 +3229,17 @@ function getReplacedLine(setting, template, replacedValues) {
             lineNum: 0 /*dummy*/, settingsIndex: '' };
     }
     return getExpectedLine(replacedSetting, template);
+}
+// tagIndexOf
+// /(^| )tag/
+function tagIndexOf(line, tag) {
+    var index = -1;
+    for (;;) {
+        index = line.indexOf(tag, index + 1);
+        if (index <= 0 || line[index - 1] === ' ') {
+            return index;
+        }
+    }
 }
 // getValue
 function getValue(line, separatorIndex = -1) {
@@ -3935,14 +4011,7 @@ function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, s
             if (index.startsWith(targetIndexSlash)) {
                 if (lib.isAlphabetIndex(index.substring(0, targetIndexSlash.length + 1))) {
                     if (variableName in settingTree.settings[index]) {
-                        // const  settings = settingTree.settingsInformation[index]
-                        // const  notVerboseParser = {... parser, verbose: false};
-                        // const  ifTagParser = new IfTagParser(notVerboseParser);
-                        // ifTagParser.setPosition(parser.filePath, settings.condition, settings.lineNum);
-                        // ifTagParser.evaluate(`#if: ${settings.condition}`, settingTree.currentSettings);
-                        // if (ifTagParser.thisIsOutOfFalseBlock) {
                         foundIndices.push(index); // e.g. '/1/a'
-                        // }
                     }
                 }
             }
@@ -4029,22 +4098,41 @@ class FoundLine {
             previousPosition = match.position + match.length;
         }
         coloredLine += line.substring(previousPosition);
-        const refColor = chalk.yellow;
-        const refIndex = coloredLine.indexOf(refLabel);
-        if (refIndex !== notFound) {
-            const commentIndex = coloredLine.indexOf(' #', refIndex + refLabel.length);
-            if (commentIndex === notFound) {
-                var refTagAndParameter = coloredLine.substring(refIndex).trim();
+        // ...
+        var thereIsKeywordLabel = false;
+        var thereIsSearchLabel = false;
+        var thereIsRefLabel = false;
+        for (const match of colorParts) {
+            if (tagIndexOf(match.matchedString, keywordLabel) !== notFound) {
+                thereIsKeywordLabel = true;
             }
-            else {
-                var refTagAndParameter = coloredLine.substring(refIndex, commentIndex).trim();
+            if (tagIndexOf(match.matchedString, searchLabel) !== notFound) {
+                thereIsSearchLabel = true;
             }
-            coloredLine =
-                coloredLine.substring(0, refIndex) +
-                    refColor(refTagAndParameter) +
-                    coloredLine.substring(refIndex + refTagAndParameter.length);
+            if (tagIndexOf(match.matchedString, refLabel) !== notFound) {
+                thereIsRefLabel = true;
+            }
         }
-        if (this.tagLabel !== searchLabel) {
+        // ref tag
+        if (!thereIsRefLabel) {
+            const refColor = chalk.yellow;
+            const refIndex = coloredLine.indexOf(refLabel);
+            if (refIndex !== notFound) {
+                const commentIndex = coloredLine.indexOf(' #', refIndex + refLabel.length);
+                if (commentIndex === notFound) {
+                    var refTagAndParameter = coloredLine.substring(refIndex).trim();
+                }
+                else {
+                    var refTagAndParameter = coloredLine.substring(refIndex, commentIndex).trim();
+                }
+                coloredLine =
+                    coloredLine.substring(0, refIndex) +
+                        refColor(refTagAndParameter) +
+                        coloredLine.substring(refIndex + refTagAndParameter.length);
+            }
+        }
+        // search tag
+        if (this.tagLabel !== searchLabel && !thereIsSearchLabel) {
             const searchColor = chalk.yellow;
             const searchIndex = coloredLine.indexOf(searchLabel);
             if (searchIndex !== notFound) {
@@ -4063,10 +4151,12 @@ class FoundLine {
                         coloredLine.substring(parameterIndex + searchKeyword.length);
             }
         }
+        // keyword tag, glossary tag
         if (this.tagLabel === keywordLabel || this.tagLabel === glossaryLabel) {
             const keywordLabelColor = chalk.gray;
             const keywordLabelIndex = coloredLine.indexOf(keywordLabel);
-            if (keywordLabelIndex !== notFound && (keywordLabelIndex === 0 || coloredLine[keywordLabelIndex - 1] === ' ')) {
+            if (keywordLabelIndex !== notFound && !thereIsKeywordLabel &&
+                (keywordLabelIndex === 0 || coloredLine[keywordLabelIndex - 1] === ' ')) {
                 coloredLine =
                     coloredLine.substring(0, keywordLabelIndex) +
                         keywordLabelColor(keywordLabel) +
@@ -4457,6 +4547,7 @@ const typrmEnvPrefix = 'TYPRM_';
 const indentRegularExpression = /^( |¥t)*/;
 const numberRegularExpression = /^[0-9]+$/;
 const variablePattern = "\\$\\{[^\\}]+\\}"; // ${__Name__}
+const lineFullMatchScore = 1000;
 const fullMatchScore = 100;
 const keywordMatchScore = 7;
 const glossaryMatchScore = 1;

@@ -115,3 +115,15 @@ find all >> shuffle:
     find_all_1
     find_all_2
     find_all_1 find_all_3 find_all_2
+find all >> full match:
+    full_match_1  full_match_1  full_match_2
+    full_match_1  full_match_2
+        ... 2 keywords match is shown
+    full_match_1  full_match_1  full_match_2
+    full_match_1  full_match_1  full_match_2
+    full_match_1  full_match_1  full_match_2
+        ... 4th full match is not shown
+find all >> search tag:
+    - #keyword: find_search_tag_1
+    - link  #search: find_search_tag_1
+    - link find_search_tag_1  // not hit because there is not keyword tag

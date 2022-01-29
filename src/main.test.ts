@@ -718,7 +718,7 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} it", "a,b"\n`,
         ],[
             "ignored keyword",
-            ["search", "#search: #keyword: AB"],
+            ["search", "#search: AB  #keyword: AB"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
         ],[
@@ -1036,7 +1036,7 @@ describe("searches glossary tag >>", () => {
 });
 
 describe("find all >>", () => {
-  test.each([
+    test.each([
     [
         "1st",
             ["search", "find_all_abc"],
@@ -1045,7 +1045,7 @@ describe("find all >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':110:') + `     ${matchedColor('find_all_abc')}\n`,
     ],[
         "shffle",
-            ["search", "find_all_1 find_all_2"],
+            ["search", "find_all_1  find_all_2"],  // double space avoids full match
             { folder: "test_data/search/2", test: "", locale: "en-US" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
@@ -1057,6 +1057,21 @@ describe("find all >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n`,
+    ],[
+        "full match",
+            ["search", "full_match_1  full_match_1  full_match_2"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':120:') + `     ${matchedColor('full_match_1')}  ${matchedColor('full_match_2')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':119:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':122:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':123:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':124:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n`,
+    ],[
+        "search tag",
+            ["search", "- link  #search: find_search_tag_1"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':128:') + `     ${matchedColor(`- link  #search: find_search_tag_1`)}\n`,
     ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 
