@@ -1817,7 +1817,7 @@ async function replaceSub(inputFilePath, parser, command) {
                                                     break;
                                                 }
                                                 replacingLine = replacingLine.replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
-                                                maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substr(i + template.expected.length);
+                                                maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substring(i + template.expected.length);
                                                 i += template.expected.length;
                                             }
                                             if (parser.verbose) {
@@ -2133,7 +2133,7 @@ async function search() {
                 var prompt = `keyword or number${programOptions.commandSymbol || ''}:`;
             }
             // typrm shell
-            const keyword = await lib.input(chalk.yellow(prompt) + ' ');
+            const keyword = await lib.input(chalk.gray('typrm') + ' ' + chalk.yellow(prompt) + ' ');
             if (keyword === 'exit()') {
                 break;
             }
@@ -2826,31 +2826,30 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     // recommended = ...
     var recommended = address;
     recommended = recommended.replace(/\$/g, '\\$');
+    var recommendedMask = recommended;
     const lowerCaseDriveRegExp = /^[a-z]:/;
     const upperCaseDriveRegExp = /^[A-Z]:/;
     const sortedEnvronmentVariables = [];
     const reservedNames = ['TYPRM_FOLDER'];
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith(typrmEnvPrefix) && !reservedNames.includes(envName) && envValue) {
-            const variableName = envName.substr(typrmEnvPrefix.length);
+            const variableName = envName.substring(typrmEnvPrefix.length);
             const value = envValue.replace(/\\/g, '/');
             sortedEnvronmentVariables.push({ key: variableName, value });
             if (lowerCaseDriveRegExp.test(value)) {
-                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toUpperCase() + value.substr(1) });
+                sortedEnvronmentVariables.push({ key: variableName, value: value.substring(0, 1).toUpperCase() + value.substring(1) });
             }
             else if (upperCaseDriveRegExp.test(value)) {
-                sortedEnvronmentVariables.push({ key: variableName, value: value.substr(0, 1).toLowerCase() + value.substr(1) });
+                sortedEnvronmentVariables.push({ key: variableName, value: value.substring(0, 1).toLowerCase() + value.substring(1) });
             }
         }
     }
     sortedEnvronmentVariables.sort((a, b) => {
         return b.value.length - a.value.length; // descending order
     });
-    for (const variable of sortedEnvronmentVariables) {
-        recommended = recommended.replace(new RegExp(lib.escapeRegularExpression(variable.value.replace('\\', '\\\\')), 'g'), '${' + variable.key + '}'); // Change the address to an address with variables
-    }
+    recommended = lib.unexpandVariable(recommended, sortedEnvronmentVariables.map((variable) => [`\${${variable.key}}`, variable.value]));
     if (recommended.replace(/\\/g, '/').startsWith(lib.getHomePath().replace(/\\/g, '/'))) {
-        recommended = '~' + recommended.substr(lib.getHomePath().length);
+        recommended = '~' + recommended.substring(lib.getHomePath().length);
     }
     // print the address
     if (option.print && addressLineNum !== notFound) {

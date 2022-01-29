@@ -337,6 +337,43 @@ export function  cutIndent(lines: string[]) {
     return  lines;
 }
 
+// unexpandVariable
+export function  unexpandVariable(expanded: string, keyValues: string[][]): string {
+    var  replacing = expanded;
+
+    var  replacedTag = '\r\n';
+    for (const [_key, value] of keyValues) {
+
+        replacing = replacing.replace(
+            new RegExp(escapeRegularExpression( value ), 'g'),
+            replacedTag);
+        replacedTag += '\n';
+    }
+
+    for (const [key, _value] of keyValues.reverse()) {
+        replacedTag = replacedTag.slice(0, replacedTag.length - 1);
+
+        replacing = replacing.replace(
+            new RegExp(escapeRegularExpression( replacedTag ), 'g'),
+            key);
+    }
+
+    const   unexpanded = replacing;
+    return  unexpanded;
+}
+export function  unexpandVariableOld(expanded: string, keyValues: string[][]): string {
+    var  replacing = expanded;
+
+    for (const [key, value] of keyValues) {
+
+        replacing = replacing.replace(
+            new RegExp(escapeRegularExpression( value ), 'g'),
+            key);
+    }
+    const   unexpanded = replacing;
+    return  unexpanded;
+}
+
 // getIndentWithoutHyphen
 function  getIndentWithoutHyphen(line: string): string | null {
     const  match = indentHyphenRegularExpression.exec(line);

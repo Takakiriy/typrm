@@ -158,9 +158,9 @@ search コマンドにキーワードを指定しないと、検索キーワー�
 このモードを終了するには、Ctrl+C キーを押します。
 
     $ typrm
-    keyword: csv
+    typrm keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
+    typrm keyword:
 
 Visual Studio Code のターミナルで実行した場合、見つかった場所（パス）を
 Ctrl キーを押しながらクリックすると開くことができます。
@@ -176,31 +176,13 @@ bash
 
     $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
     $ typrm
-    keyword: csv
+    typrm keyword: csv
     /home/user1/text.txt:1: #keyword: CSV, comma separated values
-    keyword: #1
+    typrm keyword: #1
 
 実行されるコマンド
 
     code -g "/home/user1/text.txt:1"
-
-typrm shell で何も見つからなかったときは、
-Enter キーを押すことで全文検索ができます。
-その全文検索では、大文字小文字を区別しません。また、単語単位検索はできません。
-
-    $ typrm s
-    keyword: game
-    見つかりません。全文検索するときは Enter キーを押してください。
-    keyword:
-    .../text.txt:1: Game:
-    keyword:
-
-typrm shell で `#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
-replace, reset, check, mutual-search コマンドが使えます。
-
-    #r                // 全ファイル replace
-    #r example.yaml
-    #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
 
 （すべてのバージョン）
 
@@ -551,7 +533,15 @@ typrm replace コマンドを実行すると、すべてのファイルにある
 
 ### 任意のコマンドを実行します
 
-検索キーワード入力モード(typrm shell)からシェルで使えるコマンドを実行するには、
+検索キーワード入力モード(typrm shell) で
+`#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
+typrm の replace, reset, check, mutual-search コマンドが使えます。
+
+    #r                // 全ファイル replace
+    #r example.yaml
+    #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
+
+typrm shell から bash などのシェルで使えるコマンドを実行するには、
 コマンド記号とスペースを入力してからコマンドを入力します。
 ちなみに私は、YAML の中に見つかったコードのインデントを除く
 [indenter](https://github.com/Takakiriy/indenter) コマンドをよく使います。
@@ -559,9 +549,9 @@ typrm replace コマンドを実行すると、すべてのファイルにある
 echo コマンドを実行するサンプル:
 
     $ typrm
-    keyword$: $ echo abc
+    typrm keyword$: $ echo abc
     abc
-    keyword$:
+    typrm keyword$:
 
 任意のコマンドを実行できるようにするには、コマンド記号を環境変数 `TYPRM_COMMAND_SYMBOL`
 または typrm 起動時の --command-symbol オプションに設定し、
@@ -580,12 +570,12 @@ PowerShell
 
 コマンド記号は typrm shell のコロンの前に表示されます。
 
-    keyword$:
+    typrm keyword$:
 
 typrm shell のコロンの前にコマンド記号が表示されていない状態であれば、
 任意のコマンドを実行されることはありません。
 
-    keyword:
+    typrm keyword:
 
 Windows では cmd.exe のコマンドを入力できます。
 PowerShell のコマンドを実行する場合は、
@@ -1260,10 +1250,10 @@ typrm の search コマンドのパラメーターや、typrm shell のプロン
         0.Folder
 
     $ typrm s
-    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    typrm keyword: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
-    keyword or number:
+    typrm keyword or number:
 
 環境変数の値は typrm を起動するときに設定します。
 ただし、環境変数を設定するときの環境変数名にコマンド記号 `TYPRM_` を追加する必要があります。
@@ -1293,7 +1283,7 @@ typrm の search コマンドに `#ref:` タグと環境変数のないパスを
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
 
     > typrm s
-    keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
+    typrm keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
     Recommend: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
 
@@ -1321,20 +1311,20 @@ typrm shell に入って `#ref:` タグでファイルのパスを表示した�
 数字以外を入力するとプロンプトが keyword: のときと同じことができます。
 
     $ typrm s
-    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    typrm keyword: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
-    keyword or number: 0
+    typrm keyword or number: 0
 
 検索結果の中の第1候補の行（最も下の行）に `#ref:` タグが含まれたときも、
 ファイルに関連するコマンドを選ぶことができます。
 
     $ typrm s
-    keyword: red book
+    typrm keyword: red book
     .../books.yaml:32: #keyword: red book  #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
-    keyword or number: 0
+    typrm keyword or number: 0
 
 コマンドの一覧に独自のコマンドを追加することができます。
 

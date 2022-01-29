@@ -27,6 +27,40 @@ describe("string >>", () => {
         });
     });
 
+    describe("unexpandVariable >>", () => {
+        test("1st", () => {
+            const  unexpectedLine = lib.unexpandVariable('abcXdef',
+                [['$a', 'abc'], ['$d', 'def']]);
+            expect(unexpectedLine).toBe('$aX$d');
+        });
+
+        test("not regular expression", () => {
+            const  unexpectedLine = lib.unexpandVariable('abcde_ab.*e',
+                [['$a', 'ab.*e']]);
+            expect(unexpectedLine).toBe('abcde_$a');
+        });
+
+        describe("order >>", () => {
+            test("descending", () => {
+                const  unexpectedLine = lib.unexpandVariable('abcdef',
+                    [['${ab}', 'abcde'], ['${a}', 'abc']]);
+                expect(unexpectedLine).toBe('${ab}f');
+            });
+
+            test("ascending", () => {
+                const  unexpectedLine = lib.unexpandVariable('abcdef',
+                    [['${a}', 'abc'], ['${ab}', 'abcde']]);
+                expect(unexpectedLine).toBe('${a}def');
+            });
+        });
+
+        test("matched replaced", () => {
+            const  unexpectedLine = lib.unexpandVariable('abc_def_$g',
+                [['${abc}', 'def'], ['${d}', 'abc'], ['\\$', '$']]);
+            expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
+        });
+    });
+
     describe("checkFileContents >>", () => {
 
         describe("basic >>", () => {

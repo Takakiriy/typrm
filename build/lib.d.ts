@@ -31,6 +31,8 @@ interface GlobbyParameters {
 export declare function cutLeftOf(input: string, keyword: string): string;
 export declare function cutLast(input: string, keyword: string): string;
 export declare function cutIndent(lines: string[]): string[];
+export declare function unexpandVariable(expanded: string, keyValues: string[][]): string;
+export declare function unexpandVariableOld(expanded: string, keyValues: string[][]): string;
 export declare function checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
 export declare function parseCSVColumns(columns: string): Promise<string[]>;
 export declare function parseCSVColumnPositions(csv: string, columns: string[]): number[];

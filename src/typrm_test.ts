@@ -47,7 +47,7 @@ async function  main() {
 async function  DoCustomDebug() {
     const  returns = await callChildProccess(
         `node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, {inputLines: [ /*exit()*/ ]});
+        `search  --folder test_data/search/1`, {inputLines: [ /*"exit()"*/ ]});
     console.log(`(typrm_test.ts stdout) ${returns.stdout}`);
     console.log('Done');
 }

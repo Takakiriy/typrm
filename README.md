@@ -64,6 +64,8 @@ tag `#keyword:` with the keywords in the text file you are searching for.
 Also, the content displayed in the snippet must be indented with
 whitespace deeper than the found line.
 The maximum number of lines displayed is 8.
+This number of lines can be changed with TYPRM_SNIPPET_LINE_COUNT
+environment variable or --snippet-line-count option.
 To jump to the contents of the file, run the typrm command
 and press Ctrl key and click the displayed path and line number
 in Visual Studio Code or other tools.
@@ -106,6 +108,10 @@ when you search for `git`, `git clone` is displayed first.
 in the number of characters.
 Snippets are only displayed for the keywords that have the first priority.
 You can see the snippet of `git status` by searching for `git status`.
+
+If 10 or more searches are hit, only the 10 priority items will be displayed.
+This number can be changed with TYPRM_FOUND_COUNT_MAX environment variable
+or --found-count-max option.
 
 Specify the path of the folder containing the file to be searched
 in the `TYPRM_FOLDER` environment variable or the `--folder` option.
@@ -163,9 +169,9 @@ the search keyword input mode (typrm shell) is started.
 Press Ctrl + C to exit this mode.
 
     $ typrm
-    keyword: csv
+    typrm keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
-    keyword:
+    typrm keyword:
 
 When running in Visual Studio Code terminal,
 you can open the file at the found location (path)
@@ -183,32 +189,13 @@ bash
 
     $ export TYPRM_OPEN_DOCUMENT="code -g \"\${ref}\""
     $ typrm
-    keyword: csv
+    typrm keyword: csv
     /home/user1/text.txt:1: #keyword: CSV, comma separated values
-    keyword: #1
+    typrm keyword: #1
 
 Commands executed
 
     code -g "/home/user1/text.txt:1"
-
-If you cannot find anything in typrm shell,
-you can do the full-text search by pressing the Enter key.
-The full-text search is not case sensitive.
-Also, word-based search is not possible.
-
-    $ typrm s
-    keyword: game
-    Not found. To do full text search, press Enter key.
-    keyword:
-    .../text.txt:1: Game:
-    keyword:
-
-In typrm shell, if you inputed starts with `#r`, `#replace:`, `#reset:`, `#c`,
-`#check:` or `#mutual:`, typrm runs replace, reset, check or mutual-search command.
-
-    #r                // replace all files
-    #r example.yaml
-    #replace: example.yaml  // Requires a colon at the end when not abbreviated
 
 (For all versions)
 
@@ -566,16 +553,23 @@ If you specify a file name, it processes the `#to:` tag in the specified file.
 
 ### Execute any command
 
-To execute a shell command in
-search keyword input mode (typrm shell),
+In search keyword input mode (typrm shell), if you inputed starts with
+`#r`, `#replace:`, `#reset:`, `#c`, `#check:` or `#mutual:`,
+typrm runs replace, reset, check or mutual-search command.
+
+    #r                // replace all files
+    #r example.yaml
+    #replace: example.yaml  // Requires a colon at the end when not abbreviated
+
+To execute a shell command like bash in typrm shell,
 enter the command symbol and space before entering the command.
 By the way, I often use [indenter](https://github.com/Takakiriy/indenter)
 command that remove the indentation of the found example code in YAML.
 
     $ typrm
-    keyword$: $ echo abc
+    typrm keyword$: $ echo abc
     abc
-    keyword$:
+    typrm keyword$:
 
 To execute a shell command, set the command symbol to the environment variable
 `TYPRM_COMMAND_SYMBOL` or the --command-symbol option with typrm command,
@@ -594,12 +588,12 @@ PowerShell
 
 The command symbol is shown before the colon in the typrm shell.
 
-    keyword$:
+    typrm keyword$:
 
 Any command will not be executed if the command symbol is not displayed
 before the colon in the typrm shell.
 
-    keyword:
+    typrm keyword:
 
 On Windows, you can input the cmd.exe commad.
 If you want to run PowerShell commands,
@@ -1306,10 +1300,10 @@ Note that the `#` and `$` specified on the command line must be escaped with `\`
         0.Folder
 
     $ typrm s
-    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    typrm keyword: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
-    keyword or number:
+    typrm keyword or number:
 
 The value of the environment variable is set when you start typrm.
 Note, you must add the command symbol `TYPRM_` to the environment variable name
@@ -1343,7 +1337,7 @@ that should be written in the manual.
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
 
     > typrm s
-    keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
+    typrm keyword: #ref: C:\Users\user1\Documents\books\manual\red_book_2021.pdf
     Recommend: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
 
@@ -1374,20 +1368,20 @@ If you enter a non-numeric number, you can do the same as
 when the prompt is `keyword:`.
 
     $ typrm s
-    keyword: #ref: ${books}/manual/red_book_2021.pdf
+    typrm keyword: #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
-    keyword or number: 0
+    typrm keyword or number: 0
 
 When the first candidate line (most bottom line) in the search results contains
 the `#ref:` tag, you can also select commands related to the file.
 
     $ typrm s
-    keyword: red book
+    typrm keyword: red book
     .../books.yaml:32: #keyword: red book  #ref: ${books}/manual/red_book_2021.pdf
     C:/Users/user1/Documents/books/manual/red_book_2021.pdf
         0.Folder
-    keyword or number: 0
+    typrm keyword or number: 0
 
 You can add your defined commands to the list of commands.
 

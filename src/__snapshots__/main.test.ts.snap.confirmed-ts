@@ -4619,7 +4619,7 @@ val__ue1: #template: key1
 `;
 
 exports[`typrm shell >> replace >> check: stdout 1`] = `
-"keyword: #c
+"typrm keyword: #c
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4629,7 +4629,7 @@ exports[`typrm shell >> replace >> check: stdout 1`] = `
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #c
+typrm keyword: #c
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4639,12 +4639,12 @@ keyword: #c
 
 Warning: 1, Error: 0
 template count = 1
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> check: stdout 2`] = `
-"keyword: #check:
+"typrm keyword: #check:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4654,7 +4654,7 @@ exports[`typrm shell >> replace >> check: stdout 2`] = `
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #check:
+typrm keyword: #check:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4664,12 +4664,12 @@ keyword: #check:
 
 Warning: 1, Error: 0
 template count = 1
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> check: stdout 3`] = `
-"keyword: #c _tmp.yaml
+"typrm keyword: #c _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4679,7 +4679,7 @@ exports[`typrm shell >> replace >> check: stdout 3`] = `
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #c _tmp.yaml
+typrm keyword: #c _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4689,12 +4689,12 @@ keyword: #c _tmp.yaml
 
 Warning: 1, Error: 0
 template count = 1
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> check: stdout 4`] = `
-"keyword: #check: _tmp.yaml
+"typrm keyword: #check: _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4704,7 +4704,7 @@ exports[`typrm shell >> replace >> check: stdout 4`] = `
 
 Warning: 1, Error: 0
 template count = 1
-keyword: #check: _tmp.yaml
+typrm keyword: #check: _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4714,7 +4714,7 @@ keyword: #check: _tmp.yaml
 
 Warning: 1, Error: 0
 template count = 1
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4726,19 +4726,19 @@ val__ue1: #template: key1
 `;
 
 exports[`typrm shell >> replace >> checkNotFound: stdout 1`] = `
-"keyword: #c not_found.yaml
+"typrm keyword: #c not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 template count = 0
-keyword: #c not_found.yaml
+typrm keyword: #c not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
 template count = 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4757,50 +4757,50 @@ value1: #template: key1
 `;
 
 exports[`typrm shell >> replace >> replace: stdout 1`] = `
-"keyword: #r
+"typrm keyword: #r
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #r
+typrm keyword: #r
 
 Warning: 0, Error: 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> replace: stdout 2`] = `
-"keyword: #replace:
+"typrm keyword: #replace:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #replace:
+typrm keyword: #replace:
 
 Warning: 0, Error: 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> replace: stdout 3`] = `
-"keyword: #r _tmp.yaml
+"typrm keyword: #r _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #r _tmp.yaml
+typrm keyword: #r _tmp.yaml
 
 Warning: 0, Error: 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> replace: stdout 4`] = `
-"keyword: #replace: _tmp.yaml
+"typrm keyword: #replace: _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
 
 Warning: 0, Error: 0
-keyword: #replace: _tmp.yaml
+typrm keyword: #replace: _tmp.yaml
 
 Warning: 0, Error: 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4812,17 +4812,17 @@ value1_replaced: #template: key1
 `;
 
 exports[`typrm shell >> replace >> replaceNotFound: stdout 1`] = `
-"keyword: #r not_found.yaml
+"typrm keyword: #r not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-keyword: #r not_found.yaml
+typrm keyword: #r not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4841,26 +4841,26 @@ value1_replaced: #template: key1
 `;
 
 exports[`typrm shell >> replace >> reset: stdout 1`] = `
-"keyword: #reset:
+"typrm keyword: #reset:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
 Warning: 0, Error: 0
-keyword: #reset:
+typrm keyword: #reset:
 
 Warning: 0, Error: 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> replace >> reset: stdout 2`] = `
-"keyword: #reset: _tmp.yaml
+"typrm keyword: #reset: _tmp.yaml
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: key1: value1
 
 Warning: 0, Error: 0
-keyword: #reset: _tmp.yaml
+typrm keyword: #reset: _tmp.yaml
 
 Warning: 0, Error: 0
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4872,17 +4872,17 @@ value1: #template: key1
 `;
 
 exports[`typrm shell >> replace >> resetNotFound: stdout 1`] = `
-"keyword: #reset: not_found.yaml
+"typrm keyword: #reset: not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-keyword: #reset: not_found.yaml
+typrm keyword: #reset: not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4894,17 +4894,17 @@ value1_replaced: #template: key1
 `;
 
 exports[`typrm shell >> search >> search_mode: stdout 1`] = `
-"keyword: ABC
+"typrm keyword: ABC
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm shell >> search >> search_mode_without_tags: stdout 1`] = `
-"keyword: Not
+"typrm keyword: Not
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
-keyword: exit()
+typrm keyword: exit()
 "
 `;
 
@@ -4921,49 +4921,49 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
-"keyword: #ref: "../README.md#parameters"
+"typrm keyword: #ref: "../README.md#parameters"
 Recommend: #ref: ../README.md#parameters
 ../README.md:5
     7.Test Echo, 0.Folder
-keyword or number: 7
+typrm keyword or number: 7
  "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
-keyword or number: 
-keyword: 7
-keyword: exit()
+typrm keyword or number: 
+typrm keyword: 7
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
-"keyword: #ref: "../README.md#parameters"
+"typrm keyword: #ref: "../README.md#parameters"
 Recommend: #ref: ../README.md#parameters
 ../README.md:5
     7.Test Echo, 0.Folder
-keyword or number: 7
+typrm keyword or number: 7
 ref:  ../README.md#parameters
 file: ../README.md
 fragment: parameters
 lineNum: 5
-keyword or number: 
-keyword: 7
-keyword: exit()
+typrm keyword or number: 
+typrm keyword: 7
+typrm keyword: exit()
 "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
-"keyword: file_path
+"typrm keyword: file_path
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder
-keyword or number: exit()
+typrm keyword or number: exit()
 "
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
-"keyword: file_path
+"typrm keyword: file_path
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
 ../README.md:1
     7.Test Echo, 0.Folder
-keyword or number: exit()
+typrm keyword or number: exit()
 "
 `;
 
