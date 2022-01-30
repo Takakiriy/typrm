@@ -828,12 +828,12 @@ describe("searches keyword tag >>", () => {
         ], [
             "block-to-disable-tag-tool tag",
             ["search", "document_in_block"],
-            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':78:') + `         Making materials:  ${keywordLabelColor('#keyword:')} ${matchedColor('document_in_block')}\n`,
         ], [
             "emphasize search and ref tag",
             ["search", "picture"],
-            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: path')}  #search: ${searchColor('keyword')}\n` +
                 'path\n' +
                 '    0.Folder\n',
@@ -952,18 +952,18 @@ describe("searches glossary tag >>", () => {
         ], [
             "glossary with empty line",
             ["search", "space"],
-            { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}1:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}2:\n`,
         ], [
             "glossary with parameters (1)",
             ["search", "category1 apple"],
-            { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
         ], [
             "glossary with parameters (2)",
             ["search", "apple category1"],
-            { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
         ], [
             "emphasize search and ref tag",
@@ -1023,6 +1023,12 @@ describe("find all >>", () => {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':122:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':123:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':124:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n`,
+        ], [
+            "full match or keyword tag",
+            ["search", "fk_1 fk_2"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':144:') + `     ${matchedColor('fk_1 fk_2')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':145:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('fk_1')} ${matchedColor('fk_2')}\n`,
         ], [
             "search tag",
             ["search", "- link  #search: find_search_tag_1"],

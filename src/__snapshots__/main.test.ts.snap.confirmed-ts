@@ -4908,7 +4908,7 @@ exports[`typrm shell >> search >> search_mode_snippet: stdout 1`] = `
     s1
         s11
             s111
-            s112
+
         s12
     s2
 typrm keyword: exit()

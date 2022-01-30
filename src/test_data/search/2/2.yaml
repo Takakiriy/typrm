@@ -137,6 +137,9 @@ snippet:
             s1
                 s11
                     s111
-                    s112
+
                 s12
             s2
+find all >> full match or keyword tag:
+    fk_1 fk_2
+    #keyword: fk_1 fk_2

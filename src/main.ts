@@ -8,7 +8,6 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
-import { program } from 'commander';
 
 // main
 export async function  main() {
@@ -2534,7 +2533,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     for (const found of snippetScaning) {
                         if (lineNum > found.lineNum) {
                             var  remove = false;
-                            if (currentIndent.length > found.indentLength) {
+                            if (currentIndent.length > found.indentLength  ||  line === '') {
                                 if (found.snippet.length < parseInt(programOptions.snippetLineCount)) {
 
                                     found.snippet.push(line.substring(found.indentLength));
@@ -2593,7 +2592,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 
     // console.log(snippet)
     if (foundLines.length >= 1  &&  foundLines[foundLines.length - 1].snippet.length >= 1) {
-        console.log(foundLines[foundLines.length - 1].snippet.join('\n'));
+        const  snippet = foundLines[foundLines.length - 1].snippet.join('\n');
+        const  snippetColor = chalk.rgb(144,144,160);
+        console.log(snippetColor(snippet));
     }
 
     // printRef
@@ -2640,7 +2641,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                     const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
                     if (result.score !== 0) {
                         if (result.position > previousPosition) {
-                            found.score += result.score + orderMatchScoreWeight;
+                            found.score += result.score + orderMatchScore;
                         } else {
                             found.score += result.score;
                         }
@@ -2660,7 +2661,7 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                             normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
                         if (result.score !== 0) {
                             if (result.position > previousPosition) {
-                                found.score += result.score * orderMatchScoreWeight;
+                                found.score += result.score * orderMatchScore;
                             } else {
                                 found.score += result.score;
                             }
@@ -2825,7 +2826,8 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                     found.matchedTargetKeywordCount = found.matchedKeywordCount;
                     found.testedWordCount = found.matchedKeywordCount;
                     found.tagLabel = 'find all';
-                    found.score = lineFullMatchScore + fullMatchCount;
+                    found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
+                        lineFullMatchScore;
                     foundLines.push(found);
                 }
 
@@ -4979,24 +4981,23 @@ const  searchIfLabel = "#(search)if: false";
 const  ifLabel = "#if:";
 const  ifLabelRE = /(?<= |^)#if:/;
 const  expectLabel = "#expect:";
-const  ignoredKeywords = [ /#search:/g, /: +#keyword:/g, /#keyword:/g ];
 const  searchLabel = "#search:";
 const  refLabel = "#ref:";
 const  typrmEnvPrefix = 'TYPRM_';
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]+$/;
 const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
-const  lineFullMatchScore = 1000;
+const  lineFullMatchScore = 3;
 const  fullMatchScore = 100;
 const  keywordMatchScore = 7;
-const  glossaryMatchScore = 1;
+const  glossaryMatchScore = 5;
 const  caseIgnoredFullMatchScore = 8;
 const  wordsMatchScore = 17;
 const  partMatchScore = 15;
 const  notNormalizedScore = 1;
 const  caseIgnoredWordMatchScore = 16;
 const  caseIgnoredPartMatchScore = 14;
-const  orderMatchScoreWeight = 2;
+const  orderMatchScore = 2;
 const  maxNumber = 999999999;
 const  pathColor = chalk.cyan;
 const  lineNumColor = chalk.keyword('gray');
