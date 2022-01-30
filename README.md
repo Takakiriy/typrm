@@ -219,6 +219,7 @@ it is not necessary to enclose it in " ".
 Specifying multiple words results in an AND search.
 If you increase the number of words, the search result will be refined.
 If you reduce the number of words, the related content will also be hit.
+The words in reverse order is also hit. e.g. `git status` or `status git`
 OR search is not possible. You can OR search by several times search.
 
     $ typrm Comma Separated Value
@@ -575,9 +576,9 @@ In search keyword input mode (typrm shell), if you inputed starts with
 `#r`, `#replace:`, `#reset:`, `#c`, `#check:` or `#mutual:`,
 typrm runs replace, reset, check or mutual-search command.
 
-    #r                // replace all files
-    #r example.yaml
-    #replace: example.yaml  // Requires a colon at the end when not abbreviated
+    typrm keyword: #r                // replace all files
+    typrm keyword: #r example.yaml
+    typrm keyword: #replace: example.yaml  // Requires a colon at the end when not abbreviated
 
 To execute a shell command like bash in typrm shell,
 enter the command symbol and space before entering the command.
@@ -1003,7 +1004,6 @@ symbols that guide to read or not read the phrase will be replaced.
 
 ## check command - test that it can be replaced
 
-
 To check that typrm can replace the settings correctly,
 use the `check` command. The short command name is `c`.
 
@@ -1011,6 +1011,8 @@ use the `check` command. The short command name is `c`.
 
 In order to correctly determine the range to replace the setting value,
 typrm checks that the text with the setting value exists before replacing.
+
+`--verbose` option displays details of typrm internal operations.
 
 
 ## mutual-search command - search link sources and maintain the link relationship

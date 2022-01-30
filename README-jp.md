@@ -206,6 +206,7 @@ bash
 複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
 複数の単語を指定すると AND 検索になります。
 単語数を増やすと絞り込めます。単語数を減らすと関連する内容もヒットします。
+単語の順番が逆でも見つかります。例: `git status` または `status git`
 OR 検索はできません。何度か検索してください。
 
     $ typrm Comma Separated Value
@@ -557,9 +558,9 @@ typrm replace コマンドを実行すると、すべてのファイルにある
 `#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
 typrm の replace, reset, check, mutual-search コマンドが使えます。
 
-    #r                // 全ファイル replace
-    #r example.yaml
-    #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
+    typrm keyword: #r                // 全ファイル replace
+    typrm keyword: #r example.yaml
+    typrm keyword: #replace: example.yaml  // 短縮形ではないときは、末尾にコロンが必要です
 
 typrm shell から bash などのシェルで使えるコマンドを実行するには、
 コマンド記号とスペースを入力してからコマンドを入力します。
@@ -923,12 +924,12 @@ typrm を使うには Node.js のインストールが必要です。
 
 サンプル.yaml
 
-    設定(プロジェクト1):
+    設定(プロジェクト1):
         __Name__: image1
     本文:
         これは image1 の説明です。 #template: __Name__
 
-    設定(プロジェクト2):
+    設定(プロジェクト2):
         __Name__: image2
     本文:
         これは image2 の説明です。 #template: __Name__
@@ -987,6 +988,8 @@ typrm が正しく設定値を置き換えることができることをチェ�
 
 typrm は、設定値を置き換える範囲を正しく判定するために、
 置き換える前に、置き換える前の設定値を適用したテキストが存在することをチェックしています。
+
+`--verbose` オプションを指定すると、typrm が行う内部処理の詳細も表示されます。
 
 
 ## mutual-search コマンド - リンク元も含めて検索して、リンク関係を維持します

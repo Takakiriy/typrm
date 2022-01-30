@@ -2333,6 +2333,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                 const  colonIndex = keyword.indexOf(':');
                 if (colonIndex !== notFound) {
                     keywordWithTag = keyword.substring(0, colonIndex);
+                    if (keywordWithTag.startsWith('- ')) {
+                        keywordWithTag = keywordWithTag.substring(2);
+                    }
                 } else {
                     keywordWithTag = '';
                 }

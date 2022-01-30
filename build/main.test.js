@@ -684,6 +684,11 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
         ], [
+            "ignored hyphen and colon before keyword tag",
+            ["search", "- AB: #keyword:"],
+            { folder: "test_data/search/1", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
+        ], [
             "CSV ignored colon before keyword tag",
             ["search", "A,B: #keyword:"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
