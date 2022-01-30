@@ -127,3 +127,16 @@ find all >> search tag:
     - #keyword: find_search_tag_1
     - link  #search: find_search_tag_1
     - link find_search_tag_1  // not hit because there is not keyword tag
+snippet:
+    snippet_keyword not priority:  #keyword:
+        halfOfSnippetLineCount2:
+        halfOfSnippetLineCount3:
+        halfOfSnippetLineCount4:
+        halfOfSnippetLineCount5:
+        snippet_keyword:  #keyword:
+            s1
+                s11
+                    s111
+                    s112
+                s12
+            s2

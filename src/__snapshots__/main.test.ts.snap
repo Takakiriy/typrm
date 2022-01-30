@@ -4901,6 +4901,20 @@ typrm keyword: exit()
 "
 `;
 
+exports[`typrm shell >> search >> search_mode_snippet: stdout 1`] = `
+"typrm keyword: snippet_keyword
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:131:     snippet_keyword not priority:  #keyword:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:136:         snippet_keyword:  #keyword:
+    s1
+        s11
+            s111
+            s112
+        s12
+    s2
+typrm keyword: exit()
+"
+`;
+
 exports[`typrm shell >> search >> search_mode_without_tags: stdout 1`] = `
 "typrm keyword: Not
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"

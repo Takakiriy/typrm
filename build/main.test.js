@@ -66,14 +66,15 @@ beforeAll(() => {
 describe("typrm shell >>", () => {
     describe("search >>", () => {
         test.each([
-            ['search_mode', 'test_data/search/1', 'ABC\nexit()', {}],
-            ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()', {}],
-        ])("%s", async (_caseName, folder, input, _options) => {
+            ['search_mode', 'test_data/search/1', 'ABC\nexit()\n', {}],
+            ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n', {}],
+            ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', {}],
+        ])("%s", async (_caseName, folder, input, options) => {
             chdirInProject('src');
-            var inputPattern = `${input}\nexit()\n`;
-            await callMain([], {
-                folder, test: "", locale: "en-US", input: inputPattern,
-            });
+            var typrmOptions = {
+                folder, test: "", locale: "en-US", input,
+            };
+            await callMain([], typrmOptions);
             expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout');
         });
     });
@@ -820,7 +821,7 @@ describe("searches keyword tag >>", () => {
         ], [
             "without tag parameter",
             ["search", "specular"],
-            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':25:') + `         ${matchedColor('specular')} reflection light:  ${keywordLabelColor('#keyword:')}  #// out of keyword parameter\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  ${keywordLabelColor('#keyword:')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  ${keywordLabelColor('#keyword:')}\n`,
@@ -974,7 +975,7 @@ describe("searches glossary tag >>", () => {
         ], [
             "nested glossary tag",
             ["search", "turnip"],
-            { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
+            { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':33:') + ` ${keywordLabelColor('#glossary:')} level-2:        white ${matchedColor('turnip')}:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':34:') + ` ${keywordLabelColor('#glossary:')} level-1:    ${matchedColor('turnip')} soup:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':32:') + ` ${keywordLabelColor('#glossary:')} level-2:        red ${matchedColor('turnip')}:\n` +

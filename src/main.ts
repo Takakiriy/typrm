@@ -2526,15 +2526,16 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 
             // found.snippet = ...
             if (snippetScaning.length >= 1) {
-                if ('test' in programOptions) {
+                if ('disableSnippet' in programOptions) {
                     snippetScaning.length = 0;
                 } else {
                     const  currentIndent = indentRegularExpression.exec(line)![0];
+                    const  removing: FoundLine[] = [];
                     for (const found of snippetScaning) {
                         if (lineNum > found.lineNum) {
                             var  remove = false;
                             if (currentIndent.length > found.indentLength) {
-                                if (found.snippet.length < programOptions.snippetLineCount) {
+                                if (found.snippet.length < parseInt(programOptions.snippetLineCount)) {
 
                                     found.snippet.push(line.substring(found.indentLength));
                                 } else {
@@ -2546,9 +2547,12 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                                 remove = true;
                             }
                             if (remove) {
-                                snippetScaning.splice(snippetScaning.indexOf(found));
+                                removing.push(found);
                             }
                         }
+                    }
+                    for (const removingFound of removing.reverse()) {
+                        snippetScaning.splice(snippetScaning.indexOf(removingFound), 1);
                     }
                 }
             }
@@ -4922,7 +4926,10 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
         programOptions = {};
     }
     if ( ! ('foundCountMax' in programOptions)) {
-        programOptions.foundCountMax = foundCountMaxDefault.toString();
+        programOptions.foundCountMax = foundCountMaxDefault;
+    }
+    if ( ! ('snippetLineCount' in programOptions)) {
+        programOptions.snippetLineCount = snippetLineCountDefault;
     }
     try {
         startTestRedirect();
