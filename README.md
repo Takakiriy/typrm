@@ -1,5 +1,10 @@
 # typrm
 
+typrm searches for and displays a text file with command options
+that are easy for you to use.
+It also displays the command parameters replaced to your current status.
+You can execute the command just by copying and pasting the displayed command.
+
 typrm searches snippets such as command options
 written in text file format manuals.
 Also, it replaces the parameters depending on your situations
@@ -45,32 +50,26 @@ so that you can run commands only by the copy and paste.
 
 ## Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet
 
-typrm search displays the snippet for the keywords found.
+typrm search displays your favorite snippets for the keywords you set.
 
 For example, if you search for the keyword `grep`,
-you'll see where the keyword `grep` is and the snippet.
+you'll see where the keyword `grep` is and your favorite template snippet.
 You can use `typrm grep` like Linux `man grep`.
 
 typrm command:
 
     $ typrm grep
-    /path/linux.yaml:100: grep: #keyword
-        Example: grep -r __keyword__ __FilePath__
+    /path/linux.yaml:100: grep: #keyword:
+        Example: grep -rn __keyword__ __FilePath__
         Files that do not contain keywords:
             grep -L __Keyword__ __Path__
 
-To make the snippet show,
+To make your favorite snippet show,
 tag `#keyword:` with the keywords in the text file you are searching for.
 Also, the content displayed in the snippet must be indented with
 whitespace deeper than the found line.
-The maximum number of lines displayed is 8.
-This number of lines can be changed with TYPRM_SNIPPET_LINE_COUNT
-environment variable or --snippet-line-count option.
-To jump to the contents of the file, run the typrm command
-and press Ctrl key and click the displayed path and line number
-in Visual Studio Code or other tools.
 
-Sample text file content:
+Sample text file `MyLinux.yaml` content:
 
         ....
     grep: #keyword:
@@ -79,6 +78,35 @@ Sample text file content:
             grep -L __Keyword__ __Path__
     sed: #keyword:
         ....
+
+When the displayed content is long, to jump to the contents of the file,
+jump to the contents of the file.
+If you run the typrm command in a Visual Studio Code terminal,
+you can jump to the displayed path and line number by holding down
+the Ctrl key and clicking.
+
+The maximum number of lines displayed is 8.
+This number of lines can be changed with `TYPRM_SNIPPET_LINE_COUNT`
+environment variable or `--snippet-line-count` option.
+
+Specify the path of the folder containing the file to be searched
+in the `TYPRM_FOLDER` environment variable or the `--folder` option.
+Environment variables are written in the script
+that you create when you install typrm.
+
+Case of setting environment variables in bash or zsh:
+
+    export TYPRM_FOLDER="${HOME}/Documents/typrm"
+    typrm ls
+
+Case of setting environment variables in PowerShell:
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
+    typrm ls
+
+Case of specifing to the `--folder` option:
+
+    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
 
 Snippets for keywords hit by the `#glossary:` tag are also displayed.
 However, snippets are only displayed
@@ -112,18 +140,6 @@ You can see the snippet of `git status` by searching for `git status`.
 If 10 or more searches are hit, only the 10 priority items will be displayed.
 This number can be changed with TYPRM_FOUND_COUNT_MAX environment variable
 or --found-count-max option.
-
-Specify the path of the folder containing the file to be searched
-in the `TYPRM_FOLDER` environment variable or the `--folder` option.
-
-Case of setting environment variables in PowerShell:
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
-    typrm ls
-
-Case of specifing to the `--folder` option:
-
-    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
 
 The value format of the `TYPRM_FOLDER` environment variable is CSV.
 You can specify multiple folder paths.

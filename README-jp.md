@@ -1,10 +1,10 @@
 # typrm
 <!-- Character Encoding: "WHITE SQUARE" U+25A1 is □. -->
 
-typrm は テキスト ファイル 形式のマニュアルに書かれた
-コマンドのオプションなどのスニペットを検索して表示します。
-また、パラメーターを状況に応じて置き換えて、
-コピー＆ペーストだけでコマンドを実行できるようにします。
+typrm は自分が使いやすいコマンドのオプションを書いた
+テキスト形式のファイルを検索して表示します。
+また、コマンドのパラメーターを自分の現在の状況に置き換えて表示します。
+表示されたコマンドをコピー＆ペーストするだけでコマンドを実行できるようになります。
 
 <!-- TOC depthFrom:1 -->
 
@@ -44,37 +44,59 @@ typrm は テキスト ファイル 形式のマニュアルに書かれた
 
 ## スニペット検索機能 - #keyword タグや #glossary タグを使って精度よくスニペットを検索します
 
-typrm の検索機能は、見つかったキーワードに関するスニペットを表示します。
+typrm の検索機能は、自分が設定したキーワードに関する自分がよく使うスニペットを表示します。
 
 たとえば、`grep` というキーワードを検索すると、`grep` というキーワードがある場所と、
-スニペットが表示されます。
+自分が使いやすい grep のオプションが入ったテンプレートのスニペットが表示されます。
 Linux の `man grep` のように `typrm grep` を使えます。
 
 typrm コマンド:
 
     $ typrm grep
-    /path/linux.yaml:100: grep: #keyword
-        サンプル: grep -r __keyword__ __FilePath__
-        含まないファイル:
+    /path/linux.yaml:100: grep: #keyword:
+        サンプル: grep -rn __keyword__ __FilePath__
+        キーワードを含まないファイル:
             grep -L __Keyword__ __Path__
 
-スニペットが表示されるようにするには、
+自分が使いやすいスニペットが表示されるようにするには、
 検索対象となる テキスト ファイル の中のキーワードに `#keyword:` タグを付けます。
 また、スニペットに表示させる内容は見つかった行より深い空白文字のインデントにします。
-表示される最大の行数は 8行です。
-この行数は TYPRM_SNIPPET_LINE_COUNT 環境変数または --snippet-line-count オプションで変更できます。
-ファイルの内容にジャンプするには、Visual Studio Code などで typrm コマンドを実行して
-表示されたパスと行番号を Ctrl キーを押しながらクリックします。
 
-テキスト ファイル の内容のサンプル:
+`MyLinux.yaml` テキスト ファイル の内容のサンプル:
 
         ....
     grep: #keyword:
         サンプル: grep -r __keyword__ __FilePath__
-        含まないファイル:
+        キーワードを含まないファイル:
             grep -L __Keyword__ __Path__
     sed: #keyword:
         ....
+
+表示される内容が長いとき、その続きを見たいときは、ファイルの内容にジャンプします。
+Visual Studio Code のターミナルで typrm コマンドを実行した場合、
+表示されたパスと行番号を Ctrl キーを押しながらクリックすることでジャンプします。
+
+表示される最大の行数は 8行です。
+この行数は `TYPRM_SNIPPET_LINE_COUNT` 環境変数または
+`--snippet-line-count` オプションで変更できます。
+
+`TYPRM_FOLDER` 環境変数、または `--folder` オプションに
+検索対象のファイルが入っているフォルダーのパスを指定します。
+環境変数は typrm をインストールするときに作るスクリプトに書きます。
+
+bash や zsh で環境変数を設定する場合:
+
+    export TYPRM_FOLDER="${HOME}/Documents/typrm"
+    typrm ls
+
+PowerShell で環境変数を設定する場合:
+
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
+    typrm ls
+
+`--folder` オプションに指定する場合:
+
+    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
 
 `#glossary:` タグによってヒットしたキーワードに関するスニペットも表示されます。
 ただし、スニペットが表示されるのは、最も優先的にヒットしたキーワードに関する
@@ -104,18 +126,6 @@ typrm コマンド:
 
 10件以上検索にヒットした場合、優先する10件だけ表示します。
 この件数は TYPRM_FOUND_COUNT_MAX 環境変数または --found-count-max オプションで変更できます。
-
-`TYPRM_FOLDER` 環境変数、または `--folder` オプションに
-検索対象のファイルが入っているフォルダーのパスを指定します。
-
-PowerShell で環境変数を設定する場合:
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
-    typrm ls
-
-`--folder` オプションに指定する場合:
-
-    typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
 
 `TYPRM_FOLDER` 環境変数の値は CSV 形式です。
 複数のフォルダーのパスを指定することができます。
