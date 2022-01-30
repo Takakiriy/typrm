@@ -5,11 +5,6 @@ that are easy for you to use.
 It also displays the command parameters replaced to your current status.
 You can execute the command just by copying and pasting the displayed command.
 
-typrm searches snippets such as command options
-written in text file format manuals.
-Also, it replaces the parameters depending on your situations
-so that you can run commands only by the copy and paste.
-
 ( [Japanese](./README-jp.md) )
 
 <!-- TOC depthFrom:1 -->
@@ -59,7 +54,7 @@ You can use `typrm grep` like Linux `man grep`.
 typrm command:
 
     $ typrm grep
-    /path/linux.yaml:100: grep: #keyword:
+    /path/MyLinux.yaml:100: grep: #keyword:
         Example: grep -rn __keyword__ __FilePath__
         Files that do not contain keywords:
             grep -L __Keyword__ __Path__
@@ -79,8 +74,7 @@ Sample text file `MyLinux.yaml` content:
     sed: #keyword:
         ....
 
-When the displayed content is long, to jump to the contents of the file,
-jump to the contents of the file.
+When the displayed content is long, jump to the contents of the file.
 If you run the typrm command in a Visual Studio Code terminal,
 you can jump to the displayed path and line number by holding down
 the Ctrl key and clicking.
@@ -91,6 +85,7 @@ environment variable or `--snippet-line-count` option.
 
 Specify the path of the folder containing the file to be searched
 in the `TYPRM_FOLDER` environment variable or the `--folder` option.
+
 Environment variables are written in the script
 that you create when you install typrm.
 
@@ -99,16 +94,19 @@ Case of setting environment variables in bash or zsh:
     export TYPRM_FOLDER="${HOME}/Documents/typrm"
     typrm ls
 
+Case of specifing to the `--folder` option in bash or zsh:
+
+    typrm --folder "${HOME}/Documents/typrm"  ls
+
 Case of setting environment variables in PowerShell:
 
     ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm"
     typrm ls
 
-Case of specifing to the `--folder` option:
+Case of specifing to the `--folder` option in PowerShell:
 
     typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
 
-Snippets for keywords hit by the `#glossary:` tag are also displayed.
 However, snippets are only displayed
 for the keywords that have the highest priority.
 
@@ -123,19 +121,20 @@ Sample text file content:
 typrm command:
 
     $ typrm ls
-    .../text.yaml:2: Example: ls -a sub_folder
-    .../text.yaml:1: Shows all files:  #keyword: ls
+    .../text.txt:2: Example: ls -a sub_folder
+    .../text.txt:1: Shows all files:  #keyword: ls
 
 In the above case, `ls` on the line with the `#keyword:` tag is
 preferentially found (displayed below).
-You can also find keywords that are not tagged with `#keyword:`.
 
 If you have `#keyword: git clone` and `#keyword: git status`,
 when you search for `git`, `git clone` is displayed first.
 `git status` is displayed second because of the more difference
 in the number of characters.
 Snippets are only displayed for the keywords that have the first priority.
-You can see the snippet of `git status` by searching for `git status`.
+If you want to see the snippet of `git status`, search for` git status`.
+
+Snippets for keywords hit by the `#glossary:` tag are also displayed.
 
 If 10 or more searches are hit, only the 10 priority items will be displayed.
 This number can be changed with TYPRM_FOUND_COUNT_MAX environment variable
@@ -430,6 +429,9 @@ Example after adding the `#to:` tag:
         __Name__: workC1  #// comment  #to: workC2
 
 Save the file after adding tags.
+
+If you want to set `#to:` tag from the script,
+edit it with Linux `sed` command or other tools.
 
 Entering the following command replaces the `#to:` tag in all files
 in the current folder and the folder set in the `TYPRM_FOLDER` environment variable.
