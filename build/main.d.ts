@@ -163,5 +163,5 @@ export declare var programOptions: {
     [key: string]: any;
 };
 export declare const foundCountMaxDefault = "10";
-export declare const snippetLineCountDefault = "8";
+export declare const snippetLineCountDefault = "5";
 export {};

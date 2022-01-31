@@ -4910,7 +4910,6 @@ exports[`typrm shell >> search >> search_mode_snippet: stdout 1`] = `
             s111
 
         s12
-    s2
 typrm keyword: exit()
 "
 `;

@@ -139,7 +139,7 @@ snippet:
                     s111
 
                 s12
-            s2
+        #// after snippet
 find all >> full match or keyword tag:
     fk_1 fk_2
     #keyword: fk_1 fk_2

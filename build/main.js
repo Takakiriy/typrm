@@ -2444,12 +2444,12 @@ async function searchSub(keyword, isMutual) {
     const keyphraseWordCount = keywordWithTag.split(' ').length;
     // searchWithoutTags
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
-    foundLines.sort(compareScore);
+    foundLines.sort(compareScoreAndSoOn);
     if (!('disableFindAll' in programOptions) && !isMutual) {
         const foundLineWithoutTags = await searchWithoutTags(keyword);
         const foundLineHasScore = foundLineWithoutTags.filter((found) => (found.score >= 2));
         foundLines = [...foundLineHasScore, ...foundLines];
-        foundLines.sort(compareScore);
+        foundLines.sort(compareScoreAndSoOn);
         foundLines = [...foundLineWithoutTags, ...foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) => found1.path == found2.path && found1.lineNum == found2.lineNum));
     }
@@ -2552,12 +2552,19 @@ function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
                 found.score = 0;
             }
             if (found.score !== 0) {
+                // e.g.
+                // keyphrase = "aa bbb ccc"
+                // aTestingString = "aabbb ccc dd ee"
+                // score += character count
+                // matchedKeywordCount = 3;
+                // matchedTargetKeywordCount = 2
+                // testedWordCount = 4
                 found.score += 2 * (keyphrase.length - aTestingString.length); // 2 is double score from the score of different (upper/loser) case
-                found.testedWordCount = aTestingString.split(' ').length;
                 found.matchedTargetKeywordCount = matchedCountsByWord.filter((count) => (count >= 1)).length;
+                found.testedWordCount = aTestingString.split(' ').length;
             }
             const matches = bestFound.matches.concat(found.matches);
-            if (compareScore(bestFound, found) < 0) {
+            if (compareScoreAndSoOn(bestFound, found) < 0) {
                 bestFound = found;
             }
             bestFound.matches = matches;
@@ -2609,8 +2616,8 @@ function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
     const found = subMain();
     return found;
 }
-// compareScore
-function compareScore(a, b) {
+// compareScoreAndSoOn
+function compareScoreAndSoOn(a, b) {
     var different = 0;
     // matchedTargetKeywordCount
     if (different === 0) {
@@ -2642,6 +2649,7 @@ function compareScore(a, b) {
 // searchWithoutTags
 async function searchWithoutTags(keywords) {
     const foundLines = [];
+    const keywordCount = keywords.split(' ').filter((keyword) => (keyword !== '')).length;
     const keywordsLowerCase = Array.from(new Set(keywords.replace(/\u{3000}/ug, ' ').toLowerCase()
         .split(' ').filter((keyword) => (keyword !== ''))));
     // '\u{3000}': Japanese space
@@ -2693,9 +2701,9 @@ async function searchWithoutTags(keywords) {
                         testTargetIndex: -1,
                         matchedString: fullMatchKeywords,
                     });
-                    found.matchedKeywordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
-                    found.matchedTargetKeywordCount = found.matchedKeywordCount;
-                    found.testedWordCount = found.matchedKeywordCount;
+                    found.matchedKeywordCount = keywordCount;
+                    found.matchedTargetKeywordCount = keywordCount; // not keywordsLowerCase.length
+                    found.testedWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
                     found.tagLabel = 'find all';
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                         lineFullMatchScore;
@@ -2715,12 +2723,14 @@ async function searchWithoutTags(keywords) {
                             testTargetIndex: -1,
                             matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
                         });
-                        found.matchedKeywordCount = keywordsLowerCase.length;
-                        found.matchedTargetKeywordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
-                        found.testedWordCount = found.matchedTargetKeywordCount;
+                        found.matchedKeywordCount = keywordCount;
+                        found.matchedTargetKeywordCount = keywordsLowerCase.length;
+                        found.testedWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
                         found.tagLabel = 'find all';
-                        found.score = 1;
+                        found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
+                            suffledLineFullMatchScore;
                         for (const keywordLowerCase of keywords2LowerCase) {
+                            const previousKeywordIndex = keywordIndex;
                             keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
                             if (keywordIndex === notFound) {
                                 break;
@@ -2731,6 +2741,9 @@ async function searchWithoutTags(keywords) {
                                 testTargetIndex: -1,
                                 matchedString: line.substr(keywordIndex, keywordLowerCase.length),
                             });
+                            if (keywordIndex < previousKeywordIndex) {
+                                found.score -= 1;
+                            }
                         }
                         if (keywordIndex !== notFound) {
                             matchCount += 1;
@@ -4574,6 +4587,7 @@ const indentRegularExpression = /^( |¥t)*/;
 const numberRegularExpression = /^[0-9]+$/;
 const variablePattern = "\\$\\{[^\\}]+\\}"; // ${__Name__}
 const lineFullMatchScore = 3;
+const suffledLineFullMatchScore = 1;
 const fullMatchScore = 100;
 const keywordMatchScore = 7;
 const glossaryMatchScore = 5;
@@ -4596,5 +4610,5 @@ export var stdout = '';
 export var programArguments = [];
 export var programOptions = {};
 export const foundCountMaxDefault = "10";
-export const snippetLineCountDefault = "8";
+export const snippetLineCountDefault = "5";
 //# sourceMappingURL=main.js.map

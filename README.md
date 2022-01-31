@@ -79,7 +79,7 @@ If you run the typrm command in a Visual Studio Code terminal,
 you can jump to the displayed path and line number by holding down
 the Ctrl key and clicking.
 
-The maximum number of lines displayed is 8.
+The maximum number of lines displayed is 5.
 This number of lines can be changed with `TYPRM_SNIPPET_LINE_COUNT`
 environment variable or `--snippet-line-count` option.
 
@@ -214,20 +214,33 @@ Commands executed
 
 (For all versions)
 
-If specifying a search keyword consisting of multiple words,
-it is not necessary to enclose it in " ".
-Specifying multiple words results in an AND search.
-If you increase the number of words, the search result will be refined.
-If you reduce the number of words, the related content will also be hit.
-The words in reverse order is also hit. e.g. `git status` or `status git`
-OR search is not possible. You can OR search by several times search.
+- If specifying a search keyword consisting of multiple words,
+  it is not necessary to enclose it in " ".
+  However, two or more blanks will be one.
+- Specifying multiple words results in an AND search.
+- OR search is not possible. You can OR search by several times search.
+- Even if the case is different, it will be hit,
+  but the text with the same case will be displayed at the top.
+  In typrm, the text that hits the top is displayed at the bottom.
 
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values
 
-Even if the case is different, it will be hit,
-but the text with the same case will be displayed at the top.
-In typrm, the text that hits the top is displayed at the bottom.
+(For version 1.2.0 or later)
+
+- You can find words in the same line even if the order of the words is
+  reversed or there is another word in between.
+
+    `git status`
+    `status git`
+    `status --option git`
+
+- If you increase the number of words, the search result will be refined.
+  If you reduce the number of words, the related content will also be hit.
+- If the keyphrase you enter contains `#search:`, the entire line where
+  `#search:` is replaced with `#keyword:` will also be hit.
+
+(For all versions)
 
 The more upper in the following list, the lower search score.
 - Difference numbers of words
