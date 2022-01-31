@@ -2784,15 +2784,30 @@ function  compareScore(a: FoundLine, b: FoundLine) {
 // searchWithoutTags
 async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     const  foundLines: FoundLine[] = [];
-    const  fullMatchKeywords = keywords.trim();
     const  keywordsLowerCase = Array.from(new Set(
         keywords.replace(/\u{3000}/ug,' ').toLowerCase()
         .split(' ').filter((keyword)=>(keyword !== ''))));
         // '\u{3000}': Japanese space
     const  keyword1LowerCase = keywordsLowerCase[0];
     const  keywords2LowerCase = keywordsLowerCase.slice(1);
+    var  fullMatchKeywords = lib.cutLast(keywords.trim(), ':').trimRight();
+    if (tagIndexOf(fullMatchKeywords, searchLabel) !== notFound) {
+        fullMatchKeywords = fullMatchKeywords.replace(searchLabel, keywordLabel);
+    }
     var    matchCount = 0;
     var    fullMatchCount = 0;
+    function  isFullMatch(line: string, fullMatchKeywords: string): boolean {
+        if (line.trimStart().startsWith(fullMatchKeywords)) {
+            if (line.trim() === fullMatchKeywords) {
+                return  true;
+            }
+            const  lineTrimR = line.trimRight();
+            if (lineTrimR.substring(lineTrimR.length - 1) === ':') {
+                return  true;
+            }
+        }
+        return  false;
+    }
 
     for (const inputFileFullPath of await listUpFilePaths()) {
         const  reader = readline.createInterface({
@@ -2810,7 +2825,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                 lineNum += 1;
 
                 // full match
-                if (fullMatchCount < programOptions.foundCountMax  &&  line.trim() === fullMatchKeywords) {
+                if (fullMatchCount < programOptions.foundCountMax  &&  isFullMatch(line, fullMatchKeywords)) {
                     fullMatchCount += 1;
                     const  found = new FoundLine();
                     found.path = getTestablePath(inputFileFullPath);

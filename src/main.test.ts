@@ -66,11 +66,12 @@ beforeAll(()=>{
 
 describe("typrm shell >>", () => {
     describe("search >>", () => {
-        test.each([
+        test.only.each([
             ['search_mode', 'test_data/search/1', 'ABC\nexit()\n', {}],
             ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n', {}],
             ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', {}],
         ])("%s", async (_caseName, folder, input, options) => {
+if (_caseName !== 'search_mode_snippet') {return;}  // || subCase !== '____'
             chdirInProject('src');
             var  typrmOptions: {folder: string, test?: string, locale: string, input: string} = {
                 folder, test: "", locale: "en-US", input,
@@ -78,6 +79,7 @@ describe("typrm shell >>", () => {
 
             await callMain([], typrmOptions);
             expect(lib.cutEscapeSequence( main.stdout )).toMatchSnapshot('stdout');
+expect('test code').toBe('deleted skip code.');
         });
     });
     describe("replace >>", () => {
@@ -1082,8 +1084,20 @@ describe("find all >>", () => {
         "search tag",
             ["search", "- link  #search: find_search_tag_1"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':128:') + `     ${matchedColor(`- link  #search: find_search_tag_1`)}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':128:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_1`)}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n`,
+    ],[
+        "full match replaced from search tag",
+            ["search", "- link  #search: find_search_tag_2"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':148:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_2`)}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':147:') + `     ${matchedColor(`- link  #keyword: find_search_tag_2`)}\n`,
+    ],[
+        "full match with colon",
+            ["search", "- find_search_tag_3 :"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':150:') + `     ${matchedColor(`- find_search_tag_3`)}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':151:') + `     ${matchedColor(`- find_search_tag_3`)} :\n`,
     ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 

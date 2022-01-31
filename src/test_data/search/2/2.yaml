@@ -143,3 +143,9 @@ snippet:
 find all >> full match or keyword tag:
     fk_1 fk_2
     #keyword: fk_1 fk_2
+find all >> full match replaced from search tag:
+    - link  #keyword: find_search_tag_2
+    - link  #search: find_search_tag_2
+find all >> full match with colon:
+    - find_search_tag_3
+    - find_search_tag_3 :
