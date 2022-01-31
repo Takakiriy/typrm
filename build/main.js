@@ -109,6 +109,7 @@ async function checkRoutine(inputFilePath, parser) {
         input: fs.createReadStream(inputFilePath),
         crlfDelay: Infinity
     });
+    const verbose = parser.verbose;
     var setting = {};
     var lineNum = 0;
     var fileTemplateTag = null;
@@ -123,8 +124,10 @@ async function checkRoutine(inputFilePath, parser) {
         parser.lineNum = lineNum;
         // Set condition by "#if:" tag.
         ifTagParser.evaluate(line, setting);
+        parser.verbose = false;
         // setting = ...
         settingTree.moveToLine(parser);
+        parser.verbose = verbose;
         setting = settingTree.currentSettings;
         if (settingTree.outOfScopeSettingIndices.length >= 1) {
             parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]], inputFilePath);
@@ -1287,6 +1290,9 @@ class TemplateTag {
         const parentPath = path.dirname(parser.filePath);
         const targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
         const templateEndLineNum = parser.lineNum;
+        if (parser.verbose) {
+            console.log(`        Verbose: checkTargetFileContents: ${getTestablePath(parser.filePath)}`);
+        }
         if (!fs.existsSync(targetFilePath)) {
             const templateLineNum = templateEndLineNum - this.templateLines.length;
             console.log("");
