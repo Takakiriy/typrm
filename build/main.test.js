@@ -1030,6 +1030,12 @@ describe("find all >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':144:') + `     ${matchedColor('fk_1 fk_2')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':145:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('fk_1')} ${matchedColor('fk_2')}\n`,
         ], [
+            "part full match or keyword tag",
+            ["search", "pf_1 pf_2"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':154:') + `     ${matchedColor('pf_1')}________ ${matchedColor('pf_2')}__________\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':155:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('pf_1')}__ ${matchedColor('pf_2')}__\n`,
+        ], [
             "search tag",
             ["search", "- link  #search: find_search_tag_1"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },

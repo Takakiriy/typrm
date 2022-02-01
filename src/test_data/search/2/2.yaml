@@ -149,3 +149,7 @@ find all >> full match replaced from search tag:
 find all >> full match with colon:
     - find_search_tag_3
     - find_search_tag_3 :
+        _____
+find all >> part full match or keyword tag:
+    pf_1________ pf_2__________
+    #keyword: pf_1__ pf_2__

@@ -2712,7 +2712,7 @@ async function searchWithoutTags(keywords) {
                     found.testedWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
                     found.tagLabel = 'find all';
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
-                        lineFullMatchScore;
+                        lineFullMatchScore + keywords.trim().length - line.trim().length;
                     foundLines.push(found);
                 }
                 // shuffled keywords match
@@ -2734,7 +2734,7 @@ async function searchWithoutTags(keywords) {
                         found.testedWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
                         found.tagLabel = 'find all';
                         found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
-                            suffledLineFullMatchScore;
+                            suffledLineFullMatchScore + keywords.trim().length - line.trim().length;
                         for (const keywordLowerCase of keywords2LowerCase) {
                             const previousKeywordIndex = keywordIndex;
                             keywordIndex = line.toLowerCase().indexOf(keywordLowerCase);
