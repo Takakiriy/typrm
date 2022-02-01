@@ -2718,7 +2718,7 @@ async function searchWithoutTags(keywords) {
                 // shuffled keywords match
                 else if (matchCount < programOptions.foundCountMax) {
                     var keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
-                    if (keywordIndex !== notFound && !line.includes(keywordLabel)) {
+                    if (keywordIndex !== notFound) {
                         const found = new FoundLine();
                         found.path = getTestablePath(inputFileFullPath);
                         found.lineNum = lineNum;
