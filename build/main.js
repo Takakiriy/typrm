@@ -2331,6 +2331,7 @@ async function searchSub(keyword, isMutual) {
                     for (const match of found.matches) {
                         match.position += positionOfCSV + columnPositions[match.testTargetIndex];
                     }
+                    found.evaluateSnippetDepthTag(line);
                     foundLines.push(found);
                     snippetScaning.push(found);
                 }
@@ -2405,6 +2406,7 @@ async function searchSub(keyword, isMutual) {
                                     }
                                 }
                             }
+                            found.evaluateSnippetDepthTag(line);
                             foundLines.push(found);
                             snippetScaning.push(found);
                         }
@@ -2418,29 +2420,29 @@ async function searchSub(keyword, isMutual) {
                 }
                 else {
                     const currentIndent = indentRegularExpression.exec(line)[0];
-                    const removing = [];
+                    const endsOfSnippets = [];
                     for (const found of snippetScaning) {
                         if (lineNum > found.lineNum) {
-                            var remove = false;
-                            if (currentIndent.length > found.indentLength || line === '') {
-                                if (found.snippet.length < parseInt(programOptions.snippetLineCount)) {
+                            var endOfSnippet = false;
+                            if (!found.isSnippetOver(line)) {
+                                if (found.snippetDepth >= 1 || found.snippet.length < parseInt(programOptions.snippetLineCount)) {
                                     found.snippet.push(line.substring(found.indentLength));
                                 }
                                 else {
                                     found.snippet.pop();
                                     found.snippet.push('    ....');
-                                    remove = true;
+                                    endOfSnippet = true;
                                 }
                             }
                             else {
-                                remove = true;
+                                endOfSnippet = true;
                             }
-                            if (remove) {
-                                removing.push(found);
+                            if (endOfSnippet) {
+                                endsOfSnippets.push(found);
                             }
                         }
                     }
-                    for (const removingFound of removing.reverse()) {
+                    for (const removingFound of endsOfSnippets.reverse()) {
                         snippetScaning.splice(snippetScaning.indexOf(removingFound), 1);
                     }
                 }
@@ -4109,6 +4111,8 @@ class FoundLine {
         this.line = '';
         this.indentLength = 0;
         this.snippet = [];
+        this.snippetDepth = 0;
+        this.snippetIndentLengths = [];
         this.matches = [];
         this.matchedKeywordCount = 0;
         this.matchedTargetKeywordCount = 0;
@@ -4217,6 +4221,40 @@ class FoundLine {
         }
         // colored string
         return `${pathColor(this.path)}${lineNumColor(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
+    }
+    evaluateSnippetDepthTag(line) {
+        const snippetDepthIndex = tagIndexOf(line, snippetDepthLabel);
+        if (snippetDepthIndex !== notFound) {
+            const currentIndent = indentRegularExpression.exec(line)[0];
+            this.snippetDepth = parseInt(getValue(line, snippetDepthIndex + snippetDepthLabel.length));
+            this.snippetIndentLengths.push(currentIndent.length);
+        }
+    }
+    isSnippetOver(line) {
+        if (line.trim() === '') {
+            return false;
+        }
+        const currentIndent = indentRegularExpression.exec(line)[0];
+        const currentIndentLength = currentIndent.length;
+        if (this.snippetDepth <= 0) {
+            const depth0IndentLength = this.indentLength;
+            return currentIndentLength <= depth0IndentLength;
+        }
+        else {
+            var previousIndentLength = this.snippetIndentLengths[this.snippetIndentLengths.length - 1];
+            const previousLineIndentIsDeeperOrEqual = (this.snippetIndentLengths.length >= this.snippetDepth + 1);
+            if (currentIndentLength > previousIndentLength) {
+                this.snippetIndentLengths.push(currentIndentLength);
+            }
+            else {
+                while (currentIndentLength < previousIndentLength && this.snippetIndentLengths.length >= 2) {
+                    this.snippetIndentLengths.pop();
+                    previousIndentLength = this.snippetIndentLengths[this.snippetIndentLengths.length - 1];
+                }
+            }
+            const currentLineIndentIsDeeperOrEqual = (this.snippetIndentLengths.length >= this.snippetDepth + 1);
+            return previousLineIndentIsDeeperOrEqual && !currentLineIndentIsDeeperOrEqual;
+        }
     }
 }
 // MatchedPart
@@ -4581,6 +4619,7 @@ const fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const keywordLabel = "#keyword:";
 const glossaryLabel = "#glossary:";
 const mutualTag = "#mutual:";
+const snippetDepthLabel = "#snippet-depth:";
 const disableLabel = "#disable-tag-tool:";
 const searchIfLabel = "#(search)if: false";
 const ifLabel = "#if:";

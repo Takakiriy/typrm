@@ -78,10 +78,6 @@ typrm コマンド:
 Visual Studio Code のターミナルで typrm コマンドを実行した場合、
 表示されたパスと行番号を Ctrl キーを押しながらクリックすることでジャンプします。
 
-表示される最大の行数は 5行です。
-この行数は `TYPRM_SNIPPET_LINE_COUNT` 環境変数または
-`--snippet-line-count` オプションで変更できます。
-
 `TYPRM_FOLDER` 環境変数、または `--folder` オプションに
 検索対象のファイルが入っているフォルダーのパスを指定します。
 
@@ -133,6 +129,30 @@ typrm コマンド:
 
 10件以上検索にヒットした場合、優先する10件だけ表示します。
 この件数は TYPRM_FOUND_COUNT_MAX 環境変数または --found-count-max オプションで変更できます。
+
+`#keyword:` タグがある行と同じ行に `#snippet-depth:` タグがある場合、
+タグに指定した値よりもインデントのレベルが浅くなった行の上の行までがスニペットとして表示されます。
+`#snippet-depth:` タグに指定する値は、空白文字の数ではありません。
+
+typrm コマンド:
+
+    sed: #keyword:  #snippet-depth: 2
+        サンプル:
+            _c="$(sed "s/aa/AA/g"  target.txt)";  echo "$_c" > target.txt
+
+`MyLinux.yaml` テキスト ファイル の内容のサンプル:
+
+        ....
+    sed: #keyword:  #snippet-depth: 2
+        サンプル:
+            _c="$(sed "s/aa/AA/g"  target.txt)";  echo "$_c" > target.txt
+        書式:
+        ....
+
+`#keyword:` タグがある行に `#snippet-depth:` タグがない場合、
+表示される最大の行数は 5行です。
+この行数は `TYPRM_SNIPPET_LINE_COUNT` 環境変数または
+`--snippet-line-count` オプションで変更できます。
 
 `TYPRM_FOLDER` 環境変数の値は CSV 形式です。
 複数のフォルダーのパスを指定することができます。
@@ -1677,6 +1697,7 @@ Jest を使うテストと Jest を使わないテストがあります。
 - `#search:` リンク先を検索するときのキーワード
 - `#(search)if:` 検索を有効にする条件
 - `#settings:` 変数の設定
+- `#snippet-depth:` スニペットのインデントの深さ
 - `#template:` 本文を置き換えるときのテンプレート
 - `#template-at():` 2行以上上の本文を置き換えるときのテンプレート
 - `#template-if:` 本文に入れる内容を決める条件

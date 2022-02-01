@@ -70,6 +70,9 @@ describe("typrm shell >>", () => {
             ['search_mode', 'test_data/search/1', 'ABC\nexit()\n', {}],
             ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n', {}],
             ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', {}],
+            ['snippet_depth_1', 'test_data/search/2', 'snippet_depth_1\nexit()\n', {}],
+            ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n', {}],
+            ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n', {}],
         ])("%s", async (_caseName, folder, input, options) => {
             chdirInProject('src');
             var  typrmOptions: {folder: string, test?: string, locale: string, input: string} = {

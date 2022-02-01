@@ -153,3 +153,37 @@ find all >> full match with colon:
 find all >> part full match or keyword tag:
     pf_1________ pf_2__________
     #keyword: pf_1__ pf_2__
+snippet_depth_tag:
+    snippet_depth_1: #keyword:  #snippet-depth: 1
+        s1
+            s11
+                s111
+                s112
+                s113
+                s114
+                s115
+            s12
+        s2
+    snippet_depth_2L: #keyword:  #snippet-depth: 2
+        s1
+            s11
+                s111
+                s112
+                s113
+                s114
+                s115
+            s12
+        s2
+    snippet_depth_2S: #keyword:  #snippet-depth: 2
+        s1
+            s11
+                s111
+            s12
+        s2
+    glossary: #glossary:
+        snippet_depth_3: #snippet-depth: 3
+            s1
+                s11
+                    s111
+                s12
+            s2

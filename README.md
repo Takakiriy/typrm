@@ -79,10 +79,6 @@ If you run the typrm command in a Visual Studio Code terminal,
 you can jump to the displayed path and line number by holding down
 the Ctrl key and clicking.
 
-The maximum number of lines displayed is 5.
-This number of lines can be changed with `TYPRM_SNIPPET_LINE_COUNT`
-environment variable or `--snippet-line-count` option.
-
 Specify the path of the folder containing the file to be searched
 in the `TYPRM_FOLDER` environment variable or the `--folder` option.
 
@@ -139,6 +135,31 @@ Snippets for keywords hit by the `#glossary:` tag are also displayed.
 If 10 or more searches are hit, only the 10 priority items will be displayed.
 This number can be changed with TYPRM_FOUND_COUNT_MAX environment variable
 or --found-count-max option.
+
+If the same line as the `#keyword:` tag has the `#snippet-depth:` tag,
+the line above the line whose indentation level is shallower than
+the value specified in the tag will be displayed as a snippet.
+The value you specify for the `#snippet-depth:` tag is not the number of whitespace characters.
+
+typrm command:
+
+    sed: #keyword:  #snippet-depth: 2
+        sample:
+            _c="$(sed "s/aa/AA/g"  target.txt)";  echo "$_c" > target.txt
+
+Sample text file `MyLinux.yaml` content:
+
+        ....
+    sed: #keyword:  #snippet-depth: 2
+        sample:
+            _c="$(sed "s/aa/AA/g"  target.txt)";  echo "$_c" > target.txt
+        format:
+        ....
+
+If the line with the `#keyword:` tag does not have the `#snippet-depth:` tag,
+the maximum number of lines displayed is 5.
+This number of lines can be changed with `TYPRM_SNIPPET_LINE_COUNT`
+environment variable or `--snippet-line-count` option.
 
 The value format of the `TYPRM_FOLDER` environment variable is CSV.
 You can specify multiple folder paths.
@@ -1745,6 +1766,7 @@ You can set the break point, click at the left of line number of the source file
 - `#search:` Keywords when searching for links
 - `#(search)if:` Conditions for enabling search
 - `#settings:` setting variables
+- `#snippet-depth:` snippet indent depth
 - `#template:` Template for replacing the body
 - `#template-at():` Template for replacing the body above two or more lines
 - `#template-if:` Conditions that determine the content to be included in the text
