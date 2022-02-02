@@ -877,6 +877,14 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':78:') + `         Making materials:  ${keywordLabelColor('#keyword:')} ${matchedColor('document_in_block')}\n`,
         ],[
+            "score tag",
+            ["search", "score_tag"],
+            { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':192:') + `         11: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':195:') + `         13: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':196:') + `     2: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':194:') + `             112: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n`,
+        ],[
             "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },

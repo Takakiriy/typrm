@@ -268,6 +268,15 @@ The more upper in the following list, the lower search score.
 - Difference numbers of characters
 - Lettercase difference
 
+`#score:` tag changes the priority of search results for the keywords
+specified in the `#keyword:` tag in deeper indents.
+Setting a positive value for the `#score:` tag gives priority.
+
+    main: #score: +1
+        application: #keyword:  #// priority. It displays at the bottom of search results
+    notice: #score: -1
+        application: #keyword:
+
 You can specify multiple keywords to be written
 by CSV format (comma separated values) after the `#keyword:` tag
 in the text file.
@@ -1763,8 +1772,9 @@ You can set the break point, click at the left of line number of the source file
 - `#keyword:` Search target keyword
 - `#original:` Value before replacement
 - `#ref:` Path of linked file
+- `#score:` Changes search score
 - `#search:` Keywords when searching for links
-- `#(search)if:` Conditions for enabling search
+- `#(search)if:` Conditions for enabling search (deprecated, recommend:#score:)
 - `#settings:` setting variables
 - `#snippet-depth:` snippet indent depth
 - `#template:` Template for replacing the body

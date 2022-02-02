@@ -2262,7 +2262,6 @@ async function searchSub(keyword, isMutual) {
     process.chdir(currentFolder);
     // ...
     var foundLines = [];
-    const glossaryTags = [];
     const thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
         const thesaurusFilePath = programOptions.thesaurus;
@@ -2277,15 +2276,48 @@ async function searchSub(keyword, isMutual) {
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
         });
+        const glossaryTags = [];
+        const scoreTags = [];
         const blockDisable = new BlockDisableTagParser();
         const snippetScaning = [];
         var lineNum = 0;
+        var plusScore = 0;
         for await (const line1 of reader) {
             const line = line1;
             lineNum += 1;
             blockDisable.evaluate(line);
+            const currentIndent = indentRegularExpression.exec(line)[0];
+            const currentIndentLength = currentIndent.length;
             const indexOfKeywordLabel = line.indexOf(keywordLabel);
             const indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
+            // score tag
+            if (line !== '') {
+                var scoreChaging = false;
+                while (scoreTags.length >= 1) {
+                    var deepestScoreTag = scoreTags[scoreTags.length - 1];
+                    if (currentIndentLength < deepestScoreTag.indentPosition) {
+                        scoreTags.pop();
+                        scoreChaging = true;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                const scoreTagIndex = tagIndexOf(line, scoreLabel);
+                if (scoreTagIndex !== notFound) {
+                    const scoreTag = {
+                        indentPosition: scoreTagIndex,
+                        plusScore: parseInt(getValue(line, scoreTagIndex + scoreLabel.length)),
+                    };
+                    scoreTags.push(scoreTag);
+                    scoreChaging = true;
+                }
+                if (scoreChaging) {
+                    plusScore = scoreTags.reduce((previousReturnValue, scoreTag) => {
+                        return previousReturnValue + scoreTag.plusScore;
+                    }, 0);
+                }
+            }
             // keyword tag
             if ((indexOfKeywordLabel !== notFound || indexOfSearchLabelIfMutual !== notFound)
                 && !line.includes(disableLabel) && !blockDisable.isInBlock) {
@@ -2322,7 +2354,7 @@ async function searchSub(keyword, isMutual) {
                         var positionOfCSV = unescapedLine.indexOf(csv);
                     }
                     const columnPositions = lib.parseCSVColumnPositions(csv, columns);
-                    found.score += keywordMatchScore;
+                    found.score += keywordMatchScore + plusScore;
                     found.path = getTestablePath(inputFileFullPath);
                     found.lineNum = lineNum;
                     found.line = unescapedLine;
@@ -2342,7 +2374,6 @@ async function searchSub(keyword, isMutual) {
                 if (glossaryTags.length >= 1) {
                     glossaryTag = glossaryTags[glossaryTags.length - 1];
                 }
-                const currentIndent = indentRegularExpression.exec(line)[0];
                 if (glossaryTag) {
                     if (currentIndent.length <= glossaryTag.indentAtTag.length) {
                         glossaryTags.pop();
@@ -2387,7 +2418,7 @@ async function searchSub(keyword, isMutual) {
                             line.substr(currentIndent.length, colonPosition - currentIndent.length);
                         const found = getKeywordMatchingScore([wordInGlossary], keywordWithTag, thesaurus);
                         if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
-                            found.score += glossaryMatchScore;
+                            found.score += glossaryMatchScore + plusScore;
                             found.path = getTestablePath(inputFileFullPath);
                             found.lineNum = lineNum;
                             found.indentLength = currentIndent.length;
@@ -2455,9 +2486,10 @@ async function searchSub(keyword, isMutual) {
     foundLines.sort(compareScoreAndSoOn);
     if (!('disableFindAll' in programOptions) && !isMutual) {
         const foundLineWithoutTags = await searchWithoutTags(keyword);
-        const foundLineHasScore = foundLineWithoutTags.filter((found) => (found.score >= 2));
-        foundLines = [...foundLineHasScore, ...foundLines];
-        foundLines.sort(compareScoreAndSoOn);
+        // const  foundLineHasScore = foundLineWithoutTags.filter((found)=>(found.score >= 2));
+        // foundLines = [... foundLineHasScore, ... foundLines];
+        // foundLines.sort(compareScoreAndSoOn);
+        foundLineWithoutTags.sort(compareScoreAndSoOn);
         foundLines = [...foundLineWithoutTags, ...foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) => found1.path == found2.path && found1.lineNum == found2.lineNum));
     }
@@ -4622,6 +4654,7 @@ const mutualTag = "#mutual:";
 const snippetDepthLabel = "#snippet-depth:";
 const disableLabel = "#disable-tag-tool:";
 const searchIfLabel = "#(search)if: false";
+const scoreLabel = "#score:";
 const ifLabel = "#if:";
 const ifLabelRE = /(?<= |^)#if:/;
 const expectLabel = "#expect:";

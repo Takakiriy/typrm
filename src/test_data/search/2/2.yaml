@@ -187,3 +187,10 @@ snippet_depth_tag:
                     s111
                 s12
             s2
+score tag >> keyword tag:
+    1:  #score: -1
+        11: #keyword: score_tag
+        12: #score: +2
+            112: #keyword: score_tag
+        13: #keyword: score_tag
+    2: #keyword: score_tag
