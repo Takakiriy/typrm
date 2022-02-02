@@ -2573,9 +2573,10 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
 
         const  foundLineWithoutTags = await searchWithoutTags(keyword);
-        const  foundLineHasScore = foundLineWithoutTags.filter((found)=>(found.score >= 2));
-        foundLines = [... foundLineHasScore, ... foundLines];
-        foundLines.sort(compareScoreAndSoOn);
+        // const  foundLineHasScore = foundLineWithoutTags.filter((found)=>(found.score >= 2));
+        // foundLines = [... foundLineHasScore, ... foundLines];
+        // foundLines.sort(compareScoreAndSoOn);
+        foundLineWithoutTags.sort(compareScoreAndSoOn);
         foundLines = [... foundLineWithoutTags, ... foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) =>
             found1.path == found2.path  &&  found1.lineNum == found2.lineNum));

@@ -1091,14 +1091,14 @@ describe("find all >>", () => {
         "search tag",
             ["search", "- link  #search: find_search_tag_1"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':128:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_1`)}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':128:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_1`)}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n`,
     ],[
         "full match replaced from search tag",
             ["search", "- link  #search: find_search_tag_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':148:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_2`)}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':147:') + `     ${matchedColor(`- link  #keyword: find_search_tag_2`)}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':147:') + `     - link  ${keywordLabelColor('#keyword:')} ${matchedColor(`find_search_tag_2`)}\n`,
     ],[
         "full match with colon",
             ["search", "- find_search_tag_3 :"],
