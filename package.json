@@ -28,6 +28,7 @@
         "chalk": "^4.1.2",
         "commander": "^7.2.0",
         "csv-parse": "^5.0.4",
+        "dotenv": "^16.0.0",
         "globby": "^11.0.4",
         "js-yaml": "^4.1.0"
     },
@@ -43,6 +44,8 @@
             "^.+\\.(ts|tsx)$": "ts-jest"
         },
         "maxWorkers": 1,
-        "setupFilesAfterEnv": ["./jest.setup.js"]
+        "setupFilesAfterEnv": [
+            "./jest.setup.js"
+        ]
     }
 }

@@ -194,3 +194,8 @@ score tag >> keyword tag:
             112: #keyword: score_tag
         13: #keyword: score_tag
     2: #keyword: score_tag
+typrm shell >> search >> snippet_environment_variable:
+    settings: #settings:
+        $env.TYPRM_TEST_ENV: $TYPRM_TEST_ENV
+    snippet_environment_variable: #keyword:
+        - ($TYPRM_TEST_ENV)  #template: ($env.TYPRM_TEST_ENV)

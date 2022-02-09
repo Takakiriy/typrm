@@ -1,0 +1,8 @@
+- TYPRM_TEST_ENV  = testEnv  #OK
+- TYPRM_TEST_PATH = C:\Test  #OK
+- TYPRM_TEST_ENV = testEnv  #NG-a
+- TYPRM_TEST_ENV  = testEnv  #NG-b
+- TYPRM_TEST_PATH = C:\Test  #NG-b
+- TYPRM_TEST_ENV = test____Env  #NG-c
+- TYPRM_TEST_ENV  = testEnv  #NG-d
+- TYPRM_TEST_PATH = C:\_____Test  #NG-d

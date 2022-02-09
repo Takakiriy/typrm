@@ -11,6 +11,7 @@ You can execute the command just by copying and pasting the displayed command.
 
 - [typrm](#typrm)
   - [Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet](#snippet-search---keyword-tag-glossary-tag-make-highly-accurate-search-to-the-snippet)
+    - [Handling confidential data - .env file](#handling-confidential-data---env-file)
   - [Replace - replace command, reset command](#replace---replace-command-reset-command)
     - [Replace with #to tag](#replace-with-to-tag)
     - [Execute any command](#execute-any-command)
@@ -344,6 +345,66 @@ Exmple of thesaurus.csv:
     document, doc
     source, src
     destination, dst, dest
+
+
+### Handling confidential data - .env file
+
+If you want to display secret data (secrets) such as passwords and API keys
+in the snippet, or if the contents of the file to be checked contain secrets,
+put the secret in the .env file in the current folder when you start typrm.
+
+If you set the current folder when you start typrm in the script
+that starts typrm, you can refer to the same .env file
+no matter which folder you start the typrm script from.
+
+.env file:
+
+    DB_USERNAME = root
+    DB_PASSWORD = 5I#OfEilq#)
+
+Display snippets typrm command:
+
+    $ typrm DB log in
+    /path/MyDB.yaml:100: DB log in: #keyword:
+        Command: db  --user root  --pass 5I#OfEilq#)
+
+Sample content of the `MyDB.yaml` text file:
+
+        ....
+    setting: #settings:
+        $env.DB_USERNAME = __DB_UserName__
+        $env.DB_PASSWORD = __DB_Password__
+    DB log in: #keyword:
+        Command: db  --user __DB_UserName__  --pass __DB_Password__
+            #template: db  --user $env.DB_USERNAME  --pass $env.DB_PASSWORD
+        ....
+
+Define `$env.(Variable name) = (value in the file)` in `#settings:`.
+If the snippet `#template:` contains `$env.(variable name)` in the snippet
+that appears when a keyword with `#keyword:` is found by the typrm search command,
+the .env file will contain. The snippet replaced with the written value is displayed.
+
+Checking the file contents typrm command:
+
+    $ typrm check root.yaml
+
+`__Project__/root.yaml` file:
+
+        ....
+    setting: #settings:
+        $env.DB_USERNAME = __DB_UserName__
+        $env.DB_PASSWORD = __DB_Password__
+    A part of ./my.json :  #file-template: ./my.json
+        "username": "__DB_UserName__",  #template: "$env.DB_USERNAME"
+        "password": "__DB_Password__"  #template: "$env.DB_PASSWORD"
+        ....
+
+`__Project__`/my.json file:
+
+    {
+        "username": "root",
+        "password": "5I#OfEilq#)",
+    }
 
 
 ## Replace - replace command, reset command

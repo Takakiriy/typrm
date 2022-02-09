@@ -8,6 +8,8 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
+import * as dotenv from "dotenv";
+dotenv.config();
 // main
 export async function main() {
     startTestRedirect();
@@ -1093,7 +1095,7 @@ class TemplateTag {
         }
         if (this.indexInLine !== notFound && !disabled) {
             this.isFound = true;
-            const leftOfTemplate = cutReplaceToTag(line.substr(0, this.indexInLine).trim());
+            const leftOfTemplate = cutReplaceToTag(line.substring(0, this.indexInLine).trim());
             if (this.label === fileTemplateLabel) {
                 this.onFileTemplateTagReading(line);
             }
@@ -1309,7 +1311,7 @@ class TemplateTag {
         if (this.templateLines.length === 0) {
             return false;
         }
-        const expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
+        const expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0], parser);
         var templateLineIndex = 0;
         var targetLineNum = 0;
         var errorTemplateLineIndex = 0;
@@ -1343,14 +1345,14 @@ class TemplateTag {
                     const indentLength = targetLine.indexOf(expectedFirstLine);
                     if (indentLength !== notFound && targetLine.trim() === expectedFirstLine.trim()) {
                         result = Result.same;
-                        indent = targetLine.substr(0, indentLength);
+                        indent = targetLine.substring(0, indentLength);
                     }
                     else {
                         result = Result.different;
                     }
                 }
                 else if (skipTo === '') { // lineIndex >= 1, not skipping
-                    const expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
+                    const expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex], parser);
                     if (targetLine === indent + expected) {
                         result = Result.same;
                     }
@@ -1358,7 +1360,7 @@ class TemplateTag {
                         result = Result.skipped;
                         templateLineIndex += 1;
                         skipToTemplate = this.templateLines[templateLineIndex];
-                        skipTo = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex]);
+                        skipTo = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex], parser);
                         skipFrom = targetLine;
                         skipStartLineNum = targetLineNum;
                     }
@@ -2355,7 +2357,7 @@ async function searchSub(keyword, isMutual) {
                     }
                     const columnPositions = lib.parseCSVColumnPositions(csv, columns);
                     found.score += keywordMatchScore + plusScore;
-                    found.path = getTestablePath(inputFileFullPath);
+                    found.path = inputFileFullPath;
                     found.lineNum = lineNum;
                     found.line = unescapedLine;
                     found.indentLength = indentRegularExpression.exec(line)[0].length;
@@ -2419,7 +2421,7 @@ async function searchSub(keyword, isMutual) {
                         const found = getKeywordMatchingScore([wordInGlossary], keywordWithTag, thesaurus);
                         if (found.matchedKeywordCount >= 1 && colonPosition !== notFound) {
                             found.score += glossaryMatchScore + plusScore;
-                            found.path = getTestablePath(inputFileFullPath);
+                            found.path = inputFileFullPath;
                             found.lineNum = lineNum;
                             found.indentLength = currentIndent.length;
                             found.tagLabel = glossaryLabel;
@@ -2450,14 +2452,14 @@ async function searchSub(keyword, isMutual) {
                     snippetScaning.length = 0;
                 }
                 else {
-                    const currentIndent = indentRegularExpression.exec(line)[0];
                     const endsOfSnippets = [];
                     for (const found of snippetScaning) {
                         if (lineNum > found.lineNum) {
                             var endOfSnippet = false;
                             if (!found.isSnippetOver(line)) {
                                 if (found.snippetDepth >= 1 || found.snippet.length < parseInt(programOptions.snippetLineCount)) {
-                                    found.snippet.push(line.substring(found.indentLength));
+                                    var snippetLine = line.substring(found.indentLength);
+                                    found.snippet.push(snippetLine);
                                 }
                                 else {
                                     found.snippet.pop();
@@ -2511,7 +2513,8 @@ async function searchSub(keyword, isMutual) {
     }
     // console.log(snippet)
     if (foundLines.length >= 1 && foundLines[foundLines.length - 1].snippet.length >= 1) {
-        const snippet = foundLines[foundLines.length - 1].snippet.join('\n');
+        const found = foundLines[foundLines.length - 1];
+        const snippet = (await evaluateEnvironmentVariable(found.snippet, found.path, found.lineNum)).join('\n');
         const snippetColor = chalk.rgb(144, 144, 160);
         console.log(snippetColor(snippet));
     }
@@ -2732,7 +2735,7 @@ async function searchWithoutTags(keywords) {
                 if (fullMatchCount < programOptions.foundCountMax && isFullMatch(line, fullMatchKeywords)) {
                     fullMatchCount += 1;
                     const found = new FoundLine();
-                    found.path = getTestablePath(inputFileFullPath);
+                    found.path = inputFileFullPath;
                     found.lineNum = lineNum;
                     found.line = line;
                     found.matches.push({
@@ -2754,7 +2757,7 @@ async function searchWithoutTags(keywords) {
                     var keywordIndex = line.toLowerCase().indexOf(keyword1LowerCase);
                     if (keywordIndex !== notFound) {
                         const found = new FoundLine();
-                        found.path = getTestablePath(inputFileFullPath);
+                        found.path = inputFileFullPath;
                         found.lineNum = lineNum;
                         found.line = line;
                         found.matches.push({
@@ -3282,12 +3285,16 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog) {
     return { expected, log };
 }
 // getExpectedLineInFileTemplate
-function getExpectedLineInFileTemplate(setting, template) {
-    var expected = getExpectedLine(setting, template);
-    const templateIndex = expected.indexOf(templateLabel);
-    if (templateIndex !== notFound) {
-        expected = expected.substr(0, templateIndex);
-        expected = expected.trimRight();
+function getExpectedLineInFileTemplate(setting, lineInTemplate, parser) {
+    const templateTag = parseTemplateTag(lineInTemplate, parser);
+    if (templateTag.isFound) {
+        const settingAndEnv = mergeEnvironmentVariable(setting);
+        const before = getExpectedLine(setting, templateTag.template);
+        const after = getExpectedLine(settingAndEnv, templateTag.template);
+        var expected = lineInTemplate.substring(0, templateTag.indexInLine).replace(before, after).trimRight();
+    }
+    else {
+        var expected = lineInTemplate;
     }
     return expected;
 }
@@ -3306,6 +3313,46 @@ function getReplacedLine(setting, template, replacedValues) {
             lineNum: 0 /*dummy*/, settingsIndex: '' };
     }
     return getExpectedLine(replacedSetting, template);
+}
+// mergeEnvironmentVariable
+function mergeEnvironmentVariable(settings) {
+    const settingsAndEnv = Object.assign({}, settings);
+    for (const [envName, envValue] of Object.entries(process.env)) {
+        const value = {
+            value: envValue || '(no_value)',
+            lineNum: 0,
+            settingsIndex: '/',
+            tag: 'env',
+            isReferenced: true,
+        };
+        settingsAndEnv[`$env.{${envName}}`] = value;
+        settingsAndEnv[`$env.${envName}`] = value;
+    }
+    return settingsAndEnv;
+}
+// evaluateEnvironmentVariable
+async function evaluateEnvironmentVariable(lines, filePath, linesLineNum) {
+    const evaluatedLines = [];
+    const parser = new Parser();
+    parser.command = CommandEnum.search;
+    parser.verbose = ('verbose' in programOptions);
+    parser.filePath = filePath;
+    const settingsTree = await makeSettingTree(parser);
+    const reader = readline.createInterface({
+        input: fs.createReadStream(filePath),
+        crlfDelay: Infinity
+    });
+    parser.lineNum = 0;
+    for await (const line1 of reader) {
+        parser.lineNum += 1;
+        settingsTree.moveToLine(parser);
+        if (parser.lineNum == linesLineNum) {
+            for (const replacingLine of lines) {
+                evaluatedLines.push(getExpectedLineInFileTemplate(settingsTree.currentSettings, replacingLine, parser));
+            }
+        }
+    }
+    return evaluatedLines;
 }
 // tagIndexOf
 // /(^| )tag/
@@ -4252,7 +4299,7 @@ class FoundLine {
             var debugString = ``;
         }
         // colored string
-        return `${pathColor(this.path)}${lineNumColor(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
+        return `${pathColor(getTestablePath(this.path))}${lineNumColor(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
     }
     evaluateSnippetDepthTag(line) {
         const snippetDepthIndex = tagIndexOf(line, snippetDepthLabel);

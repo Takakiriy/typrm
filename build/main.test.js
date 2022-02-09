@@ -72,6 +72,7 @@ describe("typrm shell >>", () => {
             ['snippet_depth_1', 'test_data/search/2', 'snippet_depth_1\nexit()\n', {}],
             ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n', {}],
             ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n', {}],
+            ['snippet_environment_variable', 'test_data/search/2', 'snippet_environment_variable\nexit()\n', {}],
         ])("%s", async (_caseName, folder, input, options) => {
             chdirInProject('src');
             var typrmOptions = {
@@ -123,6 +124,7 @@ describe("checks template value >>", () => {
         ["1_template_3_if"],
         ["var_not_ref_1_error"],
         ["template_if_1_error"],
+        ["environment_variable"],
         ["settings_tree"],
         ["settings_tree_deep"],
         ["settings_tree_position"],
@@ -221,6 +223,8 @@ describe("checks file contents >>", () => {
             "if", "file_4_if",
         ], [
             "any_lines", "file_8_others",
+        ], [
+            "environment_variable", "file_5",
         ]
     ])("First >> %s", async (caseName, _fileNameHead) => {
         chdirInProject('src');
@@ -285,6 +289,8 @@ describe("replaces settings >>", () => {
             '2_replace_3_English', '', 'en-US', null,
         ], [
             '2_replace_4_Japanese', '', 'ja-JP', null,
+        ], [
+            '2_replace_5_with_environment_variable', '', '', null,
         ], [
             '2_replace_6_if', ' in if block', 'en-US',
             { replacers: [{ from: '__Setting1__: yes', to: '__Setting1__: yes  #to: replaced' }] },

@@ -8,6 +8,8 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
+import * as dotenv from "dotenv";
+dotenv.config();
 
 // main
 export async function  main() {
@@ -1182,7 +1184,7 @@ class  TemplateTag {
         }
         if (this.indexInLine !== notFound  &&  ! disabled) {
             this.isFound = true;
-            const  leftOfTemplate = cutReplaceToTag(line.substr(0, this.indexInLine).trim());
+            const  leftOfTemplate = cutReplaceToTag(line.substring(0, this.indexInLine).trim());
             if (this.label === fileTemplateLabel) {
                 this.onFileTemplateTagReading(line);
             }
@@ -1417,7 +1419,7 @@ class  TemplateTag {
         if (this.templateLines.length === 0) {
             return  false;
         }
-        const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0]);
+        const  expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0], parser);
         var  templateLineIndex = 0;
         var  targetLineNum = 0;
         var  errorTemplateLineIndex = 0;
@@ -1445,13 +1447,13 @@ class  TemplateTag {
                     const  indentLength = targetLine.indexOf(expectedFirstLine);
                     if (indentLength !== notFound  &&  targetLine.trim() === expectedFirstLine.trim()) {
                         result = Result.same;
-                        indent = targetLine.substr(0, indentLength);
+                        indent = targetLine.substring(0, indentLength);
                     } else {
                         result = Result.different;
                     }
                 } else if (skipTo === '') { // lineIndex >= 1, not skipping
                     const  expected = getExpectedLineInFileTemplate(
-                        setting, this.templateLines[templateLineIndex]);
+                        setting, this.templateLines[templateLineIndex], parser);
 
                     if (targetLine === indent + expected) {
                         result = Result.same;
@@ -1460,7 +1462,7 @@ class  TemplateTag {
                         templateLineIndex += 1;
                         skipToTemplate = this.templateLines[templateLineIndex];
                         skipTo = getExpectedLineInFileTemplate(
-                            setting, this.templateLines[templateLineIndex]);
+                            setting, this.templateLines[templateLineIndex], parser);
                         skipFrom = targetLine;
                         skipStartLineNum = targetLineNum;
                     } else {
@@ -2468,7 +2470,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
 
                     found.score += keywordMatchScore + plusScore;
-                    found.path = getTestablePath(inputFileFullPath);
+                    found.path = inputFileFullPath;
                     found.lineNum = lineNum;
                     found.line = unescapedLine;
                     found.indentLength = indentRegularExpression.exec(line)![0].length;
@@ -2539,7 +2541,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                         if (found.matchedKeywordCount >= 1  &&  colonPosition !== notFound) {
 
                             found.score += glossaryMatchScore + plusScore;
-                            found.path = getTestablePath(inputFileFullPath);
+                            found.path = inputFileFullPath;
                             found.lineNum = lineNum;
                             found.indentLength = currentIndent.length;
                             found.tagLabel = glossaryLabel;
@@ -2569,15 +2571,15 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                 if ('disableSnippet' in programOptions) {
                     snippetScaning.length = 0;
                 } else {
-                    const  currentIndent = indentRegularExpression.exec(line)![0];
                     const  endsOfSnippets: FoundLine[] = [];
                     for (const found of snippetScaning) {
                         if (lineNum > found.lineNum) {
                             var  endOfSnippet = false;
                             if ( ! found.isSnippetOver(line)) {
                                 if (found.snippetDepth >= 1  ||  found.snippet.length < parseInt(programOptions.snippetLineCount)) {
+                                    var  snippetLine = line.substring(found.indentLength);
 
-                                    found.snippet.push(line.substring(found.indentLength));
+                                    found.snippet.push(snippetLine);
                                 } else {
                                     found.snippet.pop();
                                     found.snippet.push('    ....');
@@ -2634,8 +2636,10 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 
     // console.log(snippet)
     if (foundLines.length >= 1  &&  foundLines[foundLines.length - 1].snippet.length >= 1) {
-        const  snippet = foundLines[foundLines.length - 1].snippet.join('\n');
+        const  found = foundLines[foundLines.length - 1];
+        const  snippet = (await evaluateEnvironmentVariable(found.snippet, found.path, found.lineNum)).join('\n');
         const  snippetColor = chalk.rgb(144,144,160);
+
         console.log(snippetColor(snippet));
     }
 
@@ -2878,7 +2882,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                 if (fullMatchCount < programOptions.foundCountMax  &&  isFullMatch(line, fullMatchKeywords)) {
                     fullMatchCount += 1;
                     const  found = new FoundLine();
-                    found.path = getTestablePath(inputFileFullPath);
+                    found.path = inputFileFullPath;
                     found.lineNum = lineNum;
                     found.line = line;
                     found.matches.push({
@@ -2903,7 +2907,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                     if (keywordIndex !== notFound) {
 
                         const  found = new FoundLine();
-                        found.path = getTestablePath(inputFileFullPath);
+                        found.path = inputFileFullPath;
                         found.lineNum = lineNum;
                         found.line = line;
                         found.matches.push({
@@ -3486,14 +3490,16 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
 }
 
 // getExpectedLineInFileTemplate
-function  getExpectedLineInFileTemplate(setting: Settings, template: string) {
+function  getExpectedLineInFileTemplate(setting: Settings, lineInTemplate: string, parser: Parser): string {
+    const  templateTag = parseTemplateTag(lineInTemplate, parser);
+    if (templateTag.isFound) {
+        const  settingAndEnv = mergeEnvironmentVariable(setting);
+        const  before = getExpectedLine(setting, templateTag.template);
+        const  after = getExpectedLine(settingAndEnv, templateTag.template);
 
-    var  expected = getExpectedLine(setting, template);
-    const  templateIndex = expected.indexOf(templateLabel);
-    if (templateIndex !== notFound) {
-
-        expected = expected.substr(0, templateIndex);
-        expected = expected.trimRight();
+        var  expected = lineInTemplate.substring(0, templateTag.indexInLine).replace(before, after).trimRight();
+    } else {
+        var  expected = lineInTemplate;
     }
     return  expected;
 }
@@ -3514,6 +3520,57 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
     }
 
     return  getExpectedLine(replacedSetting, template);
+}
+
+// mergeEnvironmentVariable
+function  mergeEnvironmentVariable(settings: Settings): Settings {
+    const  settingsAndEnv = Object.assign({}, settings);
+
+    for (const [envName, envValue] of Object.entries(process.env)) {
+        const  value: Setting = {
+            value: envValue || '(no_value)',
+            lineNum: 0,
+            settingsIndex: '/',
+            tag: 'env',
+            isReferenced: true,
+        };
+
+        settingsAndEnv[`$env.{${envName}}`] = value;
+        settingsAndEnv[`$env.${envName}`] = value;
+    }
+
+    return  settingsAndEnv;
+}
+
+// evaluateEnvironmentVariable
+async function  evaluateEnvironmentVariable(lines: string[], filePath: string, linesLineNum: number): Promise<string[]> {
+    const  evaluatedLines: string[] = [];
+    const  parser = new Parser();
+    parser.command = CommandEnum.search;
+    parser.verbose = ('verbose' in programOptions);
+    parser.filePath = filePath;
+
+    const  settingsTree = await makeSettingTree(parser);
+    const  reader = readline.createInterface({
+        input: fs.createReadStream(filePath),
+        crlfDelay: Infinity
+    });
+    parser.lineNum = 0;
+
+    for await (const line1 of reader) {
+        parser.lineNum += 1;
+        settingsTree.moveToLine(parser);
+
+        if (parser.lineNum == linesLineNum) {
+            for (const replacingLine of lines) {
+
+                evaluatedLines.push(getExpectedLineInFileTemplate(
+                    settingsTree.currentSettings, replacingLine, parser));
+            }
+        }
+    }
+
+    return  evaluatedLines;
 }
 
 // tagIndexOf
@@ -4381,7 +4438,7 @@ interface Setting {
     value: string;
     lineNum: number;  // This count is the same as #to: tag count
     settingsIndex: string;
-    tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original';
+    tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'env';
     isReferenced: boolean;
 }
 
@@ -4602,7 +4659,7 @@ class FoundLine {
         }
 
         // colored string
-        return `${pathColor(this.path)}${lineNumColor(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
+        return `${pathColor(getTestablePath(this.path))}${lineNumColor(`:${this.lineNum}:`)} ${coloredLine}${debugString}`;
     }
 
     evaluateSnippetDepthTag(line: string) {

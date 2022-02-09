@@ -12,6 +12,7 @@ typrm は自分が使いやすいコマンドのオプションを書いた
 
 - [typrm](#typrm)
   - [スニペット検索機能 - #keyword タグや #glossary タグを使って精度よくスニペットを検索します](#スニペット検索機能---keyword-タグや-glossary-タグを使って精度よくスニペットを検索します)
+    - [秘密データを扱う - .env ファイル](#秘密データを扱う---env-ファイル)
   - [リプレース機能 - replace コマンド, reset コマンド](#リプレース機能---replace-コマンド-reset-コマンド)
     - [#to タグを使って置き換えます](#to-タグを使って置き換えます)
     - [任意のコマンドを実行します](#任意のコマンドを実行します)
@@ -327,6 +328,67 @@ thesaurus.csv のサンプル:
     source, src
     destination, dst, dest
     string, 文字列
+
+
+### 秘密データを扱う - .env ファイル
+
+パスワードや API キーなど秘密のデータ（シークレット）をスニペットに表示したいときや、
+チェックするファイルの内容にシークレットが含まれているときは、
+typrm を起動したときの カレント フォルダー にある .env ファイルに
+シークレットを書いておきます。
+
+typrm を起動するスクリプトの中で typrm を起動するときの カレント フォルダー
+を設定しておくと、どのフォルダーから typrm のスクリプトを起動しても
+同じ .env ファイルを参照できます。
+
+.env ファイル:
+
+    DB_USERNAME = root
+    DB_PASSWORD = 5I#OfEilq#)
+
+スニペットを表示する typrm コマンド:
+
+    $ typrm DB log in
+    /path/MyDB.yaml:100: DB log in: #keyword:
+        コマンド: db  --user root  --pass 5I#OfEilq#)
+
+`MyDB.yaml` テキスト ファイル の内容のサンプル:
+
+        ....
+    setting: #settings:
+        $env.DB_USERNAME = __DB_UserName__
+        $env.DB_PASSWORD = __DB_Password__
+    DB log in: #keyword:
+        コマンド: db  --user __DB_UserName__  --pass __DB_Password__
+            #template: db  --user $env.DB_USERNAME  --pass $env.DB_PASSWORD
+        ....
+
+`#settings:` に `$env.（変数名）=（ファイル内での値）` を定義します。
+`#keyword:` が付いたキーワードを typrm の search コマンドで見つかったときに
+表示されるスニペットの `#template:` に `$env.（変数名）` が含まれていると、
+.env ファイルに書かれた値に置き換えたスニペットが表示されます。
+
+ファイルの内容をチェックする typrm コマンド:
+
+    $ typrm check root.yaml
+
+`__Project__/root.yaml` ファイル:
+
+        ....
+    setting: #settings:
+        $env.DB_USERNAME = __DB_UserName__
+        $env.DB_PASSWORD = __DB_Password__
+    ./my.json の一部:  #file-template: ./my.json
+        "username": "__DB_UserName__",  #template: "$env.DB_USERNAME"
+        "password": "__DB_Password__"  #template: "$env.DB_PASSWORD"
+        ....
+
+`__Project__`/my.json ファイル:
+
+    {
+        "username": "root",
+        "password": "5I#OfEilq#)",
+    }
 
 
 ## リプレース機能 - replace コマンド, reset コマンド
