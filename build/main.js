@@ -103,13 +103,42 @@ async function checkRoutine(inputFilePath, parser) {
     parser.verbose = ('verbose' in programOptions);
     parser.filePath = inputFilePath;
     const settingTree = await makeSettingTree(parser);
+    // List up original tag
+    const originalTagTree = await makeOriginalTagTree(parser, settingTree);
+    var first = true;
+    for (const index of Object.keys(originalTagTree.replaceTo)) {
+        for (const [name, replace] of Object.entries(originalTagTree.replaceTo[index])) {
+            if (first) {
+                console.log('');
+                first = false;
+            }
+            console.log(`${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
+                `#original: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`);
+        }
+    }
+    // List up to tag
+    const toTagTree = await makeReplaceToTagTree(parser, settingTree);
+    var first = true;
+    for (const index of Object.keys(toTagTree.replaceTo)) {
+        for (const [name, replace] of Object.entries(toTagTree.replaceTo[index])) {
+            if (first) {
+                console.log('');
+                first = false;
+            }
+            console.log(`${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
+                `#to: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`);
+        }
+    }
+    // Check template
     if (parser.verbose) {
-        console.log(`Verbose: Phase 2: check ...`);
+        console.log(`Verbose: Phase 3: check ...`);
     }
     var reader = readline.createInterface({
         input: fs.createReadStream(inputFilePath),
         crlfDelay: Infinity
     });
+    parser.lineNum = 0;
+    parser.line = '';
     const verbose = parser.verbose;
     var setting = {};
     var lineNum = 0;
@@ -762,7 +791,9 @@ async function makeReplaceToTagTree(parser, settingTree) {
                         tag: 'toInSettings',
                         isReferenced: false,
                     };
-                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${toValue}`);
+                    if (parser.command !== CommandEnum.check) {
+                        console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${toValue}`);
+                    }
                     // #to: tag after the #template:
                 }
                 else {
@@ -805,7 +836,9 @@ async function makeReplaceToTagTree(parser, settingTree) {
                                     toTagTree.replaceTo[index][variableName] = newValueCopy;
                                 }
                             }
-                            console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
+                            if (parser.command !== CommandEnum.check) {
+                                console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
+                            }
                         }
                         previousTemplateTag = null;
                     }
@@ -914,7 +947,9 @@ async function makeOriginalTagTree(parser, settingTree) {
                         tag: 'original',
                         isReferenced: false,
                     };
-                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #original: ${variableName}: ${originalValue}`);
+                    if (parser.command !== CommandEnum.check) {
+                        console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #original: ${variableName}: ${originalValue}`);
+                    }
                 }
             }
         }
@@ -1479,10 +1514,12 @@ class IfTagParser {
                 var isReplacable = evaluatedContidion.isReplacable;
             }
             else {
-                console.log('');
-                console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
-                console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
-                this.parser.errorCount += 1;
+                if (this.parser.ifTagErrorMessageIsEnabled) {
+                    console.log('');
+                    console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
+                    console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
+                    this.parser.errorCount += 1;
+                }
                 var resultOfIf = true;
                 var isReplacable = false;
             }
@@ -3590,7 +3627,12 @@ class SettingsTree {
         const lineNum = parser.lineNum;
         var outOfFalseBlocks = settingsTree.outOfFalseBlocks;
         if (lineNum === 1 || lineNum === settingsTree.nextSettingsLineNum) {
-            const previousSettingIndex = settingsTree.currentSettingIndex;
+            if (lineNum === 1) {
+                var previousSettingIndex = '';
+            }
+            else {
+                var previousSettingIndex = settingsTree.currentSettingIndex;
+            }
             const currentSettingIndex = settingsTree.indices.get(parser.lineNum); // e.g. "/a/bc"
             const currentSettingIndexSlash = `${currentSettingIndex}/`; // e.g. "/a/bc/"
             return_.currentSettingIndex = currentSettingIndex;
@@ -3673,7 +3715,7 @@ class SettingsTree {
         };
         var currentSettings = currentSettings;
         const outOfFalseBlocks = new Map();
-        const notVerboseParser = { ...parser, verbose: false };
+        const notVerboseParser = { ...parser, verbose: false, ifTagErrorMessageIsEnabled: false };
         const ifTagParser = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
             var currentIndexSlash = '/';
@@ -3989,7 +4031,7 @@ class ReplaceToTagTree {
         var newSettingsByOriginalTag = { ...currentNewSettingsByOriginalTag };
         const outOfFalseBlocks = new Map();
         const outOfFalseBlocksByOriginalTag = new Map();
-        const notVerboseParser = { ...parser, verbose: false };
+        const notVerboseParser = { ...parser, verbose: false, ifTagErrorMessageIsEnabled: false };
         const ifTagParserForNewSettings = new IfTagParser(notVerboseParser);
         const ifTagParserForOldSettings = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
@@ -4453,6 +4495,7 @@ class Parser {
         this.filePath = '';
         this.lineNum = 0;
         this.line = '';
+        this.ifTagErrorMessageIsEnabled = true;
     }
 }
 // WriteBuffer

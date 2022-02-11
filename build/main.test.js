@@ -125,6 +125,7 @@ describe("checks template value >>", () => {
         ["var_not_ref_1_error"],
         ["template_if_1_error"],
         ["environment_variable"],
+        ["list_to_tag_original_tag"],
         ["settings_tree"],
         ["settings_tree_deep"],
         ["settings_tree_position"],

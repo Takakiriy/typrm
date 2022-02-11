@@ -311,12 +311,6 @@ syntax error:
 
 exports[`checks file contents >> First >> if: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:90: #if: value == value
-    Error: if tag syntax
-
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91: #if: $env.value = value
-    Error: if tag syntax
-
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:9:         user: 'user1'  #template: __Stage__
@@ -398,7 +392,7 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91:     #if: $env.value = value
     Error: if tag syntax
 
-Warning: 14, Error: 4
+Warning: 14, Error: 2
 template count = 34
 "
 `;
@@ -875,6 +869,28 @@ spippet: #keyword:  #snippet-depth: 1
     - ($TYPRM_TEST_ENVIRON)  #template: ($env.TYPRM_TEST_ENVIRON)
     - $TYPRM_TEST_ENV == $TYPRM_TEST_ENV  #template: $TYPRM_TEST_ENV == $env.TYPRM_TEST_ENV
     - \${TYPRM_TEST_PATH}  #template: $env.TYPRM_TEST_PATH
+"
+`;
+
+exports[`checks template value >> list_to_tag_original_tag: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
+
+Warning: 0, Error: 0
+template count = 2
+"
+`;
+
+exports[`checks template value >> list_to_tag_original_tag: sourceFileContents 1`] = `
+"settings: #settings:
+    varA: valueA1  #original: valueA0  #to: valueA2
+    varB: valueB1
+body:
+    - valueA1  #template: varA
+    - valueB1  #template: varB  #to: valueB2
 "
 `;
 
@@ -1586,7 +1602,26 @@ Verbose: variables:
     Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
         Verbose: var2: not value2
     Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:0: settings /
-Verbose: Phase 2: check ...
+Verbose: Phase 2: parse \\"original\\" tags ...
+    Verbose: settings \\"/1\\"
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: \\"/1\\"
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+Verbose: Phase 2: parse \\"#to:\\" tags ...
+Verbose: to tag tree:
+    Verbose: replaceTo:
+        Verbose: settings \\"/\\":
+        Verbose: settings \\"/1\\":
+        Verbose: settings \\"/1/a\\":
+        Verbose: settings \\"/1/b\\":
+        Verbose: settings \\"/1/c\\":
+        Verbose: settings \\"/1/d\\":
+        Verbose: settings \\"/1/e\\":
+        Verbose: settings \\"/1/f\\":
+        Verbose: settings \\"/1/g\\":
+        Verbose: settings \\"/1/h\\":
+    Verbose: outOfFalseBlocks:
+Verbose: Phase 3: check ...
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
@@ -4730,6 +4765,8 @@ val__ue1: #template: key1
 exports[`typrm shell >> replace >> check: stdout 1`] = `
 "typrm keyword: #c
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
+
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
@@ -4739,6 +4776,8 @@ exports[`typrm shell >> replace >> check: stdout 1`] = `
 Warning: 1, Error: 0
 template count = 1
 typrm keyword: #c
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4755,6 +4794,8 @@ typrm keyword: exit()
 exports[`typrm shell >> replace >> check: stdout 2`] = `
 "typrm keyword: #check:
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
+
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
@@ -4764,6 +4805,8 @@ exports[`typrm shell >> replace >> check: stdout 2`] = `
 Warning: 1, Error: 0
 template count = 1
 typrm keyword: #check:
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4780,6 +4823,8 @@ typrm keyword: exit()
 exports[`typrm shell >> replace >> check: stdout 3`] = `
 "typrm keyword: #c _tmp.yaml
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
+
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
@@ -4789,6 +4834,8 @@ exports[`typrm shell >> replace >> check: stdout 3`] = `
 Warning: 1, Error: 0
 template count = 1
 typrm keyword: #c _tmp.yaml
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
@@ -4805,6 +4852,8 @@ typrm keyword: exit()
 exports[`typrm shell >> replace >> check: stdout 4`] = `
 "typrm keyword: #check: _tmp.yaml
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
+
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: val__ue1: #template: key1
@@ -4814,6 +4863,8 @@ exports[`typrm shell >> replace >> check: stdout 4`] = `
 Warning: 1, Error: 0
 template count = 1
 typrm keyword: #check: _tmp.yaml
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     key1: value1  #to: value1_replaced

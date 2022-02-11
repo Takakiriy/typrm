@@ -146,6 +146,7 @@ declare class Parser {
     filePath: string;
     lineNum: number;
     line: string;
+    ifTagErrorMessageIsEnabled: boolean;
 }
 export declare function startTestRedirect(): void;
 export declare function endTestRedirect(): void;
