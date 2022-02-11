@@ -1,10 +1,23 @@
-#// zsh
-    #// Clear the screen and the screen buffer.
-        printf "\ec\e[3J"
-    #// Clear command history except for this script.
-        HISTSIZE=0
-        #// The history in typrm shell is not cleared. But it is not necessary to input secrets.
-    #// Clear clipboard.
-        pbcopy < /dev/null
-    #// Show the finished message.
-        echo Clear!
+if [ "$SHELL" == "/bin/zsh" ];then
+    #// zsh: ~/bin/clear-all
+        #// Clear the screen and the screen buffer.
+            printf "\ec\e[3J"
+        #// Clear command history except for this script.
+            HISTSIZE=0
+            #// The history in typrm shell is not cleared. But it is not necessary to input secrets.
+        #// Clear clipboard.
+            pbcopy < /dev/null
+        #// Show the finished message.
+            echo Clear!
+else
+    #// bash: ~/bin/clear-all
+        #// Clear the screen and the screen buffer.
+            clear
+        #// Clear command history except for this script.
+            history -c
+            #// The history in typrm shell is not cleared. But it is not necessary to input secrets.
+        #// Clear clipboard.
+            #// Linux does not have a clipboard.
+        #// Show the finished message.
+            echo Clear!
+fi
