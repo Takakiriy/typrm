@@ -1,5 +1,6 @@
 - TYPRM_TEST_ENV  = testEnv  #OK
 - TYPRM_TEST_PATH = C:\Test  #OK
+- TEST_SECRET = s3C6E7  #OK
 - TYPRM_TEST_ENV = testEnv  #NG-a
 - TYPRM_TEST_ENV  = testEnv  #NG-b
 - TYPRM_TEST_PATH = C:\Test  #NG-b

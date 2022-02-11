@@ -128,10 +128,12 @@ exports[`checks file contents >> First >> environment_variable: sourceFileConten
     __Base__: ../../file_target/1
     $env.TYPRM_TEST_ENV:  __TestEnv__
     $env.TYPRM_TEST_PATH: __PathEnv__
+    $env.TEST_SECRET: __Secret__
 OK:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
         - TYPRM_TEST_ENV  = __TestEnv__  #OK  #template: TYPRM_TEST_ENV  = $env.TYPRM_TEST_ENV
         - TYPRM_TEST_PATH = __PathEnv__  #OK  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+        - TEST_SECRET = __Secret__  #OK  #template: TEST_SECRET = $env.TEST_SECRET
 NG-a:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
         - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
@@ -153,38 +155,38 @@ exports[`checks file contents >> First >> environment_variable: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:1: setting: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:3:     $env.TYPRM_TEST_ENV:  __TestEnv__
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:11:         - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
     Warning: Not matched with the template.
     Expected: TYPRM_TEST_ENV = __TestEnv__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:11: - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13: - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: - TYPRM_TEST_ENV = __Bad__  #NG-a
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:1: setting: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:4:     $env.TYPRM_TEST_PATH: __PathEnv__
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:15:         - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:17:         - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
     Warning: Not matched with the template.
     Expected: TYPRM_TEST_PATH = __PathEnv__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:15: - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:5: - TYPRM_TEST_PATH = C:\\\\Test  #NG-b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:17: - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:6: - TYPRM_TEST_PATH = C:\\\\Test  #NG-b
     Warning: Not same as file contents
     Expected: - TYPRM_TEST_PATH = __Bad__  #NG-b
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:18: - TYPRM_TEST_ENV = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:20: - TYPRM_TEST_ENV = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: - TYPRM_TEST_ENV = testEnv  #NG-c
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:22: - TYPRM_TEST_PATH = __PathEnv__  #NG-d  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:8: - TYPRM_TEST_PATH = C:\\\\_____Test  #NG-d
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:24: - TYPRM_TEST_PATH = __PathEnv__  #NG-d  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:9: - TYPRM_TEST_PATH = C:\\\\_____Test  #NG-d
     Warning: Not same as file contents
     Expected: - TYPRM_TEST_PATH = C:\\\\Test  #NG-d
 
 Warning: 6, Error: 0
-template count = 13
+template count = 14
 "
 `;
 
@@ -5069,8 +5071,9 @@ typrm keyword: exit()
 exports[`typrm shell >> search >> snippet_environment_variable: stdout 1`] = `
 "typrm keyword: snippet_environment_variable
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:197: typrm shell >> search >> snippet_environment_variable:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:200:     snippet_environment_variable: #keyword:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:201:     snippet_environment_variable: #keyword:
     - (testEnv)
+    - s3C6E72
 typrm keyword: exit()
 "
 `;

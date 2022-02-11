@@ -335,16 +335,18 @@ thesaurus.csv のサンプル:
 パスワードや API キーなど秘密のデータ（シークレット）をスニペットに表示したいときや、
 チェックするファイルの内容にシークレットが含まれているときは、
 typrm を起動したときの カレント フォルダー にある .env ファイルに
-シークレットを書いておきます。
+シークレットを書きます。
 
-typrm を起動するスクリプトの中で typrm を起動するときの カレント フォルダー
-を設定しておくと、どのフォルダーから typrm のスクリプトを起動しても
-同じ .env ファイルを参照できます。
+.env ファイルに書かれた環境変数や typrm の親プロセスから継承した環境変数を参照するときは、
+`#template:` タグに `$env.{環境変数名}` または
+`$env.環境変数名` を書きます。
+
+また、`#settings:` タグに `$env.{環境変数名}: ファイル内での値` を定義します。
 
 .env ファイル:
 
-    DB_USERNAME = root
-    DB_PASSWORD = 5I#OfEilq#)
+    DB_USER = root
+    DB_PASS = 5I#OfEilq#)
 
 スニペットを表示する typrm コマンド:
 
@@ -355,18 +357,30 @@ typrm を起動するスクリプトの中で typrm を起動するときの カ
 `MyDB.yaml` テキスト ファイル の内容のサンプル:
 
         ....
-    setting: #settings:
-        $env.DB_USERNAME = __DB_UserName__
-        $env.DB_PASSWORD = __DB_Password__
     DB log in: #keyword:
         コマンド: db  --user __DB_UserName__  --pass __DB_Password__
-            #template: db  --user $env.DB_USERNAME  --pass $env.DB_PASSWORD
+            #template: db  --user $env.DB_USER  --pass $env.{DB_PASS}
+    setting: #settings:
+        $env.DB_USER: __DB_UserName__
+        $env.{DB_PASS}: __DB_Password__
         ....
 
-`#settings:` に `$env.（変数名）=（ファイル内での値）` を定義します。
-`#keyword:` が付いたキーワードを typrm の search コマンドで見つかったときに
-表示されるスニペットの `#template:` に `$env.（変数名）` が含まれていると、
-.env ファイルに書かれた値に置き換えたスニペットが表示されます。
+シークレットは、過去に表示した画面やシェルのヒストリーやクリップボードから
+削除してください。
+削除するコマンドのサンプルは `__Project__/example/clear-all` にあります。
+
+.env ファイルのロードに
+[ npm の dotenv モジュール ](https://www.npmjs.com/package/dotenv)
+を使っており上記の環境変数のようにアクセスできますが、プロセスに環境変数は設定されません。
+環境変数は設定されませんが、スニペットと ファイル チェック から参照することができます。
+typrm shell から起動する子プロセスに .env ファイルで定義した
+環境変数は継承されません。
+`--inherit-dotenv` オプションを指定して typrm を起動したときは
+環境変数が typrm のプロセスに設定および子プロセスに継承されます。
+
+typrm を起動するスクリプトの中で カレント フォルダー
+を設定しておくと、どのフォルダーから typrm のスクリプトを起動しても
+同じ .env ファイルを参照できます。
 
 ファイルの内容をチェックする typrm コマンド:
 
@@ -375,12 +389,12 @@ typrm を起動するスクリプトの中で typrm を起動するときの カ
 `__Project__/root.yaml` ファイル:
 
         ....
-    setting: #settings:
-        $env.DB_USERNAME = __DB_UserName__
-        $env.DB_PASSWORD = __DB_Password__
     ./my.json の一部:  #file-template: ./my.json
-        "username": "__DB_UserName__",  #template: "$env.DB_USERNAME"
-        "password": "__DB_Password__"  #template: "$env.DB_PASSWORD"
+        "username": "__DB_UserName__",  #template: "$env.{DB_USER}"
+        "password": "__DB_Password__"   #template: "$env.{DB_PASS}"
+    setting: #settings:
+        $env.{DB_USER}: __DB_UserName__
+        $env.{DB_PASS}: __DB_Password__
         ....
 
 `__Project__`/my.json ファイル:
@@ -390,6 +404,7 @@ typrm を起動するスクリプトの中で typrm を起動するときの カ
         "password": "5I#OfEilq#)",
     }
 
+`#if:` タグから .env ファイルで定義した変数は参照できません。
 
 ## リプレース機能 - replace コマンド, reset コマンド
 

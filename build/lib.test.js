@@ -42,9 +42,15 @@ describe("string >>", () => {
                 expect(unexpectedLine).toBe('${a}def');
             });
         });
-        test("matched replaced", () => {
-            const unexpectedLine = lib.unexpandVariable('abc_def_$g', [['${abc}', 'def'], ['${d}', 'abc'], ['\\$', '$']]);
-            expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
+        describe("matched replaced >>", () => {
+            test("replaced", () => {
+                const unexpectedLine = lib.unexpandVariable('abc_def_$g', [['${abc}', 'def'], ['${d}', 'abc'], ['\\$', '$']]);
+                expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
+            });
+            test("already replaced", () => {
+                const unexpectedLine = lib.unexpandVariable('${d}_def_$g', [['${abc}', 'def'], ['${d}', 'abc'], ['\\$', '$']]);
+                expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
+            });
         });
     });
     describe("checkFileContents >>", () => {

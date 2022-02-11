@@ -5,6 +5,7 @@ import * as readline from 'readline';
 import { ReadLineOptions } from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
+import * as dotenv from "dotenv";
 import { Readable, Writable } from 'stream';
 // @ts-ignore
 import { snapshots } from './lib-cjs.cjs';
@@ -341,9 +342,12 @@ export function  cutIndent(lines: string[]) {
 export function  unexpandVariable(expanded: string, keyValues: string[][]): string {
     var  replacing = expanded;
 
-    var  replacedTag = '\r\n';
-    for (const [_key, value] of keyValues) {
+    var  replacedTag = '\r\n';  // This is not matched with any values
+    for (const [key, value] of keyValues) {
 
+        replacing = replacing.replace(
+            new RegExp(escapeRegularExpression( key ), 'g'),
+            replacedTag);
         replacing = replacing.replace(
             new RegExp(escapeRegularExpression( value ), 'g'),
             replacedTag);
@@ -748,6 +752,52 @@ class WritableMemoryStream extends Writable {
 
     toString(): string {
         return this.array.join('');
+    }
+}
+
+// Secrets
+// Split secrets from environment variables in order to prevent child process inheritance
+type  Secrets = {[name: string]: string | undefined};
+
+// dotenvSecrets
+const  dotenvSecrets: Secrets = {};
+
+// dotenvInheritToProcessEnv
+var  dotenvInheritToProcessEnv = false;
+
+// loadDotEnvSecrets
+export function  loadDotEnvSecrets(inheritProcessEnv: boolean = false) {
+    dotenvInheritToProcessEnv = inheritProcessEnv;
+    if (inheritProcessEnv) {
+
+        dotenv.config();
+    } else {
+        const  envronmentVariableNames = Object.keys(process.env);
+
+        dotenv.config();
+        const  withSecret = Object.assign({}, process.env);
+        const  secretNames = Object.keys(withSecret).filter(
+            (key) => (envronmentVariableNames.indexOf(key) === -1));
+        for (const secretName of secretNames) {
+
+            dotenvSecrets[secretName] = process.env[secretName];
+
+            delete  process.env[secretName];
+        }
+    }
+}
+
+// getDotEnvSecrets
+export function  getDotEnvSecrets(): Secrets {
+    return  dotenvSecrets;
+}
+
+// getProcessEnvAndDotEnvSecrets
+export function  getProcessEnvAndDotEnvSecrets(): Secrets {
+    if (dotenvInheritToProcessEnv) {
+        return  process.env;
+    } else {
+        return  Object.assign(Object.assign({}, process.env), dotenvSecrets);
     }
 }
 

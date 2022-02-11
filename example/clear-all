@@ -1,0 +1,10 @@
+#// zsh
+    #// Clear the screen and the screen buffer.
+        printf "\ec\e[3J"
+    #// Clear command history except for this script.
+        HISTSIZE=0
+        #// The history in typrm shell is not cleared. But it is not necessary to input secrets.
+    #// Clear clipboard.
+        pbcopy < /dev/null
+    #// Show the finished message.
+        echo Clear!

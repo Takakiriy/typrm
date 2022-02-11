@@ -67,14 +67,14 @@ beforeAll(()=>{
 describe("typrm shell >>", () => {
     describe("search >>", () => {
         test.each([
-            ['search_mode', 'test_data/search/1', 'ABC\nexit()\n', {}],
-            ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n', {}],
-            ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', {}],
-            ['snippet_depth_1', 'test_data/search/2', 'snippet_depth_1\nexit()\n', {}],
-            ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n', {}],
-            ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n', {}],
-            ['snippet_environment_variable', 'test_data/search/2', 'snippet_environment_variable\nexit()\n', {}],
-        ])("%s", async (_caseName, folder, input, options) => {
+            ['search_mode', 'test_data/search/1', 'ABC\nexit()\n'],
+            ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n'],
+            ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n'],
+            ['snippet_depth_1', 'test_data/search/2', 'snippet_depth_1\nexit()\n'],
+            ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n'],
+            ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n'],
+            ['snippet_environment_variable', 'test_data/search/2', 'snippet_environment_variable\nexit()\n'],
+        ])("%s", async (_caseName, folder, input) => {
             chdirInProject('src');
             var  typrmOptions: {folder: string, test?: string, locale: string, input: string} = {
                 folder, test: "", locale: "en-US", input,
@@ -251,6 +251,7 @@ describe("checks file contents >>", () => {
         lib.rmdirSync(testFolderPath + '_checking');
         writeFileSync(changingFilePath, sourceFileContents);
         process.chdir('empty_folder');
+        lib.copyFileSync('../.env', '.env');
 
         // Test Main
         await callMain(["check"], {
@@ -1321,6 +1322,9 @@ describe("print reference >>", () => {
                     "        Verbose: label: 1.View\n" +
                     "        Verbose: number: 1\n" +
                     "        Verbose: command: msedge \"file://\${file}\"\n" +
+                    "    Verbose: (.env) TEST_SECRET = (secret)\n" +
+                    "    Verbose: (.env) TEST_SECRET_2 = (secret)\n" +
+                    '    Verbose: Envrironment variables defined in ".env" file are not inherit to child processes.\n' +
                     "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     "    Verbose: address: ../README.md\n" +
@@ -1353,6 +1357,9 @@ describe("print reference >>", () => {
                     "        Verbose: label: 1.View\n" +
                     "        Verbose: number: 1\n" +
                     "        Verbose: command: \"/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome\" \"file://\${file}\"\n" +
+                    "    Verbose: (.env) TEST_SECRET = (secret)\n" +
+                    "    Verbose: (.env) TEST_SECRET_2 = (secret)\n" +
+                    '    Verbose: Envrironment variables defined in ".env" file are not inherit to child processes.\n' +
                     "Verbose: typrm command: search\n" +
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     "    Verbose: address: ../README.md\n" +

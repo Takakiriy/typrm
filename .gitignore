@@ -9,5 +9,5 @@ node_modules
 **/*_changing.yaml
 bin/chmod+x.command
 *.log
-.env*
+/.env
 !.env.project

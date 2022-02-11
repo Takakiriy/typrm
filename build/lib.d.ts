@@ -45,6 +45,12 @@ interface ReplaceParameter {
     lineNum?: number;
     to: string;
 }
+declare type Secrets = {
+    [name: string]: string | undefined;
+};
+export declare function loadDotEnvSecrets(inheritProcessEnv?: boolean): void;
+export declare function getDotEnvSecrets(): Secrets;
+export declare function getProcessEnvAndDotEnvSecrets(): Secrets;
 export declare const indentRegularExpression: RegExp;
 export declare const indentHyphenRegularExpression: RegExp;
 export declare function isSameArray<T>(log: T[], answer: T[]): boolean;

@@ -351,16 +351,20 @@ Exmple of thesaurus.csv:
 
 If you want to display secret data (secrets) such as passwords and API keys
 in the snippet, or if the contents of the file to be checked contain secrets,
-put the secret in the .env file in the current folder when you start typrm.
+write the secret in the .env file in the current folder when you start typrm.
 
-If you set the current folder when you start typrm in the script
-that starts typrm, you can refer to the same .env file
-no matter which folder you start the typrm script from.
+Referencing environment variables written in the .env file
+or inherited from the parent process of typrm,
+write `$env.{__EnvironmentVariableName__}` or `$env.__EnvironmentVariableName__`
+in `#template:` tag.
+
+Also, define `$env.{__EnvironmentVariableName__}: __ValueInTheFile__`
+in `#settings:` tag.
 
 .env file:
 
-    DB_USERNAME = root
-    DB_PASSWORD = 5I#OfEilq#)
+    DB_USER = root
+    DB_PASS = 5I#OfEilq#)
 
 Display snippets typrm command:
 
@@ -371,18 +375,32 @@ Display snippets typrm command:
 Sample content of the `MyDB.yaml` text file:
 
         ....
-    setting: #settings:
-        $env.DB_USERNAME = __DB_UserName__
-        $env.DB_PASSWORD = __DB_Password__
     DB log in: #keyword:
         Command: db  --user __DB_UserName__  --pass __DB_Password__
-            #template: db  --user $env.DB_USERNAME  --pass $env.DB_PASSWORD
+            #template: db  --user $env.DB_USER  --pass $env.{DB_PASS}
+    setting: #settings:
+        $env.DB_USER: __DB_UserName__
+        $env.{DB_PASS}: __DB_Password__
         ....
 
-Define `$env.(Variable name) = (value in the file)` in `#settings:`.
-If the snippet `#template:` contains `$env.(variable name)` in the snippet
-that appears when a keyword with `#keyword:` is found by the typrm search command,
-the .env file will contain. The snippet replaced with the written value is displayed.
+Delete the secret from the screen displayed in the past,
+the history of shell and the clipboard.
+There is a command example of deleting them in `__Project__/example/clear-all`.
+
+typrm uses
+[ npm dotenv module ](https://www.npmjs.com/package/dotenv)
+to load .env file and access like environment variables.
+Environment variables in the process is not changed.
+But snippet and file checker can refer variables.
+The environment variables defined in the .env file are not inherited
+to the child process started from the typrm shell.
+When you started typrm with `--inherit-dotenv` options,
+environment variables are set in the typrm process
+and inherited to child processes.
+
+If you set the current folder when you start typrm in the script
+that starts typrm, you can refer to the same .env file
+no matter which folder you start the typrm script from.
 
 Checking the file contents typrm command:
 
@@ -391,12 +409,12 @@ Checking the file contents typrm command:
 `__Project__/root.yaml` file:
 
         ....
-    setting: #settings:
-        $env.DB_USERNAME = __DB_UserName__
-        $env.DB_PASSWORD = __DB_Password__
     A part of ./my.json :  #file-template: ./my.json
-        "username": "__DB_UserName__",  #template: "$env.DB_USERNAME"
-        "password": "__DB_Password__"  #template: "$env.DB_PASSWORD"
+        "username": "__DB_UserName__",  #template: "$env.{DB_USER}"
+        "password": "__DB_Password__"   #template: "$env.{DB_PASS}"
+    setting: #settings:
+        $env.{DB_USER}: __DB_UserName__
+        $env.{DB_PASS}: __DB_Password__
         ....
 
 `__Project__`/my.json file:
@@ -406,6 +424,7 @@ Checking the file contents typrm command:
         "password": "5I#OfEilq#)",
     }
 
+Variables defined in the .env file cannot be referenced from the `#if:` tag.
 
 ## Replace - replace command, reset command
 

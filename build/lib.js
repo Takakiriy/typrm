@@ -4,6 +4,7 @@ import globby from 'globby';
 import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
+import * as dotenv from "dotenv";
 import { Readable, Writable } from 'stream';
 // @ts-ignore
 import { snapshots } from './lib-cjs.cjs';
@@ -298,8 +299,9 @@ export function cutIndent(lines) {
 // unexpandVariable
 export function unexpandVariable(expanded, keyValues) {
     var replacing = expanded;
-    var replacedTag = '\r\n';
-    for (const [_key, value] of keyValues) {
+    var replacedTag = '\r\n'; // This is not matched with any values
+    for (const [key, value] of keyValues) {
+        replacing = replacing.replace(new RegExp(escapeRegularExpression(key), 'g'), replacedTag);
         replacing = replacing.replace(new RegExp(escapeRegularExpression(value), 'g'), replacedTag);
         replacedTag += '\n';
     }
@@ -678,6 +680,40 @@ class WritableMemoryStream extends Writable {
     }
     toString() {
         return this.array.join('');
+    }
+}
+// dotenvSecrets
+const dotenvSecrets = {};
+// dotenvInheritToProcessEnv
+var dotenvInheritToProcessEnv = false;
+// loadDotEnvSecrets
+export function loadDotEnvSecrets(inheritProcessEnv = false) {
+    dotenvInheritToProcessEnv = inheritProcessEnv;
+    if (inheritProcessEnv) {
+        dotenv.config();
+    }
+    else {
+        const envronmentVariableNames = Object.keys(process.env);
+        dotenv.config();
+        const withSecret = Object.assign({}, process.env);
+        const secretNames = Object.keys(withSecret).filter((key) => (envronmentVariableNames.indexOf(key) === -1));
+        for (const secretName of secretNames) {
+            dotenvSecrets[secretName] = process.env[secretName];
+            delete process.env[secretName];
+        }
+    }
+}
+// getDotEnvSecrets
+export function getDotEnvSecrets() {
+    return dotenvSecrets;
+}
+// getProcessEnvAndDotEnvSecrets
+export function getProcessEnvAndDotEnvSecrets() {
+    if (dotenvInheritToProcessEnv) {
+        return process.env;
+    }
+    else {
+        return Object.assign(Object.assign({}, process.env), dotenvSecrets);
     }
 }
 // indentRegularExpression

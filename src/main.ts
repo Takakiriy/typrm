@@ -8,8 +8,6 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 // main
 export async function  main() {
@@ -35,6 +33,8 @@ export async function  main() {
 
 // mainMain
 export async function  mainMain() {
+
+    lib.loadDotEnvSecrets(programOptions.inheritDotenv);
     locale = Intl.NumberFormat().resolvedOptions().locale;
     if ('locale' in programOptions) {
         locale = programOptions.locale;
@@ -3040,7 +3040,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
                 const  variableRegExp = new RegExp('\\\\?'+ lib.escapeRegularExpression( variable ), 'g');
 
                 address = address.replace(variableRegExp, (match, offset) => {
-                    const  startsBackSlash = (match.substr(0,1) === '\\');
+                    const  startsBackSlash = (match.substring(0,1) === '\\');
                     if (startsBackSlash) {
                         var  dollarOffset = offset + 1;
                     } else {
@@ -3063,7 +3063,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         }
     }
     if (address.startsWith('~')) {
-        address = lib.getHomePath() + address.substr(1);
+        address = lib.getHomePath() + address.substring(1);
     }
 
     // linkableAddress = ...
@@ -3084,8 +3084,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
 
     // recommended = ...
     var  recommended = address;
-    recommended = recommended.replace(/\$/g,'\\$');
-    var  recommendedMask = recommended;
+    recommended = recommended.replace(/\$/g,'\\$');  // not expanded $ by address.replace()
     const  lowerCaseDriveRegExp = /^[a-z]:/;
     const  upperCaseDriveRegExp = /^[A-Z]:/;
     const  sortedEnvronmentVariables: KeyValue[] = [];
@@ -3306,6 +3305,13 @@ function  printConfig() {
             }
         }
     }
+    const  secretEnvNames = Object.keys(lib.getDotEnvSecrets());
+    if (secretEnvNames.length >= 1) {
+        for (const envName of secretEnvNames) {
+            console.log(`    Verbose: (.env) ${envName} = (secret)`);
+        }
+        console.log(`    Verbose: ${translate`Envrironment variables defined in ".env" file are not inherit to child processes.`}`);
+    }
 }
 
 // varidateMutualSearchCommandArguments
@@ -3493,9 +3499,9 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
 function  getExpectedLineInFileTemplate(setting: Settings, lineInTemplate: string, parser: Parser): string {
     const  templateTag = parseTemplateTag(lineInTemplate, parser);
     if (templateTag.isFound) {
-        const  settingAndEnv = mergeEnvironmentVariable(setting);
+        const  settingWithSecrets = mergeSecretEnvironmentVariable(setting);
         const  before = getExpectedLine(setting, templateTag.template);
-        const  after = getExpectedLine(settingAndEnv, templateTag.template);
+        const  after = getExpectedLine(settingWithSecrets, templateTag.template);
 
         var  expected = lineInTemplate.substring(0, templateTag.indexInLine).replace(before, after).trimRight();
     } else {
@@ -3522,11 +3528,11 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
     return  getExpectedLine(replacedSetting, template);
 }
 
-// mergeEnvironmentVariable
-function  mergeEnvironmentVariable(settings: Settings): Settings {
+// mergeSecretEnvironmentVariable
+function  mergeSecretEnvironmentVariable(settings: Settings): Settings {
     const  settingsAndEnv = Object.assign({}, settings);
 
-    for (const [envName, envValue] of Object.entries(process.env)) {
+    for (const [envName, envValue] of Object.entries(lib.getProcessEnvAndDotEnvSecrets())) {
         const  value: Setting = {
             value: envValue || '(no_value)',
             lineNum: 0,
@@ -5041,6 +5047,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "template target values after replace are conflicted.": "変数の値を置き換えた後のテンプレートのターゲットが矛盾しています",
             "To show more result, restart typrm with --found-count-max option": "もっと多くの結果を表示するときは --found-count-max オプションを指定して typrm を再起動します",
             "To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.": "シェルのコマンドを実行するには、TYPRM_COMMAND_FOLDER 環境変数、または --command-folder オプションを設定してください。",
+            'Envrironment variables defined in ".env" file are not inherit to child processes.': ".env ファイルに定義した環境変数は子プロセスに継承されません。",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
@@ -5088,6 +5095,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
 }
 
 // callMainFromJest
+// The process runs in global scope by each starting tests.
+// This function is called by each tests.
 export async function  callMainFromJest(parameters?: string[], options?: {[name: string]: string}) {
     withJest = true;
     stdout = '';
