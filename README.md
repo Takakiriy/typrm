@@ -1300,6 +1300,32 @@ compared from the line immediately below the line found by the search.
 When the check content is `#file-template-any-lines:`,
 the check content written on the next line is searched in the target file.
 
+No error will occur even if there is a difference in tab width
+(number of space characters).
+Differences in the number of whitespace characters to the right of
+the hyphen that represent the YAML map sequence
+do not result in an error.
+
+`__Project__/root.yaml` file:
+
+    A part of ./target.yaml:  #file-template: ./target.yaml
+        name space:
+            interfaces:
+            objects:
+                -   fieldA:
+                    fieldB:
+                -   fieldA:
+                    fieldB:
+
+`__Project__/target.yaml` file:
+
+    name space:
+      interfaces:
+      objects:
+        - fieldA:
+          fieldB:
+        - fieldA:
+          fieldB:
 
 ## #if tag: set conditions
 

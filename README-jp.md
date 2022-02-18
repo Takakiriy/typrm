@@ -1260,6 +1260,30 @@ example.yaml:
 チェック内容が `#file-template-any-lines:` のときは、
 その次の行に書かれているチェック内容で対象のファイルの中を検索します。
 
+タブ幅（空白文字の数）の違いがあってもエラーにはなりません。
+YAML のマップのシーケンスを表すハイフンの右の空白文字の数も
+違いがあってもエラーにはなりません。
+
+`__Project__/root.yaml` ファイル:
+
+    ./target.yaml の一部:  #file-template: ./target.yaml
+        name space:
+            interfaces:
+            objects:
+                -   fieldA:
+                    fieldB:
+                -   fieldA:
+                    fieldB:
+
+`__Project__/target.yaml` ファイル:
+
+    name space:
+      interfaces:
+      objects:
+        - fieldA:
+          fieldB:
+        - fieldA:
+          fieldB:
 
 ## #if タグを使って条件を設定します
 

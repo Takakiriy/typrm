@@ -431,9 +431,6 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
 
         for (var contentsLineNum = 1;  contentsLineNum <= contentsLineCount;  contentsLineNum += 1) {
             const  contentsLine = contents[contentsLineNum-1];
-if (expectedParts[0].includes('TYPRM_TEST_ENV = __Bad__')  &&  contentsLineNum !== 4){
-pp('')
-}
 
             if (partsLineNum === partsLineNumFirst) {
                 if (_foundFirstLine(contentsLine, partsFirstLine, partsStartsWithHyphen)) {
@@ -464,10 +461,10 @@ pp('')
                 const  contentsLineHasNewIndent = contentsLine.startsWith(contentsIndent + ' ');
                 const  partsLineHasNewIndent = partsLine.startsWith(partsIndent + ' ');
 
-                if (contentsLineWithoutIndent === partsLineWithoutIndent  &&
+                if (_stringsWithoutIndentAreSame(contentsLineWithoutIndent, partsLineWithoutIndent)  &&
                         contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
                     result = Result.same;
-                } else if (_trimStringsAreSame(contentsLine, partsLine.trim())) {
+                } else if (_trimStringsAreSame(contentsLine, partsLine)) {
                     if (contentsLineHasNewIndent  &&  partsLineHasNewIndent) {
                         result = Result.same;
                     } else {
@@ -491,7 +488,7 @@ pp('')
                                     result = Result.same;
                                     if (_hasFirstFieldWithHyphen(partsLine, partsIndent.length)) {
                                         contentsIndent = getIndentWithoutHyphen(contentsLine)!;
-                                        partsIndent = getIndentWithoutHyphen(partsFirstLine)!;
+                                        partsIndent = getIndentWithoutHyphen(partsLine)!;
                                         contentsIndentStack.push(contentsIndent);
                                         partsIndentStack.push(partsIndent);
                                     }
@@ -614,6 +611,17 @@ pp('')
         }
 
         return  foundFirstLineOfParts  &&  rightOfFoundInContents === '';
+    }
+
+    function  _stringsWithoutIndentAreSame(contentsLineWithoutIndent: string, partsLineWithoutIndent: string): boolean {
+        const  contents = contentsLineWithoutIndent;
+        const  parts = partsLineWithoutIndent;
+
+        if (contents[0] === '-'  &&  parts[0] === '-') {
+            return  contents.substring(1).trimLeft() === parts.substring(1).trimLeft();
+        } else {
+            return  contents === parts;
+        }
     }
 
     function  _trimStringsAreSame(contentsLine: string, partsLine: string) {

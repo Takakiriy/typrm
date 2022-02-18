@@ -469,7 +469,7 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.only("OK >> YAML sequence of mappings >> width (contents < parts)", () => {
+            test("OK >> YAML sequence of mappings >> width (contents < parts)", () => {
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
                         '    Line 1:',
@@ -529,7 +529,7 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.skip("OK >> YAML sequence of mappings >> width (contents > parts)", () => {
+            test("OK >> YAML sequence of mappings >> width (contents > parts)", () => {
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
                         '    Line 1:',
@@ -580,7 +580,7 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.skip("OK >> YAML sequence of mappings >> first line contents", () => {
+            test("OK >> YAML sequence of mappings >> first line contents", () => {
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
                         '    -   Line 1:',  // This line will be not matched
@@ -590,7 +590,7 @@ describe("string >>", () => {
                         '   - Line 2:',
                         '     Line 3:',  // same or different
                     ], forDiff: {
-                        contentsLineNum: 3,  replaceContentsLine: "Line 16:",
+                        contentsLineNum: 3,  replaceContentsLine: "Line 3:",
                         partsLineNum: 2,
                     }
                 };
@@ -598,17 +598,17 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.skip("OK >> YAML sequence of mappings >> first line comment indent", () => {
+            test("OK >> YAML sequence of mappings >> first line comment indent", () => {
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
                         '    -      #// This line will be not match',
                         '    - #//',
-                        '        Line 2:',
+                        '        Line 3:',
                     ], expectedParts: [
                         '   -       #//',
-                        '     Line 2:',  // same or different
+                        '     Line 3:',  // same or different
                     ], forDiff: {
-                        contentsLineNum: 2,  replaceContentsLine: "Line 2:",
+                        contentsLineNum: 3,  replaceContentsLine: "Line 3:",
                         partsLineNum: 2,
                     }
                 };
@@ -616,7 +616,7 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.skip("Diff >> YAML comment with the hyphen in parts second line", () => {
+            test("Diff >> YAML comment with the hyphen in parts second line", () => {
                 const  unexpectedLine = lib.checkTextContents([
                         // testingContents
                         'block:',

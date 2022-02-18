@@ -1167,14 +1167,11 @@ class TemplateTag {
         const currentIndent = indentRegularExpression.exec(line)[0];
         var readingNext = true;
         if (currentIndent.length > this.indentAtTag.length && line.startsWith(this.indentAtTag)) {
-            const skip = (this.templateLines.length === 0 && line.trim() === fileTemplateAnyLinesLabel);
-            if (!skip) {
-                this.templateLines.push(line);
-            }
+            this.templateLines.push(line);
             this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
         }
         else {
-            this.templateLines = this.templateLines.map((line) => (line.substr(this.minIndentLength)));
+            this.templateLines = this.templateLines.map((line) => (line.substring(this.minIndentLength)));
             readingNext = false;
         }
         return readingNext;
@@ -1345,134 +1342,28 @@ class TemplateTag {
         if (this.templateLines.length === 0) {
             return false;
         }
-        const expectedFirstLine = getExpectedLineInFileTemplate(setting, this.templateLines[0], parser);
-        var templateLineIndex = 0;
-        var targetLineNum = 0;
-        var errorTemplateLineIndex = 0;
-        var errorTargetLineNum = 0;
-        var errorContents = '';
-        var errorExpected = '';
-        var errorTemplate = '';
-        var indent = '';
-        let Result;
-        (function (Result) {
-            Result[Result["same"] = 0] = "same";
-            Result[Result["different"] = 1] = "different";
-            Result[Result["skipped"] = 2] = "skipped";
-        })(Result || (Result = {}));
-        ;
-        var result = Result.same;
-        var skipTo = '';
-        var skipToTemplate = '';
-        var skipFrom = '';
-        var skipStartLineNum = 0;
-        var loop = true;
-        var exception;
+        const testingContents = [];
         for await (const line1 of targetFileReader) {
-            if (!loop) {
-                continue;
-            } // "reader" requests read all lines
-            try {
-                const targetLine = line1;
-                targetLineNum += 1;
-                if (templateLineIndex === 0) {
-                    const indentLength = targetLine.indexOf(expectedFirstLine);
-                    if (indentLength !== notFound && targetLine.trim() === expectedFirstLine.trim()) {
-                        result = Result.same;
-                        indent = targetLine.substring(0, indentLength);
-                    }
-                    else {
-                        result = Result.different;
-                    }
-                }
-                else if (skipTo === '') { // lineIndex >= 1, not skipping
-                    const expected = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex], parser);
-                    if (targetLine === indent + expected) {
-                        result = Result.same;
-                    }
-                    else if (expected.trim() === fileTemplateAnyLinesLabel) {
-                        result = Result.skipped;
-                        templateLineIndex += 1;
-                        skipToTemplate = this.templateLines[templateLineIndex];
-                        skipTo = getExpectedLineInFileTemplate(setting, this.templateLines[templateLineIndex], parser);
-                        skipFrom = targetLine;
-                        skipStartLineNum = targetLineNum;
-                    }
-                    else {
-                        result = Result.different;
-                        errorTemplateLineIndex = templateLineIndex;
-                        errorTargetLineNum = targetLineNum;
-                        errorContents = targetLine;
-                        errorExpected = indent + expected;
-                        errorTemplate = indent + this.templateLines[templateLineIndex];
-                    }
-                }
-                else { // skipTo
-                    if (targetLine === indent + skipTo) {
-                        result = Result.same;
-                    }
-                    else if (targetLine.trim() === '' || targetLine.startsWith(indent)) {
-                        result = Result.skipped;
-                    }
-                    else {
-                        result = Result.different;
-                        errorTemplateLineIndex = templateLineIndex;
-                        errorTargetLineNum = skipStartLineNum;
-                        errorContents = skipFrom;
-                        errorExpected = skipTo;
-                        errorTemplate = skipToTemplate;
-                    }
-                }
-                if (result === Result.same) {
-                    templateLineIndex += 1;
-                    if (templateLineIndex >= this.templateLines.length) {
-                        loop = false; // return or break must not be written.
-                        // https://stackoverflow.com/questions/23208286/node-js-10-fs-createreadstream-streams2-end-event-not-firing
-                    }
-                    skipTo = '';
-                }
-                else if (result === Result.skipped) {
-                    // Do nothing
-                }
-                else { // Result.different
-                    templateLineIndex = 0;
-                    skipTo = '';
-                }
-            }
-            catch (e) {
-                exception = e;
-                loop = false;
-            }
+            const line = line1;
+            testingContents.push(line);
         }
-        if (exception) {
-            parser.errorCount += 1;
-            throw exception;
+        const expectedParts = [];
+        for (const line of this.templateLines) {
+            expectedParts.push(getExpectedLineInFileTemplate(setting, line, parser));
         }
-        if (result !== Result.same) {
-            var templateLineNum = 0;
-            if (result === Result.different) {
-                templateLineNum = templateEndLineNum - this.templateLines.length + errorTemplateLineIndex;
-            }
-            if (result === Result.skipped) {
-                templateLineNum = templateEndLineNum - this.templateLines.length + templateLineIndex;
-                errorContents = skipFrom;
-                errorExpected = skipTo;
-                errorTemplate = skipToTemplate;
-                errorTargetLineNum = skipStartLineNum;
-            }
-            if (errorContents === '') {
-                errorContents = '(Not found)';
-                errorExpected = expectedFirstLine;
-                errorTemplate = this.templateLines[0];
-            }
+        const indent = ' '.repeat(this.minIndentLength);
+        const unexpectedLine = lib.checkTextContents(testingContents, expectedParts, fileTemplateAnyLinesLabel);
+        if (unexpectedLine) {
             console.log('');
-            console.log(`${getTestablePath(parser.filePath)}:${templateLineNum}: ${errorTemplate}`);
-            console.log(`${getTestablePath(targetFilePath)}:${errorTargetLineNum}: ${errorContents}`);
+            console.log(`${getTestablePath(parser.filePath)}:${parser.lineNum - this.templateLines.length + unexpectedLine.partsLineNum - 1}: ` +
+                `${indent + this.templateLines[unexpectedLine.partsLineNum - 1]}`);
+            console.log(`${getTestablePath(targetFilePath)}:${unexpectedLine.contentsLineNum}: ${unexpectedLine.contentsLine || '(Not found)'}`);
             console.log(`    ${translate('Warning')}: ${translate('Not same as file contents')}`);
-            console.log(`    ${translate('Expected')}: ${errorExpected}`);
+            console.log(`    ${translate('Expected')}: ${unexpectedLine.partsLine}`);
             parser.warningCount += 1;
+            return false;
         }
-        return result === Result.same;
+        return true;
     }
 }
 // IfTagParser
