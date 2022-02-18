@@ -469,7 +469,7 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test("OK >> YAML sequence of mappings >> width (contents < parts)", () => {
+            test.only("OK >> YAML sequence of mappings >> width (contents < parts)", () => {
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
                         '    Line 1:',

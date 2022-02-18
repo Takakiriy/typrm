@@ -409,12 +409,15 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
         var  contentsIndentStack: string[] = [];
         var  skipToContentsIndent = '';
         const  parts = cutIndent(expectedParts.slice());
-        const  partsStartsWithHyphen = (parts[0].substring(0,1) === '-');
+        const  partsStartsWithHyphen = (parts[0][0] === '-');
         var  partsFirstLine = parts[0].trim();
         var  partsLineNumFirst = 1;
         if (partsFirstLine.trim() === anyLinesTag) {
             partsFirstLine = parts[1].trim();
             partsLineNumFirst = 2;
+        }
+        if (partsStartsWithHyphen) {
+            partsFirstLine = partsFirstLine.substring(1).trimLeft();
         }
         var  partsIndent = '';
         var  partsIndentStack: string[] = [];
@@ -428,31 +431,17 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
 
         for (var contentsLineNum = 1;  contentsLineNum <= contentsLineCount;  contentsLineNum += 1) {
             const  contentsLine = contents[contentsLineNum-1];
+if (expectedParts[0].includes('TYPRM_TEST_ENV = __Bad__')  &&  contentsLineNum !== 4){
+pp('')
+}
 
             if (partsLineNum === partsLineNumFirst) {
-                if ( ! partsStartsWithHyphen) {
-                    var  partColumnIndexInContents = contentsLine.indexOf(partsFirstLine);
-                } else { // if partsStartsWithHyphen
-                    const  contentsStartsWithHyphen = (contentsLine.trimStart()[0] === '-');
-                    if (contentsStartsWithHyphen) {
-                        var  partColumnIndexInContents = contentsLine.indexOf('-');
-                    } else {
-                        var  partColumnIndexInContents = notFound;
-                    }
-                }
-                const  foundFirstLineOfParts = (partColumnIndexInContents !== notFound);
-                if (foundFirstLineOfParts) {
-                    var  rightOfFoundInContents = contentsLine.substring(0, partColumnIndexInContents).trim();
-                } else {
-                    var  rightOfFoundInContents = '';  // This value will be ignored
-                }
-
-                if (foundFirstLineOfParts  &&  rightOfFoundInContents === '') {
+                if (_foundFirstLine(contentsLine, partsFirstLine, partsStartsWithHyphen)) {
                     result = Result.same;
                     contentsIndentStack = [];
                     partsIndentStack = [];
                     if (partsLineNumFirst === 2) {
-                        const  deeperContentsIndent = contentsLine.substring(0, partColumnIndexInContents);
+                        const  deeperContentsIndent = indentRegularExpression.exec(contentsLine)![0];
                         for (let lineNum = contentsLineNum - 1;  lineNum >= 1;  lineNum -= 1) {
                             const  aboveContentsLine = contents[lineNum-1];
                             if ( ! aboveContentsLine.startsWith(deeperContentsIndent)) {
@@ -603,6 +592,28 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
         }
 
         return  unexpectedLine;
+    }
+
+    function  _foundFirstLine(contentsLine: string, partsFirstLine: string, partsStartsWithHyphen: boolean): boolean {
+        if ( ! partsStartsWithHyphen) {
+            var  partColumnIndexInContents = contentsLine.indexOf(partsFirstLine);
+        } else { // if partsStartsWithHyphen
+            const  contentsStartsWithHyphen = (contentsLine.trimStart()[0] === '-');
+            if (contentsStartsWithHyphen) {
+                var  partColumnIndexInContents = contentsLine.indexOf('-');
+                var  partColumnIndexInContents = contentsLine.indexOf(partsFirstLine, partColumnIndexInContents + 1);
+            } else {
+                var  partColumnIndexInContents = notFound;
+            }
+        }
+        const  foundFirstLineOfParts = (partColumnIndexInContents !== notFound);
+        if (foundFirstLineOfParts) {
+            var  rightOfFoundInContents = contentsLine.substring(partColumnIndexInContents + partsFirstLine.length).trim();
+        } else {
+            var  rightOfFoundInContents = '';  // This value will be ignored
+        }
+
+        return  foundFirstLineOfParts  &&  rightOfFoundInContents === '';
     }
 
     function  _trimStringsAreSame(contentsLine: string, partsLine: string) {
