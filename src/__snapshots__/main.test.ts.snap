@@ -116,7 +116,7 @@ exports[`checks file contents >> First >> any_lines: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:41:             3 NG not end
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:21:     3 NG start
     Warning: Not same as file contents
-    Expected:     3 NG not end
+    Expected: 3 NG not end
 
 Warning: 2, Error: 0
 template count = 9

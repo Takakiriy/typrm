@@ -246,7 +246,7 @@ describe("checks file contents >>", () => {
             "environment_variable", "file_5",
         ]
     ])("First >> %s", async (caseName, _fileNameHead) => {
-if (caseName !== 'any_lines') {return;}  // || subCase !== '____'
+if (caseName !== 'environment_variable') {return;}  // || subCase !== '____'
         chdirInProject('src');
         const  sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const  changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
