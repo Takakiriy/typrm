@@ -1268,15 +1268,12 @@ class  TemplateTag {
         const  currentIndent = indentRegularExpression.exec(line)![0];
         var  readingNext = true;
         if (currentIndent.length > this.indentAtTag.length  &&  line.startsWith(this.indentAtTag)) {
-            const  skip = (this.templateLines.length === 0  &&  line.trim() === fileTemplateAnyLinesLabel);
-            if ( ! skip ) {
 
-                this.templateLines.push(line);
-            }
+            this.templateLines.push(line);
             this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
         } else {
             this.templateLines = this.templateLines.map((line)=>(
-                line.substr(this.minIndentLength)));
+                line.substring(this.minIndentLength)));
             readingNext = false;
         }
         return  readingNext;
@@ -1435,8 +1432,61 @@ class  TemplateTag {
         }
     }
 
+    // checkTargetFileContentsNew
+    async  checkTargetFileContentsNew(setting: Settings, parser: Parser): Promise<boolean> {
+        const  parentPath = path.dirname(parser.filePath);
+        const  targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
+        const  templateEndLineNum = parser.lineNum;
+        if (parser.verbose) {
+            console.log(`        Verbose: checkTargetFileContents: ${getTestablePath(parser.filePath)}`)
+        }
+        if ( ! fs.existsSync(targetFilePath)) {
+            const  templateLineNum = templateEndLineNum - this.templateLines.length;
+            console.log("");
+            console.log(`Error of not found the target file:`);
+            console.log(`  ${translate('NotFound')}: ${getTestablePath(targetFilePath)}`);
+            console.log(`  Template: ${getTestablePath(parser.filePath)}:${templateLineNum}`);
+            parser.errorCount += 1;
+            return  false;
+        }
+        const  targetFileReader = readline.createInterface({
+            input: fs.createReadStream(targetFilePath),
+            crlfDelay: Infinity
+        });
+        if (this.templateLines.length === 0) {
+            return  false;
+        }
+
+        const  testingContents: string[] = [];
+        for await (const line1 of targetFileReader) {
+            const  line: string = line1;
+            testingContents.push(line);
+        }
+
+        const  expectedParts: string[] = [];
+        for (const line of this.templateLines) {
+            expectedParts.push(getExpectedLineInFileTemplate(setting, line, parser));
+        }
+        const  indent = ' '.repeat(this.minIndentLength);
+
+        const  unexpectedLine = lib.checkTextContents(testingContents, expectedParts, fileTemplateAnyLinesLabel);
+        if (unexpectedLine) {
+            console.log('');
+            console.log(`${getTestablePath(parser.filePath)}:${parser.lineNum - this.templateLines.length + unexpectedLine.partsLineNum - 1}: ` +
+                `${indent + this.templateLines[unexpectedLine.partsLineNum - 1]}`);
+            console.log(`${getTestablePath(targetFilePath)}:${unexpectedLine.contentsLineNum}: ${unexpectedLine.contentsLine  || '(Not found)'}`);
+            console.log(`    ${translate('Warning')}: ${translate('Not same as file contents')}`);
+            console.log(`    ${translate('Expected')}: ${unexpectedLine.partsLine}`);
+            parser.warningCount += 1;
+            return  false;
+        }
+
+        return  true;
+    }
+
     // checkTargetFileContents
     async  checkTargetFileContents(setting: Settings, parser: Parser): Promise<boolean> {
+        return  this.checkTargetFileContentsNew(setting, parser);
         const  parentPath = path.dirname(parser.filePath);
         const  targetFilePath = lib.getFullPath(getExpectedLine(setting, this.template), parentPath);
         const  templateEndLineNum = parser.lineNum;

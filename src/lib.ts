@@ -168,9 +168,9 @@ export function  getFullPath(relativePath: string, basePath: string): string {
     const  slashFirstIndex = slashRelativePath.indexOf('/');
     const  withProtocol = (colonSlashIndex + 1 === slashFirstIndex);  // e.g.) C:/, http://
 
-    if (relativePath.substr(0,1) === '/') {
+    if (relativePath[0] === '/') {
         fullPath = relativePath;
-    } else if (relativePath.substr(0,1) === '~') {
+    } else if (relativePath[0] === '~') {
         fullPath = relativePath.replace('~', getHomePath() );
     } else if (withProtocol) {
         fullPath = relativePath;
@@ -296,7 +296,7 @@ export function  cutLeftOf(input: string, keyword: string): string {
     const  keywordPosition = input.indexOf(keyword);
     if (keywordPosition !== notFound) {
 
-        return  input.substr(keywordPosition);
+        return  input.substring(keywordPosition);
     } else {
         return  input;
     }
@@ -309,7 +309,7 @@ export function  cutLeftOf(input: string, keyword: string): string {
 export function  cutLast(input: string, keyword: string): string {
     if (input.endsWith(keyword)) {
 
-        return  input.substr(0, input.length - keyword.length);
+        return  input.substring(0, input.length - keyword.length);
     } else {
         return  input;
     }
@@ -399,25 +399,26 @@ function  getIndentWithoutHyphen(line: string): string | null {
 export function  checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string
         ): UnexpectedLine | null {
 
-    return  main(testingContents, expectedParts, anyLinesTag);
-    function  main(testingContents: string[], expectedParts: string[], anyLinesTag: string
+    return  _main(testingContents, expectedParts, anyLinesTag);
+    function  _main(testingContents: string[], expectedParts: string[], anyLinesTag: string
             ): UnexpectedLine | null {
 
         const  contents = testingContents;
         const  contentsLineCount = contents.length;
         var  contentsIndent = '';
         var  contentsIndentStack: string[] = [];
+        var  skipToContentsIndent = '';
         const  parts = cutIndent(expectedParts.slice());
         const  partsStartsWithHyphen = (parts[0].substring(0,1) === '-');
-        const  partsFirstLine = parts[0];
-        if ( ! partsStartsWithHyphen) {
-            var  partsFirstLineWithoutHyphen = parts[0];
-        } else {
-            var  partsFirstLineWithoutHyphen = parts[0].substring(1).trimStart();
+        var  partsFirstLine = parts[0].trim();
+        var  partsLineNumFirst = 1;
+        if (partsFirstLine.trim() === anyLinesTag) {
+            partsFirstLine = parts[1].trim();
+            partsLineNumFirst = 2;
         }
         var  partsIndent = '';
         var  partsIndentStack: string[] = [];
-        var  partsLineNum = 1;
+        var  partsLineNum = partsLineNumFirst;
         enum Result { same, different, skipped };
         var  result = Result.same;
         var  unexpectedLine: UnexpectedLine | null = null;
@@ -427,39 +428,47 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
 
         for (var contentsLineNum = 1;  contentsLineNum <= contentsLineCount;  contentsLineNum += 1) {
             const  contentsLine = contents[contentsLineNum-1];
-// if (contentsLineNum == 5  &&  ! testingContents.includes('(unexpected)')) {
-// pp('')
-// }
-            if (partsLineNum === 1) {
+
+            if (partsLineNum === partsLineNumFirst) {
                 if ( ! partsStartsWithHyphen) {
-                    var  partColumnIndex = contentsLine.indexOf(partsFirstLine);
+                    var  partColumnIndexInContents = contentsLine.indexOf(partsFirstLine);
                 } else { // if partsStartsWithHyphen
                     const  contentsStartsWithHyphen = (contentsLine.trimStart()[0] === '-');
                     if (contentsStartsWithHyphen) {
-                        var  partColumnIndex = contentsLine.indexOf('-');
+                        var  partColumnIndexInContents = contentsLine.indexOf('-');
                     } else {
-                        var  partColumnIndex = notFound;
+                        var  partColumnIndexInContents = notFound;
                     }
                 }
-                const  contentsHasPartsFirstLine = (partColumnIndex !== notFound);
-                const  contentsAfterPartsFirstLine = contentsLine.substring(0, partColumnIndex).trim();
+                const  foundFirstLineOfParts = (partColumnIndexInContents !== notFound);
+                if (foundFirstLineOfParts) {
+                    var  rightOfFoundInContents = contentsLine.substring(0, partColumnIndexInContents).trim();
+                } else {
+                    var  rightOfFoundInContents = '';  // This value will be ignored
+                }
 
-                if (contentsHasPartsFirstLine  &&  contentsAfterPartsFirstLine === '') {
+                if (foundFirstLineOfParts  &&  rightOfFoundInContents === '') {
                     result = Result.same;
-                    contentsIndent = contentsLine.substring(0, partColumnIndex);
-                    contentsIndentStack = [contentsIndent];
-                    partsIndent = indentRegularExpression.exec(partsFirstLine)![0];
-                    partsIndentStack = [partsIndent];
-                    if (partsStartsWithHyphen) {
-                        contentsIndent = getIndentWithoutHyphen(contentsLine)!;
-                        contentsIndentStack.push(contentsIndent);
-                        partsIndent = getIndentWithoutHyphen(partsFirstLine)!;
-                        partsIndentStack.push(partsIndent);
+                    contentsIndentStack = [];
+                    partsIndentStack = [];
+                    if (partsLineNumFirst === 2) {
+                        const  deeperContentsIndent = contentsLine.substring(0, partColumnIndexInContents);
+                        for (let lineNum = contentsLineNum - 1;  lineNum >= 1;  lineNum -= 1) {
+                            const  aboveContentsLine = contents[lineNum-1];
+                            if ( ! aboveContentsLine.startsWith(deeperContentsIndent)) {
+
+                                [contentsIndent, partsIndent] =
+                                    _pushToIndentStack(contentsIndentStack, partsIndentStack, aboveContentsLine, parts[0]);
+                                break;
+                            }
+                        }
                     }
+                    [contentsIndent, partsIndent] =
+                        _pushToIndentStack(contentsIndentStack, partsIndentStack, contentsLine, parts[partsLineNumFirst - 1]);
                 } else {
                     result = Result.different;
                 }
-            } else if (skipTo === '') {
+            } else if (skipTo === '') {  // not skip
                 const  partsLine = parts[partsLineNum-1];
                 const  contentsLineWithoutIndent = contentsLine.substring(contentsIndent.length);
                 const  partsLineWithoutIndent = partsLine.substring(partsIndent.length);
@@ -469,7 +478,7 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                 if (contentsLineWithoutIndent === partsLineWithoutIndent  &&
                         contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
                     result = Result.same;
-                } else if (contentsLine.trim() === partsLine.trim()) {
+                } else if (_trimStringsAreSame(contentsLine, partsLine.trim())) {
                     if (contentsLineHasNewIndent  &&  partsLineHasNewIndent) {
                         result = Result.same;
                     } else {
@@ -488,9 +497,15 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                             partsIndent = partsIndentStack[partsIndentStack.length-1];
 
                             if (contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
-                                if (contentsLine.substr(contentsIndent.length, 1) !== ' '  &&
-                                        partsLine.substr(partsIndent.length, 1) !== ' ') {
+                                if (contentsLine[contentsIndent.length] !== ' '  &&
+                                        partsLine[partsIndent.length] !== ' ') {
                                     result = Result.same;
+                                    if (_hasFirstFieldWithHyphen(partsLine, partsIndent.length)) {
+                                        contentsIndent = getIndentWithoutHyphen(contentsLine)!;
+                                        partsIndent = getIndentWithoutHyphen(partsFirstLine)!;
+                                        contentsIndentStack.push(contentsIndent);
+                                        partsIndentStack.push(partsIndent);
+                                    }
                                 } else {
                                     result = Result.different;
                                     if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
@@ -508,6 +523,18 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                     skipTo = parts[partsLineNum-1];
                     skipFrom = contentsLine;
                     skipStartLineNum = contentsLineNum;
+                    skipToContentsIndent = contentsIndentStack[0];
+                    for (let level = partsIndentStack.length - 1;  level > 0;  level -= 1) {
+                        if (skipTo.startsWith(partsIndentStack[level])) {
+                            skipToContentsIndent = contentsIndentStack[level];
+                            if (skipTo.trimLeft()[0] === '-') {
+                                skipToContentsIndent += '-';
+                                skipTo = skipTo.substring(skipTo.indexOf('-') + 1);
+                            }
+                            break;
+                        }
+                    }
+                    skipTo = skipTo.trim();
                 } else {
                     result = Result.different;
                     if (unexpectedLine === null  ||  partsLineNum > unexpectedLine.partsLineNum) {
@@ -518,13 +545,11 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
 
                 // contentsIndentStack, ... = ...
                 if (contentsLineHasNewIndent || partsLineHasNewIndent) {
-                    contentsIndent = indentRegularExpression.exec(contentsLine)![0];
-                    contentsIndentStack.push(contentsIndent);
-                    partsIndent = indentRegularExpression.exec(partsLine)![0];
-                    partsIndentStack.push(partsIndent);
+                    [contentsIndent, partsIndent] = _pushToIndentStack(
+                        contentsIndentStack, partsIndentStack, contentsLine, partsLine);
                 }
             } else { // skipTo
-                if (contentsLine === contentsIndent + skipTo) {
+                if (_foundSkipTo(contentsLine, skipToContentsIndent, skipTo)) {
                     result = Result.same;
                 } else {  // if (contentsLine.trim() === ''  ||  (contentsLine.startsWith(contentsIndent)  &&  contentsIndent !== '')) {
                     result = Result.skipped;
@@ -540,7 +565,7 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
             } else if (result === Result.skipped) {
                 // Do nothing
             } else {  // Result.different
-                partsLineNum = 1;
+                partsLineNum = partsLineNumFirst;
                 skipTo = '';
             }
         }
@@ -549,11 +574,11 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
             unexpectedLine = null;
         } else if (result === Result.different) {
             if (unexpectedLine === null) {
-                if (partsLineNum === 1) {
+                if (partsLineNum <= partsLineNumFirst) {
                     unexpectedLine = {
                         contentsLineNum: 0,
                         contentsLine: '',
-                        partsLineNum: 1,
+                        partsLineNum: partsLineNum,
                         partsLine: expectedParts[0],
                     };
                 } else {
@@ -578,6 +603,57 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
         }
 
         return  unexpectedLine;
+    }
+
+    function  _trimStringsAreSame(contentsLine: string, partsLine: string) {
+        if (contentsLine.trimLeft()[0] === '-'  &&  partsLine.trimLeft()[0] === '-') {
+            return  contentsLine.trimLeft().substring(1).trim() === partsLine.trimLeft().substring(1).trim();
+        } else {
+            return  contentsLine.trim() === partsLine.trim();
+        }
+    }
+
+    function  _foundSkipTo(contentsLine: string, skipToContentsIndent: string, skipTo: string): boolean {
+        if (contentsLine.startsWith(skipToContentsIndent)) {
+            const  hasHyphen = skipToContentsIndent.slice(-1) === '-';
+            if ( ! hasHyphen) {
+                return  contentsLine.substring(skipToContentsIndent.length).trimRight() === skipTo;
+            } else {
+                return  contentsLine.substring(skipToContentsIndent.length).trim() === skipTo;
+            }
+        } else {
+            return  false;
+        }
+    }
+
+    function  _pushToIndentStack(contentsIndentStack: string[], partsIndentStack: string[],
+            contentsLine: string, partsLine: string): string[] {
+        const  contentsIndent = indentRegularExpression.exec(contentsLine)![0];
+        const  partsIndent = indentRegularExpression.exec(partsLine)![0];
+
+        contentsIndentStack.push(contentsIndent);
+        partsIndentStack.push(partsIndent);
+
+        if ( ! _hasFirstFieldWithHyphen(partsLine, partsIndent.length)) {
+            return  [contentsIndent, partsIndent];
+        } else {
+            const  contentsIndent = getIndentWithoutHyphen(contentsLine)!;
+            const  partsIndent = getIndentWithoutHyphen(partsLine)!;
+
+            contentsIndentStack.push(contentsIndent);
+            partsIndentStack.push(partsIndent);
+            return  [contentsIndent, partsIndent];
+        }
+    }
+
+    function  _hasFirstFieldWithHyphen(line: string, indentLength: number): boolean {
+        const  lineStartsWithHyphen = (line[indentLength] === '-');
+        if (lineStartsWithHyphen) {
+            const  rightOfHyphen = line.substring(indentLength + 1).trimLeft();
+            return  rightOfHyphen[0] !== '#';
+        } else {
+            return  false;
+        }
     }
 }
 

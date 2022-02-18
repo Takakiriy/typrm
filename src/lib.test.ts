@@ -214,20 +214,20 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.skip("OK >> any lines tag >> shallow any lines tag in parts", () => {
+            test("Diff >> any lines tag >> at first line", () => { // line 1 is deeper than line 2
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
-                        "Line 1", "Line 2", "Line 3",
-                        "Line 4",
-                        "Line 5",  // or (unexpected)
+                        "Line 1",
+                        "    Line 2",
+                        "        Line 3",
+                        "    Line 4", // or (unexpected)
                     ], expectedParts: [
-                        "    Line 1",
-                        anyLinesTag,
-                        "    Line 4",
-                        "    Line 5",  // same or different
+                        `${anyLinesTag}`,  // This indent is used as level 0 indent
+                        "    Line 3",
+                        "Line 4",  // same or different
                     ], forDiff: {
-                        contentsLineNum: 5,  replaceContentsLine: "Line 5",
-                        partsLineNum: 4,
+                        contentsLineNum: 4,  replaceContentsLine: "Line 4",
+                        partsLineNum: 3,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -303,27 +303,6 @@ describe("string >>", () => {
                     ], forDiff: {
                         contentsLineNum: 11,  replaceContentsLine: "Line 11",
                         partsLineNum: 11,
-                    }
-                };
-                simpleTestOfCheckFileContents(testData);
-                alternateTestsOfCheckFileContents(testData);
-            });
-
-            test.skip("OK >> indent depth >> line 1 is deeper than line 2", () => {
-                const  testData: testOfCheckFileContentsTestData = {
-                    testingContents: [
-                        '  Line 1',
-                        '  unexpected',
-                        '      Line 3',
-                        '  Line 4',
-                        '  Line 5',
-                    ], expectedParts: [
-                        '        Line 3',
-                        '    Line 4',
-                        '    Line 5',
-                    ], forDiff: {
-                        contentsLineNum: 5,  replaceContentsLine: "Line 5",
-                        partsLineNum: 3,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -490,32 +469,7 @@ describe("string >>", () => {
                 alternateTestsOfCheckFileContents(testData);
             });
 
-            test.skip("OK >> indent width >> line 1 is deeper than line 2", () => {
-                const  testData: testOfCheckFileContentsTestData = {
-                    testingContents: [
-                        '        Line 1',
-                        '      Line 2',
-                        '  Line 3',
-                        '  Line 4',
-                        '    Line 5',
-                        '    Line 6',  // or (unexpected)
-                    ], expectedParts: [
-                        '            Line 1', // In this test, parts first line must be deeper than contents.
-                        '        Line 2',  // In this case, it is impossible to check the level of shallowing.
-                        'Line 3',
-                        'Line 4',
-                        '    Line 5',
-                        '    Line 6',  // same or different
-                    ], forDiff: {
-                        contentsLineNum: 6,  replaceContentsLine: "Line 6",
-                        partsLineNum: 6,
-                    }
-                };
-                simpleTestOfCheckFileContents(testData);
-                alternateTestsOfCheckFileContents(testData);
-            });
-
-            test.skip("OK >> YAML sequence of mappings >> width (contents < parts)", () => {
+            test("OK >> YAML sequence of mappings >> width (contents < parts)", () => {
                 const  testData: testOfCheckFileContentsTestData = {
                     testingContents: [
                         '    Line 1:',
@@ -534,14 +488,14 @@ describe("string >>", () => {
                         '       -  Line 14:',  // different width
                         '       -  Line 15:',  // continuous hyphen
                         '       -',            // hyphen only
-                        '          Line 16:',
-                        '          Line 17:',
-                        '       -    #//',       // comment indent is not checked
-                        '          Line 19:',
-                        '          Line 20:',
-                        '          Line 21:',
-                        '       -  Line 22:',
-                        '          Line 23:',  // or (unexpected)
+                        '         Line 17:',
+                        '         Line 18:',
+                        '       -   #//',       // comment indent is not field indent of next line
+                        '         Line 20:',
+                        '         Line 21:',
+                        '         Line 22:',
+                        '       - Line 23:',
+                        '         Line 24:',  // or (unexpected)
                     ], expectedParts: [
                         '            -   Line 2:',  // found hyphen with different indent width
                         '                Line 3:',
@@ -558,17 +512,17 @@ describe("string >>", () => {
                         '                -   Line 14:',
                         '                -   Line 15:',
                         '                -',
-                        '                    Line 16:',
                         '                    Line 17:',
+                        '                    Line 18:',
                         '                -         #//',
-                        '                    Line 19:',
                         '                    Line 20:',
+                        '                    Line 21:',
                         `                    ${anyLinesTag}`,
-                        '                -   Line 22:',
-                        '                    Line 23:',  // same or different
+                        '                -   Line 23:',
+                        '                    Line 24:',  // same or different
                     ], forDiff: {
-                        contentsLineNum: 16,  replaceContentsLine: "Line 16:",
-                        partsLineNum: 15,
+                        contentsLineNum: 24,  replaceContentsLine: "Line 24:",
+                        partsLineNum: 23,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -614,7 +568,7 @@ describe("string >>", () => {
                         '     - Line 14:',
                         '     - Line 15:',
                         '       Line 16:',
-                        `        ${anyLinesTag}`,
+                        `       ${anyLinesTag}`,
                         '     - Line 18:',
                         '       Line 19:',  // same or different
                     ], forDiff: {
@@ -624,6 +578,65 @@ describe("string >>", () => {
                 };
                 simpleTestOfCheckFileContents(testData);
                 alternateTestsOfCheckFileContents(testData);
+            });
+
+            test.skip("OK >> YAML sequence of mappings >> first line contents", () => {
+                const  testData: testOfCheckFileContentsTestData = {
+                    testingContents: [
+                        '    -   Line 1:',  // This line will be not matched
+                        '    -   Line 2:',
+                        '        Line 3:',
+                    ], expectedParts: [
+                        '   - Line 2:',
+                        '     Line 3:',  // same or different
+                    ], forDiff: {
+                        contentsLineNum: 3,  replaceContentsLine: "Line 16:",
+                        partsLineNum: 2,
+                    }
+                };
+                simpleTestOfCheckFileContents(testData);
+                alternateTestsOfCheckFileContents(testData);
+            });
+
+            test.skip("OK >> YAML sequence of mappings >> first line comment indent", () => {
+                const  testData: testOfCheckFileContentsTestData = {
+                    testingContents: [
+                        '    -      #// This line will be not match',
+                        '    - #//',
+                        '        Line 2:',
+                    ], expectedParts: [
+                        '   -       #//',
+                        '     Line 2:',  // same or different
+                    ], forDiff: {
+                        contentsLineNum: 2,  replaceContentsLine: "Line 2:",
+                        partsLineNum: 2,
+                    }
+                };
+                simpleTestOfCheckFileContents(testData);
+                alternateTestsOfCheckFileContents(testData);
+            });
+
+            test.skip("Diff >> YAML comment with the hyphen in parts second line", () => {
+                const  unexpectedLine = lib.checkTextContents([
+                        // testingContents
+                        'block:',
+                        '    - #// bad comment',
+                        '        1stField:',
+                        '        2ndField:',
+                    ],[
+                        // expectedParts
+                        'block:',
+                        '    -   #// comment',
+                        '        1stField:',
+                        '        2ndField:',
+                    ],
+                    anyLinesTag);
+                expect(unexpectedLine).toStrictEqual({
+                    contentsLineNum: 2,
+                    contentsLine: '    - #// bad comment',
+                    partsLineNum: 2,
+                    partsLine: '    -   #// comment',
+                });
             });
 
             test("Diff >> shallow level", () => {

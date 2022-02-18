@@ -18,17 +18,17 @@ sudo nano ../../file_target/1/file_1_ok_and_bad_3_target.sh: |  #file-template: 
 
 exports[`checks file contents >> First >> NG: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:7:             user: 'user2'  #template: __User__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:7:         user: 'user2'  #template: __User__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:4:             user: 'user1'
     Warning: Not same as file contents
-    Expected:             user: 'user2'
+    Expected:     user: 'user2'
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:10: login user2  #template: __User__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:10:     login user2  #template: __User__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0: (Not found)
     Warning: Not same as file contents
     Expected: login user2
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:12: login user2  #template: __User__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:12:     login user2  #template: __User__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0: (Not found)
     Warning: Not same as file contents
     Expected: login user2
@@ -108,12 +108,12 @@ Target of template file >> any lines at first:
 
 exports[`checks file contents >> First >> any_lines: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:16: not fourth  #template: __Fourth__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:16:             not fourth  #template: __Fourth__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:3:     second
     Warning: Not same as file contents
     Expected: not fourth
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:41:     3 NG not end
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:41:             3 NG not end
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:21:     3 NG start
     Warning: Not same as file contents
     Expected:     3 NG not end
@@ -323,7 +323,7 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
     Warning: Not matched with the template.
     Expected: develop
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:15: Checks
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:15:             Checks
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks
@@ -346,42 +346,42 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
     Warning: Not matched with the template.
     Expected: develop
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:48: Checks if develop  #template: __Stage__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:48:             Checks if develop  #template: __Stage__
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if develop
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:57: Checks if not product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:57:             Checks if not product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if not product
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:59: Checks if not product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:59:             Checks if not product
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if not product
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:61: Checks else part
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:61:         Checks else part
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks else part
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:66: Checks if $env.typrm_aaa == aaa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:66:             Checks if $env.typrm_aaa == aaa
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if $env.typrm_aaa == aaa
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:75: Checks if $env.typrm_aaa != bbb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:75:             Checks if $env.typrm_aaa != bbb
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if $env.typrm_aaa != bbb
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:78: Checks if $env.typrm_aaa != \\"\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:78:             Checks if $env.typrm_aaa != \\"\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if $env.typrm_aaa != \\"\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:87: Checks if $env.undefined == \\"\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:87:             Checks if $env.undefined == \\"\\"
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: Checks if $env.undefined == \\"\\"
@@ -399,12 +399,12 @@ template count = 34
 
 exports[`checks file contents >> Multi folder >> all: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2:     correct contents
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: correct contents
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2:     correct contents
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: correct contents
@@ -416,7 +416,7 @@ template count = 2
 
 exports[`checks file contents >> Multi folder >> file in 1st folder: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2:     correct contents
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: correct contents
@@ -428,7 +428,7 @@ template count = 1
 
 exports[`checks file contents >> Multi folder >> file in 2nd folder: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2:     correct contents
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: correct contents
@@ -440,7 +440,7 @@ template count = 1
 
 exports[`checks file contents >> Multi folder >> full path: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2: correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2:     correct contents
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
     Warning: Not same as file contents
     Expected: correct contents
