@@ -1,5 +1,101 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`checks copy tag >> 1 >> NG: sourceFileContents 1`] = `
+"a: #copy: copy_1
+    aaa
+    bbb
+b: #copy: copy_1
+    aaa
+    BBB
+"
+`;
+
+exports[`checks copy tag >> 1 >> NG: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     bbb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     BBB
+    Warning: Not same as copy tag contents
+
+Warning: 1, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> 1 >> OK: sourceFileContents 1`] = `
+"a: #copy: copy_1
+    aaa
+    bbb
+b: #copy: copy_1
+    aaa
+    bbb
+"
+`;
+
+exports[`checks copy tag >> 1 >> OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> 2 >> NG: sourceFileContents 1`] = `
+"a: #copy: copy_1
+    aaa
+    bbb
+b: #copy: copy_1
+    aaa
+a: #copy: copy 2
+    aaa
+
+    bbb
+b: #copy: copy 2
+    aaa
+
+    bbb
+    ccc
+"
+`;
+
+exports[`checks copy tag >> 2 >> NG: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     bbb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: (out of copy tag block)
+    Warning: Not same as copy tag contents
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: (out of copy tag block)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     ccc
+    Warning: Not same as copy tag contents
+
+Warning: 2, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> 2 >> OK: sourceFileContents 1`] = `
+"a: #copy: copy_1
+    aaa
+        bbb
+b: #copy: copy 2
+    ccc
+
+    ddd
+a: #copy: copy 2
+    ccc
+
+    ddd
+b: #copy: copy_1
+        aaa
+                bbb
+"
+`;
+
+exports[`checks copy tag >> 2 >> OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+template count = 0
+"
+`;
+
 exports[`checks file contents >> First >> NG: sourceFileContents 1`] = `
 "設定: #settings:
     __Base__: ../../file_target/1

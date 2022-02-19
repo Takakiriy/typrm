@@ -96,7 +96,7 @@ export async function mainMain() {
     }
 }
 // checkRoutine
-async function checkRoutine(inputFilePath, parser) {
+async function checkRoutine(inputFilePath, copyTags, parser) {
     const parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
     parser.command = CommandEnum.check;
@@ -143,6 +143,8 @@ async function checkRoutine(inputFilePath, parser) {
     var setting = {};
     var lineNum = 0;
     var fileTemplateTag = null;
+    var copyTag = null;
+    var copyTagIndent = '';
     const lines = [];
     const ifTagParser = new IfTagParser(parser);
     for await (const line1 of reader) {
@@ -228,6 +230,29 @@ async function checkRoutine(inputFilePath, parser) {
         }
         if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock) {
             fileTemplateTag = templateTag;
+        }
+        // Get "#copy:" tag contents
+        if (copyTag) {
+            if (line.startsWith(copyTagIndent) || line.trim() === '') {
+                copyTag.contents.push(line);
+            }
+            else {
+                copyTag = null;
+            }
+        }
+        if (!copyTag) {
+            const copyTagIndex = tagIndexOf(line, copyLabel);
+            if (copyTagIndex !== notFound) {
+                copyTag = {
+                    filePath: inputFilePath,
+                    lineNum,
+                    line,
+                    tagName: getValue(line, copyTagIndex + copyLabel.length),
+                    contents: [],
+                };
+                copyTags.push(copyTag);
+                copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+            }
         }
     }
     settingTree.moveToEndOfFile();
@@ -1891,9 +1916,10 @@ async function replaceSub(inputFilePath, parser, command) {
 async function check(checkingFilePath) {
     const parser = new Parser();
     const currentFolderBackUp = process.cwd();
+    const copyTags = [];
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
-            await checkRoutine(inputFileFullPath, parser);
+            await checkRoutine(inputFileFullPath, copyTags, parser);
         }
     }
     catch (e) {
@@ -1904,9 +1930,49 @@ async function check(checkingFilePath) {
     finally {
         process.chdir(currentFolderBackUp);
     }
+    checkCopyTag(copyTags, parser);
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
     console.log(`template count = ${parser.templateCount}`);
+}
+// checkCopyTag
+function checkCopyTag(copyTags, parser) {
+    const tagNames = Array.from(new Set(copyTags.map(t => t.tagName)));
+    for (const tagName of tagNames) {
+        const copyGroup = copyTags.filter(t => t.tagName === tagName);
+        const sourceCopyTag = copyGroup[0];
+        for (const copyTag of copyGroup) {
+            if (copyTag === sourceCopyTag) {
+                continue;
+            }
+            if (sourceCopyTag.contents.length < copyTag.contents.length) {
+                var errorMessage = translate(`(out of copy tag block)`);
+                while (copyTag.contents.includes(errorMessage)) {
+                    errorMessage += '_';
+                }
+                sourceCopyTag.contents[sourceCopyTag.contents.length] = errorMessage;
+            }
+            const unexpectedLine = lib.checkTextContents(copyTag.contents, sourceCopyTag.contents, fileTemplateAnyLinesLabel);
+            if (unexpectedLine) {
+                console.log('');
+                console.log(`${getTestablePath(sourceCopyTag.filePath)}:${sourceCopyTag.lineNum + unexpectedLine.partsLineNum}: ` +
+                    `${unexpectedLine.partsLineNum ? sourceCopyTag.contents[unexpectedLine.partsLineNum - 1] : sourceCopyTag.line}`);
+                console.log(`${getTestablePath(copyTag.filePath)}:${copyTag.lineNum + unexpectedLine.contentsLineNum}: ` +
+                    `${unexpectedLine.contentsLine || copyTag.line}`);
+                console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
+                parser.warningCount += 1;
+            }
+            if (sourceCopyTag.contents.length > copyTag.contents.length) {
+                console.log('');
+                console.log(`${getTestablePath(sourceCopyTag.filePath)}:${sourceCopyTag.lineNum + copyTag.contents.length + 1}: ` +
+                    `${sourceCopyTag.contents[copyTag.contents.length]}`);
+                console.log(`${getTestablePath(copyTag.filePath)}:${copyTag.lineNum + copyTag.contents.length + 1}: ` +
+                    `${translate(`(out of copy tag block)`)}`);
+                console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
+                parser.warningCount += 1;
+            }
+        }
+    }
 }
 // listUpFilePaths
 async function listUpFilePaths(checkingFilePath) {
@@ -4532,6 +4598,8 @@ function translate(englishLiterals, ...values) {
             "To show more result, restart typrm with --found-count-max option": "もっと多くの結果を表示するときは --found-count-max オプションを指定して typrm を再起動します",
             "To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.": "シェルのコマンドを実行するには、TYPRM_COMMAND_FOLDER 環境変数、または --command-folder オプションを設定してください。",
             'Envrironment variables defined in ".env" file are not inherit to child processes.': ".env ファイルに定義した環境変数は子プロセスに継承されません。",
+            "Not same as #copy tag contents": "#copy タグの内容に違いがあります",
+            "(out of copy tag block)": "（copy タグのブロックの外）",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -4649,6 +4717,7 @@ const ifLabelRE = /(?<= |^)#if:/;
 const expectLabel = "#expect:";
 const searchLabel = "#search:";
 const refLabel = "#ref:";
+const copyLabel = "#copy:";
 const typrmEnvPrefix = 'TYPRM_';
 const indentRegularExpression = /^( |¥t)*/;
 const numberRegularExpression = /^[0-9]+$/;

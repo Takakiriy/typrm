@@ -27,6 +27,7 @@ You can execute the command just by copying and pasting the displayed command.
   - [mutual-search command - search link sources and maintain the link relationship](#mutual-search-command---search-link-sources-and-maintain-the-link-relationship)
   - [where command - finds the definition of the setting (variable) value](#where-command---finds-the-definition-of-the-setting-variable-value)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
+  - [#copy tag: check the text is the same](#copy-tag-check-the-text-is-the-same)
   - [#if tag: set conditions](#if-tag-set-conditions)
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
   - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
@@ -1135,7 +1136,12 @@ use the `check` command. The short command name is `c`.
 In order to correctly determine the range to replace the setting value,
 typrm checks that the text with the setting value exists before replacing.
 
-`--verbose` option displays details of typrm internal operations.
+- It checks the contents of the template destination by `#template:` tag
+- `--verbose` option displays details of typrm internal operations
+- It also checks the contents of the file by `#file-template:` tag
+- It also checks that the sentences targeted by the `#copy:` tag are the same.
+- It lists the `#to:` tags that are the replace command target
+- It lists the `#original:` tags that are the reset command target
 
 
 ## mutual-search command - search link sources and maintain the link relationship
@@ -1326,6 +1332,45 @@ do not result in an error.
           fieldB:
         - fieldA:
           fieldB:
+
+## #copy tag: check the text is the same
+
+You can check that the target sentences are the same by writing the
+`#copy:` tag in two or more places.
+
+To check for a match,
+use the `check` command. The short command name is `c`.
+
+    typrm check __FileName__
+
+For example, if you write the `#copy:` tag as below will check that
+the text at the deep indented lines below the line with the `#copy:` tag
+are the same text.
+If they are not the same, an error is displayed
+when you run the check command.
+
+    1: | #copy: first command
+        mkdir -p  projectA
+        cd        projectA
+    2: | #copy: first command
+        mkdir -p  projectA
+        cd        projectA
+
+The above test does not occur any error.
+The following text occur the error.
+
+    1: | #copy: first command
+        mkdir -p  projectA
+        cd        projectA
+    2: | #copy: first command
+        mkdir -p  projectA
+        cd        projectB  #// changed
+
+By collecting the same content in one place,
+the editor can make corrections in one place,
+but the reader has a disadvantage for 
+clicking the link to look for the one place.
+You can eliminate omission of correction by using `#copy:` tag.
 
 ## #if tag: set conditions
 
@@ -1870,6 +1915,7 @@ You can set the break point, click at the left of line number of the source file
 ## Tag list
 
 - `#disable-tag-tool:` Disable tags on the same line
+- `#copy:` Checks that they have the same text
 - `#expect:` Condition check
 - `#file-template:` Template for checking the contents of a file
 - `#file-template-any-lines:` Lines that do not check the contents of the file

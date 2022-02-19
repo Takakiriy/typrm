@@ -144,6 +144,20 @@ describe("string >>", () => {
                 simpleTestOfCheckFileContents(testData);
                 alternateTestsOfCheckFileContents(testData);
             });
+            test("Same >> empty line", () => {
+                const unexpectedLine = lib.checkTextContents([
+                    // testingContents
+                    '    Line 1',
+                    '',
+                    '    Line 3',
+                ], [
+                    // expectedParts
+                    '    Line 1',
+                    '',
+                    '    Line 3',
+                ], anyLinesTag);
+                expect(unexpectedLine).toStrictEqual(null);
+            });
             test("OK and Diff >> any lines tag >> different line 1 line below any lines tag", () => {
                 const testData = {
                     testingContents: [

@@ -464,6 +464,8 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                 if (_stringsWithoutIndentAreSame(contentsLineWithoutIndent, partsLineWithoutIndent)  &&
                         contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
                     result = Result.same;
+                } else if (contentsLine.trim() === ''  &&  partsLine.trim() === '') {  // not check the indent of empty line
+                    result = Result.same;
                 } else if (_trimStringsAreSame(contentsLine, partsLine)) {
                     if (contentsLineHasNewIndent  &&  partsLineHasNewIndent) {
                         result = Result.same;

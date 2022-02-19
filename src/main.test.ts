@@ -293,6 +293,31 @@ describe("checks file contents >>", () => {
     });
 });
 
+describe("checks copy tag >>", () => {
+    test.each([
+        [
+            '1 >> OK',
+        ],[
+            '1 >> NG',
+        ],[
+            '2 >> OK',
+        ],[
+            '2 >> NG',
+        ],
+
+    ])("%s", async (caseName) => {
+        const {filePath} = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);
+
+        // Test Main
+        await callMain(["check", path.basename(filePath)], {
+            folder: path.dirname(filePath), test: "", locale: "en-US",
+        });
+
+        chdirInProject('src');
+        expect(main.stdout).toMatchSnapshot('stdout');
+    });
+});
+
 describe("replaces settings >>", () => {
     test.each([
         [
