@@ -1364,7 +1364,7 @@ The following text occur the error.
         cd        projectA
     2: | #copy: first command
         mkdir -p  projectA
-        cd        projectB  #// changed
+        cd        projectB  #// Error!
 
 By collecting the same content in one place,
 the editor can make corrections in one place,
@@ -1949,23 +1949,24 @@ You can set the break point, click at the left of line number of the source file
 
 - `#disable-tag-tool:` Disable tags on the same line
 - `#copy:` Checks that they have the same text
+- `#copy-template:` A template of text in copy tag block
 - `#expect:` Condition check
-- `#file-template:` Template for checking the contents of a file
+- `#file-template:` A template for checking the contents of a file
 - `#file-template-any-lines:` Lines that do not check the contents of the file
 - `#glossary:` Use the key in the child element as the keyword to be searched
 - `#if:` Conditions for enabling tags
 - `#keyword:` Search target keyword
-- `#original:` Value before replacement
-- `#ref:` Path of linked file
+- `#original:` A value before replacement
+- `#ref:` A path of linked file
 - `#score:` Changes search score
 - `#search:` Keywords when searching for links
 - `#(search)if:` Conditions for enabling search (deprecated, recommend:#score:)
 - `#settings:` setting variables
-- `#snippet-depth:` snippet indent depth
-- `#template:` Template for replacing the body
-- `#template-at():` Template for replacing the body above two or more lines
+- `#snippet-depth:` A snippet indent depth
+- `#template:` A template for replacing the body
+- `#template-at():` A template for replacing the body above two or more lines
 - `#template-if:` Conditions that determine the content to be included in the text
-- `#to:` Value after replacement
+- `#to:` A value after replacement
 
 The tags must be preceded by a space character or at the beginning of a line.
 

@@ -1321,7 +1321,7 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
         cd        projectA
     2: | #copy: first command
         mkdir -p  projectA
-        cd        projectB  #// changed
+        cd        projectB  #// エラー！
 
 同じ内容を1箇所に集めることで修正が1箇所で済むようになりますが、
 読む人にとってはその1箇所へのリンクをたどらなければならないデメリットがあります。
@@ -1870,6 +1870,7 @@ Jest を使うテストと Jest を使わないテストがあります。
 
 - `#disable-tag-tool:` 同じ行にあるタグを無効にします
 - `#copy:` 同じ文章であることをチェックします
+- `#copy-template:` copy タグのブロックの中に書かれる文章のテンプレート
 - `#expect:` 条件チェック
 - `#file-template:` ファイルの内容をチェックするときのテンプレート
 - `#file-template-any-lines:` ファイルの内容をチェックしない行
