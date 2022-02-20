@@ -2150,7 +2150,7 @@ function  checkCopyTag(copyTags: CopyTag[], parser: Parser) {
                     `${unexpectedLine.partsLineNum ? sourceCopyTagContents[unexpectedLine.partsLineNum - 1] : sourceCopyTag.line}`);
                 console.log(`${getTestablePath(copyTag.filePath)}:` +
                     `${unexpectedLine.contentsLineNum  ?  copyTag.lineNum + unexpectedLine.contentsLineNum  :  copyTag.lineNum + 1}: ` +
-                    `${unexpectedLine.contentsLine  ||  copyTag.contents[0]}`);
+                    `${unexpectedLine.contentsLineNum  ?  unexpectedLine.contentsLine  :  copyTag.contents[0]}`);
                 console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
                 parser.warningCount += 1;
             }
