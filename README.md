@@ -1372,6 +1372,39 @@ but the reader has a disadvantage for
 clicking the link to look for the one place.
 You can eliminate omission of correction by using `#copy:` tag.
 
+If the partially replaced content was correct:
+
+- Write `#copy-template:` tag in the template content
+- Specify parameters in YAML mapping format at the right of the comma
+- Write `#template:` tag in the replacement part
+<!-- -->
+
+    1: | #copy-template: command, {__Project__: projectA}
+        mkdir -p  projectA  #template: __Project__
+        cd        projectA  #template: __Project__
+    2: | #copy: first command, {__Project__: projectB}
+        mkdir -p  projectB
+        cd        projectB
+
+Variables defined in the `#settings:` tag cannot be referenced
+from the `#template:` tag in `#copy-template:` tag or `#copy:` tag block.
+
+If you specify a variable for the parameter,
+write the variable name after `$settings.`.
+
+    settings: #settings:
+        __VariableA__: projectB
+    1: | #copy: first command, {__Project__: $settings.__VariableA__}
+        mkdir -p  projectB
+        cd        projectB
+    2: | #copy-template: command, {__Project__: projectA}
+        mkdir -p  projectA  #template: __Project__
+        cd        projectA  #template: __Project__
+
+Currently, it is not supported to replace the value of
+the variable specified in `#copy-template:` tag or `#copy:` tag
+by replace command.
+
 ## #if tag: set conditions
 
 When there is a relationship between one setting and another,

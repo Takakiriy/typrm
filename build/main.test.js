@@ -271,15 +271,15 @@ describe("checks file contents >>", () => {
 });
 describe("checks copy tag >>", () => {
     test.each([
-        [
-            '1 >> OK',
-        ], [
-            '1 >> NG',
-        ], [
-            '2 >> OK',
-        ], [
-            '2 >> NG',
-        ],
+        ['1 >> OK'],
+        ['1 >> NG'],
+        ['2 >> OK'],
+        ['2 >> NG'],
+        ['template >> 1 >> OK'],
+        ['template >> 1 >> NG-1'],
+        ['template >> 1 >> NG-2'],
+        ['template >> default value'],
+        ['template >> variable'],
     ])("%s", async (caseName) => {
         const { filePath } = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);
         // Test Main

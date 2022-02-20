@@ -96,6 +96,114 @@ template count = 0
 "
 `;
 
+exports[`checks copy tag >> template >> 1 >> NG-1: sourceFileContents 1`] = `
+"a: #copy-template: copy_1, {__VariableA__: a1}
+    (a1)  #template: (__VariableA__)
+b: #copy: copy_1, {__VariableA__: a2}
+    (__Bad__)
+"
+`;
+
+exports[`checks copy tag >> template >> 1 >> NG-1: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (a2)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__)
+    Warning: Not same as copy tag contents
+
+Warning: 1, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> template >> 1 >> NG-2: sourceFileContents 1`] = `
+"a: #copy-template: copy_1, {__VariableA__: a1}
+    (__Bad__)  #template: (__VariableA__)
+b: #copy: copy_1, {__VariableA__: a2}
+    (a2)
+"
+`;
+
+exports[`checks copy tag >> template >> 1 >> NG-2: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (a2)
+    Warning: Not same as copy tag contents
+
+Warning: 1, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> template >> 1 >> OK: sourceFileContents 1`] = `
+"a: #copy-template: copy_1, {__VariableA__: a1}
+    (a1)  #template: (__VariableA__)
+b: #copy: copy_1, {__VariableA__: a2}
+    (a2)
+"
+`;
+
+exports[`checks copy tag >> template >> 1 >> OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> template >> default value: sourceFileContents 1`] = `
+"OK: #copy: copy_1, {__VariableB__: b2}
+    (a1, b2)
+NG-1: #copy: copy_1, {__VariableB__: b2}
+    (__Bad__, b2)
+NG-2: #copy: copy_1, {__VariableB__: b2}
+    (a1, __Bad__)
+T: #copy-template: copy_1, {__VariableA__: a1, __VariableB__: b1}
+    (a1, b1)  #template: (__VariableA__, __VariableB__)
+"
+`;
+
+exports[`checks copy tag >> template >> default value: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__, b2)
+    Warning: Not same as copy tag contents
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     (a1, __Bad__)
+    Warning: Not same as copy tag contents
+
+Warning: 2, Error: 0
+template count = 0
+"
+`;
+
+exports[`checks copy tag >> template >> variable: sourceFileContents 1`] = `
+"setting: #settings:
+    __SetA__: s1
+T: #copy-template: command, {__VariableA__: a1}
+    [a1]  #template: [__VariableA__]
+OK: #copy: command, {__VariableA__: $settings.__SetA__}
+    [s1]
+NG-1: #copy: command, {__VariableA__: $settings.__SetA__}
+    [__Bad__]
+NG-2: #copy: command, {__VariableA__: $settings.__Undefined__}
+    [s1]
+"
+`;
+
+exports[`checks copy tag >> template >> variable: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: NG-2: #copy: command, {__VariableA__: $settings.__Undefined__}
+    Error: undefined variable
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     [s1]
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     [__Bad__]
+    Warning: Not same as copy tag contents
+
+Warning: 1, Error: 1
+template count = 0
+"
+`;
+
 exports[`checks file contents >> First >> NG: sourceFileContents 1`] = `
 "設定: #settings:
     __Base__: ../../file_target/1

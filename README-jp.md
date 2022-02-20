@@ -1327,6 +1327,37 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
 読む人にとってはその1箇所へのリンクをたどらなければならないデメリットがあります。
 `#copy:` タグを使うことによって修正漏れを無くすことができます。
 
+一部を置き換えた内容が正しいとする場合、
+
+- テンプレートとする内容に `#copy-template:` タグを書きます
+- パラメーターを YAML のマッピング形式でコンマの右に指定します
+- 置き換える部分に `#template:` タグを書きます
+<!-- -->
+
+    1: | #copy-template: command, {__Project__: projectA}
+        mkdir -p  projectA  #template: __Project__
+        cd        projectA  #template: __Project__
+    2: | #copy: first command, {__Project__: projectB}
+        mkdir -p  projectB
+        cd        projectB
+
+`#copy-template:` タグや `#copy:` タグのブロックの中の
+`#template:` タグから `#settings:` タグで定義された変数を参照できません。
+
+パラメーターに変数を指定する場合、`$settings.` に続けて変数名を書きます。
+
+    settings: #settings:
+        __VariableA__: projectB
+    1: | #copy: first command, {__Project__: $settings.__VariableA__}
+        mkdir -p  projectB
+        cd        projectB
+    2: | #copy-template: command, {__Project__: projectA}
+        mkdir -p  projectA  #template: __Project__
+        cd        projectA  #template: __Project__
+
+現在 `#copy-template:` タグや `#copy:` タグに指定する変数の値を
+replace コマンドで置き換えることには対応していません。
+
 ## #if タグを使って条件を設定します
 
 ある設定値と別の設定値の間に関連があるときは、

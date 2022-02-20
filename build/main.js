@@ -195,7 +195,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
             parser.templateCount += 1;
             parser.errorCount += 1;
         }
-        if (templateTag.isFound) {
+        if (templateTag.isFound && !copyTag) {
             parser.templateCount += 1;
             const checkingLine = lines[lineNum - 1 + templateTag.lineNumOffset];
             const commonCase = (templateTag.label !== templateIfLabel);
@@ -242,16 +242,34 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
         }
         if (!copyTag) {
             const copyTagIndex = tagIndexOf(line, copyLabel);
-            if (copyTagIndex !== notFound) {
+            const copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
+            if (copyTagIndex !== notFound || copyTemplateTagIndex !== notFound) {
                 copyTag = {
                     filePath: inputFilePath,
                     lineNum,
                     line,
-                    tagName: getValue(line, copyTagIndex + copyLabel.length),
-                    contents: [],
+                    tagName: '', value: '', copyName: '', contents: [], parameters: {},
                 };
-                copyTags.push(copyTag);
-                copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                if (copyTagIndex !== notFound) {
+                    copyTag.tagName = copyLabel;
+                    copyTag.value = getValue(line, copyTagIndex + copyLabel.length);
+                }
+                else {
+                    copyTag.tagName = copyTemplateLabel;
+                    copyTag.value = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
+                }
+                const { replaced, isError } = replaceDollerVariable(copyTag.value, setting);
+                if (!isError) {
+                    copyTag.value = replaced;
+                    copyTags.push(copyTag);
+                    copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                }
+                else {
+                    console.log('');
+                    console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                    console.log('    Error: undefined variable');
+                    parser.errorCount += 1;
+                }
             }
         }
     }
@@ -1937,35 +1955,55 @@ async function check(checkingFilePath) {
 }
 // checkCopyTag
 function checkCopyTag(copyTags, parser) {
-    const tagNames = Array.from(new Set(copyTags.map(t => t.tagName)));
-    for (const tagName of tagNames) {
-        const copyGroup = copyTags.filter(t => t.tagName === tagName);
-        const sourceCopyTag = copyGroup[0];
+    // copyTags = ...
+    for (const copyTag of copyTags) {
+        const firstCommaIndex = copyTag.value.indexOf(',');
+        if (firstCommaIndex === notFound) {
+            copyTag.copyName = copyTag.value.trim();
+        }
+        else {
+            copyTag.copyName = copyTag.value.substring(0, firstCommaIndex).trim();
+            copyTag.parameters = yaml.load(copyTag.value.substring(firstCommaIndex + 1));
+        }
+    }
+    const copyNames = Array.from(new Set(copyTags.map(t => t.copyName)));
+    const copyTemplateTags = new Map(copyTags.filter(t => t.tagName === copyTemplateLabel).map(t => [t.copyName, t]));
+    // ...
+    for (const copyName of copyNames) {
+        const copyGroup = copyTags.filter(t => t.copyName === copyName);
+        if (copyTemplateTags.has(copyName)) {
+            var sourceCopyTag = copyTemplateTags.get(copyName);
+        }
+        else {
+            var sourceCopyTag = copyGroup[0];
+        }
         for (const copyTag of copyGroup) {
             if (copyTag === sourceCopyTag) {
                 continue;
             }
-            if (sourceCopyTag.contents.length < copyTag.contents.length) {
+            const sourceCopyTagContents = getReplacedCopyTagContents(sourceCopyTag, copyTag.parameters);
+            if (copyTag.contents.length > sourceCopyTagContents.length) {
                 var errorMessage = translate(`(out of copy tag block)`);
                 while (copyTag.contents.includes(errorMessage)) {
                     errorMessage += '_';
                 }
-                sourceCopyTag.contents[sourceCopyTag.contents.length] = errorMessage;
+                sourceCopyTagContents[sourceCopyTagContents.length] = errorMessage;
             }
-            const unexpectedLine = lib.checkTextContents(copyTag.contents, sourceCopyTag.contents, fileTemplateAnyLinesLabel);
+            const unexpectedLine = lib.checkTextContents(copyTag.contents, sourceCopyTagContents, fileTemplateAnyLinesLabel);
             if (unexpectedLine) {
                 console.log('');
                 console.log(`${getTestablePath(sourceCopyTag.filePath)}:${sourceCopyTag.lineNum + unexpectedLine.partsLineNum}: ` +
-                    `${unexpectedLine.partsLineNum ? sourceCopyTag.contents[unexpectedLine.partsLineNum - 1] : sourceCopyTag.line}`);
-                console.log(`${getTestablePath(copyTag.filePath)}:${copyTag.lineNum + unexpectedLine.contentsLineNum}: ` +
-                    `${unexpectedLine.contentsLine || copyTag.line}`);
+                    `${unexpectedLine.partsLineNum ? sourceCopyTagContents[unexpectedLine.partsLineNum - 1] : sourceCopyTag.line}`);
+                console.log(`${getTestablePath(copyTag.filePath)}:` +
+                    `${unexpectedLine.contentsLineNum ? copyTag.lineNum + unexpectedLine.contentsLineNum : copyTag.lineNum + 1}: ` +
+                    `${unexpectedLine.contentsLine || copyTag.contents[0]}`);
                 console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
                 parser.warningCount += 1;
             }
-            if (sourceCopyTag.contents.length > copyTag.contents.length) {
+            if (copyTag.contents.length < sourceCopyTagContents.length) {
                 console.log('');
                 console.log(`${getTestablePath(sourceCopyTag.filePath)}:${sourceCopyTag.lineNum + copyTag.contents.length + 1}: ` +
-                    `${sourceCopyTag.contents[copyTag.contents.length]}`);
+                    `${sourceCopyTagContents[copyTag.contents.length]}`);
                 console.log(`${getTestablePath(copyTag.filePath)}:${copyTag.lineNum + copyTag.contents.length + 1}: ` +
                     `${translate(`(out of copy tag block)`)}`);
                 console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
@@ -3312,6 +3350,67 @@ function getReplacedLine(setting, template, replacedValues) {
             lineNum: 0 /*dummy*/, settingsIndex: '' };
     }
     return getExpectedLine(replacedSetting, template);
+}
+// replaceDollerVariable
+function replaceDollerVariable(expression, setting) {
+    const dollerSettings = '$settings.';
+    const dollerSettingsIndex = expression.indexOf(dollerSettings);
+    if (dollerSettingsIndex === notFound) {
+        return { replaced: expression, isError: false };
+    }
+    const variableNameIndex = dollerSettingsIndex + dollerSettings.length;
+    for (const variableName of Object.keys(setting).sort((a, b) => (b.length - a.length))) {
+        if (expression.indexOf(variableName, variableNameIndex) !== notFound) {
+            setting[variableName].isReferenced = true;
+            return {
+                replaced: expression.replace(`${dollerSettings}${variableName}`, setting[variableName].value),
+                isError: false
+            };
+        }
+    }
+    return { replaced: expression, isError: true };
+}
+// getReplacedCopyTagContents
+function getReplacedCopyTagContents(sourceCopyTag, parameters) {
+    if (Object.keys(sourceCopyTag.parameters).length === 0) {
+        return sourceCopyTag.contents;
+    }
+    else {
+        const replacedContents = [];
+        const parser = new Parser();
+        const replacingKeys = Object.keys(sourceCopyTag.parameters);
+        const emptySetting = { lineNum: 0, settingsIndex: '', tag: 'copyParameter', isReferenced: true };
+        const oldSetting = Object.entries(sourceCopyTag.parameters).reduce((setting, [key, value]) => {
+            setting[key] = { ...{ value }, ...emptySetting };
+            return setting;
+        }, {});
+        const newSetting = Object.entries({ ...sourceCopyTag.parameters, ...parameters }).reduce((setting, [key, value]) => {
+            setting[key] = { ...{ value }, ...emptySetting };
+            return setting;
+        }, {});
+        for (const line of sourceCopyTag.contents) {
+            const templateTag = parseTemplateTag(line, parser);
+            if (templateTag.isFound && templateTag.includesKey(replacingKeys)) {
+                var expected = getExpectedLine(oldSetting, templateTag.template);
+                var replaced = getReplacedLine(newSetting, templateTag.template, {});
+                if (line.includes(expected)) {
+                    const before = expected;
+                    const after = replaced;
+                    var replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before), 'g'), after.replace(/\$/g, '$$'));
+                    const templateTagIndex = tagIndexOf(replacedLine, templateLabel);
+                    replacedLine = replacedLine.substring(0, templateTagIndex).trimRight();
+                    replacedContents.push(replacedLine);
+                }
+                else {
+                    replacedContents.push(line);
+                }
+            }
+            else {
+                replacedContents.push(line);
+            }
+        }
+        return replacedContents;
+    }
 }
 // mergeSecretEnvironmentVariable
 function mergeSecretEnvironmentVariable(settings) {
@@ -4718,6 +4817,7 @@ const expectLabel = "#expect:";
 const searchLabel = "#search:";
 const refLabel = "#ref:";
 const copyLabel = "#copy:";
+const copyTemplateLabel = "#copy-template:";
 const typrmEnvPrefix = 'TYPRM_';
 const indentRegularExpression = /^( |¥t)*/;
 const numberRegularExpression = /^[0-9]+$/;
