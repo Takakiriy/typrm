@@ -14,7 +14,7 @@ exports[`checks copy tag >> 1 >> NG: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     bbb
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     BBB
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
 template count = 0
@@ -60,11 +60,11 @@ exports[`checks copy tag >> 2 >> NG: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     bbb
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: (out of copy tag block)
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: (out of copy tag block)
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     ccc
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
 template count = 0
@@ -108,7 +108,7 @@ exports[`checks copy tag >> template >> 1 >> NG-1: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (a2)
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__)
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
 template count = 0
@@ -120,6 +120,8 @@ exports[`checks copy tag >> template >> 1 >> NG-2: sourceFileContents 1`] = `
     (__Bad__)  #template: (__VariableA__)
 b: #copy: copy_1, {__VariableA__: a2}
     (a2)
+indent: #copy: copy_1, {__VariableA__: a2}
+        (a2)
 "
 `;
 
@@ -127,9 +129,13 @@ exports[`checks copy tag >> template >> 1 >> NG-2: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (a2)
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
-Warning: 1, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         (a2)
+    Warning: Not same as #copy tag contents
+
+Warning: 2, Error: 0
 template count = 0
 "
 `;
@@ -165,11 +171,11 @@ exports[`checks copy tag >> template >> default value: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__, b2)
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     (a1, __Bad__)
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
 template count = 0
@@ -197,7 +203,7 @@ exports[`checks copy tag >> template >> variable: stdout 1`] = `
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     [s1]
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     [__Bad__]
-    Warning: Not same as copy tag contents
+    Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 1
 template count = 0

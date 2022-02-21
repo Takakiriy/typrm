@@ -1,4 +1,5 @@
 import * as lib from "./lib";
+import chalk from 'chalk';
 var anyLinesTag = '#anyLines:';
 describe("string >>", () => {
     describe("cutIndent >>", () => {
@@ -80,8 +81,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 0,
                     contentsLine: '',
+                    contentsIndentLength: 0,
                     partsLineNum: 1,
                     partsLine: 'not found line',
+                    partsIndentLength: 0,
+                    indentDiff: 0,
                 });
             });
             test("Diff >> Different at many expected line", () => {
@@ -103,8 +107,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 5,
                     contentsLine: '5: unexpected',
+                    contentsIndentLength: 0,
                     partsLineNum: 3,
                     partsLine: 'Line 3',
+                    partsIndentLength: 0,
+                    indentDiff: 0,
                 });
             });
             test("Diff >> Different at parts line 2", () => {
@@ -214,7 +221,7 @@ describe("string >>", () => {
                         "    Line 3",
                         "Line 4", // same or different
                     ], forDiff: {
-                        contentsLineNum: 4, replaceContentsLine: "Line 4",
+                        contentsLineNum: 4, replaceContentsLine: "Line 4", contentsIndentLength: 4,
                         partsLineNum: 3,
                     }
                 };
@@ -252,8 +259,8 @@ describe("string >>", () => {
                         '            Line 12',
                         '            Line 13', // same or different
                     ], forDiff: {
-                        contentsLineNum: 13, replaceContentsLine: "         Line 13",
-                        partsLineNum: 11,
+                        contentsLineNum: 13, replaceContentsLine: "         Line 13", contentsIndentLength: 1,
+                        partsLineNum: 11, partsIndentLength: 4,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -286,8 +293,8 @@ describe("string >>", () => {
                         '         Line 10',
                         '         Line 11', // same or different
                     ], forDiff: {
-                        contentsLineNum: 11, replaceContentsLine: "Line 11",
-                        partsLineNum: 11,
+                        contentsLineNum: 11, replaceContentsLine: "Line 11", contentsIndentLength: 4,
+                        partsLineNum: 11, partsIndentLength: 1,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -306,8 +313,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 2,
                     contentsLine: '    Line 2',
+                    contentsIndentLength: 4,
                     partsLineNum: 2,
                     partsLine: '      Line 2',
+                    partsIndentLength: 2,
+                    indentDiff: -4,
                 });
             });
             test("Diff >> deeper and shallower", () => {
@@ -325,8 +335,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 3,
                     contentsLine: '        Line 3',
+                    contentsIndentLength: 0,
                     partsLineNum: 3,
                     partsLine: 'Line 3',
+                    partsIndentLength: 0,
+                    indentDiff: +8,
                 });
             });
             test("Diff >> shallow level", () => {
@@ -346,8 +359,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 4,
                     contentsLine: '    Line 4',
+                    contentsIndentLength: 0,
                     partsLineNum: 4,
                     partsLine: 'Line 4',
+                    partsIndentLength: 0,
+                    indentDiff: 4,
                 });
             });
             test("Diff >> shallow level >> opposite", () => {
@@ -367,8 +383,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 4,
                     contentsLine: 'Line 4',
+                    contentsIndentLength: 0,
                     partsLineNum: 4,
                     partsLine: '    Line 4',
+                    partsIndentLength: 0,
+                    indentDiff: -4,
                 });
             });
         });
@@ -400,8 +419,8 @@ describe("string >>", () => {
                         '                Line 10',
                         '                Line 11', // same or different
                     ], forDiff: {
-                        contentsLineNum: 11, replaceContentsLine: "Line 11",
-                        partsLineNum: 11,
+                        contentsLineNum: 11, replaceContentsLine: "Line 11", contentsIndentLength: 2,
+                        partsLineNum: 11, partsIndentLength: 8,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -494,8 +513,8 @@ describe("string >>", () => {
                         '                -   Line 23:',
                         '                    Line 24:', // same or different
                     ], forDiff: {
-                        contentsLineNum: 24, replaceContentsLine: "Line 24:",
-                        partsLineNum: 23,
+                        contentsLineNum: 24, replaceContentsLine: "Line 24:", contentsIndentLength: 4,
+                        partsLineNum: 23, partsIndentLength: 12,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -544,8 +563,8 @@ describe("string >>", () => {
                         '     - Line 18:',
                         '       Line 19:', // same or different
                     ], forDiff: {
-                        contentsLineNum: 16, replaceContentsLine: "Line 16:",
-                        partsLineNum: 16,
+                        contentsLineNum: 16, replaceContentsLine: "Line 16:", contentsIndentLength: 4,
+                        partsLineNum: 16, partsIndentLength: 3,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -561,8 +580,8 @@ describe("string >>", () => {
                         '   - Line 2:',
                         '     Line 3:', // same or different
                     ], forDiff: {
-                        contentsLineNum: 3, replaceContentsLine: "Line 3:",
-                        partsLineNum: 2,
+                        contentsLineNum: 3, replaceContentsLine: "Line 3:", contentsIndentLength: 4,
+                        partsLineNum: 2, partsIndentLength: 3,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -578,8 +597,8 @@ describe("string >>", () => {
                         '   -       #//',
                         '     Line 3:', // same or different
                     ], forDiff: {
-                        contentsLineNum: 3, replaceContentsLine: "Line 3:",
-                        partsLineNum: 2,
+                        contentsLineNum: 3, replaceContentsLine: "Line 3:", contentsIndentLength: 4,
+                        partsLineNum: 2, partsIndentLength: 3,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);
@@ -602,8 +621,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 2,
                     contentsLine: '    - #// bad comment',
+                    contentsIndentLength: 0,
                     partsLineNum: 2,
                     partsLine: '    -   #// comment',
+                    partsIndentLength: 0,
+                    indentDiff: 0,
                 });
             });
             test("Diff >> shallow level", () => {
@@ -623,8 +645,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 4,
                     contentsLine: '    Line 4',
+                    contentsIndentLength: 0,
                     partsLineNum: 4,
                     partsLine: 'Line 4',
+                    partsIndentLength: 0,
+                    indentDiff: 4,
                 });
             });
             test("Diff >> shallow level >> opposite", () => {
@@ -644,8 +669,11 @@ describe("string >>", () => {
                 expect(unexpectedLine).toStrictEqual({
                     contentsLineNum: 4,
                     contentsLine: 'Line 4',
+                    contentsIndentLength: 0,
                     partsLineNum: 4,
                     partsLine: '  Line 4',
+                    partsIndentLength: 0,
+                    indentDiff: -2,
                 });
             });
         });
@@ -656,17 +684,37 @@ describe("string >>", () => {
         }
         function alternateTestsOfCheckFileContents(testData) {
             var { testingContents, expectedParts } = testData;
-            var { contentsLineNum, replaceContentsLine, contentsLine, partsLineNum } = testData.forDiff;
+            var { contentsLineNum, replaceContentsLine, contentsLine, contentsIndentLength, partsLineNum, partsIndentLength, indentDiff } = testData.forDiff;
             contentsLine = contentsLine || '(unexpected)';
+            contentsIndentLength = contentsIndentLength || 0;
+            partsIndentLength = partsIndentLength || 0;
+            indentDiff = indentDiff || 0;
             // Test case of unexpected parts
             const unexpectedLine = lib.checkTextContents(testingContents.map((line) => (line.includes(replaceContentsLine) ? '(unexpected)' : line)), expectedParts, anyLinesTag);
             expect(unexpectedLine).toStrictEqual({
-                contentsLineNum: contentsLineNum,
+                contentsLineNum,
                 contentsLine: (contentsLineNum === 0) ? '' : contentsLine,
-                partsLineNum: partsLineNum,
+                contentsIndentLength,
+                partsLineNum,
                 partsLine: expectedParts[partsLineNum - 1],
+                partsIndentLength,
+                indentDiff,
             });
         }
+    });
+    describe("coloredDiff >>", () => {
+        const green = chalk.bgGreen.black;
+        const red = chalk.bgRed.black;
+        test("1st", () => {
+            const result = lib.coloredDiff('0125dd89Y', '012aa589X');
+            expect(result.redLine).toBe(`0125${red('dd')}89${red('Y')}`);
+            expect(result.greenLine).toBe(`012${green('aa')}589${green('X')}`);
+        });
+        test("header", () => {
+            const result = lib.coloredDiff('red: 0125dd89Y', 'green: 012aa589X', 'red: '.length, 'green: '.length);
+            expect(result.redLine).toBe(`red: 0125${red('dd')}89${red('Y')}`);
+            expect(result.greenLine).toBe(`green: 012${green('aa')}589${green('X')}`);
+        });
     });
 });
 describe("data >>", () => {

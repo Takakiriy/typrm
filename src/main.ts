@@ -2145,13 +2145,40 @@ function  checkCopyTag(copyTags: CopyTag[], parser: Parser) {
 
             const  unexpectedLine = lib.checkTextContents(copyTag.contents, sourceCopyTagContents, fileTemplateAnyLinesLabel);
             if (unexpectedLine) {
+                const  foundFirstLine = (unexpectedLine.contentsLineNum >= 1);
+                if (foundFirstLine) {
+                    var  sourceCopyLine = sourceCopyTagContents[unexpectedLine.partsLineNum - 1];
+                    var  copyLine = unexpectedLine.contentsLine;
+                } else {
+                    var  sourceCopyLine = sourceCopyTagContents[0];
+                    var  copyLine = copyTag.contents[0];
+                }
+                if (sourceCopyLine.includes('(out of copy tag block)')) {
+                    var  diff = {greenLine: translate(sourceCopyLine), redLine: copyLine};
+                } else {
+                    if (foundFirstLine) {
+                        var  copyIndentLength = unexpectedLine.contentsIndentLength;
+                        var  sourceCopyIndentLength = unexpectedLine.partsIndentLength;
+                        if (unexpectedLine.indentDiff > 0) {
+                            copyIndentLength += unexpectedLine.indentDiff;
+                        } else {
+                            sourceCopyIndentLength -= unexpectedLine.indentDiff;
+                        }
+                        var  diff = lib.coloredDiff(copyLine, sourceCopyLine, copyIndentLength, sourceCopyIndentLength);
+                    } else {
+                        const  copyIndentLength = indentRegularExpression.exec( copyLine )![0].length;
+                        const  sourceCopyIndentLength = indentRegularExpression.exec( sourceCopyLine )![0].length;
+                        var  diff = lib.coloredDiff(copyLine, sourceCopyLine, copyIndentLength, sourceCopyIndentLength);
+                    }
+                }
+
                 console.log('');
                 console.log(`${getTestablePath(sourceCopyTag.filePath)}:${sourceCopyTag.lineNum + unexpectedLine.partsLineNum}: ` +
-                    `${unexpectedLine.partsLineNum ? sourceCopyTagContents[unexpectedLine.partsLineNum - 1] : sourceCopyTag.line}`);
+                    `${diff.greenLine}`);
                 console.log(`${getTestablePath(copyTag.filePath)}:` +
                     `${unexpectedLine.contentsLineNum  ?  copyTag.lineNum + unexpectedLine.contentsLineNum  :  copyTag.lineNum + 1}: ` +
-                    `${unexpectedLine.contentsLineNum  ?  unexpectedLine.contentsLine  :  copyTag.contents[0]}`);
-                console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
+                    `${diff.redLine}`);
+                console.log(`    ${translate('Warning')}: ${translate('Not same as #copy tag contents')}`);
                 parser.warningCount += 1;
             }
             if (copyTag.contents.length < sourceCopyTagContents.length) {
@@ -2160,7 +2187,7 @@ function  checkCopyTag(copyTags: CopyTag[], parser: Parser) {
                     `${sourceCopyTagContents[copyTag.contents.length]}`);
                 console.log(`${getTestablePath(copyTag.filePath)}:${copyTag.lineNum + copyTag.contents.length + 1}: ` +
                     `${translate(`(out of copy tag block)`)}`);
-                console.log(`    ${translate('Warning')}: ${translate('Not same as copy tag contents')}`);
+                console.log(`    ${translate('Warning')}: ${translate('Not same as #copy tag contents')}`);
                 parser.warningCount += 1;
             }
         }

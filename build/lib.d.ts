@@ -15,8 +15,11 @@ export declare function pathResolve(path_: string): string;
 export interface UnexpectedLine {
     contentsLineNum: number;
     contentsLine: string;
+    contentsIndentLength: number;
     partsLineNum: number;
     partsLine: string;
+    partsIndentLength: number;
+    indentDiff: number;
 }
 export declare function getFullPath(relativePath: string, basePath: string): string;
 export declare function isFullPath(path: string): boolean;
@@ -34,6 +37,11 @@ export declare function cutIndent(lines: string[]): string[];
 export declare function unexpandVariable(expanded: string, keyValues: string[][]): string;
 export declare function unexpandVariableOld(expanded: string, keyValues: string[][]): string;
 export declare function checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
+export declare function coloredDiff(redLine: string, greenLine: string, redHeaderLength?: number, greenHeaderLength?: number): ColoredDiff;
+interface ColoredDiff {
+    greenLine: string;
+    redLine: string;
+}
 export declare function parseCSVColumns(columns: string): Promise<string[]>;
 export declare function parseCSVColumnPositions(csv: string, columns: string[]): number[];
 export declare function escapeRegularExpression(expression: string): string;

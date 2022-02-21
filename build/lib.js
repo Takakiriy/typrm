@@ -5,6 +5,8 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 import * as dotenv from "dotenv";
+import chalk from 'chalk';
+import * as diff from 'diff';
 import { Readable, Writable } from 'stream';
 // @ts-ignore
 import { snapshots } from './lib-cjs.cjs';
@@ -348,6 +350,7 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
         var skipToContentsIndent = '';
         const parts = cutIndent(expectedParts.slice());
         const partsStartsWithHyphen = (parts[0][0] === '-');
+        var partsBaseIndentLength = expectedParts[0].length - parts[0].length;
         var partsFirstLine = parts[0].trim();
         var partsLineNumFirst = 1;
         if (partsFirstLine.trim() === anyLinesTag) {
@@ -369,6 +372,8 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
         ;
         var result = Result.same;
         var unexpectedLine = null;
+        var contentsIndentLength = 0;
+        var indentDiff = 0;
         var skipTo = '';
         var skipFrom = '';
         var skipStartLineNum = 1;
@@ -392,6 +397,7 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
                     }
                     [contentsIndent, partsIndent] =
                         _pushToIndentStack(contentsIndentStack, partsIndentStack, contentsLine, parts[partsLineNumFirst - 1]);
+                    contentsIndentLength = contentsIndentStack[0].length - partsIndentStack[0].length;
                 }
                 else {
                     result = Result.different;
@@ -416,11 +422,15 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
                     }
                     else {
                         for (;;) {
-                            if (contentsIndentStack.length === 0 || partsIndentStack.length === 0) {
+                            if (contentsIndentStack.length <= 1 || partsIndentStack.length <= 1 ||
+                                contentsLine.startsWith(contentsIndent) || partsLine.startsWith(partsIndent)) {
                                 result = Result.different;
                                 if (unexpectedLine === null || partsLineNum > unexpectedLine.partsLineNum) {
-                                    unexpectedLine = { contentsLineNum, contentsLine, partsLineNum,
-                                        partsLine: expectedParts[partsLineNum - 1] };
+                                    const partsLine = expectedParts[partsLineNum - 1];
+                                    unexpectedLine = { contentsLineNum, contentsLine, contentsIndentLength, partsLineNum,
+                                        partsLine,
+                                        partsIndentLength: partsBaseIndentLength,
+                                        indentDiff: _getIndentDiff(contentsIndentStack, contentsLine, partsIndentStack, partsLine, partsBaseIndentLength) };
                                 }
                                 break;
                             }
@@ -442,8 +452,8 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
                                 else {
                                     result = Result.different;
                                     if (unexpectedLine === null || partsLineNum > unexpectedLine.partsLineNum) {
-                                        unexpectedLine = { contentsLineNum, contentsLine, partsLineNum,
-                                            partsLine: expectedParts[partsLineNum - 1] };
+                                        unexpectedLine = { contentsLineNum, contentsLine, contentsIndentLength, partsLineNum,
+                                            partsLine: expectedParts[partsLineNum - 1], partsIndentLength: partsBaseIndentLength, indentDiff };
                                     }
                                 }
                                 break;
@@ -473,8 +483,8 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
                 else {
                     result = Result.different;
                     if (unexpectedLine === null || partsLineNum > unexpectedLine.partsLineNum) {
-                        unexpectedLine = { contentsLineNum, contentsLine, partsLineNum,
-                            partsLine: expectedParts[partsLineNum - 1] };
+                        unexpectedLine = { contentsLineNum, contentsLine, contentsIndentLength, partsLineNum,
+                            partsLine: expectedParts[partsLineNum - 1], partsIndentLength: partsBaseIndentLength, indentDiff };
                     }
                 }
                 // contentsIndentStack, ... = ...
@@ -514,16 +524,22 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
                     unexpectedLine = {
                         contentsLineNum: 0,
                         contentsLine: '',
+                        contentsIndentLength: 0,
                         partsLineNum: partsLineNum,
                         partsLine: expectedParts[0],
+                        partsIndentLength: partsBaseIndentLength,
+                        indentDiff: 0,
                     };
                 }
                 else {
                     unexpectedLine = {
                         contentsLineNum: contentsLineNum,
                         contentsLine: testingContents[contentsLineNum - 1],
+                        contentsIndentLength: 0,
                         partsLineNum: partsLineNum,
                         partsLine: expectedParts[partsLineNum - 1],
+                        partsIndentLength: partsBaseIndentLength,
+                        indentDiff: 0,
                     };
                 }
             }
@@ -534,8 +550,11 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
                 unexpectedLine = {
                     contentsLineNum: skipStartLineNum,
                     contentsLine: skipFrom,
+                    contentsIndentLength: 0,
                     partsLineNum: partsLineNum,
                     partsLine: skipTo,
+                    partsIndentLength: partsBaseIndentLength,
+                    indentDiff: 0,
                 };
             }
         }
@@ -622,6 +641,45 @@ export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
             return false;
         }
     }
+    function _getIndentDiff(contentsIndentStack, contentsLine, partsIndentStack, partsLine, partsBaseIndentLength) {
+        const contentsIndentPreviousLength = contentsIndentStack[contentsIndentStack.length - 1].length;
+        const contentsIndentCurrentLength = indentRegularExpression.exec(contentsLine)[0].length;
+        const partsIndentPreviousLength = partsIndentStack[partsIndentStack.length - 1].length + partsBaseIndentLength;
+        const partsIndentCurrentLength = indentRegularExpression.exec(partsLine)[0].length;
+        if (contentsIndentCurrentLength > contentsIndentPreviousLength && partsIndentCurrentLength > partsIndentPreviousLength) {
+            return 0;
+        }
+        else if (contentsIndentCurrentLength === contentsIndentPreviousLength && partsIndentCurrentLength > partsIndentPreviousLength) {
+            return -(partsIndentCurrentLength - partsIndentPreviousLength);
+        }
+        else if (contentsIndentCurrentLength > contentsIndentPreviousLength && partsIndentCurrentLength === partsIndentPreviousLength) {
+            return contentsIndentCurrentLength - contentsIndentPreviousLength;
+        }
+        else {
+            return contentsIndentCurrentLength - partsIndentCurrentLength;
+        }
+    }
+}
+// coloredDiff
+export function coloredDiff(redLine, greenLine, redHeaderLength = 0, greenHeaderLength = 0) {
+    const green = chalk.bgGreen.black;
+    const red = chalk.bgRed.black;
+    const changes = diff.diffChars(redLine.substring(redHeaderLength), greenLine.substring(greenHeaderLength));
+    redLine = redLine.substring(0, redHeaderLength);
+    greenLine = greenLine.substring(0, greenHeaderLength);
+    for (const change of changes) {
+        if (change.added) {
+            greenLine += green(change.value);
+        }
+        else if (change.removed) {
+            redLine += red(change.value);
+        }
+        else {
+            greenLine += change.value;
+            redLine += change.value;
+        }
+    }
+    return { greenLine, redLine };
 }
 // parseCSVColumns
 export async function parseCSVColumns(columns) {
