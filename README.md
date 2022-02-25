@@ -425,6 +425,20 @@ Checking the file contents typrm command:
         "password": "5I#OfEilq#)",
     }
 
+If you change the current folder to the folder where
+the .env file is in the PowerShell script (.ps1 file),
+to return the current folder to the original folder
+when you exit with Ctrl + C,
+try ~ Write a PowerShell script enclosed in Finally.
+
+    $StartingFolder = (Convert-Path .)
+    cd  "${HOME}"
+    Try {
+        node ... typrm.js ...
+    } Finally {  #// It also runs when you press Ctrl + C
+        cd  $StartingFolder
+    }
+
 Variables defined in the .env file cannot be referenced from the `#if:` tag.
 
 ## Replace - replace command, reset command

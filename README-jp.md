@@ -405,6 +405,19 @@ typrm を起動するスクリプトの中で カレント フォルダー
         "password": "5I#OfEilq#)",
     }
 
+PowerShell のスクリプト(.ps1 ファイル)の中で
+カレント フォルダー を .env ファイルがあるフォルダーに移動した場合、
+Ctrl + C で終了したときに カレント フォルダー を元のフォルダーに戻すには、
+下記のように Try 〜 Finally で囲んだ PowerShell のスクリプトを書きます。
+
+    $StartingFolder = (Convert-Path .)
+    cd  "${HOME}"
+    Try {
+        node ... typrm.js ...
+    } Finally {  #// Ctrl+C を押したときも実行されます
+        cd  $StartingFolder
+    }
+
 `#if:` タグから .env ファイルで定義した変数は参照できません。
 
 ## リプレース機能 - replace コマンド, reset コマンド
