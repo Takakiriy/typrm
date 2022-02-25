@@ -413,6 +413,7 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
         var  contentsIndent = '';
         var  contentsIndentStack: string[] = [];
         var  skipToContentsIndent = '';
+        var  skipToDeeper = false;
         const  parts = cutIndent(expectedParts.slice());
         const  partsStartsWithHyphen = (parts[0][0] === '-');
         var  partsBaseIndentLength = expectedParts[0].length - parts[0].length;
@@ -464,11 +465,11 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                     result = Result.different;
                 }
             } else if (skipTo === '') {  // not skip
-                const  partsLine = parts[partsLineNum-1];
+                var    partsLine = parts[partsLineNum-1];
                 const  contentsLineWithoutIndent = contentsLine.substring(contentsIndent.length);
                 const  partsLineWithoutIndent = partsLine.substring(partsIndent.length);
                 const  contentsLineHasNewIndent = contentsLine.startsWith(contentsIndent + ' ');
-                const  partsLineHasNewIndent = partsLine.startsWith(partsIndent + ' ');
+                var    partsLineHasNewIndent = partsLine.startsWith(partsIndent + ' ');
 
                 if (_stringsWithoutIndentAreSame(contentsLineWithoutIndent, partsLineWithoutIndent)  &&
                         contentsLine.startsWith(contentsIndent)  &&  partsLine.startsWith(partsIndent)) {
@@ -527,7 +528,7 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                     skipFrom = contentsLine;
                     skipStartLineNum = contentsLineNum;
                     skipToContentsIndent = contentsIndentStack[0];
-                    for (let level = partsIndentStack.length - 1;  level > 0;  level -= 1) {
+                    for (let level = partsIndentStack.length - 1;  level >= 0;  level -= 1) {
                         if (skipTo.startsWith(partsIndentStack[level])) {
                             skipToContentsIndent = contentsIndentStack[level];
                             if (skipTo.trimLeft()[0] === '-') {
@@ -537,6 +538,9 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                             break;
                         }
                     }
+                    skipToDeeper = (skipTo[skipToContentsIndent.length] === ' ');
+                    partsLineHasNewIndent = skipToDeeper;
+                    partsLine = skipTo;
                     skipTo = skipTo.trim();
                 } else {
                     result = Result.different;
@@ -552,7 +556,7 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
                         contentsIndentStack, partsIndentStack, contentsLine, partsLine);
                 }
             } else { // skipTo
-                if (_foundSkipTo(contentsLine, skipToContentsIndent, skipTo)) {
+                if (_foundSkipTo(contentsLine, skipToContentsIndent, skipToDeeper, skipTo)) {
                     result = Result.same;
                 } else {  // if (contentsLine.trim() === ''  ||  (contentsLine.startsWith(contentsIndent)  &&  contentsIndent !== '')) {
                     result = Result.skipped;
@@ -658,12 +662,17 @@ export function  checkTextContents(testingContents: string[], expectedParts: str
         }
     }
 
-    function  _foundSkipTo(contentsLine: string, skipToContentsIndent: string, skipTo: string): boolean {
+    function  _foundSkipTo(contentsLine: string, skipToContentsIndent: string, skipToDeeper: boolean, skipTo: string): boolean {
         if (contentsLine.startsWith(skipToContentsIndent)) {
             const  hasHyphen = skipToContentsIndent.slice(-1) === '-';
             if ( ! hasHyphen) {
-                return  contentsLine.substring(skipToContentsIndent.length).trimRight() === skipTo;
-            } else {
+                if ( ! skipToDeeper) {
+                    return  contentsLine.substring(skipToContentsIndent.length).trimRight() === skipTo;
+                } else { // skipToDeeper
+                    return  contentsLine[skipToContentsIndent.length] === ' '  &&
+                        contentsLine.substring(skipToContentsIndent.length).trim() === skipTo;
+                }
+            } else { // hasHyphen
                 return  contentsLine.substring(skipToContentsIndent.length).trim() === skipTo;
             }
         } else {
