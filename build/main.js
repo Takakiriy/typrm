@@ -1965,6 +1965,7 @@ function checkCopyTag(copyTags, parser) {
             copyTag.copyName = copyTag.value.substring(0, firstCommaIndex).trim();
             copyTag.parameters = yaml.load(copyTag.value.substring(firstCommaIndex + 1));
         }
+        copyTag.contents = copyTag.contents.map(contents => contents.replace(keywordTagAndParameterRegExp, '$1').trimRight());
     }
     const copyNames = Array.from(new Set(copyTags.map(t => t.copyName)));
     const copyTemplateTags = new Map(copyTags.filter(t => t.tagName === copyTemplateLabel).map(t => [t.copyName, t]));
@@ -4835,6 +4836,7 @@ const templateIfNoKey = "template-if(no)";
 const fileTemplateLabel = "#file-template:";
 const fileTemplateAnyLinesLabel = "#file-template-any-lines:";
 const keywordLabel = "#keyword:";
+const keywordTagAndParameterRegExp = /( |^)#keyword:[^#]*/g;
 const glossaryLabel = "#glossary:";
 const mutualTag = "#mutual:";
 const snippetDepthLabel = "#snippet-depth:";

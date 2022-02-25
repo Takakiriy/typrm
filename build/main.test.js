@@ -280,6 +280,10 @@ describe("checks copy tag >>", () => {
                 ] }],
         ['2 >> OK', null],
         ['2 >> NG', null],
+        ['ignore keyword tag', { replacers: [
+                    { from: 'aaa', to: goodColor('aaa') },
+                    { from: 'bbb', to: badColor('bbb') },
+                ] }],
         ['template >> 1 >> OK', null],
         ['template >> 1 >> NG-1', { replacers: [
                     { from: 'a2', to: `a${goodColor('2')}` },

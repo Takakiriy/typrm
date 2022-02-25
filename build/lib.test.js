@@ -190,20 +190,28 @@ describe("string >>", () => {
                 simpleTestOfCheckFileContents(testData);
                 alternateTestsOfCheckFileContents(testData);
             });
-            test("Diff >> any lines tag >> different line 2 lines below any lines tag", () => {
+            test("Diff >> any lines tag >> different line 2 lines below any lines tag, anyLinesTag next line is deeper", () => {
                 const testData = {
                     testingContents: [
                         "Line 1", "Line 2", "Line 3",
                         "Line 4",
-                        "Line 5", // or (unexpected)
+                        "    Line 5",
+                        "    Line 6",
+                        "        Line 7",
+                        "        Line 8",
+                        "Line 9", // or (unexpected)
                     ], expectedParts: [
                         "Line 1",
-                        anyLinesTag,
+                        `${anyLinesTag}`,
                         "Line 4",
-                        "Line 5", // same or different
+                        `${anyLinesTag}`,
+                        "    Line 6",
+                        `        ${anyLinesTag}`,
+                        "        Line 8",
+                        "Line 9", // same or different
                     ], forDiff: {
-                        contentsLineNum: 5, replaceContentsLine: "Line 5",
-                        partsLineNum: 4,
+                        contentsLineNum: 9, replaceContentsLine: "Line 9",
+                        partsLineNum: 8,
                     }
                 };
                 simpleTestOfCheckFileContents(testData);

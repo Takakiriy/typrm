@@ -96,6 +96,39 @@ template count = 0
 "
 `;
 
+exports[`checks copy tag >> ignore keyword tag: sourceFileContents 1`] = `
+"same1: #copy: same
+    aaa:  #keyword:
+    bbb:  #keyword:  a  #// comment
+    both:  #keyword: both 1
+same2: #copy: same
+    aaa:
+    bbb:  #// comment
+    both:  #keyword: both 2
+sameR1: #copy: sameR
+    aaa:
+    bbb:  #// comment
+sameR2: #copy: sameR
+    aaa:  #keyword:
+    bbb:  #keyword:  a  #// comment
+diff1: #copy: diff
+    aaa:  #keyword:
+diff2: #copy: diff
+    bbb:  #keyword:
+"
+`;
+
+exports[`checks copy tag >> ignore keyword tag: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:     aaa:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:     bbb:
+    Warning: Not same as #copy tag contents
+
+Warning: 1, Error: 0
+template count = 0
+"
+`;
+
 exports[`checks copy tag >> template >> 1 >> NG-1: sourceFileContents 1`] = `
 "a: #copy-template: copy_1, {__VariableA__: a1}
     (a1)  #template: (__VariableA__)

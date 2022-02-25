@@ -1,3 +1,6 @@
+タグ一覧:
+    README: #ref: ${GitHub}/typrm/README-jp.md### タグ一覧
+    コード: #ref: ${GitHub}/typrm/src/main.ts#const  originalLabel = 
 Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
     main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
     拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:
