@@ -2548,7 +2548,7 @@ async function searchSub(keyword, isMutual) {
         }
     }
     const keyphraseWordCount = keywordWithTag.split(' ').length;
-    // searchWithoutTags
+    // searchWithoutTags (find all)
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
     foundLines.sort(compareScoreAndSoOn);
     if (!('disableFindAll' in programOptions) && !isMutual) {
@@ -2763,10 +2763,11 @@ async function searchWithoutTags(keywords) {
     // '\u{3000}': Japanese space
     const keyword1LowerCase = keywordsLowerCase[0];
     const keywords2LowerCase = keywordsLowerCase.slice(1);
-    var fullMatchKeywords = lib.cutLast(keywords.trim(), ':').trimRight();
+    var fullMatchKeywords = keywords;
     if (tagIndexOf(fullMatchKeywords, searchLabel) !== notFound) {
         fullMatchKeywords = fullMatchKeywords.replace(searchLabel, keywordLabel);
     }
+    fullMatchKeywords = lib.cutLast(fullMatchKeywords.trim(), ':').trimRight();
     var matchCount = 0;
     var fullMatchCount = 0;
     function isFullMatch(line, fullMatchKeywords) {

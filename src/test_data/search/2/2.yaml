@@ -201,3 +201,5 @@ typrm shell >> search >> snippet_environment_variable:
     snippet_environment_variable: #keyword:
         - ($TYPRM_TEST_ENV)  #template: ($env.TYPRM_TEST_ENV)
         - __TEST_SECRET_2__  #template: $env.TEST_SECRET_2
+find all >> full match replaced from search tag (2):
+    find_search_tag_4:  #keyword:

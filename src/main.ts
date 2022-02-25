@@ -2702,7 +2702,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     }
     const  keyphraseWordCount = keywordWithTag.split(' ').length;
 
-    // searchWithoutTags
+    // searchWithoutTags (find all)
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
     foundLines.sort(compareScoreAndSoOn);
     if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
@@ -2944,12 +2944,13 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
         // '\u{3000}': Japanese space
     const  keyword1LowerCase = keywordsLowerCase[0];
     const  keywords2LowerCase = keywordsLowerCase.slice(1);
-    var  fullMatchKeywords = lib.cutLast(keywords.trim(), ':').trimRight();
+    var  fullMatchKeywords = keywords;
     if (tagIndexOf(fullMatchKeywords, searchLabel) !== notFound) {
         fullMatchKeywords = fullMatchKeywords.replace(searchLabel, keywordLabel);
     }
-    var    matchCount = 0;
-    var    fullMatchCount = 0;
+    fullMatchKeywords = lib.cutLast(fullMatchKeywords.trim(), ':').trimRight();
+    var  matchCount = 0;
+    var  fullMatchCount = 0;
     function  isFullMatch(line: string, fullMatchKeywords: string): boolean {
         if (line.trimStart().startsWith(fullMatchKeywords)) {
             if (line.trim() === fullMatchKeywords) {

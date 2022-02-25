@@ -1117,6 +1117,11 @@ describe("find all >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':148:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_2`)}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':147:') + `     - link  ${keywordLabelColor('#keyword:')} ${matchedColor(`find_search_tag_2`)}\n`,
         ], [
+            "full match replaced from search tag (2)",
+            ["search", "find_search_tag_4:  #search:"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':205:') + `     ${matchedColor(`find_search_tag_4:  #keyword`)}:\n`,
+        ], [
             "full match with colon",
             ["search", "- find_search_tag_3 :"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
