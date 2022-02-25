@@ -5965,6 +5965,39 @@ root:
 "
 `;
 
+exports[`unit test >> makeSettingTree >> bug_case_6: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/",
+    2 => "/1",
+    6 => "/1/a",
+    8 => "/1/1",
+    11 => "/1",
+    12 => "/1/b",
+    14 => "/1/2",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree >> bug_case_6: sourceFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+        21:
+            21a:  #if: $settings.__Variable1__ == value1
+                value1  #template: __Variable1__
+        22:
+            settings: #settings:
+                __Variable21__: value21
+        23:
+            23a:  #if: $settings.__Variable1__ == value1
+                value1  #template: __Variable1__
+        24:
+            settings: #settings:
+                __Variable22__: value22
+"
+`;
+
 exports[`unit test >> makeSettingTree >> if_and_no_indent: answer indicesWithIf 1`] = `
 "Map {
     1 => "/",

@@ -1405,6 +1405,11 @@ Currently, it is not supported to replace the value of
 the variable specified in `#copy-template:` tag or `#copy:` tag
 by replace command.
 
+Even if there are differences in the presence or absence
+of　`#keyword:` tag (including parameters) and
+differences in the content, typrm judged that the sentence is the same
+because typrm avoids to show the same content in the search result.
+
 ## #if tag: set conditions
 
 When there is a relationship between one setting and another,

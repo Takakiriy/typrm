@@ -8,6 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import { pp } from "./lib";
+import { settings } from 'cluster';
 
 // main
 export async function  main() {
@@ -368,9 +369,9 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
         {lineNum: 1, indent: ''}
     ];
     const  settingStack:  // #search: settingStack of typrm makeSettingTree
-            {lineNum: number, index: string, nextAlphabetIndex: string, indent: string, startLineNum: number, startIndentLevel: number}[] = [
-        {lineNum: 0, index: '/',  nextAlphabetIndex: 'a', indent: '', startLineNum: 1, startIndentLevel: -1},
-        {lineNum: 0, index: '/1', nextAlphabetIndex: 'a', indent: '', startLineNum: 0, startIndentLevel: 0}
+            {lineNum: number, index: string, nextNumberIndex: number, nextAlphabetIndex: string, indent: string, startLineNum: number, startIndentLevel: number}[] = [
+        {lineNum: 0, index: '/',  nextNumberIndex: 0, nextAlphabetIndex: 'a', indent: '', startLineNum: 1, startIndentLevel: -1},
+        {lineNum: 0, index: '/1', nextNumberIndex: 1, nextAlphabetIndex: 'a', indent: '', startLineNum: 0, startIndentLevel: 0}
         // "parentIndentLevel" is a parent indent of a settings tag. It is not a indent of a settings tag.
     ];
     var  reader = readline.createInterface({
@@ -444,9 +445,9 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                         if (indent.length <= settingStack[currentSettingStackIndex + 1].indent.length) {
                             nextSetting.nextAlphabetIndex = path.basename(nextSetting.index);
                             if (parentSettingIndex === '/') {
-                                nextSetting.index = `/1`;
+                                nextSetting.index = `/${nextSetting.nextNumberIndex}`;
                             } else {
-                                nextSetting.index = `${parentSettingIndex}/1`;
+                                nextSetting.index = `${parentSettingIndex}/${nextSetting.nextNumberIndex}`;
                             }
                         }
                         break;
@@ -491,6 +492,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 } else {
                     nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
                 }
+                nextSetting.nextNumberIndex += 1;
             }
 
             // push "indentStack"
@@ -612,6 +614,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     settingStack.push({
                         lineNum: 0,
                         index: nextNestedIndex,
+                        nextNumberIndex: 1,
                         nextAlphabetIndex: 'a',
                         indent: '',
                         startLineNum: 0,
@@ -704,6 +707,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             settingStack.push({
                 lineNum: 0,
                 index: nextSetting.index + '/a',
+                nextNumberIndex: 1,
                 nextAlphabetIndex: 'a',
                 indent: '',
                 startLineNum: 0,

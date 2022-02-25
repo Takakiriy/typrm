@@ -1445,6 +1445,7 @@ describe("unit test >>", () => {
             ["bug_case_2", {}],
             ["bug_case_3", { checkSettings: true }],
             ["bug_case_4", {}],
+            ["bug_case_6", {}],
         ])("%s", async (caseName, options) => {
             const  Parser = main.private_.Parser;
             const  makeSettingTree = main.private_.makeSettingTree;
