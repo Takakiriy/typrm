@@ -11,3 +11,4 @@ bin/chmod+x.command
 *.log
 /.env
 !.env.project
+_output

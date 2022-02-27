@@ -13,11 +13,13 @@
     "type": "module",
     "devDependencies": {
         "@types/csv-parse": "^1.2.2",
+        "@types/diff": "^5.0.2",
         "@types/globby": "^9.1.0",
         "@types/jest": "^26.0.24",
         "@types/js-yaml": "^4.0.5",
         "@types/node": "^13.13.4",
         "@types/prettier": "^2.4.2",
+        "@types/sharp": "^0.29.5",
         "jest": "^26.6.3",
         "prettier": "^2.5.1",
         "ts-jest": "^26.4.4",
@@ -25,14 +27,14 @@
         "typescript": "^4.5.4"
     },
     "dependencies": {
-        "@types/diff": "^5.0.2",
         "chalk": "^4.1.2",
         "commander": "^7.2.0",
         "csv-parse": "^5.0.4",
         "diff": "^5.0.0",
         "dotenv": "^16.0.0",
         "globby": "^11.0.4",
-        "js-yaml": "^4.1.0"
+        "js-yaml": "^4.1.0",
+        "sharp": "^0.30.1"
     },
     "jest": {
         "roots": [

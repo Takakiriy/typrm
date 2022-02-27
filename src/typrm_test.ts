@@ -18,6 +18,15 @@ process.env.TYPRM_LINE_NUM_GETTER = `
         filePathRegularExpressionIndex: 1
         keywordRegularExpressionIndex: 4
         address: "\${file}:\${lineNum}"
+    - #
+        regularExpression: ^(.*\\.(jpg|jpeg|png))\\?(name=([^&]*)&)?x=([0-9]+)&y=([0-9]+)$
+        type: figure
+        filePathRegularExpressionIndex: 1
+        nameExpressionIndex: 4
+        xExpressionIndex: 5
+        yExpressionIndex: 6
+        pointerImage: ../example/pointer_100x100.png
+        outputFolder: ../_output
 `;
 process.env.TYPRM_VERB = `
     - #

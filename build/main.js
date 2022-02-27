@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
+import sharp from 'sharp';
 import { pp } from "./lib";
 // main
 export async function main() {
@@ -2961,14 +2962,19 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     var addressLineNum = 0;
     const getter = getRelatedLineNumGetter(address);
     if (getter.type === 'text') {
-        const { filePath, lineNum } = await searchAsText(getter, address);
-        linkableAddress = getter.address
+        const lineNumGetter = getter;
+        const { filePath, lineNum } = await searchAsText(lineNumGetter, address);
+        linkableAddress = lineNumGetter.address
             .replace(verbVar.file, filePath.replace(/\\/g, '/'))
             .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
             .replace(verbVar.fragment, '')
             .replace(verbVar.lineNum, lineNum.toString());
         // This format is hyperlinkable in the Visual Studio Code Terminal
         addressLineNum = lineNum;
+    }
+    if (getter.type === 'figure') {
+        const figurePointGetter = getter;
+        linkableAddress = await getPointedFigurePath(figurePointGetter, address);
     }
     // recommended = ...
     var recommended = address;
@@ -3026,12 +3032,12 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
 // getRelatedLineNumGetter
 function getRelatedLineNumGetter(address) {
     if (process.env.TYPRM_LINE_NUM_GETTER) {
-        const searchConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
-        if (typeof searchConfig === 'object' && searchConfig) {
-            const searchs = searchConfig;
-            for (const search of searchs) {
-                if (new RegExp(search.regularExpression).test(address)) {
-                    return search;
+        const getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
+        if (typeof getterConfig === 'object' && getterConfig) {
+            const getters = getterConfig;
+            for (const getter of getters) {
+                if (new RegExp(getter.regularExpression).test(address)) {
+                    return getter;
                 }
             }
         }
@@ -3146,16 +3152,37 @@ function printConfig() {
         if (typeof getterConfig === 'object' && getterConfig) {
             const getters = getterConfig;
             var index = 0;
-            for (const getter of getters) {
-                console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
-                console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
-                console.log(`        Verbose: type: ${getter.type}`);
-                console.log(`        Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
-                console.log(`        Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
-                console.log(`        Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
-                console.log(`        Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
-                console.log(`        Verbose: address: ${getter.address}`);
-                index += 1;
+            for (const getter1 of getters) {
+                if (getter1.type === 'text') {
+                    const getter = getter1;
+                    console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                    console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
+                    console.log(`        Verbose: type: ${getter.type}`);
+                    console.log(`        Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+                    console.log(`        Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
+                    console.log(`        Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
+                    console.log(`        Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
+                    console.log(`        Verbose: address: ${getter.address}`);
+                    index += 1;
+                }
+                else if (getter1.type === 'figure') {
+                    const getter = getter1;
+                    console.log(`    Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
+                    console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
+                    console.log(`        Verbose: type: ${getter.type}`);
+                    console.log(`        Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+                    console.log(`        Verbose: xExpressionIndex: ${getter.xExpressionIndex}`);
+                    console.log(`        Verbose: yExpressionIndex: ${getter.yExpressionIndex}`);
+                    console.log(`        Verbose: nameExpressionIndex: ${getter.nameExpressionIndex}`);
+                    console.log(`        Verbose: pointerImage: ${getter.pointerImage}`);
+                    console.log(`        Verbose: outputFolder: ${getter.outputFolder}`);
+                }
+                else {
+                    const getter = getter1;
+                    console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                    console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
+                    console.log(`        Verbose: type: ${getter.type} (unknown)`);
+                }
             }
         }
     }
@@ -4543,6 +4570,80 @@ async function searchAsText(getter, address) {
     }
     const lineNum = await lib.searchAsTextSub({ input: fs.createReadStream(filePath) }, keyword, csvOption);
     return { filePath, lineNum };
+}
+// parseFigureParameters
+function parseFigureParameters(address, getter) {
+    const verboseMode = 'verbose' in programOptions;
+    if (verboseMode) {
+        console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
+        console.log(`    Verbose: address: ${address}`);
+        console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
+        console.log(`    Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+        console.log(`    Verbose: xExpressionIndex: ${getter.xExpressionIndex}`);
+        console.log(`    Verbose: yExpressionIndex: ${getter.yExpressionIndex}`);
+        console.log(`    Verbose: nameExpressionIndex: ${getter.nameExpressionIndex}`);
+        console.log(`    Verbose: pointerImage: ${getter.pointerImage}`);
+        console.log(`    Verbose: outputFolder: ${getter.outputFolder}`);
+    }
+    const parameters = (new RegExp(getter.regularExpression)).exec(address);
+    if (!parameters) {
+        throw new Error(`ERROR: regularExpression (${getter.regularExpression}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is not matched.` +
+            `testing string is "${address}".`);
+    }
+    if (verboseMode) {
+        console.log(`    Verbose: matched: [${parameters.join(', ')}]`);
+    }
+    if (getter.filePathRegularExpressionIndex > parameters.length - 1) {
+        throw new Error(`ERROR: filePathRegularExpressionIndex (${getter.filePathRegularExpressionIndex}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+    if (getter.xExpressionIndex > parameters.length - 1) {
+        throw new Error(`ERROR: xExpressionIndex (${getter.xExpressionIndex}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+    if (getter.yExpressionIndex > parameters.length - 1) {
+        throw new Error(`ERROR: yExpressionIndex (${getter.yExpressionIndex}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+    if (getter.nameExpressionIndex > parameters.length - 1) {
+        throw new Error(`ERROR: nameExpressionIndex (${getter.nameExpressionIndex}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+    return {
+        filePath: parameters[getter.filePathRegularExpressionIndex],
+        name: getter.nameExpressionIndex ? parameters[getter.nameExpressionIndex] : '',
+        x: parseInt(parameters[getter.xExpressionIndex]),
+        y: parseInt(parameters[getter.yExpressionIndex]),
+    };
+}
+// getPointedFigurePath
+async function getPointedFigurePath(getter, address) {
+    const { filePath, name, x, y } = parseFigureParameters(address, getter);
+    const inputImage = path.parse(filePath);
+    const outputImagePath = (name) ?
+        `${getter.outputFolder}/${inputImage.name}_${name}_${x}_${y}${inputImage.ext}` :
+        `${getter.outputFolder}/${inputImage.name}_${x}_${y}${inputImage.ext}`;
+    fs.mkdirSync(getter.outputFolder, { recursive: true });
+    try {
+        const pointer = await sharp(getter.pointerImage).metadata();
+        sharp(filePath)
+            .composite([{
+                input: getter.pointerImage,
+                left: x - pointer.width / 2,
+                top: y - pointer.height / 2,
+            }])
+            .toFile(outputImagePath);
+    }
+    catch (e) {
+        console.log(e);
+        return '';
+    }
+    return outputImagePath;
 }
 // verbVar
 var VerbVariable;
