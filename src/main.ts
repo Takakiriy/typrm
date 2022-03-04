@@ -5085,11 +5085,16 @@ async function  getPointedFigurePath(getter: FigurePointGetter, address: string)
         `${getter.outputFolder}/${inputImage.name}_${x}_${y}${inputImage.ext}`;
     fs.mkdirSync(getter.outputFolder, {recursive: true});
     try {
-        const  pointer = await sharp(getter.pointerImage).metadata();
+        const  figure = sharp(filePath);
+        const  pointerImage = sharp(getter.pointerImage);
+        const  pointerBuffer = await pointerImage.toBuffer();
+        const  pointer = await pointerImage.metadata();
 
-        sharp(filePath)
+        // sharp(getter.pointerImage)
+        //     .resize()
+        figure
             .composite([{
-                input: getter.pointerImage,
+                input: pointerBuffer,
                 left: x - pointer.width! / 2,
                 top:  y - pointer.height! / 2,
             }])
