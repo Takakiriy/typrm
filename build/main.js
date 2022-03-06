@@ -2972,7 +2972,7 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
         // This format is hyperlinkable in the Visual Studio Code Terminal
         addressLineNum = lineNum;
     }
-    if (getter.type === 'figure') {
+    else if (getter.type === 'figure') {
         const figurePointGetter = getter;
         linkableAddress = await getPointedFigurePath(figurePointGetter, address);
     }
@@ -4630,12 +4630,15 @@ async function getPointedFigurePath(getter, address) {
         `${getter.outputFolder}/${inputImage.name}_${x}_${y}${inputImage.ext}`;
     fs.mkdirSync(getter.outputFolder, { recursive: true });
     try {
-        const pointer = await sharp(getter.pointerImage).metadata();
-        sharp(filePath)
+        const figureChain = sharp(filePath);
+        const figure = await figureChain.metadata();
+        const pointerChain = sharp(getter.pointerImage).resize(Math.floor(figure.width * 15 / 100), Math.floor(figure.height * 15 / 100), { fit: 'contain' });
+        const pointer = await pointerChain.toBuffer({ resolveWithObject: true });
+        await figureChain
             .composite([{
-                input: getter.pointerImage,
-                left: x - pointer.width / 2,
-                top: y - pointer.height / 2,
+                input: pointer.data,
+                left: x - Math.floor(pointer.info.width / 2),
+                top: y - Math.floor(pointer.info.height / 2),
             }])
             .toFile(outputImagePath);
     }

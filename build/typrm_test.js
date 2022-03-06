@@ -89,9 +89,19 @@ async function TestOfCommandLine() {
             "parameters": "search  --folder test_data/search/2",
             "check": "true",
             "inputLines": "file_path\nexit()\n",
+        }, {
+            "name": "pointed_figure_1",
+            "parameters": "search  \"#ref: ../example/figure_1.png?name=test_1&x=404&y=70\"",
+            "check": "true",
+            "inputLines": "",
+        }, {
+            "name": "pointed_figure_2",
+            "parameters": "search",
+            "check": "true",
+            "inputLines": "#ref: ../example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
         }];
     for (const case_ of cases) {
-        if (true || case_.name === 'search_mode_select_by_number') {
+        if (false || case_.name === 'pointed_figure_1') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
             // Test Main
