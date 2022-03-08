@@ -33,6 +33,7 @@ You can execute the command just by copying and pasting the displayed command.
   - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
     - [Execute commands related to files](#execute-commands-related-to-files)
     - [Replace to the line number of the file](#replace-to-the-line-number-of-the-file)
+    - [Display with a pointer at noteworthy position in the image](#display-with-a-pointer-at-noteworthy-position-in-the-image)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -1716,6 +1717,8 @@ You can check the setting value by adding the --verbose option to typrm.
 If you specify the file path and parameters by search (s)
 command with `#ref:` tag, the file path and line number will be
 displayed.
+It can also be displayed by entering it in the search keyword
+input mode (typrm shell).
 
     $ typrm s \#ref: '${projects}/project1/src/app.ts#main'
     C:/Users/user1/Projects/project1/src/app.ts:25
@@ -1802,6 +1805,87 @@ You can write variable references in the `address` parameter.
 | ${file} | left of `#` in `#ref:` parameter |
 | ${windowsFile} | the path with backslash |
 | ${lineNum} | the line number |
+
+If you add the --verbose option to the search command of typrm,
+you can check the setting value of the TYPRM_LINE_NUM_GETTER environment variable
+and the result of the value of the `#ref:` tag parsed by the regular expression.
+
+
+### Display with a pointer at noteworthy position in the image
+
+If you add the `#ref:` tag, the path of the image file
+and the position of interest written by the query parameter
+to the search (s) command,
+an image compositing the pointer (red circle) file will be created and
+the image path is shown.
+It can also be displayed by entering it
+in the search keyword input mode (typrm shell).
+
+    $ typrm s \#ref: '${projects}/example/figure_1.png?name=example&x=404&y=70'
+    C:/Users/user1/tmp/figpoint/figure_1_example_404_70.png
+
+| parameter name | contents |
+| ------------ | ----------- |
+| name | a part of file name. optional |
+| x | X coordinate with the upper left as the origin |
+| y | Y coordinate with the upper left as the origin |
+
+To display the image with a pointer,
+set the `TYPRM_LINE_NUM_GETTER` environment variable to YAML as shown below.
+However, edit the `regularExpression` settings according to your environment.
+
+Case of Windows PowerShell:
+
+    ${env:TYPRM_LINE_NUM_GETTER} = @"
+        - #
+            regularExpression: ^(.*\.(jpg|jpeg|png))\?(name=([^&]*)&)?x=([0-9]+)&y=([0-9]+)`$
+            type: figure
+            filePathRegularExpressionIndex: 1
+            nameExpressionIndex: 4
+            xExpressionIndex: 5
+            yExpressionIndex: 6
+            pointerImage: C:\Users\user1\GitProjects\GitHub\figpoint\test\pointer_100x100.png
+            outputFolder: C:\Users\user1\tmp\figpoint
+    "@
+
+Case of mac zsh:
+
+    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
+        - #
+            regularExpression: ^(.*\.(jpg|jpeg|png))\?(name=([^&]*)&)?x=([0-9]+)&y=([0-9]+)$
+            type: figure
+            filePathRegularExpressionIndex: 1
+            nameExpressionIndex: 4
+            xExpressionIndex: 5
+            yExpressionIndex: 6
+            pointerImage: /Users/user1/GitProjects/GitHub/figpoint/test/pointer_100x100.png
+            outputFolder: /Users/user1/tmp/figpoint
+    __HERE_DOCUMENT__
+    )
+
+For `type`, specify `figure`.
+
+For `filePathRegularExpressionIndex`, specify the number
+in parentheses that corresponds to the file path part of
+the result evaluated by `regularExpression`.
+The numbers specification in parentheses are the same as
+the JavaScript
+[RegExp.exec (MDN)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#description) specification.
+
+For `nameExpressionIndex`, specify the number in parentheses
+that corresponds to part of the file name.
+
+For `xExpressionIndex`, specify the number in parentheses
+that corresponds to the part of the X coordinate.
+
+For `yExpressionIndex`, specify the number in parentheses
+that corresponds to the part of the Y coordinate.
+
+For `pointerImage`, specify the path of the pointer image
+that indicates the position of interest.
+
+For `outputFolder`, specify the path of the folder
+that stores the composite image of the pointer image.
 
 If you add the --verbose option to the search command of typrm,
 you can check the setting value of the TYPRM_LINE_NUM_GETTER environment variable

@@ -34,6 +34,7 @@ typrm は自分が使いやすいコマンドのオプションを書いた
   - [#ref タグ - 環境変数を含むファイルのパスを展開して表示します](#ref-タグ---環境変数を含むファイルのパスを展開して表示します)
     - [ファイルに関連するコマンドを実行します](#ファイルに関連するコマンドを実行します)
     - [ファイルの行番号に置き換えて表示します](#ファイルの行番号に置き換えて表示します)
+    - [画像の中の注目すべき位置にポインターを付けて表示します](#画像の中の注目すべき位置にポインターを付けて表示します)
   - [（開発者用） 開発環境の構築手順](#開発者用-開発環境の構築手順)
     - [Windows の場合](#windows-の場合-1)
     - [mac の場合](#mac-の場合-1)
@@ -686,7 +687,7 @@ typrm replace コマンドを実行すると、すべてのファイルにある
 
 ### 任意のコマンドを実行します
 
-検索キーワード入力モード(typrm shell) で
+検索キーワード入力モード (typrm shell) で
 `#r`, `#replace:`, `#reset:`, `#c`, `#check:`, `#mutual:` から入力すると、
 typrm の replace, reset, check, mutual-search コマンドが使えます。
 
@@ -1647,6 +1648,7 @@ typrm に --verbose オプションを付けると、設定値を確認できま
 
 search (s) コマンドに `#ref:` タグを付けてファイルのパスとパラメーターを指定すると、
 ファイルのパスと行番号に置き換えて表示します。
+検索キーワード入力モード (typrm shell) で入力しても表示できます。
 
     $ typrm s \#ref: '${projects}/project1/src/app.ts#main'
     C:/Users/user1/Projects/project1/src/app.ts:25
@@ -1723,6 +1725,78 @@ CSV オプションが指定されると、`#` より右側を CSV 形式のキ�
 | ${file} | #ref: のパラメーターの # より左 |
 | ${windowsFile} | バックスラッシュを使ったパス |
 | ${lineNum} | 行番号 |
+
+typrm の search コマンドに --verbose オプションを付けると、
+TYPRM_LINE_NUM_GETTER 環境変数の設定値、
+および `#ref:` タグの値を正規表現で解析した結果を確認できます。
+
+
+### 画像の中の注目すべき位置にポインターを付けて表示します
+
+search (s) コマンドに `#ref:` タグを付けて画像ファイルのパスと
+注目すべき位置を クエリー パラメーター で指定すると、
+注目すべき位置にポインター（赤い丸）を合成した画像ファイルを作り、
+その画像ファイルへのパスを表示します。
+検索キーワード入力モード (typrm shell) で入力しても表示できます。
+
+    $ typrm s \#ref: '${projects}/example/figure_1.png?name=example&x=404&y=70'
+    C:/Users/user1/tmp/figpoint/figure_1_example_404_70.png
+
+| パラメーター名 | 内容 |
+| ------------ | ---- |
+| name | ファイル名の一部。省略可能 |
+| x | 左上を原点とした X座標 |
+| y | 左上を原点とした Y座標 |
+
+ポインターを付けて画像を表示するには、
+`TYPRM_LINE_NUM_GETTER` 環境変数に以下のような YAML を設定します。
+ただし、`regularExpression` の設定は環境に応じて編集してください。
+
+Windows の PowerShell の場合:
+
+    ${env:TYPRM_LINE_NUM_GETTER} = @"
+        - #
+            regularExpression: ^(.*\.(jpg|jpeg|png))\?(name=([^&]*)&)?x=([0-9]+)&y=([0-9]+)`$
+            type: figure
+            filePathRegularExpressionIndex: 1
+            nameExpressionIndex: 4
+            xExpressionIndex: 5
+            yExpressionIndex: 6
+            pointerImage: C:\Users\user1\GitProjects\GitHub\figpoint\test\pointer_100x100.png
+            outputFolder: C:\Users\user1\tmp\figpoint
+    "@
+
+bash, zsh の場合:
+
+    export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
+        - #
+            regularExpression: ^(.*\.(jpg|jpeg|png))\?(name=([^&]*)&)?x=([0-9]+)&y=([0-9]+)$
+            type: figure
+            filePathRegularExpressionIndex: 1
+            nameExpressionIndex: 4
+            xExpressionIndex: 5
+            yExpressionIndex: 6
+            pointerImage: /Users/user1/GitProjects/GitHub/figpoint/test/pointer_100x100.png
+            outputFolder: /Users/user1/tmp/figpoint
+    __HERE_DOCUMENT__
+    )
+
+`type` には、`figure` を指定します。
+
+`filePathRegularExpressionIndex` には、`regularExpression`（正規表現）で
+評価した結果のうち、ファイル パス の部分に該当するカッコの番号を指定します。
+括弧の番号は、JavaScript の
+[RegExp.exec (MDN)](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec#description) の仕様と同じです。
+
+`nameExpressionIndex` には、ファイル名の一部に相当するカッコの番号を指定します。
+
+`xExpressionIndex` には、X 座標の部分に相当するカッコの番号を指定します。
+
+`yExpressionIndex` には、Y 座標の部分に相当するカッコの番号を指定します。
+
+`pointerImage` には、注目すべき位置を示すポインター画像のパスを指定します。
+
+`outputFolder` には、ポインター画像を合成した画像を格納するフォルダーのパスを指定します。
 
 typrm の search コマンドに --verbose オプションを付けると、
 TYPRM_LINE_NUM_GETTER 環境変数の設定値、

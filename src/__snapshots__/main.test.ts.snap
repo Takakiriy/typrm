@@ -17,7 +17,7 @@ exports[`checks copy tag >> 1 >> NG: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -34,7 +34,7 @@ b: #copy: copy_1
 exports[`checks copy tag >> 1 >> OK: stdout 1`] = `
 "
 Warning: 0, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -67,7 +67,7 @@ exports[`checks copy tag >> 2 >> NG: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -92,7 +92,7 @@ b: #copy: copy_1
 exports[`checks copy tag >> 2 >> OK: stdout 1`] = `
 "
 Warning: 0, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -125,7 +125,7 @@ exports[`checks copy tag >> ignore keyword tag: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -144,7 +144,7 @@ exports[`checks copy tag >> template >> 1 >> NG-1: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -169,7 +169,7 @@ exports[`checks copy tag >> template >> 1 >> NG-2: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -184,7 +184,7 @@ b: #copy: copy_1, {__VariableA__: a2}
 exports[`checks copy tag >> template >> 1 >> OK: stdout 1`] = `
 "
 Warning: 0, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -211,7 +211,7 @@ exports[`checks copy tag >> template >> default value: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -239,7 +239,7 @@ exports[`checks copy tag >> template >> variable: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 1
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -277,7 +277,7 @@ exports[`checks file contents >> First >> NG: stdout 1`] = `
     Expected: login user2
 
 Warning: 3, Error: 0
-template count = 6
+checked file count = 1, template count = 6
 "
 `;
 
@@ -300,7 +300,7 @@ sudo nano ../../file_target/1/file_1_ok_and_bad_3_target.sh: |  #file-template: 
 exports[`checks file contents >> First >> OK: stdout 1`] = `
 "
 Warning: 0, Error: 0
-template count = 6
+checked file count = 1, template count = 6
 "
 `;
 
@@ -362,7 +362,7 @@ exports[`checks file contents >> First >> any_lines: stdout 1`] = `
     Expected: 3 NG not end
 
 Warning: 2, Error: 0
-template count = 9
+checked file count = 1, template count = 9
 "
 `;
 
@@ -429,7 +429,7 @@ exports[`checks file contents >> First >> environment_variable: stdout 1`] = `
     Expected: - TYPRM_TEST_PATH = C:\\\\Test  #NG-d
 
 Warning: 6, Error: 0
-template count = 14
+checked file count = 1, template count = 14
 "
 `;
 
@@ -453,7 +453,7 @@ Error of not found the target file:
   Template: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:4
 
 Warning: 1, Error: 1
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -636,7 +636,7 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
     Error: if tag syntax
 
 Warning: 14, Error: 2
-template count = 34
+checked file count = 1, template count = 34
 "
 `;
 
@@ -653,7 +653,7 @@ exports[`checks file contents >> Multi folder >> all: stdout 1`] = `
     Expected: correct contents
 
 Warning: 2, Error: 0
-template count = 2
+checked file count = 2, template count = 2
 "
 `;
 
@@ -665,7 +665,7 @@ exports[`checks file contents >> Multi folder >> file in 1st folder: stdout 1`] 
     Expected: correct contents
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -677,7 +677,7 @@ exports[`checks file contents >> Multi folder >> file in 2nd folder: stdout 1`] 
     Expected: correct contents
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -689,7 +689,7 @@ exports[`checks file contents >> Multi folder >> full path: stdout 1`] = `
     Expected: correct contents
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -702,7 +702,7 @@ exports[`checks file contents >> file_0_one_error: sourceFileContents 1`] = `
 exports[`checks template value >> 1_template_1_ok: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 8
+checked file count = 1, template count = 8
 "
 `;
 
@@ -827,7 +827,7 @@ exports[`checks template value >> 1_template_2_error: answer 1`] = `
     Expected: __Undefined__
 
 Warning: 11, Error: 2
-template count = 13
+checked file count = 1, template count = 13
 "
 `;
 
@@ -963,7 +963,7 @@ Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:84
   Not referenced: target1
 
 Warning: 9, Error: 7
-template count = 12
+checked file count = 1, template count = 12
 "
 `;
 
@@ -1070,7 +1070,7 @@ exports[`checks template value >> check files in multi folder >> 1st: answer 1`]
     Expected: value1
 
 Warning: 2, Error: 0
-template count = 2
+checked file count = 2, template count = 2
 "
 `;
 
@@ -1083,21 +1083,21 @@ exports[`checks template value >> check files in multi folder >> with current fo
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
 exports[`checks template value >> check one file only: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 8
+checked file count = 1, template count = 8
 "
 `;
 
 exports[`checks template value >> environment_variable: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 5
+checked file count = 1, template count = 5
 "
 `;
 
@@ -1123,7 +1123,7 @@ exports[`checks template value >> list_to_tag_original_tag: answer 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
 
 Warning: 0, Error: 0
-template count = 2
+checked file count = 1, template count = 2
 "
 `;
 
@@ -1149,7 +1149,7 @@ exports[`checks template value >> one_error: sourceFileContents 1`] = `
 exports[`checks template value >> settings >> 1 same values: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -1185,7 +1185,7 @@ Error of duplicated variable name:
     Expected: value111, value222
 
 Warning: 1, Error: 2
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -1202,7 +1202,7 @@ value1, value2  #template: var1, var2
 exports[`checks template value >> settings >> 3 overwrite: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 8
+checked file count = 1, template count = 8
 "
 `;
 
@@ -1303,7 +1303,7 @@ exports[`checks template value >> settings >> 3e overwrite error: answer 1`] = `
     Expected: value1, value2, value3
 
 Warning: 8, Error: 0
-template count = 8
+checked file count = 1, template count = 8
 "
 `;
 
@@ -1337,7 +1337,7 @@ exports[`checks template value >> settings >> 4 neighbor error: answer 1`] = `
     First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -1359,7 +1359,7 @@ exports[`checks template value >> settings >> 4-2 neighbor level 2 error: answer
     First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -1378,7 +1378,7 @@ exports[`checks template value >> settings >> 4-2 neighbor level 2 error: source
 exports[`checks template value >> settings >> b1_bug_case_no_root_settings: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 0
+checked file count = 1, template count = 0
 "
 `;
 
@@ -1394,7 +1394,7 @@ no indent:
 exports[`checks template value >> settings >> b2_bug_case_nest_settings: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 6
+checked file count = 1, template count = 6
 "
 `;
 
@@ -1453,7 +1453,7 @@ root2:  #// Test of 211
 exports[`checks template value >> settings_tree: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 4
+checked file count = 1, template count = 4
 "
 `;
 
@@ -1479,7 +1479,7 @@ Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36
   Not referenced: __11A__
 
 Warning: 1, Error: 0
-template count = 20
+checked file count = 1, template count = 20
 "
 `;
 
@@ -1596,7 +1596,7 @@ exports[`checks template value >> settings_tree_error: answer 1`] = `
     Expected: Value111A
 
 Warning: 9, Error: 0
-template count = 9
+checked file count = 1, template count = 9
 "
 `;
 
@@ -1636,7 +1636,7 @@ exports[`checks template value >> settings_tree_if: answer 1`] = `
     Expected: ValueC
 
 Warning: 1, Error: 0
-template count = 6
+checked file count = 1, template count = 6
 "
 `;
 
@@ -1688,7 +1688,7 @@ Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
   Not referenced: variable1
 
 Warning: 2, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 "
 `;
 
@@ -1704,7 +1704,7 @@ val__ue2: #template: variable2
 exports[`checks template value >> settings_tree_position: answer 1`] = `
 "
 Warning: 0, Error: 0
-template count = 5
+checked file count = 1, template count = 5
 "
 `;
 
@@ -1737,7 +1737,7 @@ exports[`checks template value >> template_if_1_error: answer 1`] = `
     Expected: 🌟
 
 Warning: 2, Error: 0
-template count = 4
+checked file count = 1, template count = 4
 "
 `;
 
@@ -1769,7 +1769,7 @@ Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14
   Not referenced: __Key2__
 
 Warning: 4, Error: 0
-template count = 2
+checked file count = 1, template count = 2
 "
 `;
 
@@ -1906,7 +1906,7 @@ Verbose: Phase 3: check ...
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
 
 Warning: 4, Error: 0
-template count = 7
+checked file count = 1, template count = 7
 "
 `;
 
@@ -1986,7 +1986,7 @@ exports[`replaces settings >> in 2_replace_1_ok setting 1: answer 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/empty_folder/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
 
 Warning: 0, Error: 0
-template count = 8
+checked file count = 1, template count = 8
 "
 `;
 
@@ -5017,7 +5017,7 @@ exports[`typrm shell >> replace >> check: stdout 1`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: #c
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5029,7 +5029,7 @@ typrm keyword: #c
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: exit()
 "
 `;
@@ -5046,7 +5046,7 @@ exports[`typrm shell >> replace >> check: stdout 2`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: #check:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5058,7 +5058,7 @@ typrm keyword: #check:
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: exit()
 "
 `;
@@ -5075,7 +5075,7 @@ exports[`typrm shell >> replace >> check: stdout 3`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: #c _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5087,7 +5087,7 @@ typrm keyword: #c _tmp.yaml
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: exit()
 "
 `;
@@ -5104,7 +5104,7 @@ exports[`typrm shell >> replace >> check: stdout 4`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: #check: _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5116,7 +5116,7 @@ typrm keyword: #check: _tmp.yaml
     Expected: value1
 
 Warning: 1, Error: 0
-template count = 1
+checked file count = 1, template count = 1
 typrm keyword: exit()
 "
 `;
@@ -5134,13 +5134,13 @@ exports[`typrm shell >> replace >> checkNotFound: stdout 1`] = `
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-template count = 0
+checked file count = 0, template count = 0
 typrm keyword: #c not_found.yaml
 
 Exception: Error: Not found specified target file at \\"[\\"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/not_found.yaml\\",\\"\${HOME}/GitProjects/GitHub/typrm/src/not_found.yaml\\"]\\".
 
 Warning: 0, Error: 1
-template count = 0
+checked file count = 0, template count = 0
 typrm keyword: exit()
 "
 `;

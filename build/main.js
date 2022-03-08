@@ -699,6 +699,8 @@ async function makeSettingTree(parser) {
     }
     if (!('/' in tree.settings)) {
         tree.settings['/'] = {};
+    }
+    if (!('/' in tree.settingsInformation)) {
         tree.settingsInformation['/'] = {
             index: '/', lineNum: 0, indent: '', condition: '', inSettings: false
         };
@@ -1939,8 +1941,10 @@ async function check(checkingFilePath) {
     const parser = new Parser();
     const currentFolderBackUp = process.cwd();
     const copyTags = [];
+    var fileCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
+            fileCount += 1;
             await checkRoutine(inputFileFullPath, copyTags, parser);
         }
     }
@@ -1955,7 +1959,7 @@ async function check(checkingFilePath) {
     checkCopyTag(copyTags, parser);
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
-    console.log(`template count = ${parser.templateCount}`);
+    console.log(`checked file count = ${fileCount}, template count = ${parser.templateCount}`);
 }
 // checkCopyTag
 function checkCopyTag(copyTags, parser) {
@@ -3716,7 +3720,7 @@ class SettingsTree {
         // current: current line moved by "moveToLine" method
         this.wasChanged = false;
         this.currentSettings = {};
-        this.currentSettingIndex = '';
+        this.currentSettingIndex = '/';
         this.currentIsOutOfFalseBlock = true; // by settings before replaced
         this.outOfScopeSettingIndices = []; // This is set when previous line is in scope
         // next: next for "moveToLine" method
@@ -4632,7 +4636,7 @@ async function getPointedFigurePath(getter, address) {
     try {
         const figureChain = sharp(filePath);
         const figure = await figureChain.metadata();
-        const pointerChain = sharp(getter.pointerImage).resize(Math.floor(figure.width * 15 / 100), Math.floor(figure.height * 15 / 100), { fit: 'contain' });
+        const pointerChain = sharp(getter.pointerImage).resize(Math.floor(figure.width * 15 / 100), Math.floor(figure.height * 15 / 100), { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } });
         const pointer = await pointerChain.toBuffer({ resolveWithObject: true });
         await figureChain
             .composite([{

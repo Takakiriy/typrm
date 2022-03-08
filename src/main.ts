@@ -745,6 +745,8 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     }
     if ( ! ('/' in tree.settings)) {
         tree.settings['/'] = {};
+    }
+    if ( ! ('/' in tree.settingsInformation)) {
         tree.settingsInformation['/'] = {
             index: '/', lineNum: 0, indent: '', condition: '', inSettings: false
         };
@@ -2089,8 +2091,10 @@ async function  check(checkingFilePath?: string) {
     const  parser = new Parser();
     const  currentFolderBackUp = process.cwd();
     const  copyTags: CopyTag[] = [];
+    var    fileCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
+            fileCount += 1;
 
             await checkRoutine(inputFileFullPath, copyTags, parser);
         }
@@ -2106,7 +2110,7 @@ async function  check(checkingFilePath?: string) {
 
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
-    console.log(`template count = ${parser.templateCount}`);
+    console.log(`checked file count = ${fileCount}, template count = ${parser.templateCount}`);
 }
 
 // checkCopyTag
@@ -2200,7 +2204,7 @@ function  checkCopyTag(copyTags: CopyTag[], parser: Parser) {
 }
 
 // listUpFilePaths
-async function  listUpFilePaths(checkingFilePath?: string) {
+async function  listUpFilePaths(checkingFilePath?: string): Promise<string[]> {
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
@@ -3986,7 +3990,7 @@ class SettingsTree {
     // current: current line moved by "moveToLine" method
     wasChanged = false;
     currentSettings: {[name: string]: Setting} = {};
-    currentSettingIndex = '';
+    currentSettingIndex = '/';
     currentIsOutOfFalseBlock: boolean = true;  // by settings before replaced
     outOfScopeSettingIndices: string[] = [];  // This is set when previous line is in scope
 
@@ -5088,7 +5092,8 @@ async function  getPointedFigurePath(getter: FigurePointGetter, address: string)
         const  figureChain = sharp(filePath);
         const  figure = await figureChain.metadata();
         const  pointerChain = sharp(getter.pointerImage).resize(
-            Math.floor(figure.width! * 15/100), Math.floor(figure.height! * 15/100), {fit: 'contain'});
+            Math.floor(figure.width! * 15/100), Math.floor(figure.height! * 15/100),
+            {fit: 'contain', background: {r:0,g:0,b:0,alpha:0}});
         const  pointer = await pointerChain.toBuffer({ resolveWithObject: true });
 
         await figureChain
