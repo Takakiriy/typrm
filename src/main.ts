@@ -381,6 +381,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     var  isReadingSetting = false;
     var  setting: Settings = {};
     var  currentSettingIndex = '/';
+    var  settingTagParameters: {[name: string]: string} = {};
     var  lineNum = 0;
     var  settingIndentLength = 0;
     tree.indices.set(1, '/');
@@ -638,6 +639,10 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     condition: '',
                     inSettings: isReadingSetting,
                 };
+                const  parameters = line.substring(line.indexOf(':', settingLabel.exec(line)!.index) + 1).trim();
+                if (parameters) {
+                    settingTagParameters = yaml.load(parameters) as {[name: string]: string};
+                }
             }
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
@@ -677,6 +682,12 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                         tag: 'settings',
                         isReferenced: false
                     };
+
+                    const  sameAsIndex = line.indexOf(' ' + sameAsLabel);
+                    if (sameAsIndex != notFound) {
+                        const  variableNameTemplate = getValue(line, sameAsIndex + sameAsLabel.length + 1);
+                        const  variableName = getExpectedLine(__setting__, variableNameTemplate);
+                    }
                 }
             }
         }
@@ -5458,6 +5469,7 @@ if (process.env.windir) {
     var  runningOS = 'Linux';
 }
 const  settingLabel = /(^| )#settings:/;
+const  sameAsLabel = "#same-as:";
 const  originalLabel = "#original:";
 const  toLabel = "#to:";  // replace to tag
 const  checkTag = "#check:";

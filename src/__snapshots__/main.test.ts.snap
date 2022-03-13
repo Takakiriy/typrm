@@ -1146,14 +1146,14 @@ exports[`checks template value >> one_error: sourceFileContents 1`] = `
 "
 `;
 
-exports[`checks template value >> settings >> 1 same values: answer 1`] = `
+exports[`checks template value >> settings >> 1_same_values : answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 1
 "
 `;
 
-exports[`checks template value >> settings >> 1 same values: sourceFileContents 1`] = `
+exports[`checks template value >> settings >> 1_same_values: sourceFileContents 1`] = `
 "settings: #settings:
     var1: value1
     var2: value2
@@ -1163,7 +1163,7 @@ value1, value2  #template: var1, var2
 "
 `;
 
-exports[`checks template value >> settings >> 2 not same values error: answer 1`] = `
+exports[`checks template value >> settings >> 2_not_same_values_error: answer 1`] = `
 "
 Error of duplicated variable name:
   typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
@@ -1189,7 +1189,7 @@ checked file count = 1, template count = 1
 "
 `;
 
-exports[`checks template value >> settings >> 2 not same values error: sourceFileContents 1`] = `
+exports[`checks template value >> settings >> 2_not_same_values_error: sourceFileContents 1`] = `
 "settings: #settings:
     var1: value1
     var2: value2
@@ -1199,14 +1199,14 @@ value1, value2  #template: var1, var2
 "
 `;
 
-exports[`checks template value >> settings >> 3 overwrite: answer 1`] = `
+exports[`checks template value >> settings >> 3_overwrite: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 8
 "
 `;
 
-exports[`checks template value >> settings >> 3 overwrite: sourceFileContents 1`] = `
+exports[`checks template value >> settings >> 3_overwrite: sourceFileContents 1`] = `
 "value1, value2, value3  #template: var1, var2, var3
 settings: #settings:
     var1: value1
@@ -1229,7 +1229,7 @@ value1, value2, value3  #template: var1, var2, var3
 "
 `;
 
-exports[`checks template value >> settings >> 3e overwrite error: answer 1`] = `
+exports[`checks template value >> settings >> 3e_overwrite_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
@@ -1307,7 +1307,7 @@ checked file count = 1, template count = 8
 "
 `;
 
-exports[`checks template value >> settings >> 3e overwrite error: sourceFileContents 1`] = `
+exports[`checks template value >> settings >> 3e_overwrite_error: sourceFileContents 1`] = `
 ".....1, .....2, .....3  #template: var1, var2, var3
 settings: #settings:
     var1: value1
@@ -1330,7 +1330,7 @@ level 1:
 "
 `;
 
-exports[`checks template value >> settings >> 4 neighbor error: answer 1`] = `
+exports[`checks template value >> settings >> 4_neighbor_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
     Warning: double settings are not supported.
@@ -1341,7 +1341,7 @@ checked file count = 1, template count = 1
 "
 `;
 
-exports[`checks template value >> settings >> 4 neighbor error: sourceFileContents 1`] = `
+exports[`checks template value >> settings >> 4_neighbor_error: sourceFileContents 1`] = `
 "settings: #settings:
     var1: value1
     var2: value2
@@ -1352,7 +1352,7 @@ settings: #settings:
 "
 `;
 
-exports[`checks template value >> settings >> 4-2 neighbor level 2 error: answer 1`] = `
+exports[`checks template value >> settings >> 4_2_neighbor_level_2_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7
     Warning: double settings are not supported.
@@ -1363,7 +1363,7 @@ checked file count = 1, template count = 1
 "
 `;
 
-exports[`checks template value >> settings >> 4-2 neighbor level 2 error: sourceFileContents 1`] = `
+exports[`checks template value >> settings >> 4_2_neighbor_level_2_error: sourceFileContents 1`] = `
 "root:
     settings: #settings:
         var1: value1
@@ -1372,6 +1372,60 @@ exports[`checks template value >> settings >> 4-2 neighbor level 2 error: source
     value1, value2, value3, value4  #template: var1, var2, var3, var4
     settings: #settings:
         var4: value4
+"
+`;
+
+exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:     settings: #settings: {(CS): $settings.__C_S__}
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         __OperationServer__: OS
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:25:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:         __Operation__: Ox  #same-as: __Operation(CS)__
+    Warning: Not matched with the value referenced from same-as tag.
+    Same as: __OperationServer__
+    Expected: OS
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:     settings: #settings: {(CS): $settings.__C_S__}
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         __Store__: SS      #same-as: __Store(xxx)__
+    Warning: Not found a variable name specified in the same-as tag.
+    Same as: __Store(xxx)__
+
+Warning: 2, Error: 0
+checked file count = 1, template count = 0
+"
+`;
+
+exports[`checks template value >> settings >> 5_check_same_as_tag: sourceFileContents 1`] = `
+"1:
+    settings: #settings: {(C_S): $settings.__C_S__}
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __StoreClient__: SC
+        __StoreServer__: SS
+        __C_S__: Client  #// Client or Server
+        __Operation__: OC  #same-as: __Operation(C_S)__
+        __Store__: SC      #same-as: __Store(C_S)__
+2:
+    settings: #settings: {(CS): $settings.__C_S__}
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __StoreClient__: SC
+        __StoreServer__: SS
+        __C_S__: Server  #// Client or Server
+        __Operation__: OS  #same-as: __Operation(CS)__
+        __Store__: SS      #same-as: __Store(CS)__
+error:
+    settings: #settings: {(CS): $settings.__C_S__}
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __StoreClient__: SC
+        __StoreServer__: SS
+        __C_S__: Server  #// Client or Server
+        __Operation__: Ox  #same-as: __Operation(CS)__
+        __Store__: SS      #same-as: __Store(xxx)__
+settings: #settings:
 "
 `;
 

@@ -195,12 +195,13 @@ describe("checks template value >>", () => {
 
     describe("settings >>", () => {
         test.each([
-            ["1 same values"],
-            ["2 not same values error"],
-            ["3 overwrite"],
-            ["3e overwrite error"],
-            ["4 neighbor error"],
-            ["4-2 neighbor level 2 error"],
+            ["1_same_values"],
+            ["2_not_same_values_error"],
+            ["3_overwrite"],
+            ["3e_overwrite_error"],
+            ["4_neighbor_error"],
+            ["4_2_neighbor_level_2_error"],
+            ["5_check_same_as_tag"],
             ["b1_bug_case_no_root_settings"],
             ["b2_bug_case_nest_settings"],
             // There are other settings tests in "unit test >>"
