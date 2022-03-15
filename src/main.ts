@@ -185,6 +185,45 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
                 inputFilePath);
         }
 
+        // Check the "#same-as:" tag.
+        if (settingTree.wasChanged) {
+            const  localSettings = settingTree.settings[settingTree.currentSettingIndex];
+            for (const [variableName, variable] of Object.entries(localSettings)) {
+                if (variable.sameAs) {
+                    var  expectedVariableName = variable.sameAs;
+                    const  settings = settingTree.settingsInformation[settingTree.currentSettingIndex];
+                    for (const [placeholder, value] of Object.entries(settings.tagParameters).sort((a,b)=>(b[0].length - a[0].length))) {
+                        const {replaced, isError} = replaceDollerVariable(value, setting);
+                        if ( ! isError) {
+                            expectedVariableName = expectedVariableName.replace(placeholder, replaced);
+                        } else {
+                            console.log('');
+                            console.log(`    ${translate('Warning')}: ${translate('Not found a variable name')}`);
+                            console.log(`    Not found: ${value}`);
+                            parser.warningCount += 1;
+                        }
+                    }
+                    if (expectedVariableName in setting) {
+                        if (variable.value !== setting[expectedVariableName].value) {
+                            console.log('');
+                            console.log(getVariablesForErrorMessage('', [expectedVariableName], settingTree, lines, inputFilePath));
+                            console.log(`${getTestablePath(inputFilePath)}:${settings.lineNum}: ${lines[settings.lineNum - 1]}`);
+                            console.log(`    ${translate('Warning')}: ${translate('Not matched with the value referenced from same-as tag.')}`);
+                            console.log(`    Same as: ${expectedVariableName}`);
+                            console.log(`    Expected: ${setting[expectedVariableName].value}`);
+                            parser.warningCount += 1;
+                        }
+                    } else {
+                        console.log('');
+                        console.log(`${getTestablePath(inputFilePath)}:${settings.lineNum}: ${lines[settings.lineNum - 1]}`);
+                        console.log(`    ${translate('Warning')}: ${translate('Not found a variable name specified in the same-as tag.')}`);
+                        console.log(`    Same as: ${expectedVariableName}`);
+                        parser.warningCount += 1;
+                    }
+                }
+            }
+        }
+
         // Check the condition by "#expect:" tag.
         if (line.includes(expectLabel)  &&  ifTagParser.thisIsOutOfFalseBlock) {
             const  condition = line.substring(line.indexOf(expectLabel) + expectLabel.length).trim();
@@ -381,7 +420,6 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     var  isReadingSetting = false;
     var  setting: Settings = {};
     var  currentSettingIndex = '/';
-    var  settingTagParameters: {[name: string]: string} = {};
     var  lineNum = 0;
     var  settingIndentLength = 0;
     tree.indices.set(1, '/');
@@ -474,6 +512,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                         indent: setting_.indent,
                         condition: '',
                         inSettings: isReadingSetting,
+                        tagParameters: tree.settingsInformation[currentSettingIndex].tagParameters,
                     };
                 } else {
                     tree.settings[currentSettingIndex] = {... tree.settings[currentSettingIndex], ... setting};
@@ -629,6 +668,12 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 }
             }
             if (isNewSettings) {
+                const  parameters = line.substring(line.indexOf(':', settingLabel.exec(line)!.index) + 1).trim();
+                if (parameters) {
+                    var  settingTagParameters: {[name: string]: string} = yaml.load(parameters) as {[name: string]: string};
+                } else {
+                    var  settingTagParameters: {[name: string]: string} = {};
+                }
 
                 setting = {};
                 settingIndentLength = indent.length;
@@ -638,11 +683,8 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     indent: indentStack[indentStack.length - 1].indent,
                     condition: '',
                     inSettings: isReadingSetting,
+                    tagParameters: settingTagParameters,
                 };
-                const  parameters = line.substring(line.indexOf(':', settingLabel.exec(line)!.index) + 1).trim();
-                if (parameters) {
-                    settingTagParameters = yaml.load(parameters) as {[name: string]: string};
-                }
             }
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
@@ -674,20 +716,21 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                         console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
                     }
                     const  currentSetting = settingStack[settingStack.length - 2];
+                    const  sameAsIndex = line.indexOf(' ' + sameAsLabel);
+                    if (sameAsIndex != notFound) {
+                        var  sameAs = getValue(line, sameAsIndex + sameAsLabel.length + 1);
+                    } else {
+                        var  sameAs = '';
+                    }
 
                     setting[key] = {
                         value,
                         lineNum,
                         settingsIndex: currentSetting.index,
                         tag: 'settings',
-                        isReferenced: false
+                        isReferenced: false,
+                        sameAs,
                     };
-
-                    const  sameAsIndex = line.indexOf(' ' + sameAsLabel);
-                    if (sameAsIndex != notFound) {
-                        const  variableNameTemplate = getValue(line, sameAsIndex + sameAsLabel.length + 1);
-                        const  variableName = getExpectedLine(__setting__, variableNameTemplate);
-                    }
                 }
             }
         }
@@ -732,6 +775,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 indent,
                 condition,
                 inSettings: isReadingSetting,
+                tagParameters: {},
             };
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
@@ -743,7 +787,6 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     if (isReadingSetting) {
         const  setting_ = settingStack[settingStack.length - 2];
         tree.settings[currentSettingIndex] = {... tree.settings[currentSettingIndex], ... setting};
-        tree.indices.set(setting_.startLineNum, currentSettingIndex);
         if ( ! (currentSettingIndex in tree.settingsInformation)) {
             tree.settingsInformation[currentSettingIndex] = {
                 index: currentSettingIndex,
@@ -751,6 +794,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                 indent: setting_.indent,
                 condition: '',
                 inSettings: isReadingSetting,
+                tagParameters: {},
             };
         }
     }
@@ -759,7 +803,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     }
     if ( ! ('/' in tree.settingsInformation)) {
         tree.settingsInformation['/'] = {
-            index: '/', lineNum: 0, indent: '', condition: '', inSettings: false
+            index: '/', lineNum: 0, indent: '', condition: '', inSettings: false, tagParameters: {},
         };
     }
     for (const index of Object.values(tree.indices)) {
@@ -4646,6 +4690,7 @@ interface SettingsInformation {
     indent: string;
     condition: string;
     inSettings: boolean;
+    tagParameters: {[name: string]: string};
 }
 
 // Settings
@@ -4658,6 +4703,7 @@ interface Setting {
     settingsIndex: string;
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyParameter' | 'env';
     isReferenced: boolean;
+    sameAs?: string;
 }
 
 // searchDefinedSettingIndices
@@ -5374,6 +5420,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             'Envrironment variables defined in ".env" file are not inherit to child processes.': ".env ファイルに定義した環境変数は子プロセスに継承されません。",
             "Not same as #copy tag contents": "#copy タグの内容に違いがあります",
             "(out of copy tag block)": "（copy タグのブロックの外）",
+            "Not found a variable name specified in the same-as tag.": "same-as タグに指定した変数名が見つかりません",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
