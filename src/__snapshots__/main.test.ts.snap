@@ -3543,6 +3543,28 @@ case B after:  #if: $settings.__Switch_01__ == B
 "
 `;
 
+exports[`replaces settings >> in bug_1_template_in_copy_tag: sourceFileContents 1`] = `
+"settings: #settings:
+    variable: value
+copy template: #copy-template: copy1, { (variable): example }
+    example:  #template: (variable)
+"
+`;
+
+exports[`replaces settings >> in bug_1_template_in_copy_tag: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in bug_1_template_in_copy_tag: updatedFileContents 1`] = `
+"settings: #settings:
+    variable: value
+copy template: #copy-template: copy1, { (variable): example }
+    example:  #template: (variable)
+"
+`;
+
 exports[`replaces settings >> replace to tag >> 1_OK: replacedFileContents 1`] = `
 "settings: #settings:
     __SettingA__: SetAA  #original: SetA

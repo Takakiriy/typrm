@@ -1610,6 +1610,7 @@ async function replaceSub(inputFilePath, parser, command) {
     var lineNum = 0;
     var isCheckingTemplateIfKey = false;
     var templateIfKeyError = false;
+    var copyTagIndent = '';
     const checkedTemplateTags = {};
     try {
         for (const line of lines) {
@@ -1628,6 +1629,16 @@ async function replaceSub(inputFilePath, parser, command) {
                 replacingKeyValues = {};
                 for (const [key, value] of Object.entries(newSetting)) {
                     replacingKeyValues[key] = value.value;
+                }
+            }
+            if (copyTagIndent) {
+                if (!line.startsWith(copyTagIndent) && line.trim() !== '') {
+                    copyTagIndent = '';
+                }
+            }
+            if (line.includes('#copy')) {
+                if (tagIndexOf(line, copyLabel) !== notFound || tagIndexOf(line, copyTemplateLabel) !== notFound) {
+                    copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
                 }
             }
             if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
@@ -1676,6 +1687,9 @@ async function replaceSub(inputFilePath, parser, command) {
             }
             else {
                 const templateTag = parseTemplateTag(line, parser);
+                if (copyTagIndent) {
+                    templateTag.isFound = false;
+                }
                 if (templateTag.isFound) {
                     parser.templateCount += 1;
                 }

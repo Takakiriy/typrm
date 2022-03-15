@@ -406,6 +406,8 @@ describe("replaces settings >>", () => {
         ], [
             '2_replace_11_nested_if', ' C', 'en-US',
             { replacers: [{ from: '__Set2__: C', to: '__Set2__: C  #to:CC' }] },
+        ], [
+            'bug_1_template_in_copy_tag', '', 'en-US', null,
         ],
         // There are other cases in "replace to tag" test.
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {

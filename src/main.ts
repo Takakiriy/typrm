@@ -283,6 +283,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
                 const  {replaced, isError} = replaceDollerVariable(copyTag.value, setting);
                 if ( ! isError) {
                     copyTag.value = replaced;
+
                     copyTags.push(copyTag);
                     copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
                 } else {
@@ -1759,6 +1760,7 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
     var  lineNum = 0;
     var  isCheckingTemplateIfKey = false;
     var  templateIfKeyError = false;
+    var  copyTagIndent = '';
     const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
     try {
         for (const line of lines) {
@@ -1778,6 +1780,16 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
                 replacingKeyValues = {};
                 for (const [key, value] of Object.entries(newSetting)) {
                     replacingKeyValues[key] = value.value;
+                }
+            }
+            if (copyTagIndent) {
+                if ( ! line.startsWith(copyTagIndent)  &&  line.trim() !== '') {
+                    copyTagIndent = '';
+                }
+            }
+            if (line.includes('#copy')) {
+                if (tagIndexOf(line, copyLabel) !== notFound  ||  tagIndexOf(line, copyTemplateLabel) !== notFound) {
+                    copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
                 }
             }
 
@@ -1830,11 +1842,14 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
             // Out of settings
             } else {
                 const  templateTag = parseTemplateTag(line, parser);
+                if (copyTagIndent) {
+                    templateTag.isFound = false;
+                }
                 if (templateTag.isFound) {
                     parser.templateCount += 1;
                 }
                 if (templateTag.isFound  &&  templateTag.includesKey(replacingKeys)
-                        &&  toTagTree.currentIsOutOfFalseBlock) {
+                &&  toTagTree.currentIsOutOfFalseBlock) {
                     const  replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
                     const  commonCase = (templateTag.label !== templateIfLabel);
                     if (commonCase) {
