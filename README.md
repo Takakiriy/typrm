@@ -1391,7 +1391,9 @@ If the partially replaced content was correct:
 
 - Write `#copy-template:` tag in the template content
 - Specify parameters in YAML mapping format at the right of the comma
-- Write `#template:` tag in the replacement part
+  (The following `{__Project__: projectA}`)
+- Write `#template:` tag in the replacement part.
+  Do not write `#template:` tag in `#copy:` tag block
 <!-- -->
 
     1: | #copy-template: command, {__Project__: projectA}
@@ -1401,10 +1403,28 @@ If the partially replaced content was correct:
         mkdir -p  projectB
         cd        projectB
 
-Variables defined in the `#settings:` tag cannot be referenced
+Variables defined in the `#settings:` tag can be referenced
 from the `#template:` tag in `#copy-template:` tag or `#copy:` tag block.
+In this case, write `#template:` tag in both block of `#copy-template:` tag
+and `#copy:` tag.
 
-If you specify a variable for the parameter,
+    1:
+        settings: #settings:
+            __Variable__: projectA
+        body: | #copy: command
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+    2:
+        settings: #settings:
+            __Variable__: projectB
+        body: | #copy: command
+            mkdir -p  projectB  #template: __Variable__
+            cd        projectB  #template: __Variable__
+
+If you don't always refer to variables in the block of
+all `#copy-template:` tags and `#copy:` tags,
+specify the variable at parameters.
+If you specify the variable,
 write the variable name after `$settings.`.
 
     settings: #settings:
@@ -1420,10 +1440,12 @@ Currently, it is not supported to replace the value of
 the variable specified in `#copy-template:` tag or `#copy:` tag
 by replace command.
 
-Even if there are differences in the presence or absence
-of　`#keyword:` tag (including parameters) and
-differences in the content, typrm judged that the sentence is the same
-because typrm avoids to show the same content in the search result.
+Even if there were differences in the presence or absence
+of　`#keyword:` tag or differences in the content of `#keyword:` tag,
+typrm judges that the sentence is the same.
+The reason is that you can put the `#keyword:` tag only
+inside the block of one `#copy-template:` tag
+to avoid searching multiple locations.
 
 ## #if tag: set conditions
 

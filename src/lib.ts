@@ -344,41 +344,33 @@ export function  cutIndent(lines: string[]) {
 }
 
 // unexpandVariable
-export function  unexpandVariable(expanded: string, keyValues: string[][]): string {
+export function  unexpandVariable(expanded: string, keyValues: string[][], out_replacedIndices: number[]|null = null): string {
     var  replacing = expanded;
 
     var  replacedTag = '\r\n';  // This is not matched with any values
     for (const [key, value] of keyValues) {
+        const  keyRe = new RegExp(escapeRegularExpression( key ), 'g');
+        const  valueRe = new RegExp(escapeRegularExpression( value ), 'g');
 
-        replacing = replacing.replace(
-            new RegExp(escapeRegularExpression( key ), 'g'),
-            replacedTag);
-        replacing = replacing.replace(
-            new RegExp(escapeRegularExpression( value ), 'g'),
-            replacedTag);
+        replacing = replacing.replace(keyRe, replacedTag);
+        replacing = replacing.replace(valueRe, replacedTag);
         replacedTag += '\n';
     }
+    var  index = keyValues.length;
 
     for (const [key, _value] of keyValues.reverse()) {
         replacedTag = replacedTag.slice(0, replacedTag.length - 1);
+        const  replacedTagRe = new RegExp(escapeRegularExpression( replacedTag ), 'g');
+        if (out_replacedIndices) {
+            index -= 1;
+            if (replacing.includes(replacedTag)) {
+                out_replacedIndices.unshift(index);
+            }
+        }
 
-        replacing = replacing.replace(
-            new RegExp(escapeRegularExpression( replacedTag ), 'g'),
-            key);
+        replacing = replacing.replace(replacedTagRe, key);
     }
 
-    const   unexpanded = replacing;
-    return  unexpanded;
-}
-export function  unexpandVariableOld(expanded: string, keyValues: string[][]): string {
-    var  replacing = expanded;
-
-    for (const [key, value] of keyValues) {
-
-        replacing = replacing.replace(
-            new RegExp(escapeRegularExpression( value ), 'g'),
-            key);
-    }
     const   unexpanded = replacing;
     return  unexpanded;
 }

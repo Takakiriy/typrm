@@ -160,6 +160,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
     var  fileTemplateTag: TemplateTag | null = null;
     var  copyTag: CopyTag | null = null;
     var  copyTagIndent = '';
+    var  dollerSettingForCopyTag: string[][] = [];
     const  lines: string[] = [];
     const  ifTagParser = new IfTagParser(parser);
     for await (const line1 of reader) {
@@ -258,11 +259,41 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
         // Get "#copy:" tag contents
         if (copyTag) {
             if (line.startsWith(copyTagIndent) || line.trim() === '') {
-                copyTag.contents.push(line);
+                if (templateTag.isFound) {
+                    parser.templateCount += 1;
+                    const  {log: envaluatedItems} = getExpectedLineAndEvaluationLog(setting, templateTag.template);
+                    const  referencedVariableNames = envaluatedItems.map(item => `$settings.${item.before}`);
+                    const  referencedSetting = dollerSettingForCopyTag.filter(item => referencedVariableNames.includes(item[0]));
+                    const  checkingLineWithoutTemplate = line.substring(0, templateTag.indexInLine);
+                    const  replacedIndices: number[] = [];
+
+                    var  comparableLine =
+                        lib.unexpandVariable(checkingLineWithoutTemplate, referencedSetting, /*in_out*/ replacedIndices) +
+                        line.substring(templateTag.indexInLine);
+                    for (const replacedIndex of replacedIndices) {
+                        const  replacedVariableName = dollerSettingForCopyTag[replacedIndex][0].substring('$settings.'.length);
+                        setting[replacedVariableName].isReferenced = true;
+                    }
+                    const  notMatchedSettings = referencedSetting.filter((_, index) => ! replacedIndices.includes(index));
+                    if (notMatchedSettings.length >= 1) {
+                        const  variableNames = notMatchedSettings.map(item => item[0].substring('$settings.'.length));
+                        console.log('');
+                        console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, parser.filePath));
+                        console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                        console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                        parser.warningCount += 1;
+                    }
+                } else {
+                    var  comparableLine = line;
+                }
+
+                copyTag.contents.push(comparableLine);
             } else {
                 copyTag = null;
             }
         }
+
+        // Start a "#copy:" tag block
         if ( ! copyTag) {
             const  copyTagIndex = tagIndexOf(line, copyLabel);
             const  copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
@@ -273,10 +304,10 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
                     line,
                     tagName: '', value: '', copyName: '', contents: [], parameters: {},
                 };
-                if (copyTagIndex !== notFound) {
+                if (copyTagIndex !== notFound) { // if copyTagIndex
                     copyTag.tagName = copyLabel;
                     copyTag.value = getValue(line, copyTagIndex + copyLabel.length);
-                } else {
+                } else { // if copyTemplateTagIndex
                     copyTag.tagName = copyTemplateLabel;
                     copyTag.value = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
                 }
@@ -286,6 +317,9 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
 
                     copyTags.push(copyTag);
                     copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
+                    dollerSettingForCopyTag = Object.entries(setting)
+                        .map(keyValue => [`$settings.${keyValue[0]}`, keyValue[1].value])
+                        .sort((a,b)=>(b[1].length - a[1].length));
                 } else {
                     console.log('');
                     console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
@@ -3622,15 +3656,16 @@ function  getExpectedLine(setting: Settings, template: string): string {
 }
 
 // getExpectedLineAndEvaluationLog
-function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean
+function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean = false
         ): {expected: string, log: EvaluationLog[]} {
     var  expected = template;
     const  log: EvaluationLog[] = [];
 
     for (const key of Object.keys(setting)) {
-        const  re = new RegExp(lib.escapeRegularExpression( key ), "gi" );
+        const  keyRe = new RegExp(lib.escapeRegularExpression( key ), "gi" );
+        const  value = setting[key].value.replace(/\$/g,'$$');
 
-        const  expectedAfter = expected.replace(re, setting[key].value.replace(/\$/g,'$$'));
+        const  expectedAfter = expected.replace(keyRe, value);
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
             log.push({before: key, after: setting[key].value});

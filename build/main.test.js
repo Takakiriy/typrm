@@ -302,8 +302,12 @@ describe("checks copy tag >>", () => {
                     { from: '(a1, __Bad__)', to: `(a1, ${badColor('__Bad__')})` },
                 ] }],
         ['template >> variable', { replacers: [
-                    { from: 's1', to: `${goodColor('s1')}` },
+                    { from: '[s1]', to: `[${goodColor('s1')}]` },
                     { from: '__Bad__', to: `${badColor('__Bad__')}` },
+                    { from: 'good_color($settings.__SetA__)', to: `${goodColor('$settings.__SetA__')}` },
+                    { from: 'bad_color(bad):', to: `${badColor('bad')}:` },
+                    { from: 'good_color($settings.__SetA__)', to: `${goodColor('$settings.__SetA__')}` },
+                    { from: 'bad_color(bad):', to: `${badColor('bad')}:` },
                 ] }],
     ])("%s", async (caseName, option) => {
         const { filePath } = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);
