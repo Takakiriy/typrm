@@ -3662,7 +3662,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
     const  log: EvaluationLog[] = [];
 
     for (const key of Object.keys(setting)) {
-        const  keyRe = new RegExp(lib.escapeRegularExpression( key ), "gi" );
+        const  keyRe = new RegExp(lib.escapeRegularExpression( key ), 'g' );
         const  value = setting[key].value.replace(/\$/g,'$$');
 
         const  expectedAfter = expected.replace(keyRe, value);

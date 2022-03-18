@@ -1093,6 +1093,33 @@ test_of_duplicated_variable_name_error:
 "
 `;
 
+exports[`checks template value >> case_sensitive_variable_name: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable__: Value
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     value: #template: __Variable__  #// The value is different in case
+    Warning: Not matched with the template.
+    Expected: Value
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 4
+"
+`;
+
+exports[`checks template value >> case_sensitive_variable_name: sourceFileContents 1`] = `
+"settings: #settings:
+    __Variable__: Value
+    __variable__: value2
+    __variable2__: Value2
+OK:
+    Value: #template: __Variable__
+    value2: #template: __variable__
+    Value2: #template: __variable2__
+NG:
+    value: #template: __Variable__  #// The value is different in case
+"
+`;
+
 exports[`checks template value >> check files in multi folder >> 1st: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2:     settings: #settings:
@@ -3578,6 +3605,39 @@ case B after:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_12_case_sensitive_variable: sourceFileContents 1`] = `
+"settings: #settings:
+    __Variable__: Value
+    __variable__: value2
+    __variable2__: Value2
+body:
+    Value: #template: __Variable__
+    value2: #template: __variable__
+    Value2: #template: __variable2__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_12_case_sensitive_variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Variable__: After
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __variable__: after2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __variable2__: After2
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_12_case_sensitive_variable: updatedFileContents 1`] = `
+"settings: #settings:
+    __Variable__: After  #original: Value
+    __variable__: after2  #original: value2
+    __variable2__: After2  #original: Value2
+body:
+    After: #template: __Variable__
+    after2: #template: __variable__
+    After2: #template: __variable2__
 "
 `;
 

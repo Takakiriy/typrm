@@ -472,6 +472,7 @@ new_folder.yaml
         - cd    work1  #template: __Name__
 
 Write "variable_name: value" at `#settings:` for the part you want to change to.
+Variable names are case sensitive.
 Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
