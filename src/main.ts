@@ -1108,6 +1108,83 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
     return  toTagTree;
 }
 
+// makeTemplatesInCopyTag
+async function  makeTemplatesInCopyTag(replacingLines: string[]): Promise<TemplateInCopyTag[]> {
+    const  templatesInCopyTag: TemplateInCopyTag[] = [];
+    const  copyTagRe = new RegExp(' #copy(-template)?: *([^,]*),[^\\$]*(\\$settings\..*)}');
+    const  copyTemplateTagRe = new RegExp(' #copy-template: *([^,]*),(.*)');
+    const  settingsRe = new RegExp('\\$settings\\.([^ ,}]*)', 'g');
+
+    const  variableNames: {[copyTagName: string]: Set<string>} = {}
+    for (const line of replacingLines) {
+
+        const  matchedCopyTag = copyTagRe.exec(line);
+        if (matchedCopyTag) {
+            const  name = matchedCopyTag[2];
+            const  parameters = matchedCopyTag[3];
+            const  templateVariableNames = new Set<string>();
+            var  settingsMatch: RegExpExecArray | null = null;
+            settingsRe.lastIndex = 0;
+            variableNames[name] = templateVariableNames;
+
+            while ( (settingsMatch = settingsRe.exec(parameters)) !== null ) {
+                templateVariableNames.add(settingsMatch[1].trimRight());
+            }
+        }
+    }
+
+    for (const inputFileFullPath of await listUpFilePaths('')) {
+        var  reader = readline.createInterface({
+            input: fs.createReadStream(inputFileFullPath),
+            crlfDelay: Infinity
+        });
+        var  lineNum = 0;
+        var  copyTagIndent = '';
+        var  copyTagName = '';
+        var  copyTagLineNum = 0;
+        var  copyTagParameterNames: string[] = [];
+
+        for await (const line1 of reader) {
+            const  line: string = line1;
+            lineNum += 1;
+
+            if (copyTagIndent) {
+                if (line.startsWith(copyTagIndent)) {
+
+                    const  templateIndex = line.indexOf(' ' + templateLabel);
+                    if (templateIndex !== notFound) {
+                        const  template = getValue(line, templateIndex + templateLabel.length + 1);
+
+                        templatesInCopyTag.push({
+                            copyTagName,
+                            lineNumOffset: lineNum - copyTagLineNum,
+                            template,
+                        });
+                    }
+                } else if (line.trim() === '') {
+                } else {
+                    copyTagIndent = '';
+                }
+            }
+            if ( ! copyTagIndent) {
+
+                const  matchedCopyTag = copyTemplateTagRe.exec(line);
+                if (matchedCopyTag) {
+                    copyTagName = matchedCopyTag[1];
+                    if (copyTagName in variableNames) {
+
+                        copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
+                        copyTagLineNum = lineNum;
+                    } else {
+                        copyTagName = '';
+                    }
+                }
+            }
+        }
+    }
+    return  templatesInCopyTag;
+}
+
 // getReplacedLineInSettings
 function  getReplacedLineInSettings(
         line: string, separator: number, oldValue: string, replacedValue: string,
@@ -1589,6 +1666,13 @@ interface  CopyTag {
     parameters: {[name: string]: string};
 }
 
+// TemplateInCopyTag
+interface  TemplateInCopyTag {
+    copyTagName: string;
+    lineNumOffset: number;
+    template: string;
+}
+
 // IfTagParser
 class  IfTagParser {
     readonly  parser: Parser;
@@ -1795,7 +1879,12 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
     var  isCheckingTemplateIfKey = false;
     var  templateIfKeyError = false;
     var  copyTagIndent = '';
+    var  copyTagLineNum = 0;
+    var  oldSettingAndCopyTagParameters: Settings = {};
+    var  newSettingAndCopyTagParameters: Settings = {};
     const  checkedTemplateTags: {[lineNum: number]: CheckedTemplateTag[]} = {};
+    var    templatesInCopyTag: TemplateInCopyTag[] = [];
+    const  templatesInCopyTagAll = await makeTemplatesInCopyTag(lines);
     try {
         for (const line of lines) {
             var  output = false;
@@ -1816,17 +1905,62 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
                     replacingKeyValues[key] = value.value;
                 }
             }
+
+            // #copy tag
             if (copyTagIndent) {
                 if ( ! line.startsWith(copyTagIndent)  &&  line.trim() !== '') {
                     copyTagIndent = '';
+                    copyTagLineNum = 0;
+                    replacingKeys = Object.keys(oldSetting);
+                    templatesInCopyTag = [];
+                    oldSettingAndCopyTagParameters = {};
+                    newSettingAndCopyTagParameters = {};
                 }
             }
             if (line.includes('#copy')) {
-                if (tagIndexOf(line, copyLabel) !== notFound  ||  tagIndexOf(line, copyTemplateLabel) !== notFound) {
-                    copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
+                const  copyTagIndex = tagIndexOf(line, copyLabel);
+                const  copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
+                if (copyTagIndex !== notFound  ||  copyTemplateTagIndex !== notFound) {
+                    if (copyTagIndex !== notFound) { // if copyTagIndex
+                        var  copyTagValue = getValue(line, copyTagIndex + copyLabel.length);
+                    } else { // if copyTemplateTagIndex
+                        var  copyTagValue = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
+                    }
+                    const  firstCommaIndex = copyTagValue.indexOf(',');
+                    if (firstCommaIndex !== notFound) {
+                        const  copyTagName = copyTagValue.substring(0, firstCommaIndex);
+                        const  parameters = yaml.load(copyTagValue.substring(firstCommaIndex + 1)) as {[name: string]: string};
+                        const  values = Object.entries( parameters ).filter(keyValue => ! keyValue[1].startsWith('$settings.'))
+                            .map(keyValue=>[keyValue[0], {
+                                value: keyValue[1], lineNum, settingsIndex: '', tag: 'copyParameter', isReferenced: true,
+                            }]);
+                        const  variables = Object.entries( parameters ).filter(keyValue => keyValue[1].startsWith('$settings.'))
+                            .map(keyValue=>[keyValue[0], keyValue[1].substring('$settings.'.length)]);
+                        const  copyTagParameters = variables.filter(keyValue => (keyValue[1] in oldSetting));
+
+                        copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
+                        copyTagLineNum = lineNum;
+                        templatesInCopyTag = templatesInCopyTagAll.filter(item => item.copyTagName === copyTagName);
+                        oldSettingAndCopyTagParameters = {
+                            ... oldSetting,
+                            ... Object.fromEntries( values ),
+                            ... Object.fromEntries( copyTagParameters.map(keyValue => [keyValue[0], oldSetting[keyValue[1]]]))
+                        };
+                        newSettingAndCopyTagParameters = {
+                            ... newSetting,
+                            ... Object.fromEntries( values ),
+                            ... Object.fromEntries( copyTagParameters.map(keyValue => [keyValue[0], newSetting[keyValue[1]]]))
+                        };
+                        replacingKeys = Object.keys(oldSettingAndCopyTagParameters);
+                        if (copyTagParameters.length < variables.length) {
+                            const  foundVaraibleNames = copyTagParameters.map(keyValue => keyValue[1]);
+                            const  notFoundVariables = variables.filter(keyValue => ! foundVaraibleNames.includes(keyValue[1]));
+                        }
+                    }
                 }
             }
 
+            // #settings tag
             if (settingLabel.test(line.trim())  &&  ! line.includes(disableLabel)) {
                 isSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)![0].length;
@@ -1876,23 +2010,41 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
             // Out of settings
             } else {
                 const  templateTag = parseTemplateTag(line, parser);
-                if (copyTagIndent) {
-                    templateTag.isFound = false;
-                }
                 if (templateTag.isFound) {
                     parser.templateCount += 1;
+                } else {
+                    if (copyTagIndent) {
+                        const  templateInCopyTag = templatesInCopyTag.find(item => item.lineNumOffset === lineNum - copyTagLineNum);
+                        if (templateInCopyTag) {
+                            templateTag.isFound = true;
+                            templateTag.template = templateInCopyTag.template;
+                            templateTag.label = templateLabel;
+                            templateTag.lineNumOffset = 0;
+                        }
+                    }
                 }
                 if (templateTag.isFound  &&  templateTag.includesKey(replacingKeys)
                 &&  toTagTree.currentIsOutOfFalseBlock) {
                     const  replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
                     const  commonCase = (templateTag.label !== templateIfLabel);
-                    if (commonCase) {
-                        var  expected = getExpectedLine(oldSetting, templateTag.template);
-                        var  replaced = getReplacedLine(newSetting, templateTag.template, replacingKeyValues);
-                    } else { // if (templateTag.label === templateIfLabel)
-                        templateTag.evaluate(newSetting);
-                        var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                        var  replaced = getReplacedLine(newSetting, templateTag.newTemplate, replacingKeyValues);
+                    if ( ! copyTagIndent) {  // if common case
+                        if (commonCase) {
+                            var  expected = getExpectedLine(oldSetting, templateTag.template);
+                            var  replaced = getReplacedLine(newSetting, templateTag.template, replacingKeyValues);
+                        } else { // if (templateTag.label === templateIfLabel)
+                            templateTag.evaluate(newSetting);
+                            var  expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
+                            var  replaced = getReplacedLine(newSetting, templateTag.newTemplate, replacingKeyValues);
+                        }
+                    } else {  // if copyTagIndent
+                        if (commonCase) {
+                            var  expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.template);
+                            var  replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template, replacingKeyValues);
+                        } else { // if (templateTag.label === templateIfLabel)
+                            templateTag.evaluate(newSetting);
+                            var  expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.oldTemplate);
+                            var  replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate, replacingKeyValues);
+                        }
                     }
 
                     if (replacingLine.includes(expected)) {
@@ -3661,7 +3813,7 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
     var  expected = template;
     const  log: EvaluationLog[] = [];
 
-    for (const key of Object.keys(setting)) {
+    for (const key of Object.keys(setting).sort((a,b)=>(b.length - a.length))) {
         const  keyRe = new RegExp(lib.escapeRegularExpression( key ), 'g' );
         const  value = setting[key].value.replace(/\$/g,'$$');
 

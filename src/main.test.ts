@@ -724,6 +724,26 @@ describe("replaces settings >>", () => {
     });
 });
 
+describe("replaces in copy tag >>", () => {
+    test.each([
+        ['template >> 1'],
+
+    ])("%s", async (caseName) => {
+        const {filePath} = initializeTestInputFile(`replaces in copy tag >> ${caseName}: sourceFileContents 1`);
+        chdirInProject('src');
+
+        // Test Main
+        await callMain(["replace", path.basename(filePath)], {
+            folder: path.dirname(filePath), test: "", locale: "en-US",
+        });
+        const  updatedFileContents = fs.readFileSync(filePath).toString();
+
+        chdirInProject('src');
+        expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
+        lib.rmdirSync(testFolderPath + '_tmp');
+    });
+});
+
 describe("searches keyword tag >>", () => {
     test.skip('sharp (best)',()=>{});
     test.each([

@@ -1405,28 +1405,34 @@ If the partially replaced content was correct:
         cd        projectB
 
 Variables defined in the `#settings:` tag can be referenced
-from the `#template:` tag in `#copy-template:` tag or `#copy:` tag block.
-In this case, write `#template:` tag in both block of `#copy-template:` tag
-and `#copy:` tag.
+from the `#template:` tag in `#copy-template:` tag block.
+If there is no `#copy-template:` tag that is the target of the `#copy:` tag,
+write the `#template:` tag and the referenced variable in blocks of
+all `#copy:` tags.
 
     1:
         settings: #settings:
             __Variable__: projectA
-        body: | #copy: command
+        body1: | #copy-template: command1
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+        body2: | #copy: command2
             mkdir -p  projectA  #template: __Variable__
             cd        projectA  #template: __Variable__
     2:
         settings: #settings:
             __Variable__: projectB
-        body: | #copy: command
+        body1: | #copy: command1
+            mkdir -p  projectB
+            cd        projectB
+        body2: | #copy: command2
             mkdir -p  projectB  #template: __Variable__
             cd        projectB  #template: __Variable__
 
 If you don't always refer to variables in the block of
 all `#copy-template:` tags and `#copy:` tags,
 specify the variable at parameters.
-If you specify the variable,
-write the variable name after `$settings.`.
+If you specify, write the variable name after `$settings.`.
 
     settings: #settings:
         __VariableA__: projectB
@@ -1436,10 +1442,6 @@ write the variable name after `$settings.`.
     2: | #copy-template: command, {__Project__: projectA}
         mkdir -p  projectA  #template: __Project__
         cd        projectA  #template: __Project__
-
-Currently, it is not supported to replace the value of
-the variable specified in `#copy-template:` tag or `#copy:` tag
-by replace command.
 
 Even if there were differences in the presence or absence
 of　`#keyword:` tag or differences in the content of `#keyword:` tag,

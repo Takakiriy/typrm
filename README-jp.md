@@ -1358,27 +1358,33 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
         mkdir -p  projectB
         cd        projectB
 
-`#copy-template:` タグや `#copy:` タグのブロックの中の
-`#template:` タグから `#settings:` タグで定義された変数を参照することができます。
-この場合、`#copy-template:` タグおよび `#copy:` タグの両方のブロックの中に
-`#template:` タグを書きます。
+`#copy-template:` タグのブロックの中の
+`#template:` タグから `#settings:` タグで定義された変数を参照することもできます。
+`#copy:` タグの対象となる `#copy-template:` タグがない場合、
+すべての `#copy:` タグの両方のブロックの中に `#template:` タグと参照する変数を書きます。
 
     1:
         settings: #settings:
             __Variable__: projectA
-        body: | #copy: command
+        body1: | #copy-template: command1
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+        body2: | #copy: command2
             mkdir -p  projectA  #template: __Variable__
             cd        projectA  #template: __Variable__
     2:
         settings: #settings:
             __Variable__: projectB
-        body: | #copy: command
+        body1: | #copy: command1
+            mkdir -p  projectB
+            cd        projectB
+        body2: | #copy: command2
             mkdir -p  projectB  #template: __Variable__
             cd        projectB  #template: __Variable__
 
 すべての `#copy-template:` タグや `#copy:` タグのブロックの中から
 常に変数を参照するわけではない場合は、パラメーターに変数を指定します。
-変数を指定するときは、`$settings.` に続けて変数名を書きます。
+指定するときは、`$settings.` に続けて変数名を書きます。
 
     settings: #settings:
         __VariableA__: projectB
@@ -1388,9 +1394,6 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
     2: | #copy-template: command, {__Project__: projectA}
         mkdir -p  projectA  #template: __Project__
         cd        projectA  #template: __Project__
-
-現在 `#copy-template:` タグや `#copy:` タグに指定する変数の値を
-replace コマンドで置き換えることには対応していません。
 
 `#keyword:` タグの有無の違いや `#keyword:` タグの内容に違いがあっても
 同じ文章であると判定します。

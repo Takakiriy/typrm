@@ -1999,6 +1999,68 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
 "
 `;
 
+exports[`replaces in copy tag >> template >> 1: sourceFileContents 1`] = `
+"setting: #settings:
+    __VarA__: valueA  #to: replacedA
+    __VarB__: valueB  #to: replacedB
+variable in copy blocks:
+    Template: #copy: variable in copy copy
+        <valueA>  #template: <__VarA__>
+    Copy: #copy: variable in copy copy
+        <valueA>  #template: <__VarA__>
+variable in copy-template:
+    Template: #copy-template: variable in copy-template, {__VariableA__: $settings.__VarB__}
+        (valueB)  #template: (__VariableA__)
+    Copy: #copy: variable in copy-template, {__VariableA__: a1}
+        (a1)
+variable in copy:
+    Template: #copy-template: variable in copy, {__VariableA__: a1}
+        [a1]  #template: [__VariableA__]
+    Copy: #copy: variable in copy, {__VariableA__: $settings.__VarB__}
+        [valueB]
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__VarB__}
+        <valueB>  #template: <__VariableA__>
+        <valueA>  #template: <__VarA__>
+        <valueB, valueA>  #template: <__VariableA__, __VarA__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <valueA>
+        <a1, valueA>
+"
+`;
+
+exports[`replaces in copy tag >> template >> 1: updatedFileContents 1`] = `
+"setting: #settings:
+    __VarA__: replacedA  #original: valueA
+    __VarB__: replacedB  #original: valueB
+variable in copy blocks:
+    Template: #copy: variable in copy copy
+        <replacedA>  #template: <__VarA__>
+    Copy: #copy: variable in copy copy
+        <replacedA>  #template: <__VarA__>
+variable in copy-template:
+    Template: #copy-template: variable in copy-template, {__VariableA__: $settings.__VarB__}
+        (replacedB)  #template: (__VariableA__)
+    Copy: #copy: variable in copy-template, {__VariableA__: a1}
+        (a1)
+variable in copy:
+    Template: #copy-template: variable in copy, {__VariableA__: a1}
+        [a1]  #template: [__VariableA__]
+    Copy: #copy: variable in copy, {__VariableA__: $settings.__VarB__}
+        [replacedB]
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__VarB__}
+        <replacedB>  #template: <__VariableA__>
+        <replacedA>  #template: <__VarA__>
+        <replacedB, replacedA>  #template: <__VariableA__, __VarA__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <replacedA>
+        <a1, replacedA>
+"
+`;
+
 exports[`replaces settings >> CR LF >>: sourceFileContents 1`] = `
 "(BOM)settings: #settings:\\r
     var1: value1
