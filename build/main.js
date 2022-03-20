@@ -239,19 +239,19 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
                 if (templateTag.isFound) {
                     parser.templateCount += 1;
                     const { log: envaluatedItems } = getExpectedLineAndEvaluationLog(setting, templateTag.template);
-                    const referencedVariableNames = envaluatedItems.map(item => `$settings.${item.before}`);
+                    const referencedVariableNames = envaluatedItems.map(item => `${settingsDot}${item.before}`);
                     const referencedSetting = dollerSettingForCopyTag.filter(item => referencedVariableNames.includes(item[0]));
                     const checkingLineWithoutTemplate = line.substring(0, templateTag.indexInLine);
                     const replacedIndices = [];
                     var comparableLine = lib.unexpandVariable(checkingLineWithoutTemplate, referencedSetting, /*in_out*/ replacedIndices) +
                         line.substring(templateTag.indexInLine);
                     for (const replacedIndex of replacedIndices) {
-                        const replacedVariableName = dollerSettingForCopyTag[replacedIndex][0].substring('$settings.'.length);
+                        const replacedVariableName = dollerSettingForCopyTag[replacedIndex][0].substring(settingsDot.length);
                         setting[replacedVariableName].isReferenced = true;
                     }
                     const notMatchedSettings = referencedSetting.filter((_, index) => !replacedIndices.includes(index));
                     if (notMatchedSettings.length >= 1) {
-                        const variableNames = notMatchedSettings.map(item => item[0].substring('$settings.'.length));
+                        const variableNames = notMatchedSettings.map(item => item[0].substring(settingsDot.length));
                         console.log('');
                         console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, parser.filePath));
                         console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
@@ -293,7 +293,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
                     copyTags.push(copyTag);
                     copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
                     dollerSettingForCopyTag = Object.entries(setting)
-                        .map(keyValue => [`$settings.${keyValue[0]}`, keyValue[1].value])
+                        .map(keyValue => [`${settingsDot}${keyValue[0]}`, keyValue[1].value])
                         .sort((a, b) => (b[1].length - a[1].length));
                 }
                 else {
@@ -1044,6 +1044,75 @@ async function makeOriginalTagTree(parser, settingTree) {
     toTagTree.command = 'reset';
     return toTagTree;
 }
+// makeTemplatesInCopyTag
+async function makeTemplatesInCopyTag(replacingLines) {
+    const templatesInCopyTag = [];
+    const copyTagRe = new RegExp(' #copy(-template)?: *([^,]*),[^\\$]*(\\$settings\..*)}');
+    const copyTemplateTagRe = new RegExp(' #copy-template: *([^,]*),(.*)');
+    const settingsRe = new RegExp('\\$settings\\.([^ ,}]*)', 'g');
+    const variableNames = {};
+    for (const line of replacingLines) {
+        const matchedCopyTag = copyTagRe.exec(line);
+        if (matchedCopyTag) {
+            const name = matchedCopyTag[2];
+            const parameters = matchedCopyTag[3];
+            const templateVariableNames = new Set();
+            var settingsMatch = null;
+            settingsRe.lastIndex = 0;
+            variableNames[name] = templateVariableNames;
+            while ((settingsMatch = settingsRe.exec(parameters)) !== null) {
+                templateVariableNames.add(settingsMatch[1].trimRight());
+            }
+        }
+    }
+    for (const inputFileFullPath of await listUpFilePaths('')) {
+        var reader = readline.createInterface({
+            input: fs.createReadStream(inputFileFullPath),
+            crlfDelay: Infinity
+        });
+        var lineNum = 0;
+        var copyTagIndent = '';
+        var copyTagName = '';
+        var copyTagLineNum = 0;
+        var copyTagParameterNames = [];
+        for await (const line1 of reader) {
+            const line = line1;
+            lineNum += 1;
+            if (copyTagIndent) {
+                if (line.startsWith(copyTagIndent)) {
+                    const templateIndex = line.indexOf(' ' + templateLabel);
+                    if (templateIndex !== notFound) {
+                        const template = getValue(line, templateIndex + templateLabel.length + 1);
+                        templatesInCopyTag.push({
+                            copyTagName,
+                            lineNumOffset: lineNum - copyTagLineNum,
+                            template,
+                        });
+                    }
+                }
+                else if (line.trim() === '') {
+                }
+                else {
+                    copyTagIndent = '';
+                }
+            }
+            if (!copyTagIndent) {
+                const matchedCopyTag = copyTemplateTagRe.exec(line);
+                if (matchedCopyTag) {
+                    copyTagName = matchedCopyTag[1];
+                    if (copyTagName in variableNames) {
+                        copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                        copyTagLineNum = lineNum;
+                    }
+                    else {
+                        copyTagName = '';
+                    }
+                }
+            }
+        }
+    }
+    return templatesInCopyTag;
+}
 // getReplacedLineInSettings
 function getReplacedLineInSettings(line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     // spaceAndComment
@@ -1642,7 +1711,12 @@ async function replaceSub(inputFilePath, parser, command) {
     var isCheckingTemplateIfKey = false;
     var templateIfKeyError = false;
     var copyTagIndent = '';
+    var copyTagLineNum = 0;
+    var oldSettingAndCopyTagParameters = {};
+    var newSettingAndCopyTagParameters = {};
     const checkedTemplateTags = {};
+    var templatesInCopyTag = [];
+    const templatesInCopyTagAll = await makeTemplatesInCopyTag(lines);
     try {
         for (const line of lines) {
             var output = false;
@@ -1662,16 +1736,67 @@ async function replaceSub(inputFilePath, parser, command) {
                     replacingKeyValues[key] = value.value;
                 }
             }
+            // #copy tag
             if (copyTagIndent) {
                 if (!line.startsWith(copyTagIndent) && line.trim() !== '') {
                     copyTagIndent = '';
+                    copyTagLineNum = 0;
+                    replacingKeys = Object.keys(oldSetting);
+                    templatesInCopyTag = [];
+                    oldSettingAndCopyTagParameters = {};
+                    newSettingAndCopyTagParameters = {};
                 }
             }
             if (line.includes('#copy')) {
-                if (tagIndexOf(line, copyLabel) !== notFound || tagIndexOf(line, copyTemplateLabel) !== notFound) {
-                    copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                const copyTagIndex = tagIndexOf(line, copyLabel);
+                const copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
+                if (copyTagIndex !== notFound || copyTemplateTagIndex !== notFound) {
+                    if (copyTagIndex !== notFound) { // if copyTagIndex
+                        var copyTagValue = getValue(line, copyTagIndex + copyLabel.length);
+                    }
+                    else { // if copyTemplateTagIndex
+                        var copyTagValue = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
+                    }
+                    const firstCommaIndex = copyTagValue.indexOf(',');
+                    if (firstCommaIndex !== notFound) {
+                        const copyTagName = copyTagValue.substring(0, firstCommaIndex);
+                        const parameters = yaml.load(copyTagValue.substring(firstCommaIndex + 1));
+                        const values = Object.entries(parameters).filter(keyValue => !keyValue[1].startsWith(settingsDot))
+                            .map(keyValue => [keyValue[0], {
+                                value: keyValue[1], lineNum, settingsIndex: '', tag: 'copyParameter', isReferenced: true,
+                            }]);
+                        const variables = Object.entries(parameters).filter(keyValue => keyValue[1].startsWith(settingsDot))
+                            .map(keyValue => [keyValue[0], keyValue[1].substring(settingsDot.length)]);
+                        const copyTagParameters = variables.filter(keyValue => (keyValue[1] in oldSetting));
+                        copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                        copyTagLineNum = lineNum;
+                        templatesInCopyTag = templatesInCopyTagAll.filter(item => item.copyTagName === copyTagName);
+                        oldSettingAndCopyTagParameters = {
+                            ...oldSetting,
+                            ...Object.fromEntries(values),
+                            ...Object.fromEntries(copyTagParameters.map(keyValue => [keyValue[0], oldSetting[keyValue[1]]]))
+                        };
+                        newSettingAndCopyTagParameters = {
+                            ...newSetting,
+                            ...Object.fromEntries(values),
+                            ...Object.fromEntries(copyTagParameters.map(keyValue => [keyValue[0], newSetting[keyValue[1]]]))
+                        };
+                        replacingKeys = Object.keys(oldSettingAndCopyTagParameters);
+                        if (copyTagParameters.length < variables.length) {
+                            const foundVaraibleNames = copyTagParameters.map(keyValue => keyValue[1]);
+                            const notFoundVariables = variables.filter(keyValue => !foundVaraibleNames.includes(keyValue[1]))
+                                .map(keyValue => keyValue[1]);
+                            console.log('');
+                            console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
+                            console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                            console.log(`    ${translate('Error')}: ${translate('Not found specified variable name.')}`);
+                            console.log(`    ${translate('Variable')}: ${notFoundVariables.join(', ')}`);
+                            parser.errorCount += 1;
+                        }
+                    }
                 }
             }
+            // #settings tag
             if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
                 isSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)[0].length;
@@ -1718,24 +1843,45 @@ async function replaceSub(inputFilePath, parser, command) {
             }
             else {
                 const templateTag = parseTemplateTag(line, parser);
-                if (copyTagIndent) {
-                    templateTag.isFound = false;
-                }
                 if (templateTag.isFound) {
                     parser.templateCount += 1;
+                }
+                else {
+                    if (copyTagIndent) {
+                        const templateInCopyTag = templatesInCopyTag.find(item => item.lineNumOffset === lineNum - copyTagLineNum);
+                        if (templateInCopyTag) {
+                            templateTag.isFound = true;
+                            templateTag.template = templateInCopyTag.template;
+                            templateTag.label = templateLabel;
+                            templateTag.lineNumOffset = 0;
+                        }
+                    }
                 }
                 if (templateTag.isFound && templateTag.includesKey(replacingKeys)
                     && toTagTree.currentIsOutOfFalseBlock) {
                     const replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
                     const commonCase = (templateTag.label !== templateIfLabel);
-                    if (commonCase) {
-                        var expected = getExpectedLine(oldSetting, templateTag.template);
-                        var replaced = getReplacedLine(newSetting, templateTag.template, replacingKeyValues);
+                    if (!copyTagIndent) { // if common case
+                        if (commonCase) {
+                            var expected = getExpectedLine(oldSetting, templateTag.template);
+                            var replaced = getReplacedLine(newSetting, templateTag.template, replacingKeyValues);
+                        }
+                        else { // if (templateTag.label === templateIfLabel)
+                            templateTag.evaluate(newSetting);
+                            var expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
+                            var replaced = getReplacedLine(newSetting, templateTag.newTemplate, replacingKeyValues);
+                        }
                     }
-                    else { // if (templateTag.label === templateIfLabel)
-                        templateTag.evaluate(newSetting);
-                        var expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                        var replaced = getReplacedLine(newSetting, templateTag.newTemplate, replacingKeyValues);
+                    else { // if copyTagIndent
+                        if (commonCase) {
+                            var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.template);
+                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template, replacingKeyValues);
+                        }
+                        else { // if (templateTag.label === templateIfLabel)
+                            templateTag.evaluate(newSetting);
+                            var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.oldTemplate);
+                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate, replacingKeyValues);
+                        }
                     }
                     if (replacingLine.includes(expected)) {
                         const before = expected;
@@ -3292,7 +3438,6 @@ function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyVa
         }
         return false;
     }
-    const settingsDot = '$settings.';
     const envDot = '$env.';
     var match = null;
     var parent = '';
@@ -3421,7 +3566,7 @@ function getExpectedLine(setting, template) {
 function getExpectedLineAndEvaluationLog(setting, template, withLog = false) {
     var expected = template;
     const log = [];
-    for (const key of Object.keys(setting)) {
+    for (const key of Object.keys(setting).sort((a, b) => (b.length - a.length))) {
         const keyRe = new RegExp(lib.escapeRegularExpression(key), 'g');
         const value = setting[key].value.replace(/\$/g, '$$');
         const expectedAfter = expected.replace(keyRe, value);
@@ -3465,17 +3610,16 @@ function getReplacedLine(setting, template, replacedValues) {
 }
 // replaceDollerVariable
 function replaceDollerVariable(expression, setting) {
-    const dollerSettings = '$settings.';
-    const dollerSettingsIndex = expression.indexOf(dollerSettings);
+    const dollerSettingsIndex = expression.indexOf(settingsDot);
     if (dollerSettingsIndex === notFound) {
         return { replaced: expression, isError: false };
     }
-    const variableNameIndex = dollerSettingsIndex + dollerSettings.length;
+    const variableNameIndex = dollerSettingsIndex + settingsDot.length;
     for (const variableName of Object.keys(setting).sort((a, b) => (b.length - a.length))) {
         if (expression.indexOf(variableName, variableNameIndex) !== notFound) {
             setting[variableName].isReferenced = true;
             return {
-                replaced: expression.replace(`${dollerSettings}${variableName}`, setting[variableName].value),
+                replaced: expression.replace(`${settingsDot}${variableName}`, setting[variableName].value),
                 isError: false
             };
         }
@@ -4873,7 +5017,7 @@ function translate(englishLiterals, ...values) {
             "Defined variables are decreased": "定義された変数が減りました",
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.": "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
-            "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
+            "Not found specified variable name.": "指定した変数名が見つかりません。",
             "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
             "Error of duplicated variable name:": "エラー：変数名が重複しています",
             "Error of not expected condition:": "エラー：予期しない条件です",
@@ -4980,6 +5124,7 @@ else {
     var runningOS = 'Linux';
 }
 const settingLabel = /(^| )#settings:/;
+const settingsDot = '$settings.';
 const originalLabel = "#original:";
 const toLabel = "#to:"; // replace to tag
 const checkTag = "#check:";

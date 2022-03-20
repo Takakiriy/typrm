@@ -262,7 +262,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
                 if (templateTag.isFound) {
                     parser.templateCount += 1;
                     const  {log: envaluatedItems} = getExpectedLineAndEvaluationLog(setting, templateTag.template);
-                    const  referencedVariableNames = envaluatedItems.map(item => `$settings.${item.before}`);
+                    const  referencedVariableNames = envaluatedItems.map(item => `${settingsDot}${item.before}`);
                     const  referencedSetting = dollerSettingForCopyTag.filter(item => referencedVariableNames.includes(item[0]));
                     const  checkingLineWithoutTemplate = line.substring(0, templateTag.indexInLine);
                     const  replacedIndices: number[] = [];
@@ -271,12 +271,12 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
                         lib.unexpandVariable(checkingLineWithoutTemplate, referencedSetting, /*in_out*/ replacedIndices) +
                         line.substring(templateTag.indexInLine);
                     for (const replacedIndex of replacedIndices) {
-                        const  replacedVariableName = dollerSettingForCopyTag[replacedIndex][0].substring('$settings.'.length);
+                        const  replacedVariableName = dollerSettingForCopyTag[replacedIndex][0].substring(settingsDot.length);
                         setting[replacedVariableName].isReferenced = true;
                     }
                     const  notMatchedSettings = referencedSetting.filter((_, index) => ! replacedIndices.includes(index));
                     if (notMatchedSettings.length >= 1) {
-                        const  variableNames = notMatchedSettings.map(item => item[0].substring('$settings.'.length));
+                        const  variableNames = notMatchedSettings.map(item => item[0].substring(settingsDot.length));
                         console.log('');
                         console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, parser.filePath));
                         console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
@@ -318,7 +318,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag[], parser:
                     copyTags.push(copyTag);
                     copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
                     dollerSettingForCopyTag = Object.entries(setting)
-                        .map(keyValue => [`$settings.${keyValue[0]}`, keyValue[1].value])
+                        .map(keyValue => [`${settingsDot}${keyValue[0]}`, keyValue[1].value])
                         .sort((a,b)=>(b[1].length - a[1].length));
                 } else {
                     console.log('');
@@ -1930,12 +1930,12 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
                     if (firstCommaIndex !== notFound) {
                         const  copyTagName = copyTagValue.substring(0, firstCommaIndex);
                         const  parameters = yaml.load(copyTagValue.substring(firstCommaIndex + 1)) as {[name: string]: string};
-                        const  values = Object.entries( parameters ).filter(keyValue => ! keyValue[1].startsWith('$settings.'))
+                        const  values = Object.entries( parameters ).filter(keyValue => ! keyValue[1].startsWith(settingsDot))
                             .map(keyValue=>[keyValue[0], {
                                 value: keyValue[1], lineNum, settingsIndex: '', tag: 'copyParameter', isReferenced: true,
                             }]);
-                        const  variables = Object.entries( parameters ).filter(keyValue => keyValue[1].startsWith('$settings.'))
-                            .map(keyValue=>[keyValue[0], keyValue[1].substring('$settings.'.length)]);
+                        const  variables = Object.entries( parameters ).filter(keyValue => keyValue[1].startsWith(settingsDot))
+                            .map(keyValue=>[keyValue[0], keyValue[1].substring(settingsDot.length)]);
                         const  copyTagParameters = variables.filter(keyValue => (keyValue[1] in oldSetting));
 
                         copyTagIndent = indentRegularExpression.exec(line)![0] + ' ';
@@ -1954,7 +1954,14 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
                         replacingKeys = Object.keys(oldSettingAndCopyTagParameters);
                         if (copyTagParameters.length < variables.length) {
                             const  foundVaraibleNames = copyTagParameters.map(keyValue => keyValue[1]);
-                            const  notFoundVariables = variables.filter(keyValue => ! foundVaraibleNames.includes(keyValue[1]));
+                            const  notFoundVariables = variables.filter(keyValue => ! foundVaraibleNames.includes(keyValue[1]))
+                                .map(keyValue => keyValue[1]);
+                            console.log('');
+                            console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
+                            console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                            console.log(`    ${translate('Error')}: ${translate('Not found specified variable name.')}`);
+                            console.log(`    ${translate('Variable')}: ${notFoundVariables.join(', ')}`);
+                            parser.errorCount += 1;
                         }
                     }
                 }
@@ -3683,7 +3690,6 @@ function  evaluateIfCondition(expression: string, setting: Settings, parser: Par
         }
         return  false;
     }
-    const  settingsDot = '$settings.';
     const  envDot = '$env.';
     var    match: RegExpExecArray | null = null;
     var    parent = '';
@@ -3862,19 +3868,18 @@ function  getReplacedLine(setting: Settings, template: string, replacedValues: {
 
 // replaceDollerVariable
 function  replaceDollerVariable(expression: string, setting: Settings): {replaced: string, isError: boolean} {
-    const  dollerSettings = '$settings.';
-    const  dollerSettingsIndex = expression.indexOf(dollerSettings);
+    const  dollerSettingsIndex = expression.indexOf(settingsDot);
     if (dollerSettingsIndex === notFound) {
         return  {replaced: expression, isError: false};
     }
-    const  variableNameIndex = dollerSettingsIndex + dollerSettings.length;
+    const  variableNameIndex = dollerSettingsIndex + settingsDot.length;
 
     for (const variableName of Object.keys(setting).sort((a,b)=>(b.length - a.length))) {
         if (expression.indexOf(variableName, variableNameIndex) !== notFound) {
             setting[variableName].isReferenced = true;
 
             return  {
-                replaced: expression.replace(`${dollerSettings}${variableName}`, setting[variableName].value),
+                replaced: expression.replace(`${settingsDot}${variableName}`, setting[variableName].value),
                 isError: false
             };
         }
@@ -5550,7 +5555,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.":
                 "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
-            "Error of not found specified setting name.": "エラー：指定した設定名が見つかりません。",
+            "Not found specified variable name.": "指定した変数名が見つかりません。",
             "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
             "Error of duplicated variable name:": "エラー：変数名が重複しています",
             "Error of not expected condition:": "エラー：予期しない条件です",
@@ -5660,6 +5665,7 @@ if (process.env.windir) {
     var  runningOS = 'Linux';
 }
 const  settingLabel = /(^| )#settings:/;
+const  settingsDot = '$settings.';
 const  originalLabel = "#original:";
 const  toLabel = "#to:";  // replace to tag
 const  checkTag = "#check:";
