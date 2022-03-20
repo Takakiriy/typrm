@@ -1464,32 +1464,32 @@ checked file count = 1, template count = 0
 
 exports[`checks template value >> settings >> 5_check_same_as_tag: sourceFileContents 1`] = `
 "1:
-    settings: #settings: {(C_S): $settings.__C_S__}
+    settings: #settings:
         __OperationClient__: OC
         __OperationServer__: OS
         __StoreClient__: SC
         __StoreServer__: SS
         __C_S__: Client  #// Client or Server
-        __Operation__: OC  #same-as: __Operation(C_S)__
-        __Store__: SC      #same-as: __Store(C_S)__
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+        __Store__: SC      #same-as: __Store{$settings.__C_S__}__
 2:
-    settings: #settings: {(CS): $settings.__C_S__}
+    settings: #settings:
         __OperationClient__: OC
         __OperationServer__: OS
         __StoreClient__: SC
         __StoreServer__: SS
         __C_S__: Server  #// Client or Server
-        __Operation__: OS  #same-as: __Operation(CS)__
-        __Store__: SS      #same-as: __Store(CS)__
+        __Operation__: OS  #same-as: __Operation{$settings.__C_S__}__
+        __Store__: SS      #same-as: __Store{$settings.__C_S__}__
 error:
-    settings: #settings: {(CS): $settings.__C_S__}
+    settings: #settings:
         __OperationClient__: OC
         __OperationServer__: OS
         __StoreClient__: SC
         __StoreServer__: SS
         __C_S__: Server  #// Client or Server
-        __Operation__: Ox  #same-as: __Operation(CS)__
-        __Store__: SS      #same-as: __Store(xxx)__
+        __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
+        __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
 settings: #settings:
 "
 `;
