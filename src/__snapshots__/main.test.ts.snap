@@ -1395,28 +1395,6 @@ level 1:
 "
 `;
 
-exports[`checks template value >> settings >> 4_neighbor_error: answer 1`] = `
-"
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
-    Warning: double settings are not supported.
-    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 1
-"
-`;
-
-exports[`checks template value >> settings >> 4_neighbor_error: sourceFileContents 1`] = `
-"settings: #settings:
-    var1: value1
-    var2: value2
-    var3: value3
-value1, value2, value3, value4  #template: var1, var2, var3, var4
-settings: #settings:
-    var4: value4
-"
-`;
-
 exports[`checks template value >> settings >> 4_2_neighbor_level_2_error: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7
@@ -1440,25 +1418,46 @@ exports[`checks template value >> settings >> 4_2_neighbor_level_2_error: source
 "
 `;
 
+exports[`checks template value >> settings >> 4_neighbor_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
+    Warning: double settings are not supported.
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1
+"
+`;
+
+exports[`checks template value >> settings >> 4_neighbor_error: sourceFileContents 1`] = `
+"settings: #settings:
+    var1: value1
+    var2: value2
+    var3: value3
+value1, value2, value3, value4  #template: var1, var2, var3, var4
+settings: #settings:
+    var4: value4
+"
+`;
+
 exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:     settings: #settings: {(CS): $settings.__C_S__}
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         __OperationServer__: OS
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:25:         __C_S__: Server  #// Client or Server
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:         __Operation__: Ox  #same-as: __Operation(CS)__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings: {(CS): $settings.__C_S__}
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:         __OperationServer__: OS
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         __Operation__: Ox  #same-as: __Operation(CS)__
     Warning: Not matched with the value referenced from same-as tag.
     Same as: __OperationServer__
     Expected: OS
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:     settings: #settings: {(CS): $settings.__C_S__}
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         __Store__: SS      #same-as: __Store(xxx)__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings: {(CS): $settings.__C_S__}
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __Store__: SS      #same-as: __Store(xxx)__
     Warning: Not found a variable name specified in the same-as tag.
     Same as: __Store(xxx)__
 
 Warning: 2, Error: 0
-checked file count = 1, template count = 0
+checked file count = 1, template count = 6
 "
 `;
 
@@ -1472,6 +1471,9 @@ exports[`checks template value >> settings >> 5_check_same_as_tag: sourceFileCon
         __C_S__: Client  #// Client or Server
         __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
         __Store__: SC      #same-as: __Store{$settings.__C_S__}__
+    ref:
+        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
+        OC, SC:  #template: __Operation__, __Store__
 2:
     settings: #settings:
         __OperationClient__: OC
@@ -1481,6 +1483,9 @@ exports[`checks template value >> settings >> 5_check_same_as_tag: sourceFileCon
         __C_S__: Server  #// Client or Server
         __Operation__: OS  #same-as: __Operation{$settings.__C_S__}__
         __Store__: SS      #same-as: __Store{$settings.__C_S__}__
+    ref:
+        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
+        OS, SS:  #template: __Operation__, __Store__
 error:
     settings: #settings:
         __OperationClient__: OC
@@ -1490,6 +1495,9 @@ error:
         __C_S__: Server  #// Client or Server
         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
+    ref:
+        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
+        Ox, SS:  #template: __Operation__, __Store__
 settings: #settings:
 "
 `;
@@ -6127,6 +6135,7 @@ Object {
     "__Variable1__": Object {
       "isReferenced": false,
       "lineNum": 4,
+      "sameAs": "",
       "settingsIndex": "/1",
       "tag": "settings",
       "value": "value1",
@@ -6136,6 +6145,7 @@ Object {
     "__Variable2__": Object {
       "isReferenced": false,
       "lineNum": 14,
+      "sameAs": "",
       "settingsIndex": "/2",
       "tag": "settings",
       "value": "value2",
@@ -6145,6 +6155,7 @@ Object {
     "__Variable21__": Object {
       "isReferenced": false,
       "lineNum": 9,
+      "sameAs": "",
       "settingsIndex": "/2/1",
       "tag": "settings",
       "value": "value21",
@@ -6231,6 +6242,22 @@ exports[`unit test >> makeSettingTree >> bug_case_6: sourceFileContents 1`] = `
         24:
             settings: #settings:
                 __Variable22__: value22
+"
+`;
+
+exports[`unit test >> makeSettingTree >> bug_case_7_first_child_settings: answer indicesWithIf 1`] = `
+"Map {
+    1 => "/1",
+    4 => "/",
+}
+"
+`;
+
+exports[`unit test >> makeSettingTree >> bug_case_7_first_child_settings: sourceFileContents 1`] = `
+"1:
+    settings: #settings:
+        __Variable__: OC
+settings: #settings:
 "
 `;
 

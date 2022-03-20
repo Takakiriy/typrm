@@ -195,7 +195,7 @@ describe("checks template value >>", () => {
     });
 
     describe("settings >>", () => {
-        test.each([
+        test.only.each([
             ["1_same_values"],
             ["2_not_same_values_error"],
             ["3_overwrite"],
@@ -208,6 +208,7 @@ describe("checks template value >>", () => {
             // There are other settings tests in "unit test >>"
 
         ])("%s", async (caseName) => {
+if (caseName !== '5_check_same_as_tag') {return;}  // || subCase !== '____'
             initializeTestInputFile(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
 
             await callMain(["check", "_tmp/_tmp.yaml"], {
@@ -216,6 +217,7 @@ describe("checks template value >>", () => {
             chdirInProject('src');
             expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
             lib.rmdirSync(testFolderPath + '_tmp');
+expect('test code').toBe('deleted skip code.');
         });
     });
 
@@ -1486,6 +1488,7 @@ describe("unit test >>", () => {
             ["bug_case_3", { checkSettings: true }],
             ["bug_case_4", {}],
             ["bug_case_6", {}],
+            ["bug_case_7_first_child_settings", {}],
         ])("%s", async (caseName, options) => {
             const  Parser = main.private_.Parser;
             const  makeSettingTree = main.private_.makeSettingTree;
@@ -1502,6 +1505,11 @@ describe("unit test >>", () => {
             expect(Array.from( settingsTree.indicesWithIf )).toStrictEqual(answerIndicesWithIf);
             if ('checkSettings' in options) {
                 expect(settingsTree.settings).toMatchSnapshot('settings');
+            }
+
+            for (const [lineNum, index] of settingsTree.indices.entries()) {
+                expect(Array.from(settingsTree.indicesWithIf.keys()).includes(lineNum)).toBe(true);
+                expect(settingsTree.indicesWithIf.get(lineNum)).toBe(index);
             }
             lib.rmdirSync(testFolderPath + '_tmp');
         });
