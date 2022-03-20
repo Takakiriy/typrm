@@ -183,12 +183,13 @@ describe("checks template value >>", () => {
     });
     describe("settings >>", () => {
         test.each([
-            ["1 same values"],
-            ["2 not same values error"],
-            ["3 overwrite"],
-            ["3e overwrite error"],
-            ["4 neighbor error"],
-            ["4-2 neighbor level 2 error"],
+            ["1_same_values"],
+            ["2_not_same_values_error"],
+            ["3_overwrite"],
+            ["3e_overwrite_error"],
+            ["4_neighbor_error"],
+            ["4_2_neighbor_level_2_error"],
+            ["5_check_same_as_tag"],
             ["b1_bug_case_no_root_settings"],
             ["b2_bug_case_nest_settings"],
             // There are other settings tests in "unit test >>"
@@ -1418,6 +1419,7 @@ describe("unit test >>", () => {
             ["bug_case_3", { checkSettings: true }],
             ["bug_case_4", {}],
             ["bug_case_6", {}],
+            ["bug_case_7_first_child_settings", {}],
         ])("%s", async (caseName, options) => {
             const Parser = main.private_.Parser;
             const makeSettingTree = main.private_.makeSettingTree;
@@ -1432,6 +1434,10 @@ describe("unit test >>", () => {
             expect(Array.from(settingsTree.indicesWithIf)).toStrictEqual(answerIndicesWithIf);
             if ('checkSettings' in options) {
                 expect(settingsTree.settings).toMatchSnapshot('settings');
+            }
+            for (const [lineNum, index] of settingsTree.indices.entries()) {
+                expect(Array.from(settingsTree.indicesWithIf.keys()).includes(lineNum)).toBe(true);
+                expect(settingsTree.indicesWithIf.get(lineNum)).toBe(index);
             }
             lib.rmdirSync(testFolderPath + '_tmp');
         });

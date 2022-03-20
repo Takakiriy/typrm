@@ -1218,6 +1218,13 @@ checked file count = 1, template count = 1
 "
 `;
 
+exports[`checks template value >> settings >> 1_same_values: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 1
+"
+`;
+
 exports[`checks template value >> settings >> 1_same_values: sourceFileContents 1`] = `
 "settings: #settings:
     var1: value1
@@ -1443,18 +1450,19 @@ settings: #settings:
 exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings: {(CS): $settings.__C_S__}
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:         __OperationServer__: OS
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         __C_S__: Server  #// Client or Server
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         __Operation__: Ox  #same-as: __Operation(CS)__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
     Warning: Not matched with the value referenced from same-as tag.
     Same as: __OperationServer__
     Expected: OS
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings: {(CS): $settings.__C_S__}
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __Store__: SS      #same-as: __Store(xxx)__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
     Warning: Not found a variable name specified in the same-as tag.
-    Same as: __Store(xxx)__
+    Variable Name: __Unknown__
 
 Warning: 2, Error: 0
 checked file count = 1, template count = 6

@@ -195,7 +195,7 @@ describe("checks template value >>", () => {
     });
 
     describe("settings >>", () => {
-        test.only.each([
+        test.each([
             ["1_same_values"],
             ["2_not_same_values_error"],
             ["3_overwrite"],
@@ -208,7 +208,6 @@ describe("checks template value >>", () => {
             // There are other settings tests in "unit test >>"
 
         ])("%s", async (caseName) => {
-if (caseName !== '5_check_same_as_tag') {return;}  // || subCase !== '____'
             initializeTestInputFile(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
 
             await callMain(["check", "_tmp/_tmp.yaml"], {
@@ -217,7 +216,6 @@ if (caseName !== '5_check_same_as_tag') {return;}  // || subCase !== '____'
             chdirInProject('src');
             expect(lib.cutLeftOf(main.stdout, 'Verbose: typrm command: check')).toMatchSnapshot('answer');
             lib.rmdirSync(testFolderPath + '_tmp');
-expect('test code').toBe('deleted skip code.');
         });
     });
 

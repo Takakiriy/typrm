@@ -21,6 +21,7 @@ typrm は自分が使いやすいコマンドのオプションを書いた
     - [mac の場合](#mac-の場合)
     - [CentOS 7 の場合](#centos-7-の場合)
   - [設定タグと #template タグを使って設定値を置き換えます](#設定タグと-template-タグを使って設定値を置き換えます)
+    - [変数名の一部を別の変数から参照します - #same-as タグ](#変数名の一部を別の変数から参照します---same-as-タグ)
     - [設定の詳細](#設定の詳細)
     - [設定名](#設定名)
     - [#template-if タグ - 条件を満たしているかどうかの記号を置き換えます](#template-if-タグ---条件を満たしているかどうかの記号を置き換えます)
@@ -1015,6 +1016,25 @@ typrm を使うには Node.js のインストールが必要です。
 `"%` を含むテンプレートを指定するときは、`""%25"` と書いてください。
 
     cd  "react1 #"  <!-- #template: __ProjectName__"%20"# #-->
+
+
+### 変数名の一部を別の変数から参照します - #same-as タグ
+
+参照する変数の名前の一部を別の変数の値から参照することで、デフォルトの変数を定義します。
+`#same-as:` タグに参照先の変数名を指定しますが、
+参照先の変数名の一部を他の変数の値にするときは、
+一部の部分に `{$settings.（変数名）}` を指定します。
+
+下記の場合、`__C_S__` 変数の値によって、デフォルトの変数 `__Operation__` の値が
+`__OperationClient__` 変数の値と同じか `__OperationServer__` 変数の値と同じになります。
+
+    settings: #settings:
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+        __C_S__: Client  #// Client or Server
+        __OperationClient__: OC
+        __OperationServer__: OS
+
+現在、`#same-as:` タグは replace コマンドに対応していません。
 
 
 ### 設定の詳細

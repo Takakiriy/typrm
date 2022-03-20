@@ -129,6 +129,9 @@ interface SettingsInformation {
     indent: string;
     condition: string;
     inSettings: boolean;
+    tagParameters: {
+        [name: string]: string;
+    };
 }
 interface Setting {
     value: string;
@@ -136,6 +139,7 @@ interface Setting {
     settingsIndex: string;
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyParameter' | 'env';
     isReferenced: boolean;
+    sameAs?: string;
 }
 declare class Parser {
     command: CommandEnum;
