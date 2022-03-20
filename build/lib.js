@@ -299,25 +299,27 @@ export function cutIndent(lines) {
     return lines;
 }
 // unexpandVariable
-export function unexpandVariable(expanded, keyValues) {
+export function unexpandVariable(expanded, keyValues, out_replacedIndices = null) {
     var replacing = expanded;
     var replacedTag = '\r\n'; // This is not matched with any values
     for (const [key, value] of keyValues) {
-        replacing = replacing.replace(new RegExp(escapeRegularExpression(key), 'g'), replacedTag);
-        replacing = replacing.replace(new RegExp(escapeRegularExpression(value), 'g'), replacedTag);
+        const keyRe = new RegExp(escapeRegularExpression(key), 'g');
+        const valueRe = new RegExp(escapeRegularExpression(value), 'g');
+        replacing = replacing.replace(keyRe, replacedTag);
+        replacing = replacing.replace(valueRe, replacedTag);
         replacedTag += '\n';
     }
+    var index = keyValues.length;
     for (const [key, _value] of keyValues.reverse()) {
         replacedTag = replacedTag.slice(0, replacedTag.length - 1);
-        replacing = replacing.replace(new RegExp(escapeRegularExpression(replacedTag), 'g'), key);
-    }
-    const unexpanded = replacing;
-    return unexpanded;
-}
-export function unexpandVariableOld(expanded, keyValues) {
-    var replacing = expanded;
-    for (const [key, value] of keyValues) {
-        replacing = replacing.replace(new RegExp(escapeRegularExpression(value), 'g'), key);
+        const replacedTagRe = new RegExp(escapeRegularExpression(replacedTag), 'g');
+        if (out_replacedIndices) {
+            index -= 1;
+            if (replacing.includes(replacedTag)) {
+                out_replacedIndices.unshift(index);
+            }
+        }
+        replacing = replacing.replace(replacedTagRe, key);
     }
     const unexpanded = replacing;
     return unexpanded;

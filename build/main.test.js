@@ -124,6 +124,7 @@ describe("checks template value >>", () => {
         ["1_template_3_if"],
         ["var_not_ref_1_error"],
         ["template_if_1_error"],
+        ["case_sensitive_variable_name"],
         ["environment_variable"],
         ["list_to_tag_original_tag"],
         ["settings_tree"],
@@ -302,8 +303,12 @@ describe("checks copy tag >>", () => {
                     { from: '(a1, __Bad__)', to: `(a1, ${badColor('__Bad__')})` },
                 ] }],
         ['template >> variable', { replacers: [
-                    { from: 's1', to: `${goodColor('s1')}` },
+                    { from: '[s1]', to: `[${goodColor('s1')}]` },
                     { from: '__Bad__', to: `${badColor('__Bad__')}` },
+                    { from: 'good_color($settings.__SetA__)', to: `${goodColor('$settings.__SetA__')}` },
+                    { from: 'bad_color(bad):', to: `${badColor('bad')}:` },
+                    { from: 'good_color($settings.__SetA__)', to: `${goodColor('$settings.__SetA__')}` },
+                    { from: 'bad_color(bad):', to: `${badColor('bad')}:` },
                 ] }],
     ])("%s", async (caseName, option) => {
         const { filePath } = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);
@@ -406,6 +411,15 @@ describe("replaces settings >>", () => {
         ], [
             '2_replace_11_nested_if', ' C', 'en-US',
             { replacers: [{ from: '__Set2__: C', to: '__Set2__: C  #to:CC' }] },
+        ], [
+            '2_replace_12_case_sensitive_variable', '', 'en-US',
+            { replacers: [
+                    { from: '__Variable__: Value', to: '__Variable__: Value  #to: After' },
+                    { from: '__variable__: value2', to: '__variable__: value2  #to: after2' },
+                    { from: '__variable2__: Value2', to: '__variable2__: Value2  #to: After2' },
+                ] },
+        ], [
+            'bug_1_template_in_copy_tag', '', 'en-US', null,
         ],
         // There are other cases in "replace to tag" test.
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {

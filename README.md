@@ -472,6 +472,7 @@ new_folder.yaml
         - cd    work1  #template: __Name__
 
 Write "variable_name: value" at `#settings:` for the part you want to change to.
+Variable names are case sensitive.
 Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
@@ -1391,7 +1392,9 @@ If the partially replaced content was correct:
 
 - Write `#copy-template:` tag in the template content
 - Specify parameters in YAML mapping format at the right of the comma
-- Write `#template:` tag in the replacement part
+  (The following `{__Project__: projectA}`)
+- Write `#template:` tag in the replacement part.
+  Do not write `#template:` tag in `#copy:` tag block
 <!-- -->
 
     1: | #copy-template: command, {__Project__: projectA}
@@ -1401,11 +1404,35 @@ If the partially replaced content was correct:
         mkdir -p  projectB
         cd        projectB
 
-Variables defined in the `#settings:` tag cannot be referenced
-from the `#template:` tag in `#copy-template:` tag or `#copy:` tag block.
+Variables defined in the `#settings:` tag can be referenced
+from the `#template:` tag in `#copy-template:` tag block.
+If there is no `#copy-template:` tag that is the target of the `#copy:` tag,
+write the `#template:` tag and the referenced variable in blocks of
+all `#copy:` tags.
 
-If you specify a variable for the parameter,
-write the variable name after `$settings.`.
+    1:
+        settings: #settings:
+            __Variable__: projectA
+        body1: | #copy-template: command1
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+        body2: | #copy: command2
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+    2:
+        settings: #settings:
+            __Variable__: projectB
+        body1: | #copy: command1
+            mkdir -p  projectB
+            cd        projectB
+        body2: | #copy: command2
+            mkdir -p  projectB  #template: __Variable__
+            cd        projectB  #template: __Variable__
+
+If you don't always refer to variables in the block of
+all `#copy-template:` tags and `#copy:` tags,
+specify the variable at parameters.
+If you specify, write the variable name after `$settings.`.
 
     settings: #settings:
         __VariableA__: projectB
@@ -1416,14 +1443,12 @@ write the variable name after `$settings.`.
         mkdir -p  projectA  #template: __Project__
         cd        projectA  #template: __Project__
 
-Currently, it is not supported to replace the value of
-the variable specified in `#copy-template:` tag or `#copy:` tag
-by replace command.
-
-Even if there are differences in the presence or absence
-of　`#keyword:` tag (including parameters) and
-differences in the content, typrm judged that the sentence is the same
-because typrm avoids to show the same content in the search result.
+Even if there were differences in the presence or absence
+of　`#keyword:` tag or differences in the content of `#keyword:` tag,
+typrm judges that the sentence is the same.
+The reason is that you can put the `#keyword:` tag only
+inside the block of one `#copy-template:` tag
+to avoid searching multiple locations.
 
 ## #if tag: set conditions
 

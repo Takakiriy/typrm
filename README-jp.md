@@ -454,6 +454,7 @@ new_folder.yaml
         - cd    work1  #template: __Name__
 
 `#settings:` に変更する部分に関する 変数名: 値 を書きます。
+変数名は大文字小文字を区別します。
 変更する部分と同じ行の末尾に `#template:` タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
@@ -1345,7 +1346,9 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
 
 - テンプレートとする内容に `#copy-template:` タグを書きます
 - パラメーターを YAML のマッピング形式でコンマの右に指定します
-- 置き換える部分に `#template:` タグを書きます
+  （下記 `{__Project__: projectA}`）
+- 置き換える部分に `#template:` タグを書きます。
+  `#copy:` タグのブロックの中には `#template:` タグを書きません
 <!-- -->
 
     1: | #copy-template: command, {__Project__: projectA}
@@ -1355,10 +1358,33 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
         mkdir -p  projectB
         cd        projectB
 
-`#copy-template:` タグや `#copy:` タグのブロックの中の
-`#template:` タグから `#settings:` タグで定義された変数を参照できません。
+`#copy-template:` タグのブロックの中の
+`#template:` タグから `#settings:` タグで定義された変数を参照することもできます。
+`#copy:` タグの対象となる `#copy-template:` タグがない場合、
+すべての `#copy:` タグの両方のブロックの中に `#template:` タグと参照する変数を書きます。
 
-パラメーターに変数を指定する場合、`$settings.` に続けて変数名を書きます。
+    1:
+        settings: #settings:
+            __Variable__: projectA
+        body1: | #copy-template: command1
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+        body2: | #copy: command2
+            mkdir -p  projectA  #template: __Variable__
+            cd        projectA  #template: __Variable__
+    2:
+        settings: #settings:
+            __Variable__: projectB
+        body1: | #copy: command1
+            mkdir -p  projectB
+            cd        projectB
+        body2: | #copy: command2
+            mkdir -p  projectB  #template: __Variable__
+            cd        projectB  #template: __Variable__
+
+すべての `#copy-template:` タグや `#copy:` タグのブロックの中から
+常に変数を参照するわけではない場合は、パラメーターに変数を指定します。
+指定するときは、`$settings.` に続けて変数名を書きます。
 
     settings: #settings:
         __VariableA__: projectB
@@ -1369,12 +1395,11 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
         mkdir -p  projectA  #template: __Project__
         cd        projectA  #template: __Project__
 
-現在 `#copy-template:` タグや `#copy:` タグに指定する変数の値を
-replace コマンドで置き換えることには対応していません。
-
-`#keyword:` タグ（パラメーターを含む）の有無の違いや内容の違いがあっても
+`#keyword:` タグの有無の違いや `#keyword:` タグの内容に違いがあっても
 同じ文章であると判定します。
-なぜなら、検索結果に同じ内容が表示されるのを避けるためです。
+理由は、`#keyword:` タグを 1つの
+`#copy-template:` タグのブロックの中だけに付けるができることで、
+複数の場所が検索されてしまうことを避けられるようにするためです。
 
 ## #if タグを使って条件を設定します
 

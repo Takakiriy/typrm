@@ -144,7 +144,7 @@ exports[`checks copy tag >> template >> 1 >> NG-1: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 0
+checked file count = 1, template count = 1
 "
 `;
 
@@ -169,7 +169,7 @@ exports[`checks copy tag >> template >> 1 >> NG-2: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
-checked file count = 1, template count = 0
+checked file count = 1, template count = 1
 "
 `;
 
@@ -184,7 +184,7 @@ b: #copy: copy_1, {__VariableA__: a2}
 exports[`checks copy tag >> template >> 1 >> OK: stdout 1`] = `
 "
 Warning: 0, Error: 0
-checked file count = 1, template count = 0
+checked file count = 1, template count = 1
 "
 `;
 
@@ -211,14 +211,14 @@ exports[`checks copy tag >> template >> default value: stdout 1`] = `
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
-checked file count = 1, template count = 0
+checked file count = 1, template count = 1
 "
 `;
 
 exports[`checks copy tag >> template >> variable: sourceFileContents 1`] = `
 "setting: #settings:
     __SetA__: s1
-T: #copy-template: command, {__VariableA__: a1}
+Template: #copy-template: command, {__VariableA__: a1}
     [a1]  #template: [__VariableA__]
 OK: #copy: command, {__VariableA__: $settings.__SetA__}
     [s1]
@@ -226,6 +226,25 @@ NG-1: #copy: command, {__VariableA__: $settings.__SetA__}
     [__Bad__]
 NG-2: #copy: command, {__VariableA__: $settings.__Undefined__}
     [s1]
+Template in copy:
+    Template: #copy-template: command2, {__VariableA__: a1}
+        s1:  #template: __SetA__
+        [a1]  #template: [__VariableA__]
+    OK: #copy: command2, {__VariableA__: a2}
+        s1:  #template: __SetA__
+        [a2]
+    NG: #copy: command2, {__VariableA__: a2}
+        bad:  #template: __SetA__
+        [a2]
+    other setting:
+        setting: #settings:
+            __SetA__: ss1
+        OK: #copy: command2, {__VariableA__: aa1}
+            ss1:  #template: __SetA__
+            [aa1]
+        NG: #copy: command2, {__VariableA__: aa1}
+            bad:  #template: __SetA__
+            [aa1]
 "
 `;
 
@@ -234,12 +253,31 @@ exports[`checks copy tag >> template >> variable: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: NG-2: #copy: command, {__VariableA__: $settings.__Undefined__}
     Error: undefined variable
 
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __SetA__: s1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         bad:  #template: __SetA__
+    Warning: Not matched with the template.
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:23:             __SetA__: ss1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             bad:  #template: __SetA__
+    Warning: Not matched with the template.
+
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     [s1]
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     [__Bad__]
     Warning: Not same as #copy tag contents
 
-Warning: 1, Error: 1
-checked file count = 1, template count = 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         good_color($settings.__SetA__):  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         bad_color(bad):  #template: __SetA__
+    Warning: Not same as #copy tag contents
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         good_color($settings.__SetA__):  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             bad_color(bad):  #template: __SetA__
+    Warning: Not same as #copy tag contents
+
+Warning: 5, Error: 1
+checked file count = 1, template count = 7
 "
 `;
 
@@ -1052,6 +1090,33 @@ test_of_duplicated_variable_name_error:
         target1: banana
         nest:
             target1: yellow
+"
+`;
+
+exports[`checks template value >> case_sensitive_variable_name: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable__: Value
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     value: #template: __Variable__  #// The value is different in case
+    Warning: Not matched with the template.
+    Expected: Value
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 4
+"
+`;
+
+exports[`checks template value >> case_sensitive_variable_name: sourceFileContents 1`] = `
+"settings: #settings:
+    __Variable__: Value
+    __variable__: value2
+    __variable2__: Value2
+OK:
+    Value: #template: __Variable__
+    value2: #template: __variable__
+    Value2: #template: __variable2__
+NG:
+    value: #template: __Variable__  #// The value is different in case
 "
 `;
 
@@ -1931,6 +1996,68 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
         bad2  #template: var2
     #if: false
         bad2  #template: var2
+"
+`;
+
+exports[`replaces in copy tag >> template >> 1: sourceFileContents 1`] = `
+"setting: #settings:
+    __VarA__: valueA  #to: replacedA
+    __VarB__: valueB  #to: replacedB
+variable in copy blocks:
+    Template: #copy: variable in copy copy
+        <valueA>  #template: <__VarA__>
+    Copy: #copy: variable in copy copy
+        <valueA>  #template: <__VarA__>
+variable in copy-template:
+    Template: #copy-template: variable in copy-template, {__VariableA__: $settings.__VarB__}
+        (valueB)  #template: (__VariableA__)
+    Copy: #copy: variable in copy-template, {__VariableA__: a1}
+        (a1)
+variable in copy:
+    Template: #copy-template: variable in copy, {__VariableA__: a1}
+        [a1]  #template: [__VariableA__]
+    Copy: #copy: variable in copy, {__VariableA__: $settings.__VarB__}
+        [valueB]
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__VarB__}
+        <valueB>  #template: <__VariableA__>
+        <valueA>  #template: <__VarA__>
+        <valueB, valueA>  #template: <__VariableA__, __VarA__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <valueA>
+        <a1, valueA>
+"
+`;
+
+exports[`replaces in copy tag >> template >> 1: updatedFileContents 1`] = `
+"setting: #settings:
+    __VarA__: replacedA  #original: valueA
+    __VarB__: replacedB  #original: valueB
+variable in copy blocks:
+    Template: #copy: variable in copy copy
+        <replacedA>  #template: <__VarA__>
+    Copy: #copy: variable in copy copy
+        <replacedA>  #template: <__VarA__>
+variable in copy-template:
+    Template: #copy-template: variable in copy-template, {__VariableA__: $settings.__VarB__}
+        (replacedB)  #template: (__VariableA__)
+    Copy: #copy: variable in copy-template, {__VariableA__: a1}
+        (a1)
+variable in copy:
+    Template: #copy-template: variable in copy, {__VariableA__: a1}
+        [a1]  #template: [__VariableA__]
+    Copy: #copy: variable in copy, {__VariableA__: $settings.__VarB__}
+        [replacedB]
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__VarB__}
+        <replacedB>  #template: <__VariableA__>
+        <replacedA>  #template: <__VarA__>
+        <replacedB, replacedA>  #template: <__VariableA__, __VarA__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <replacedA>
+        <a1, replacedA>
 "
 `;
 
@@ -3540,6 +3667,61 @@ case B after:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_12_case_sensitive_variable: sourceFileContents 1`] = `
+"settings: #settings:
+    __Variable__: Value
+    __variable__: value2
+    __variable2__: Value2
+body:
+    Value: #template: __Variable__
+    value2: #template: __variable__
+    Value2: #template: __variable2__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_12_case_sensitive_variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Variable__: After
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __variable__: after2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __variable2__: After2
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_12_case_sensitive_variable: updatedFileContents 1`] = `
+"settings: #settings:
+    __Variable__: After  #original: Value
+    __variable__: after2  #original: value2
+    __variable2__: After2  #original: Value2
+body:
+    After: #template: __Variable__
+    after2: #template: __variable__
+    After2: #template: __variable2__
+"
+`;
+
+exports[`replaces settings >> in bug_1_template_in_copy_tag: sourceFileContents 1`] = `
+"settings: #settings:
+    variable: value
+copy template: #copy-template: copy1, { (variable): example }
+    example:  #template: (variable)
+"
+`;
+
+exports[`replaces settings >> in bug_1_template_in_copy_tag: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces settings >> in bug_1_template_in_copy_tag: updatedFileContents 1`] = `
+"settings: #settings:
+    variable: value
+copy template: #copy-template: copy1, { (variable): example }
+    example:  #template: (variable)
 "
 `;
 

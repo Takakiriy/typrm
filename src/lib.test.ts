@@ -67,6 +67,15 @@ describe("string >>", () => {
                 expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
             });
         });
+
+        test("replaced indices >>", () => {
+            const  replacedIndices: number[] = [];
+            const  unexpectedLine = lib.unexpandVariable('abc_def_$g',
+                [['${abc}', 'def'], ['${d}', 'abc'], ['${n}', 'not found'], ['\\$', '$']],
+                replacedIndices);
+            expect(replacedIndices).toStrictEqual([0, 1, 3]);
+            expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
+        });
     });
 
     describe("checkFileContents >>", () => {
