@@ -730,6 +730,7 @@ describe("replaces settings >>", () => {
 describe("replaces in copy tag >>", () => {
     test.each([
         ['template >> 1'],
+        ['template >> error_not_found_variable'],
 
     ])("%s", async (caseName) => {
         const {filePath} = initializeTestInputFile(`replaces in copy tag >> ${caseName}: sourceFileContents 1`);
@@ -743,6 +744,7 @@ describe("replaces in copy tag >>", () => {
 
         chdirInProject('src');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
+        expect(main.stdout).toMatchSnapshot('stdout');
         lib.rmdirSync(testFolderPath + '_tmp');
     });
 });

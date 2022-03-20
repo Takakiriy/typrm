@@ -2092,6 +2092,14 @@ variable in template and copy block:
 "
 `;
 
+exports[`replaces in copy tag >> template >> 1: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __VarA__: replacedA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __VarB__: replacedB
+
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces in copy tag >> template >> 1: updatedFileContents 1`] = `
 "setting: #settings:
     __VarA__: replacedA  #original: valueA
@@ -2120,6 +2128,47 @@ variable in template and copy block:
         <a1>
         <replacedA>
         <a1, replacedA>
+"
+`;
+
+exports[`replaces in copy tag >> template >> error_not_found_variable: sourceFileContents 1`] = `
+"setting: #settings:
+    __VarA__: valueA  #to: replacedA
+    __VarB__: valueB  #to: replacedB
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__Unknown__}
+        <valueB>  #template: <__VariableA__>
+        <valueA>  #template: <__Unknown__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <valueA>
+"
+`;
+
+exports[`replaces in copy tag >> template >> error_not_found_variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __VarA__: replacedA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __VarB__: replacedB
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__Unknown__}
+    Error: Not found specified variable name.
+    Variable: __Unknown__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces in copy tag >> template >> error_not_found_variable: updatedFileContents 1`] = `
+"setting: #settings:
+    __VarA__: valueA  #to: replacedA
+    __VarB__: valueB  #to: replacedB
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__Unknown__}
+        <valueB>  #template: <__VariableA__>
+        <valueA>  #template: <__Unknown__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <valueA>
 "
 `;
 
