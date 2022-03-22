@@ -354,7 +354,7 @@ describe("checks copy tag >>", () => {
 });
 
 describe("replaces settings >>", () => {
-    test.each([
+    test.only.each([
         [
             '1_replace', '', 'en-US', null,
         ],[
@@ -448,11 +448,16 @@ describe("replaces settings >>", () => {
                     { from: '__variable2__: Value2',  to: '__variable2__: Value2  #to: After2' },
                 ]},
         ],[
+            '2_replace_13_same_as_tag', '', 'en-US', null,
+        ],[
+            '2_replace_13_same_as_tag', ' error', 'en-US', null,
+        ],[
             'bug_1_template_in_copy_tag', '', 'en-US', null,
         ],
         // There are other cases in "replace to tag" test.
 
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
+if (fileNameHead !== '2_replace_13_same_as_tag' || _subCaseName !== '') {return;}
         const {filePath} = initializeTestInputFile(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
         if (option) {
             lib.replaceFileSync(filePath, (text)=>(lib.replace(text, option.replacers)))
@@ -468,6 +473,7 @@ describe("replaces settings >>", () => {
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         lib.rmdirSync(testFolderPath + '_tmp');
+expect('test code').toBe('deleted skip code.');
     });
 
     describe("Multi folder >>", () => {
