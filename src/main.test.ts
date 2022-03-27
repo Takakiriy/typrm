@@ -297,7 +297,7 @@ describe("checks file contents >>", () => {
 describe("checks copy tag >>", () => {
     const  goodColor = chalk.bgGreen.black;
     const  badColor = chalk.bgRed.black;
-    test.each([
+    test.only.each([
         ['1 >> OK', null],
         ['1 >> NG', { replacers:[
             { from: 'bbb',  to: goodColor('bbb') },
@@ -311,14 +311,14 @@ describe("checks copy tag >>", () => {
         ]}],
         ['template >> 1 >> OK', null],
         ['template >> 1 >> NG-1', { replacers:[
-            { from: 'a2',  to: `a${goodColor('2')}` },
-            { from: '__Bad__',  to: `${badColor('__B')}a${badColor('d__')}` },
+            { from: 'good_color($copy.__VariableA__)',  to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__` },
+            { from: 'bad_color(__Bad__)',  to: `__${badColor('B')}a${badColor('d')}__` },
         ]}],
         ['template >> 1 >> NG-2', { replacers:[
-            { from: '(__Bad__)  #template: (__VariableA__)',  to: `(${goodColor('__B')}a${goodColor('d__')})${goodColor('  #template: (__VariableA__)')}` },
-            { from: 'a2',  to: `a${badColor('2')}` },
-            { from: '(__Bad__)  #template: (__VariableA__)',  to: `(${goodColor('__B')}a${goodColor('d__')})${goodColor('  #template: (__VariableA__)')}` },
-            { from: 'a2',  to: `a${badColor('2')}` },
+            { from: 'good_color(__Bad__)',  to: `__${goodColor('B')}a${goodColor('d')}__` },
+            { from: 'bad_color($copy.__VariableA__)',  to: `${badColor('$copy.')}__${badColor('V')}a${badColor('riableA')}__` },
+            { from: 'good_color(__Bad__)',  to: `__${goodColor('B')}a${goodColor('d')}__` },
+            { from: 'bad_color($copy.__VariableA__)',  to: `${badColor('$copy.')}__${badColor('V')}a${badColor('riableA')}__` },
         ]}],
         ['template >> default value', { replacers:[
             { from: '(a1, b2)',  to: `(a${goodColor('1')}, b2)` },
@@ -327,8 +327,12 @@ describe("checks copy tag >>", () => {
             { from: '(a1, __Bad__)',  to: `(a1, ${badColor('__Bad__')})` },
         ]}],
         ['template >> variable', { replacers:[
-            { from: '[s1]',  to: `[${goodColor('s1')}]` },
+            { from: 'good_color($copy.__VariableA__)',  to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__` },
+            { from: 'bad_color(__Bad__)',  to: `__${badColor('B')}a${badColor('d')}__` },
+            { from: '[$copy.__VariableA__]',  to: `[${goodColor('$copy.__VariableA__')}]` },
             { from: '__Bad__',  to: `${badColor('__Bad__')}` },
+            { from: 'good_color($copy.__VariableA__)',  to: `${goodColor('$copy.__VariableA__')}` },
+            { from: 'bad_color(s1)',  to: badColor('s1') },
             { from: 'good_color($settings.__SetA__)',  to: `${goodColor('$settings.__SetA__')}` },
             { from: 'bad_color(bad):',  to: `${badColor('bad')}:` },
             { from: 'good_color($settings.__SetA__)',  to: `${goodColor('$settings.__SetA__')}` },
@@ -336,6 +340,7 @@ describe("checks copy tag >>", () => {
         ]}],
 
     ])("%s", async (caseName, option) => {
+// if (caseName !== 'template >> variable') {return;}  // || subCase !== '____'
         const {filePath} = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);
         var  inputContents = lib.getSnapshot(`checks copy tag >> ${caseName}: stdout 1`);
         if (option) {
@@ -349,6 +354,7 @@ describe("checks copy tag >>", () => {
 
         chdirInProject('src');
         expect(main.stdout).toBe(inputContents);
+// expect('test code').toBe('deleted skip code.');
     });
 });
 
