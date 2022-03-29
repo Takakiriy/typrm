@@ -340,9 +340,9 @@ function getIndentWithoutHyphen(line) {
     }
     return indentWithoutHyphen;
 }
-// checkTextContents
+// checkExpectedTextContents
 // This ignores different indent depth and different indent width.
-export function checkTextContents(testingContents, expectedParts, anyLinesTag) {
+export function checkExpectedTextContents(testingContents, expectedParts, anyLinesTag) {
     return _main(testingContents, expectedParts, anyLinesTag);
     function _main(testingContents, expectedParts, anyLinesTag) {
         const contents = testingContents;

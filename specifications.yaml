@@ -26,13 +26,14 @@ tag:
         code:
             #// parent: #search: checkRoutine
             check:  #ref: ${GitHub}/typrm/src/main.ts#function  check(
+                CopyTag.scanAllTemplate:  #ref: ${GitHub}/typrm/src/main.ts#// CopyTag.scanAllTemplate
                 checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#function  checkRoutine
-                    #   // Start a "#copy:" tag block
-                    #   // Get "#copy:" tag contents
-                checkCopyTag:  #ref: ${GitHub}/typrm/src/main.ts#function  checkCopyTag
-            #// parent: #search: replaceSub
-            replaceSub:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
-                #    // #copy tag
+                    CheckParser.evaluate:  #ref: ${GitHub}/typrm/src/main.ts#// CheckParser.evaluate
+                CopyTag.check:  #ref: ${GitHub}/typrm/src/main.ts#// CopyTag.check
+            replace:
+                #// parent: #search: replaceSub
+                replaceSub:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
+                    makeTemplatesInCopyTag:
     if tag:  #keyword:#if:
         outOfFalseBlocks:  #search:
     settings tag:  #keyword:#settings:

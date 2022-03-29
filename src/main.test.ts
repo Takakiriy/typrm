@@ -297,7 +297,7 @@ describe("checks file contents >>", () => {
 describe("checks copy tag >>", () => {
     const  goodColor = chalk.bgGreen.black;
     const  badColor = chalk.bgRed.black;
-    test.only.each([
+    test.each([
         ['1 >> OK', null],
         ['1 >> NG', { replacers:[
             { from: 'bbb',  to: goodColor('bbb') },
@@ -321,10 +321,10 @@ describe("checks copy tag >>", () => {
             { from: 'bad_color($copy.__VariableA__)',  to: `${badColor('$copy.')}__${badColor('V')}a${badColor('riableA')}__` },
         ]}],
         ['template >> default value', { replacers:[
-            { from: '(a1, b2)',  to: `(a${goodColor('1')}, b2)` },
-            { from: '(__Bad__, b2)',  to: `(${badColor('__B')}a${badColor('d__')}, b2)` },
-            { from: '(a1, b2)',  to: `(a1, ${goodColor('b2')})` },
-            { from: '(a1, __Bad__)',  to: `(a1, ${badColor('__Bad__')})` },
+            { from: 'good_color($copy.__VariableA__, $copy.__VariableB__)',  to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__, ${goodColor('$copy.__Varia')}b${goodColor('leB__')}` },
+            { from: 'bad_color(__Bad__, b2)',  to: `__${badColor('B')}a${badColor('d')}__, b${badColor('2')}` },
+            { from: 'good_color($copy.__VariableA__, $copy.__VariableB__)',  to: `${goodColor('$copy.__V')}a${goodColor('riableA__')}, ${goodColor('$copy.')}__${goodColor('Variable')}B__` },
+            { from: 'bad_color(a1, __Bad__)',  to: `a${badColor('1')}, __B${badColor('ad')}__` },
         ]}],
         ['template >> variable', { replacers:[
             { from: 'good_color($copy.__VariableA__)',  to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__` },
@@ -340,7 +340,6 @@ describe("checks copy tag >>", () => {
         ]}],
 
     ])("%s", async (caseName, option) => {
-// if (caseName !== 'template >> variable') {return;}  // || subCase !== '____'
         const {filePath} = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);
         var  inputContents = lib.getSnapshot(`checks copy tag >> ${caseName}: stdout 1`);
         if (option) {
@@ -354,7 +353,6 @@ describe("checks copy tag >>", () => {
 
         chdirInProject('src');
         expect(main.stdout).toBe(inputContents);
-// expect('test code').toBe('deleted skip code.');
     });
 });
 

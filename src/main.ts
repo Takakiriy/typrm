@@ -2256,7 +2256,7 @@ namespace CopyTag {
     // CopyTag.CheckParser
     export class  CheckParser {
         parsingCopyTag: CopyTag.Properties | undefined = undefined;
-        templateCopyTag: CopyTag.Properties | undefined = undefined;
+        copyTemplateTag: CopyTag.Properties | undefined = undefined;
         copyTagIndent = '';
         settingAndCopyTagParameters: Settings = {};
         comparableDollers: Settings = {};
@@ -2292,7 +2292,7 @@ namespace CopyTag {
                             copyName,
                             contents: [], arguments: {}, argumentNames: {},
                         };
-                        this.templateCopyTag = copyTags.find(item => (item.copyName === copyName  &&  item.tagName === copyTemplateLabel));
+                        this.copyTemplateTag = copyTags.find(item => (item.copyName === copyName  &&  item.tagName === copyTemplateLabel));
                         copyTags.push(this.parsingCopyTag);
 
                     // if copyTemplateLabel
@@ -2303,7 +2303,7 @@ namespace CopyTag {
 
                         this.parsingCopyTag = copyTags.find(item => (item.copyName === copyName))!;
                         this.parsingCopyTag.contents = [];
-                        this.templateCopyTag = undefined;
+                        this.copyTemplateTag = undefined;
                     }
                     const  {evaluated: evaluatedCopyTagValue, isError} = evaluateSettingsDotVariable(this.parsingCopyTag.value, setting);
                     if (isError) {
@@ -2328,8 +2328,13 @@ namespace CopyTag {
                             };
                         }
                         if (firstCommaIndex !== notFound) {
-                            const  copyArguments = Object.entries(
-                                yaml.load(this.parsingCopyTag.value.substring(firstCommaIndex + 1)) as {[name: string]: string})
+                            const  specifiedCopyArguments = yaml.load(this.parsingCopyTag.value.substring(firstCommaIndex + 1)) as {[name: string]: string};
+                            if (this.copyTemplateTag) {
+                                const  defaultArguments = yaml.load(this.copyTemplateTag.value.substring(firstCommaIndex + 1)) as {[name: string]: string};
+                                var  copyArguments = Object.entries({... defaultArguments, ... specifiedCopyArguments});
+                            } else {
+                                var  copyArguments = Object.entries(specifiedCopyArguments);
+                            }
                             for (const [copyTagArgumentName, copyTagArgumentValue] of copyArguments) {
 
                                 this.settingAndCopyTagParameters[copyTagArgumentName] = {
@@ -2357,17 +2362,17 @@ namespace CopyTag {
         _evaluateCopyTagContents(line: string, copyTags: CopyTag.Properties[], templateTag: TemplateTag, setting: Settings, parser: Parser) {
             if (this.parsingCopyTag) {
                 if (line.startsWith(this.copyTagIndent) || line.trim() === '') {
-                    if (this.templateCopyTag) {
+                    if (this.copyTemplateTag) {
                         const  lineNumOffset = this.parsingCopyTag.contents.length;
-                        const  line = this.templateCopyTag.contents[lineNumOffset];
+                        const  line = this.copyTemplateTag.contents[lineNumOffset];
                         templateTag = parseTemplateTag(line, parser);
                     }
                     if (templateTag.isFound) {
-                        const  {expected,  log: variablesInTemplate} = getExpectedLineAndEvaluationLog(this.settingAndCopyTagParameters, templateTag.template);
-                        const  replaced = getReplacedLine(this.comparableDollers, templateTag.template, {});
+                        const  {expected: expectedText,  log: variablesInTemplate} = getExpectedLineAndEvaluationLog(this.settingAndCopyTagParameters, templateTag.template);
+                        const  replacedTextContainsDoller = getReplacedLine(this.comparableDollers, templateTag.template, {});
                         const  checkingLineWithoutTemplate = line.substring(0, templateTag.indexInLine);
 
-                        var  comparableLine = checkingLineWithoutTemplate.replace(expected, replaced) +
+                        var  comparableLine = checkingLineWithoutTemplate.replace(expectedText, replacedTextContainsDoller) +
                             line.substring(templateTag.indexInLine);
                     } else {
                         var  comparableLine = line;
@@ -2376,7 +2381,7 @@ namespace CopyTag {
                     this.parsingCopyTag.contents.push(comparableLine);
                 } else {
                     this.parsingCopyTag = undefined;
-                    this.templateCopyTag = undefined;
+                    this.copyTemplateTag = undefined;
                     this.settingAndCopyTagParameters = {};
                 }
             }
@@ -4033,9 +4038,6 @@ function  getReplacedCopyTagContents(copyTag: CopyTag.Properties, sourceCopyTag:
             const  sourceLine = sourceCopyTag.contents[lineNum - 1];
             const  replacingLine = copyTag.contents[lineNum - 1];
             const  templateTag = parseTemplateTag(sourceLine, parser);
-if (copyTag.lineNum === 5) {
-pp('')
-}
             if (templateTag.isFound  &&  templateTag.includesKey(replacingKeys)) {
                 var  expected = getExpectedLine(oldSetting, templateTag.template);
                 var  replaced = getReplacedLine(newSetting, templateTag.template, {});

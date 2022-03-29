@@ -139,8 +139,8 @@ b: #copy: copy_1, {__VariableA__: a2}
 
 exports[`checks copy tag >> template >> 1 >> NG-1: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (a2)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (good_color($copy.__VariableA__))  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (bad_color(__Bad__))  #template: (__VariableA__)
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
@@ -160,15 +160,20 @@ indent: #copy: copy_1, {__VariableA__: a2}
 
 exports[`checks copy tag >> template >> 1 >> NG-2: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (a2)
-    Warning: Not same as #copy tag contents
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         (a2)
+    Warning: Not matched with the template.
+    Expected: (a1)
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (good_color(__Bad__))  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (bad_color($copy.__VariableA__))  #template: (__VariableA__)
     Warning: Not same as #copy tag contents
 
-Warning: 2, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (good_color(__Bad__))  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         (bad_color($copy.__VariableA__))  #template: (__VariableA__)
+    Warning: Not same as #copy tag contents
+
+Warning: 3, Error: 0
 checked file count = 1, template count = 1
 "
 `;
@@ -202,12 +207,12 @@ T: #copy-template: copy_1, {__VariableA__: a1, __VariableB__: b1}
 
 exports[`checks copy tag >> template >> default value: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__, b2)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (good_color($copy.__VariableA__, $copy.__VariableB__))  #template: (__VariableA__, __VariableB__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (bad_color(__Bad__, b2))  #template: (__VariableA__, __VariableB__)
     Warning: Not same as #copy tag contents
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     (a1, __Bad__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (good_color($copy.__VariableA__, $copy.__VariableB__))  #template: (__VariableA__, __VariableB__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     (bad_color(a1, __Bad__))  #template: (__VariableA__, __VariableB__)
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0

@@ -134,7 +134,7 @@ interface Setting {
     value: string;
     lineNum: number;
     settingsIndex: string;
-    tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyParameter' | 'env';
+    tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyArgument' | 'env';
     isReferenced: boolean;
 }
 declare class Parser {
