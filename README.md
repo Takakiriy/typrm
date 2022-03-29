@@ -1034,7 +1034,10 @@ In the above case, if you do not enclose the value of the `#template:` tag in " 
     cd  "react1"  #template: __ProjectName__
 
 ` #` (blank and #) are interpreted as the next tag or comment.
-If you want to include ` #` (blank and #) in your template, write `"%20"#`.
+If you want to include ` #` (blank and #) in your template,
+escape with `%`. write `"%20"#`.
+If you write `"%20"#` in the parameter of the `#keyword:` tag,
+it is the next word starting with `#`.
 When specifying a template that contains `"%`, write`""%25"`.
 
     cd  "react1 #"  <!-- #template: __ProjectName__"%20"# #-->

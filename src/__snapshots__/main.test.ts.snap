@@ -139,8 +139,8 @@ b: #copy: copy_1, {__VariableA__: a2}
 
 exports[`checks copy tag >> template >> 1 >> NG-1: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (a2)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (good_color($copy.__VariableA__))  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (bad_color(__Bad__))  #template: (__VariableA__)
     Warning: Not same as #copy tag contents
 
 Warning: 1, Error: 0
@@ -160,15 +160,20 @@ indent: #copy: copy_1, {__VariableA__: a2}
 
 exports[`checks copy tag >> template >> 1 >> NG-2: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (a2)
-    Warning: Not same as #copy tag contents
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (__Bad__)  #template: (__VariableA__)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         (a2)
+    Warning: Not matched with the template.
+    Expected: (a1)
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (good_color(__Bad__))  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (bad_color($copy.__VariableA__))  #template: (__VariableA__)
     Warning: Not same as #copy tag contents
 
-Warning: 2, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     (good_color(__Bad__))  #template: (__VariableA__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         (bad_color($copy.__VariableA__))  #template: (__VariableA__)
+    Warning: Not same as #copy tag contents
+
+Warning: 3, Error: 0
 checked file count = 1, template count = 1
 "
 `;
@@ -202,12 +207,12 @@ T: #copy-template: copy_1, {__VariableA__: a1, __VariableB__: b1}
 
 exports[`checks copy tag >> template >> default value: stdout 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (__Bad__, b2)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (good_color($copy.__VariableA__, $copy.__VariableB__))  #template: (__VariableA__, __VariableB__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     (bad_color(__Bad__, b2))  #template: (__VariableA__, __VariableB__)
     Warning: Not same as #copy tag contents
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (a1, b2)
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     (a1, __Bad__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     (good_color($copy.__VariableA__, $copy.__VariableB__))  #template: (__VariableA__, __VariableB__)
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     (bad_color(a1, __Bad__))  #template: (__VariableA__, __VariableB__)
     Warning: Not same as #copy tag contents
 
 Warning: 2, Error: 0
@@ -226,6 +231,11 @@ NG-1: #copy: command, {__VariableA__: $settings.__SetA__}
     [__Bad__]
 NG-2: #copy: command, {__VariableA__: $settings.__Undefined__}
     [s1]
+Same name variable:
+    Template: #copy-template: same name, {__SetA__: a1}
+        [a1]  #template: [__SetA__]
+    OK: #copy: same name, {__SetA__: b1}
+        [b1]
 Template in copy:
     Template: #copy-template: command2, {__VariableA__: a1}
         s1:  #template: __SetA__
@@ -255,29 +265,35 @@ exports[`checks copy tag >> template >> variable: stdout 1`] = `
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: setting: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __SetA__: s1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         bad:  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:24:         bad:  #template: __SetA__
     Warning: Not matched with the template.
+    Expected: s1
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: setting: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         setting: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:23:             __SetA__: ss1
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             bad:  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             __SetA__: ss1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:             bad:  #template: __SetA__
     Warning: Not matched with the template.
+    Expected: ss1
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     [s1]
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     [__Bad__]
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     [good_color($copy.__VariableA__)]  #template: [__VariableA__]
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     [bad_color(__Bad__)]  #template: [__VariableA__]
     Warning: Not same as #copy tag contents
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         good_color($settings.__SetA__):  #template: __SetA__
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         bad_color(bad):  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     [good_color($copy.__VariableA__)]  #template: [__VariableA__]
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     [bad_color(s1)]  #template: [__VariableA__]
     Warning: Not same as #copy tag contents
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         good_color($settings.__SetA__):  #template: __SetA__
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             bad_color(bad):  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         good_color($settings.__SetA__):  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:24:         bad_color(bad):  #template: __SetA__
     Warning: Not same as #copy tag contents
 
-Warning: 5, Error: 1
-checked file count = 1, template count = 7
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         good_color($settings.__SetA__):  #template: __SetA__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:             bad_color(bad):  #template: __SetA__
+    Warning: Not same as #copy tag contents
+
+Warning: 6, Error: 1
+checked file count = 1, template count = 8
 "
 `;
 

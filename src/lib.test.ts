@@ -82,7 +82,7 @@ describe("string >>", () => {
 
         describe("basic >>", () => {
             test("Same", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         'Line 2',
@@ -96,7 +96,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> Not found expected line 1", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         'Line 2',
@@ -118,7 +118,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> Different at many expected line", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         '2: unexpected',
@@ -185,7 +185,7 @@ describe("string >>", () => {
             });
 
             test("Same >> empty line", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         '    Line 1',
                         '',
@@ -350,7 +350,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> Different indent", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         '    Line 1',
                         '    Line 2',
@@ -372,7 +372,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> deeper and shallower", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         '    Line 2',
@@ -396,7 +396,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> shallow level", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         '    Line 2',
@@ -422,7 +422,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> shallow level >> opposite", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         '    Line 2',
@@ -669,7 +669,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> YAML comment with the hyphen in parts second line", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'block:',
                         '    - #// bad comment',
@@ -695,7 +695,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> shallow level", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         '    Line 2',
@@ -721,7 +721,7 @@ describe("string >>", () => {
             });
 
             test("Diff >> shallow level >> opposite", () => {
-                const  unexpectedLine = lib.checkTextContents([
+                const  unexpectedLine = lib.checkExpectedTextContents([
                         // testingContents
                         'Line 1',
                         '    Line 2',
@@ -764,7 +764,7 @@ describe("string >>", () => {
         function  simpleTestOfCheckFileContents(testData: testOfCheckFileContentsTestData) {
             const  { testingContents, expectedParts } = testData;
 
-            const  unexpectedLine = lib.checkTextContents(
+            const  unexpectedLine = lib.checkExpectedTextContents(
                 testingContents,
                 expectedParts,
                 anyLinesTag);
@@ -781,7 +781,7 @@ describe("string >>", () => {
             indentDiff = indentDiff || 0;
 
             // Test case of unexpected parts
-            const  unexpectedLine = lib.checkTextContents(
+            const  unexpectedLine = lib.checkExpectedTextContents(
                 testingContents.map((line) =>
                     (line.includes(replaceContentsLine) ? '(unexpected)': line)),
                 expectedParts,

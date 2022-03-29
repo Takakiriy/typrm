@@ -35,7 +35,7 @@ export declare function cutLeftOf(input: string, keyword: string): string;
 export declare function cutLast(input: string, keyword: string): string;
 export declare function cutIndent(lines: string[]): string[];
 export declare function unexpandVariable(expanded: string, keyValues: string[][], out_replacedIndices?: number[] | null): string;
-export declare function checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
+export declare function checkExpectedTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
 export declare function coloredDiff(redLine: string, greenLine: string, redHeaderLength?: number, greenHeaderLength?: number): ColoredDiff;
 interface ColoredDiff {
     greenLine: string;

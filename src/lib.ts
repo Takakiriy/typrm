@@ -391,9 +391,9 @@ function  getIndentWithoutHyphen(line: string): string | null {
     return  indentWithoutHyphen;
 }
 
-// checkTextContents
+// checkExpectedTextContents
 // This ignores different indent depth and different indent width.
-export function  checkTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string
+export function  checkExpectedTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string
         ): UnexpectedLine | null {
 
     return  _main(testingContents, expectedParts, anyLinesTag);

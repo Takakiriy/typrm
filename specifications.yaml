@@ -1,106 +1,152 @@
-タグ一覧:
-    README: #ref: ${GitHub}/typrm/README-jp.md### タグ一覧
-    コード: #ref: ${GitHub}/typrm/src/main.ts#const  originalLabel = 
-Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
-    main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
-    拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:
-    ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです:
-Test >> reset 2_replace_6_if both:  #keyword: typrm reset 2_replace_6_if both
-    replace command:
-        settingTree.currentSettings:
-            lineNum ==  1: banana, yes
-        toTagTree.currentOldSettingsInIfBlock:
-            lineNum ==  1: banana, yes
-            lineNum == 12: melon, no
-    reset command:
-        settingTree.currentSettings:  #// oldSetting
-            lineNum ==  1: melon, replaced
-        return_.currentOldSettingsInIfBlock:
-            lineNum ==  1: melon, replaced
-            lineNum ==  8: melon, replaced
-            lineNum == 10: {}
-            lineNum == 12: melon, replaced
-        return_.currentNewSettingsByOriginalTag:
-            lineNum ==  1: banana, yes
-        return_.currentNewSettingsByOriginalTagInIfBlock; outOfFalseBlockByOriginalTag:
-            lineNum ==  1: banana, yes;  true
-            lineNum ==  8: banana, yes;  true
-            lineNum == 10: "{};          false"
-            lineNum == 12: banana, yes;  true
-        return_.currentNewSettings:
-            （reset では対象外）
-    課題）複数の if ブロックの中に original タグがあるときの reset :  #keyword: typrm reset with if tag
-        reset する対象のファイルのサンプル:
-            settings:
-                fruit: banana
-                banana:  #if: $settings.fruit == banana
-                    __Setting1__: yes
-                not banana:  #if: $settings.fruit != banana
-                    __Setting1__: no
-        解決法:
-            - 一時的に if の条件を満たす設定に変えて、if ブロック内の定義を戻す
-            - # replace {fruit: banana}, reset {__Setting1__: yes}
-            - # replace {fruit: __not_banana}, reset {__Setting1__: no}
-            - # {fruit: banana}
-            - original タグが残っていたら警告する。別の設定セットに残っていても
-    課題）if で参照されている変数と if ブロック内で定義している変数を内部では同時に変更できない:  #keyword: typrm replace with if tag
-        置き換える対象のファイルのサンプル:
-            settings:
-                fruit: banana
-                banana:  #if: $settings.fruit == banana
-                    __Setting1__: yes
-                not banana:  #if: $settings.fruit != banana
-                    __Setting1__: no
-            check:
-                yes:  #template: __Setting1__
-                banana:  #if: $settings.fruit == banana
-                    yes  #template: __Setting1__
-                not banana:  #if: $settings.fruit != banana
-                    no  #template: __Setting1__
-        解決法:
-            if ブロック内で定義している変数は、if で参照されている変数が置き換えた後にすること
-        理由:
-            置き換えるときに指定するパラメーター: { fruit: melon, __Settings1__: replaced }
-            このとき、同時に置き換えると、置き換える前が [check/yes] と [check/not banana/no] の2種類(yes, no)あり、置き換える範囲が曖昧になって良くない:
-                サンプル）ある変数がとりうる値が aa, aaa だけのとき、置き換える前の値として 2種類を認めてしまうと aaa が aaaa に置き換わる可能性があり、良くない:
-            先に fruit を置き換えるときの置き換える前は、[check/yes] のみ:
-            次に __Settings1__ を置き換えるときの置き換える前は、(check/yesだった)[check/no] と [check/not banana/no] で 1種類（2箇所）:
-        コードの説明:
-            IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
-settingStack of typrm makeSettingTree: #keyword:
-    overview: |
-        'settingStack' has parent indentLevel.
-    example:
-        YAML: |
-            1:  A:
-            2:      setting:
-            :
-            15:     A:
-            16:         setting:
-            31:     B:
-            32:         setting:
-        lineNum = 16 >> settingStack: |
-            { lineNum:  0, index: '/',    indentLevel: 0, ...}
-            { lineNum:  2, index: '/1',   indentLevel: 4, ...}
-            { lineNum: 16, index: '/1/1', indentLevel: 8, ...}
-        lineNum = 31 >> settingStack: |  #focus: /1/2
-            { lineNum:  0, index: '/', ...}
-            { lineNum:  2, index: '/1', ...}
-            { lineNum:  0, index: '/1/2', ...}
-        lineNum = 32 >> settingStack: |
-            { lineNum:  0, index: '/', ...}
-            { lineNum:  2, index: '/1', ...}
-            { lineNum: 32, index: '/1/2', ...}
-outOfFalseBlocks:  #focus: outOfFalseBlocks, indicesWithIf
-    moveToLine (SettingsTree):
-        moveToLine_Immutably:
-            addCurrentSettingsInIfTag_Immutably:
-                # class SettingsTree {
-                #     addCurrentSettingsInIfTag_Immutably(
-                #         for (const [lineNum, index] of Array.from(settingsTree.indicesWithIf.entries())) {
-                #             outOfFalseBlocks.set(lineNum, falseIndex == disabledFalseIndex);
-    moveToLine (ReplaceToTagTree):
-        moveToLine_Immutably:
-            # class ReplaceToTagTree {
-            #     moveToLine_Immutably(parser: Parser, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_for_moveToLine {
-            #         return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;
+#keyword: typrm specifications
+command:
+    check:  #keyword: typrm check
+        code:
+            #// parent: #search: mainMain
+            check:  #ref: ${GitHub}/typrm/src/main.ts#function  check(
+                checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#function  checkRoutine
+    replace:  #keyword: typrm replace
+        code:
+            #// parent: #search: mainMain
+            replace:  #ref: ${GitHub}/typrm/src/main.ts#function  replace(
+                replaceMain:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceMain
+                    replaceSub:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
+tag:
+    list:
+        document:
+            English: #ref: ${GitHub}/typrm/README-jp.md### Tag list
+            Japanese: #ref: ${GitHub}/typrm/README-jp.md### タグ一覧
+        code: #ref: ${GitHub}/typrm/src/main.ts#const  originalLabel = 
+    copy tag:  #keyword:#copy:
+        document:
+            English: #ref: ${GitHub}/typrm/README-jp.md### #copy tag: check the text is the same
+            Japanese: #ref: ${GitHub}/typrm/README-jp.md### #copy タグを使って文章が同じことをチェックします
+        test:
+            #   describe("checks copy tag >>"
+        code:
+            #// parent: #search: checkRoutine
+            check:  #ref: ${GitHub}/typrm/src/main.ts#function  check(
+                CopyTag.scanAllTemplate:  #ref: ${GitHub}/typrm/src/main.ts#// CopyTag.scanAllTemplate
+                checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#function  checkRoutine
+                    CheckParser.evaluate:  #ref: ${GitHub}/typrm/src/main.ts#// CheckParser.evaluate
+                CopyTag.check:  #ref: ${GitHub}/typrm/src/main.ts#// CopyTag.check
+            replace:
+                #// parent: #search: replaceSub
+                replaceSub:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
+                    makeTemplatesInCopyTag:
+    if tag:  #keyword:#if:
+        outOfFalseBlocks:  #search:
+    settings tag:  #keyword:#settings:
+        #search: settingStack of typrm makeSettingTree
+test:
+    Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
+        main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
+        拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:
+        ____.snap.confirmed-ts ファイルが存在する理由は、Jest の自動編集が予期しないデータを追加することがあるからです:
+    Test >> reset 2_replace_6_if both:  #keyword: typrm reset 2_replace_6_if both
+        replace command:
+            settingTree.currentSettings:
+                lineNum ==  1: banana, yes
+            toTagTree.currentOldSettingsInIfBlock:
+                lineNum ==  1: banana, yes
+                lineNum == 12: melon, no
+        reset command:
+            settingTree.currentSettings:  #// oldSetting
+                lineNum ==  1: melon, replaced
+            return_.currentOldSettingsInIfBlock:
+                lineNum ==  1: melon, replaced
+                lineNum ==  8: melon, replaced
+                lineNum == 10: {}
+                lineNum == 12: melon, replaced
+            return_.currentNewSettingsByOriginalTag:
+                lineNum ==  1: banana, yes
+            return_.currentNewSettingsByOriginalTagInIfBlock; outOfFalseBlockByOriginalTag:
+                lineNum ==  1: banana, yes;  true
+                lineNum ==  8: banana, yes;  true
+                lineNum == 10: "{};          false"
+                lineNum == 12: banana, yes;  true
+            return_.currentNewSettings:
+                （reset では対象外）
+        課題）複数の if ブロックの中に original タグがあるときの reset :  #keyword: typrm reset with if tag
+            reset する対象のファイルのサンプル:
+                settings:
+                    fruit: banana
+                    banana:  #if: $settings.fruit == banana
+                        __Setting1__: yes
+                    not banana:  #if: $settings.fruit != banana
+                        __Setting1__: no
+            解決法:
+                - 一時的に if の条件を満たす設定に変えて、if ブロック内の定義を戻す
+                - # replace {fruit: banana}, reset {__Setting1__: yes}
+                - # replace {fruit: __not_banana}, reset {__Setting1__: no}
+                - # {fruit: banana}
+                - original タグが残っていたら警告する。別の設定セットに残っていても
+        課題）if で参照されている変数と if ブロック内で定義している変数を内部では同時に変更できない:  #keyword: typrm replace with if tag
+            置き換える対象のファイルのサンプル:
+                settings:
+                    fruit: banana
+                    banana:  #if: $settings.fruit == banana
+                        __Setting1__: yes
+                    not banana:  #if: $settings.fruit != banana
+                        __Setting1__: no
+                check:
+                    yes:  #template: __Setting1__
+                    banana:  #if: $settings.fruit == banana
+                        yes  #template: __Setting1__
+                    not banana:  #if: $settings.fruit != banana
+                        no  #template: __Setting1__
+            解決法:
+                if ブロック内で定義している変数は、if で参照されている変数が置き換えた後にすること
+            理由:
+                置き換えるときに指定するパラメーター: { fruit: melon, __Settings1__: replaced }
+                このとき、同時に置き換えると、置き換える前が [check/yes] と [check/not banana/no] の2種類(yes, no)あり、置き換える範囲が曖昧になって良くない:
+                    サンプル）ある変数がとりうる値が aa, aaa だけのとき、置き換える前の値として 2種類を認めてしまうと aaa が aaaa に置き換わる可能性があり、良くない:
+                先に fruit を置き換えるときの置き換える前は、[check/yes] のみ:
+                次に __Settings1__ を置き換えるときの置き換える前は、(check/yesだった)[check/no] と [check/not banana/no] で 1種類（2箇所）:
+            コードの説明:
+                IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
+other specifications:
+    start up:
+        start from shell:
+            main:  #ref: ${GitHub}/typrm/src/main.ts#function  main(
+                mainMain:  #ref: ${GitHub}/typrm/src/main.ts#function  mainMains(
+        start from test:
+            callMainFromJest:  #ref: ${GitHub}/typrm/src/main.ts#function  callMainFromJest(
+                mainMain:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  mainMains(
+    settingStack of typrm makeSettingTree: #keyword:
+        overview: |
+            'settingStack' has parent indentLevel.
+        example:
+            YAML: |
+                1:  A:
+                2:      setting:
+                :
+                15:     A:
+                16:         setting:
+                31:     B:
+                32:         setting:
+            lineNum = 16 >> settingStack: |
+                { lineNum:  0, index: '/',    indentLevel: 0, ...}
+                { lineNum:  2, index: '/1',   indentLevel: 4, ...}
+                { lineNum: 16, index: '/1/1', indentLevel: 8, ...}
+            lineNum = 31 >> settingStack: |  #focus: /1/2
+                { lineNum:  0, index: '/', ...}
+                { lineNum:  2, index: '/1', ...}
+                { lineNum:  0, index: '/1/2', ...}
+            lineNum = 32 >> settingStack: |
+                { lineNum:  0, index: '/', ...}
+                { lineNum:  2, index: '/1', ...}
+                { lineNum: 32, index: '/1/2', ...}
+    outOfFalseBlocks:  #focus: outOfFalseBlocks, indicesWithIf
+        moveToLine (SettingsTree):
+            moveToLine_Immutably:
+                addCurrentSettingsInIfTag_Immutably:
+                    # class SettingsTree {
+                    #     addCurrentSettingsInIfTag_Immutably(
+                    #         for (const [lineNum, index] of Array.from(settingsTree.indicesWithIf.entries())) {
+                    #             outOfFalseBlocks.set(lineNum, falseIndex == disabledFalseIndex);
+        moveToLine (ReplaceToTagTree):
+            moveToLine_Immutably:
+                # class ReplaceToTagTree {
+                #     moveToLine_Immutably(parser: Parser, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_for_moveToLine {
+                #         return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;

@@ -288,24 +288,28 @@ describe("checks copy tag >>", () => {
                 ] }],
         ['template >> 1 >> OK', null],
         ['template >> 1 >> NG-1', { replacers: [
-                    { from: 'a2', to: `a${goodColor('2')}` },
-                    { from: '__Bad__', to: `${badColor('__B')}a${badColor('d__')}` },
+                    { from: 'good_color($copy.__VariableA__)', to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__` },
+                    { from: 'bad_color(__Bad__)', to: `__${badColor('B')}a${badColor('d')}__` },
                 ] }],
         ['template >> 1 >> NG-2', { replacers: [
-                    { from: '(__Bad__)  #template: (__VariableA__)', to: `(${goodColor('__B')}a${goodColor('d__')})${goodColor('  #template: (__VariableA__)')}` },
-                    { from: 'a2', to: `a${badColor('2')}` },
-                    { from: '(__Bad__)  #template: (__VariableA__)', to: `(${goodColor('__B')}a${goodColor('d__')})${goodColor('  #template: (__VariableA__)')}` },
-                    { from: 'a2', to: `a${badColor('2')}` },
+                    { from: 'good_color(__Bad__)', to: `__${goodColor('B')}a${goodColor('d')}__` },
+                    { from: 'bad_color($copy.__VariableA__)', to: `${badColor('$copy.')}__${badColor('V')}a${badColor('riableA')}__` },
+                    { from: 'good_color(__Bad__)', to: `__${goodColor('B')}a${goodColor('d')}__` },
+                    { from: 'bad_color($copy.__VariableA__)', to: `${badColor('$copy.')}__${badColor('V')}a${badColor('riableA')}__` },
                 ] }],
         ['template >> default value', { replacers: [
-                    { from: '(a1, b2)', to: `(a${goodColor('1')}, b2)` },
-                    { from: '(__Bad__, b2)', to: `(${badColor('__B')}a${badColor('d__')}, b2)` },
-                    { from: '(a1, b2)', to: `(a1, ${goodColor('b2')})` },
-                    { from: '(a1, __Bad__)', to: `(a1, ${badColor('__Bad__')})` },
+                    { from: 'good_color($copy.__VariableA__, $copy.__VariableB__)', to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__, ${goodColor('$copy.__Varia')}b${goodColor('leB__')}` },
+                    { from: 'bad_color(__Bad__, b2)', to: `__${badColor('B')}a${badColor('d')}__, b${badColor('2')}` },
+                    { from: 'good_color($copy.__VariableA__, $copy.__VariableB__)', to: `${goodColor('$copy.__V')}a${goodColor('riableA__')}, ${goodColor('$copy.')}__${goodColor('Variable')}B__` },
+                    { from: 'bad_color(a1, __Bad__)', to: `a${badColor('1')}, __B${badColor('ad')}__` },
                 ] }],
         ['template >> variable', { replacers: [
-                    { from: '[s1]', to: `[${goodColor('s1')}]` },
+                    { from: 'good_color($copy.__VariableA__)', to: `${goodColor('$copy.')}__${goodColor('V')}a${goodColor('riableA')}__` },
+                    { from: 'bad_color(__Bad__)', to: `__${badColor('B')}a${badColor('d')}__` },
+                    { from: '[$copy.__VariableA__]', to: `[${goodColor('$copy.__VariableA__')}]` },
                     { from: '__Bad__', to: `${badColor('__Bad__')}` },
+                    { from: 'good_color($copy.__VariableA__)', to: `${goodColor('$copy.__VariableA__')}` },
+                    { from: 'bad_color(s1)', to: badColor('s1') },
                     { from: 'good_color($settings.__SetA__)', to: `${goodColor('$settings.__SetA__')}` },
                     { from: 'bad_color(bad):', to: `${badColor('bad')}:` },
                     { from: 'good_color($settings.__SetA__)', to: `${goodColor('$settings.__SetA__')}` },
@@ -326,7 +330,7 @@ describe("checks copy tag >>", () => {
     });
 });
 describe("replaces settings >>", () => {
-    test.each([
+    test.only.each([
         [
             '1_replace', '', 'en-US', null,
         ], [
@@ -420,10 +424,17 @@ describe("replaces settings >>", () => {
                     { from: '__variable2__: Value2', to: '__variable2__: Value2  #to: After2' },
                 ] },
         ], [
+            '2_replace_13_same_as_tag', '', 'en-US', null,
+        ], [
+            '2_replace_13_same_as_tag', ' error', 'en-US', null,
+        ], [
             'bug_1_template_in_copy_tag', '', 'en-US', null,
         ],
         // There are other cases in "replace to tag" test.
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
+        if (fileNameHead !== '2_replace_13_same_as_tag' || _subCaseName !== '') {
+            return;
+        }
         const { filePath } = initializeTestInputFile(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
         if (option) {
             lib.replaceFileSync(filePath, (text) => (lib.replace(text, option.replacers)));
@@ -437,6 +448,7 @@ describe("replaces settings >>", () => {
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         lib.rmdirSync(testFolderPath + '_tmp');
+        expect('test code').toBe('deleted skip code.');
     });
     describe("Multi folder >>", () => {
         const fileNameHead = '2_replace_1_ok';
