@@ -96,6 +96,41 @@ checked file count = 1, template count = 0
 "
 `;
 
+exports[`checks copy tag >> bug_1_continual_template: sourceFileContents 1`] = `
+"1: #copy-template: copy1
+    template1
+2: #copy-template: copy2
+    template2
+11: #copy: copy1
+    template1
+22: #copy: copy2
+    template2
+"
+`;
+
+exports[`checks copy tag >> bug_1_continual_template: stdout 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 0
+"
+`;
+
+exports[`checks copy tag >> bug_2_template_in_deep_indent: sourceFileContents 1`] = `
+"1:
+                1: #copy-template: copy1, {__Argument__: 123}
+                    123  #template: __Argument__
+11: #copy: copy1, {__Argument__: 456}
+    456
+"
+`;
+
+exports[`checks copy tag >> bug_2_template_in_deep_indent: stdout 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 1
+"
+`;
+
 exports[`checks copy tag >> ignore keyword tag: sourceFileContents 1`] = `
 "same1: #copy: same
     aaa:  #keyword:

@@ -60,7 +60,7 @@ describe("string >>", () => {
             expect(unexpectedLine).toBe('${d}_${abc}_\\$g');
         });
     });
-    describe("checkFileContents >>", () => {
+    describe("checkExpectedTextContents >>", () => {
         describe("basic >>", () => {
             test("Same", () => {
                 const unexpectedLine = lib.checkExpectedTextContents([
@@ -170,6 +170,26 @@ describe("string >>", () => {
                     '    Line 3',
                 ], anyLinesTag);
                 expect(unexpectedLine).toStrictEqual(null);
+            });
+            test("Same >> empty lines", () => {
+                const unexpectedLine = lib.checkExpectedTextContents([], [], anyLinesTag);
+                expect(unexpectedLine).toStrictEqual(null);
+            });
+            test("Same >> empty expected", () => {
+                const unexpectedLine = lib.checkExpectedTextContents(["Line 1"], [], anyLinesTag);
+                expect(unexpectedLine).toStrictEqual(null);
+            });
+            test("Same >> empty lines check", () => {
+                const unexpectedLine = lib.checkExpectedTextContents([], ["Line 1"], anyLinesTag);
+                expect(unexpectedLine).toStrictEqual({
+                    contentsLineNum: 0,
+                    contentsLine: '',
+                    contentsIndentLength: 0,
+                    partsLineNum: 1,
+                    partsLine: 'Line 1',
+                    partsIndentLength: 0,
+                    indentDiff: 0,
+                });
             });
             test("OK and Diff >> any lines tag >> different line 1 line below any lines tag", () => {
                 const testData = {
@@ -402,6 +422,24 @@ describe("string >>", () => {
                     partsLine: '    Line 4',
                     partsIndentLength: 0,
                     indentDiff: -4,
+                });
+            });
+            test("Diff >> bug case 1", () => {
+                const unexpectedLine = lib.checkExpectedTextContents([
+                    // testingContents
+                    '    aaa',
+                ], [
+                    // expectedParts
+                    '    bbb',
+                ], anyLinesTag);
+                expect(unexpectedLine).toStrictEqual({
+                    contentsLineNum: 0,
+                    contentsLine: '',
+                    contentsIndentLength: 0,
+                    partsLineNum: 1,
+                    partsLine: '    bbb',
+                    partsIndentLength: 4,
+                    indentDiff: 0,
                 });
             });
         });

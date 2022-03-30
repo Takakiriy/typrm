@@ -1413,22 +1413,26 @@ If there is no `#copy-template:` tag that is the target of the `#copy:` tag,
 write the `#template:` tag and the referenced variable in blocks of
 all `#copy:` tags.
 
-    1:
+    original:
         settings: #settings:
             __Variable__: projectA
-        body1: | #copy-template: command1
+
+        body1: | #copy-template: There is a copy template
             mkdir -p  projectA  #template: __Variable__
             cd        projectA  #template: __Variable__
-        body2: | #copy: command2
+
+        body2: | #copy: without template
             mkdir -p  projectA  #template: __Variable__
             cd        projectA  #template: __Variable__
-    2:
+    copy:
         settings: #settings:
             __Variable__: projectB
-        body1: | #copy: command1
+
+        body1: | #copy: There is a copy template
             mkdir -p  projectB
             cd        projectB
-        body2: | #copy: command2
+
+        body2: | #copy: without template
             mkdir -p  projectB  #template: __Variable__
             cd        projectB  #template: __Variable__
 

@@ -345,6 +345,9 @@ function getIndentWithoutHyphen(line) {
 export function checkExpectedTextContents(testingContents, expectedParts, anyLinesTag) {
     return _main(testingContents, expectedParts, anyLinesTag);
     function _main(testingContents, expectedParts, anyLinesTag) {
+        if (expectedParts.length === 0) {
+            return null;
+        }
         const contents = testingContents;
         const contentsLineCount = contents.length;
         var contentsIndent = '';
@@ -373,7 +376,7 @@ export function checkExpectedTextContents(testingContents, expectedParts, anyLin
             Result[Result["skipped"] = 2] = "skipped";
         })(Result || (Result = {}));
         ;
-        var result = Result.same;
+        var result = Result.different;
         var unexpectedLine = null;
         var contentsIndentLength = 0;
         var indentDiff = 0;

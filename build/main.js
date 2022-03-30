@@ -1693,10 +1693,10 @@ async function replaceSub(inputFilePath, parser, command) {
                         const parameters = yaml.load(copyTagValue.substring(firstCommaIndex + 1));
                         const values = Object.entries(parameters).filter(keyValue => !keyValue[1].startsWith(settingsDot))
                             .map(keyValue => [keyValue[0], {
-                                value: keyValue[1], lineNum, settingsIndex: '', tag: 'copyArgument', isReferenced: true,
+                                value: keyValue[1].toString(), lineNum, settingsIndex: '', tag: 'copyArgument', isReferenced: true,
                             }]);
                         const variables = Object.entries(parameters).filter(keyValue => keyValue[1].startsWith(settingsDot))
-                            .map(keyValue => [keyValue[0], keyValue[1].substring(settingsDot.length)]);
+                            .map(keyValue => [keyValue[0], keyValue[1].toString().substring(settingsDot.length)]);
                         const copyTagParameters = variables.filter(keyValue => (keyValue[1] in oldSetting));
                         copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
                         copyTagLineNum = lineNum;
@@ -2129,7 +2129,12 @@ var CopyTag;
                     else {
                         const value = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
                         const firstCommaIndex = value.indexOf(',');
-                        const copyName = value.substring(0, firstCommaIndex).trim();
+                        if (firstCommaIndex === notFound) {
+                            var copyName = value;
+                        }
+                        else {
+                            var copyName = value.substring(0, firstCommaIndex).trim();
+                        }
                         this.parsingCopyTag = copyTags.find(item => (item.copyName === copyName));
                         this.parsingCopyTag.contents = [];
                         this.copyTemplateTag = undefined;
@@ -2167,7 +2172,7 @@ var CopyTag;
                             }
                             for (const [copyTagArgumentName, copyTagArgumentValue] of copyArguments) {
                                 this.settingAndCopyTagParameters[copyTagArgumentName] = {
-                                    value: copyTagArgumentValue,
+                                    value: copyTagArgumentValue.toString(),
                                     lineNum: parser.lineNum,
                                     settingsIndex: '',
                                     tag: 'copyArgument',
@@ -2191,15 +2196,19 @@ var CopyTag;
                 if (line.startsWith(this.copyTagIndent) || line.trim() === '') {
                     if (this.copyTemplateTag) {
                         const lineNumOffset = this.parsingCopyTag.contents.length;
-                        const line = this.copyTemplateTag.contents[lineNumOffset];
-                        templateTag = parseTemplateTag(line, parser);
+                        const lineInTemplate = this.copyTemplateTag.contents[lineNumOffset];
+                        var sourceTemplateTag = parseTemplateTag(lineInTemplate, parser);
                     }
-                    if (templateTag.isFound) {
-                        const { expected: expectedText, log: variablesInTemplate } = getExpectedLineAndEvaluationLog(this.settingAndCopyTagParameters, templateTag.template);
-                        const replacedTextContainsDoller = getReplacedLine(this.comparableDollers, templateTag.template, {});
-                        const checkingLineWithoutTemplate = line.substring(0, templateTag.indexInLine);
+                    else {
+                        var sourceTemplateTag = templateTag;
+                    }
+                    if (sourceTemplateTag.isFound) {
+                        const { expected: expectedText, log: variablesInTemplate } = getExpectedLineAndEvaluationLog(this.settingAndCopyTagParameters, sourceTemplateTag.template);
+                        const replacedTextContainsDoller = getReplacedLine(this.comparableDollers, sourceTemplateTag.template, {});
+                        const templateIndex = (templateTag.indexInLine !== notFound) ? templateTag.indexInLine : line.length;
+                        const checkingLineWithoutTemplate = line.substring(0, templateIndex);
                         var comparableLine = checkingLineWithoutTemplate.replace(expectedText, replacedTextContainsDoller) +
-                            line.substring(templateTag.indexInLine);
+                            line.substring(templateIndex);
                     }
                     else {
                         var comparableLine = line;
@@ -2237,24 +2246,28 @@ var CopyTag;
                         copyTag = undefined;
                     }
                 }
-                else {
-                    if (line.includes(copyTemplateLabel)) {
-                        const copyTagIndex = line.indexOf(copyTemplateLabel);
-                        const firstCommaIndex = line.indexOf(',', copyTagIndex);
-                        copyTag = {
-                            filePath: inputFileFullPath,
-                            lineNum,
-                            line,
-                            tagName: copyTemplateLabel,
-                            value: getValue(line, copyTagIndex + copyTemplateLabel.length),
-                            copyName: line.substring(copyTagIndex + copyTemplateLabel.length, firstCommaIndex).trim(),
-                            contents: [],
-                            arguments: {},
-                            argumentNames: {},
-                        };
-                        copyTags.push(copyTag);
-                        copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                if (line.includes(copyTemplateLabel) && !copyTag) {
+                    const copyTagIndex = line.indexOf(copyTemplateLabel);
+                    const firstCommaIndex = line.indexOf(',', copyTagIndex);
+                    if (firstCommaIndex === notFound) {
+                        var copyName = line.substring(copyTagIndex + copyTemplateLabel.length).trim();
                     }
+                    else {
+                        var copyName = line.substring(copyTagIndex + copyTemplateLabel.length, firstCommaIndex).trim();
+                    }
+                    copyTag = {
+                        filePath: inputFileFullPath,
+                        lineNum,
+                        line,
+                        tagName: copyTemplateLabel,
+                        value: getValue(line, copyTagIndex + copyTemplateLabel.length),
+                        copyName,
+                        contents: [],
+                        arguments: {},
+                        argumentNames: {},
+                    };
+                    copyTags.push(copyTag);
+                    copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
                 }
             }
         }
@@ -2301,9 +2314,6 @@ var CopyTag;
                         targetLine = targetLine.trimRight() + templateInSourceLine[0];
                         copyTagDollerContents[lineNumOffset] = targetLine;
                     }
-                }
-                if (copyTag.lineNum === 1) {
-                    pp('');
                 }
                 const unexpectedLine = lib.checkExpectedTextContents(copyTagDollerContents, sourceCopyTagDollerContents, fileTemplateAnyLinesLabel);
                 if (unexpectedLine) {
@@ -3768,9 +3778,6 @@ function getReplacedCopyTagContents(copyTag, sourceCopyTag, parameters) {
             const sourceLine = sourceCopyTag.contents[lineNum - 1];
             const replacingLine = copyTag.contents[lineNum - 1];
             const templateTag = parseTemplateTag(sourceLine, parser);
-            if (copyTag.lineNum === 5) {
-                pp('');
-            }
             if (templateTag.isFound && templateTag.includesKey(replacingKeys)) {
                 var expected = getExpectedLine(oldSetting, templateTag.template);
                 var replaced = getReplacedLine(newSetting, templateTag.template, {});

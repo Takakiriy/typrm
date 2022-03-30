@@ -338,6 +338,8 @@ describe("checks copy tag >>", () => {
             { from: 'good_color($settings.__SetA__)',  to: `${goodColor('$settings.__SetA__')}` },
             { from: 'bad_color(bad):',  to: `${badColor('bad')}:` },
         ]}],
+        ['bug_1_continual_template', null],
+        ['bug_2_template_in_deep_indent', null],
 
     ])("%s", async (caseName, option) => {
         const {filePath} = initializeTestInputFile(`checks copy tag >> ${caseName}: sourceFileContents 1`);

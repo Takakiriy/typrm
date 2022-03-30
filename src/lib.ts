@@ -399,6 +399,9 @@ export function  checkExpectedTextContents(testingContents: string[], expectedPa
     return  _main(testingContents, expectedParts, anyLinesTag);
     function  _main(testingContents: string[], expectedParts: string[], anyLinesTag: string
             ): UnexpectedLine | null {
+        if (expectedParts.length === 0) {
+            return  null;
+        }
 
         const  contents = testingContents;
         const  contentsLineCount = contents.length;
@@ -422,7 +425,7 @@ export function  checkExpectedTextContents(testingContents: string[], expectedPa
         var  partsIndentStack: string[] = [];
         var  partsLineNum = partsLineNumFirst;
         enum Result { same, different, skipped };
-        var  result = Result.same;
+        var  result = Result.different;
         var  unexpectedLine: UnexpectedLine | null = null;
         var  contentsIndentLength = 0;
         var  indentDiff = 0;
