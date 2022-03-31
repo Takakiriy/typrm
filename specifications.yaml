@@ -11,6 +11,11 @@ command:
             replace:  #ref: ${GitHub}/typrm/src/main.ts#function  replace(
                 replaceMain:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceMain
                     replaceSub:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
+                        # // In settings
+                            # // Change a settings value
+                                getReplacedLineInSettings:
+                        # // Out of settings
+                            # // Replace in template
 tag:
     list:
         document:
@@ -22,7 +27,8 @@ tag:
             English: #ref: ${GitHub}/typrm/README-jp.md### #copy tag: check the text is the same
             Japanese: #ref: ${GitHub}/typrm/README-jp.md### #copy タグを使って文章が同じことをチェックします
         test:
-            #   describe("checks copy tag >>"
+            # describe("checks copy tag >>"
+            # describe("replaces in copy tag >>"
         code:
             #// parent: #search: checkRoutine
             check:  #ref: ${GitHub}/typrm/src/main.ts#function  check(
@@ -71,9 +77,9 @@ test:
             reset する対象のファイルのサンプル:
                 settings:
                     fruit: banana
-                    banana:  #if: $settings.fruit == banana
+                    banana:  #if: $settings.fruit == banana  #disable-tag-tool:
                         __Setting1__: yes
-                    not banana:  #if: $settings.fruit != banana
+                    not banana:  #if: $settings.fruit != banana  #disable-tag-tool:
                         __Setting1__: no
             解決法:
                 - 一時的に if の条件を満たす設定に変えて、if ブロック内の定義を戻す
@@ -85,16 +91,16 @@ test:
             置き換える対象のファイルのサンプル:
                 settings:
                     fruit: banana
-                    banana:  #if: $settings.fruit == banana
+                    banana:  #if: $settings.fruit == banana  #disable-tag-tool:
                         __Setting1__: yes
-                    not banana:  #if: $settings.fruit != banana
+                    not banana:  #if: $settings.fruit != banana  #disable-tag-tool:
                         __Setting1__: no
                 check:
-                    yes:  #template: __Setting1__
-                    banana:  #if: $settings.fruit == banana
-                        yes  #template: __Setting1__
-                    not banana:  #if: $settings.fruit != banana
-                        no  #template: __Setting1__
+                    yes:  #template: __Setting1__                #disable-tag-tool:
+                    banana:  #if: $settings.fruit == banana      #disable-tag-tool:
+                        yes  #template: __Setting1__             #disable-tag-tool:
+                    not banana:  #if: $settings.fruit != banana  #disable-tag-tool:
+                        no  #template: __Setting1__              #disable-tag-tool:
             解決法:
                 if ブロック内で定義している変数は、if で参照されている変数が置き換えた後にすること
             理由:
