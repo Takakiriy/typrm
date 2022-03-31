@@ -454,14 +454,14 @@ describe("replaces settings >>", () => {
         ],[
             '2_replace_13_same_as_tag', '', 'en-US', null,
         ],[
-            '2_replace_13_same_as_tag', ' error', 'en-US', null,
+            '2_replace_13e_same_as_tag_error', '', 'en-US', null,
         ],[
             'bug_1_template_in_copy_tag', '', 'en-US', null,
         ],
         // There are other cases in "replace to tag" test.
 
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
-if (fileNameHead !== '2_replace_13_same_as_tag' || _subCaseName !== '') {return;}
+if (fileNameHead !== '2_replace_13e_same_as_tag_error' || _subCaseName !== '') {return;}
         const {filePath} = initializeTestInputFile(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
         if (option) {
             lib.replaceFileSync(filePath, (text)=>(lib.replace(text, option.replacers)))

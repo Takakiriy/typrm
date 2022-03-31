@@ -3838,45 +3838,6 @@ body:
 "
 `;
 
-exports[`replaces settings >> in 2_replace_13_same_as_tag error: sourceFileContents 1`] = `
-"1:
-    settings: #settings:
-        __OperationClient__: OC
-        __OperationServer__: OS
-        __C_S__: Client  #// Client or Server                         #to: Unknown
-        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
-    ref:
-        OC, OS:  #template: __OperationClient__, __OperationServer__
-        OC:  #template: __Operation__
-"
-`;
-
-exports[`replaces settings >> in 2_replace_13_same_as_tag error: stdout 1`] = `
-"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __C_S__: Unknown
-
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:         __C_S__: Server  #// Client or Server
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
-    Warning: Not found a variable name.
-    Same as: __OperationUnknown__
-
-Warning: 1, Error: 0
-"
-`;
-
-exports[`replaces settings >> in 2_replace_13_same_as_tag error: updatedFileContents 1`] = `
-"1:
-    settings: #settings:
-        __OperationClient__: OC
-        __OperationServer__: OS
-        __C_S__: Client  #// Client or Server                         #to: Unknown
-        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
-    ref:
-        OC, OS:  #template: __OperationClient__, __OperationServer__
-        OC:  #template: __Operation__
-"
-`;
-
 exports[`replaces settings >> in 2_replace_13_same_as_tag: sourceFileContents 1`] = `
 "1:
     settings: #settings:
@@ -3913,19 +3874,58 @@ exports[`replaces settings >> in 2_replace_13_same_as_tag: updatedFileContents 1
         __OperationClient__: OC
         __OperationServer__: OS
         __C_S__: Server  #original: Client  #// Client or Server
-        __Operation__: OS  #same-as: __Operation{$settings.__C_S__}__
+        __Operation__: OS  #original: OC  #same-as: __Operation{$settings.__C_S__}__
     ref:
         OC, OS:  #template: __OperationClient__, __OperationServer__
-        OC:  #template: __Operation__
+        OS:  #template: __Operation__
 2:
     settings: #settings:
         __OperationClient__: OC_replaced  #original: OC
         __OperationServer__: OS
         __C_S__: Client  #// Client or Server
-        __Operation__: OC_replaced  #same-as: __Operation{$settings.__C_S__}__
+        __Operation__: OC_replaced  #original: OC  #same-as: __Operation{$settings.__C_S__}__
     ref:
         OC_replaced, OS:  #template: __OperationClient__, __OperationServer__
         OC_replaced:  #template: __Operation__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_13e_same_as_tag_error: sourceFileContents 1`] = `
+"1:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __C_S__: Client  #// Client or Server                         #to: Unknown
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+    ref:
+        OC, OS:  #template: __OperationClient__, __OperationServer__
+        OC:  #template: __Operation__
+"
+`;
+
+exports[`replaces settings >> in 2_replace_13e_same_as_tag_error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __C_S__: Unknown
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+    Warning: Not found a variable name.
+    Same as: __OperationUnknown__
+
+Warning: 1, Error: 0
+"
+`;
+
+exports[`replaces settings >> in 2_replace_13e_same_as_tag_error: updatedFileContents 1`] = `
+"1:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __C_S__: Client  #// Client or Server                         #to: Unknown
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+    ref:
+        OC, OS:  #template: __OperationClient__, __OperationServer__
+        OC:  #template: __Operation__
 "
 `;
 

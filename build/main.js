@@ -170,27 +170,19 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
             for (const [variableName, variable] of Object.entries(localSettings)) {
                 const lineNumInSetting = setting[variableName].lineNum;
                 if (variable.sameAs) {
-                    const variableNames = [];
                     var expectedVariableName = variable.sameAs;
                     var errorInSameAsTag = false;
-                    var matchedVariable = null;
-                    settingsDotRe.lastIndex = 0;
-                    while ((matchedVariable = settingsDotRe.exec(expectedVariableName)) !== null) {
-                        const referencingVariableName = matchedVariable[1];
-                        if (referencingVariableName in setting) {
-                            expectedVariableName = expectedVariableName.replace(matchedVariable[0], `${setting[referencingVariableName].value}`);
-                            setting[referencingVariableName].isReferenced = true;
-                            variableNames.push(referencingVariableName);
-                        }
-                        else {
-                            console.log('');
-                            console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
-                            console.log(`${getTestablePath(inputFilePath)}:${lineNumInSetting}: ${lines[lineNumInSetting - 1]}`);
-                            console.log(`    ${translate('Warning')}: ${translate('Not found a variable name specified in the same-as tag.')}`);
-                            console.log(`    Variable Name: ${referencingVariableName}`);
-                            parser.warningCount += 1;
-                            errorInSameAsTag = true;
-                        }
+                    const r = SameAsTag.evaluateVariableName(expectedVariableName, setting);
+                    expectedVariableName = r.variableName;
+                    var variableNames = r.referencedVariableNames;
+                    for (const errorVariableName of r.errorVariableNames) {
+                        console.log('');
+                        console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
+                        console.log(`${getTestablePath(inputFilePath)}:${lineNumInSetting}: ${lines[lineNumInSetting - 1]}`);
+                        console.log(`    ${translate('Warning')}: ${translate('Not found a variable name specified in the same-as tag.')}`);
+                        console.log(`    Variable Name: ${errorVariableName}`);
+                        parser.warningCount += 1;
+                        errorInSameAsTag = true;
                     }
                     if (expectedVariableName in setting) {
                         if (variable.value !== setting[expectedVariableName].value) {
@@ -639,9 +631,9 @@ async function makeSettingTree(parser) {
                         console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
                     }
                     const currentSetting = settingStack[settingStack.length - 2];
-                    const sameAsIndex = line.indexOf(' ' + sameAsLabel);
+                    const sameAsIndex = line.indexOf(' ' + SameAsTag.label);
                     if (sameAsIndex != notFound) {
-                        var sameAs = getValue(line, sameAsIndex + sameAsLabel.length + 1);
+                        var sameAs = getValue(line, sameAsIndex + SameAsTag.label.length + 1);
                     }
                     else {
                         var sameAs = '';
@@ -1980,6 +1972,7 @@ async function replaceSub(inputFilePath, parser, command) {
                                                 if (i === notFound) {
                                                     break;
                                                 }
+                                                // Replace in template
                                                 replacingLine = replacingLine.replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
                                                 maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substring(i + template.expected.length);
                                                 i += template.expected.length;
@@ -2416,6 +2409,34 @@ var CopyTag;
     }
     CopyTag.check = check;
 })(CopyTag || (CopyTag = {}));
+var SameAsTag;
+(function (SameAsTag) {
+    // SameAsTag.label
+    SameAsTag.label = "#same-as:";
+    // evaluateVariableName
+    function evaluateVariableName(variableName, setting) {
+        const return_ = {
+            variableName,
+            referencedVariableNames: [],
+            errorVariableNames: [],
+        };
+        var matchedVariable = null;
+        settingsDotRe.lastIndex = 0;
+        while ((matchedVariable = settingsDotRe.exec(variableName)) !== null) {
+            const referencingVariableName = matchedVariable[1];
+            if (referencingVariableName in setting) {
+                return_.variableName = return_.variableName.replace(matchedVariable[0], `${setting[referencingVariableName].value}`);
+                setting[referencingVariableName].isReferenced = true;
+                return_.referencedVariableNames.push(referencingVariableName);
+            }
+            else {
+                return_.errorVariableNames.push(referencingVariableName);
+            }
+        }
+        return return_;
+    }
+    SameAsTag.evaluateVariableName = evaluateVariableName;
+})(SameAsTag || (SameAsTag = {}));
 // listUpFilePaths
 async function listUpFilePaths(checkingFilePath) {
     const currentFolder = process.cwd();
@@ -4502,6 +4523,12 @@ class ReplaceToTagTree {
                 return_.nextIfLineNum = 0;
             }
         }
+        const key = 0, value = 1;
+        const sameAsSettings = Object.entries(return_.currentNewSettings).filter(keyValue => keyValue[value].sameAs);
+        for (const [settingName, setting] of sameAsSettings) {
+            const r = SameAsTag.evaluateVariableName(setting.sameAs, return_.currentNewSettings);
+            return_.currentNewSettings[settingName] = return_.currentNewSettings[r.variableName];
+        }
         return_.outOfFalseBlocks = outOfFalseBlocks;
         return_.outOfFalseBlocksByOriginalTag = outOfFalseBlocksByOriginalTag;
         return return_;
@@ -5309,7 +5336,6 @@ else {
 const settingLabel = /(^| )#settings:/;
 const settingsDot = '$settings.';
 const settingsDotRe = /{\$settings\.(.*)}/g;
-const sameAsLabel = "#same-as:";
 const originalLabel = "#original:";
 const toLabel = "#to:"; // replace to tag
 const checkTag = "#check:";

@@ -11,6 +11,11 @@ command:
             replace:  #ref: ${GitHub}/typrm/src/main.ts#function  replace(
                 replaceMain:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceMain
                     replaceSub:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
+                        # // In settings
+                            # // Change a settings value
+                                getReplacedLineInSettings:
+                        # // Out of settings
+                            # // Replace in template
 tag:
     list:
         document:
@@ -36,6 +41,20 @@ tag:
                     makeTemplatesInCopyTag:
     if tag:  #keyword:#if:
         outOfFalseBlocks:  #search:
+    same-as tag:
+        test:
+            settings:
+                5_check_same_as_tag:  #ref: ${GitHub}/typrm/src/main.test.ts#5_check_same_as_tag
+            replaces settings:
+                2_replace_13_same_as_tag:  #ref: ${GitHub}/typrm/src/main.test.ts#2_replace_13_same_as_tag
+        code:
+            makeSettingTree:  #ref: ${GitHub}/typrm/src/main.ts#var  sameAs = getValue
+            #// parent: #search: checkRoutine
+                checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#// Check the "#same-as:" tag.
+                    # if (variable.value !== setting[expectedVariableName].value) {
+            #// parent: #search: replaceSub
+                replaceSub:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
+                    makeReplaceToTagTree:  #ref: ${GitHub}/typrm/src/main.ts#function  makeReplaceToTagTree
     settings tag:  #keyword:#settings:
         #search: settingStack of typrm makeSettingTree
 test:
