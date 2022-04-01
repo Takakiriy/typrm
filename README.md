@@ -20,6 +20,7 @@ You can execute the command just by copying and pasting the displayed command.
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
   - [settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
+    - [Reference a part of the variable name from another variable - #same-as tag](#reference-a-part-of-the-variable-name-from-another-variable---same-as-tag)
     - [The details of settings](#the-details-of-settings)
     - [Setting name](#setting-name)
     - [#template-if tag - replaces the sign of whether the condition is met](#template-if-tag---replaces-the-sign-of-whether-the-condition-is-met)
@@ -1040,6 +1041,29 @@ it is the next word starting with `#`.
 When specifying a template that contains `"%`, write`""%25"`.
 
     cd  "react1 #"  <!-- #template: __ProjectName__"%20"# #-->
+
+
+### Reference a part of the variable name from another variable - #same-as tag
+
+Define a default variable by referencing part of the name of
+the referenced variable from the value of another variable.
+Specify the variable name of the reference destination in the `#same-as:` tag,
+but if you want to make a part of the variable name
+of the reference destination the value of another variable,
+make a part of it `{$settings.(Variable Name)} `is specified.
+
+In the following cases, depending on the value of the `__C_S__` variable,
+the value of the default variable `__Operation__` will be the same as
+the value of the `__OperationClient__` variable or
+the value of the` __OperationServer__` variable.
+
+    settings: #settings:
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+        __C_S__: Client  #// Client or Server
+        __OperationClient__: OC
+        __OperationServer__: OS
+
+Currently, `#same-as:` tag does not support the replace command.
 
 
 ### The details of settings

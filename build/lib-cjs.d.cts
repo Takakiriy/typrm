@@ -1,3 +1,2 @@
 /// <reference types="node" />
-declare var snapshots: {[key: string]: string};
-export default snapshots;
+export declare const snapshots: {[key: string]: string};

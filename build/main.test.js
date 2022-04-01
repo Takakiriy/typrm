@@ -183,12 +183,13 @@ describe("checks template value >>", () => {
     });
     describe("settings >>", () => {
         test.each([
-            ["1 same values"],
-            ["2 not same values error"],
-            ["3 overwrite"],
-            ["3e overwrite error"],
-            ["4 neighbor error"],
-            ["4-2 neighbor level 2 error"],
+            ["1_same_values"],
+            ["2_not_same_values_error"],
+            ["3_overwrite"],
+            ["3e_overwrite_error"],
+            ["4_neighbor_error"],
+            ["4_2_neighbor_level_2_error"],
+            ["5_check_same_as_tag"],
             ["b1_bug_case_no_root_settings"],
             ["b2_bug_case_nest_settings"],
             // There are other settings tests in "unit test >>"
@@ -331,7 +332,7 @@ describe("checks copy tag >>", () => {
     });
 });
 describe("replaces settings >>", () => {
-    test.each([
+    test.only.each([
         [
             '1_replace', '', 'en-US', null,
         ], [
@@ -425,10 +426,17 @@ describe("replaces settings >>", () => {
                     { from: '__variable2__: Value2', to: '__variable2__: Value2  #to: After2' },
                 ] },
         ], [
+            '2_replace_13_same_as_tag', '', 'en-US', null,
+        ], [
+            '2_replace_13e_same_as_tag_error', '', 'en-US', null,
+        ], [
             'bug_1_template_in_copy_tag', '', 'en-US', null,
         ],
         // There are other cases in "replace to tag" test.
     ])("in %s%s", async (fileNameHead, _subCaseName, locale, option) => {
+        if (fileNameHead !== '2_replace_13e_same_as_tag_error' || _subCaseName !== '') {
+            return;
+        }
         const { filePath } = initializeTestInputFile(`replaces settings >> in ${fileNameHead}: sourceFileContents 1`);
         if (option) {
             lib.replaceFileSync(filePath, (text) => (lib.replace(text, option.replacers)));
@@ -442,6 +450,7 @@ describe("replaces settings >>", () => {
         expect(main.stdout).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         lib.rmdirSync(testFolderPath + '_tmp');
+        expect('test code').toBe('deleted skip code.');
     });
     describe("Multi folder >>", () => {
         const fileNameHead = '2_replace_1_ok';
@@ -1424,6 +1433,7 @@ describe("unit test >>", () => {
             ["bug_case_3", { checkSettings: true }],
             ["bug_case_4", {}],
             ["bug_case_6", {}],
+            ["bug_case_7_first_child_settings", {}],
         ])("%s", async (caseName, options) => {
             const Parser = main.private_.Parser;
             const makeSettingTree = main.private_.makeSettingTree;
@@ -1438,6 +1448,10 @@ describe("unit test >>", () => {
             expect(Array.from(settingsTree.indicesWithIf)).toStrictEqual(answerIndicesWithIf);
             if ('checkSettings' in options) {
                 expect(settingsTree.settings).toMatchSnapshot('settings');
+            }
+            for (const [lineNum, index] of settingsTree.indices.entries()) {
+                expect(Array.from(settingsTree.indicesWithIf.keys()).includes(lineNum)).toBe(true);
+                expect(settingsTree.indicesWithIf.get(lineNum)).toBe(index);
             }
             lib.rmdirSync(testFolderPath + '_tmp');
         });

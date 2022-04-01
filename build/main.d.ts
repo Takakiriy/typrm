@@ -136,6 +136,7 @@ interface Setting {
     settingsIndex: string;
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyArgument' | 'env';
     isReferenced: boolean;
+    sameAs?: string;
 }
 declare class Parser {
     command: CommandEnum;
