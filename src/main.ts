@@ -188,7 +188,8 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
         if (settingTree.wasChanged) {
             for (const [variableName, variable] of Object.entries(settingTree.currentSettings)) {
                 const  lineNumInSetting = setting[variableName].lineNum;
-                if (variable.sameAs) {
+                if (variable.sameAs  &&  ! variable.sameAsWasChecked) {
+                    variable.sameAsWasChecked = true;
                     var  expectedVariableName = variable.sameAs;
                     var  errorInSameAsTag = false;
 
@@ -5128,6 +5129,7 @@ interface Setting {
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyArgument' | 'env';
     isReferenced: boolean;
     sameAs?: string;
+    sameAsWasChecked?: boolean;
 }
 
 // searchDefinedSettingIndices

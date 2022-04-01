@@ -144,6 +144,7 @@ interface Setting {
     tag: 'settings' | 'toInSettings' | 'toAfterTemplate' | 'original' | 'copyArgument' | 'env';
     isReferenced: boolean;
     sameAs?: string;
+    sameAsWasChecked?: boolean;
 }
 declare class Parser {
     command: CommandEnum;

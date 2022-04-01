@@ -168,7 +168,8 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
         if (settingTree.wasChanged) {
             for (const [variableName, variable] of Object.entries(settingTree.currentSettings)) {
                 const lineNumInSetting = setting[variableName].lineNum;
-                if (variable.sameAs) {
+                if (variable.sameAs && !variable.sameAsWasChecked) {
+                    variable.sameAsWasChecked = true;
                     var expectedVariableName = variable.sameAs;
                     var errorInSameAsTag = false;
                     const r = SameAsTag.evaluateVariableName(expectedVariableName, setting);
