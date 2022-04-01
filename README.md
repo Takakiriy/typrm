@@ -1063,8 +1063,6 @@ the value of the` __OperationServer__` variable.
         __OperationClient__: OC
         __OperationServer__: OS
 
-Currently, `#same-as:` tag does not support the replace command.
-
 
 ### The details of settings
 

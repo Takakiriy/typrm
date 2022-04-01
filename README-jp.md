@@ -1036,8 +1036,6 @@ typrm を使うには Node.js のインストールが必要です。
         __OperationClient__: OC
         __OperationServer__: OS
 
-現在、`#same-as:` タグは replace コマンドに対応していません。
-
 
 ### 設定の詳細
 

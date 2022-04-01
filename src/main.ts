@@ -220,9 +220,10 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
                     } else {
                         if ( ! errorInSameAsTag) {
                             console.log('');
+                            console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, inputFilePath));
                             console.log(`${getTestablePath(inputFilePath)}:${lineNumInSetting}: ${lines[lineNumInSetting - 1]}`);
-                            console.log(`    ${translate('Warning')}: ${translate('Not found a variable name.')}`);
-                            console.log(`    Same as: ${expectedVariableName}`);
+                            console.log(`    ${translate('Warning')}: ${translate('Not found a variable name specified in the same-as tag.')}`);
+                            console.log(`    Variable Name: ${expectedVariableName}`);
                             parser.warningCount += 1;
                         }
                     }
@@ -2269,7 +2270,7 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
 async function  check(checkingFilePath?: string) {
     const  parser = new Parser();
     const  currentFolderBackUp = process.cwd();
-    const  copyTags: CopyTag.Properties[] = await CopyTag.scanAllTemplate();
+    const  copyTags: CopyTag.Properties[] = await CopyTag.scanAllTemplate(checkingFilePath);
     var    fileCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
@@ -2458,11 +2459,17 @@ namespace CopyTag {
     }
 
     // CopyTag.scanAllTemplate
-    export async function  scanAllTemplate(): Promise<CopyTag.Properties[]> {
+    export async function  scanAllTemplate(checkingFilePath?: string): Promise<CopyTag.Properties[]> {
         const  copyTags: CopyTag.Properties[] = [];
-        var  copyTag: CopyTag.Properties | undefined = undefined;
+        var    copyTag: CopyTag.Properties | undefined = undefined;
+        const  filePaths = await listUpFilePaths();
+        if (checkingFilePath  &&  ! filePaths.some(item => item.endsWith(checkingFilePath))) {
+            if (fs.existsSync(checkingFilePath)) {
+                filePaths.push(lib.getFullPath( checkingFilePath, process.cwd()));
+            }
+        }
 
-        for (const inputFileFullPath of await listUpFilePaths()) {
+        for (const inputFileFullPath of filePaths) {
             var  reader = readline.createInterface({
                 input: fs.createReadStream(inputFileFullPath),
                 crlfDelay: Infinity

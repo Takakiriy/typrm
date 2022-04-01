@@ -199,9 +199,10 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
                     else {
                         if (!errorInSameAsTag) {
                             console.log('');
+                            console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, inputFilePath));
                             console.log(`${getTestablePath(inputFilePath)}:${lineNumInSetting}: ${lines[lineNumInSetting - 1]}`);
-                            console.log(`    ${translate('Warning')}: ${translate('Not found a variable name.')}`);
-                            console.log(`    Same as: ${expectedVariableName}`);
+                            console.log(`    ${translate('Warning')}: ${translate('Not found a variable name specified in the same-as tag.')}`);
+                            console.log(`    Variable Name: ${expectedVariableName}`);
                             parser.warningCount += 1;
                         }
                     }
@@ -2121,7 +2122,7 @@ async function replaceSub(inputFilePath, parser, command) {
 async function check(checkingFilePath) {
     const parser = new Parser();
     const currentFolderBackUp = process.cwd();
-    const copyTags = await CopyTag.scanAllTemplate();
+    const copyTags = await CopyTag.scanAllTemplate(checkingFilePath);
     var fileCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
@@ -2285,10 +2286,16 @@ var CopyTag;
     }
     CopyTag.CheckParser = CheckParser;
     // CopyTag.scanAllTemplate
-    async function scanAllTemplate() {
+    async function scanAllTemplate(checkingFilePath) {
         const copyTags = [];
         var copyTag = undefined;
-        for (const inputFileFullPath of await listUpFilePaths()) {
+        const filePaths = await listUpFilePaths();
+        if (checkingFilePath && !filePaths.some(item => item.endsWith(checkingFilePath))) {
+            if (fs.existsSync(checkingFilePath)) {
+                filePaths.push(lib.getFullPath(checkingFilePath, process.cwd()));
+            }
+        }
+        for (const inputFileFullPath of filePaths) {
             var reader = readline.createInterface({
                 input: fs.createReadStream(inputFileFullPath),
                 crlfDelay: Infinity

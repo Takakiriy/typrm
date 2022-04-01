@@ -1500,22 +1500,29 @@ settings: #settings:
 
 exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:         __OperationServer__: OS
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         __C_S__: Server  #// Client or Server
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
     Warning: Not matched with the value referenced from same-as tag.
     Same as: __OperationServer__
     Expected: OS
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
     Warning: Not found a variable name specified in the same-as tag.
     Variable Name: __Unknown__
 
-Warning: 2, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:35:         __Store2__: x      #same-as: __Store{$settings.__Other__}__
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __StoreHost__
+
+Warning: 3, Error: 0
 checked file count = 1, template count = 6
 "
 `;
@@ -1552,11 +1559,13 @@ error:
         __StoreClient__: SC
         __StoreServer__: SS
         __C_S__: Server  #// Client or Server
+        __Other__: Host
         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
+        __Store2__: x      #same-as: __Store{$settings.__Other__}__
     ref:
         OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
-        Ox, SS:  #template: __Operation__, __Store__
+        Ox, SS, x:  #template: __Operation__, __Store__, __Store2__
 settings: #settings:
 "
 `;
