@@ -1716,6 +1716,14 @@ async function replaceSub(inputFilePath, parser, command) {
                 for (const [key, value] of Object.entries(newSetting)) {
                     replacingKeyValues[key] = value.value;
                 }
+                for (const error of toTagTree.currentNotFoundNameInSameAsTag) {
+                    const settingNames = error.referencedVariableNames.concat([error.settingName]);
+                    console.log('');
+                    console.log(`${getVariablesForErrorMessage('', settingNames, settingTree, lines, parser.filePath)}`);
+                    console.log(`    ${translate('Warning')}: ${translate('Not found a variable name.')}`);
+                    console.log(`    Same as: ${error.notFoundName}`);
+                    parser.errorCount += 1;
+                }
             }
             // #copy tag
             if (copyTagIndent) {
@@ -4320,6 +4328,7 @@ class ReplaceToTagTree {
         this.currentOldSettingsInIfBlock = {}; // before replaced in current if block out of settings
         this.currentNewSettingsInIfBlock = {}; // after  replaced in current if block out of settings
         this.currentIsOutOfFalseBlock = false; // true means that to replace is enabled
+        this.currentNotFoundNameInSameAsTag = [];
         // next: next for "moveToLine" method
         this.nextLineNumIndex = 0;
         this.nextSettingsLineNum = 1;
@@ -4337,6 +4346,7 @@ class ReplaceToTagTree {
             currentNewSettingsByOriginalTag: toTagTree.currentNewSettingsByOriginalTag,
             currentOldSettingsInIfBlock: toTagTree.currentOldSettingsInIfBlock,
             currentNewSettingsInIfBlock: toTagTree.currentNewSettingsInIfBlock,
+            currentNotFoundNameInSameAsTag: toTagTree.currentNotFoundNameInSameAsTag,
             nextLineNumIndex: toTagTree.nextLineNumIndex,
             nextSettingsLineNum: toTagTree.nextSettingsLineNum,
             outOfFalseBlocks: toTagTree.outOfFalseBlocks,
@@ -4535,12 +4545,22 @@ class ReplaceToTagTree {
             else {
                 return_.nextIfLineNum = 0;
             }
-        }
-        const key = 0, value = 1;
-        const sameAsSettings = Object.entries(return_.currentNewSettings).filter(keyValue => keyValue[value].sameAs);
-        for (const [settingName, setting] of sameAsSettings) {
-            const r = SameAsTag.evaluateVariableName(setting.sameAs, return_.currentNewSettings);
-            return_.currentNewSettings[settingName] = return_.currentNewSettings[r.variableName];
+            const value = 1;
+            return_.currentNotFoundNameInSameAsTag = [];
+            const sameAsSettings = Object.entries(return_.currentNewSettings).filter(keyValue => keyValue[value].sameAs);
+            for (const [settingName, setting] of sameAsSettings) {
+                const r = SameAsTag.evaluateVariableName(setting.sameAs, return_.currentNewSettings);
+                if (r.variableName in return_.currentNewSettings) {
+                    return_.currentNewSettings[settingName] = return_.currentNewSettings[r.variableName];
+                }
+                else {
+                    return_.currentNotFoundNameInSameAsTag.push({
+                        settingName,
+                        notFoundName: r.variableName,
+                        referencedVariableNames: r.referencedVariableNames,
+                    });
+                }
+            }
         }
         return_.outOfFalseBlocks = outOfFalseBlocks;
         return_.outOfFalseBlocksByOriginalTag = outOfFalseBlocksByOriginalTag;

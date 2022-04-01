@@ -80,6 +80,7 @@ declare class ReplaceToTagTree {
         [name: string]: Setting;
     };
     currentIsOutOfFalseBlock: boolean;
+    currentNotFoundNameInSameAsTag: NotFoundNameInSameAsTag[];
     nextLineNumIndex: number;
     nextSettingsLineNum: number;
     nextIfLineNumIndex: number;
@@ -105,6 +106,7 @@ interface ReplaceToTagTree_for_moveToLine {
     currentNewSettingsInIfBlock: {
         [name: string]: Setting;
     };
+    currentNotFoundNameInSameAsTag: NotFoundNameInSameAsTag[];
     nextLineNumIndex: number;
     nextSettingsLineNum: number;
     outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
@@ -122,6 +124,11 @@ interface ReplaceToTagTree_for_addCurrentSettingsInIfBlock {
     };
     outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
     outOfFalseBlocksByOriginalTag: Map</*lineNum*/ number, boolean>;
+}
+interface NotFoundNameInSameAsTag {
+    settingName: string;
+    notFoundName: string;
+    referencedVariableNames: string[];
 }
 interface SettingsInformation {
     index: string;
