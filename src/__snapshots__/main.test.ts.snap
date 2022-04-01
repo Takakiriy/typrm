@@ -1522,8 +1522,15 @@ exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = 
     Warning: Not found a variable name specified in the same-as tag.
     Variable Name: __StoreHost__
 
-Warning: 3, Error: 0
-checked file count = 1, template count = 6
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:53:             __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __OperationHost__
+
+Warning: 4, Error: 0
+checked file count = 1, template count = 8
 "
 `;
 
@@ -1567,6 +1574,23 @@ error:
         OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
         Ox, SS, x:  #template: __Operation__, __Store__, __Store2__
 settings: #settings:
+with if tag:
+    settings: #settings:
+        __Type__: B
+        __C_S__: Server  #// Client or Server
+        __Other__: Host
+        #if: $settings.__Type__ == A
+            __OperationClient__: AC
+            __OperationServer__: AS
+            __Operation__: AS  #same-as: __Operation{$settings.__C_S__}__
+        #if: $settings.__Type__ == B
+            __OperationClient__: BC
+            __OperationServer__: BS
+            __Operation__: BS  #same-as: __Operation{$settings.__C_S__}__
+            __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
+    ref:
+        BC, BS:  #template: __OperationClient__, __OperationServer__
+        BS:  #template: __Operation__
 "
 `;
 
@@ -1991,7 +2015,7 @@ B:
 
 exports[`checks template value >> verbose: answer 1`] = `
 "Verbose: typrm command: check
-Verbose: Phase 1: parse settings ...
+Verbose: Phase 1: parse settings ...  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml
     Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1

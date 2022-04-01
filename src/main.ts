@@ -186,8 +186,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
 
         // Check the "#same-as:" tag.
         if (settingTree.wasChanged) {
-            const  localSettings = settingTree.settings[settingTree.currentSettingIndex];
-            for (const [variableName, variable] of Object.entries(localSettings)) {
+            for (const [variableName, variable] of Object.entries(settingTree.currentSettings)) {
                 const  lineNumInSetting = setting[variableName].lineNum;
                 if (variable.sameAs) {
                     var  expectedVariableName = variable.sameAs;
@@ -398,7 +397,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     tree.indicesWithIf.set(1, '/');
     tree.settings = {};
     if (parser.verbose) {
-        console.log(`Verbose: Phase 1: parse settings ...`);
+        console.log(`Verbose: Phase 1: parse settings ...  ${getTestablePath(parser.filePath)}`);
     }
 
     for await (const line1 of reader) {
