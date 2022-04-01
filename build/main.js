@@ -5374,7 +5374,7 @@ else {
 }
 const settingLabel = /(^| )#settings:/;
 const settingsDot = '$settings.';
-const settingsDotRe = /{\$settings\.(.*)}/g;
+const settingsDotRe = /{\$settings\.(.*?)}/g;
 const originalLabel = "#original:";
 const toLabel = "#to:"; // replace to tag
 const checkTag = "#check:";

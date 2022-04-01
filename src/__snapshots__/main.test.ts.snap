@@ -1500,36 +1500,62 @@ settings: #settings:
 
 exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = `
 "
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:         __OperationServer__: OS
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         __C_S__: Server  #// Client or Server
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:         __OperationServer__: OS
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:35:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
     Warning: Not matched with the value referenced from same-as tag.
     Same as: __OperationServer__
     Expected: OS
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
     Warning: Not found a variable name specified in the same-as tag.
     Variable Name: __Unknown__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         __Other__: Host
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:35:         __Store2__: x      #same-as: __Store{$settings.__Other__}__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37:         __Store2__: x      #same-as: __Store{$settings.__Other__}__
     Warning: Not found a variable name specified in the same-as tag.
     Variable Name: __StoreHost__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39: settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:     settings: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44:         __Other__: Host
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:53:             __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:         __OperationServer__: OS
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:         __On__: on
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42:         __U__: _
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38:         __Operation3__: 0x  #same-as: __Operati{$settings.__On__}{$settings.__C_S__}{$settings.__U__}_
+    Warning: Not matched with the value referenced from same-as tag.
+    Same as: __OperationServer__
+    Expected: OS
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39:         __Operation4__: OS  #same-as: __Operati{$settings.__On__}{$settings.__Unknown__}{$settings.__U__}_
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __Unknown__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:         __On__: on
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42:         __U__: _
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:40:         __Operation5__: xx  #same-as: __Operati{$settings.__On__}{$settings.__Other__}{$settings.__U__}_
     Warning: Not found a variable name specified in the same-as tag.
     Variable Name: __OperationHost__
 
-Warning: 4, Error: 0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:46: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:48:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:51:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60:             __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __OperationHost__
+
+Warning: 7, Error: 0
 checked file count = 1, template count = 8
 "
 `;
@@ -1556,9 +1582,11 @@ exports[`checks template value >> settings >> 5_check_same_as_tag: sourceFileCon
         __C_S__: Server  #// Client or Server
         __Operation__: OS  #same-as: __Operation{$settings.__C_S__}__
         __Store__: SS      #same-as: __Store{$settings.__C_S__}__
+        __Operation3__: OS #same-as: __Operati{$settings.__On__}{$settings.__C_S__}__
+        __On__: on
     ref:
         OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
-        OS, SS:  #template: __Operation__, __Store__
+        OS, SS, OS:  #template: __Operation__, __Store__, __Operation3__
 error:
     settings: #settings:
         __OperationClient__: OC
@@ -1570,9 +1598,14 @@ error:
         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
         __Store2__: x      #same-as: __Store{$settings.__Other__}__
+        __Operation3__: 0x  #same-as: __Operati{$settings.__On__}{$settings.__C_S__}{$settings.__U__}_
+        __Operation4__: OS  #same-as: __Operati{$settings.__On__}{$settings.__Unknown__}{$settings.__U__}_
+        __Operation5__: xx  #same-as: __Operati{$settings.__On__}{$settings.__Other__}{$settings.__U__}_
+        __On__: on
+        __U__: _
     ref:
         OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
-        Ox, SS, x:  #template: __Operation__, __Store__, __Store2__
+        Ox, SS, x, 0x, OS, xx:  #template: __Operation__, __Store__, __Store2__, __Operation3__, __Operation4__, __Operation5__
 settings: #settings:
 with if tag:
     settings: #settings:
