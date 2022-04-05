@@ -145,7 +145,8 @@ async function  TestOfCommandLine() {
                 const  snapShotName = `typrm_test >> TestOfCommandLine >> ${case_.name} >> ${case_.checkFile} 1`;
                 const  result = fs.readFileSync(testFolderPath + case_.checkFile, 'utf-8')
                     .replace(/\r/g, '').replace(lib.getHomePath(), '${HOME}');
-                const  answer = lib.getSnapshot(snapShotName);
+                const  answer = lib.getSnapshot(snapShotName)
+                    .replace('${HOME}', lib.getHomePath()).replace(/\//g, '\\');
 
                 if (result !== answer) {
                     fs.writeFileSync(testFolderPath + '_expected.log', answer);

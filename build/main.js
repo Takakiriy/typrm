@@ -250,7 +250,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
             }
             else { // if (templateTag.label === templateIfLabel)
                 templateTag.evaluate(settingForTemplate);
-                var expected = getExpectedLine(settingForTemplate, templateTag.newTemplate);
+                var expected = getExpectedLine(settingForTemplate, templateTag.newTemplate, { relatedReferenced: true });
             }
             if (templateTag.lineNumOffset === 0) {
                 var checkingLineWithoutTemplate = checkingLine.substring(0, templateTag.indexInLine);
@@ -468,7 +468,7 @@ async function makeSettingTree(parser) {
             }
         }
         // setting = ...
-        if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
+        if (settingLabel.test(line) && !line.includes(disableLabel)) {
             isReadingSetting = true;
             if (indent === '') {
                 settingStack[0].lineNum = lineNum;
@@ -795,7 +795,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
                 toTagTree.replaceTo[currentSettingIndex] = {};
             }
             // setting = ...
-            if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
+            if (settingLabel.test(line) && !line.includes(disableLabel)) {
                 isReadingSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)[0].length;
                 previousTemplateTag = null;
@@ -979,7 +979,7 @@ async function makeOriginalTagTree(parser, settingTree) {
                 toTagTree.replaceTo[currentSettingIndex] = {};
             }
             // setting = ...
-            if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
+            if (settingLabel.test(line) && !line.includes(disableLabel)) {
                 isReadingSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)[0].length;
             }
@@ -1787,7 +1787,7 @@ async function replaceSub(inputFilePath, parser, command) {
                 }
             }
             // #settings tag
-            if (settingLabel.test(line.trim()) && !line.includes(disableLabel)) {
+            if (settingLabel.test(line) && !line.includes(disableLabel)) {
                 isSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)[0].length;
                 if (!templateIfKeyError) {
@@ -1854,23 +1854,23 @@ async function replaceSub(inputFilePath, parser, command) {
                     if (!copyTagIndent) { // if common case
                         if (commonCase) {
                             var expected = getExpectedLine(oldSetting, templateTag.template);
-                            var replaced = getReplacedLine(newSetting, templateTag.template, replacingKeyValues);
+                            var replaced = getReplacedLine(newSetting, templateTag.template);
                         }
                         else { // if (templateTag.label === templateIfLabel)
                             templateTag.evaluate(newSetting);
                             var expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                            var replaced = getReplacedLine(newSetting, templateTag.newTemplate, replacingKeyValues);
+                            var replaced = getReplacedLine(newSetting, templateTag.newTemplate);
                         }
                     }
                     else { // if copyTagIndent
                         if (commonCase) {
                             var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.template);
-                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template, replacingKeyValues);
+                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template);
                         }
                         else { // if (templateTag.label === templateIfLabel)
                             templateTag.evaluate(newSetting);
                             var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.oldTemplate);
-                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate, replacingKeyValues);
+                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate);
                         }
                     }
                     if (replacingLine.includes(expected)) {
@@ -2265,7 +2265,7 @@ var CopyTag;
                     }
                     if (sourceTemplateTag.isFound) {
                         const { expected: expectedText, log: variablesInTemplate } = getExpectedLineAndEvaluationLog(this.settingAndCopyTagParameters, sourceTemplateTag.template);
-                        const replacedTextContainsDoller = getReplacedLine(this.comparableDollers, sourceTemplateTag.template, {});
+                        const replacedTextContainsDoller = getReplacedLine(this.comparableDollers, sourceTemplateTag.template);
                         const templateIndex = (templateTag.indexInLine !== notFound) ? templateTag.indexInLine : line.length;
                         const checkingLineWithoutTemplate = line.substring(0, templateIndex);
                         var comparableLine = checkingLineWithoutTemplate.replace(expectedText, replacedTextContainsDoller) +
@@ -3782,11 +3782,11 @@ function deleteFileSync(path) {
     }
 }
 // getExpectedLine
-function getExpectedLine(setting, template) {
-    return getExpectedLineAndEvaluationLog(setting, template, false).expected;
+function getExpectedLine(setting, template, options = {}) {
+    return getExpectedLineAndEvaluationLog(setting, template, false, options).expected;
 }
 // getExpectedLineAndEvaluationLog
-function getExpectedLineAndEvaluationLog(setting, template, withLog = false) {
+function getExpectedLineAndEvaluationLog(setting, template, withLog = false, options = {}) {
     var expected = template;
     const log = [];
     for (const key of Object.keys(setting).sort((a, b) => (b.length - a.length))) {
@@ -3795,11 +3795,29 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog = false) {
         const expectedAfter = expected.replace(keyRe, value);
         if (expectedAfter !== expected) {
             setting[key].isReferenced = true;
+            if ('relatedReferenced' in options) {
+                const relatedKey = getRelatedKey(key);
+                if (relatedKey in setting) {
+                    setting[relatedKey].isReferenced = true;
+                }
+            }
             log.push({ before: key, after: setting[key].value });
         }
         expected = expectedAfter;
     }
     return { expected, log };
+    function getRelatedKey(key) {
+        if (key.endsWith('(yes)')) {
+            var relatedKey = key.slice(0, -'(yes)'.length) + '(no)';
+        }
+        else if (key.endsWith('(no)')) {
+            var relatedKey = key.slice(0, -'(no)'.length) + '(yes)';
+        }
+        else {
+            var relatedKey = '';
+        }
+        return relatedKey;
+    }
 }
 // getExpectedLineInFileTemplate
 function getExpectedLineInFileTemplate(setting, lineInTemplate, parser) {
@@ -3816,16 +3834,10 @@ function getExpectedLineInFileTemplate(setting, lineInTemplate, parser) {
     return expected;
 }
 // getReplacedLine
-function getReplacedLine(setting, template, replacedValues) {
+function getReplacedLine(setting, template) {
     const replacedSetting = {};
     for (const key of Object.keys(setting)) {
-        if (key in replacedValues) {
-            // var  value = replacedValues[key];
-            var value = setting[key].value;
-        }
-        else {
-            var value = setting[key].value;
-        }
+        var value = setting[key].value;
         replacedSetting[key] = { value, isReferenced: true /*dummy*/, tag: 'toAfterTemplate',
             lineNum: 0 /*dummy*/, settingsIndex: '' };
     }
@@ -3875,7 +3887,7 @@ function getReplacedCopyTagContents(copyTag, sourceCopyTag, parameters) {
             const templateTag = parseTemplateTag(sourceLine, parser);
             if (templateTag.isFound && templateTag.includesKey(replacingKeys)) {
                 var expected = getExpectedLine(oldSetting, templateTag.template);
-                var replaced = getReplacedLine(newSetting, templateTag.template, {});
+                var replaced = getReplacedLine(newSetting, templateTag.template);
                 if (replacingLine.includes(expected)) {
                     var replacedLine = replacingLine.replace(new RegExp(lib.escapeRegularExpression(expected), 'g'), replaced.replace(/\$/g, '$$'));
                     const templateTagIndex = tagIndexOf(replacedLine, templateLabel);

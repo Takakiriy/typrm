@@ -2009,6 +2009,23 @@ exports[`checks template value >> template_if_1_error: sourceFileContents 1`] = 
 "
 `;
 
+exports[`checks template value >> template_if_2_referenced_one_side: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 1
+"
+`;
+
+exports[`checks template value >> template_if_2_referenced_one_side: sourceFileContents 1`] = `
+"設定: #settings:
+    __Stage__: develop
+    template-if(yes): Do
+    template-if(no):  skip
+手順:
+    Do case product:  #template-if: $settings.__Stage__ == develop
+"
+`;
+
 exports[`checks template value >> var_not_ref_1_error: answer 1`] = `
 "
 Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3

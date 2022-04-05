@@ -62,6 +62,12 @@ tag:
                         #     return_.currentNewSettings[settingName] = return_.currentNewSettings[r.variableName];
     settings tag:  #keyword:#settings:
         #search: settingStack of typrm makeSettingTree
+    template-if tag:  #keyword:#template-if:
+        test:
+            checks template value >>
+                template_if_1_error
+            replaces settings >>
+                2_replace_9_template_if_1_OK
 test:
     Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
         main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:

@@ -128,6 +128,7 @@ describe("checks template value >>", () => {
         ["1_template_3_if"],
         ["var_not_ref_1_error"],
         ["template_if_1_error"],
+        ["template_if_2_referenced_one_side"],
         ["case_sensitive_variable_name"],
         ["environment_variable"],
         ["list_to_tag_original_tag"],

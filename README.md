@@ -55,7 +55,7 @@ For example, if you search for the keyword `grep`,
 you'll see where the keyword `grep` is and your favorite template snippet.
 You can use `typrm grep` like Linux `man grep`.
 
-typrm command:
+typrm command to show a snippet:
 
     $ typrm grep
     /path/MyLinux.yaml:100: grep: #keyword:
@@ -369,7 +369,7 @@ in `#settings:` tag.
     DB_USER = root
     DB_PASS = 5I#OfEilq#)
 
-Display snippets typrm command:
+Display a snippet with secrets typrm command (It is same as standard typrm search command):
 
     $ typrm DB log in
     /path/MyDB.yaml:100: DB log in: #keyword:

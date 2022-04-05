@@ -56,9 +56,8 @@ typrm の検索機能は、自分が設定したキーワードに関する自�
 自分が使いやすい grep のオプションが入ったテンプレートのスニペットが表示されます。
 Linux の `man grep` のように `typrm grep` を使えます。
 
-typrm コマンド:
+スニペットを表示する typrm コマンド:
 
-    $ typrm grep
     /path/MyLinux.yaml:100: grep: #keyword:
         サンプル: grep -rn __keyword__ __FilePath__
         キーワードを含まないファイル:
@@ -351,7 +350,7 @@ typrm を起動したときの カレント フォルダー にある .env フ�
     DB_USER = root
     DB_PASS = 5I#OfEilq#)
 
-スニペットを表示する typrm コマンド:
+シークレットを含むスニペットを表示する（通常の typrm search コマンドと同じ）:
 
     $ typrm DB log in
     /path/MyDB.yaml:100: DB log in: #keyword:
