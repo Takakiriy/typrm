@@ -2041,7 +2041,7 @@ Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14
   Not referenced: __Key2__
 
 Warning: 4, Error: 0
-checked file count = 1, template count = 2
+checked file count = 1, template count = 3
 "
 `;
 
@@ -2063,6 +2063,11 @@ B:
         Key3: value3
     手順: |
         - echo  "value3"  #template: - echo  "Key3"
+case that the name is same as the value:
+    設定: #settings:
+        keyValue: keyValue
+    手順:
+        keyValue  #template: keyValue
 "
 `;
 

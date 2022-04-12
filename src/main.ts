@@ -4065,19 +4065,20 @@ function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, w
         const  keyRe = new RegExp(lib.escapeRegularExpression( key ), 'g' );
         const  value = setting[key].value.replace(/\$/g,'$$');
 
-        const  expectedAfter = expected.replace(keyRe, value);
-        if (expectedAfter !== expected) {
+        if (keyRe.test(expected)) {
+            const  expectedAfter = expected.replace(keyRe, value);
+
             setting[key].isReferenced = true;
             if ('relatedReferenced' in options) {
                 const  relatedKey = getRelatedKey(key);
                 if (relatedKey in setting) {
-
                     setting[relatedKey].isReferenced = true;
                 }
             }
+
+            expected = expectedAfter;
             log.push({before: key, after: setting[key].value});
         }
-        expected = expectedAfter;
     }
     return  {expected, log};
 

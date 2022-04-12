@@ -105,7 +105,7 @@ async function  TestOfCommandLine() {
         "inputLines": "#ref: ../example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( true  ||  case_.name === 'pointed_figure_2') {
+        if ( false  ||  case_.name === 'search_mode_select_by_number') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 
@@ -175,8 +175,8 @@ async function  callChildProccess(commandLine: string,  option?: ProcessOption):
 
                 // on close the "childProcess" (2)
                 (error: child_process.ExecException | null, stdout: string, stderr: string) => {
-                    returnValue.stdout = stdout;
-                    returnValue.stderr = stderr;
+                    returnValue.stdout = stdout.replace(/\r\n/g, '\n');
+                    returnValue.stderr = stderr.replace(/\r\n/g, '\n');
                     resolveFunction(returnValue);
                 },
             );

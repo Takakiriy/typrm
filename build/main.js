@@ -3792,8 +3792,8 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog = false, opt
     for (const key of Object.keys(setting).sort((a, b) => (b.length - a.length))) {
         const keyRe = new RegExp(lib.escapeRegularExpression(key), 'g');
         const value = setting[key].value.replace(/\$/g, '$$');
-        const expectedAfter = expected.replace(keyRe, value);
-        if (expectedAfter !== expected) {
+        if (keyRe.test(expected)) {
+            const expectedAfter = expected.replace(keyRe, value);
             setting[key].isReferenced = true;
             if ('relatedReferenced' in options) {
                 const relatedKey = getRelatedKey(key);
@@ -3801,9 +3801,9 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog = false, opt
                     setting[relatedKey].isReferenced = true;
                 }
             }
+            expected = expectedAfter;
             log.push({ before: key, after: setting[key].value });
         }
-        expected = expectedAfter;
     }
     return { expected, log };
     function getRelatedKey(key) {
