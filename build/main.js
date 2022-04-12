@@ -1671,6 +1671,9 @@ async function replaceSub(inputFilePath, parser, command) {
         var cutOriginalTag = true;
         var cutReplaceToTagEnabled = false;
     }
+    if (toTagTree.replaceToLength === 0) {
+        return;
+    }
     if (parser.verbose) {
         console.log(`Verbose: Phase 3: replace ...`);
     }
@@ -4353,6 +4356,9 @@ class ReplaceToTagTree {
         this.nextSettingsLineNum = 1;
         this.nextIfLineNumIndex = 0;
         this.nextIfLineNum = 1;
+    }
+    get replaceToLength() {
+        return Object.values(this.replaceTo).reduce((sum, settings) => sum + Object.values(settings).length, 0);
     }
     moveToLine(parser, settingsTree) {
         Object.assign(this, this.moveToLine_Immutably(parser, settingsTree));

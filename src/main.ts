@@ -1820,6 +1820,9 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
         var  cutOriginalTag = true
         var  cutReplaceToTagEnabled = false
     }
+    if (toTagTree.replaceToLength === 0) {
+        return
+    }
     if (parser.verbose) {
         console.log(`Verbose: Phase 3: replace ...`);
     }
@@ -4691,6 +4694,9 @@ class  ReplaceToTagTree {
     outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
     outOfFalseBlocksByOriginalTag = new Map</*lineNum*/ number, boolean>();
     command: 'replace' | 'reset' = 'replace';
+    get replaceToLength(): number {
+        return  Object.values(this.replaceTo).reduce((sum, settings) => sum + Object.values(settings).length,  0);
+    }
 
     // current: current line moved by "moveToLine" method
     currentNewSettings:  {[name: string]: Setting} = {};  // to tag. It includes settings before replace

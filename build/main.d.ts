@@ -67,6 +67,7 @@ declare class ReplaceToTagTree {
     outOfFalseBlocks: Map<number, boolean>;
     outOfFalseBlocksByOriginalTag: Map<number, boolean>;
     command: 'replace' | 'reset';
+    get replaceToLength(): number;
     currentNewSettings: {
         [name: string]: Setting;
     };
