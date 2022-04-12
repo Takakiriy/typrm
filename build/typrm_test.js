@@ -5,6 +5,12 @@ import * as path from 'path';
 import * as lib from './lib';
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+if (process.env.windir) {
+    var testingOS = 'Windows';
+}
+else {
+    var testingOS = 'Linux';
+}
 const scriptPath = `../build/typrm.js`;
 const testFolderPath = `test_data` + path.sep;
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
@@ -101,7 +107,7 @@ async function TestOfCommandLine() {
             "inputLines": "#ref: ../example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
         }];
     for (const case_ of cases) {
-        if (false || case_.name === 'search_mode_select_by_number') {
+        if (true || case_.name === 'search_mode_select_by_number') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
             // Test Main
@@ -138,8 +144,10 @@ async function TestOfCommandLine() {
                 const snapShotName = `typrm_test >> TestOfCommandLine >> ${case_.name} >> ${case_.checkFile} 1`;
                 const result = fs.readFileSync(testFolderPath + case_.checkFile, 'utf-8')
                     .replace(/\r/g, '').replace(lib.getHomePath(), '${HOME}');
-                const answer = lib.getSnapshot(snapShotName)
-                    .replace('${HOME}', lib.getHomePath()).replace(/\//g, '\\');
+                var answer = lib.getSnapshot(snapShotName);
+                if (testingOS === 'Windows') {
+                    answer = answer.replace(/\//g, '\\');
+                }
                 if (result !== answer) {
                     fs.writeFileSync(testFolderPath + '_expected.log', answer);
                     printDifferentPaths(case_.checkFile, '_expected.log');
@@ -163,8 +171,8 @@ async function callChildProccess(commandLine, option) {
             var childProcess = child_process.exec(commandLine, { /* maxBuffer: 2000*1024, timeout:5000*/}, 
             // on close the "childProcess" (2)
             (error, stdout, stderr) => {
-                returnValue.stdout = stdout.replace(/\r\n/g, '\n');
-                returnValue.stderr = stderr.replace(/\r\n/g, '\n');
+                returnValue.stdout = stdout;
+                returnValue.stderr = stderr;
                 resolveFunction(returnValue);
             });
             if (option && childProcess.stdin) {
