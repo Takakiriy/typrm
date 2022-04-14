@@ -42,6 +42,7 @@ typrm は自分が使いやすいコマンドのオプションを書いた
     - [Jest を使うテスト](#jest-を使うテスト)
     - [Jest を使わないテスト](#jest-を使わないテスト)
   - [タグ一覧](#タグ一覧)
+  - [環境変数一覧](#環境変数一覧)
 
 <!-- /TOC -->
 
@@ -56,6 +57,7 @@ Linux の `man grep` のように `typrm grep` を使えます。
 
 スニペットを表示する typrm コマンド:
 
+    $ typrm grep
     /path/MyLinux.yaml:100: grep: #keyword:
         サンプル: grep -rn __keyword__ __FilePath__
         キーワードを含まないファイル:
@@ -364,7 +366,7 @@ typrm を起動したときの カレント フォルダー にある .env フ�
 .env ファイルのロードに
 [ npm の dotenv モジュール ](https://www.npmjs.com/package/dotenv)
 を使っており上記の環境変数のようにアクセスできますが、プロセスに環境変数は設定されません。
-環境変数は設定されませんが、スニペットと ファイル チェック から参照することができます。
+環境変数は設定されませんが、スニペットと ファイル チェック から参照することができます。
 typrm shell から起動する子プロセスに .env ファイルで定義した
 環境変数は継承されません。
 `--inherit-dotenv` オプションを指定して typrm を起動したときは
@@ -931,6 +933,7 @@ typrm を使うには Node.js のインストールが必要です。
 
 下記の場合、`__C_S__` 変数の値によって、デフォルトの変数 `__Operation__` の値が
 `__OperationClient__` 変数の値と同じか `__OperationServer__` 変数の値と同じになります。
+`#to:` タグで `__C_S__` 変数の値を変えたら、`__Operation__` 変数の値も変わります。
 
     settings: #settings:
         __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
@@ -1009,11 +1012,14 @@ OS 変数の値を Windows から mac に置き換えると、
 
 typrm が正しく設定値を置き換えることができることをチェックするときは、
 `check` コマンドを使います。短いコマンド名は `c` です。
+また、`check` コマンドは `#to:` タグと `#original:` タグを一覧します。
 
+    typrm check
+<!-- -->
     typrm check __FileName__
 
 typrm は、設定値を置き換える範囲を正しく判定するために、
-置き換える前に、置き換える前の設定値を適用したテキストが存在することをチェックしています。
+置き換える前に、置き換える前の設定値を適用したテキストが存在することをチェックします。
 
 - `#template:` タグによるテンプレートの適用先の内容のチェックを行います
 - `--verbose` オプションを指定すると、typrm が行う内部処理の詳細も表示します
@@ -1025,7 +1031,15 @@ typrm は、設定値を置き換える範囲を正しく判定するために�
 
 ## mutual-search コマンド - リンク元も含めて検索して、リンク関係を維持します
 
-mutual-search コマンドは、下記に示すリンク関係を維持するために使います。
+`mutual-search` コマンドは、下記に示すリンク関係を維持するために使います。
+短いコマンド名は `m` です。
+typrm shell の中では `#mutual:` とキーワードを入力します。
+
+    typrm mutual-search example detail
+<!-- -->
+    typrm m example detail
+<!-- -->
+    typrm keyword: #mutual: example detail
 
 `#search:` タグは、リンク元に相当し、
 詳細な情報や関連する情報が検索して見つかることを示しています。
@@ -1868,3 +1882,17 @@ Jest を使うテストと Jest を使わないテストがあります。
 タグの前は空白文字、または行頭である必要があります。
 
 タグの詳細については、このページを検索してください。
+
+## 環境変数一覧
+
+- `TYPRM_COMMAND_FOLDER` 任意のコマンドを実行するときの カレント フォルダー
+- `TYPRM_COMMAND_SYMBOL` 任意のコマンドを実行するときに入力する文字
+- `TYPRM_FOLDER` 検索対象のフォルダー
+- `TYPRM_FOUND_COUNT_MAX` 検索結果に表示される最大の件数
+- `TYPRM_LINE_NUM_GETTER` `#ref:` タグに指定したキーワードで検索する設定
+- `TYPRM_OPEN_DOCUMENT` 検索後に # と数字で開くときのコマンド
+- `TYPRM_SNIPPET_LINE_COUNT` スニペットを表示する最大の行数
+- `TYPRM_THESAURUS` シソーラス ファイル のパス
+- `TYPRM_VERB` 検索された行に `#ref:` タグが含まれたときにメニューから実行するコマンド
+
+環境変数の詳細については、このページを検索してください。

@@ -25,7 +25,6 @@ You can execute the command just by copying and pasting the displayed command.
     - [#template-if tag - replaces the sign of whether the condition is met](#template-if-tag---replaces-the-sign-of-whether-the-condition-is-met)
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
   - [mutual-search command - search link sources and maintain the link relationship](#mutual-search-command---search-link-sources-and-maintain-the-link-relationship)
-  - [where command - finds the definition of the setting (variable) value](#where-command---finds-the-definition-of-the-setting-variable-value)
   - [#file-template tag: checks the contents of the file](#file-template-tag-checks-the-contents-of-the-file)
   - [#copy tag: check the text is the same](#copy-tag-check-the-text-is-the-same)
   - [#if tag: set conditions](#if-tag-set-conditions)
@@ -42,6 +41,7 @@ You can execute the command just by copying and pasting the displayed command.
     - [Test using Jest](#test-using-jest)
     - [Test without Jest](#test-without-jest)
   - [Tag list](#tag-list)
+  - [Environment variable list](#environment-variable-list)
 
 <!-- /TOC -->
 
@@ -962,7 +962,9 @@ make a part of it `{$settings.(Variable Name)} `is specified.
 In the following cases, depending on the value of the `__C_S__` variable,
 the value of the default variable `__Operation__` will be the same as
 the value of the `__OperationClient__` variable or
-the value of the` __OperationServer__` variable.
+the value of the `__OperationServer__` variable.
+If you change the value of the `__C_S__` variable by the `#to:` tag,
+the value of the `__Operation__` variable will also change.
 
     settings: #settings:
         __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
@@ -1046,7 +1048,10 @@ symbols that guide to read or not read the phrase will be replaced.
 
 To check that typrm can replace the settings correctly,
 use the `check` command. The short command name is `c`.
+Also, the `check` command lists up `#to:` tag and `#original:` tag.
 
+    typrm check
+<!-- -->
     typrm check __FileName__
 
 In order to correctly determine the range to replace the setting value,
@@ -1062,7 +1067,15 @@ typrm checks that the text with the setting value exists before replacing.
 
 ## mutual-search command - search link sources and maintain the link relationship
 
-The mutual-search command is used to maintain the link relationships shown below.
+The `mutual-search` command is used to maintain the link relationships shown below.
+The short command name is `m`.
+In the typrm shell, enter `#mutual:` and the keyword.
+
+    typrm mutual-search example detail
+<!-- -->
+    typrm m example detail
+<!-- -->
+    typrm keyword: #mutual: example detail
 
 The `#search:` tag corresponds to the link source and
 indicates that detailed or related information can be searched and found.
@@ -1965,3 +1978,17 @@ You can set the break point, click at the left of line number of the source file
 The tags must be preceded by a space character or at the beginning of a line.
 
 You can find more informations of tags by searching this page.
+
+## Environment variable list
+
+- `TYPRM_COMMAND_FOLDER` Current folder when executing any command
+- `TYPRM_COMMAND_SYMBOL` Characters to enter when executing any command
+- `TYPRM_FOLDER` Folder to be searched
+- `TYPRM_FOUND_COUNT_MAX` Maximum number displayed in search results
+- `TYPRM_LINE_NUM_GETTER` Setting to search by the keyword specified in the `#ref:` tag
+- `TYPRM_OPEN_DOCUMENT` Command to open with # and number after search
+- `TYPRM_SNIPPET_LINE_COUNT` Maximum number of lines to display snippets
+- `TYPRM_THESAURUS` Thesaurus file path
+- `TYPRM_VERB` Command to execute from the menu when the searched line contains the `#ref:` tag
+
+You can find more informations of environment variables by searching this page.
