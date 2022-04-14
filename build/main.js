@@ -2013,16 +2013,19 @@ async function replaceSub(inputFilePath, parser, command) {
                                 var errorMessage = '';
                                 errorMessage += '\n';
                                 errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
-                                errorMessage += `    ${translate('Error')}: ${translate('template target values after replace are conflicted.')}\n`;
+                                errorMessage += `    ${translate('Error')}: ${translate('template target values after replace are conflicted.')}` +
+                                    ` ${translate('You should add #to: tags at setting variables in other templates.')}\n`;
                                 errorMessage += getVariablesForErrorMessage('    ', variableNames, settingTree, lines, parser.filePath) + '\n';
+                                var templateNum = 0;
                                 for (const template of checkedTemplateTags[outputTargetLineNum]) {
                                     const replacedLine = lines[outputTargetLineNum - 1].replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
-                                    errorMessage += `    replace\n`;
-                                    errorMessage += `    ${getTestablePath(inputFilePath)}:${template.templateLineNum}: ${lines[template.templateLineNum - 1]}\n`;
-                                    errorMessage += `    ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
-                                    errorMessage += `        ${translate('Before Replacing')}: ${template.expected.trim()}\n`;
-                                    errorMessage += `        ${translate('After  Replacing')}: ${template.replaced.trim()}\n`;
-                                    errorMessage += `    ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacedLine}\n`;
+                                    templateNum += 1;
+                                    errorMessage += `    replaced (${templateNum}): ${replacedLine.trim()}\n`;
+                                    errorMessage += `        ${getTestablePath(inputFilePath)}:${template.templateLineNum}: ${lines[template.templateLineNum - 1]}\n`;
+                                    errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
+                                    errorMessage += `            ${translate('Before Replacing')}: ${template.expected.trim()}\n`;
+                                    errorMessage += `            ${translate('After  Replacing')}: ${template.replaced.trim()}\n`;
+                                    errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacedLine}\n`;
                                 }
                                 conflictErrors[outputTargetLineNum] = lib.cutLast(errorMessage, '\n');
                             }
@@ -5294,6 +5297,7 @@ function translate(englishLiterals, ...values) {
             "${0}a quote is found inside a field${1}": "${0}フィールド内に引用符があります${1}",
             "Not found. To do full text search, press Enter key.": "見つかりません。全文検索するときは Enter キーを押してください。",
             "template target values after replace are conflicted.": "変数の値を置き換えた後のテンプレートのターゲットが矛盾しています",
+            "You should add #to: tags at setting variables in other templates.": "他のテンプレートから参照されている設定の変数に #to: タグを追加してください",
             "To show more result, restart typrm with --found-count-max option": "もっと多くの結果を表示するときは --found-count-max オプションを指定して typrm を再起動します",
             "To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.": "シェルのコマンドを実行するには、TYPRM_COMMAND_FOLDER 環境変数、または --command-folder オプションを設定してください。",
             'Envrironment variables defined in ".env" file are not inherit to child processes.': ".env ファイルに定義した環境変数は子プロセスに継承されません。",
