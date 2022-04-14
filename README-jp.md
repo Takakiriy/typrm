@@ -23,11 +23,9 @@ typrm は自分が使いやすいコマンドのオプションを書いた
   - [設定タグと #template タグを使って設定値を置き換えます](#設定タグと-template-タグを使って設定値を置き換えます)
     - [変数名の一部を別の変数から参照します - #same-as タグ](#変数名の一部を別の変数から参照します---same-as-タグ)
     - [設定の詳細](#設定の詳細)
-    - [設定名](#設定名)
     - [#template-if タグ - 条件を満たしているかどうかの記号を置き換えます](#template-if-タグ---条件を満たしているかどうかの記号を置き換えます)
   - [check コマンド - 置き換えることができることをテストします](#check-コマンド---置き換えることができることをテストします)
   - [mutual-search コマンド - リンク元も含めて検索して、リンク関係を維持します](#mutual-search-コマンド---リンク元も含めて検索してリンク関係を維持します)
-  - [where コマンド - 設定値（変数）の定義を探します](#where-コマンド---設定値変数の定義を探します)
   - [#file-template タグを使ってファイルの内容をチェックします](#file-template-タグを使ってファイルの内容をチェックします)
   - [#copy タグを使って文章が同じことをチェックします](#copy-タグを使って文章が同じことをチェックします)
   - [#if タグを使って条件を設定します](#if-タグを使って条件を設定します)
@@ -205,8 +203,6 @@ search コマンドにキーワードを指定しないと、検索キーワー�
 Visual Studio Code のターミナルで実行した場合、見つかった場所（パス）を
 Ctrl キーを押しながらクリックすると開くことができます。
 
-（バージョン 1.x の場合）
-
 検索した後で # と数字（例：#1）を入力すると、
 `TYPRM_OPEN_DOCUMENT` 環境変数に設定したコマンドを実行します。
 入力する数字は検索結果の下から数えた番号です。
@@ -224,8 +220,6 @@ bash
 
     code -g "/home/user1/text.txt:1"
 
-（すべてのバージョン）
-
 - 複数の単語からなる検索キーワードを指定するときでも、" " で囲む必要はありません。
   ただし 2つ以上の空白は 1つになります。
 - 複数の単語を指定すると AND 検索になります。
@@ -237,8 +231,6 @@ bash
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values
 
-（バージョン 1.2.0 以上）
-
 - 同じ行内なら単語の順番が逆でも間に別の単語があっても見つかります。
 
     `git status`
@@ -248,8 +240,6 @@ bash
 - 単語数を増やすと絞り込めます。単語数を減らすと関連する内容もヒットします。
 - 入力したキーフレーズに `#search:` を含む場合、`#search:` を `#keyword:`
   に置き換えた行全体にもヒットします。
-
-（すべてのバージョン）
 
 下記のうち、上に書かれた違いほど検索スコアを大きく落とします。
 - 語数の違い
@@ -458,8 +448,6 @@ new_folder.yaml
 変更する部分と同じ行の末尾に `#template:` タグを書きます。
 （後で説明しますが、別の行に書くこともできます）
 
-（バージョン 1.x の場合）
-
 設定の中の変数の値の右に `#to:` タグと置き換えた後の値を書きます。
 
     設定: #settings:
@@ -471,26 +459,6 @@ typrm をインストールして、
 bash や PowerShell から以下のように `replace` コマンドを入力します。短いコマンド名は `r` です。
 
     typrm replace  new_folder.yaml  #// または typrm r  new_folder.yaml
-
-（バージョン 0.x の場合）
-
-typrm をインストールして、
-bash や PowerShell から以下のように `replace` コマンドを入力します。短いコマンド名は `r` です。
-
-    cp  "typrm/example/new_folder.yaml"  "."  #// 変更するので一時的にコピーします
-
-    typrm replace  new_folder.yaml  4  "__Name__:work2"
-
-ファイル パス は、キーボードから入力しなくても、
-ファイルをドラッグ＆ドロップして入力できます。
-
-4 は行番号の例です。`#settings:` が書いてある行、またはそれより下、
-または次の `#settings:` が書いてある行より上であれば、
-どの行番号を入力しても構いません。
-ファイルの中に `#settings:` が 1つだけのときは行番号を省略できます。
-行番号の代わりに設定名を指定する方法は後で説明します。
-
-（すべてのバージョン）
 
 new_folder.yaml ファイルは次のような内容に変わり、コピー＆ペーストできるようになります。
 コメントの付いたテキストはそのまま貼り付けることができます。# は
@@ -507,29 +475,10 @@ new_folder.yaml ファイルは次のような内容に変わり、コピー＆�
 置き換える前の値が書かれた `#original:` タグが同じ行に追加されます。
 `#original:` タグがすでにあるときは追加されません。
 
-（バージョン 1.x の場合）
-
 `#original:` タグに書かれた値に戻すときは、reset コマンドを使います。
 また、reset コマンドを使うと `#original:` タグは削除されます。
 
     typrm reset  new_folder.yaml
-
-（バージョン 0.x の場合）
-
-`#original:` タグに書かれた値に戻すときは、reset コマンドを使います。
-また、reset コマンドを使うと `#original:` タグは削除されます。
-
-    typrm reset  new_folder.yaml  4
-
-4 は　replace コマンドと同様に、行番号です。
-設定名を指定することもできます。
-
-「変数名: 新しい変数値」を複数入力するときは、
-複数行をコピー＆ペーストして連続入力することができます。
-
-    typrm replace  new_folder.yaml  4  "__Name1__: work1
-        __Name2__: work2"
-
 
 ### #to タグを使って置き換えます
 
@@ -613,8 +562,6 @@ Linux `sed` コマンドなどで編集します。
 
     (workA1 : workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
 
-（バージョン 1.x の場合）
-
 `#template:` タグが参照する変数が何かを調べるには、
 一時的にテンプレートにマッチしないように書き換えて check コマンドを実行します。
 
@@ -642,37 +589,6 @@ Linux `sed` コマンドなどで編集します。
 警告の内容から、`#template:` タグが参照する変数が
 `__NameA__` と `__NameB__` であることが分かります。
 また、それぞれの変数の定義位置も分かります。
-
-（バージョン 0.x の場合）
-
-`#to:` タグの代わりに `#to-test:` タグを書くと、
-置き換えた後の変数の値がどうなるかをテストすることができます。
-`#to-test:` タグがあるファイルは、内容の置き換えをしません。
-ただし、1回の replace コマンドで
-`#to-test:` タグがあるファイルが置き換えられず、
-同時に `#to-test:` タグがない別のファイルが置き換えられることはあります。
-
-    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to-test: workA2, workB2
-    (workC1, workD1)  #template: (__NameC__ : __NameD__)  #to-test: (workC2 : workD2)
-
-テストの結果の表示の例:
-
-    Verbose:     /____/____.yaml:1:
-    Verbose:         template: (__NameA__ : __NameB__)    ... #template: タグの内容
-    Verbose:         templatePattern: (* : *)             ... #template: タグの内容から変数の部分を * に置き換えた内容
-    Verbose:         toValue: workA2, workB2              ... #to-test: タグの内容
-    Verbose:         toValueIsMatchedWithTemplate: false  ... false = #to-test: タグの値を CSV として解釈します
-    Verbose:         __NameA__: workA2                    ... #to: タグによって置き換えれられる変数の名前と置き換えた後の値
-    Verbose:         __NameB__: workB2
-    Verbose:     /____/____.yaml:2:
-    Verbose:         template: (__NameC__ : __NameD__)
-    Verbose:         templatePattern: (* : *)
-    Verbose:         toValue: (workC2 : workD2)
-    Verbose:         toValueIsMatchedWithTemplate: true  ... true = #to-test: タグの値をテンプレートを置き換えた後の内容として解釈します
-    Verbose:         __NameC__: workC2
-    Verbose:         __NameD__: workD2
-
-（すべてのバージョン）
 
 typrm replace コマンドを実行すると、すべてのファイルにある `#to:` タグに従って
 ファイルの内容を置き換えます。 すべてのファイルとは、
@@ -940,25 +856,12 @@ typrm を使うには Node.js のインストールが必要です。
 
 ## 設定タグと #template タグを使って設定値を置き換えます
 
-（バージョン 1.1.0 以降の場合）
-
 置き換えるテキストは、`#settings:` が書かれた行の下に、
 インデントを深くして `変数名: 値` を書きます。
 
     設定: #settings:
         __ProjectName__: react1
         __npxOption__: --template typescript
-
-（バージョン 1.0.x 以前の場合）
-
-置き換えるテキストは、`設定:` または `settings:` が書かれた行の下に、
-インデントを深くして `変数名: 値` を書きます。
-
-    設定:
-        __ProjectName__: react1
-        __npxOption__: --template typescript
-
-（すべてのバージョン）
 
 また、`#template:` タグを置き換えるテキストと同じ行の右、または、次の行全体に書きます。
 
@@ -1041,9 +944,6 @@ typrm を使うには Node.js のインストールが必要です。
 - 一部の行のインデントを別の行よりも深くすることもできますが、オブジェクトにはなりません
 - 値の指定がない変数は定義できません。`変数名:` だけの行は変数を定義しません
 - 変数名や値に # を含めることはできません
-- (version 0.x) 設定はネストできません。
-    `設定:` より上の `設定:` で定義された変数は参照できません
-- (version 1.x) 設定をネストできます。
     空白文字によるインデントのツリー構造において、
     変数を定義した `#settings:` の親ノードの子孫…ノードから参照できます。
     親方向にある `#settings:` で定義した変数と同じ名前の変数が
@@ -1065,33 +965,6 @@ typrm を使うには Node.js のインストールが必要です。
 
 上記の設定で定義される変数の一覧:
 `__Name__`, `__MainID__`, `__MainValue__`, `__SubID__`, `__SubValue__`
-
-### 設定名
-
-（バージョン 1.0.x 以前のみ）
-
-設定名を付けると replace コマンドや reset コマンドで置き換える対象の設定を
-行番号の代わりに設定名で指定できるようになります。
-ただし、置き換える対象のテキストに書かれた `設定:` または `settings:` の
-コロンの前にカッコ付きで設定名を書く必要があります。
-
-サンプル.yaml
-
-    設定(プロジェクト1):
-        __Name__: image1
-    本文:
-        これは image1 の説明です。 #template: __Name__
-
-    設定(プロジェクト2):
-        __Name__: image2
-    本文:
-        これは image2 の説明です。 #template: __Name__
-
-コマンド
-
-    typrm replace  サンプル.yaml  "プロジェクト1"  "__Name__: Image1"
-
-- 設定名は、数字だけにすることはできません
 
 ### #template-if タグ - 条件を満たしているかどうかの記号を置き換えます
 
@@ -1190,42 +1063,6 @@ mutual-search コマンドは `#keyword:` タグに指定したキーワード�
 
     example.yaml:5:   タイトル2: #search: example detail
     example.yaml:7: タイトル2:  #keyword: example detail
-
-
-## where コマンド - 設定値（変数）の定義を探します
-
-(version 1.0.0 以降は使えません。
-`#template:`が参照する変数の定義位置を探すときは、
-テンプレートにマッチしないエラーをわざと発生させてください。)
-
-`設定:` にまとめて書かれている変数の定義（変数名: 値）の場所を探すときは、
-where コマンドを入力します。
-
-example.yaml:
-
-    1: 設定:
-    2:     __FileName__: file.txt
-    3:     __Number__: 12
-    4: 本文:
-    5:     file.txt  #template: __FileName__
-
-`__FileName__` 変数の定義の場所を表示するときは、下記のように入力します。
-
-    typrm where __FileName__
-
-見つかったら下記のように場所と定義内容が表示されます。
-複数見つかる場合もあります。
-
-    .../example.yaml:2:     __FileName__: file.txt
-
-ファイル名で絞り込むときは、変数名に続けてファイル名を入力します。
-
-    typrm where __FileName__ example.yaml
-
-特定のテンプレートで参照される変数の定義を探すときは、
-変数名に続けてテンプレートがあるファイル名と行番号を入力します。
-
-    typrm where __FileName__ example.yaml 5
 
 
 ## #file-template タグを使ってファイルの内容をチェックします

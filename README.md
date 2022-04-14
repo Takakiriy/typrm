@@ -22,7 +22,6 @@ You can execute the command just by copying and pasting the displayed command.
   - [settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
     - [Reference a part of the variable name from another variable - #same-as tag](#reference-a-part-of-the-variable-name-from-another-variable---same-as-tag)
     - [The details of settings](#the-details-of-settings)
-    - [Setting name](#setting-name)
     - [#template-if tag - replaces the sign of whether the condition is met](#template-if-tag---replaces-the-sign-of-whether-the-condition-is-met)
   - [check command - test that it can be replaced](#check-command---test-that-it-can-be-replaced)
   - [mutual-search command - search link sources and maintain the link relationship](#mutual-search-command---search-link-sources-and-maintain-the-link-relationship)
@@ -217,8 +216,6 @@ When running in Visual Studio Code terminal,
 you can open the file at the found location (path)
 by holding down the Ctrl key and clicking.
 
-(For version 1.x)
-
 If you enter # and a number (e.g. #1) after searching,
 the command you set for the 'TYPRM_OPEN_DOCUMENT' environment variable
 will be executed.
@@ -237,8 +234,6 @@ Commands executed
 
     code -g "/home/user1/text.txt:1"
 
-(For all versions)
-
 - If specifying a search keyword consisting of multiple words,
   it is not necessary to enclose it in " ".
   However, two or more blanks will be one.
@@ -251,8 +246,6 @@ Commands executed
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values
 
-(For version 1.2.0 or later)
-
 - You can find words in the same line even if the order of the words is
   reversed or there is another word in between.
 
@@ -264,8 +257,6 @@ Commands executed
   If you reduce the number of words, the related content will also be hit.
 - If the keyphrase you enter contains `#search:`, the entire line where
   `#search:` is replaced with `#keyword:` will also be hit.
-
-(For all versions)
 
 The more upper in the following list, the lower search score.
 - Difference numbers of words
@@ -477,8 +468,6 @@ Variable names are case sensitive.
 Write the `#template:` tag at the end of the same line as the part you want to change.
 (You can write it on a separate line, it will be explained at the following section.)
 
-(For version 1.x)
-
 Write the `#to:` tag and the value after replacing
 at the right of the value of the variable in the setting.
 
@@ -491,25 +480,6 @@ Install typrm and
 type the following `replace` command from bash or PowerShell. The short command name is `r`.
 
     typrm replace  new_folder.yaml  #// or typrm r  new_folder.yaml
-
-
-(For version 0.x)
-
-Install typrm and
-type the following `replace` command from bash or PowerShell. The short command name is `r`.
-
-    cp  "typrm/example/new_folder.yaml"  "."  #// Temporary copy to change from the original file
-
-    typrm replace  new_folder.yaml  4  "__Name__:work2"
-
-You can drag and drop a file to enter the file without having to type it from the keyboard.
-
-4 is an example of the line number. It is same or below the line where `settings:` is written,
-or above the line where the next `settings:` is written.
-You can omit the line number if there is only one `setting:` in the file.
-See the below about the way of specify the setting name instead of the line number.
-
-(For all versions)
 
 new_folder.yaml file will be chaned to the following contents and you can copy and paste.
 You can paste the text with the comment as it is,
@@ -526,28 +496,10 @@ It replaces `work1` in the settings and document body to `work2`.
 `#original:` tag with the value before replacement is added to the same line.
 If the `#original:` tag already exists, it will not be added.
 
-(For version 1.x)
-
 To return to the value written in the `#original:` tag, use the reset command.
 Also, the reset command removes the `#original:` tag.
 
     typrm reset  new_folder.yaml
-
-(For version 0.x)
-
-To return to the value written in the `#original:` tag, use the reset command.
-Also, the reset command removes the `#original:` tag.
-
-    typrm reset  new_folder.yaml  4
-
-4 is the line number, similar to the replace command.
-You can also specify the setting name.
-
-When you enter multiple variable names: new variable values,
-you can copy and paste multiple linees and enter them continuously.
-
-    typrm replace  new_folder.yaml  4  "__Name1__: work1
-        __Name2__: work2"
 
 
 ### Replace with #to tag
@@ -637,8 +589,6 @@ or
 
     (workA1 : workB1)  #template: (__NameA__ : __NameB__)  #to: (workA2 : workB2)
 
-(For version 1.x)
-
 To find out what variable the `#template:` tag refers to,
 rewrite contents temporarily it doesn't match the template
 and run the check command.
@@ -668,36 +618,6 @@ From the content of the warning,
 you can see that the variables referenced by the `#template:` tag are
 `__NameA__` and` __NameB__`.
 You can also see the definition position of each variable.
-
-(For version 0.x)
-
-You can write `#to-test:` tag instead of the `#to:` tag
-to test the value of the variable after the replacement.
-The file contains `#to-test:` tag does not replace contents.
-However, a replace command may not replace the file with the `#to-test:` tag,
-but at the same time replace another file without the `#to-test:` tag.
-
-    (workA1, workB1)  #template: (__NameA__ : __NameB__)  #to-test: workA2, workB2
-    (workC1, workD1)  #template: (__NameC__ : __NameD__)  #to-test: (workC2 : workD2)
-
-Example of displaying test results:
-
-    Verbose:     /____/____.yaml:1:
-    Verbose:         template: (__NameA__ : __NameB__)    ... #template: tag's value
-    Verbose:         templatePattern: (* : *)             ... replaced the variable part to * in the #template: tag's value
-    Verbose:         toValue: workA2, workB2              ... #to-test: tag's value
-    Verbose:         toValueIsMatchedWithTemplate: false  ... false = typrm treats #to-test: tag value as CSV
-    Verbose:         __NameA__: workA2                    ... The name of the variable replaced by #to: tag and the value after replacement
-    Verbose:         __NameB__: workB2
-    Verbose:     /____/____.yaml:2:
-    Verbose:         template: (__NameC__ : __NameD__)
-    Verbose:         templatePattern: (* : *)
-    Verbose:         toValue: (workC2 : workD2)
-    Verbose:         toValueIsMatchedWithTemplate: true  ... true = typrm treats #to-test: tag value as the content that replaced from template
-    Verbose:         __NameC__: workC2
-    Verbose:         __NameD__: workD2
-
-(For all versions)
 
 The typrm replace command replaces the contents of a file according
 to the `#to:` tag found in all files.
@@ -962,25 +882,12 @@ To use typrm, you must install Node.js.
 
 ## settings tag and #template tag: replaces settings values
 
-(For 1.1.x version)
-
 About the text you want to replace, write `variable name: value`
 with deeper indentation below `#settings:`.
 
     settings: #settings:
         __ProjectName__: react1
         __npxOption__: --template typescript
-
-(For 0.x, 1.0.x version)
-
-About the text you want to replace, write `variable name: value`
-with deeper indentation below `settings:`.
-
-    settings:
-        __ProjectName__: react1
-        __npxOption__: --template typescript
-
-(For all versions)
 
 Also, write `#template:` tag at the right of the same line as the text that replaces,
 or write `#template:` tag to the entire next line.
@@ -1070,9 +977,6 @@ the value of the` __OperationServer__` variable.
 - Variables for which no value is specified cannot be defined.
   Lines with only `variable name:` do not define any variables
 - Variable names and values cannot contain #
-- (version 0.x) Settings cannot be nested.
-    Variables defined by `setting:` above `setting:` cannot be referenced
-- (version 1.x) You can nest settings.
     In the space character indent tree structure,
     it can be referenced from the descendants of
     the parent node of `#settings:` that defines the variable.
@@ -1097,35 +1001,6 @@ Example:
 
 List of variables defined in the above settings:
 `__Name__`, `__MainID__`, `__MainValue__`, `__SubID__`, `__SubValue__`
-
-
-### Setting name
-
-(For 0.x version only)
-
-If you wrote a setting name, you can specify the setting name
-instead of the line number to be replaced
-by the replace command or reset command.
-You must write the setting name in parentheses
-before the colon of `settings:` in the text you will be replacing.
-
-example.yaml
-
-    settings(project1):
-        __Name__: image1
-    body:
-        This is image1.  #template: __Name__
-
-    settings(project2):
-        __Name__: image2
-    body:
-        This is image2.  #template: __Name__
-
-Command:
-
-    typrm replace  example.yaml  "project1"  "__Name__: Image1"
-
-- The setting name cannot be written numbers only
 
 ### #template-if tag - replaces the sign of whether the condition is met
 
@@ -1226,44 +1101,6 @@ After:
 
     example.yaml:5:   Title2: #search: example detail
     example.yaml:7: Title2:  #keyword: example detail
-
-
-## where command - finds the definition of the setting (variable) value
-
-(This command cannot be used after version 1.0.0.
-If you want to look for the definition position of the variable referenced by `#template:`,
-please raise an error that does not match the template.)
-
-To find the location of the variable definitions
-(variable name: value) listed in `Settings:`,
-enter the where command.
-
-example.yaml:
-
-    1: 設定:
-    2:     __FileName__: file.txt
-    3:     __Number__: 12
-    4: 本文:
-    5:     file.txt  #template: __FileName__
-
-To display the location of `__FileName__` variable definition, enter:
-
-    typrm where __FileName__
-
-If found, the location and definition will be displayed as shown below.
-Also, you may find more than one.
-
-    .../example.yaml:2:     __FileName__: file.txt
-
-When filtering by file name, type the variable name followed by the file name.
-
-    typrm where __FileName__ example.yaml
-
-When you look for a definition of a variable referenced in a particular template,
-type the variable name followed by the file name and line number
-where the template is located.
-
-    typrm where __FileName__ example.yaml 5
 
 
 ## #file-template tag: checks the contents of the file
