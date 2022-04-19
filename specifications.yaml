@@ -1,5 +1,14 @@
 #keyword: typrm specifications
 command:
+    search:  #keyword: typrm search
+        code:
+            #// parent: #search: mainMain
+            search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
+                searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
+                printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
+                runVerb:  #ref: ${GitHub}/typrm/src/main.ts#function  runVerb
+                openDocument:  #ref: ${GitHub}/typrm/src/main.ts#function  openDocument
+                runShellCommand:  #ref: ${GitHub}/typrm/src/main.ts#function  runShellCommand
     check:  #keyword: typrm check
         code:
             #// parent: #search: mainMain
@@ -18,6 +27,10 @@ command:
                                 getReplacedLineInSettings:
                         # // Out of settings
                             # // Replace in template
+    reset:  #keyword: typrm reset
+        code:
+            #// parent: #search: mainMain
+            reset:  #ref: ${GitHub}/typrm/src/main.ts#function  reset(
 tag:
     list:
         document:

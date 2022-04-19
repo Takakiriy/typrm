@@ -675,7 +675,11 @@ before the colon in the typrm shell.
 
     typrm keyword:
 
-On Windows, you can input the cmd.exe commad.
+On Windows, you can input the **cmd.exe** commad.
+You can also execute a batch file.
+
+    example.bat parameter
+
 If you want to run PowerShell commands,
 start powershell.exe with the -Command option.
 
