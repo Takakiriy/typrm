@@ -19,3 +19,15 @@ Target of template file >> any lines at first:
     3 OK end
         3 NG nested line
     3 NG start
+Target of template file >> multi_paths >> OK:
+    multi_paths OK first
+    second
+    third
+Target of template file >> multi_paths >> NG:
+    multi_paths NG first
+    second BAD
+    third
+Target of template file >> empty_line:
+    empty_line first
+
+    BAD

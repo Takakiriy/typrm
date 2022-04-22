@@ -455,6 +455,27 @@ checked file count = 1, template count = 9
 "
 `;
 
+exports[`checks file contents >> First >> empty_line: sourceFileContents 1`] = `
+"
+../../file_target/1/file_8_others_2_target.yaml : |  #file-template: ../../file_target/1/file_8_others_2_target.yaml
+    empty_line first
+
+    not good
+"
+`;
+
+exports[`checks file contents >> First >> empty_line: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/empty_line_1_changing.yaml:5:     not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:33:     BAD
+    Warning: Not same as file contents
+    Expected: not good
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1
+"
+`;
+
 exports[`checks file contents >> First >> environment_variable: sourceFileContents 1`] = `
 "setting: #settings:
     __Base__: ../../file_target/1
@@ -726,6 +747,42 @@ exports[`checks file contents >> First >> if: stdout 1`] = `
 
 Warning: 14, Error: 2
 checked file count = 1, template count = 34
+"
+`;
+
+exports[`checks file contents >> First >> multi_paths: sourceFileContents 1`] = `
+"settings: #settings:
+    __Path2__: ../../file_target/1/file_8_others_2_target.yaml
+    __Path3__: ../../file_target/1/file_8_others_3_target.yaml
+checker:
+    ../../file_target/1/file_8_others_2_target.yaml : #file-template: __Path2__
+    ../../file_target/1/file_8_others_3_target.yaml : #file-template: __Path3__
+        multi_paths OK first
+        second
+        third
+    ../../file_target/1/file_8_others_2_target.yaml (2): #file-template: __Path2__
+        ../../file_target/1/file_8_others_3_target.yaml (2): #file-template: __Path3__
+            multi_paths NG first
+            second not good
+            third
+        end:
+"
+`;
+
+exports[`checks file contents >> First >> multi_paths: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/multi_paths_1_changing.yaml:13:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:28:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/multi_paths_1_changing.yaml:13:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_3_target.yaml:7:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+Warning: 2, Error: 0
+checked file count = 1, template count = 4
 "
 `;
 

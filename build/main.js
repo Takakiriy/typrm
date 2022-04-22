@@ -143,7 +143,8 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
     const verbose = parser.verbose;
     var setting = {};
     var lineNum = 0;
-    var fileTemplateTag = null;
+    var fileTemplateTags = [];
+    var previousLineIncludesFileTemplate = false;
     const copyTagParser = new CopyTag.CheckParser();
     const lines = [];
     const ifTagParser = new IfTagParser(parser);
@@ -267,15 +268,24 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
             }
         }
         // Check target file contents by "#file-template:" tag.
-        if (fileTemplateTag) {
-            const continue_ = fileTemplateTag.onReadLine(line);
-            if (!continue_) {
-                await fileTemplateTag.checkTargetFileContents(setting, parser);
-                fileTemplateTag = null;
+        for (const fileTemplateTag of fileTemplateTags) {
+            if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock && previousLineIncludesFileTemplate) {
+                fileTemplateTag.indentAtTag = templateTag.indentAtTag;
+            }
+            else {
+                const continue_ = fileTemplateTag.onReadLine(line);
+                if (!continue_) {
+                    await fileTemplateTag.checkTargetFileContents(setting, parser);
+                    fileTemplateTags = fileTemplateTags.filter(object => (object !== fileTemplateTag));
+                }
             }
         }
         if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock) {
-            fileTemplateTag = templateTag;
+            fileTemplateTags.push(templateTag);
+            previousLineIncludesFileTemplate = true;
+        }
+        else {
+            previousLineIncludesFileTemplate = false;
         }
         // ...
         copyTagParser.evaluate(line, copyTags, templateTag, setting, parser);
@@ -286,8 +296,8 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
     }
     parser.lineNum += 1;
     // Check target file contents by "#file-template:" tag (2).
-    if (fileTemplateTag) {
-        fileTemplateTag.onReadLine(''); // Cut indent
+    for (const fileTemplateTag of fileTemplateTags) {
+        fileTemplateTag.onEndOfFile();
         await fileTemplateTag.checkTargetFileContents(setting, parser);
     }
 }
@@ -1301,11 +1311,17 @@ class TemplateTag {
             this.templateLines.push(line);
             this.minIndentLength = Math.min(this.minIndentLength, currentIndent.length);
         }
+        else if (line.trim() === '') {
+            this.templateLines.push(line);
+        }
         else {
-            this.templateLines = this.templateLines.map((line) => (line.substring(this.minIndentLength)));
+            this.onEndOfFile();
             readingNext = false;
         }
         return readingNext;
+    }
+    onEndOfFile() {
+        this.templateLines = this.templateLines.map((line) => (line.substring(this.minIndentLength)));
     }
     // includesKey
     includesKey(keys) {
@@ -1478,10 +1494,13 @@ class TemplateTag {
             const line = line1;
             testingContents.push(line);
         }
-        const expectedParts = [];
+        var expectedParts = [];
+        var lastEmptyLineCount = 0;
         for (const line of this.templateLines) {
             expectedParts.push(getExpectedLineInFileTemplate(setting, line, parser));
+            lastEmptyLineCount = (line.trim() === '') ? (lastEmptyLineCount + 1) : 0;
         }
+        expectedParts.splice(expectedParts.length - lastEmptyLineCount, expectedParts.length);
         const indent = ' '.repeat(this.minIndentLength);
         const unexpectedLine = lib.checkExpectedTextContents(testingContents, expectedParts, fileTemplateAnyLinesLabel);
         if (unexpectedLine) {

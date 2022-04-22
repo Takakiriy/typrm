@@ -246,9 +246,13 @@ describe("checks file contents >>", () => {
         ],[
             "any_lines", "file_8_others",
         ],[
+            "empty_line", "file_8_others",
+        ],[
             "environment_variable", "file_5",
+        ],[
+            "multi_paths", "file_8_others",
         ]
-    ])("First >> %s", async (caseName, _fileNameHead) => {
+    ])("First >> %s", async (caseName, fileNameHead) => {
         chdirInProject('src');
         const  sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const  changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";

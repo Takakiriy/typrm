@@ -131,7 +131,7 @@ typrm コマンド:
 `#glossary:` タグによってヒットしたキーワードに関するスニペットも表示されます。
 
 10件以上検索にヒットした場合、優先する10件だけ表示します。
-この件数は TYPRM_FOUND_COUNT_MAX 環境変数または --found-count-max オプションで変更できます。
+この件数は `TYPRM_FOUND_COUNT_MAX` 環境変数または --found-count-max オプションで変更できます。
 
 `#keyword:` タグがある行と同じ行に `#snippet-depth:` タグがある場合、
 タグに指定した値よりもインデントのレベルが浅くなった行の上の行までがスニペットとして表示されます。
@@ -1136,6 +1136,31 @@ mutual-search コマンドは `#keyword:` タグに指定したキーワード�
 
 `#file-template:` より右に書かれたパスが相対パスのときは、その基準は、
 `#file-template:` タグが書かれているファイルがあるフォルダーです。
+
+複数のファイルでチェックする内容が同じ場合、
+`#file-template:` タグを含む行を複数書いて、
+最後にチェックする内容を書きます。
+下記の場合、./my.json ファイルと ./your.json ファイルの両方について
+チェック内容を比較します。
+
+    ./my.json の一部:  #file-template: ./my.json
+    ./your.json の一部:  #file-template: ./your.json
+        チェック内容
+        チェック内容
+        チェック内容
+    チェックしない内容
+
+上記は下記と同じ処理を行います。
+
+    ./my.json の一部:  #file-template: ./my.json
+        チェック内容
+        チェック内容
+        チェック内容
+    ./your.json の一部:  #file-template: ./your.json
+        チェック内容
+        チェック内容
+        チェック内容
+    チェックしない内容
 
 `#file-template-any-lines:` タグをチェックする内容の一部に書くと、
 その行（0行以上）は対象のファイルの内容と比較しません。

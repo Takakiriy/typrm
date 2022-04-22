@@ -136,7 +136,7 @@ If you want to see the snippet of `git status`, search for` git status`.
 Snippets for keywords hit by the `#glossary:` tag are also displayed.
 
 If 10 or more searches are hit, only the 10 priority items will be displayed.
-This number can be changed with TYPRM_FOUND_COUNT_MAX environment variable
+This number can be changed with `TYPRM_FOUND_COUNT_MAX` environment variable
 or --found-count-max option.
 
 If the same line as the `#keyword:` tag has the `#snippet-depth:` tag,
@@ -1179,6 +1179,31 @@ as the line with the `#file-template:` tag.
 If the path to the right of `#file-template:` is a relative path,
 the base path is the folder containing the file with the
 `#file-template:` tag.
+
+If the contents in multiple files to be checked are the same,
+write multiple lines containing the `#file-template:` tag,
+and write the contents to be checked at the end.
+In the following cases, the checks are compared
+for both the ./my.json file and the ./your.json file.
+
+    a part of ./my.json:  #file-template: ./my.json
+    a part of ./your.json:  #file-template: ./your.json
+        check
+        check
+        check
+    not check
+
+The above is the same check as below.
+
+    a part of ./my.json:  #file-template: ./my.json
+        check
+        check
+        check
+    a part of ./your.json:  #file-template: ./your.json
+        check
+        check
+        check
+    not check
 
 If you write the `#file-template-any-lines:` tag
 in the part of the checked content,
