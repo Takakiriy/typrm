@@ -766,6 +766,10 @@ checker:
             second not good
             third
         end:
+    ../../file_target/1/file_8_others_2_target.yaml (3): #file-template: __Path2__  #if: false
+        multi_paths NG first
+        second not good
+        third
 "
 `;
 
@@ -782,7 +786,7 @@ exports[`checks file contents >> First >> multi_paths: stdout 1`] = `
     Expected: second not good
 
 Warning: 2, Error: 0
-checked file count = 1, template count = 4
+checked file count = 1, template count = 5
 "
 `;
 
