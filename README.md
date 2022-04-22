@@ -1,19 +1,28 @@
 # typrm
 
-typrm searches for and displays a text file with command options
-that are easy for you to use.
-It also displays the command parameters replaced to your current status.
-You can execute the command just by copying and pasting the displayed command.
+typrm searches and displays for your favorite document text file 
+and your useful snippets.
+It also replaces the command parameters to fit your current status.
+You can execute the command just by copy and paste the displayed command.
+
+    $ typrm ssh
+    /path/MyServers.yaml:100: Log In: #keyword: ssh
+        ssh webserver-0011-stg.example.com  -i ~/.ssh/stg/id_rsa
+            #template: ssh __Server__  -i __Identity__
 
 ( [Japanese](./README-jp.md) )
 
 <!-- TOC depthFrom:1 -->
 
 - [typrm](#typrm)
-  - [Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet](#snippet-search---keyword-tag-glossary-tag-make-highly-accurate-search-to-the-snippet)
-    - [Handling confidential data - .env file](#handling-confidential-data---env-file)
-  - [Replace - replace command, reset command](#replace---replace-command-reset-command)
-    - [Replace with #to tag](#replace-with-to-tag)
+  - [Snippet search (#keyword tag, #glossary tag) - make highly accurate search to the snippet](#snippet-search-keyword-tag-glossary-tag---make-highly-accurate-search-to-the-snippet)
+    - [Search target folder settings](#search-target-folder-settings)
+    - [Search priorities and set snippets](#search-priorities-and-set-snippets)
+    - [Details of the search command](#details-of-the-search-command)
+    - [#glossary tags and the thesaurus file](#glossary-tags-and-the-thesaurus-file)
+    - [Write secret data in a safe place - .env file](#write-secret-data-in-a-safe-place---env-file)
+  - [Replace (replace command, reset command) - make a command input just by copy and paste](#replace-replace-command-reset-command---make-a-command-input-just-by-copy-and-paste)
+    - [Replace by #to tag](#replace-by-to-tag)
     - [Execute any command](#execute-any-command)
   - [Install](#install)
     - [For Windows](#for-windows)
@@ -31,8 +40,8 @@ You can execute the command just by copying and pasting the displayed command.
   - [#expect tag: checks settings values](#expect-tag-checks-settings-values)
   - [#ref tag: expands file path that contains environment variables](#ref-tag-expands-file-path-that-contains-environment-variables)
     - [Execute commands related to files](#execute-commands-related-to-files)
-    - [Replace to the line number of the file](#replace-to-the-line-number-of-the-file)
-    - [Display with a pointer at noteworthy position in the image](#display-with-a-pointer-at-noteworthy-position-in-the-image)
+    - [Search in the file and replace to the line number](#search-in-the-file-and-replace-to-the-line-number)
+    - [Display with a pointer at noteworthy location in the image](#display-with-a-pointer-at-noteworthy-location-in-the-image)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -46,41 +55,57 @@ You can execute the command just by copying and pasting the displayed command.
 <!-- /TOC -->
 
 
-## Snippet search - #keyword tag, #glossary tag make highly accurate search to the snippet
+## Snippet search (#keyword tag, #glossary tag) - make highly accurate search to the snippet
 
-typrm search displays your favorite snippets for the keywords you set.
-
-For example, if you search for the keyword `grep`,
-you'll see where the keyword `grep` is and your favorite template snippet.
+typrm search displays your favorite document text file and
+your useful snippets.
 You can use `typrm grep` like Linux `man grep`.
+You can also enter the search keyword input mode (typrm shell).
 
-typrm command to show a snippet:
+To search typrm command:
 
     $ typrm grep
     /path/MyLinux.yaml:100: grep: #keyword:
-        Example: grep -rn __keyword__ __FilePath__
-        Files that do not contain keywords:
-            grep -L __Keyword__ __Path__
 
-To make your favorite snippet show,
-tag `#keyword:` with the keywords in the text file you are searching for.
-Also, the content displayed in the snippet must be indented with
+If you run the typrm command in a Visual Studio Code terminal,
+you can jump the document contents by holding down
+the Ctrl key and click the displayed path and line number.
+You can also enter commands while looking at the document.
+
+Also, the first few lines of the document will appear as snippets
+at the same time as the search.
+
+    $ typrm grep
+    /path/MyLinux.yaml:100: grep: #keyword:
+        Example: grep -rn __Keyword__ __FilePath__
+        Files that do not contain keywords: grep -L __Keyword__ __Path__
+
+typrm search is better suited for searching documents than searching by grep.
+For example, grep will not match if the words are out of order, but typrm will.
+typrm is not support the regular expression,
+but you can search without paying attention
+to the special symbol of the regular expression.
+
+    $ typrm valid? ruby
+    /path/Ruby.yaml:100: valid?: #keyword: Ruby valid?
+
+If you write a `#keyword:` tag with the keywords
+in the text file you are searching for,
+typrm displays it preferentially (at the bottom of the list of search results).
+
+The content displayed in the snippet must be indented with
 whitespace deeper than the found line.
 
 Sample text file `MyLinux.yaml` content:
 
         ....
     grep: #keyword:
-        Sample: grep -r __keyword__ __FilePath__
-        Files that do not contain keywords:
-            grep -L __Keyword__ __Path__
+        Sample: grep -r __Keyword__ __FilePath__
+        Files that do not contain keywords: grep -L __Keyword__ __Path__
     sed: #keyword:
         ....
 
-When the displayed content is long, jump to the contents of the file.
-If you run the typrm command in a Visual Studio Code terminal,
-you can jump to the displayed path and line number by holding down
-the Ctrl key and clicking.
+### Search target folder settings
 
 Specify the path of the folder containing the file to be searched
 in the `TYPRM_FOLDER` environment variable or the `--folder` option.
@@ -106,11 +131,17 @@ Case of specifing to the `--folder` option in PowerShell:
 
     typrm --folder "${env:USERPROFILE}\Documents\typrm"  ls
 
-However, snippets are only displayed
-for the keywords that have the highest priority.
+The value format of the `TYPRM_FOLDER` environment variable is CSV.
+You can specify multiple folder paths.
+You can also specify a wildcard for the file name.
+You can also specify a file path.
 
-Also tag `#keyword:` with the keyword that you want to prioritize
-in the search results.
+    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
+
+### Search priorities and set snippets
+
+You should write `#keyword:` tag with the keyword
+that you want to prioritize in the search results.
 
 Sample text file content:
 
@@ -126,14 +157,13 @@ typrm command:
 In the above case, `ls` on the line with the `#keyword:` tag is
 preferentially found (displayed below).
 
-If you have `#keyword: git clone` and `#keyword: git status`,
-when you search for `git`, `git clone` is displayed first.
-`git status` is displayed second because of the more difference
-in the number of characters.
-Snippets are only displayed for the keywords that have the first priority.
-If you want to see the snippet of `git status`, search for` git status`.
-
-Snippets for keywords hit by the `#glossary:` tag are also displayed.
+- If you have `#keyword: git clone` and `#keyword: git status`,
+  when you search for `git`, `git clone` is displayed first.
+  `git status` is displayed second because of the more difference
+  in the number of characters.
+- If you want to see the snippet of `git status`, search for `git status`.
+- Snippets are only displayed for the keywords that have the first priority.
+- Snippets for keywords hit by the `#glossary:` tag are also displayed.
 
 If 10 or more searches are hit, only the 10 priority items will be displayed.
 This number can be changed with `TYPRM_FOUND_COUNT_MAX` environment variable
@@ -164,13 +194,6 @@ the maximum number of lines displayed is 5.
 This number of lines can be changed with `TYPRM_SNIPPET_LINE_COUNT`
 environment variable or `--snippet-line-count` option.
 
-The value format of the `TYPRM_FOLDER` environment variable is CSV.
-You can specify multiple folder paths.
-You can also specify a wildcard for the file name.
-You can also specify a file path.
-
-    ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
-
 You can omit the parameter in the `#keyword:` tag
 if the keyword was written up to the colon.
 In the following cases, the searchable keyword is ls.
@@ -182,6 +205,10 @@ the keyword does not include the hyphen.
 In the following cases, the searchable keyword is ls.
 
     - ls:  #keyword:
+
+Entering `#keyword:` or `#search:` in the search keyword will be ignored.
+
+### Details of the search command
 
 The typrm search command name (search) can be omitted.
 The short command name for the search command is s.
@@ -201,8 +228,6 @@ or
 If the search keyword was the same as the command name of typrm,
 the command name (search or s) cannot be omitted.
 
-Entering `#keyword:` or `#search:` in the search keyword will be ignored.
-
 If you do not specify any keywords with the search command,
 the search keyword input mode (typrm shell) is started.
 Press Ctrl + C to exit this mode.
@@ -211,6 +236,11 @@ Press Ctrl + C to exit this mode.
     typrm keyword: csv
     .../text.txt:1: #keyword: CSV, comma separated values
     typrm keyword:
+
+Even if you have Git bash open on Windows,
+you can launch typrm.ps1 PowerShell script with the following command:
+
+    $ powershell typrm
 
 When running in Visual Studio Code terminal,
 you can open the file at the found location (path)
@@ -298,6 +328,8 @@ are not searched.
     original:
         #keyword: abc  #// searchable
 
+### #glossary tags and the thesaurus file
+
 If you add the `#glossary:` tag,
 words up to the colon is searchable keywords
 that written in the indent line one step deeper than
@@ -341,7 +373,7 @@ Exmple of thesaurus.csv:
     destination, dst, dest
 
 
-### Handling confidential data - .env file
+### Write secret data in a safe place - .env file
 
 If you want to display secret data (secrets) such as passwords and API keys
 in the snippet, or if the contents of the file to be checked contain secrets,
@@ -434,7 +466,7 @@ try ~ Write a PowerShell script enclosed in Finally.
 
 Variables defined in the .env file cannot be referenced from the `#if:` tag.
 
-## Replace - replace command, reset command
+## Replace (replace command, reset command) - make a command input just by copy and paste
 
 The manual that tells you to create a new folder and run shell commands in it will tell you to type in the shell as follows:
 
@@ -502,7 +534,7 @@ Also, the reset command removes the `#original:` tag.
     typrm reset  new_folder.yaml
 
 
-### Replace with #to tag
+### Replace by #to tag
 
 If writing `#to:` tag in the settings,
 write `#to:` tag and the value after replacing
@@ -511,28 +543,55 @@ at the right of the variable value.
 Example before adding the `#to:` tag:
 
     settings: #settings:
-        __Name__: workA1
-        __Name__: workB1  #// comment
-        __Name__: workC1  #// comment
+        __NameA__: workA1
+        __NameB__: workB1
+        __NameC__: workC1
+    body:
+        workB1  #template: __NameB__
+        workB1  #template: __NameB__
 
-Example after adding the `#to:` tag:
+Example after adding the `#to:` tag at `__NameB__`:
 
     settings: #settings:
-        __Name__: workA1  #to: workA2
-        __Name__: workB1  #to: workB2  #// comment
-        __Name__: workC1  #// comment  #to: workC2
+        __NameA__: workA1
+        __NameB__: workB1  #to: workB2
+        __NameC__: workC1
+    body:
+        workB1  #template: __NameB__
+        workB1  #template: __NameB__
 
 Save the file after adding tags.
 
 If you want to set `#to:` tag from the script,
 edit it with Linux `sed` command or other tools.
 
-Entering the following command replaces the `#to:` tag in all files
-in the current folder and the folder set in the `TYPRM_FOLDER` environment variable.
+Entering the replace command without any parameters,
+typrm replaces the `#to:` tag in all files in the current folder
+and the folder set in the `TYPRM_FOLDER` environment variable.
+At the same time, it also replaces the document contents
+attached with `#template:` tags.
+The setting value before replacement remains in the `#original:` tag.
 
 Input command:
 
     typrm replace  #// or typrm r
+
+Contents after command execution:
+
+    settings: #settings:
+        __NameA__: workA1
+        __NameB__: workB2  #original: workB1
+        __NameC__: workC1
+    body:
+        workB2  #template: __NameB__
+        workB2  #template: __NameB__
+
+Variation after adding the `#to:` tag:
+
+    settings: #settings:
+        __Name__: workA1  #to: workA2
+        __Name__: workB1  #to: workB2  #// comment
+        __Name__: workC1  #// comment  #to: workC2
 
 Contents after command execution:
 
@@ -1645,7 +1704,7 @@ You can write variable references in the `command` parameter.
 You can check the setting value by adding the --verbose option to typrm.
 
 
-### Replace to the line number of the file
+### Search in the file and replace to the line number
 
 If you specify the file path and parameters by search (s)
 command with `#ref:` tag, the file path and line number will be
@@ -1744,7 +1803,7 @@ you can check the setting value of the TYPRM_LINE_NUM_GETTER environment variabl
 and the result of the value of the `#ref:` tag parsed by the regular expression.
 
 
-### Display with a pointer at noteworthy position in the image
+### Display with a pointer at noteworthy location in the image
 
 If you add the `#ref:` tag, the path of the image file
 and the position of interest written by the query parameter
