@@ -650,7 +650,11 @@ typrm shell のコロンの前にコマンド記号が表示されていない�
 
     typrm keyword:
 
-Windows では cmd.exe のコマンドを入力できます。
+Windows では **cmd.exe** のコマンドを入力できます。
+バッチファイルを実行することもできます。
+
+    example.bat parameter
+
 PowerShell のコマンドを実行する場合は、
 powershell.exe に -Command オプションを付けて起動してください。
 

@@ -2892,6 +2892,7 @@ async function  search() {
 
                     await  reset(filePath);
                 } else if (command === Command.shellCommand) {
+
                     runShellCommand(keyword);
                 }
             }
