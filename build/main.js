@@ -148,6 +148,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
     const copyTagParser = new CopyTag.CheckParser();
     const lines = [];
     const ifTagParser = new IfTagParser(parser);
+    const enableFileTemplateParser = new EnableFileTemplateParser(parser);
     for await (const line1 of reader) {
         const line = line1;
         lines.push(line);
@@ -157,6 +158,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
         parser.lineNum = lineNum;
         // Set condition by "#if:" tag.
         ifTagParser.evaluate(line, setting);
+        enableFileTemplateParser.evaluate(line, setting);
         parser.verbose = false;
         // setting = ...
         settingTree.moveToLine(parser);
@@ -1577,6 +1579,51 @@ class IfTagParser {
         this.parser.filePath = filePath;
         this.parser.lineNum = lineNum;
         this.parser.line = line;
+    }
+}
+// EnableFileTemplateParser
+class EnableFileTemplateParser {
+    constructor(parser) {
+        this.indentLengthsOfIfTag = [
+            { indentLength: -1, resultOfIf: true, enabled: true }
+        ];
+        this.isEnabled_ = true;
+        this.parser = parser;
+    }
+    get isEnabled() { return this.isEnabled_; }
+    evaluate(line, setting) {
+        var expression = '';
+        const indentLength = indentRegularExpression.exec(line)[0].length;
+        if (line.trim() !== '') {
+            while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
+                this.indentLengthsOfIfTag.pop();
+                this.isEnabled_ = lastOf(this.indentLengthsOfIfTag).enabled;
+            }
+        }
+        if (line.includes(enableFileTemplateIfExist) && !line.includes(disableLabel)) {
+            expression = line.substring(line.indexOf(ifLabel) + ifLabel.length).trim();
+            const evaluatedContidion = evaluateIfCondition(expression, setting, this.parser);
+            if (typeof evaluatedContidion === 'boolean') {
+                var resultOfIf = evaluatedContidion;
+                var isEnabled = false;
+            }
+            else if (instanceOf.EvaluatedCondition(evaluatedContidion)) {
+                var resultOfIf = evaluatedContidion.result;
+                var isEnabled = evaluatedContidion.isReplacable;
+            }
+            else {
+                if (this.parser.ifTagErrorMessageIsEnabled) {
+                    console.log('');
+                    console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
+                    console.log(`    ${translate('Error')}: ${translate('enable-file-template-if-exist tag syntax')}`);
+                    this.parser.errorCount += 1;
+                }
+                var resultOfIf = true;
+                var isEnabled = false;
+            }
+            this.indentLengthsOfIfTag.push({ indentLength, resultOfIf, enabled: isEnabled });
+            this.isEnabled_ = isEnabled;
+        }
     }
 }
 // BlockDisableTagParser
@@ -5431,6 +5478,7 @@ const templateIfYesKey = "template-if(yes)";
 const templateIfNoKey = "template-if(no)";
 const fileTemplateLabel = "#file-template:";
 const fileTemplateAnyLinesLabel = "#file-template-any-lines:";
+const enableFileTemplateIfExist = "#enable-file-template-if-exist:";
 const keywordLabel = "#keyword:";
 const keywordTagAndParameterRegExp = /( |^)#keyword:[^#]*/g;
 const glossaryLabel = "#glossary:";

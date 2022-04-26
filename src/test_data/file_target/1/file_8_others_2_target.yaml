@@ -31,3 +31,7 @@ Target of template file >> empty_line:
     empty_line first
 
     BAD
+Target of template file >> exist_if:
+    exist_if first
+    second BAD
+    third

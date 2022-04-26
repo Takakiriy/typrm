@@ -6,3 +6,7 @@ Target of template file >> multi_paths >> NG:
     multi_paths NG first
     second BAD
     third
+Target of template file >> exist_if:
+    exist_if first
+    second BAD
+    third
