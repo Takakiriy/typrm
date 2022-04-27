@@ -1196,10 +1196,10 @@ when you run the check command.
 
 `__Project__/root.yaml file`:
 
-    settings: #settings:
-        __Stage__: develop
     a part of ./my.json:  #file-template: ./my.json
         "stage": "develop"  #template: "__Stage__"
+    settings: #settings:
+        __Stage__: develop
 
 `__Project__/my.json file`:
 
@@ -1311,6 +1311,16 @@ do not result in an error.
           fieldB:
         - fieldA:
           fieldB:
+
+If you write `#enable-file-template-if-exist:` tag and a path
+on a shallow indentation line,
+when there is no file or folder in the specified path,
+the contents of the file by `#file-template:` tag will not check.
+
+    check:  #enable-file-template-if-exist: ./build/
+        a part of ./build/my.json :  #file-template: ./build/my.json
+            "stage": "develop"
+
 
 ## #copy tag: check the text is the same
 
@@ -2042,9 +2052,10 @@ You can set the break point, click at the left of line number of the source file
 
 ## Tag list
 
-- `#disable-tag-tool:` Disable tags on the same line
 - `#copy:` Checks that they have the same text
 - `#copy-template:` A template of text in copy tag block
+- `#disable-tag-tool:` Disable tags on the same line
+- `#enable-file-template-if-exist:` Check file contents only when there is a folder
 - `#expect:` Condition check
 - `#file-template:` A template for checking the contents of a file
 - `#file-template-any-lines:` Lines that do not check the contents of the file

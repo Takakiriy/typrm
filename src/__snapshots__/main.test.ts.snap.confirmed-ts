@@ -550,16 +550,21 @@ exports[`checks file contents >> First >> exist_if: sourceFileContents 1`] = `
         exist_if first
         second not good
         third
-3: #enable-file-template-if-exist: false
+3: #enable-file-template-if-exist: ./not_exist
     ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: ../../file_target/1/file_8_others_2_target.yaml
         exist_if first
         second not good
         third
-    3-a: #enable-file-template-if-exist: true
-    ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: ../../file_target/1/file_8_others_2_target.yaml
-        exist_if first
-        second not good
-        third
+    3-a: #enable-file-template-if-exist: ../../file_target
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: ../../file_target/1/file_8_others_2_target.yaml
+            exist_if first
+            second not good
+            third
+    3-b: #enable-file-template-if-exist: ../../file_target/1/file_8_others_2_target.yaml
+        ../../file_target/1/file_8_others_2_target.yaml : |  #file-template: ../../file_target/1/file_8_others_2_target.yaml
+            exist_if first
+            second not good
+            third
 "
 `;
 
@@ -570,13 +575,18 @@ exports[`checks file contents >> First >> exist_if: stdout 1`] = `
     Warning: Not same as file contents
     Expected: second not good
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/exist_if_1_changing.yaml:15:         second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/exist_if_1_changing.yaml:15:             second not good
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:36:     second BAD
     Warning: Not same as file contents
     Expected: second not good
 
-Warning: 2, Error: 0
-checked file count = 1, template count = 3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/exist_if_1_changing.yaml:20:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:36:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+Warning: 3, Error: 0
+checked file count = 1, template count = 4
 "
 `;
 

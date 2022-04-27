@@ -1154,10 +1154,10 @@ mutual-search コマンドは `#keyword:` タグに指定したキーワード�
 
 `__Project__/root.yaml` ファイル:
 
-    設定: #settings:
-        __Stage__: develop
     ./my.json の一部:  #file-template: ./my.json
         "stage": "develop"  #template: "__Stage__"
+    設定: #settings:
+        __Stage__: develop
 
 `__Project__`/my.json ファイル:
 
@@ -1260,6 +1260,15 @@ YAML のマップのシーケンスを表すハイフンの右の空白文字の
           fieldB:
         - fieldA:
           fieldB:
+
+`#enable-file-template-if-exist:` タグとパスを浅いインデントの行に書くと、
+指定したパスにファイルまたはフォルダーが存在しないときに、
+`#file-template:` タグによるファイルの内容のチェックをしないようになります。
+
+    check:  #enable-file-template-if-exist: ./build/
+        ./build/my.json の一部:  #file-template: ./build/my.json
+            "stage": "develop"
+
 
 ## #copy タグを使って文章が同じことをチェックします
 
@@ -1943,9 +1952,10 @@ Jest を使うテストと Jest を使わないテストがあります。
 
 ## タグ一覧
 
-- `#disable-tag-tool:` 同じ行にあるタグを無効にします
 - `#copy:` 同じ文章であることをチェックします
 - `#copy-template:` copy タグのブロックの中に書かれる文章のテンプレート
+- `#disable-tag-tool:` 同じ行にあるタグを無効にします
+- `#enable-file-template-if-exist:` フォルダーがあるときだけファイルの内容をチェックします
 - `#expect:` 条件チェック
 - `#file-template:` ファイルの内容をチェックするときのテンプレート
 - `#file-template-any-lines:` ファイルの内容をチェックしない行

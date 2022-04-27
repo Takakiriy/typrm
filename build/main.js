@@ -271,7 +271,8 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
         }
         // Check target file contents by "#file-template:" tag.
         for (const fileTemplateTag of fileTemplateTags) {
-            if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock && previousLineIncludesFileTemplate) {
+            if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock &&
+                previousLineIncludesFileTemplate) {
                 fileTemplateTag.indentAtTag = templateTag.indentAtTag;
             }
             else {
@@ -282,7 +283,8 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
                 }
             }
         }
-        if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock) {
+        if (templateTag.label === fileTemplateLabel && ifTagParser.thisIsOutOfFalseBlock &&
+            enableFileTemplateParser.isEnabled) {
             fileTemplateTags.push(templateTag);
             previousLineIncludesFileTemplate = true;
         }
@@ -1585,44 +1587,28 @@ class IfTagParser {
 class EnableFileTemplateParser {
     constructor(parser) {
         this.indentLengthsOfIfTag = [
-            { indentLength: -1, resultOfIf: true, enabled: true }
+            { indentLength: -1, resultOfIf: true }
         ];
         this.isEnabled_ = true;
         this.parser = parser;
     }
     get isEnabled() { return this.isEnabled_; }
     evaluate(line, setting) {
-        var expression = '';
         const indentLength = indentRegularExpression.exec(line)[0].length;
         if (line.trim() !== '') {
             while (indentLength <= lastOf(this.indentLengthsOfIfTag).indentLength) {
                 this.indentLengthsOfIfTag.pop();
-                this.isEnabled_ = lastOf(this.indentLengthsOfIfTag).enabled;
+                this.isEnabled_ = lastOf(this.indentLengthsOfIfTag).resultOfIf;
             }
         }
-        if (line.includes(enableFileTemplateIfExist) && !line.includes(disableLabel)) {
-            expression = line.substring(line.indexOf(ifLabel) + ifLabel.length).trim();
-            const evaluatedContidion = evaluateIfCondition(expression, setting, this.parser);
-            if (typeof evaluatedContidion === 'boolean') {
-                var resultOfIf = evaluatedContidion;
-                var isEnabled = false;
-            }
-            else if (instanceOf.EvaluatedCondition(evaluatedContidion)) {
-                var resultOfIf = evaluatedContidion.result;
-                var isEnabled = evaluatedContidion.isReplacable;
-            }
-            else {
-                if (this.parser.ifTagErrorMessageIsEnabled) {
-                    console.log('');
-                    console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
-                    console.log(`    ${translate('Error')}: ${translate('enable-file-template-if-exist tag syntax')}`);
-                    this.parser.errorCount += 1;
-                }
-                var resultOfIf = true;
-                var isEnabled = false;
-            }
-            this.indentLengthsOfIfTag.push({ indentLength, resultOfIf, enabled: isEnabled });
-            this.isEnabled_ = isEnabled;
+        if (line.includes(enableFileTemplateIfExistLabel) && !line.includes(disableLabel)) {
+            const tagLabel = enableFileTemplateIfExistLabel;
+            const basePath = path.parse(this.parser.filePath).dir;
+            const pathParameter = line.substring(line.indexOf(tagLabel) + tagLabel.length).trim();
+            const fullPathParameter = lib.getFullPath(pathParameter, basePath);
+            var resultOfIf = fs.existsSync(fullPathParameter);
+            this.indentLengthsOfIfTag.push({ indentLength, resultOfIf });
+            this.isEnabled_ = resultOfIf;
         }
     }
 }
@@ -5478,7 +5464,7 @@ const templateIfYesKey = "template-if(yes)";
 const templateIfNoKey = "template-if(no)";
 const fileTemplateLabel = "#file-template:";
 const fileTemplateAnyLinesLabel = "#file-template-any-lines:";
-const enableFileTemplateIfExist = "#enable-file-template-if-exist:";
+const enableFileTemplateIfExistLabel = "#enable-file-template-if-exist:";
 const keywordLabel = "#keyword:";
 const keywordTagAndParameterRegExp = /( |^)#keyword:[^#]*/g;
 const glossaryLabel = "#glossary:";

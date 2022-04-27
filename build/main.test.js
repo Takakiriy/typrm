@@ -225,8 +225,8 @@ describe("checks file contents >>", () => {
             "file name", "file_3_file_name",
         ], [
             "if", "file_4_if",
-            // ],[
-            //     "exist_if", "file_8_others",
+        ], [
+            "exist_if", "file_8_others",
         ], [
             "any_lines", "file_8_others",
         ], [
@@ -237,7 +237,6 @@ describe("checks file contents >>", () => {
             "multi_paths", "file_8_others",
         ]
     ])("First >> %s", async (caseName, fileNameHead) => {
-        // if (caseName !== 'exist_if') {return;}  // || subCase !== '____'
         chdirInProject('src');
         const sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
@@ -252,7 +251,6 @@ describe("checks file contents >>", () => {
         chdirInProject('src');
         expect(main.stdout).toMatchSnapshot('stdout');
         lib.rmdirSync(testFolderPath + '_checking');
-        // expect('test code').toBe('deleted skip code.');
     });
     test.each([
         [
