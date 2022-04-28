@@ -4,33 +4,39 @@ function  main_func() {
     target_to="test"
 
     file_path="service_S.yaml"
-    change_service_A_setting_func  ${file_path} ${target_from} ${target_to}
-    change_service_B_setting_func  ${file_path} ${target_from} ${target_to}
+    change_service_A_setting_func  ${file_path} ${target_from} ${target_to} 4
+    change_service_B_setting_func  ${file_path} ${target_from} ${target_to} 5
 
     file_path="service_T.yaml"
-    change_service_A_setting_func  ${file_path} ${target_from} ${target_to}
+    change_service_A_setting_func  ${file_path} ${target_from} ${target_to} 14
 }
 
 function  change_service_A_setting_func() {
     local  file_path="$1"
     local  target_from="$2"
     local  target_to="$3"
+    local  line_num="$4"
 
     local  service="service_A"
     setting=(
         "application" "server"
-        "test" "local docker"
-        "debug" "local docker"
+        "test"        "local docker"
+        "debug"       "local docker"
     )
     local  setting_from="$(_get setting "${target_from}" )"
     local  setting_to="$(_get setting "${target_to}" )"
     local  from_to="from \"${target_from}/${setting_from}\" to \"${target_to}/${setting_to}\""
 
     if [ "${setting_from}" == "server"  -a  "${setting_to}" == "local docker" ]; then
-        echo "${file_path}/${service}: Change ${from_to}"
-        #// _c="$(sed "s/aa/AA/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
+        echo "${file_path}/${service}:$((${line_num} + 1)): Change ${from_to}"
+
+        #// _c="$(sed "$((${line_num} + 1)) s/aa/AA/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
+
     elif [ "${setting_from}" == "local docker"  -a  "${setting_to}" == "server" ]; then
-        echo "${file_path}/${service}: Change ${from_to}"
+        echo "${file_path}/${service}:${line_num}: Change ${from_to}"
+
+        #// _c="$(sed "${line_num} s/AA/aa/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
+
     elif [ "${setting_from}" == ""  -o  "${setting_to}" == "" ]; then
         echo "${file_path}/${service}: Error (${from_to})"; exit 2
     else
@@ -42,21 +48,22 @@ function  change_service_B_setting_func() {
     local  file_path="$1"
     local  target_from="$2"
     local  target_to="$3"
+    local  line_num="$4"
 
     local  service="service_B"
     setting=(
         "application" "server"
-        "test" "server"
-        "debug" "local docker"
+        "test"        "server"
+        "debug"       "local docker"
     )
     local  setting_from="$(_get setting "${target_from}" )"
     local  setting_to="$(_get setting "${target_to}" )"
     local  from_to="from \"${target_from}/${setting_from}\" to \"${target_to}/${setting_to}\""
 
     if [ "${setting_from}" == "server"  -a  "${setting_to}" == "local docker" ]; then
-        echo ${file_path}/${service}: Change ${from_to}
+        echo ${file_path}/${service}:${line_num}: Change ${from_to}
     elif [ "${setting_from}" == "local docker"  -a  "${setting_to}" == "server" ]; then
-        echo ${file_path}/${service}: Change ${from_to}
+        echo ${file_path}/${service}:${line_num}: Change ${from_to}
     elif [ "${setting_from}" == ""  -o  "${setting_to}" == "" ]; then
         echo "${file_path}/${service}: Error (${from_to})"; exit 2
     else
