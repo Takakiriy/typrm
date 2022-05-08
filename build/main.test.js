@@ -119,23 +119,27 @@ describe("typrm shell >>", () => {
 });
 describe("checks template value >>", () => {
     test.each([
-        ["1_template_1_ok"],
-        ["1_template_2_error"],
-        ["1_template_3_if"],
-        ["var_not_ref_1_error"],
-        ["template_if_1_error"],
-        ["template_if_2_referenced_one_side"],
-        ["case_sensitive_variable_name"],
-        ["environment_variable"],
-        ["list_to_tag_original_tag"],
-        ["settings_tree"],
-        ["settings_tree_deep"],
-        ["settings_tree_position"],
-        ["settings_tree_if"],
-        ["settings_tree_if_disable"],
-        ["settings_tree_error"],
-    ])("%s", async (fileNameHead) => {
-        initializeTestInputFile(`checks template value >> ${fileNameHead}: sourceFileContents 1`);
+        ["1_template_1_ok", {}],
+        ["1_template_2_error", {}],
+        ["1_template_3_if", {}],
+        ["var_not_ref_1_error", {}],
+        ["template_if_1_error", {}],
+        ["template_if_2_referenced_one_side", {}],
+        ["case_sensitive_variable_name", {}],
+        ["environment_variable", {}],
+        ["list_to_tag_original_tag", {}],
+        ["list_to_tag_original_tag_in_multi_files", { multiFiles: true }],
+        ["settings_tree", {}],
+        ["settings_tree_deep", {}],
+        ["settings_tree_position", {}],
+        ["settings_tree_if", {}],
+        ["settings_tree_if_disable", {}],
+        ["settings_tree_error", {}],
+    ])("%s", async (caseName, options) => {
+        initializeTestInputFile(`checks template value >> ${caseName}: sourceFileContents 1`);
+        if ('multiFiles' in options) {
+            lib.copyFileSync(`${testFolderPath}_tmp/_tmp.yaml`, `${testFolderPath}_tmp/_tmp_2.yaml`);
+        }
         process.chdir('empty_folder');
         await callMain(["check"], {
             folder: '../test_data/_tmp', test: "", locale: "en-US",

@@ -157,6 +157,10 @@ declare class Parser {
     lineNum: number;
     line: string;
     ifTagErrorMessageIsEnabled: boolean;
+    outputToTagList: boolean;
+    toTagList: string[];
+    originalTagList: string[];
+    flushToTagList(): void;
 }
 export declare function startTestRedirect(): void;
 export declare function endTestRedirect(): void;

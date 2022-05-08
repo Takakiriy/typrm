@@ -1361,6 +1361,31 @@ body:
 "
 `;
 
+exports[`checks template value >> list_to_tag_original_tag_in_multi_files: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:2: #original: varA: valueA1 => valueA0
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:2: #to: varA: valueA1 => valueA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:6: #to: varB: valueB1 => valueB2
+
+Warning: 0, Error: 0
+checked file count = 2, template count = 4
+"
+`;
+
+exports[`checks template value >> list_to_tag_original_tag_in_multi_files: sourceFileContents 1`] = `
+"settings: #settings:
+    varA: valueA1  #original: valueA0  #to: valueA2
+    varB: valueB1
+body:
+    - valueA1  #template: varA
+    - valueB1  #template: varB  #to: valueB2
+"
+`;
+
 exports[`checks template value >> one_error: sourceFileContents 1`] = `
 "one_error:
     settings: #settings:

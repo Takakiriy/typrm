@@ -116,32 +116,25 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
 
     // List up original tag
     const  originalTagTree = await makeOriginalTagTree(parser, settingTree);
-    var  first = true;
     for (const index of Object.keys(originalTagTree.replaceTo)) {
         for (const [name, replace] of Object.entries(originalTagTree.replaceTo[index])) {
-            if (first) {
-                console.log('');
-                first = false;
-            }
-
-            console.log(`${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
-                `#original: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`);
+            const  log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
+                `#original: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
+            parser.originalTagList.push(log);
         }
     }
 
     // List up to tag
     const  toTagTree = await makeReplaceToTagTree(parser, settingTree);
-    var  first = true;
     for (const index of Object.keys(toTagTree.replaceTo)) {
         for (const [name, replace] of Object.entries(toTagTree.replaceTo[index])) {
-            if (first) {
-                console.log('');
-                first = false;
-            }
-
-            console.log(`${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
-                `#to: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`);
+            const  log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
+                `#to: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
+            parser.toTagList.push(log);
         }
+    }
+    if (parser.outputToTagList) {
+        parser.flushToTagList();
     }
 
     // Check template
@@ -183,8 +176,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
         setting = settingTree.currentSettings;
 
         if (settingTree.outOfScopeSettingIndices.length >= 1) {
-            parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
-                inputFilePath);
+            onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]], parser);
         }
 
         // Check the "#same-as:" tag.
@@ -200,6 +192,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
                     expectedVariableName = r.variableName;
                     var  variableNames = r.referencedVariableNames;
                     for (const errorVariableName of r.errorVariableNames) {
+                        parser.flushToTagList();
                         console.log('');
                         console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
                         console.log(`${getTestablePath(inputFilePath)}:${lineNumInSetting}: ${lines[lineNumInSetting - 1]}`);
@@ -211,6 +204,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
 
                     if (expectedVariableName in setting) {
                         if (variable.value !== setting[expectedVariableName].value) {
+                            parser.flushToTagList();
                             variableNames.push(expectedVariableName);
                             console.log('');
                             console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, inputFilePath));
@@ -222,6 +216,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
                         }
                     } else {
                         if ( ! errorInSameAsTag) {
+                            parser.flushToTagList();
                             console.log('');
                             console.log(getVariablesForErrorMessage('', variableNames, settingTree, lines, inputFilePath));
                             console.log(`${getTestablePath(inputFilePath)}:${lineNumInSetting}: ${lines[lineNumInSetting - 1]}`);
@@ -241,6 +236,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
             const  evaluatedContidion = evaluateIfCondition(condition, setting, parser);
             if (typeof evaluatedContidion === 'boolean') {
                 if ( ! evaluatedContidion) {
+                    parser.flushToTagList();
                     console.log('');
                     console.log(translate('Error of not expected condition:'));
                     console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
@@ -248,6 +244,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
                     parser.errorCount += 1;
                 }
             } else {
+                parser.flushToTagList();
                 console.log('');
                 console.log('Error of expect tag syntax:');
                 console.log(`  ${translate('typrmFile')}: ${getTestablePath(inputFilePath)}:${lineNum}`);
@@ -259,6 +256,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
         // Check if previous line has "template" replaced contents.
         const  templateTag = parseTemplateTag(line, parser);
         if (templateTag.lineNumOffset >= 1  &&  templateTag.isFound) {
+            parser.flushToTagList();
             console.log("");
             console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line.trim()}`);
             console.log(`    ${translate('Error')}: ${translate('The parameter must be less than 0')}`);
@@ -284,6 +282,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
             }
 
             if ( ! checkingLineWithoutTemplate.includes(expected)  &&  ifTagParser.thisIsOutOfFalseBlock) {
+                parser.flushToTagList();
                 console.log("");
                 console.log(getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines));
                 console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
@@ -319,8 +318,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
     }
     settingTree.moveToEndOfFile();
     if (settingTree.outOfScopeSettingIndices.length >= 1) {
-        parser.warningCount += onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]],
-            inputFilePath);
+        onEndOfSettingScope(settingTree.settings[settingTree.outOfScopeSettingIndices[0]], parser);
     }
     parser.lineNum += 1;
 
@@ -2342,6 +2340,7 @@ async function  check(checkingFilePath?: string) {
 
             await checkRoutine(inputFileFullPath, copyTags, parser);
         }
+        parser.flushToTagList();
     } catch (e: any) {
         console.log('');
         console.log('Exception: ' + e.toString());
@@ -3968,17 +3967,16 @@ function  varidateMutualSearchCommandArguments() {
 }
 
 // onEndOfSettingScope
-function onEndOfSettingScope(setting: Settings, inputFilePath: string): /* warningCount */ number {
-    var  warningCount = 0;
+function  onEndOfSettingScope(setting: Settings, parser: Parser) {
     for (const key of Object.keys(setting)) {
         if ( ! setting[key].isReferenced) {
+            parser.flushToTagList();
             console.log('');
-            console.log(translate`Warning: ${getTestablePath(inputFilePath)}:${setting[key].lineNum}`);
+            console.log(translate`Warning: ${getTestablePath(parser.filePath)}:${setting[key].lineNum}`);
             console.log(translate`  Not referenced: ${key}`);
-            warningCount += 1;
+            parser.warningCount += 1;
         }
     }
-    return  warningCount;
 }
 
 // evaluateIfCondition
@@ -4659,7 +4657,8 @@ class SettingsTree {
         };
         var    currentSettings = currentSettings;
         const  outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
-        const  notVerboseParser = {... parser, verbose: false, ifTagErrorMessageIsEnabled: false};
+        const  notVerboseParser = new Parser();
+        Object.assign(notVerboseParser, {... parser, verbose: false, ifTagErrorMessageIsEnabled: false});
         const  ifTagParser = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
             var  currentIndexSlash = '/';
@@ -5035,7 +5034,8 @@ class  ReplaceToTagTree {
         var    newSettingsByOriginalTag = {... currentNewSettingsByOriginalTag };
         const  outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
         const  outOfFalseBlocksByOriginalTag = new Map</*lineNum*/ number, boolean>();
-        const  notVerboseParser = {... parser, verbose: false, ifTagErrorMessageIsEnabled: false};
+        const  notVerboseParser = new Parser();
+        Object.assign(notVerboseParser, {... parser, verbose: false, ifTagErrorMessageIsEnabled: false});
         const  ifTagParserForNewSettings = new IfTagParser(notVerboseParser);
         const  ifTagParserForOldSettings = new IfTagParser(notVerboseParser);
         if (currentIndex === '/') {
@@ -5775,6 +5775,29 @@ class  Parser {
     lineNum = 0;
     line = '';
     ifTagErrorMessageIsEnabled = true;
+    outputToTagList = false;
+    toTagList: string[] = [];
+    originalTagList: string[] = [];
+
+    flushToTagList() {
+        this.outputToTagList = true;
+
+        if (this.originalTagList.length >= 1) {
+            console.log('');
+            for (const log of this.originalTagList) {
+                console.log(log);
+            }
+            this.originalTagList = [];
+        }
+
+        if (this.toTagList.length >= 1) {
+            console.log('');
+            for (const log of this.toTagList) {
+                console.log(log);
+            }
+            this.toTagList = [];
+        }
+    }
 }
 
 // WriteBuffer
