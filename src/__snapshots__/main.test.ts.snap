@@ -4262,6 +4262,13 @@ new body:
         __SubA__: SetSubAA  #original: SetSubA
     body:
         SetSubAA   #template: __SubA__
+replace to original tag:
+    settings: #settings:
+        __ToOriginal_A__: value_0
+        __ToOriginal_B__: value_0
+    body:
+        value_0  #template: __ToOriginal_A__
+        value_0  #template: __ToOriginal_B__
 "
 `;
 
@@ -4317,6 +4324,13 @@ new body:
         __SubA__: SetSubA
     body:
         SetSubA   #template: __SubA__
+replace to original tag:
+    settings: #settings:
+        __ToOriginal_A__: value_0
+        __ToOriginal_B__: value_0
+    body:
+        value_0  #template: __ToOriginal_A__
+        value_0  #template: __ToOriginal_B__
 "
 `;
 
@@ -4378,6 +4392,13 @@ new body:
         __SubA__: SetSubA  #to: SetSubAA
     body:
         SetSubA   #template: __SubA__
+replace to original tag:
+    settings: #settings:
+        __ToOriginal_A__: value_1  #original: value_0  #to: value_0
+        __ToOriginal_B__: value_1  #original: value_0
+    body:
+        value_1  #template: __ToOriginal_A__
+        value_1  #template: __ToOriginal_B__  #to: value_0
 "
 `;
 
@@ -4404,6 +4425,8 @@ exports[`replaces settings >> replace to tag >> 1_OK: stdout 1`] = `
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __BodyG2__: ValueGG2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:53: #to: __BodyL__: Valu
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:55: #to: __SubA__: SetSubAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60: #to: __ToOriginal_A__: value_0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:64: #to: __ToOriginal_B__: value_0
 
 Warning: 0, Error: 0
 "

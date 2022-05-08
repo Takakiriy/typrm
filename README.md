@@ -527,6 +527,8 @@ It replaces `work1` in the settings and document body to `work2`.
 
 `#original:` tag with the value before replacement is added to the same line.
 If the `#original:` tag already exists, it will not be added.
+If you set `#to:` tag value to the same as `#original:` tag value,
+the `#original:` tag will be removed.
 
 To return to the value written in the `#original:` tag, use the reset command.
 Also, the reset command removes the `#original:` tag.

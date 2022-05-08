@@ -1189,15 +1189,23 @@ function  getReplacedLineInSettings(
     // __SettingB__: SetB      #to: NewSetB   #// SetBB...
     //                   ^ spaceAndCommentIndex
     var  spaceAndComment = '';
-    const  commentMatch = / +#.*/.exec(line.substr(separator));
+    const  commentMatch = / +#.*/.exec(line.substring(separator));
     if (commentMatch) {
         var  spaceAndCommentIndex = separator + commentMatch.index;
-        spaceAndComment = line.substr(spaceAndCommentIndex);
+        spaceAndComment = line.substring(spaceAndCommentIndex);
     } else {
         var  spaceAndCommentIndex = notFound;
     }
+    const  originalLabelIndex = line.indexOf(originalLabel);
+    const  lineIncludesOriginalLabel = (originalLabelIndex !== notFound);
+    if (addOriginalTag  &&  lineIncludesOriginalLabel) {
+        const  originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
+
+        if (replacedValue === originalValue) {
+            cutOriginalTag = true;
+        }
+    }
     var  original = '';
-    const  lineIncludesOriginalLabel = line.includes(originalLabel);
 
     // addOriginalTag
     if (addOriginalTag) {
@@ -1222,7 +1230,7 @@ function  getReplacedLineInSettings(
                     //                               ^ commentIndex   ^ toLabelIndex
                     // after:  __SettingB__: NewSetB  #original: SetB    #// comment1
                     spaceAndComment = ' '.repeat(commentIndex - spaceAndCommentIndex) +
-                        line.substr(commentIndex, toLabelIndex - commentIndex).trimRight();
+                        line.substring(commentIndex, toLabelIndex).trimRight();
                 } else {
                     nextCommentIndex += 1;
                     if (line[toLabelIndex - 2] !== ' '  &&  line[nextCommentIndex - 2] !== ' ') {
@@ -1232,8 +1240,8 @@ function  getReplacedLineInSettings(
                         //      spaceAndCommentIndex ^                ^ toLabelIndex 
                         // after:  __SettingB__: NewSetB  #original: SetB    #// comment1 #// comment2
                         spaceAndComment = ' '.repeat(commentIndex - spaceAndCommentIndex) +
-                            line.substr(commentIndex, toLabelIndex - commentIndex) +
-                            line.substr(nextCommentIndex);
+                            line.substring(commentIndex, toLabelIndex) +
+                            line.substring(nextCommentIndex);
                     } else {
                         const  commentMatch2 = / +#.*/.exec(line.substr(toLabelIndex))!;
                         const  spaceAndCommentIndex2 = toLabelIndex + commentMatch2.index;
@@ -1243,14 +1251,14 @@ function  getReplacedLineInSettings(
                         //                           ^ spaceAndCommentIndex              ^ spaceAndCommentIndex2
                         // after:  __SettingB__: NewSetB  #original: SetB    #// comment1         #// comment2
                         spaceAndComment = ' '.repeat(commentIndex - spaceAndCommentIndex) +
-                            line.substr(commentIndex, toLabelIndex - commentIndex - 1) +
-                            line.substr(spaceAndCommentIndex2 + 1);
+                            line.substring(commentIndex, toLabelIndex - 1) +
+                            line.substring(spaceAndCommentIndex2 + 1);
                     }
                 }
             } else {
                 var  nextCommentIndex = notFound;
                 if (toLabelIndex !== notFound) {
-                    const  nextCommentMatch = / +#.*/.exec(line.substr(commentIndex))
+                    const  nextCommentMatch = / +#.*/.exec(line.substring(commentIndex))
                     if (nextCommentMatch) {
                         nextCommentIndex = commentIndex + nextCommentMatch.index;
                     }
@@ -1280,7 +1288,8 @@ function  getReplacedLineInSettings(
                         if ( ! lineIncludesOriginalLabel) {
                             original = ' '.repeat(spaceCountAfterToTag) + `${originalLabel} ${oldValue}`;
                         }
-                        spaceAndComment = ' '.repeat(spaceCountBeforeToTag) + line.substr(nextCommentIndex + spaceCountAfterToTag)
+                        spaceAndComment = ' '.repeat(spaceCountBeforeToTag) +
+                            line.substring(nextCommentIndex + spaceCountAfterToTag);
                     }
                 }
             }
