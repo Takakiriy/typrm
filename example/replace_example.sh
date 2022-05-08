@@ -2,6 +2,13 @@ function  main_func() {
     #// "application", "test" or "debug"
     target_from="application"
     target_to="test"
+    if [ "$1" != ""  -o  "$2" != "" ]; then
+        if [ "$1" == ""  -o  "$2" == "" ]; then
+            echo "ERROR"; exit 2
+        fi
+        target_from="$1"
+        target_to="$2"
+    fi
 
     file_path="service_S.yaml"
     change_service_A_setting_func  ${file_path} ${target_from} ${target_to} 4
@@ -28,14 +35,14 @@ function  change_service_A_setting_func() {
     local  from_to="from \"${target_from}/${setting_from}\" to \"${target_to}/${setting_to}\""
 
     if [ "${setting_from}" == "server"  -a  "${setting_to}" == "local docker" ]; then
-        echo "${file_path}/${service}:$((${line_num} + 1)): Change ${from_to}"
+        echo "${file_path}/${service}:$((${line_num} + 0)): Change ${from_to}"
 
-        #// _c="$(sed "$((${line_num} + 1)) s/aa/AA/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
+        #// _c="$(sed "$((${line_num} + 0)) s/aa/AA/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
 
     elif [ "${setting_from}" == "local docker"  -a  "${setting_to}" == "server" ]; then
-        echo "${file_path}/${service}:${line_num}: Change ${from_to}"
+        echo "${file_path}/${service}:$((${line_num} + 0)): Change ${from_to}"
 
-        #// _c="$(sed "${line_num} s/AA/aa/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
+        #// _c="$(sed "$((${line_num} + 0)) s/AA/aa/g" "${file_path}" )";  echo "$_c" > "${file_path}";  unset _c
 
     elif [ "${setting_from}" == ""  -o  "${setting_to}" == "" ]; then
         echo "${file_path}/${service}: Error (${from_to})"; exit 2
@@ -154,4 +161,4 @@ function  test_of_get_set_func() {
 
 test_of_get_set_func
 
-main_func
+main_func  "$@"
