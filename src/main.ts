@@ -1610,8 +1610,9 @@ class  TemplateTag {
         }
         if ( ! fs.existsSync(targetFilePath)) {
             const  templateLineNum = templateEndLineNum - this.templateLines.length;
+            parser.flushToTagList();
             console.log("");
-            console.log(`Error of not found the target file:`);
+            console.log(translate(`Error of not found the target file:`));
             console.log(`  ${translate('NotFound')}: ${getTestablePath(targetFilePath)}`);
             console.log(`  Template: ${getTestablePath(parser.filePath)}:${templateLineNum}`);
             parser.errorCount += 1;
@@ -5963,6 +5964,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.":
                 "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "Not found specified variable name.": "指定した変数名が見つかりません。",
+            "Error of not found the file:": "エラー：ファイルが見つかりません",
             "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
             "Error of duplicated variable name:": "エラー：変数名が重複しています",
             "Error of not expected condition:": "エラー：予期しない条件です",
