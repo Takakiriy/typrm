@@ -1,21 +1,18 @@
 function  main_func() {
-    #// "application", "test" or "debug"
-    target_from="application"
-    target_to="test"
-    if [ "$1" != ""  -o  "$2" != "" ]; then
-        if [ "$1" == ""  -o  "$2" == "" ]; then
-            echo "ERROR"; exit 2
-        fi
-        target_from="$1"
-        target_to="$2"
+    if [ "$1" == ""  -o  "$2" == "" ]; then
+        echo  "  command example: $0 app test"
+        echo  "  parameters: application, test or debug"
+        exit  3
     fi
+    target_from="$1"
+    target_to="$2"
 
     file_path="service_S.yaml"
-    change_service_A_setting_func  ${file_path} ${target_from} ${target_to} 4
-    change_service_B_setting_func  ${file_path} ${target_from} ${target_to} 5
+    change_service_A_setting_func  "${file_path}" "${target_from}" "${target_to}" 4
+    change_service_B_setting_func  "${file_path}" "${target_from}" "${target_to}" 5
 
     file_path="service_T.yaml"
-    change_service_A_setting_func  ${file_path} ${target_from} ${target_to} 14
+    change_service_A_setting_func  "${file_path}" "${target_from}" "${target_to}" 14
 }
 
 function  change_service_A_setting_func() {
@@ -148,6 +145,7 @@ function  _set_sub() {
 }
 
 function  test_of_get_set_func() {
+    echo  "Strat of test_of_get_set_func()."
     object=(key_A "1" key_B "x")
     echo "$(_get object key_A )"
     echo "$(_get object key_B )"
@@ -157,6 +155,7 @@ function  test_of_get_set_func() {
     echo "$(_get object key_A )"
     echo "$(_get object key_B )"
     echo "$(_get object key_C )"
+    echo  "End of test_of_get_set_func()."
 }
 
 test_of_get_set_func
