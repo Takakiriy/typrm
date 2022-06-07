@@ -3074,12 +3074,12 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     var  labelLength = searchLabel.length;
                 }
 
-                var  csv = getValue(line, indexOfLabel + labelLength);
+                var  csv = getValue(line, indexOfLabel + labelLength);  // keywords, target words
                 if (csv !== '') {
                     var  withParameter = true;
                 } else {
                     var  withParameter = false;
-                    csv = parseKeyName(line);
+                    csv = parseKeyName(line);  // Keywords at the left of keyword tag
                 }
                 const  columns = await lib.parseCSVColumns(csv)
                     .catch((e: Error) => {
@@ -3104,8 +3104,11 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     found.indentLength = indentRegularExpression.exec(line)![0].length;
                     found.tagLabel = label;
                     for (const match of found.matches) {
-                        match.position += positionOfCSV + columnPositions[match.testTargetIndex];
+                        if (match.targetType === '') {
+                            match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
+                        }
                     }
+                    found.rightOfTargetKeywords = positionOfCSV + csv.length;
                     found.evaluateSnippetDepthTag(line);
                     foundLines.push(found);
                     snippetScaning.push(found);
@@ -3296,23 +3299,27 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 }
 
 // getKeywordMatchingScore
-function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, thesaurus: Thesaurus): FoundLine {
+function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, thesaurus: Thesaurus): FoundLine {
 
     function  subMain() {
-        const  bestFound = testingStrings.reduce(
-            (bestFound: FoundLine, aTestingString: string, stringIndex: number) => {
+        const  bestFound = targetStrings.reduce(
+            (bestFound: FoundLine, aTargetString: string, stringIndex: number) => {
                 const  keywords = keyphrase.split(' ');
                 const  found = new FoundLine();
 
                 var    previousPosition = -1;
+                var    isNormalizedMatched = false;
+                const  normalizedTestingString = thesaurus.normalize(aTargetString);
                 const  wordPositions = new WordPositions();
-                wordPositions.setPhrase(aTestingString);
-                const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length).fill( 0 )
+                const  normalizedWordPositions = new WordPositions();
+                wordPositions.setPhrase(aTargetString);
+                normalizedWordPositions.setPhrase(normalizedTestingString);
+                const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 )
 
                 for (const keyword of keywords) {
                     if (keyword === '') {continue;}
 
-                    const  result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
+                    const  result = getSubMatchedScore(aTargetString, keyword, keyword.toLowerCase(), stringIndex, '', found);
                     if (result.score !== 0) {
                         if (result.position > previousPosition) {
                             found.score += result.score + orderMatchScore;
@@ -3328,11 +3335,10 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                     }
                     const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
                     if (useThesaurus) {
-                        const  normalizedTestingString = thesaurus.normalize(aTestingString);
                         const  normalizedKeyword = thesaurus.normalize(keyword);
 
                         const  result = getSubMatchedScore(normalizedTestingString,
-                            normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
+                            normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, 'normalized', found);
                         if (result.score !== 0) {
                             if (result.position > previousPosition) {
                                 found.score += result.score * orderMatchScore;
@@ -3342,8 +3348,9 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                             found.matchedKeywordCount += 1;
                         }
                         if (result.position !== notFound) {
-                            matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                            matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
                             previousPosition = result.position;
+                            isNormalizedMatched = true;
                         }
                     }
                 }
@@ -3351,16 +3358,28 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
                     found.score = 0;
                 }
                 if (found.score !== 0) {
+                    if ( ! isNormalizedMatched) {
+                        var  matchedTargetString = aTargetString;
+                    } else {
+                        var  matchedTargetString = normalizedTestingString;
+                    }
                     // e.g.
                     // keyphrase = "aa bbb ccc"
-                    // aTestingString = "aabbb ccc dd ee"
+                    // matchedTargetString = "aabbb ccc dd ee"
                     // score += character count
                     // matchedKeywordCount = 3;
                     // matchedTargetKeywordCount = 2
                     // testedWordCount = 4
-                    found.score += 2 * (keyphrase.length - aTestingString.length);  // 2 is double score from the score of different (upper/loser) case
+                    found.score += 2 * (keyphrase.length - matchedTargetString.length);
+                        // 2 is double score from the score of different (upper/loser) case
                     found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    found.testedWordCount = aTestingString.split(' ').length;
+                    if ( ! isNormalizedMatched) {
+                        found.targetWordCount = aTargetString.split(' ').length;
+                        found.normalizedTargetKeywords = '';
+                    } else {
+                        found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTestingString.split(' ').length);
+                        found.normalizedTargetKeywords = normalizedTestingString;
+                    }
                 }
                 const  matches = bestFound.matches.concat(found.matches);
                 if (compareScoreAndSoOn(bestFound, found) < 0) {
@@ -3379,31 +3398,31 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
         position: number;
     }
 
-    function  getSubMatchedScore(testingString: string, keyword: string,
-            lowerKeyword: string, stringIndex: number, found: FoundLine): Result {
+    function  getSubMatchedScore(targetString: string, keyword: string,
+            lowerKeyword: string, stringIndex: number, targetType: SearchTargetType, found: FoundLine): Result {
         var  score = 0;
         var  position = notFound;
 
-        if ((position = testingString.indexOf(keyword)) !== notFound) {
-            if (testingString.length === keyword.length) {
+        if ((position = targetString.indexOf(keyword)) !== notFound) {
+            if (targetString.length === keyword.length) {
                 score = fullMatchScore;
             } else {
                 if (
-                    (position === 0  ||  testingString[position - 1] === ' ' ) &&
-                    (position + keyword.length === testingString.length  ||  testingString[position + keyword.length] === ' ')
+                    (position === 0  ||  targetString[position - 1] === ' ' ) &&
+                    (position + keyword.length === targetString.length  ||  targetString[position + keyword.length] === ' ')
                 ) {
                     score = wordsMatchScore;
                 } else {
                     score = partMatchScore;
                 }
             }
-        } else if ((position = testingString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
-            if (testingString.length === lowerKeyword.length) {
+        } else if ((position = targetString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
+            if (targetString.length === lowerKeyword.length) {
                 score = caseIgnoredFullMatchScore;
             } else {
                 if (
-                    (position === 0  ||  testingString[position - 1] === ' ' ) &&
-                    (position + keyword.length === testingString.length  ||  testingString[position + keyword.length] === ' ')
+                    (position === 0  ||  targetString[position - 1] === ' ' ) &&
+                    (position + keyword.length === targetString.length  ||  targetString[position + keyword.length] === ' ')
                 ) {
                     score = caseIgnoredWordMatchScore;
                 } else {
@@ -3415,8 +3434,9 @@ function  getKeywordMatchingScore(testingStrings: string[], keyphrase: string, t
             const  matched = new MatchedPart();
             matched.position = position;
             matched.length = keyword.replace(/"/g, '""').length;
-            matched.testTargetIndex = stringIndex;
-            matched.matchedString = testingString.substr(position, matched.length);
+            matched.targetWordsIndex = stringIndex;
+            matched.matchedString = targetString.substr(position, matched.length);
+            matched.targetType = targetType;
             found.matches.push(matched);
         }
         return { score, position };
@@ -3437,7 +3457,7 @@ function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
 
     // testedWordCount
     if (different === 0) {
-        different = b.testedWordCount - a.testedWordCount;
+        different = b.targetWordCount - a.targetWordCount;
     }
 
     // score
@@ -3517,12 +3537,13 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                     found.matches.push({
                         position: line.indexOf(fullMatchKeywords),
                         length: fullMatchKeywords.length,
-                        testTargetIndex: -1,
+                        targetWordsIndex: -1,
                         matchedString: fullMatchKeywords,
+                        targetType: 'withoutTags',
                     });
                     found.matchedKeywordCount = keywordCount;
                     found.matchedTargetKeywordCount = keywordCount;  // not keywordsLowerCase.length
-                    found.testedWordCount = line.split(' ').filter((keyword)=>(keyword !== '')).length;
+                    found.targetWordCount = line.split(' ').filter((keyword)=>(keyword !== '')).length;
                     found.tagLabel = 'find all';
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                         lineFullMatchScore + keywords.trim().length - line.trim().length;
@@ -3542,12 +3563,13 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                         found.matches.push({
                             position: keywordIndex,
                             length: keyword1LowerCase.length,
-                            testTargetIndex: -1,
+                            targetWordsIndex: -1,
                             matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
+                            targetType: 'withoutTags',
                         });
                         found.matchedKeywordCount = keywordCount;
                         found.matchedTargetKeywordCount = keywordsLowerCase.length;
-                        found.testedWordCount = line.split(' ').filter((keyword)=>(keyword !== '')).length;
+                        found.targetWordCount = line.split(' ').filter((keyword)=>(keyword !== '')).length;
                         found.tagLabel = 'find all';
                         found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                             suffledLineFullMatchScore + keywords.trim().length - line.trim().length;
@@ -3562,8 +3584,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                             found.matches.push({
                                 position: keywordIndex,
                                 length: keywordLowerCase.length,
-                                testTargetIndex: -1,
+                                targetWordsIndex: -1,
                                 matchedString: line.substr(keywordIndex, keywordLowerCase.length),
+                                targetType: 'withoutTags',
                             });
                             if (keywordIndex < previousKeywordIndex) {
                                 found.score -= 1;
@@ -4457,9 +4480,9 @@ function  parseKeyName(line: string): string {
     if (colon === notFound) {
         return  '';
     }
-    const  lineHead = line.substr(0, colon).trim();
+    const  lineHead = line.substring(0, colon).trim();
     if (lineHead[0] === '-') {
-        var  csv = lineHead.substr(1).trim();  // cut '-'
+        var  csv = lineHead.substring(1).trim();  // cut '-'
     } else {
         var  csv = lineHead;
     }
@@ -5337,7 +5360,9 @@ class FoundLine {
     matches: MatchedPart[] = [];
     matchedKeywordCount: number = 0;
     matchedTargetKeywordCount: number = 0;
-    testedWordCount: number = 0;
+    targetWordCount: number = 0;
+    normalizedTargetKeywords: string = '';  // '' = not matched in "normalized" target words
+    rightOfTargetKeywords: number = 0;
     tagLabel: string = '';  // keywordLabel, searchLabel, glossaryLabel, find all
     score: number = 0;
 
@@ -5345,7 +5370,17 @@ class FoundLine {
 
         // colorParts = sort matched positions and merge overrlapping parts.
         const  colorParts: MatchedPart[] = [];
-        const  sortedParts: MatchedPart[] = this.matches.sort((a, b) => (a.position - b.position));
+        const  sortedParts: MatchedPart[] = this.matches.sort((a, b) => {
+            var  diff = a.targetWordsIndex - b.targetWordsIndex;
+            if (diff === 0) {
+                const  prior = -1;
+                diff = (a.targetType === '' ? prior : 0) - (b.targetType === '' ? prior : 0);
+                if (diff === 0) {
+                    diff = a.position - b.position;
+                }
+            } 
+            return  diff;
+        });
         var  previousPart = new MatchedPart();
         previousPart.position = -1;
         previousPart.length = 0;
@@ -5439,7 +5474,7 @@ class FoundLine {
             }
         }
         if (false) {
-            var  debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
+            var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
         } else {
             var  debugString = ``;
         }
@@ -5486,12 +5521,16 @@ class FoundLine {
     }
 }
 
+// SearchTargetType
+type SearchTargetType = '' | 'normalized' | 'withoutTags';
+
 // MatchedPart
 class MatchedPart {
-    position: number = 0;
+    position: number = 0;  // in line or in normalizedTargetKeywords (SearchTargetType=='normalized')
     length: number = 0;
-    testTargetIndex: number = -1;
+    targetWordsIndex: number = -1;
     matchedString: string = '';
+    targetType: SearchTargetType = '';
 }
 
 // SearchKeyword
