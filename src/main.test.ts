@@ -1046,12 +1046,17 @@ describe("searches keyword tag >>", () => {
     });
 
     describe("thesaurus >>", () => {
-        test.only.each([
+        test.each([
             [
-                "acronym",
+                "acronym search keyword",
                 ["search", "PS"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('PowerShell')}\n`,
+            ],[
+                "acronym keyword tag",
+                ["search", "PowerShell"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} PS (${matchedColor('PowerShell')})\n`,
             ],[
                 "ignore case",
                 ["search", "ps"],
@@ -1062,12 +1067,10 @@ describe("searches keyword tag >>", () => {
                 ["search", "object end"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} DI (object dep${matchedColor('end')}ency injection)\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} DI object (dep${matchedColor('end')}ency injection ${matchedColor('object')}), end object\n` +
-                // pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} DI object, ${matchedColor('end')} ${matchedColor('object')}\n`+
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} DI ${matchedColor('object')} (dep${matchedColor('end')}ency injection object), ${matchedColor('end')} ${matchedColor('object')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} ${matchedColor('end')}\n`,
             ],
         ])("%s", async (caseName, arguments_, options, answer) => {
-if (caseName !== 'score') {return;}  // || subCase !== '____'
             chdirInProject('src');
             const  sourceFileContents =    lib.getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: sourceFileContents 1`);
             const  thesaurusFileContents = lib.getSnapshot(`searches keyword tag >> thesaurus >> ${caseName}: thesaurus 1`);
@@ -1079,7 +1082,6 @@ if (caseName !== 'score') {return;}  // || subCase !== '____'
             chdirInProject('src');
             expect(main.stdout).toBe(answer);
             lib.rmdirSync(testFolderPath + '_checking');
-expect('test code').toBe('deleted skip code.');
         });
     });
 });

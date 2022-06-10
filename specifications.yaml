@@ -7,6 +7,8 @@ command:
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
                     getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
+                    searchWithoutTags:
+                    FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
                 printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
                 runVerb:  #ref: ${GitHub}/typrm/src/main.ts#function  runVerb
                 openDocument:  #ref: ${GitHub}/typrm/src/main.ts#function  openDocument

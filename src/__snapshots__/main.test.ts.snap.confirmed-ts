@@ -5196,6 +5196,37 @@ Warning: 0, Error: 0
 "
 `;
 
+exports[`replaces settings >> replace to tag >> E3_ReplaceIncludesPart: replacedFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Variable__: develop  #original: dev
+    develop  #template: __Variable__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E3_ReplaceIncludesPart: resetFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Variable__: dev
+    dev  #template: __Variable__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E3_ReplaceIncludesPart: sourceFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Variable__: dev  #to: develop
+    dev  #template: __Variable__
+"
+`;
+
+exports[`replaces settings >> replace to tag >> E3_ReplaceIncludesPart: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Variable__: develop
+
+Warning: 0, Error: 0
+"
+`;
+
 exports[`replaces settings >> replace to tag >> bug_case_5: replacedFileContents 1`] = `
 "bug case:
     1:
@@ -5662,12 +5693,23 @@ Warning: 0, Error: 0
 "
 `;
 
-exports[`searches keyword tag >> thesaurus >> acronym: sourceFileContents 1`] = `
+exports[`searches keyword tag >> thesaurus >> acronym keyword tag: sourceFileContents 1`] = `
+"#keyword: PS
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> acronym keyword tag: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+PowerShell, PS
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> acronym search keyword: sourceFileContents 1`] = `
 "#keyword: PowerShell
 "
 `;
 
-exports[`searches keyword tag >> thesaurus >> acronym: thesaurus 1`] = `
+exports[`searches keyword tag >> thesaurus >> acronym search keyword: thesaurus 1`] = `
 "#keyword: thesaurus.csv 
 PowerShell, PS
 PowerShell, PS
@@ -5685,6 +5727,19 @@ exports[`searches keyword tag >> thesaurus >> ignore case: thesaurus 1`] = `
 PowerShell, PS
 PowerShell, PS
 PowerShell, PS
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> score: sourceFileContents 1`] = `
+"#keyword: object end
+#keyword: object DI
+#keyword: DI object, end object
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> score: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+dependency injection, DI
 "
 `;
 

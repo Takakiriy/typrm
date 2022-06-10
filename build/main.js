@@ -1489,8 +1489,9 @@ class TemplateTag {
         }
         if (!fs.existsSync(targetFilePath)) {
             const templateLineNum = templateEndLineNum - this.templateLines.length;
+            parser.flushToTagList();
             console.log("");
-            console.log(`Error of not found the target file:`);
+            console.log(translate(`Error of not found the target file:`));
             console.log(`  ${translate('NotFound')}: ${getTestablePath(targetFilePath)}`);
             console.log(`  Template: ${getTestablePath(parser.filePath)}:${templateLineNum}`);
             parser.errorCount += 1;
@@ -2886,13 +2887,13 @@ async function searchSub(keyword, isMutual) {
                     var indexOfLabel = indexOfSearchLabelIfMutual;
                     var labelLength = searchLabel.length;
                 }
-                var csv = getValue(line, indexOfLabel + labelLength);
+                var csv = getValue(line, indexOfLabel + labelLength); // keywords, target words
                 if (csv !== '') {
                     var withParameter = true;
                 }
                 else {
                     var withParameter = false;
-                    csv = parseKeyName(line);
+                    csv = parseKeyName(line); // Keywords at the left of keyword tag
                 }
                 const columns = await lib.parseCSVColumns(csv)
                     .catch((e) => {
@@ -2916,7 +2917,18 @@ async function searchSub(keyword, isMutual) {
                     found.indentLength = indentRegularExpression.exec(line)[0].length;
                     found.tagLabel = label;
                     for (const match of found.matches) {
-                        match.position += positionOfCSV + columnPositions[match.testTargetIndex];
+                        if (match.targetType === '') {
+                            match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
+                        }
+                    }
+                    for (let i = 0; i < columnPositions.length; i += 1) {
+                        if (i < columnPositions.length - 1) {
+                            var rightPosition = csv.lastIndexOf(',', columnPositions[i + 1]);
+                        }
+                        else {
+                            var rightPosition = csv.length;
+                        }
+                        found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
                     }
                     found.evaluateSnippetDepthTag(line);
                     foundLines.push(found);
@@ -3096,20 +3108,24 @@ async function searchSub(keyword, isMutual) {
     }
 }
 // getKeywordMatchingScore
-function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
+function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
     function subMain() {
-        const bestFound = testingStrings.reduce((bestFound, aTestingString, stringIndex) => {
+        const bestFound = targetStrings.reduce((bestFound, aTargetString, stringIndex) => {
             const keywords = keyphrase.split(' ');
             const found = new FoundLine();
             var previousPosition = -1;
+            var isNormalizedMatched = false;
+            const normalizedTargetKeywords = thesaurus.normalize(aTargetString);
             const wordPositions = new WordPositions();
-            wordPositions.setPhrase(aTestingString);
-            const matchedCountsByWord = new Array(wordPositions.length).fill(0);
+            const normalizedWordPositions = new WordPositions();
+            wordPositions.setPhrase(aTargetString);
+            normalizedWordPositions.setPhrase(normalizedTargetKeywords);
+            const matchedCountsByWord = new Array(wordPositions.length + normalizedWordPositions.length).fill(0);
             for (const keyword of keywords) {
                 if (keyword === '') {
                     continue;
                 }
-                const result = getSubMatchedScore(aTestingString, keyword, keyword.toLowerCase(), stringIndex, found);
+                const result = getSubMatchedScore(aTargetString, keyword, keyword.toLowerCase(), stringIndex, '', found);
                 if (result.score !== 0) {
                     if (result.position > previousPosition) {
                         found.score += result.score + orderMatchScore;
@@ -3126,21 +3142,26 @@ function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
                 }
                 const useThesaurus = (result.score === 0 && result.position === notFound && thesaurus.enabled);
                 if (useThesaurus) {
-                    const normalizedTestingString = thesaurus.normalize(aTestingString);
                     const normalizedKeyword = thesaurus.normalize(keyword);
-                    const result = getSubMatchedScore(normalizedTestingString, normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, found);
-                    if (result.score !== 0) {
-                        if (result.position > previousPosition) {
-                            found.score += result.score * orderMatchScore;
+                    if (normalizedKeyword !== keyword || normalizedTargetKeywords !== aTargetString) {
+                        const targetType = (normalizedTargetKeywords === aTargetString) ? '' : 'normalized';
+                        const result = getSubMatchedScore(normalizedTargetKeywords, normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, targetType, found);
+                        if (result.score !== 0) {
+                            if (result.position > previousPosition) {
+                                found.score += result.score * orderMatchScore;
+                            }
+                            else {
+                                found.score += result.score;
+                            }
+                            found.matchedKeywordCount += 1;
                         }
-                        else {
-                            found.score += result.score;
+                        if (result.position !== notFound) {
+                            matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
+                            previousPosition = result.position;
+                            if (normalizedTargetKeywords !== aTargetString) {
+                                isNormalizedMatched = true;
+                            }
                         }
-                        found.matchedKeywordCount += 1;
-                    }
-                    if (result.position !== notFound) {
-                        matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
-                        previousPosition = result.position;
                     }
                 }
             }
@@ -3148,36 +3169,56 @@ function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
                 found.score = 0;
             }
             if (found.score !== 0) {
+                if (!isNormalizedMatched) {
+                    var matchedTargetString = aTargetString;
+                }
+                else {
+                    var matchedTargetString = normalizedTargetKeywords;
+                }
                 // e.g.
                 // keyphrase = "aa bbb ccc"
-                // aTestingString = "aabbb ccc dd ee"
+                // matchedTargetString = "aabbb ccc dd ee"
                 // score += character count
                 // matchedKeywordCount = 3;
                 // matchedTargetKeywordCount = 2
                 // testedWordCount = 4
-                found.score += 2 * (keyphrase.length - aTestingString.length); // 2 is double score from the score of different (upper/loser) case
+                found.score += 2 * (keyphrase.length - matchedTargetString.length);
+                // 2 is double score from the score of different (upper/loser) case
                 found.matchedTargetKeywordCount = matchedCountsByWord.filter((count) => (count >= 1)).length;
-                found.testedWordCount = aTestingString.split(' ').length;
+                if (!isNormalizedMatched) {
+                    found.targetWordCount = aTargetString.split(' ').length;
+                }
+                else {
+                    found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTargetKeywords.split(' ').length);
+                }
             }
             const matches = bestFound.matches.concat(found.matches);
+            if (isNormalizedMatched) {
+                bestFound.normalizedTargetsKeywords.push(normalizedTargetKeywords);
+            }
+            else {
+                bestFound.normalizedTargetsKeywords.push('');
+            }
+            const normalizedTargetsKeywords = bestFound.normalizedTargetsKeywords;
             if (compareScoreAndSoOn(bestFound, found) < 0) {
                 bestFound = found;
             }
             bestFound.matches = matches;
+            bestFound.normalizedTargetsKeywords = normalizedTargetsKeywords;
             return bestFound;
         }, new FoundLine());
         return bestFound;
     }
-    function getSubMatchedScore(testingString, keyword, lowerKeyword, stringIndex, found) {
+    function getSubMatchedScore(targetString, keyword, lowerKeyword, stringIndex, targetType, found) {
         var score = 0;
         var position = notFound;
-        if ((position = testingString.indexOf(keyword)) !== notFound) {
-            if (testingString.length === keyword.length) {
+        if ((position = targetString.indexOf(keyword)) !== notFound) {
+            if (targetString.length === keyword.length) {
                 score = fullMatchScore;
             }
             else {
-                if ((position === 0 || testingString[position - 1] === ' ') &&
-                    (position + keyword.length === testingString.length || testingString[position + keyword.length] === ' ')) {
+                if ((position === 0 || targetString[position - 1] === ' ') &&
+                    (position + keyword.length === targetString.length || targetString[position + keyword.length] === ' ')) {
                     score = wordsMatchScore;
                 }
                 else {
@@ -3185,13 +3226,13 @@ function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
                 }
             }
         }
-        else if ((position = testingString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
-            if (testingString.length === lowerKeyword.length) {
+        else if ((position = targetString.toLowerCase().indexOf(lowerKeyword)) !== notFound) {
+            if (targetString.length === lowerKeyword.length) {
                 score = caseIgnoredFullMatchScore;
             }
             else {
-                if ((position === 0 || testingString[position - 1] === ' ') &&
-                    (position + keyword.length === testingString.length || testingString[position + keyword.length] === ' ')) {
+                if ((position === 0 || targetString[position - 1] === ' ') &&
+                    (position + keyword.length === targetString.length || targetString[position + keyword.length] === ' ')) {
                     score = caseIgnoredWordMatchScore;
                 }
                 else {
@@ -3203,8 +3244,9 @@ function getKeywordMatchingScore(testingStrings, keyphrase, thesaurus) {
             const matched = new MatchedPart();
             matched.position = position;
             matched.length = keyword.replace(/"/g, '""').length;
-            matched.testTargetIndex = stringIndex;
-            matched.matchedString = testingString.substr(position, matched.length);
+            matched.targetWordsIndex = stringIndex;
+            matched.matchedString = targetString.substr(position, matched.length);
+            matched.targetType = targetType;
             found.matches.push(matched);
         }
         return { score, position };
@@ -3221,7 +3263,7 @@ function compareScoreAndSoOn(a, b) {
     }
     // testedWordCount
     if (different === 0) {
-        different = b.testedWordCount - a.testedWordCount;
+        different = b.targetWordCount - a.targetWordCount;
     }
     // score
     if (different === 0) {
@@ -3295,12 +3337,13 @@ async function searchWithoutTags(keywords) {
                     found.matches.push({
                         position: line.indexOf(fullMatchKeywords),
                         length: fullMatchKeywords.length,
-                        testTargetIndex: -1,
+                        targetWordsIndex: -1,
                         matchedString: fullMatchKeywords,
+                        targetType: 'withoutTags',
                     });
                     found.matchedKeywordCount = keywordCount;
                     found.matchedTargetKeywordCount = keywordCount; // not keywordsLowerCase.length
-                    found.testedWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
+                    found.targetWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
                     found.tagLabel = 'find all';
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                         lineFullMatchScore + keywords.trim().length - line.trim().length;
@@ -3317,12 +3360,13 @@ async function searchWithoutTags(keywords) {
                         found.matches.push({
                             position: keywordIndex,
                             length: keyword1LowerCase.length,
-                            testTargetIndex: -1,
+                            targetWordsIndex: -1,
                             matchedString: line.substr(keywordIndex, keyword1LowerCase.length),
+                            targetType: 'withoutTags',
                         });
                         found.matchedKeywordCount = keywordCount;
                         found.matchedTargetKeywordCount = keywordsLowerCase.length;
-                        found.testedWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
+                        found.targetWordCount = line.split(' ').filter((keyword) => (keyword !== '')).length;
                         found.tagLabel = 'find all';
                         found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                             suffledLineFullMatchScore + keywords.trim().length - line.trim().length;
@@ -3335,8 +3379,9 @@ async function searchWithoutTags(keywords) {
                             found.matches.push({
                                 position: keywordIndex,
                                 length: keywordLowerCase.length,
-                                testTargetIndex: -1,
+                                targetWordsIndex: -1,
                                 matchedString: line.substr(keywordIndex, keywordLowerCase.length),
+                                targetType: 'withoutTags',
                             });
                             if (keywordIndex < previousKeywordIndex) {
                                 found.score -= 1;
@@ -4141,9 +4186,9 @@ function parseKeyName(line) {
     if (colon === notFound) {
         return '';
     }
-    const lineHead = line.substr(0, colon).trim();
+    const lineHead = line.substring(0, colon).trim();
     if (lineHead[0] === '-') {
-        var csv = lineHead.substr(1).trim(); // cut '-'
+        var csv = lineHead.substring(1).trim(); // cut '-'
     }
     else {
         var csv = lineHead;
@@ -4882,14 +4927,26 @@ class FoundLine {
         this.matches = [];
         this.matchedKeywordCount = 0;
         this.matchedTargetKeywordCount = 0;
-        this.testedWordCount = 0;
+        this.targetWordCount = 0;
+        this.normalizedTargetsKeywords = []; // '' = not matched in "normalized" target words
+        this.rightOfTargetKeywords = [];
         this.tagLabel = ''; // keywordLabel, searchLabel, glossaryLabel, find all
         this.score = 0;
     }
     toString() {
         // colorParts = sort matched positions and merge overrlapping parts.
         const colorParts = [];
-        const sortedParts = this.matches.sort((a, b) => (a.position - b.position));
+        const sortedParts = this.matches.sort((a, b) => {
+            var diff = a.targetWordsIndex - b.targetWordsIndex;
+            if (diff === 0) {
+                const prior = -1;
+                diff = (a.targetType === '' ? prior : 0) - (b.targetType === '' ? prior : 0);
+                if (diff === 0) {
+                    diff = a.position - b.position;
+                }
+            }
+            return diff;
+        });
         var previousPart = new MatchedPart();
         previousPart.position = -1;
         previousPart.length = 0;
@@ -4904,11 +4961,44 @@ class FoundLine {
         var coloredLine = '';
         const line = this.line;
         var previousPosition = 0;
+        var previousPositionInNormalized = 0;
+        var inNormalizedWords = false;
+        var matchIndex = 0;
+        var normalizedTargetKeywords = '';
         for (const match of colorParts) {
+            if (match.targetType === 'normalized' && !inNormalizedWords) {
+                inNormalizedWords = true;
+                coloredLine += line.substring(previousPosition, this.rightOfTargetKeywords[match.targetWordsIndex]) +
+                    ' (';
+                previousPosition = this.rightOfTargetKeywords[match.targetWordsIndex];
+                previousPositionInNormalized = 0;
+                normalizedTargetKeywords = this.normalizedTargetsKeywords[match.targetWordsIndex];
+            }
+            else if (match.targetType !== 'normalized' && inNormalizedWords) {
+                inNormalizedWords = false;
+                coloredLine +=
+                    normalizedTargetKeywords.substring(previousPositionInNormalized) +
+                        ')';
+                normalizedTargetKeywords = '';
+            }
+            if (!inNormalizedWords) {
+                coloredLine +=
+                    line.substring(previousPosition, match.position) +
+                        matchedColor(line.substr(match.position, match.length));
+                previousPosition = match.position + match.length;
+            }
+            else { // inNormalizedWords
+                coloredLine +=
+                    normalizedTargetKeywords.substring(previousPositionInNormalized, match.position) +
+                        matchedColor(normalizedTargetKeywords.substr(match.position, match.length));
+                previousPositionInNormalized = match.position + match.length;
+            }
+            matchIndex += 1;
+        }
+        if (inNormalizedWords) {
             coloredLine +=
-                line.substring(previousPosition, match.position) +
-                    matchedColor(line.substr(match.position, match.length));
-            previousPosition = match.position + match.length;
+                normalizedTargetKeywords.substring(previousPositionInNormalized) +
+                    ')';
         }
         coloredLine += line.substring(previousPosition);
         // ...
@@ -4980,7 +5070,7 @@ class FoundLine {
             }
         }
         if (false) {
-            var debugString = ` (score: ${this.score}, wordCount: ${this.testedWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
+            var debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
         }
         else {
             var debugString = ``;
@@ -5026,10 +5116,11 @@ class FoundLine {
 // MatchedPart
 class MatchedPart {
     constructor() {
-        this.position = 0;
+        this.position = 0; // in line or in normalizedTargetKeywords (SearchTargetType=='normalized')
         this.length = 0;
-        this.testTargetIndex = -1;
+        this.targetWordsIndex = -1;
         this.matchedString = '';
+        this.targetType = '';
     }
 }
 // SearchKeyword
@@ -5372,6 +5463,7 @@ function translate(englishLiterals, ...values) {
             "Add variable declarations": "変数宣言を追加してください",
             "Settings cannot be identified, because the file has 2 or more settings. Add line number parameter.": "複数の設定があるので、設定を特定できません。行番号のパラメーターを追加してください。",
             "Not found specified variable name.": "指定した変数名が見つかりません。",
+            "Error of not found the file:": "エラー：ファイルが見つかりません",
             "Error of not found the file or folder at \"${verbNum}\"": "エラー：ファイルまたはフォルダーが見つかりません \"${0}\"",
             "Error of duplicated variable name:": "エラー：変数名が重複しています",
             "Error of not expected condition:": "エラー：予期しない条件です",

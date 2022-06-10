@@ -931,7 +931,7 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
                         if (parser.verbose) {
                             console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:`);
                         }
-                        const  newKeyValues = await previousTemplateTag.scanKeyValues(
+                        const  newKeyValues: {[name: string]: Setting} = await previousTemplateTag.scanKeyValues(
                             toValue, settingTree.currentSettings, parser);
                         if (parser.verbose) {
                             for (const [variableName, newValue] of Object.entries(newKeyValues)) {
@@ -3108,7 +3108,14 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                             match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
                         }
                     }
-                    found.rightOfTargetKeywords = positionOfCSV + csv.length;
+                    for (let i=0; i < columnPositions.length; i += 1) {
+                        if (i < columnPositions.length - 1) {
+                            var  rightPosition = csv.lastIndexOf(',', columnPositions[i+1]);
+                        } else {
+                            var  rightPosition = csv.length;
+                        }
+                        found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
+                    }
                     found.evaluateSnippetDepthTag(line);
                     foundLines.push(found);
                     snippetScaning.push(found);
@@ -3309,11 +3316,11 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
 
                 var    previousPosition = -1;
                 var    isNormalizedMatched = false;
-                const  normalizedTestingString = thesaurus.normalize(aTargetString);
+                const  normalizedTargetKeywords = thesaurus.normalize(aTargetString);
                 const  wordPositions = new WordPositions();
                 const  normalizedWordPositions = new WordPositions();
                 wordPositions.setPhrase(aTargetString);
-                normalizedWordPositions.setPhrase(normalizedTestingString);
+                normalizedWordPositions.setPhrase(normalizedTargetKeywords);
                 const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 )
 
                 for (const keyword of keywords) {
@@ -3336,21 +3343,26 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                     const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
                     if (useThesaurus) {
                         const  normalizedKeyword = thesaurus.normalize(keyword);
+                        if (normalizedKeyword !== keyword  ||  normalizedTargetKeywords !== aTargetString) {
+                            const  targetType = (normalizedTargetKeywords === aTargetString) ? '' : 'normalized';
 
-                        const  result = getSubMatchedScore(normalizedTestingString,
-                            normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, 'normalized', found);
-                        if (result.score !== 0) {
-                            if (result.position > previousPosition) {
-                                found.score += result.score * orderMatchScore;
-                            } else {
-                                found.score += result.score;
+                            const  result = getSubMatchedScore(normalizedTargetKeywords,
+                                normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, targetType, found);
+                            if (result.score !== 0) {
+                                if (result.position > previousPosition) {
+                                    found.score += result.score * orderMatchScore;
+                                } else {
+                                    found.score += result.score;
+                                }
+                                found.matchedKeywordCount += 1;
                             }
-                            found.matchedKeywordCount += 1;
-                        }
-                        if (result.position !== notFound) {
-                            matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
-                            previousPosition = result.position;
-                            isNormalizedMatched = true;
+                            if (result.position !== notFound) {
+                                matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
+                                previousPosition = result.position;
+                                if (normalizedTargetKeywords !== aTargetString) {
+                                    isNormalizedMatched = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -3361,7 +3373,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                     if ( ! isNormalizedMatched) {
                         var  matchedTargetString = aTargetString;
                     } else {
-                        var  matchedTargetString = normalizedTestingString;
+                        var  matchedTargetString = normalizedTargetKeywords;
                     }
                     // e.g.
                     // keyphrase = "aa bbb ccc"
@@ -3375,18 +3387,23 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                     found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
                     if ( ! isNormalizedMatched) {
                         found.targetWordCount = aTargetString.split(' ').length;
-                        found.normalizedTargetKeywords = '';
                     } else {
-                        found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTestingString.split(' ').length);
-                        found.normalizedTargetKeywords = normalizedTestingString;
+                        found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTargetKeywords.split(' ').length);
                     }
                 }
                 const  matches = bestFound.matches.concat(found.matches);
-                if (compareScoreAndSoOn(bestFound, found) < 0) {
+                if (isNormalizedMatched) {
+                    bestFound.normalizedTargetsKeywords.push(normalizedTargetKeywords);
+                } else {
+                    bestFound.normalizedTargetsKeywords.push('');
+                }
+                const  normalizedTargetsKeywords = bestFound.normalizedTargetsKeywords;
 
+                if (compareScoreAndSoOn(bestFound, found) < 0) {
                     bestFound = found;
                 }
                 bestFound.matches = matches;
+                bestFound.normalizedTargetsKeywords = normalizedTargetsKeywords;
                 return bestFound;
             }, new FoundLine());
 
@@ -5361,8 +5378,8 @@ class FoundLine {
     matchedKeywordCount: number = 0;
     matchedTargetKeywordCount: number = 0;
     targetWordCount: number = 0;
-    normalizedTargetKeywords: string = '';  // '' = not matched in "normalized" target words
-    rightOfTargetKeywords: number = 0;
+    normalizedTargetsKeywords: string[] = [];  // '' = not matched in "normalized" target words
+    rightOfTargetKeywords: number[] = [];
     tagLabel: string = '';  // keywordLabel, searchLabel, glossaryLabel, find all
     score: number = 0;
 
@@ -5395,12 +5412,44 @@ class FoundLine {
         var    coloredLine = '';
         const  line = this.line;
         var    previousPosition = 0;
-        for (const match of colorParts) {
+        var    previousPositionInNormalized = 0;
+        var    inNormalizedWords = false;
+        var    matchIndex = 0;
+        var    normalizedTargetKeywords = '';
 
+        for (const match of colorParts) {
+            if (match.targetType === 'normalized'  &&  ! inNormalizedWords) {
+                inNormalizedWords = true;
+                coloredLine += line.substring(previousPosition, this.rightOfTargetKeywords[match.targetWordsIndex]) +
+                    ' (';
+                previousPosition = this.rightOfTargetKeywords[match.targetWordsIndex];
+                previousPositionInNormalized = 0;
+                normalizedTargetKeywords = this.normalizedTargetsKeywords[match.targetWordsIndex];
+            } else if (match.targetType !== 'normalized'  &&  inNormalizedWords) {
+                inNormalizedWords = false;
+                coloredLine +=
+                    normalizedTargetKeywords.substring(previousPositionInNormalized) +
+                    ')';
+                normalizedTargetKeywords = '';
+            }
+            if ( ! inNormalizedWords) {
+
+                coloredLine +=
+                    line.substring(previousPosition,  match.position) +
+                    matchedColor( line.substr(match.position, match.length) );
+                previousPosition = match.position + match.length;
+            } else {  // inNormalizedWords
+                coloredLine +=
+                    normalizedTargetKeywords.substring(previousPositionInNormalized,  match.position) +
+                    matchedColor( normalizedTargetKeywords.substr(match.position, match.length) );
+                previousPositionInNormalized = match.position + match.length;
+            }
+            matchIndex += 1;
+        }
+        if (inNormalizedWords) {
             coloredLine +=
-                line.substring(previousPosition,  match.position) +
-                matchedColor( line.substr(match.position, match.length) );
-            previousPosition = match.position + match.length;
+                normalizedTargetKeywords.substring(previousPositionInNormalized) +
+                ')';
         }
         coloredLine += line.substring(previousPosition);
 
