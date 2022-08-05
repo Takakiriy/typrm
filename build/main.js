@@ -4934,6 +4934,7 @@ class FoundLine {
         this.score = 0;
     }
     toString() {
+        const length_limit = 200;
         // colorParts = sort matched positions and merge overrlapping parts.
         const colorParts = [];
         const sortedParts = this.matches.sort((a, b) => {
@@ -4951,7 +4952,9 @@ class FoundLine {
         previousPart.position = -1;
         previousPart.length = 0;
         for (const part of sortedParts) {
-            if (part.position === previousPart.position) {
+            if (part.position === previousPart.position ||
+                part.position + part.length >= length_limit) {
+                // no push
             }
             else {
                 colorParts.push(part);
@@ -4959,12 +4962,16 @@ class FoundLine {
         }
         // coloredLine = ...
         var coloredLine = '';
-        const line = this.line;
+        var line = this.line;
+        const terminator = '\n';
         var previousPosition = 0;
         var previousPositionInNormalized = 0;
         var inNormalizedWords = false;
         var matchIndex = 0;
         var normalizedTargetKeywords = '';
+        if (line.length > length_limit) {
+            line = line.substring(0, length_limit) + terminator + line.substring(length_limit + 1);
+        }
         for (const match of colorParts) {
             if (match.targetType === 'normalized' && !inNormalizedWords) {
                 inNormalizedWords = true;
@@ -5001,6 +5008,10 @@ class FoundLine {
                     ')';
         }
         coloredLine += line.substring(previousPosition);
+        const terminatorPosition = coloredLine.indexOf(terminator);
+        if (terminatorPosition !== notFound) {
+            coloredLine = coloredLine.substring(0, terminatorPosition);
+        }
         // ...
         var thereIsKeywordLabel = false;
         var thereIsSearchLabel = false;
