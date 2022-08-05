@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run TypeScript",
+            "preLaunchTask": "TypeScript Compile Task",
+            "program": "${workspaceFolder}/src/typrm_test.ts",
+            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "args": [],
+            "cwd": "${workspaceFolder}/src",
+            "smartStep": true,
+            "outFiles": [
+                "${workspaceFolder}/build/**/*.js"
+            ]
+        }
+    ]
+}
