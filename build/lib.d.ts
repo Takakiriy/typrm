@@ -26,10 +26,10 @@ export declare function isFullPath(path: string): boolean;
 export declare function checkNotInGitWorking(): void;
 export declare function getTestWorkFolderFullPath(): string;
 export declare function getHomePath(): string;
-export declare function getGlobbyParameters(targetPath: string, baseFullPath: string): GlobbyParameters;
+export declare function getGlobbyParameters(targetPath: string, baseFullPath: string): Promise<GlobbyParameters>;
 interface GlobbyParameters {
     targetFolderFullPath: string;
-    wildcard: string;
+    globbyParameters: string[];
 }
 export declare function cutLeftOf(input: string, keyword: string): string;
 export declare function cutLast(input: string, keyword: string): string;

@@ -224,13 +224,23 @@ export function getHomePath() {
 }
 // getGlobbyParameters
 // #keyword: lib.ts getGlobbyParameters
-export function getGlobbyParameters(targetPath, baseFullPath) {
-    const targetFullPath = getFullPath(targetPath, baseFullPath);
-    const fileName = path.basename(targetFullPath);
+export async function getGlobbyParameters(targetPath, baseFullPath) {
+    var targetFullPath = getFullPath(targetPath, baseFullPath);
+    var fileName = path.basename(targetFullPath);
+    const negated = (fileName[0] === '!');
+    if (fileName[0] === '{' && fileName[fileName.length - 1] === '}') {
+        var fileNames = await parseCSVColumns(fileName.substring(1, fileName.length - 1));
+    }
+    else {
+        var fileNames = [fileName];
+    }
     const filePath = 1;
     const folderPath = 2;
     var pathIs = 0;
     if (fileName.includes('*')) {
+        pathIs = filePath;
+    }
+    else if (fileNames.length >= 2) {
         pathIs = filePath;
     }
     else {
@@ -244,15 +254,23 @@ export function getGlobbyParameters(targetPath, baseFullPath) {
     }
     if (pathIs === filePath) {
         var targetFolderFullPath = path.dirname(targetFullPath);
-        var wildcard = fileName;
+        var globbyParameters = [];
+        for (let fileName_ of fileNames) {
+            if (fileName_[0] !== '!') {
+                globbyParameters.push(`**/${fileName_}`);
+            }
+            else {
+                globbyParameters.push(`!**/${fileName_.substring(1)}`);
+            }
+        }
     }
     else { // folderPath
         var targetFolderFullPath = targetFullPath;
-        var wildcard = '*';
+        var globbyParameters = [`**/*`];
     }
     return {
         targetFolderFullPath,
-        wildcard,
+        globbyParameters,
     };
 }
 // String group

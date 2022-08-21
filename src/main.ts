@@ -2731,6 +2731,7 @@ async function  listUpFilePaths(checkingFilePath?: string): Promise<string[]> {
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
     const  notFoundPaths: string[] = [];
+
     var    targetFolders = await lib.parseCSVColumns(programOptions.folder);
     targetFolders = targetFolders.map((path)=>(lib.pathResolve(path)));  // Normalize path separators
     if (checkingFilePath) {
@@ -2764,12 +2765,12 @@ async function  listUpFilePaths(checkingFilePath?: string): Promise<string[]> {
     } else {
 
         for (const folder of targetFolders) {
-            const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder);
+            const { targetFolderFullPath, globbyParameters } = await lib.getGlobbyParameters(folder, currentFolder);
             if (!fs.existsSync(targetFolderFullPath)) {
                 throw  new Error(`Not found target folder at "${getTestablePath(targetFolderFullPath)}".`);
             }
             process.chdir(targetFolderFullPath);
-            const scanedPaths = await globby([`**/${wildcard}`]);
+            const scanedPaths = await globby(globbyParameters);
             scanedPaths.forEach((scanedPath: string) => {
 
                 inputFileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
@@ -2980,25 +2981,8 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
         }
     }
 
-    // fileFullPaths = ...
-    const  currentFolder = process.cwd();
-    const  fileFullPaths: string[] = [];
-    const  targetFolders = await lib.parseCSVColumns(programOptions.folder);
-    for (const folder of targetFolders) {
-        const { targetFolderFullPath, wildcard } = lib.getGlobbyParameters(folder, currentFolder)
-        if (!fs.existsSync(targetFolderFullPath)) {
-            throw  new Error(`Not found target folder at "${targetFolderFullPath}".`);
-        }
-        process.chdir(targetFolderFullPath);
-        const scanedPaths = await globby([`**/${wildcard}`]);
-        scanedPaths.forEach((scanedPath: string) => {
-
-            fileFullPaths.push(lib.getFullPath(scanedPath, targetFolderFullPath))
-        });
-    }
-    process.chdir(currentFolder);
-
     // ...
+    const  fileFullPaths: string[] = await listUpFilePaths();
     var  foundLines: FoundLine[] = [];
     const  thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {

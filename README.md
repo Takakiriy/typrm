@@ -138,6 +138,18 @@ You can also specify a file path.
 
     ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
 
+If you want to exclude specific folders or files, specify them like `{*, !__Exclude__}`.
+`__Exclude__` in subfolders are also excluded.
+However, enclose the entire file with `" "` so that `*,` commas do not parsed with delimiters in CSV format.
+
+bash:
+
+    TYPRM_FOLDER="\"${HOME}/Documents/typrm/{*, !node_modules}\", ${HOME}/Files/*.yaml"
+
+PowerShell:
+
+    ${env:TYPRM_FOLDER} = "`"${env:USERPROFILE}\Documents\typrm\{*, !node_modules}`", ${env:USERPROFILE}\Files\*.yaml"
+
 ### Search priorities and set snippets
 
 You should write `#keyword:` tag with the keyword

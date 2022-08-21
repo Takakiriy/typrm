@@ -132,6 +132,18 @@ PowerShell で `--folder` オプションを指定する場合:
 
     ${env:TYPRM_FOLDER} = "${env:USERPROFILE}\Documents\typrm, ${env:USERPROFILE}\Files\*.yaml"
 
+特定のフォルダーやファイルを除外する場合は、`{*, !__Exclude__}` のように指定します。
+サブフォルダーにある `__Exclude__` も除外されます。
+ただし、`*,` のコンマが CSV 形式の区切りにならないように全体を `" "` で囲んでください。
+
+bash:
+
+    TYPRM_FOLDER="\"${HOME}/Documents/typrm/{*, !node_modules}\", ${HOME}/Files/*.yaml"
+
+PowerShell:
+
+    ${env:TYPRM_FOLDER} = "`"${env:USERPROFILE}\Documents\typrm\{*, !node_modules}`", ${env:USERPROFILE}\Files\*.yaml"
+
 ### 検索の優先順位とスニペットの設定方法
 
 検索結果に優先的に表示させるキーワードに対して `#keyword:` タグを付けます。

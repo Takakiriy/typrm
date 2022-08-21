@@ -5,6 +5,7 @@ command:
             #// parent: #search: mainMain
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
+                    listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                     searchWithoutTags:

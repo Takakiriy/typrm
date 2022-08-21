@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import * as lib from "./lib";
 import chalk from 'chalk';
 var anyLinesTag = '#anyLines:';
@@ -868,6 +869,30 @@ describe("alphabetIndex >>", () => {
         expect(lib.cutAlphabetInIndex('/1/2/a')).toBe('/1/2');
         expect(lib.cutAlphabetInIndex('/1/2/a/b')).toBe('/1/2');
         expect(lib.cutAlphabetInIndex('/1/2')).toBe('/1/2');
+    });
+});
+describe("file and file path >>", () => {
+    test.each([
+        [
+            "folder",
+            "_test",
+            "_test", ["**/*"],
+        ], [
+            "wildcard",
+            "_test/*.yaml",
+            "_test", ["**/*.yaml"],
+        ], [
+            "negate",
+            "_test/{*, !node_modules}",
+            "_test", ["**/*", "!**/node_modules"],
+        ],
+    ])("getGlobbyParameters >> %s", async (_caseName, arguments_, answerOfTarget, answerOfWildcard) => {
+        fs.mkdirSync('_test', { recursive: true });
+        const currentFolder = process.cwd();
+        const result = await lib.getGlobbyParameters(arguments_, currentFolder);
+        expect(result.targetFolderFullPath).toBe(`${currentFolder}/${answerOfTarget}`);
+        expect(result.globbyParameters).toEqual(answerOfWildcard);
+        lib.rmdirSync('_test');
     });
 });
 //# sourceMappingURL=lib.test.js.map
