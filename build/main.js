@@ -5173,7 +5173,8 @@ function splitFilePathAndKeyword(address, getter) {
 // searchAsText
 async function searchAsText(getter, address) {
     const { filePath, keyword, csvOption } = splitFilePathAndKeyword(address, getter);
-    if (!fs.existsSync(filePath)) {
+    const fileExists = fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
+    if (!fileExists) {
         console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
         return { filePath, lineNum: notFound };
     }
@@ -5233,6 +5234,11 @@ function parseFigureParameters(address, getter) {
 // getPointedFigurePath
 async function getPointedFigurePath(getter, address) {
     const { filePath, name, x, y } = parseFigureParameters(address, getter);
+    const fileExists = fs.lstatSync(filePath).isFile();
+    if (!fileExists) {
+        console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
+        return '(NotFound)';
+    }
     const inputImage = path.parse(filePath);
     const outputImagePath = (name) ?
         `${getter.outputFolder}/${inputImage.name}_${name}_${x}_${y}${inputImage.ext}` :

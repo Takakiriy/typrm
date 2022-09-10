@@ -1,5 +1,6 @@
 ﻿import * as fs from "fs";
 import * as lib from "./lib";
+import * as path from "path";
 import chalk from 'chalk';
 var anyLinesTag = '#anyLines:'
 
@@ -994,7 +995,7 @@ describe("file and file path >>", () => {
         const  currentFolder = process.cwd();
 
         const  result = await lib.getGlobbyParameters(arguments_, currentFolder);
-        expect(result.targetFolderFullPath).toBe(`${currentFolder}/${answerOfTarget}`);
+        expect(result.targetFolderFullPath).toBe(`${currentFolder}/${answerOfTarget}`.replace(/\//g, path.sep));
         expect(result.globbyParameters).toEqual(answerOfWildcard);
         lib.rmdirSync('_test');
     });
