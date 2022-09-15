@@ -8,7 +8,7 @@ function  exitFromCommander(e: commander.CommanderError) {
     }
 }
 async function  callMain() {
-    commander.program.version('1.3.0')  // previous revision of new features, update package.json, commit and add git tag
+    commander.program.version('1.4.0')  // previous revision of new features, update package.json, commit and add git tag
         .exitOverride(exitFromCommander)
         .option("-l, --locale <s>")
         .option("-t, --test")
