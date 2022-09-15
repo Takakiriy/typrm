@@ -1673,12 +1673,12 @@ Windows の PowerShell の場合:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:csv)?(:id=([0-9]+))?(#(.*))?`$
+            regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?`$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 7
-            csvOptionRegularExpressionIndex: 3
-            targetMatchIdRegularExpressionIndex: 5
+            keywordRegularExpressionIndex: 6
+            csvOptionRegularExpressionIndex: 2
+            targetMatchIdRegularExpressionIndex: 4
             address: "`${file}:`${lineNum}"
     "@
 
@@ -1688,12 +1688,12 @@ bash, zsh の場合:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
         - #
-            regularExpression: ^(.*\.(yaml|yml|json|js|ts|jsx|tsx|md|py|go|swift))(:csv)?(:id=([0-9]+))?(#(.*))?$
+            regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$
             type: text
             filePathRegularExpressionIndex: 1
-            keywordRegularExpressionIndex: 7
-            csvOptionRegularExpressionIndex: 3
-            targetMatchIdRegularExpressionIndex: 5
+            keywordRegularExpressionIndex: 6
+            csvOptionRegularExpressionIndex: 2
+            targetMatchIdRegularExpressionIndex: 4
             address: "${file}:${lineNum}"
     __HERE_DOCUMENT__
     )

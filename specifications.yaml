@@ -10,7 +10,10 @@ command:
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                     searchWithoutTags:
                     FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
-                printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
+                    snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
+                    printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
+                        getRelatedLineNumGetter:  #ref: ${GitHub}/typrm/src/main.ts#function  getRelatedLineNumGetter
+                        searchAsText:  #ref: ${GitHub}/typrm/src/main.ts#function  searchAsText
                 runVerb:  #ref: ${GitHub}/typrm/src/main.ts#function  runVerb
                 openDocument:  #ref: ${GitHub}/typrm/src/main.ts#function  openDocument
                 runShellCommand:  #ref: ${GitHub}/typrm/src/main.ts#function  runShellCommand

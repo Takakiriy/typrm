@@ -1243,6 +1243,12 @@ describe("print reference >>", () => {
                 "testEnv/file.txt\n" +
                     "    0.Folder\n",
             ], [
+                "folder",
+                ["search", "#ref:", "${TEST_ENV}"],
+                { locale: "en-US", test: "" },
+                "testEnv\n" +
+                    "    0.Folder\n",
+            ], [
                 "multi parameters",
                 ["search", " #ref:", "${TEST_ENV}/file1.txt", "${TEST_ENV}/${TEST_ENV}/file2.txt"],
                 { locale: "en-US", test: "" },
