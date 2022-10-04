@@ -3722,22 +3722,30 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     // linkableAddress = ...
     var  linkableAddress = address;
     var  addressLineNum = 0;
-    const  getter = getRelatedLineNumGetter(address);
-    if (getter.type === 'text') {
-        const  lineNumGetter = getter as LineNumGetter;
-        const  { filePath, lineNum } = await searchAsText(lineNumGetter, address);
+    if ( ! lib.isFullPath(address)) {
+        console.log(translate`Warning` + ': ' + translate`ref tag value \"${address}\" must be full path. Then you can specify the path with a variable.`);
+    } else if (lib.isInFileSystem(address)) {
+        const  getter = getRelatedLineNumGetter(address);
+        if (getter.type === 'text') {
+            const  lineNumGetter = getter as LineNumGetter;
+            const  { filePath, lineNum } = await searchAsText(lineNumGetter, address);
+            if (lineNum !== notFound) {
 
-        linkableAddress = lineNumGetter.address
-            .replace(verbVar.file, filePath.replace(/\\/g, '/'))
-            .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
-            .replace(verbVar.fragment, '')
-            .replace(verbVar.lineNum, lineNum.toString());
-            // This format is hyperlinkable in the Visual Studio Code Terminal
-        addressLineNum = lineNum;
-    }
-    else if (getter.type === 'figure') {
-        const  figurePointGetter = getter as FigurePointGetter;
-        linkableAddress = await getPointedFigurePath(figurePointGetter, address);
+                linkableAddress = lineNumGetter.address
+                    .replace(verbVar.file, filePath.replace(/\\/g, '/'))
+                    .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
+                    .replace(verbVar.fragment, '')
+                    .replace(verbVar.lineNum, lineNum.toString());
+                    // This format is hyperlinkable in the Visual Studio Code Terminal
+                addressLineNum = lineNum;
+            } else {
+                linkableAddress = lib.getExistingParentPath(filePath);
+            }
+        }
+        else if (getter.type === 'figure') {
+            const  figurePointGetter = getter as FigurePointGetter;
+            linkableAddress = await getPointedFigurePath(figurePointGetter, address);
+        }
     }
 
     // recommended = ...
@@ -3781,7 +3789,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     }
 
     // print the verb menu
-    if (addressLineNum !== notFound) {
+    if (addressLineNum !== notFound  &&  lib.isInFileSystem(linkableAddress)) {
         var  verbs = getRelatedVerbs(address);
         var  verbMenu = verbs.map((verb) => (verb.label)).join(', ');
         if (verbMenu !== ''  &&  option.print) {
@@ -3793,15 +3801,18 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     }
 
     return  {
+        foundLines: [],
         hasVerbMenu: (verbMenu !== ''),
         verbs,
         address,
         addressLineNum,
-    } as PrintRefResult;
+        previousKeyword: '',
+    };
 }
 
 // getRelatedLineNumGetter
 function  getRelatedLineNumGetter(address: string): AbstractLineNumGetter {
+    const  fileGetterType = ['text'];
     if (process.env.TYPRM_LINE_NUM_GETTER) {
 
         const  getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
@@ -5627,6 +5638,7 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
     if (verboseMode) {
         console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
         console.log(`    Verbose: address: ${address}`);
+        console.log(`    Verbose: type: ${getter.type}`);
         console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
         console.log(`    Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
         console.log(`    Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
@@ -5672,14 +5684,20 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
 async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<FilePathLineNum> {
     const  { filePath, keyword, csvOption } = splitFilePathAndKeyword(address,  getter);
     if ( ! fs.existsSync(filePath)) {
-        console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
+        if ( ! ('noFileExistCheck' in programOptions)) {
+            console.log(translate`ERROR: not found a file at` + ` "${getTestablePath(filePath)}"`);
+        }
         return  { filePath, lineNum: notFound };
     }
     if (fs.lstatSync(filePath).isDirectory()) {
-        return  { filePath, lineNum: 0 };
+        return  { filePath, lineNum: notFound };
     }
 
-    const  lineNum = await lib.searchAsTextSub({input: fs.createReadStream(filePath)}, keyword, csvOption);
+    if (keyword) {
+        var  lineNum = await lib.searchAsTextSub({input: fs.createReadStream(filePath)}, keyword, csvOption);
+    } else {
+        var  lineNum = notFound;
+    }
     return  { filePath, lineNum };
 }
 
@@ -6072,6 +6090,8 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "Not same as #copy tag contents": "#copy タグの内容に違いがあります",
             "(out of copy tag block)": "（copy タグのブロックの外）",
             "Not found a variable name specified in the same-as tag.": "same-as タグに指定した変数名が見つかりません",
+            "ref tag value \"${0}\" must be full path. Then you can specify the path with a variable.": "ref タグの値 \"${0}\" をフルパスに修正してください。その際、変数を指定できます。",
+            "ERROR: not found a file at": "エラー: ファイルが見つかりません",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
@@ -6102,7 +6122,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
     }
     var  translated = english;
     if (dictionary) {
-        if (english in dictionary) {
+        if (english in dictionary) {  // Full words match
 
             translated = dictionary[english];
         }

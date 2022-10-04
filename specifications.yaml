@@ -1,6 +1,15 @@
 #keyword: typrm specifications
-command:
+command: #keyword: typrm command list
     search:  #keyword: typrm search
+        test:
+            keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword tag >>"
+            glossary tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches glossary tag >>"
+            find all: #ref: ${GitHub}/typrm/src/main.test.ts#describe("find all >>"
+            mutual search: #ref: ${GitHub}/typrm/src/main.test.ts#describe("mutual search >>"
+            ref tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("print reference >>"
+            TYPRM_LINE_NUM_GETTER: #ref: ${GitHub}/typrm/src/main.test.ts#describe("line number getter >>"
+            recommend: #ref: ${GitHub}/typrm/src/main.test.ts#describe("recommend >>"
+            TYPRM_VERB: #ref: ${GitHub}/typrm/src/main.test.ts#describe("verb >>"
         code:
             #// parent: #search: mainMain
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
@@ -45,6 +54,9 @@ tag:
             English: #ref: ${GitHub}/typrm/README-jp.md### Tag list
             Japanese: #ref: ${GitHub}/typrm/README-jp.md### タグ一覧
         code: #ref: ${GitHub}/typrm/src/main.ts#const  originalLabel = 
+    keyword tag:
+        test: #search: keyword tag test
+        code: #search: typrm search
     copy tag:  #keyword:#copy:
         document:
             English: #ref: ${GitHub}/typrm/README-jp.md### #copy tag: check the text is the same
@@ -89,7 +101,8 @@ tag:
                 template_if_1_error
             replaces settings >>
                 2_replace_9_template_if_1_OK
-test:
+test 詳細:
+    機能からテストを探す場合: #search: typrm command list
     Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
         main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
         拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:

@@ -976,6 +976,33 @@ describe("alphabetIndex >>", () => {
 
 describe("file and file path >>", () => {
 
+    test("isFullPath >>", () => {
+        expect(lib.isFullPath('/path')).toEqual(true);
+        expect(lib.isFullPath('\\path')).toEqual(true);
+        expect(lib.isFullPath('\\\\pc\\path')).toEqual(true);
+        expect(lib.isFullPath('path')).toEqual(false);
+        expect(lib.isFullPath('http://example.com')).toEqual(true);
+        expect(lib.isFullPath('http://example.com:80')).toEqual(true);
+        expect(lib.isFullPath('path/path')).toEqual(false);
+        expect(lib.isFullPath('/file.md:csv#a,b')).toEqual(true);
+    });
+
+    test("isInFileSystem >>", () => {
+        expect(lib.isInFileSystem('/path')).toEqual(true);
+        expect(lib.isInFileSystem('\\path')).toEqual(true);
+        expect(lib.isInFileSystem('\\\\pc\\path')).toEqual(true);
+        expect(lib.isInFileSystem('path')).toEqual(true);
+        expect(lib.isInFileSystem('http://example.com')).toEqual(false);
+        expect(lib.isInFileSystem('http://example.com:80')).toEqual(false);
+        expect(lib.isInFileSystem('c:\\Program Files')).toEqual(true);
+        expect(lib.isInFileSystem('z:\\')).toEqual(true);
+        expect(lib.isInFileSystem('z:/')).toEqual(true);
+        expect(lib.isInFileSystem('path/path')).toEqual(true);
+        expect(lib.isInFileSystem('/file.md:csv#a,b')).toEqual(true);
+        // "file" URI scheme is not supported in this library.
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=1299624
+    });
+
     test.each([
         [
             "folder",

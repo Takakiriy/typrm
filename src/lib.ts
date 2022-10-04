@@ -201,10 +201,31 @@ export function  isFullPath(path: string): boolean {
 
     if (colonPosition === notFound) {
         var  isFullPath = (separatorPosition === 0);
-    } else {
+    } else if (colonPosition < separatorPosition) {
         var  isFullPath = (separatorPosition === colonPosition + 1);
+    } else {
+        var  isFullPath = (separatorPosition === 0);
     }
     return  isFullPath;
+}
+
+// isInFileSystem
+export function  isInFileSystem(path_: string): boolean {
+    return  ! path_.includes('://');
+}
+
+// getExistingParentPath
+export function  getExistingParentPath(path_: string): string {
+    if (path_[0] !== '/') {
+        return  getHomePath();
+    }
+    while (path_ !== '/') {
+        if (fs.existsSync(path_)) {
+            return  path_;
+        }
+        path_ = path.dirname(path_);
+    }
+    return  getHomePath();
 }
 
 // checkNotInGitWorking
