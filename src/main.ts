@@ -3776,8 +3776,11 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
 
     recommended = lib.unexpandVariable(recommended,
         sortedEnvronmentVariables.map((variable) => [`\${${variable.key}}`, variable.value]));
+    if (recommended[0] === '$') {
+        recommended = recommended.replace(/\\/g,'/');
+    }
     if (recommended.replace(/\\/g,'/').startsWith(lib.getHomePath().replace(/\\/g,'/'))) {
-        recommended = '~' + recommended.substring(lib.getHomePath().length);
+        recommended = '~' + recommended.substring(lib.getHomePath().length).replace(/\\/g,'/');
     }
 
     // print the address

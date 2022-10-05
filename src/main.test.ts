@@ -1322,7 +1322,8 @@ describe("print reference >>", () => {
                 "1st",
                 ["search", "#ref:", "${TEST_ENV}/file_target/1/file_5.yaml"],
                 {locale: "en-US", test: ""},
-                `${__dirname}/test_data/file_target/1/file_5.yaml\n` +
+                `Recommend: #ref: ~/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml\n` +
+                `${__dirname}/test_data/file_target/1/file_5.yaml\n`.replace(/\//g, path.sep) +
                 "    0.Folder\n",
             ],[
                 "folder",
@@ -1362,7 +1363,7 @@ describe("print reference >>", () => {
                 "http://example.com/a.html#fragment\n"
             ],
         ])("%s", async (_caseName, arguments_, options, answer) => {
-// if (_caseName !== 'URL') {return;}  // || subCase !== '____'
+// if (_caseName !== '1st') {return;}  // || subCase !== '____'
             chdirInProject('src');
 
             await callMain(arguments_, options);
