@@ -976,6 +976,13 @@ describe("alphabetIndex >>", () => {
 
 describe("file and file path >>", () => {
 
+    test("replacePathToSlashed >>", () => {
+        expect(lib.replacePathToSlashed('\\path\\to')).toEqual('/path/to');
+        expect(lib.replacePathToSlashed('\\path\\to\\ space')).toEqual('/path/to\\ space');
+        expect(lib.replacePathToSlashed('C:\\path\\to\\ space')).toEqual('c:/path/to\\ space');
+        expect(lib.replacePathToSlashed('\\\\pc\\folder\\sub/file.yaml')).toEqual('\\\\pc\\folder\\sub\\file.yaml');
+    });
+
     test("isFullPath >>", () => {
         expect(lib.isFullPath('/path')).toEqual(true);
         expect(lib.isFullPath('\\path')).toEqual(true);

@@ -31,6 +31,7 @@ if (true) {
         - #
             regularExpression: ^(.*\\.html)(:csv)?(:id=([0-9]+))?(#(.*))?\$
             type: keep
+            filePathRegularExpressionIndex: 1
         - #
             regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?\$
             type: text
@@ -58,7 +59,7 @@ if (testingOS === 'Windows') {
             label: 7.Test Echo
             number: 7
             regularExpression: ^.*\\.md(#.*)?\$
-            command: 'echo {ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}'
+            command: 'echo {ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}, lineNum: \${lineNum}}'
         - #
             label: 1.View
             number: 1
@@ -66,12 +67,13 @@ if (testingOS === 'Windows') {
             command: 'msedge "file://\${file}"'
     `;
 } else {
+    // "wr" and "wf" avoids to escape by back slash. 
     process.env.TYPRM_VERB = `
         - #
             label: 7.Test Echo
             number: 7
-            regularExpression: ^.*\\.md(#.*)?\$
-            command: 'echo  "{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, fragment: \${fragment}}"'
+            regularExpression: ^.*\\.(md|html)(#.*)?\$
+            command: "wr='\${windowsRef}' wf='\${windowsFile}' we='\${windowsExistingAddress}'  bash -c  'echo  \\"{ref: \${ref}, windowsRef: \${wr}, file: \${file}, windowsFile: \${wf}, existingAddress: \${existingAddress}, windowsExistingAddress: \${we}, fragment: \${fragment}, lineNum: \${lineNum}}\\"'"
         - #
             label: 1.View
             number: 1
@@ -1317,7 +1319,7 @@ describe("mutual search >>", () => {
 
 describe("print reference >>", () => {
     describe("basic >>", () => {
-        test.only.each([
+        test.each([
             [
                 "1st",
                 ["search", "#ref:", "${TEST_ENV}/file_target/1/file_5.yaml"],
@@ -1334,21 +1336,22 @@ describe("print reference >>", () => {
                 "escape",
                 ["search", "#ref:", "\\${TEST_SEARCH}", "-\\${TEST_SEARCH}-", "/${TEST_SEARCH}"],
                 {locale: "en-US", test: ""},
-                'Warning: ref tag value "${TEST_SEARCH} -${TEST_SEARCH}- /search" must be full path. Then you can specify the path with a variable.\n' +
-                "${TEST_SEARCH} -${TEST_SEARCH}- /search\n" +
-                "    0.Folder\n",
+                'Warning: ref tag value "${TEST_SEARCH} -${TEST_SEARCH}- /search" must be full path. Then you can specify the path with a variable.\n',
             ],[
                 "path",
                 ["search", "#ref:", "~/.ssh  folder/f1.txt  ${TEST_PATH}  escaped\\ space  /root  //pc"],
-                {locale: "en-US", test: "", "noFileExistCheck": ""},
-                lib.getHomePath() +"/.ssh  folder/f1.txt  C:/Test  escaped\\ space  /root  //pc\n" +  // TYPRM_TEST_PATH has \ but print replaced to /
+                {locale: "en-US", test: ""},
+                "ERROR: not found a file or folder at \"\${HOME}/.ssh  folder/f1.txt  C:/Test  escaped\\ space  /root  //pc\"\n" +  // TYPRM_TEST_PATH has \ but print replaced to /
+                lib.replacePathToSlashed(lib.getHomePath()) +"/.ssh  folder/f1.txt  C:/Test  escaped\\ space  /root  //pc\n" +
+                lib.replacePathToSlashed(lib.getHomePath()) +"\n" +
                 "    0.Folder\n",
             ],[
                 "shared folder",
                 ["search", "#ref:", "\\\\pc\\folder\\file.yaml"],
                 {locale: "en-US", test: ""},
-                'ERROR: not found a file at "//pc/folder/file.yaml"\n' +
+                'ERROR: not found a file or folder at "\\\\pc\\folder\\file.yaml"\n' +
                 "\\\\pc\\folder\\file.yaml\n" +
+                lib.replacePathToSlashed(lib.getHomePath()) +"\n" +  // USERPROFILE, if pc is not found
                 "    0.Folder\n",
             ],[
                 "URL",
@@ -1362,12 +1365,10 @@ describe("print reference >>", () => {
                 "http://example.com/a.html#fragment\n"
             ],
         ])("%s", async (_caseName, arguments_, options, answer) => {
-// if (_caseName !== 'URL') {return;}  // || subCase !== '____'
             chdirInProject('src');
 
             await callMain(arguments_, options);
             expect(main.stdout).toBe(answer);
-// expect('test code').toBe('deleted skip code.');
         });
     });
 
@@ -1395,19 +1396,21 @@ describe("print reference >>", () => {
                 "(error) lineNum not found",
                 ["search", "#ref:", "${TEST_ENV}/${TEST_SEARCH}/2/2.yaml#notFound"],
                 {locale: "en-US", test: ""},
-                `${__dirname}/test_data/search/2/2.yaml:0\n` +
+                `${__dirname}/test_data/search/2/2.yaml#notFound\n` +
+                `${__dirname}/test_data/search/2/2.yaml\n` +
                 "    0.Folder\n",
             ],[
                 "keep",
-                ["search", "#ref:", "${TEST_ENV}/${TEST_SEARCH}/2/2.html#lineNum"],
+                ["search", "#ref:", "${TEST_ENV}/verb/test.html#lineNum"],
                 {locale: "en-US", test: ""},
-                `${__dirname}/test_data/search/2/2.html#lineNum\n` +
-                "    0.Folder\n",
+                `${__dirname}/test_data/verb/test.html#lineNum\n` +
+                "    7.Test Echo, 0.Folder\n",
             ],[
                 "(error) file not found",
                 ["search", "#ref:", "${TEST_ENV}/${TEST_SEARCH}/2/notFound.yaml#notFound"],
                 {locale: "en-US", test: ""},
-                'ERROR: not found a file at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n' +
+                'ERROR: not found a file or folder at "${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/notFound.yaml"\n' +
+                `${__dirname}/test_data/search/2/notFound.yaml#notFound\n` +
                 `${__dirname}/test_data/search/2\n` +
                 "    0.Folder\n",
             ],
@@ -1422,24 +1425,63 @@ describe("print reference >>", () => {
         test.each([
             [
                 "recommend",
-                ["search", "#ref:", `${lib.getHomePath()}/.ssh  ${__dirname}/test_data/search/1/1.yaml  ${__dirname}/test_data/search/2/2.yaml  C:\\Test\\user1  c:\\Test  \\root  \\\\pc  last\\`],
+                ["search", "#ref:", `${lib.getHomePath()}/.ssh  ${__dirname}/test_data/search/1/1.yaml  ${__dirname}/test_data/search/2/2.yaml  C:\\Test\\user1  c:\\Test  last\\`],
                 {locale: "en-US", test: ""},
-                'Recommend: #ref: ~/.ssh  ${TEST_ENV}/search/1/1.yaml  ${TEST_ENV}/search/2/2.yaml  ${TEST_PATH}/user1  ${TEST_PATH}  /root  //pc  last/\n' +
-                lib.getHomePath().replace(/\\/g,'/') +"/.ssh  testEnv/file1.txt  testEnv/testEnv/file2.txt  C:/Test/user1  c:/Test  /root  //pc  last/\n" +
+                `ERROR: not found a file or folder at \"\${HOME}/.ssh  ${lib.getHomePath().replace(/\\/g,'/')}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml  ${lib.getHomePath().replace(/\\/g,'/')}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml  C:/Test/user1  c:/Test  last/\"\n` +
+                'Recommend: #ref: ~/.ssh  ${TEST_ENV}/${TEST_SEARCH}/1/1.yaml  ${TEST_ENV}/${TEST_SEARCH}/2/2.yaml  ${TEST_PATH}/user1  ${TEST_PATH}  last/\n' +
+                `${lib.getHomePath().replace(/\\/g,'/')}/.ssh  ${lib.getHomePath().replace(/\\/g,'/')}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml  ${lib.getHomePath().replace(/\\/g,'/')}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml  C:/Test/user1  c:/Test  last/\n` +
+                lib.getHomePath().replace(/\\/g,'/') +"\n" +  // USERPROFILE, if pc is not found
                 "    0.Folder\n",
             ],[
                 "recommend (2)",  // cut ' '
                 ["search", "#ref: '/User'"],
                 {locale: "en-US", test: ""},
+                `ERROR: not found a file or folder at \"/User\"\n` +
                 "Recommend: #ref: /User\n" +
                 "/User\n" +
+                lib.getHomePath().replace(/\\/g,'/') +"\n" +  // USERPROFILE, if pc is not found
+                "    0.Folder\n",
+            ],[
+                "root",
+                ["search", "#ref: \\root"],
+                {locale: "en-US", test: ""},
+                `ERROR: not found a file or folder at \"/root\"\n` +
+                "Recommend: #ref: /root\n" +
+                "/root\n" +
+                lib.getHomePath().replace(/\\/g,'/') +"\n" +  // USERPROFILE, if pc is not found
+                "    0.Folder\n",
+            ],[
+                "Windows drive (1)",
+                ["search", "#ref: C:\\"],
+                {locale: "en-US", test: ""},
+                `ERROR: not found a file or folder at \"c:/\"\n` +
+                "Recommend: #ref: c:/\n" +
+                "c:/\n" +
+                lib.getHomePath().replace(/\\/g,'/') +"\n" +  // USERPROFILE, if pc is not found
+                "    0.Folder\n",
+            ],[
+                "Windows drive (2)",
+                ["search", "#ref: C:\\test"],
+                {locale: "en-US", test: ""},
+                `ERROR: not found a file or folder at \"c:/test\"\n` +
+                "Recommend: #ref: c:/test\n" +
+                "c:/test\n" +
+                lib.getHomePath().replace(/\\/g,'/') +"\n" +  // USERPROFILE, if pc is not found
+                "    0.Folder\n",
+            ],[
+                "shared folder",
+                ["search", "#ref: \\\\pc"],
+                {locale: "en-US", test: ""},
+                `ERROR: not found a file or folder at \"\\\\pc\"\n` +
+                `\\\\pc\n` +
+                lib.getHomePath().replace(/\\/g,'/') +"\n" +  // USERPROFILE, if pc is not found
                 "    0.Folder\n",
             ],[
                 "Do not recommend reserved variables",
                 ["search", `#ref: TYPRM_FOLDER`],
                 {locale: "en-US", test: ""},
-                "TYPRM_FOLDER\n" +
-                "    0.Folder\n",
+                "Warning: ref tag value \"TYPRM_FOLDER\" must be full path. Then you can specify the path with a variable.\n",
+                // No recommend message
             ],
         ])("%s", async (_caseName, arguments_, options, answer) => {
             if (arguments_[1].includes('TYPRM_FOLDER')) {
@@ -1455,30 +1497,43 @@ describe("print reference >>", () => {
     });
 
     describe("verb >>", () => {
+        const  projectPathLinux = lib.getFullPath("..", __dirname);
+        const  projectPathWindows = projectPathLinux.replace(/\//g, '\\');
         test.each([
             [
                 "verb",
-                ["search", "#ref:", "../README.md", "7"],  // 7 is echo command by "TYPRM_VERB"
+                ["search", "#ref:", `${projectPathLinux}/README.md`, "7"],  // 7 is echo command by "TYPRM_VERB"
                 {commandFolder: ".", locale: "en-US", test: ""},
-                "{ref: ../README.md, windowsRef: ..\\README.md, file: ../README.md, windowsFile: ..\\README.md, fragment: }\n",
+                `{ref: ${projectPathLinux}/README.md, windowsRef: ${projectPathWindows}\\README.md, file: ${projectPathLinux}/README.md, windowsFile: ${projectPathWindows}\\README.md, existingAddress: ${projectPathLinux}/README.md, windowsExistingAddress: ${projectPathWindows}\\README.md, fragment: , lineNum: 0}\n`,
             ],[
-                "verb (2)",
-                ["search", "#ref:", "../README.md#title", "7"],  // 7 is echo command by "TYPRM_VERB"
+                "verb fragment",
+                ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.html#example`, "7"],  // 7 is echo command by "TYPRM_VERB"
                 {commandFolder: ".", locale: "en-US", test: ""},
-                "{ref: ../README.md#title, windowsRef: ..\\README.md#title, file: ../README.md, windowsFile: ..\\README.md, fragment: title}\n",
+                `{ref: ${projectPathLinux}/src/test_data/verb/test.html#example, windowsRef: ${projectPathWindows}\\src\\test_data\\verb\\test.html#example, file: ${projectPathLinux}/src/test_data/verb/test.html, windowsFile: ${projectPathWindows}\\src\\test_data\\verb\\test.html, existingAddress: ${projectPathLinux}/src/test_data/verb/test.html, windowsExistingAddress: ${projectPathWindows}\\src\\test_data\\verb\\test.html, fragment: example, lineNum: 0}\n`,
+            ],[
+                "verb line num",
+                ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.md#document`, "7"],  // 7 is echo command by "TYPRM_VERB"
+                {commandFolder: ".", locale: "en-US", test: ""},
+                `{ref: ${projectPathLinux}/src/test_data/verb/test.md#document, windowsRef: ${projectPathWindows}\\src\\test_data\\verb\\test.md#document, file: ${projectPathLinux}/src/test_data/verb/test.md, windowsFile: ${projectPathWindows}\\src\\test_data\\verb\\test.md, existingAddress: ${projectPathLinux}/src/test_data/verb/test.md, windowsExistingAddress: ${projectPathWindows}\\src\\test_data\\verb\\test.md, fragment: document, lineNum: 3}\n`,
+            ],[
+                "verb not found",
+                ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/sub/test.md#document`, "7"],  // 7 is echo command by "TYPRM_VERB"
+                {commandFolder: ".", locale: "en-US", test: ""},
+                'ERROR: not found a file or folder at "${HOME}/GitProjects/GitHub/typrm/src/test_data/verb/sub/test.md"\n' +
+                `{ref: ${projectPathLinux}/src/test_data/verb/sub/test.md#document, windowsRef: ${projectPathWindows}\\src\\test_data\\verb\\sub\\test.md#document, file: ${projectPathLinux}/src/test_data/verb/sub/test.md, windowsFile: ${projectPathWindows}\\src\\test_data\\verb\\sub\\test.md, existingAddress: ${projectPathLinux}/src/test_data/verb, windowsExistingAddress: ${projectPathWindows}\\src\\test_data\\verb, fragment: document, lineNum: -1}\n`,
             ],[
                 "verb error",
-                ["search", "#ref:", "../README.md", "4"],  // 4 is unknown verb
+                ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.md`, "4"],  // 4 is unknown verb
                 {locale: "en-US", test: ""},
                 "Error that verb number 4 is not defined\n",
             ],[
-                "not found the folder",
-                ["search", "#ref:", "/Unknown_", "0"],
+                "URL",
+                ["search", "#ref:", "http://example.com/", "0"],  // 0 opens the folder
                 {locale: "en-US", test: ""},
-                "Error of not found the file or folder at \"/Unknown_\"\n",
+                "Error that verb number 0 is not defined\n",
             ],[
                 "verb verbose",
-                ["search", "#ref:", "../README.md", "4"],
+                ["search", "#ref:", `${projectPathLinux}/README.md`, "4"],
                 {locale: "en-US", test: "", verbose: ""},
                 (testingOS === 'Windows')
                 ? // Windows

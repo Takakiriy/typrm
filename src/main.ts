@@ -2812,8 +2812,8 @@ function  runShellCommand(keyword: string) {
 }
 
 // execShellCommand
-function  execShellCommand(command: string) {
-    if ( ! programOptions.commandFolder) {
+function  execShellCommand(command: string, requestedCommandFolder: boolean = true) {
+    if ( ! programOptions.commandFolder  &&  requestedCommandFolder) {
         console.log(`${translate('Error')}: ${translate('To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.')}`);
         return;
     }
@@ -2824,7 +2824,11 @@ function  execShellCommand(command: string) {
             console.log(`Verbose: current folder: ${getTestablePath(programOptions.commandFolder)}`);
             console.log(`Verbose: command: ${command}`);
         }
-        process.chdir(programOptions.commandFolder);
+        if (requestedCommandFolder) {
+            process.chdir(programOptions.commandFolder);
+        } else {
+            process.chdir(__dirname);
+        }
 
         const  stdoutBuffer = child_process.execSync( command );
         stdout_ = cutLastLF(stdoutBuffer.toString());
@@ -2870,7 +2874,7 @@ async function  search() {
             const  keywordWithoutVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
             const  ref = await printRef(keywordWithoutVerb, {print: false});
 
-            runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
+            runVerb(ref.verbs, ref.address, ref.addressLineNum, ref.existingAddress, lastWord);
         }
     } else {  // if keyword === ''
         lib.inputSkip(startIndex);
@@ -2927,7 +2931,7 @@ async function  search() {
                 } else if (command === Command.runVerb) {
                     const  verbNumber = keyword;
 
-                    runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
+                    runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, previousPrint.existingAddress, verbNumber);
                 } else if (command === Command.check) {
                     const  filePath = cutTag(keyword);
 
@@ -3636,6 +3640,7 @@ interface  PrintRefResult {
     verbs: Verb[];
     address: string;
     addressLineNum: number;
+    existingAddress: string;
     previousKeyword: string;
 }
 
@@ -3647,6 +3652,7 @@ function  getEmptyOfPrintRefResult(): PrintRefResult {
         verbs: [],
         address: '',
         addressLineNum: 0,
+        existingAddress: '',
         previousKeyword: '',
     }
 }
@@ -3718,10 +3724,13 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     if (address.startsWith('~')) {
         address = lib.getHomePath() + address.substring(1);
     }
+    address = lib.replacePathToSlashed(address);
 
     // linkableAddress = ...
     var  linkableAddress = address;
     var  addressLineNum = 0;
+    var  existingAddress = '';
+    var  existingParentOnly = false;
     if ( ! lib.isFullPath(address)) {
         console.log(translate`Warning` + ': ' + translate`ref tag value \"${address}\" must be full path. Then you can specify the path with a variable.`);
     } else if (lib.isInFileSystem(address)) {
@@ -3729,22 +3738,38 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         if (getter.type === 'text') {
             const  lineNumGetter = getter as LineNumGetter;
             const  { filePath, lineNum } = await searchAsText(lineNumGetter, address);
-            if (lineNum !== notFound) {
+            if (lineNum <= 0) {
+                linkableAddress = address;
+                existingAddress = lib.getExistingParentPath(filePath);
+                existingParentOnly = (existingAddress !== filePath);
+            } else {
 
                 linkableAddress = lineNumGetter.address
-                    .replace(verbVar.file, filePath.replace(/\\/g, '/'))
-                    .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
+                    .replace(verbVar.file, lib.replacePathToSlashed(filePath))
+                    .replace(verbVar.windowsFile, lib.replacePathToSlashed(filePath))
                     .replace(verbVar.fragment, '')
                     .replace(verbVar.lineNum, lineNum.toString());
                     // This format is hyperlinkable in the Visual Studio Code Terminal
-                addressLineNum = lineNum;
-            } else {
-                linkableAddress = lib.getExistingParentPath(filePath);
+                existingAddress = filePath;
             }
+            addressLineNum = lineNum;
         }
         else if (getter.type === 'figure') {
             const  figurePointGetter = getter as FigurePointGetter;
             linkableAddress = await getPointedFigurePath(figurePointGetter, address);
+            existingAddress = linkableAddress;
+        }
+        else if (getter.type === 'keep') {
+            const  localKeepGetter = getter as LocalKeepGetter;
+            const  filePath = getFilePathFromKeepGetter(address, localKeepGetter);
+            linkableAddress = address;
+            existingAddress = lib.getExistingParentPath(filePath);
+            existingParentOnly = (existingAddress !== filePath);
+            if (existingAddress !== filePath) {
+                addressLineNum = notFound;
+            } else {
+                addressLineNum = 0;
+            }
         }
     }
 
@@ -3754,11 +3779,12 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     const  lowerCaseDriveRegExp = /^[a-z]:/;
     const  upperCaseDriveRegExp = /^[A-Z]:/;
     const  sortedEnvronmentVariables: KeyValue[] = [];
-    const  reservedNames = ['TYPRM_FOLDER'];
+    const  reservedNames = ['TYPRM_COMMAND_FOLDER', 'TYPRM_COMMAND_SYMBOL', 'TYPRM_FOLDER', 'TYPRM_FOUND_COUNT_MAX',
+        'TYPRM_LINE_NUM_GETTER', 'TYPRM_OPEN_DOCUMENT', 'TYPRM_SNIPPET_LINE_COUNT', 'TYPRM_THESAURUS', 'TYPRM_VERB'];
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith(typrmEnvPrefix)  &&  ! reservedNames.includes(envName)  &&  envValue) {
             const  variableName = envName.substring(typrmEnvPrefix.length);
-            const  value = envValue!.replace(/\\/g,'/');
+            const  value = lib.replacePathToSlashed(envValue!);
 
             sortedEnvronmentVariables.push({key: variableName, value});
             if (lowerCaseDriveRegExp.test(value)) {
@@ -3774,29 +3800,36 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         return  b.value.length - a.value.length;  // descending order
     });
 
+    recommended = lib.replacePathToSlashed(recommended);
     recommended = lib.unexpandVariable(recommended,
         sortedEnvronmentVariables.map((variable) => [`\${${variable.key}}`, variable.value]));
-    if (recommended.replace(/\\/g,'/').startsWith(lib.getHomePath().replace(/\\/g,'/'))) {
+    if (recommended.startsWith(lib.replacePathToSlashed(lib.getHomePath()))) {
         recommended = '~' + recommended.substring(lib.getHomePath().length);
     }
 
     // print the address
-    if (option.print  &&  addressLineNum !== notFound) {
+    if (option.print  &&  lib.isFullPath(address)) {
         if (recommended !== addressBefore) {
             console.log('Recommend: #ref: ' + recommended);
         }
         console.log(linkableAddress);
+        if (existingParentOnly) {
+            console.log(existingAddress);
+        }
     }
 
     // print the verb menu
-    if (addressLineNum !== notFound  &&  lib.isInFileSystem(linkableAddress)) {
+    if (lib.isInFileSystem(linkableAddress)  &&  lib.isFullPath(address)) {
         var  verbs = getRelatedVerbs(address);
+    } else {
+        var  verbs: Verb[] = [];
+    }
+    if (verbs.length >= 1) {
         var  verbMenu = verbs.map((verb) => (verb.label)).join(', ');
         if (verbMenu !== ''  &&  option.print) {
             console.log('    ' + verbMenu);
         }
     } else {
-        var  verbs: Verb[] = [];
         var  verbMenu = '';
     }
 
@@ -3806,6 +3839,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         verbs,
         address,
         addressLineNum,
+        existingAddress,
         previousKeyword: '',
     };
 }
@@ -3842,7 +3876,7 @@ function  getRelatedLineNumGetter(address: string): AbstractLineNumGetter {
 
 // getRelatedVerbs
 function  getRelatedVerbs(address: string): Verb[] {
-    const  relatedVerbs: Verb[] = [];
+    var  relatedVerbs: Verb[] = [];
     if (process.env.TYPRM_VERB) {
 
         const  verbConfig = yaml.load(process.env.TYPRM_VERB);
@@ -3851,32 +3885,42 @@ function  getRelatedVerbs(address: string): Verb[] {
             for (const verb of verbs) {
 
                 if (new RegExp(verb.regularExpression).test(address)) {
+                    verb.requestedCommandFolder = true;
                     relatedVerbs.push(verb);
                 }
             }
         }
     }
-
-    if (runningOS === 'Windows') {
-        var  command = `explorer /select, "${verbVar.windowsFile}"`;
-    } else {
-        var  command = `open -R "${verbVar.file}"`;
-            // Open the folder by Finder and select the file
-    }
-    relatedVerbs.push({
-        regularExpression: '.*',
-        label: '0.Folder',
-        number: '0',
-        echo: '',
-        command,
-    } as Verb);
+    relatedVerbs = relatedVerbs.concat(getFolderVerbs());
 
     return  relatedVerbs;
 }
 
+// getFolderVerbs
+function  getFolderVerbs(): Verb[] {
+    const  relatedVerbs: Verb[] = [];
+
+    if (runningOS === 'Windows') {
+        var  command = `explorer /select, "${verbVar.windowsExistingAddress}"`;
+        var  requestedCommandFolder = false;
+    } else {
+        var  command = `open -R "${verbVar.existingAddress}"`;
+            // Open the folder by Finder and select the file
+        var  requestedCommandFolder = false;
+    }
+    return [{
+        regularExpression: '.*',
+        label: '0.Folder',
+        number: '0',
+        command,
+        requestedCommandFolder,
+    }]
+}
+
 // runVerb
-function  runVerb(verbs: Verb[], address: string, lineNum: number, verbNum: string) {
+function  runVerb(verbs: Verb[], address: string, lineNum: number, existingAddress: string, verbNum: string) {
     var  command = '';
+    var  requestedCommandFolder = true;
     const  matchesVerbs = verbs.filter((verb) => (verb.number.toString() === verbNum));
     if (matchesVerbs.length >= 1) {
         const  verb = matchesVerbs[0];
@@ -3888,31 +3932,31 @@ function  runVerb(verbs: Verb[], address: string, lineNum: number, verbNum: stri
                 .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
                 .replace(verbVar.file, address)
                 .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
+                .replace(verbVar.existingAddress, existingAddress)
+                .replace(verbVar.windowsExistingAddress, existingAddress.replace(/\//g, '\\'))
                 .replace(verbVar.fragment, '')
                 .replace(verbVar.lineNum, lineNum.toString());
             var  fileOrFolderPath = address;
         } else {
             command = verb.command
                 .replace(verbVar.ref, address)
-                .replace(verbVar.windowsRef,  address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
-                .replace(verbVar.file,        address.substr(0, fragmentIndex))
-                .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
-                .replace(verbVar.fragment,    address.substr(fragmentIndex + 1))
+                .replace(verbVar.windowsRef,  address.substring(0, fragmentIndex).replace(/\//g, '\\') + address.substring(fragmentIndex))
+                .replace(verbVar.file,        address.substring(0, fragmentIndex))
+                .replace(verbVar.windowsFile, address.substring(0, fragmentIndex).replace(/\//g, '\\'))
+                .replace(verbVar.existingAddress, existingAddress)
+                .replace(verbVar.windowsExistingAddress, existingAddress.replace(/\//g, '\\'))
+                .replace(verbVar.fragment,    address.substring(fragmentIndex + 1))
                 .replace(verbVar.lineNum,     lineNum.toString());
-            var  fileOrFolderPath = address.substr(0, fragmentIndex);
+            var  fileOrFolderPath = address.substring(0, fragmentIndex);
         }
         if (runningOS === 'Windows') {
             fileOrFolderPath = fileOrFolderPath.replace(/\//g, '\\');
         }
         fileOrFolderPath = lib.getFullPath(fileOrFolderPath, process.cwd());
-
-        if ( ! fs.existsSync(fileOrFolderPath)) {
-            console.log(translate`Error of not found the file or folder at "${getTestablePath(fileOrFolderPath)}"`);
-            return
-        }
+        requestedCommandFolder = verb.requestedCommandFolder;
     }
     if (command !== '') {
-        execShellCommand(command);
+        execShellCommand(command, requestedCommandFolder);
     } else {
         console.log(translate`Error that verb number ${verbNum} is not defined`);
     }
@@ -4140,11 +4184,11 @@ function  getTestablePath(path_: string) {
         const  home = lib.getHomePath();
 
         if (path_.startsWith(home)) {
-            return  '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
+            return  '${HOME}' + lib.replacePathToSlashed(path_.substr(home.length));
         } else if (path_.startsWith(inputFileParentPath + path.sep)  &&  inputFileParentPath !== '') {
-            return  '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
+            return  '${inputFileParentPath}/' + lib.replacePathToSlashed(path_.substr(inputFileParentPath.length + 1));
         } else {
-            return  path_.replace(/\\/g, '/');
+            return  lib.replacePathToSlashed(path_);
         }
     } else {
         return  path_;
@@ -5624,6 +5668,13 @@ interface  FigurePointGetter  extends AbstractLineNumGetter {
     outputFolder: string;
 }
 
+// LocalKeepGetter
+interface  LocalKeepGetter  extends AbstractLineNumGetter {
+    regularExpression: string;
+    type: string;
+    filePathRegularExpressionIndex: number;
+}
+
 // FilePathAndKeyword
 interface  FilePathAndKeyword {
     filePath: string;
@@ -5637,13 +5688,14 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
     const  verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
         console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
-        console.log(`    Verbose: address: ${address}`);
+        console.log(`    Verbose: address in ref tag: ${address}`);
         console.log(`    Verbose: type: ${getter.type}`);
         console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
         console.log(`    Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
         console.log(`    Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
         console.log(`    Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
         console.log(`    Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
+        console.log(`    Verbose: address: ${getter.address}`);
     }
 
     const  parameters = (new RegExp(getter.regularExpression)).exec(address);
@@ -5680,12 +5732,41 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
     } as FilePathAndKeyword;
 }
 
+// getFilePathFromKeepGetter
+function  getFilePathFromKeepGetter(address: string, getter: LocalKeepGetter): string {
+
+    const  verboseMode = 'verbose' in programOptions;
+    if (verboseMode) {
+        console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
+        console.log(`    Verbose: address in ref tag: ${address}`);
+        console.log(`    Verbose: type: ${getter.type}`);
+        console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
+    }
+
+    const  parameters = (new RegExp(getter.regularExpression)).exec(address);
+    if ( ! parameters) {
+        throw  new Error(`ERROR: regularExpression (${getter.regularExpression}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is not matched.` +
+            `testing string is "${address}".`);
+    }
+    if (verboseMode) {
+        console.log(`    Verbose: matched: [${parameters.join(', ')}]`);
+    }
+    if (getter.filePathRegularExpressionIndex > parameters.length - 1) {
+        throw  new Error(`ERROR: filePathRegularExpressionIndex (${getter.filePathRegularExpressionIndex}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+
+    return  parameters[getter.filePathRegularExpressionIndex];
+}
+
 // searchAsText
 async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<FilePathLineNum> {
     const  { filePath, keyword, csvOption } = splitFilePathAndKeyword(address,  getter);
     if ( ! fs.existsSync(filePath)) {
         if ( ! ('noFileExistCheck' in programOptions)) {
-            console.log(translate`ERROR: not found a file at` + ` "${getTestablePath(filePath)}"`);
+            console.log(translate`ERROR: not found a file or folder at` + ` "${getTestablePath(filePath)}"`);
         }
         return  { filePath, lineNum: notFound };
     }
@@ -5696,7 +5777,7 @@ async function  searchAsText(getter: LineNumGetter, address: string): /* linkabl
     if (keyword) {
         var  lineNum = await lib.searchAsTextSub({input: fs.createReadStream(filePath)}, keyword, csvOption);
     } else {
-        var  lineNum = notFound;
+        var  lineNum = 0;
     }
     return  { filePath, lineNum };
 }
@@ -5768,7 +5849,7 @@ async function  getPointedFigurePath(getter: FigurePointGetter, address: string)
     const  { filePath, name, x, y } = parseFigureParameters(address,  getter);
     const  fileExists =  fs.existsSync(filePath)  &&  fs.lstatSync(filePath).isFile();
     if ( ! fileExists) {
-        console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
+        console.log(`ERROR: not found a file or folder at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
         return '(NotFound)';
     }
     const  inputImage = path.parse(filePath);
@@ -5805,6 +5886,7 @@ interface Verb {
     label: string;
     number: string;
     command: string;  // This can contain "verbVar"
+    requestedCommandFolder: boolean;
 }
 
 // verbVar
@@ -5813,6 +5895,8 @@ namespace VerbVariable {
     export const  windowsRef = '${windowsRef}';
     export const  file = '${file}';
     export const  windowsFile = '${windowsFile}';
+    export const  existingAddress = '${existingAddress}';
+    export const  windowsExistingAddress = '${windowsExistingAddress}';
     export const  fragment = '${fragment}';
     export const  lineNum = '${lineNum}';
 }
@@ -6091,7 +6175,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "(out of copy tag block)": "（copy タグのブロックの外）",
             "Not found a variable name specified in the same-as tag.": "same-as タグに指定した変数名が見つかりません",
             "ref tag value \"${0}\" must be full path. Then you can specify the path with a variable.": "ref タグの値 \"${0}\" をフルパスに修正してください。その際、変数を指定できます。",
-            "ERROR: not found a file at": "エラー: ファイルが見つかりません",
+            "ERROR: not found a file or folder at": "エラー: ファイルまたはフォルダーが見つかりません",
 
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",

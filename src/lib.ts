@@ -151,6 +151,18 @@ export function  pathResolve(path_: string) {
     return path_
 }
 
+// replacePathToSlashed
+export function  replacePathToSlashed(path_: string): string {
+    if (path_.substring(0,2) === "\\\\") {
+        return  path_.replace(/\//g, '\\');
+    } else {
+        if (/^([A-Z]):/.test(path_)) {
+            path_ = path_[0].toLowerCase() + path_.substring(1);
+        }
+        return  path_.replace(/\\([^ ])/g, '/$1');
+    }
+}
+
 // UnexpectedLine
 export interface  UnexpectedLine {
     contentsLineNum: number;
