@@ -1010,6 +1010,13 @@ describe("file and file path >>", () => {
         // https://bugs.chromium.org/p/chromium/issues/detail?id=1299624
     });
 
+    test("getExistingParentPath >>", () => {
+        fs.mkdirSync(`${__dirname}/_lib_test`, {recursive: true});
+        expect(lib.getExistingParentPath(`${__dirname}/_lib_test/sub/s`)).toEqual(`${__dirname}/_lib_test`.replace(/\//g, path.sep));
+        expect(lib.getExistingParentPath(`${__dirname}/_lib_test/sub/s`.replace(/\//g, path.sep))).toEqual(`${__dirname}/_lib_test`.replace(/\//g, path.sep));
+        lib.rmdirSync(`${__dirname}/_lib_test`);
+    });
+
     test.each([
         [
             "folder",

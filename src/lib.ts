@@ -228,10 +228,11 @@ export function  isInFileSystem(path_: string): boolean {
 
 // getExistingParentPath
 export function  getExistingParentPath(path_: string): string {
-    if (path_[0] !== '/') {
+    path_ = path_.replace(/\//g, path.sep);
+    if ( ! (path_[0] === path.sep || path_.substr(1,2) === ':' + path.sep)) {
         return  getHomePath();
     }
-    while (path_ !== '/') {
+    while (path_ !== path.sep) {
         if (fs.existsSync(path_)) {
             return  path_;
         }
