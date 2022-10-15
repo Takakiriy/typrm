@@ -976,13 +976,6 @@ describe("alphabetIndex >>", () => {
 
 describe("file and file path >>", () => {
 
-    test("replacePathToSlashed >>", () => {
-        expect(lib.replacePathToSlashed('\\path\\to')).toEqual('/path/to');
-        expect(lib.replacePathToSlashed('\\path\\to\\ space')).toEqual('/path/to\\ space');
-        expect(lib.replacePathToSlashed('C:\\path\\to\\ space')).toEqual('c:/path/to\\ space');
-        expect(lib.replacePathToSlashed('\\\\pc\\folder\\sub/file.yaml')).toEqual('\\\\pc\\folder\\sub\\file.yaml');
-    });
-
     test("isFullPath >>", () => {
         expect(lib.isFullPath('/path')).toEqual(true);
         expect(lib.isFullPath('\\path')).toEqual(true);
@@ -1015,6 +1008,58 @@ describe("file and file path >>", () => {
         expect(lib.getExistingParentPath(`${__dirname}/_lib_test/sub/s`)).toEqual(`${__dirname}/_lib_test`.replace(/\//g, path.sep));
         expect(lib.getExistingParentPath(`${__dirname}/_lib_test/sub/s`.replace(/\//g, path.sep))).toEqual(`${__dirname}/_lib_test`.replace(/\//g, path.sep));
         lib.rmdirSync(`${__dirname}/_lib_test`);
+    });
+
+    // test("withHomeVariable", () => {
+    //     const  home = lib.getHomePath();
+    //     const  homePathLinux = home.replace(/\\/g, '/').replace(/^[A-Z]/, home[0].toLowerCase());
+    //     const  homePathWindows = home.replace(/\//g, '\\').replace(/^[A-Z]/, home[0].toUpperCase());
+
+    //     expect(lib.withHomeVariable(`${homePathLinux}`)).toEqual('${HOME}');
+    //     expect(lib.withHomeVariable(`${homePathLinux}/bin`)).toEqual('${HOME}/bin');
+    //     expect(lib.withHomeVariable(`${homePathWindows}`)).toEqual('${HOME}');
+    //     expect(lib.withHomeVariable(`${homePathWindows}\\bin`)).toEqual('${HOME}\\bin');
+    // });
+
+    test("replacePathToSlashed >>", () => {
+        expect(lib.replacePathToSlashed('\\path\\to')).toEqual('/path/to');
+        expect(lib.replacePathToSlashed('\\path\\to\\ space')).toEqual('/path/to\\ space');
+        expect(lib.replacePathToSlashed('\\\\pc\\folder\\sub/file.yaml')).toEqual('\\\\pc\\folder\\sub\\file.yaml');
+        if (fs.existsSync('/mnt/c')) {
+            expect(lib.replacePathToSlashed('c:\\path\\to')).toEqual('/mnt/c/path/to');
+            expect(lib.replacePathToSlashed('c:/path/to')).toEqual('/mnt/c/path/to');
+            expect(lib.replacePathToSlashed('/mnt/c/path/to')).toEqual('/mnt/c/path/to');
+            expect(lib.replacePathToSlashed('C:\\')).toEqual('/mnt/c/');
+            expect(lib.replacePathToSlashed('c:/')).toEqual('/mnt/c/');
+            expect(lib.replacePathToSlashed('/mnt/c/')).toEqual('/mnt/c/');
+            expect(lib.replacePathToSlashed('C:\\path\\to\\ space')).toEqual('/mnt/c/path/to\\ space');
+            expect(lib.replacePathToSlashed('D:\\path\\to')).toEqual('/mnt/d/path/to');
+            expect(lib.replacePathToSlashed('d:/path/to')).toEqual('/mnt/d/path/to');
+            expect(lib.replacePathToSlashed('/mnt/d/path/to')).toEqual('/mnt/d/path/to');
+        } else {
+            expect(lib.replacePathToSlashed('c:\\path\\to')).toEqual('c:/path/to');
+            expect(lib.replacePathToSlashed('c:/path/to')).toEqual('c:/path/to');
+            expect(lib.replacePathToSlashed('/mnt/c/path/to')).toEqual('c:/path/to');
+            expect(lib.replacePathToSlashed('C:\\')).toEqual('c:/');
+            expect(lib.replacePathToSlashed('c:/')).toEqual('c:/');
+            expect(lib.replacePathToSlashed('/mnt/c/')).toEqual('c:/');
+            expect(lib.replacePathToSlashed('C:\\path\\to\\ space')).toEqual('c:/path/to\\ space');
+            expect(lib.replacePathToSlashed('D:\\path\\to')).toEqual('d:/path/to');
+            expect(lib.replacePathToSlashed('d:/path/to')).toEqual('d:/path/to');
+            expect(lib.replacePathToSlashed('/mnt/d/path/to')).toEqual('d:/path/to');
+        }
+    });
+
+    test("replaceToPathForWindows >>", () => {
+        expect(lib.replaceToPathForWindows('C:\\path\\to')).toEqual('C:\\path\\to');
+        expect(lib.replaceToPathForWindows('c:/path/to')).toEqual('C:\\path\\to');
+        expect(lib.replaceToPathForWindows('/mnt/c/path/to')).toEqual('C:\\path\\to');
+        expect(lib.replaceToPathForWindows('C:\\')).toEqual('C:\\');
+        expect(lib.replaceToPathForWindows('c:/')).toEqual('C:\\');
+        expect(lib.replaceToPathForWindows('/mnt/c/')).toEqual('C:\\');
+        expect(lib.replaceToPathForWindows('C:')).toEqual('C:');
+        expect(lib.replaceToPathForWindows('c:')).toEqual('C:');
+        expect(lib.replaceToPathForWindows('/mnt/c')).toEqual('C:');
     });
 
     test.each([

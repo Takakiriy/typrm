@@ -23,6 +23,10 @@ export interface UnexpectedLine {
 }
 export declare function getFullPath(relativePath: string, basePath: string): string;
 export declare function isFullPath(path: string): boolean;
+export declare function isInFileSystem(path_: string): boolean;
+export declare function getExistingParentPath(path_: string): string;
+export declare function replacePathToSlashed(path_: string): string;
+export declare function replaceToPathForWindows(path_: string): string;
 export declare function checkNotInGitWorking(): void;
 export declare function getTestWorkFolderFullPath(): string;
 export declare function getHomePath(): string;

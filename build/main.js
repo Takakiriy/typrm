@@ -96,7 +96,6 @@ export async function mainMain() {
         }
     }
 }
-// checkRoutine
 async function checkRoutine(inputFilePath, copyTags, parser) {
     const parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
@@ -307,7 +306,6 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
         await fileTemplateTag.checkTargetFileContents(setting, parser);
     }
 }
-// getErrorMessageOfNotMatchedWithTemplate
 function getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines) {
     var errorMessage = '';
     const variableNames = templateTag.scanKeys(Object.keys(settingTree.currentSettings));
@@ -320,7 +318,6 @@ function getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines
     }
     return lib.cutLast(errorMessage, '\n');
 }
-// getVariablesForErrorMessage
 function getVariablesForErrorMessage(indent, variableNames, settingTree, lines, inputFilePath) {
     var errorMessage = '';
     var settingIndices = [];
@@ -353,7 +350,6 @@ function getVariablesForErrorMessage(indent, variableNames, settingTree, lines, 
     }
     return lib.cutLast(errorMessage, '\n');
 }
-// makeSettingTree
 async function makeSettingTree(parser) {
     const tree = new SettingsTree();
     const indentStack = [
@@ -755,7 +751,6 @@ async function makeSettingTree(parser) {
     }
     return tree;
 }
-// insertParentIndexNum
 function insertParentIndexNum(indexBefore, firstShiftingIndex) {
     if (indexBefore === '/') {
         return firstShiftingIndex;
@@ -766,7 +761,6 @@ function insertParentIndexNum(indexBefore, firstShiftingIndex) {
     const beforeMinus = parseInt(path.basename(indexBefore.substring(0, indexBefore.length - rightOfInsert.length))); // e.g. 6
     return `${firstShiftingIndex}/${beforeMinus - minus}${rightOfInsert}`; // e.g. '/2/3/4/7'
 }
-// makeReplaceToTagTree
 async function makeReplaceToTagTree(parser, settingTree) {
     const toTagTree = new ReplaceToTagTree();
     const verbose = parser.verbose;
@@ -957,7 +951,6 @@ async function makeReplaceToTagTree(parser, settingTree) {
     }
     return toTagTree;
 }
-// makeOriginalTagTree
 async function makeOriginalTagTree(parser, settingTree) {
     const toTagTree = new ReplaceToTagTree();
     var reader = readline.createInterface({
@@ -1042,7 +1035,6 @@ async function makeOriginalTagTree(parser, settingTree) {
     toTagTree.command = 'reset';
     return toTagTree;
 }
-// makeTemplatesInCopyTag
 async function makeTemplatesInCopyTag(replacingLines) {
     const templatesInCopyTag = [];
     const copyTagRe = new RegExp(' #copy(-template)?: *([^,]*),[^\\$]*(\\$settings\..*)}');
@@ -1111,7 +1103,6 @@ async function makeTemplatesInCopyTag(replacingLines) {
     }
     return templatesInCopyTag;
 }
-// getReplacedLineInSettings
 function getReplacedLineInSettings(line, separator, oldValue, replacedValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled) {
     // spaceAndComment
     // __SettingB__: SetB
@@ -1227,7 +1218,6 @@ function getReplacedLineInSettings(line, separator, oldValue, replacedValue, add
     }
     return { original, spaceAndComment };
 }
-// cutReplaceToTag
 function cutReplaceToTag(line) {
     const toLabelIndex = line.indexOf(toLabel);
     if (toLabelIndex !== notFound) {
@@ -1247,7 +1237,6 @@ function cutReplaceToTag(line) {
     }
     return line;
 }
-// TemplateTag
 class TemplateTag {
     // constructor
     constructor(parser) {
@@ -1531,7 +1520,6 @@ class TemplateTag {
         return true;
     }
 }
-// IfTagParser
 class IfTagParser {
     // constructor
     constructor(parser) {
@@ -1594,7 +1582,6 @@ class IfTagParser {
         this.parser.line = line;
     }
 }
-// EnableFileTemplateParser
 class EnableFileTemplateParser {
     constructor(parser) {
         this.indentLengthsOfIfTag = [
@@ -1623,7 +1610,6 @@ class EnableFileTemplateParser {
         }
     }
 }
-// BlockDisableTagParser
 class BlockDisableTagParser {
     constructor() {
         this.previousLineHasTag = false;
@@ -1654,7 +1640,6 @@ class BlockDisableTagParser {
         }
     }
 }
-// WordPositions
 class WordPositions {
     constructor() {
         this.wordPositions = [];
@@ -1684,15 +1669,12 @@ class WordPositions {
         return wordIndex;
     }
 }
-// replace
 async function replace(inputFileOrFolderPath) {
     await replaceMain(inputFileOrFolderPath, 'replace');
 }
-// reset
 async function reset(inputFileOrFolderPath) {
     await replaceMain(inputFileOrFolderPath, 'reset');
 }
-// replaceMain
 async function replaceMain(inputFileOrFolderPath, command) {
     const parser = new Parser();
     const currentFolderBackUp = process.cwd();
@@ -1712,7 +1694,6 @@ async function replaceMain(inputFileOrFolderPath, command) {
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
 }
-// replaceSub
 async function replaceSub(inputFilePath, parser, command) {
     parser.command = CommandEnum.replace;
     parser.verbose = ('verbose' in programOptions);
@@ -2187,7 +2168,6 @@ async function replaceSub(inputFilePath, parser, command) {
         deleteFileSync(updatingFilePath);
     }
 }
-// check
 async function check(checkingFilePath) {
     const parser = new Parser();
     const currentFolderBackUp = process.cwd();
@@ -2535,7 +2515,6 @@ var SameAsTag;
     }
     SameAsTag.evaluateVariableName = evaluateVariableName;
 })(SameAsTag || (SameAsTag = {}));
-// listUpFilePaths
 async function listUpFilePaths(checkingFilePath) {
     const currentFolder = process.cwd();
     const inputFileFullPaths = [];
@@ -2588,7 +2567,6 @@ async function listUpFilePaths(checkingFilePath) {
     }
     return inputFileFullPaths;
 }
-// checkLineNoConfilict
 function checkLineNoConfilict(keyValue, key, newValue, parser) {
     if (key in keyValue) {
         if (keyValue[key] !== newValue) {
@@ -2601,7 +2579,6 @@ function checkLineNoConfilict(keyValue, key, newValue, parser) {
         }
     }
 }
-// runShellCommand
 function runShellCommand(keyword) {
     if (!programOptions.commandSymbol) {
         console.log(`${translate('Error')}: ${translate(`To run shell command, TYPRM_COMMAND_SYMBOL environment variable must be set.`)}`);
@@ -2614,9 +2591,8 @@ function runShellCommand(keyword) {
     const command = keyword.substring(programOptions.commandSymbol.length + 1);
     execShellCommand(command);
 }
-// execShellCommand
-function execShellCommand(command) {
-    if (!programOptions.commandFolder) {
+function execShellCommand(command, requestedCommandFolder = true) {
+    if (!programOptions.commandFolder && requestedCommandFolder) {
         console.log(`${translate('Error')}: ${translate('To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.')}`);
         return;
     }
@@ -2627,7 +2603,12 @@ function execShellCommand(command) {
             console.log(`Verbose: current folder: ${getTestablePath(programOptions.commandFolder)}`);
             console.log(`Verbose: command: ${command}`);
         }
-        process.chdir(programOptions.commandFolder);
+        if (requestedCommandFolder) {
+            process.chdir(programOptions.commandFolder);
+        }
+        else {
+            process.chdir(__dirname);
+        }
         const stdoutBuffer = child_process.execSync(command);
         stdout_ = cutLastLF(stdoutBuffer.toString());
     }
@@ -2639,7 +2620,6 @@ function execShellCommand(command) {
     }
     process.chdir(currentFolder);
 }
-// search
 async function search() {
     const startIndex = (programArguments[0] === 's' || programArguments[0] === 'search') ? 1 : 0;
     const keyword = programArguments.slice(startIndex).join(' ');
@@ -2683,7 +2663,7 @@ async function search() {
         else if (command === Command.runVerb) {
             const keywordWithoutVerb = programArguments.slice(startIndex, programArguments.length - 1).join(' ');
             const ref = await printRef(keywordWithoutVerb, { print: false });
-            runVerb(ref.verbs, ref.address, ref.addressLineNum, lastWord);
+            runVerb(ref.verbs, ref.address, ref.addressLineNum, ref.existingAddress, lastWord);
         }
     }
     else { // if keyword === ''
@@ -2747,7 +2727,7 @@ async function search() {
                 }
                 else if (command === Command.runVerb) {
                     const verbNumber = keyword;
-                    runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, verbNumber);
+                    runVerb(previousPrint.verbs, previousPrint.address, previousPrint.addressLineNum, previousPrint.existingAddress, verbNumber);
                 }
                 else if (command === Command.check) {
                     const filePath = cutTag(keyword);
@@ -2771,7 +2751,6 @@ async function search() {
         }
     }
 }
-// searchSub
 async function searchSub(keyword, isMutual) {
     keyword = keyword.trim();
     // keywordWithTag = ...
@@ -3092,7 +3071,6 @@ async function searchSub(keyword, isMutual) {
         return normalReturn;
     }
 }
-// getKeywordMatchingScore
 function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
     function subMain() {
         const bestFound = targetStrings.reduce((bestFound, aTargetString, stringIndex) => {
@@ -3239,7 +3217,6 @@ function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
     const found = subMain();
     return found;
 }
-// compareScoreAndSoOn
 function compareScoreAndSoOn(a, b) {
     var different = 0;
     // matchedTargetKeywordCount
@@ -3269,7 +3246,6 @@ function compareScoreAndSoOn(a, b) {
     }
     return different;
 }
-// searchWithoutTags
 async function searchWithoutTags(keywords) {
     const foundLines = [];
     const keywordCount = keywords.split(' ').filter((keyword) => (keyword !== '')).length;
@@ -3390,16 +3366,13 @@ async function searchWithoutTags(keywords) {
     }
     return foundLines;
 }
-// mutualSearch
 async function mutualSearch() {
     const keyword = programArguments.slice(1).join(' ');
     await searchSub(keyword, true);
 }
-// printRefOptionDefault
 const printRefOptionDefault = {
     print: true,
 };
-// getEmptyOfPrintRefResult
 function getEmptyOfPrintRefResult() {
     return {
         foundLines: [],
@@ -3407,10 +3380,10 @@ function getEmptyOfPrintRefResult() {
         verbs: [],
         address: '',
         addressLineNum: 0,
+        existingAddress: '',
         previousKeyword: '',
     };
 }
-// openDocument
 function openDocument(ref) {
     if (!process.env.TYPRM_OPEN_DOCUMENT) {
         console.log(`${translate('Error')}: ${translate('Not defined TYPRM_OPEN_DOCUMENT environment variable.')}`);
@@ -3419,7 +3392,6 @@ function openDocument(ref) {
     const command = process.env.TYPRM_OPEN_DOCUMENT.replace('${ref}', ref);
     execShellCommand(command);
 }
-// printRef
 async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     const addressBefore = refTagAndAddress.trim().substring(refLabel.length).trim();
     const variableRe = new RegExp(variablePattern, 'g'); // variableRegularExpression
@@ -3474,24 +3446,63 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     if (address.startsWith('~')) {
         address = lib.getHomePath() + address.substring(1);
     }
+    address = lib.replacePathToSlashed(address);
     // linkableAddress = ...
     var linkableAddress = address;
-    var addressLineNum = 0;
-    const getter = getRelatedLineNumGetter(address);
-    if (getter.type === 'text') {
-        const lineNumGetter = getter;
-        const { filePath, lineNum } = await searchAsText(lineNumGetter, address);
-        linkableAddress = lineNumGetter.address
-            .replace(verbVar.file, filePath.replace(/\\/g, '/'))
-            .replace(verbVar.windowsFile, filePath.replace(/\//g, '\\'))
-            .replace(verbVar.fragment, '')
-            .replace(verbVar.lineNum, lineNum.toString());
-        // This format is hyperlinkable in the Visual Studio Code Terminal
-        addressLineNum = lineNum;
+    var addressLineNum = notFound;
+    var existingAddress = '';
+    var existingParentOnly = false;
+    if (!lib.isFullPath(address)) {
+        console.log(translate `Warning` + ': ' + translate `ref tag value \"${address}\" must be full path. Then you can specify the path with a variable.`);
     }
-    else if (getter.type === 'figure') {
-        const figurePointGetter = getter;
-        linkableAddress = await getPointedFigurePath(figurePointGetter, address);
+    else if (lib.isInFileSystem(address)) {
+        const getter = getRelatedLineNumGetter(address);
+        if (getter.type === 'text') {
+            const lineNumGetter = getter;
+            const { filePath, lineNum } = await searchAsText(lineNumGetter, address);
+            if (lineNum === notFound || lineNum === notSearchedInFile || lineNum === notFoundInFile) {
+                linkableAddress = address;
+                existingAddress = lib.getExistingParentPath(filePath);
+                existingParentOnly = (lib.replacePathToSlashed(existingAddress) !== lib.replacePathToSlashed(filePath));
+            }
+            else {
+                linkableAddress = lineNumGetter.address
+                    .replace(verbVar.file, lib.replacePathToSlashed(filePath))
+                    .replace(verbVar.windowsFile, lib.replacePathToSlashed(filePath))
+                    .replace(verbVar.fragment, '')
+                    .replace(verbVar.lineNum, lineNum.toString());
+                // This format is hyperlinkable in the Visual Studio Code Terminal
+                existingAddress = filePath;
+            }
+            addressLineNum = lineNum;
+        }
+        else if (getter.type === 'figure') {
+            const figurePointGetter = getter;
+            linkableAddress = await getPointedFigurePath(figurePointGetter, address);
+            existingAddress = linkableAddress;
+        }
+        else if (getter.type === 'keep') {
+            const localKeepGetter = getter;
+            const filePath = getFilePathFromKeepGetter(address, localKeepGetter);
+            linkableAddress = address;
+            existingAddress = lib.getExistingParentPath(filePath);
+            if (lib.replacePathToSlashed(existingAddress) !== lib.replacePathToSlashed(filePath)) {
+                addressLineNum = notFound;
+                existingParentOnly = true;
+            }
+            else {
+                addressLineNum = notSearchedInFile;
+                existingParentOnly = false;
+            }
+        }
+    }
+    if (lib.isInFileSystem(linkableAddress)) {
+        if (runningOS === 'Windows') {
+            linkableAddress = lib.replaceToPathForWindows(linkableAddress);
+        }
+    }
+    else {
+        addressLineNum = notSearchedInFile;
     }
     // recommended = ...
     var recommended = address;
@@ -3499,11 +3510,12 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     const lowerCaseDriveRegExp = /^[a-z]:/;
     const upperCaseDriveRegExp = /^[A-Z]:/;
     const sortedEnvronmentVariables = [];
-    const reservedNames = ['TYPRM_FOLDER'];
+    const reservedNames = ['TYPRM_COMMAND_FOLDER', 'TYPRM_COMMAND_SYMBOL', 'TYPRM_FOLDER', 'TYPRM_FOUND_COUNT_MAX',
+        'TYPRM_LINE_NUM_GETTER', 'TYPRM_OPEN_DOCUMENT', 'TYPRM_SNIPPET_LINE_COUNT', 'TYPRM_THESAURUS', 'TYPRM_VERB'];
     for (const [envName, envValue] of Object.entries(process.env)) {
         if (envName.startsWith(typrmEnvPrefix) && !reservedNames.includes(envName) && envValue) {
             const variableName = envName.substring(typrmEnvPrefix.length);
-            const value = envValue.replace(/\\/g, '/');
+            const value = lib.replacePathToSlashed(envValue);
             sortedEnvronmentVariables.push({ key: variableName, value });
             if (lowerCaseDriveRegExp.test(value)) {
                 sortedEnvronmentVariables.push({ key: variableName, value: value.substring(0, 1).toUpperCase() + value.substring(1) });
@@ -3516,37 +3528,56 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     sortedEnvronmentVariables.sort((a, b) => {
         return b.value.length - a.value.length; // descending order
     });
+    recommended = lib.replacePathToSlashed(recommended);
     recommended = lib.unexpandVariable(recommended, sortedEnvronmentVariables.map((variable) => [`\${${variable.key}}`, variable.value]));
-    if (recommended.replace(/\\/g, '/').startsWith(lib.getHomePath().replace(/\\/g, '/'))) {
+    if (recommended.startsWith(lib.replacePathToSlashed(lib.getHomePath()))) {
         recommended = '~' + recommended.substring(lib.getHomePath().length);
     }
     // print the address
-    if (option.print && addressLineNum !== notFound) {
+    if (option.print && lib.isFullPath(address)) {
         if (recommended !== addressBefore) {
             console.log('Recommend: #ref: ' + recommended);
         }
-        console.log(linkableAddress);
+        if (addressLineNum === notFound && !('noFileExistCheck' in programOptions)) {
+            var checkedPath = (runningOS === 'Windows') ? lib.replaceToPathForWindows(linkableAddress) : lib.replacePathToSlashed(linkableAddress);
+            console.log(translate `ERROR: not found a file or folder at` + ` "${checkedPath}"`);
+        }
+        else {
+            console.log(linkableAddress);
+            if (addressLineNum === notFoundInFile) {
+                console.log(existingAddress);
+            }
+        }
+        if (existingParentOnly) {
+            console.log(existingAddress);
+        }
     }
     // print the verb menu
-    if (addressLineNum !== notFound) {
+    if (lib.isInFileSystem(linkableAddress) && lib.isFullPath(address)) {
         var verbs = getRelatedVerbs(address);
+    }
+    else {
+        var verbs = [];
+    }
+    if (verbs.length >= 1) {
         var verbMenu = verbs.map((verb) => (verb.label)).join(', ');
         if (verbMenu !== '' && option.print) {
             console.log('    ' + verbMenu);
         }
     }
     else {
-        var verbs = [];
         var verbMenu = '';
     }
     return {
+        foundLines: [],
         hasVerbMenu: (verbMenu !== ''),
         verbs,
         address,
         addressLineNum,
+        existingAddress,
+        previousKeyword: '',
     };
 }
-// getRelatedLineNumGetter
 function getRelatedLineNumGetter(address) {
     if (process.env.TYPRM_LINE_NUM_GETTER) {
         const getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
@@ -3564,46 +3595,51 @@ function getRelatedLineNumGetter(address) {
         console.log(`Verbose: Not matched address "${address}". Check TYPRM_LINE_NUM_GETTER environment variable.`);
     }
     return {
-        regularExpression: '.*',
-        type: '',
-        filePathRegularExpressionIndex: 0,
-        keywordRegularExpressionIndex: 0,
+        regularExpression: '^(.*?)(#.*)?$',
+        type: 'keep',
+        filePathRegularExpressionIndex: 1,
         address,
     };
 }
-// getRelatedVerbs
 function getRelatedVerbs(address) {
-    const relatedVerbs = [];
+    var relatedVerbs = [];
     if (process.env.TYPRM_VERB) {
         const verbConfig = yaml.load(process.env.TYPRM_VERB);
         if (typeof verbConfig === 'object' && verbConfig) {
             const verbs = verbConfig;
             for (const verb of verbs) {
                 if (new RegExp(verb.regularExpression).test(address)) {
+                    verb.requestedCommandFolder = true;
                     relatedVerbs.push(verb);
                 }
             }
         }
     }
-    if (runningOS === 'Windows') {
-        var command = `explorer /select, "${verbVar.windowsFile}"`;
-    }
-    else {
-        var command = `open -R "${verbVar.file}"`;
-        // Open the folder by Finder and select the file
-    }
-    relatedVerbs.push({
-        regularExpression: '.*',
-        label: '0.Folder',
-        number: '0',
-        echo: '',
-        command,
-    });
+    relatedVerbs = relatedVerbs.concat(getFolderVerbs());
     return relatedVerbs;
 }
-// runVerb
-function runVerb(verbs, address, lineNum, verbNum) {
+function getFolderVerbs() {
+    const relatedVerbs = [];
+    if (runningOS === 'Windows') {
+        var command = `explorer /select, "${verbVar.windowsExistingAddress}"`;
+        var requestedCommandFolder = false;
+    }
+    else {
+        var command = `open -R "${verbVar.existingAddress}"`;
+        // Open the folder by Finder and select the file
+        var requestedCommandFolder = false;
+    }
+    return [{
+            regularExpression: '.*',
+            label: '0.Folder',
+            number: '0',
+            command,
+            requestedCommandFolder,
+        }];
+}
+function runVerb(verbs, address, lineNum, existingAddress, verbNum) {
     var command = '';
+    var requestedCommandFolder = true;
     const matchesVerbs = verbs.filter((verb) => (verb.number.toString() === verbNum));
     if (matchesVerbs.length >= 1) {
         const verb = matchesVerbs[0];
@@ -3611,9 +3647,11 @@ function runVerb(verbs, address, lineNum, verbNum) {
         if (fragmentIndex === notFound) {
             command = verb.command
                 .replace(verbVar.ref, address)
-                .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
-                .replace(verbVar.file, address)
-                .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
+                .replace(verbVar.windowsRef, lib.replaceToPathForWindows(address))
+                .replace(verbVar.file, lib.replacePathToSlashed(address))
+                .replace(verbVar.windowsFile, lib.replaceToPathForWindows(address))
+                .replace(verbVar.existingAddress, lib.replacePathToSlashed(existingAddress))
+                .replace(verbVar.windowsExistingAddress, lib.replaceToPathForWindows(existingAddress))
                 .replace(verbVar.fragment, '')
                 .replace(verbVar.lineNum, lineNum.toString());
             var fileOrFolderPath = address;
@@ -3621,30 +3659,28 @@ function runVerb(verbs, address, lineNum, verbNum) {
         else {
             command = verb.command
                 .replace(verbVar.ref, address)
-                .replace(verbVar.windowsRef, address.substr(0, fragmentIndex).replace(/\//g, '\\') + address.substr(fragmentIndex))
-                .replace(verbVar.file, address.substr(0, fragmentIndex))
-                .replace(verbVar.windowsFile, address.substr(0, fragmentIndex).replace(/\//g, '\\'))
-                .replace(verbVar.fragment, address.substr(fragmentIndex + 1))
+                .replace(verbVar.windowsRef, lib.replaceToPathForWindows(address.substring(0, fragmentIndex)) + address.substring(fragmentIndex))
+                .replace(verbVar.file, lib.replacePathToSlashed(address.substring(0, fragmentIndex)))
+                .replace(verbVar.windowsFile, lib.replaceToPathForWindows(address.substring(0, fragmentIndex)))
+                .replace(verbVar.existingAddress, lib.replacePathToSlashed(existingAddress))
+                .replace(verbVar.windowsExistingAddress, lib.replaceToPathForWindows(existingAddress))
+                .replace(verbVar.fragment, address.substring(fragmentIndex + 1))
                 .replace(verbVar.lineNum, lineNum.toString());
-            var fileOrFolderPath = address.substr(0, fragmentIndex);
+            var fileOrFolderPath = address.substring(0, fragmentIndex);
         }
         if (runningOS === 'Windows') {
             fileOrFolderPath = fileOrFolderPath.replace(/\//g, '\\');
         }
         fileOrFolderPath = lib.getFullPath(fileOrFolderPath, process.cwd());
-        if (!fs.existsSync(fileOrFolderPath)) {
-            console.log(translate `Error of not found the file or folder at "${getTestablePath(fileOrFolderPath)}"`);
-            return;
-        }
+        requestedCommandFolder = verb.requestedCommandFolder;
     }
     if (command !== '') {
-        execShellCommand(command);
+        execShellCommand(command, requestedCommandFolder);
     }
     else {
         console.log(translate `Error that verb number ${verbNum} is not defined`);
     }
 }
-// printConfig
 function printConfig() {
     console.log(`Verbose: Option and environment variables:`);
     if ('folder' in programOptions) {
@@ -3680,7 +3716,6 @@ function printConfig() {
                     console.log(`        Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
                     console.log(`        Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
                     console.log(`        Verbose: address: ${getter.address}`);
-                    index += 1;
                 }
                 else if (getter1.type === 'figure') {
                     const getter = getter1;
@@ -3694,12 +3729,20 @@ function printConfig() {
                     console.log(`        Verbose: pointerImage: ${getter.pointerImage}`);
                     console.log(`        Verbose: outputFolder: ${getter.outputFolder}`);
                 }
+                else if (getter1.type === 'keep') {
+                    const getter = getter1;
+                    console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                    console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
+                    console.log(`        Verbose: type: ${getter.type}`);
+                    console.log(`        Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
+                }
                 else {
                     const getter = getter1;
                     console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
                     console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
                     console.log(`        Verbose: type: ${getter.type} (unknown)`);
                 }
+                index += 1;
             }
         }
     }
@@ -3726,14 +3769,12 @@ function printConfig() {
         console.log(`    Verbose: ${translate `Envrironment variables defined in ".env" file are not inherit to child processes.`}`);
     }
 }
-// varidateMutualSearchCommandArguments
 function varidateMutualSearchCommandArguments() {
     if (programArguments.length < 2) {
         throw new Error('Error: Too few argurments.\n' +
             'typrm mutual-search  __Keywords__"');
     }
 }
-// onEndOfSettingScope
 function onEndOfSettingScope(setting, parser) {
     for (const key of Object.keys(setting)) {
         if (!setting[key].isReferenced) {
@@ -3745,7 +3786,6 @@ function onEndOfSettingScope(setting, parser) {
         }
     }
 }
-// evaluateIfCondition
 function evaluateIfCondition(expression, setting, parser, previsousEvalatedKeyValues = []) {
     if (expression === 'true') {
         if (parser.verbose) {
@@ -3855,35 +3895,48 @@ var instanceOf;
     }
     instanceOf.EvaluatedCondition = EvaluatedCondition;
 })(instanceOf || (instanceOf = {}));
-// getTestablePath
 function getTestablePath(path_) {
     if ('test' in programOptions) {
         const home = lib.getHomePath();
         if (path_.startsWith(home)) {
-            return '${HOME}' + path_.substr(home.length).replace(/\\/g, '/');
+            return '${HOME}' + lib.replacePathToSlashed(path_.substring(home.length));
         }
         else if (path_.startsWith(inputFileParentPath + path.sep) && inputFileParentPath !== '') {
-            return '${inputFileParentPath}/' + path_.substr(inputFileParentPath.length + 1).replace(/\\/g, '/');
+            return '${inputFileParentPath}/' + lib.replacePathToSlashed(path_.substring(inputFileParentPath.length + 1));
         }
         else {
-            return path_.replace(/\\/g, '/');
+            return lib.replacePathToSlashed(path_);
         }
     }
     else {
         return path_;
     }
 }
-// deleteFile
+function getTestableOSPath(path_) {
+    if ('test' in programOptions) {
+        const home = lib.getHomePath();
+        if (path_.startsWith(home)) {
+            return '${HOME}' + path_.substring(home.length);
+        }
+        else if (path_.startsWith(inputFileParentPath + path.sep) && inputFileParentPath !== '') {
+            return '${inputFileParentPath}/' + path_.substring(inputFileParentPath.length + 1);
+        }
+        else {
+            return path_;
+        }
+    }
+    else {
+        return path_;
+    }
+}
 function deleteFileSync(path) {
     if (fs.existsSync(path)) {
         fs.unlinkSync(path);
     }
 }
-// getExpectedLine
 function getExpectedLine(setting, template, options = {}) {
     return getExpectedLineAndEvaluationLog(setting, template, false, options).expected;
 }
-// getExpectedLineAndEvaluationLog
 function getExpectedLineAndEvaluationLog(setting, template, withLog = false, options = {}) {
     var expected = template;
     const log = [];
@@ -3917,7 +3970,6 @@ function getExpectedLineAndEvaluationLog(setting, template, withLog = false, opt
         return relatedKey;
     }
 }
-// getExpectedLineInFileTemplate
 function getExpectedLineInFileTemplate(setting, lineInTemplate, parser) {
     const templateTag = parseTemplateTag(lineInTemplate, parser);
     if (templateTag.isFound) {
@@ -3931,7 +3983,6 @@ function getExpectedLineInFileTemplate(setting, lineInTemplate, parser) {
     }
     return expected;
 }
-// getReplacedLine
 function getReplacedLine(setting, template) {
     const replacedSetting = {};
     for (const key of Object.keys(setting)) {
@@ -4003,7 +4054,6 @@ function getReplacedCopyTagContents(copyTag, sourceCopyTag, parameters) {
         return replacedContents;
     }
 }
-// mergeSecretEnvironmentVariable
 function mergeSecretEnvironmentVariable(settings) {
     const settingsAndEnv = Object.assign({}, settings);
     for (const [envName, envValue] of Object.entries(lib.getProcessEnvAndDotEnvSecrets())) {
@@ -4014,12 +4064,12 @@ function mergeSecretEnvironmentVariable(settings) {
             tag: 'env',
             isReferenced: true,
         };
+        value.value = getTestableOSPath(value.value);
         settingsAndEnv[`$env.{${envName}}`] = value;
         settingsAndEnv[`$env.${envName}`] = value;
     }
     return settingsAndEnv;
 }
-// evaluateEnvironmentVariable
 async function evaluateEnvironmentVariable(lines, filePath, linesLineNum) {
     const evaluatedLines = [];
     const parser = new Parser();
@@ -4054,7 +4104,6 @@ function tagIndexOf(line, tag) {
         }
     }
 }
-// getValue
 function getValue(line, separatorIndex = -1) {
     var value = line.substring(separatorIndex + 1).trim();
     if (value[0] === '#') {
@@ -4069,7 +4118,6 @@ function getValue(line, separatorIndex = -1) {
     value = unscapePercentByte(value);
     return value;
 }
-// unscapePercentByte
 function unscapePercentByte(value) {
     var found = 0;
     for (;;) {
@@ -4103,43 +4151,35 @@ function unscapePercentByte(value) {
     }
     return value;
 }
-// hasRefTag
 function hasRefTag(keywords) {
     return keywords.trim().startsWith(refLabel);
 }
-// hasCheckTag
 function hasCheckTag(keywords) {
     keywords = keywords.trim();
     return keywords === '#c' || keywords.startsWith('#c ') ||
         keywords === checkTag || keywords.startsWith(`${checkTag} `);
 }
-// hasReplaceTag
 function hasReplaceTag(keywords) {
     keywords = keywords.trim();
     return keywords === '#r' || keywords.startsWith('#r ') ||
         keywords === replaceTag || keywords.startsWith(`${replaceTag} `);
 }
-// hasResetTag
 function hasResetTag(keywords) {
     keywords = keywords.trim();
     return keywords === resetTag || keywords.startsWith(`${resetTag} `);
 }
-// hasMutualTag
 function hasMutualTag(keywords) {
     keywords = keywords.trim();
     return keywords === mutualTag || keywords.startsWith(`${mutualTag} `);
 }
-// hasNumberTag
 function hasNumberTag(keywords) {
     const numberRegularExpression = /^[0-9]+$/;
     keywords = keywords.trim();
     return keywords[0] === '#' && numberRegularExpression.test(keywords.substring(1));
 }
-// hasCommandSymbol
 function hasShellCommandSymbol(keywords) {
     return keywords[0] === programOptions.commandSymbol && keywords[1] === ' ';
 }
-// getNotSetTemplateIfTagVariableNames
 function getNotSetTemplateIfTagVariableNames(settingKeys) {
     if (settingKeys.includes(templateIfYesKey)) {
         if (settingKeys.includes(templateIfNoKey)) {
@@ -4159,13 +4199,11 @@ function getNotSetTemplateIfTagVariableNames(settingKeys) {
     }
     return notSetNames;
 }
-// parseTemplateTag
 function parseTemplateTag(line, parser) {
     const tag = new TemplateTag(parser);
     tag.parseLine(line);
     return tag;
 }
-// parseKeyName
 function parseKeyName(line) {
     const colon = line.indexOf(':');
     if (colon === notFound) {
@@ -4193,7 +4231,6 @@ function cutQuotation(str) {
         return str;
     }
 }
-// cutTag
 function cutTag(line) {
     if (line[0] === '#') {
         var separatorIndex = line.indexOf(' ');
@@ -4226,7 +4263,6 @@ function isBackSlashParameter(checkingString, index) {
     const backSlashCount = startIndex - index - 1;
     return (backSlashCount % 2 === 1);
 }
-// CommandEnum
 var CommandEnum;
 (function (CommandEnum) {
     CommandEnum[CommandEnum["unknown"] = 0] = "unknown";
@@ -4234,7 +4270,6 @@ var CommandEnum;
     CommandEnum[CommandEnum["replace"] = 2] = "replace";
     CommandEnum[CommandEnum["search"] = 3] = "search";
 })(CommandEnum || (CommandEnum = {}));
-// SettingsTree
 class SettingsTree {
     constructor() {
         this.indices = new Map(); // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
@@ -4433,7 +4468,6 @@ class SettingsTree {
 }
 ;
 ;
-// ReplaceToTagTree
 class ReplaceToTagTree {
     constructor() {
         this.replaceTo = {};
@@ -4821,7 +4855,6 @@ class ReplaceToTagTree {
 }
 ;
 ;
-// searchDefinedSettingIndices
 function searchDefinedSettingIndices(variableName, currentSettingIndex, settingTree, parser) {
     var index = currentSettingIndex;
     for (;;) {
@@ -4835,7 +4868,6 @@ function searchDefinedSettingIndices(variableName, currentSettingIndex, settingT
         index = path.dirname(index);
     }
 }
-// searchDefinedSettingIndexInCurrentLevel
 function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, settingTree, parser) {
     if (variableName in settingTree.settings[indexWithoutIf]) {
         return [indexWithoutIf]; // e.g. '/1'
@@ -4860,7 +4892,6 @@ function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, s
         return foundIndices;
     }
 }
-// Thesaurus
 class Thesaurus {
     constructor() {
         this.synonym = {}; // the value is the normalized word
@@ -5109,7 +5140,6 @@ class FoundLine {
         }
     }
 }
-// MatchedPart
 class MatchedPart {
     constructor() {
         this.position = 0; // in line or in normalizedTargetKeywords (SearchTargetType=='normalized')
@@ -5119,7 +5149,6 @@ class MatchedPart {
         this.targetType = '';
     }
 }
-// SearchKeyword
 class SearchKeyword {
     constructor() {
         this.keyword = '';
@@ -5127,17 +5156,18 @@ class SearchKeyword {
         this.direction = Direction.Following;
     }
 }
-// splitFilePathAndKeyword
 function splitFilePathAndKeyword(address, getter) {
     const verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
         console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
-        console.log(`    Verbose: address: ${address}`);
+        console.log(`    Verbose: address in ref tag: ${address}`);
+        console.log(`    Verbose: type: ${getter.type}`);
         console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
         console.log(`    Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
         console.log(`    Verbose: keywordRegularExpressionIndex: ${getter.keywordRegularExpressionIndex}`);
         console.log(`    Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
         console.log(`    Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
+        console.log(`    Verbose: address: ${getter.address}`);
     }
     const parameters = (new RegExp(getter.regularExpression)).exec(address);
     if (!parameters) {
@@ -5170,20 +5200,46 @@ function splitFilePathAndKeyword(address, getter) {
         csvOption,
     };
 }
-// searchAsText
+function getFilePathFromKeepGetter(address, getter) {
+    const verboseMode = 'verbose' in programOptions;
+    if (verboseMode) {
+        console.log(`Verbose: Parsed by TYPRM_LINE_NUM_GETTER:`);
+        console.log(`    Verbose: address in ref tag: ${address}`);
+        console.log(`    Verbose: type: ${getter.type}`);
+        console.log(`    Verbose: regularExpression: ${getter.regularExpression}`);
+    }
+    const parameters = (new RegExp(getter.regularExpression)).exec(address);
+    if (!parameters) {
+        throw new Error(`ERROR: regularExpression (${getter.regularExpression}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is not matched.` +
+            `testing string is "${address}".`);
+    }
+    if (verboseMode) {
+        console.log(`    Verbose: matched: [${parameters.join(', ')}]`);
+    }
+    if (getter.filePathRegularExpressionIndex > parameters.length - 1) {
+        throw new Error(`ERROR: filePathRegularExpressionIndex (${getter.filePathRegularExpressionIndex}) of regularExpression ` +
+            `"${getter.regularExpression}" in TYPRM_LINE_NUM_GETTER is out of range.` +
+            `testing string is "${address}".`);
+    }
+    return parameters[getter.filePathRegularExpressionIndex];
+}
 async function searchAsText(getter, address) {
     const { filePath, keyword, csvOption } = splitFilePathAndKeyword(address, getter);
     if (!fs.existsSync(filePath)) {
-        console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
         return { filePath, lineNum: notFound };
     }
     if (fs.lstatSync(filePath).isDirectory()) {
-        return { filePath, lineNum: 0 };
+        return { filePath, lineNum: notSearchedInFile };
     }
-    const lineNum = await lib.searchAsTextSub({ input: fs.createReadStream(filePath) }, keyword, csvOption);
+    if (keyword) {
+        var lineNum = await lib.searchAsTextSub({ input: fs.createReadStream(filePath) }, keyword, csvOption);
+    }
+    else {
+        var lineNum = notSearchedInFile;
+    }
     return { filePath, lineNum };
 }
-// parseFigureParameters
 function parseFigureParameters(address, getter) {
     const verboseMode = 'verbose' in programOptions;
     if (verboseMode) {
@@ -5233,12 +5289,11 @@ function parseFigureParameters(address, getter) {
         y: parseInt(parameters[getter.yExpressionIndex]),
     };
 }
-// getPointedFigurePath
 async function getPointedFigurePath(getter, address) {
     const { filePath, name, x, y } = parseFigureParameters(address, getter);
     const fileExists = fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
     if (!fileExists) {
-        console.log(`ERROR: not found a file at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
+        console.log(`ERROR: not found a file or folder at "${getTestablePath(lib.getFullPath(filePath, process.cwd()))}"`);
         return '(NotFound)';
     }
     const inputImage = path.parse(filePath);
@@ -5265,25 +5320,24 @@ async function getPointedFigurePath(getter, address) {
     }
     return outputImagePath;
 }
-// verbVar
 var VerbVariable;
 (function (VerbVariable) {
     VerbVariable.ref = '${ref}';
     VerbVariable.windowsRef = '${windowsRef}';
     VerbVariable.file = '${file}';
     VerbVariable.windowsFile = '${windowsFile}';
+    VerbVariable.existingAddress = '${existingAddress}';
+    VerbVariable.windowsExistingAddress = '${windowsExistingAddress}';
     VerbVariable.fragment = '${fragment}';
     VerbVariable.lineNum = '${lineNum}';
 })(VerbVariable || (VerbVariable = {}));
 const verbVar = VerbVariable;
-// FilePathLineNum
 class FilePathLineNum {
     constructor() {
         this.filePath = '';
         this.lineNum = 0;
     }
 }
-// KeyValue
 class KeyValue {
     constructor() {
         this.key = '';
@@ -5296,13 +5350,11 @@ function key(keyValue) {
 function value(keyValue) {
     return keyValue[1];
 }
-// Direction
 var Direction;
 (function (Direction) {
     Direction[Direction["Above"] = -1] = "Above";
     Direction[Direction["Following"] = 1] = "Following";
 })(Direction || (Direction = {}));
-// Parser
 class Parser {
     constructor() {
         this.command = CommandEnum.unknown;
@@ -5336,7 +5388,6 @@ class Parser {
         }
     }
 }
-// WriteBuffer
 class WriteBuffer {
     constructor(stream) {
         this.stream = stream;
@@ -5374,7 +5425,6 @@ class WriteBuffer {
         return this.lineBuffer[lineNum];
     }
 }
-// cutLastLF
 function cutLastLF(message) {
     if (message.slice(-1) === '\n') {
         message = message.substring(0, message.length - 1);
@@ -5416,7 +5466,6 @@ function writeToStdout(message, a2, a3) {
     return true;
 }
 const processStdoutWrite = process.stdout.write;
-// startTestRedirect
 export function startTestRedirect() {
     if (withJest || programOptions.stdoutBuffer) {
         console.log = println;
@@ -5424,7 +5473,6 @@ export function startTestRedirect() {
         lib.setInputEchoBack(true);
     }
 }
-// endTestRedirect
 export function endTestRedirect() {
     if (withJest || programOptions.stdoutBuffer) {
         console.log = consoleLog;
@@ -5432,7 +5480,6 @@ export function endTestRedirect() {
         lib.setInputEchoBack(false);
     }
 }
-// lastOf
 function lastOf(array) {
     return array[array.length - 1];
 }
@@ -5484,6 +5531,8 @@ function translate(englishLiterals, ...values) {
             "Not same as #copy tag contents": "#copy タグの内容に違いがあります",
             "(out of copy tag block)": "（copy タグのブロックの外）",
             "Not found a variable name specified in the same-as tag.": "same-as タグに指定した変数名が見つかりません",
+            "ref tag value \"${0}\" must be full path. Then you can specify the path with a variable.": "ref タグの値 \"${0}\" をフルパスに修正してください。その際、変数を指定できます。",
+            "ERROR: not found a file or folder at": "エラー: ファイルまたはフォルダーが見つかりません",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -5513,7 +5562,7 @@ function translate(englishLiterals, ...values) {
     }
     var translated = english;
     if (dictionary) {
-        if (english in dictionary) {
+        if (english in dictionary) { // Full words match
             translated = dictionary[english];
         }
     }
@@ -5629,6 +5678,8 @@ const maxNumber = 999999999;
 const pathColor = chalk.cyan;
 const lineNumColor = chalk.keyword('gray');
 const matchedColor = chalk.green.bold;
+const notSearchedInFile = 0;
+const notFoundInFile = -2;
 const notFound = -1;
 var inputFileParentPath = '';
 var locale = '';

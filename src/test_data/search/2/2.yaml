@@ -59,7 +59,7 @@ output order (6):
     #keyword: Tool release now
     #keyword: Tool release, Tool deploy
 emphasize search and ref tag:
-    #keyword: picture  #ref: path  #search: keyword
+    #keyword: picture  #ref: /path  #search: keyword
 
 test of target word count 3:
     #keyword: World wide web
@@ -80,7 +80,7 @@ block-to-disable-tag-tool tag:
 Bug case (1):
     #keyword: Go_language.yaml, go
 search verb:
-    #keyword: file_path  #ref: ../README.md#typrm
+    #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
 search one:
     #keyword: wonderful
 lineNum second match:

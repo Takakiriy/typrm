@@ -1722,6 +1722,8 @@ You can write variable references in the `command` parameter.
 | ${windowsRef} | `#ref:` parameter replaced from `/` to `\` |
 | ${file} | left of `#` in `#ref:` parameter |
 | ${windowsFile} | the path with backslash |
+| ${existingAddress} | the parameter of `#ref:` or existing parent folder |
+| ${windowsExistingAddress} | the parameter of `#ref:` or existing parent folder replaced from `/` to `\` |
 | ${fragment} | right of `#` in `#ref:` parameter |
 | ${lineNum} | the line number. Set `TYPRM_LINE_NUM_GETTER` environment variable |
 
@@ -2057,6 +2059,7 @@ You can set the break point, click at the left of line number of the source file
 - Restart the test:
     - Continue button:  #// Run to the end of program
     - Press `f` key in the terminal running `npm test`
+- Runs tests in both cases where defaultUsesLineNumGetter = true and false
 - (When you finish,) Terminal tab (bottom) >> Recycle box icon (right)
 
 ### Test without Jest

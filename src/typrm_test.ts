@@ -13,6 +13,7 @@ if (process.env.windir) {
 
 const  scriptPath =  `../build/typrm.js`;
 const  testFolderPath = `test_data` + path.sep;
+const  normalizedHomePath = 'c' + lib.getHomePath().substring(1).replace(/\\/g, '/');
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
 process.env.TYPRM_COMMAND_FOLDER = process.cwd();
@@ -92,7 +93,7 @@ async function  TestOfCommandLine() {
         "name": "search_mode_ref_verb",
         "parameters": "search",
         "check": "true",
-        "inputLines": "#ref: \"../README.md#parameters\"\n7\n\n7\nexit()\n",
+        "inputLines": `#ref: \"${normalizedHomePath}/GitProjects/GitHub/typrm/README.md#parameters\"\n7\n\n7\nexit()\n`,
     },{
         "name": "search_mode_result_has_ref_verb",
         "parameters": "search  --folder test_data/search/2",
@@ -100,17 +101,17 @@ async function  TestOfCommandLine() {
         "inputLines": "file_path\nexit()\n",
     },{
         "name": "pointed_figure_1",
-        "parameters": "search  \"#ref: ../example/figure_1.png?name=test_1&x=404&y=70\"",
+        "parameters": "search  \"#ref: ${normalizedHomePath}/GitProjects/GitHub/typrm/example/figure_1.png?name=test_1&x=404&y=70\"",
         "check": "false",
         "inputLines": "",
     },{
         "name": "pointed_figure_2",
         "parameters": "search",
         "check": "false",
-        "inputLines": "#ref: ../example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
+        "inputLines": "#ref: ${normalizedHomePath}/GitProjects/GitHub/typrm//example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
     }];
     for (const case_ of cases) {
-        if ( true  ||  case_.name === 'search_mode_select_by_number') {
+        if ( true  ||  case_.name === 'pointed_figure_1') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
             const  optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
 
@@ -133,14 +134,18 @@ async function  TestOfCommandLine() {
                 const  noData = 'no data';
                 const  answer  = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
                 const  answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
+                var  stdout = returns.stdout;
+                stdout = stdout.replace(new RegExp(normalizedHomePath, 'ig'), '${HOME}')
+                    .replace(new RegExp(lib.getHomePath().replace(/\\/g, '\\\\'), 'ig'), '${HOME}')
+                    .replace(/\\/g, '/');
 
-                if (returns.stdout !== answer) {
+                if (stdout !== answer) {
                     if (answer2 === noData) {
                         printDifferentPaths('_output.log', '_expected.log');
                     } else {
                         printDifferentPaths('_output.log', '_expected.log', '_expected2.log');
                     }
-                    fs.writeFileSync(testFolderPath + "_output.log", returns.stdout);
+                    fs.writeFileSync(testFolderPath + "_output.log", stdout);
                     fs.writeFileSync(testFolderPath + "_expected.log", answer);
                     fs.writeFileSync(testFolderPath + "_expected2.log", answer2);
                     throw new Error(`in typrm_test >> TestOfCommandLine >> ${case_.name}`);

@@ -1645,6 +1645,8 @@ mac の zsh の場合:
 | ${windowsRef} | スラッシュをバックスラッシュに置き換えた #ref: のパラメーター |
 | ${file} | #ref: のパラメーターの # より左 |
 | ${windowsFile} | バックスラッシュを使ったパス |
+| ${existingAddress} | #ref: のパラメーター、または、存在する親フォルダー |
+| ${windowsExistingAddress} | スラッシュをバックスラッシュに置き換えた #ref: のパラメーター、または、存在する親フォルダー |
 | ${fragment} | #ref: のパラメーターの # より右 |
 | ${lineNum} | 行番号。`TYPRM_LINE_NUM_GETTER` 環境変数の設定が必要です |
 
@@ -1957,6 +1959,7 @@ Jest を使うテストと Jest を使わないテストがあります。
 - テストを再起動します:
     - Continue ボタン:  #// 最後まで実行します
     - npm test が動いている Terminal で f キーを押します
+- defaultUsesLineNumGetter = true のケースと false のケースの両方でテストを実行します
 - （終了するときは）Terminal タブ（下）>> ゴミ箱アイコン（右）
 
 ### Jest を使わないテスト

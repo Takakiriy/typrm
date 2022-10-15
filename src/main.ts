@@ -104,7 +104,6 @@ export async function  mainMain() {
     }
 }
 
-// checkRoutine
 async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties[], parser: Parser) {
     const  parentPath = path.dirname(inputFilePath);
     inputFileParentPath = parentPath;
@@ -330,7 +329,6 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
     }
 }
 
-// getErrorMessageOfNotMatchedWithTemplate
 function  getErrorMessageOfNotMatchedWithTemplate(
         templateTag: TemplateTag, settingTree: SettingsTree, lines: string[]): string {
     var  errorMessage = '';
@@ -347,7 +345,6 @@ function  getErrorMessageOfNotMatchedWithTemplate(
     return  lib.cutLast( errorMessage, '\n');
 }
 
-// getVariablesForErrorMessage
 function  getVariablesForErrorMessage(indent: string, variableNames: string[], settingTree: SettingsTree, lines: string[], inputFilePath: string): string {
     var  errorMessage = '';
     var  settingIndices: string[] = [];
@@ -383,7 +380,6 @@ function  getVariablesForErrorMessage(indent: string, variableNames: string[], s
     return  lib.cutLast( errorMessage, '\n');
 }
 
-// makeSettingTree
 async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     const  tree = new SettingsTree();
     const  indentStack: {lineNum: number, indent: string}[] = [
@@ -802,7 +798,6 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     return  tree;
 }
 
-// insertParentIndexNum
 function  insertParentIndexNum(indexBefore: string, firstShiftingIndex: string): string {
     if (indexBefore === '/') {
         return  firstShiftingIndex;
@@ -816,7 +811,6 @@ function  insertParentIndexNum(indexBefore: string, firstShiftingIndex: string):
     return  `${firstShiftingIndex}/${beforeMinus - minus}${rightOfInsert}`;  // e.g. '/2/3/4/7'
 }
 
-// makeReplaceToTagTree
 async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<SettingsTree>): Promise<ReplaceToTagTree>  {
     const  toTagTree = new ReplaceToTagTree();
     const  verbose = parser.verbose;
@@ -1012,7 +1006,6 @@ async function  makeReplaceToTagTree(parser: Parser, settingTree: Readonly<Setti
     return  toTagTree;
 }
 
-// makeOriginalTagTree
 async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<SettingsTree>): Promise<ReplaceToTagTree>  {
     const  toTagTree = new ReplaceToTagTree();
     var  reader = readline.createInterface({
@@ -1100,7 +1093,6 @@ async function  makeOriginalTagTree(parser: Parser, settingTree: Readonly<Settin
     return  toTagTree;
 }
 
-// makeTemplatesInCopyTag
 async function  makeTemplatesInCopyTag(replacingLines: string[]): Promise<CopyTag.Template[]> {
     const  templatesInCopyTag: CopyTag.Template[] = [];
     const  copyTagRe = new RegExp(' #copy(-template)?: *([^,]*),[^\\$]*(\\$settings\..*)}');
@@ -1177,7 +1169,6 @@ async function  makeTemplatesInCopyTag(replacingLines: string[]): Promise<CopyTa
     return  templatesInCopyTag;
 }
 
-// getReplacedLineInSettings
 function  getReplacedLineInSettings(
         line: string, separator: number, oldValue: string, replacedValue: string,
         addOriginalTag: boolean, cutOriginalTag: boolean, cutReplaceToTagEnabled: boolean
@@ -1308,13 +1299,11 @@ function  getReplacedLineInSettings(
     return { original, spaceAndComment } as ReplacedLineInSettings;
 }
 
-// ReplacedLineInSettings
 interface  ReplacedLineInSettings {
     original: string;
     spaceAndComment: string;
 }
 
-// cutReplaceToTag
 function  cutReplaceToTag(line: string): string {
     const  toLabelIndex = line.indexOf(toLabel);
     if (toLabelIndex !== notFound) {
@@ -1336,7 +1325,6 @@ function  cutReplaceToTag(line: string): string {
     return  line;
 }
 
-// TemplateTag
 class  TemplateTag {
 
     label = '';
@@ -1657,7 +1645,6 @@ class  TemplateTag {
     }
 }
 
-// CheckedTemplateTag
 interface  CheckedTemplateTag {
     templateLineNum: number;
     template: string;
@@ -1667,7 +1654,6 @@ interface  CheckedTemplateTag {
     replaced: string;
 }
 
-// IfTagParser
 class  IfTagParser {
     readonly  parser: Parser;
     get       thisIsOutOfFalseBlock(): boolean {return this.thisIsOutOfFalseBlock_;}
@@ -1736,7 +1722,6 @@ class  IfTagParser {
     }
 }
 
-// EnableFileTemplateParser
 class  EnableFileTemplateParser {
     readonly  parser: Parser;
     readonly  indentLengthsOfIfTag: EnableFileTemplateIfExistTag[] = [
@@ -1771,7 +1756,6 @@ class  EnableFileTemplateParser {
     }
 }
 
-// BlockDisableTagParser
 class  BlockDisableTagParser {
     previousLineHasTag: boolean = false;
     isInBlock_: boolean = false;
@@ -1801,7 +1785,6 @@ class  BlockDisableTagParser {
     }
 }
 
-// WordPositions
 class  WordPositions {
     wordPositions: number[] = [];
     get  length() { return this.wordPositions.length; }
@@ -1834,17 +1817,14 @@ class  WordPositions {
     }
 }
 
-// replace
 async function  replace(inputFileOrFolderPath: string) {
     await  replaceMain(inputFileOrFolderPath, 'replace');
 }
 
-// reset
 async function  reset(inputFileOrFolderPath: string) {
     await  replaceMain(inputFileOrFolderPath, 'reset');
 }
 
-// replaceMain
 async function  replaceMain(inputFileOrFolderPath: string, command: 'replace' | 'reset') {
     const  parser = new Parser();
     const  currentFolderBackUp = process.cwd();
@@ -1864,7 +1844,6 @@ async function  replaceMain(inputFileOrFolderPath: string, command: 'replace' | 
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
 }
 
-// replaceSub
 async function  replaceSub(inputFilePath: string, parser: Parser, command: 'replace' | 'reset') {
     parser.command = CommandEnum.replace;
     parser.verbose = ('verbose' in programOptions);
@@ -2338,7 +2317,6 @@ async function  replaceSub(inputFilePath: string, parser: Parser, command: 'repl
     }
 }
 
-// check
 async function  check(checkingFilePath?: string) {
     const  parser = new Parser();
     const  currentFolderBackUp = process.cwd();
@@ -2726,7 +2704,6 @@ namespace SameAsTag {
     }
 }
 
-// listUpFilePaths
 async function  listUpFilePaths(checkingFilePath?: string): Promise<string[]> {
     const  currentFolder = process.cwd();
     const  inputFileFullPaths: string[] = [];
@@ -2782,7 +2759,6 @@ async function  listUpFilePaths(checkingFilePath?: string): Promise<string[]> {
     return  inputFileFullPaths;
 }
 
-// checkLineNoConfilict
 function  checkLineNoConfilict(keyValue: {[key: string]: string}, key: string, newValue: string, parser: Parser) {
     if (key in keyValue) {
         if (keyValue[key] !== newValue) {
@@ -2796,7 +2772,6 @@ function  checkLineNoConfilict(keyValue: {[key: string]: string}, key: string, n
     }
 }
 
-// runShellCommand
 function  runShellCommand(keyword: string) {
     if ( ! programOptions.commandSymbol) {
         console.log(`${translate('Error')}: ${translate(`To run shell command, TYPRM_COMMAND_SYMBOL environment variable must be set.`)}`);
@@ -2811,7 +2786,6 @@ function  runShellCommand(keyword: string) {
     execShellCommand(command);
 }
 
-// execShellCommand
 function  execShellCommand(command: string, requestedCommandFolder: boolean = true) {
     if ( ! programOptions.commandFolder  &&  requestedCommandFolder) {
         console.log(`${translate('Error')}: ${translate('To run shell command, TYPRM_COMMAND_FOLDER environment variable or --command-folder option must be set.')}`);
@@ -2841,7 +2815,6 @@ function  execShellCommand(command: string, requestedCommandFolder: boolean = tr
     process.chdir(currentFolder);
 }
 
-// search
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
@@ -2957,7 +2930,6 @@ async function  search() {
     }
 }
 
-// searchSub
 async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefResult> {
     keyword = keyword.trim();
 
@@ -3293,7 +3265,6 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     }
 }
 
-// getKeywordMatchingScore
 function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, thesaurus: Thesaurus): FoundLine {
 
     function  subMain() {
@@ -3451,7 +3422,6 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
     return  found;
 }
 
-// compareScoreAndSoOn
 function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
     var  different = 0;
 
@@ -3487,7 +3457,6 @@ function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
     return  different;
 }
 
-// searchWithoutTags
 async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     const  foundLines: FoundLine[] = [];
     const  keywordCount = keywords.split(' ').filter((keyword)=>(keyword !== '')).length;
@@ -3616,24 +3585,20 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     return  foundLines;
 }
 
-// mutualSearch
 async function  mutualSearch() {
     const  keyword = programArguments.slice(1).join(' ');
 
     await  searchSub(keyword, true);
 }
 
-// PrintRefOption
 interface  PrintRefOption {
     print: boolean | undefined; 
 }
 
-// printRefOptionDefault
 const  printRefOptionDefault = {
     print: true,
 } as PrintRefOption;
 
-// PrintRefResult
 interface  PrintRefResult {
     foundLines: FoundLine[];
     hasVerbMenu: boolean;
@@ -3644,7 +3609,6 @@ interface  PrintRefResult {
     previousKeyword: string;
 }
 
-// getEmptyOfPrintRefResult
 function  getEmptyOfPrintRefResult(): PrintRefResult {
     return  {
         foundLines: [],
@@ -3657,7 +3621,6 @@ function  getEmptyOfPrintRefResult(): PrintRefResult {
     }
 }
 
-// openDocument
 function  openDocument(ref: string) {
     if ( ! process.env.TYPRM_OPEN_DOCUMENT) {
         console.log(`${translate('Error')}: ${translate('Not defined TYPRM_OPEN_DOCUMENT environment variable.')}`);
@@ -3668,7 +3631,6 @@ function  openDocument(ref: string) {
     execShellCommand(command);
 }
 
-// printRef
 async function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Promise<PrintRefResult> {
     const  addressBefore = refTagAndAddress.trim().substring(refLabel.length).trim();
     const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
@@ -3728,7 +3690,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
 
     // linkableAddress = ...
     var  linkableAddress = address;
-    var  addressLineNum = 0;
+    var  addressLineNum = notFound;
     var  existingAddress = '';
     var  existingParentOnly = false;
     if ( ! lib.isFullPath(address)) {
@@ -3738,10 +3700,10 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         if (getter.type === 'text') {
             const  lineNumGetter = getter as LineNumGetter;
             const  { filePath, lineNum } = await searchAsText(lineNumGetter, address);
-            if (lineNum <= 0) {
+            if (lineNum === notFound  ||  lineNum === notSearchedInFile  ||  lineNum === notFoundInFile) {
                 linkableAddress = address;
                 existingAddress = lib.getExistingParentPath(filePath);
-                existingParentOnly = (existingAddress !== filePath);
+                existingParentOnly = (lib.replacePathToSlashed(existingAddress) !== lib.replacePathToSlashed(filePath));
             } else {
 
                 linkableAddress = lineNumGetter.address
@@ -3764,13 +3726,21 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
             const  filePath = getFilePathFromKeepGetter(address, localKeepGetter);
             linkableAddress = address;
             existingAddress = lib.getExistingParentPath(filePath);
-            existingParentOnly = (existingAddress !== filePath);
-            if (existingAddress !== filePath) {
+            if (lib.replacePathToSlashed(existingAddress) !== lib.replacePathToSlashed(filePath)) {
                 addressLineNum = notFound;
+                existingParentOnly = true;
             } else {
-                addressLineNum = 0;
+                addressLineNum = notSearchedInFile;
+                existingParentOnly = false;
             }
         }
+    }
+    if (lib.isInFileSystem(linkableAddress)) {
+        if (runningOS === 'Windows') {
+            linkableAddress = lib.replaceToPathForWindows(linkableAddress);
+        }
+    } else {
+        addressLineNum = notSearchedInFile;
     }
 
     // recommended = ...
@@ -3812,7 +3782,15 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
         if (recommended !== addressBefore) {
             console.log('Recommend: #ref: ' + recommended);
         }
-        console.log(linkableAddress);
+        if (addressLineNum === notFound  &&  ! ('noFileExistCheck' in programOptions)) {
+            var  checkedPath = (runningOS === 'Windows') ? lib.replaceToPathForWindows(linkableAddress) : lib.replacePathToSlashed(linkableAddress);
+            console.log(translate`ERROR: not found a file or folder at` + ` "${checkedPath}"`);
+        } else {
+            console.log(linkableAddress);
+            if (addressLineNum === notFoundInFile) {
+                console.log(existingAddress);
+            }
+        }
         if (existingParentOnly) {
             console.log(existingAddress);
         }
@@ -3844,9 +3822,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     };
 }
 
-// getRelatedLineNumGetter
 function  getRelatedLineNumGetter(address: string): AbstractLineNumGetter {
-    const  fileGetterType = ['text'];
     if (process.env.TYPRM_LINE_NUM_GETTER) {
 
         const  getterConfig = yaml.load(process.env.TYPRM_LINE_NUM_GETTER);
@@ -3866,15 +3842,13 @@ function  getRelatedLineNumGetter(address: string): AbstractLineNumGetter {
         console.log(`Verbose: Not matched address "${address}". Check TYPRM_LINE_NUM_GETTER environment variable.`)
     }
     return  {
-        regularExpression: '.*',
-        type: '',
-        filePathRegularExpressionIndex: 0,
-        keywordRegularExpressionIndex: 0,
+        regularExpression: '^(.*?)(#.*)?$',
+        type: 'keep',
+        filePathRegularExpressionIndex: 1,
         address,
     } as LineNumGetter;
 }
 
-// getRelatedVerbs
 function  getRelatedVerbs(address: string): Verb[] {
     var  relatedVerbs: Verb[] = [];
     if (process.env.TYPRM_VERB) {
@@ -3896,7 +3870,6 @@ function  getRelatedVerbs(address: string): Verb[] {
     return  relatedVerbs;
 }
 
-// getFolderVerbs
 function  getFolderVerbs(): Verb[] {
     const  relatedVerbs: Verb[] = [];
 
@@ -3917,7 +3890,6 @@ function  getFolderVerbs(): Verb[] {
     }]
 }
 
-// runVerb
 function  runVerb(verbs: Verb[], address: string, lineNum: number, existingAddress: string, verbNum: string) {
     var  command = '';
     var  requestedCommandFolder = true;
@@ -3929,22 +3901,22 @@ function  runVerb(verbs: Verb[], address: string, lineNum: number, existingAddre
 
             command = verb.command
                 .replace(verbVar.ref, address)
-                .replace(verbVar.windowsRef, address.replace(/\//g, '\\'))
-                .replace(verbVar.file, address)
-                .replace(verbVar.windowsFile, address.replace(/\//g, '\\'))
-                .replace(verbVar.existingAddress, existingAddress)
-                .replace(verbVar.windowsExistingAddress, existingAddress.replace(/\//g, '\\'))
+                .replace(verbVar.windowsRef, lib.replaceToPathForWindows(address))
+                .replace(verbVar.file, lib.replacePathToSlashed(address))
+                .replace(verbVar.windowsFile, lib.replaceToPathForWindows(address))
+                .replace(verbVar.existingAddress, lib.replacePathToSlashed(existingAddress))
+                .replace(verbVar.windowsExistingAddress, lib.replaceToPathForWindows(existingAddress))
                 .replace(verbVar.fragment, '')
                 .replace(verbVar.lineNum, lineNum.toString());
             var  fileOrFolderPath = address;
         } else {
             command = verb.command
-                .replace(verbVar.ref, address)
-                .replace(verbVar.windowsRef,  address.substring(0, fragmentIndex).replace(/\//g, '\\') + address.substring(fragmentIndex))
-                .replace(verbVar.file,        address.substring(0, fragmentIndex))
-                .replace(verbVar.windowsFile, address.substring(0, fragmentIndex).replace(/\//g, '\\'))
-                .replace(verbVar.existingAddress, existingAddress)
-                .replace(verbVar.windowsExistingAddress, existingAddress.replace(/\//g, '\\'))
+                .replace(verbVar.ref,         address)
+                .replace(verbVar.windowsRef,  lib.replaceToPathForWindows(address.substring(0, fragmentIndex)) + address.substring(fragmentIndex))
+                .replace(verbVar.file,        lib.replacePathToSlashed(address.substring(0, fragmentIndex)))
+                .replace(verbVar.windowsFile, lib.replaceToPathForWindows(address.substring(0, fragmentIndex)))
+                .replace(verbVar.existingAddress, lib.replacePathToSlashed(existingAddress))
+                .replace(verbVar.windowsExistingAddress, lib.replaceToPathForWindows(existingAddress))
                 .replace(verbVar.fragment,    address.substring(fragmentIndex + 1))
                 .replace(verbVar.lineNum,     lineNum.toString());
             var  fileOrFolderPath = address.substring(0, fragmentIndex);
@@ -3962,7 +3934,6 @@ function  runVerb(verbs: Verb[], address: string, lineNum: number, existingAddre
     }
 }
 
-// printConfig
 function  printConfig() {
     console.log(`Verbose: Option and environment variables:`);
     if ('folder' in programOptions) {
@@ -4000,7 +3971,6 @@ function  printConfig() {
                     console.log(`        Verbose: csvOptionRegularExpressionIndex: ${getter.csvOptionRegularExpressionIndex}`);
                     console.log(`        Verbose: targetMatchIdRegularExpressionIndex: ${getter.targetMatchIdRegularExpressionIndex}`);
                     console.log(`        Verbose: address: ${getter.address}`);
-                    index += 1;
                 } else if (getter1.type === 'figure') {
                     const  getter = getter1 as FigurePointGetter;
 
@@ -4013,12 +3983,21 @@ function  printConfig() {
                     console.log(`        Verbose: nameExpressionIndex: ${getter.nameExpressionIndex}`);
                     console.log(`        Verbose: pointerImage: ${getter.pointerImage}`);
                     console.log(`        Verbose: outputFolder: ${getter.outputFolder}`);
+                } else if (getter1.type === 'keep') {
+                    const  getter = getter1 as LocalKeepGetter;
+
+                    console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
+                    console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
+                    console.log(`        Verbose: type: ${getter.type}`);
+                    console.log(`        Verbose: filePathRegularExpressionIndex: ${getter.filePathRegularExpressionIndex}`);
                 } else {
                     const  getter = getter1;
+
                     console.log(`    Verbose: TYPRM_LINE_NUM_GETTER[${index}]:`);
                     console.log(`        Verbose: regularExpression: ${getter.regularExpression}`);
                     console.log(`        Verbose: type: ${getter.type} (unknown)`);
                 }
+                index += 1;
             }
         }
     }
@@ -4047,7 +4026,6 @@ function  printConfig() {
     }
 }
 
-// varidateMutualSearchCommandArguments
 function  varidateMutualSearchCommandArguments() {
     if (programArguments.length < 2) {
         throw  new Error('Error: Too few argurments.\n' +
@@ -4055,7 +4033,6 @@ function  varidateMutualSearchCommandArguments() {
     }
 }
 
-// onEndOfSettingScope
 function  onEndOfSettingScope(setting: Settings, parser: Parser) {
     for (const key of Object.keys(setting)) {
         if ( ! setting[key].isReferenced) {
@@ -4068,7 +4045,6 @@ function  onEndOfSettingScope(setting: Settings, parser: Parser) {
     }
 }
 
-// evaluateIfCondition
 function  evaluateIfCondition(expression: string, setting: Settings, parser: Parser,
         previsousEvalatedKeyValues: string[] = [])
         : boolean | Error | EvaluatedCondition {
@@ -4178,15 +4154,14 @@ namespace  instanceOf {
     }
 }
 
-// getTestablePath
 function  getTestablePath(path_: string) {
     if ('test' in programOptions) {
         const  home = lib.getHomePath();
 
         if (path_.startsWith(home)) {
-            return  '${HOME}' + lib.replacePathToSlashed(path_.substr(home.length));
+            return  '${HOME}' + lib.replacePathToSlashed(path_.substring(home.length));
         } else if (path_.startsWith(inputFileParentPath + path.sep)  &&  inputFileParentPath !== '') {
-            return  '${inputFileParentPath}/' + lib.replacePathToSlashed(path_.substr(inputFileParentPath.length + 1));
+            return  '${inputFileParentPath}/' + lib.replacePathToSlashed(path_.substring(inputFileParentPath.length + 1));
         } else {
             return  lib.replacePathToSlashed(path_);
         }
@@ -4195,19 +4170,32 @@ function  getTestablePath(path_: string) {
     }
 }
 
-// deleteFile
+function  getTestableOSPath(path_: string) {
+    if ('test' in programOptions) {
+        const  home = lib.getHomePath();
+
+        if (path_.startsWith(home)) {
+            return  '${HOME}' + path_.substring(home.length);
+        } else if (path_.startsWith(inputFileParentPath + path.sep)  &&  inputFileParentPath !== '') {
+            return  '${inputFileParentPath}/' + path_.substring(inputFileParentPath.length + 1);
+        } else {
+            return  path_;
+        }
+    } else {
+        return  path_;
+    }
+}
+
 function  deleteFileSync(path: string) {
     if (fs.existsSync(path)) {
         fs.unlinkSync(path);
     }
 }
 
-// getExpectedLine
 function  getExpectedLine(setting: Settings, template: string, options: OptionOfGetExpectedLine = {}): string {
     return  getExpectedLineAndEvaluationLog(setting, template, false, options).expected;
 }
 
-// getExpectedLineAndEvaluationLog
 function  getExpectedLineAndEvaluationLog(setting: Settings, template: string, withLog: boolean = false,
         options: OptionOfGetExpectedLine  = {}): {expected: string, log: EvaluationLog[]} {
     var  expected = template;
@@ -4251,7 +4239,6 @@ interface OptionOfGetExpectedLine {
 }
 
 
-// getExpectedLineInFileTemplate
 function  getExpectedLineInFileTemplate(setting: Settings, lineInTemplate: string, parser: Parser): string {
     const  templateTag = parseTemplateTag(lineInTemplate, parser);
     if (templateTag.isFound) {
@@ -4266,7 +4253,6 @@ function  getExpectedLineInFileTemplate(setting: Settings, lineInTemplate: strin
     return  expected;
 }
 
-// getReplacedLine
 function  getReplacedLine(setting: Settings, template: string): string {
     const  replacedSetting: Settings = {};
     for (const key of Object.keys(setting)) {
@@ -4348,7 +4334,6 @@ function  getReplacedCopyTagContents(copyTag: CopyTag.Properties, sourceCopyTag:
     }
 }
 
-// mergeSecretEnvironmentVariable
 function  mergeSecretEnvironmentVariable(settings: Settings): Settings {
     const  settingsAndEnv = Object.assign({}, settings);
 
@@ -4360,6 +4345,7 @@ function  mergeSecretEnvironmentVariable(settings: Settings): Settings {
             tag: 'env',
             isReferenced: true,
         };
+        value.value = getTestableOSPath(value.value);
 
         settingsAndEnv[`$env.{${envName}}`] = value;
         settingsAndEnv[`$env.${envName}`] = value;
@@ -4368,7 +4354,6 @@ function  mergeSecretEnvironmentVariable(settings: Settings): Settings {
     return  settingsAndEnv;
 }
 
-// evaluateEnvironmentVariable
 async function  evaluateEnvironmentVariable(lines: string[], filePath: string, linesLineNum: number): Promise<string[]> {
     const  evaluatedLines: string[] = [];
     const  parser = new Parser();
@@ -4411,7 +4396,6 @@ function  tagIndexOf(line: string, tag: string): number {
     }
 }
 
-// getValue
 function  getValue(line: string, separatorIndex: number = -1) {
 
     var  value = line.substring(separatorIndex + 1).trim();
@@ -4429,7 +4413,6 @@ function  getValue(line: string, separatorIndex: number = -1) {
     return  value;
 }
 
-// unscapePercentByte
 function  unscapePercentByte(value: string): string {
     var  found = 0;
     for (;;) {
@@ -4460,38 +4443,32 @@ function  unscapePercentByte(value: string): string {
     return  value;
 }
 
-// hasRefTag
 function  hasRefTag(keywords: string) {
     return  keywords.trim().startsWith(refLabel);
 }
 
-// hasCheckTag
 function  hasCheckTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === '#c'  ||  keywords.startsWith('#c ')  ||
         keywords === checkTag  ||  keywords.startsWith(`${checkTag} `);
 }
 
-// hasReplaceTag
 function  hasReplaceTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === '#r'  ||  keywords.startsWith('#r ')  ||
         keywords === replaceTag  ||  keywords.startsWith(`${replaceTag} `);
 }
 
-// hasResetTag
 function  hasResetTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === resetTag  ||  keywords.startsWith(`${resetTag} `);
 }
 
-// hasMutualTag
 function  hasMutualTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === mutualTag  ||  keywords.startsWith(`${mutualTag} `);
 }
 
-// hasNumberTag
 function  hasNumberTag(keywords: string) {
     const  numberRegularExpression = /^[0-9]+$/;
     keywords = keywords.trim();
@@ -4499,12 +4476,10 @@ function  hasNumberTag(keywords: string) {
     return  keywords[0] === '#'  &&  numberRegularExpression.test( keywords.substring(1) );
 }
 
-// hasCommandSymbol
 function  hasShellCommandSymbol(keywords: string) {
     return  keywords[0] === programOptions.commandSymbol  &&  keywords[1] === ' ';
 }
 
-// getNotSetTemplateIfTagVariableNames
 function  getNotSetTemplateIfTagVariableNames(settingKeys: string[]) {
     if (settingKeys.includes(templateIfYesKey)) {
         if (settingKeys.includes(templateIfNoKey)) {
@@ -4522,14 +4497,12 @@ function  getNotSetTemplateIfTagVariableNames(settingKeys: string[]) {
     return  notSetNames;
 }
 
-// parseTemplateTag
 function  parseTemplateTag(line: string, parser: Parser): TemplateTag {
     const  tag = new TemplateTag(parser);
     tag.parseLine(line);
     return  tag;
 }
 
-// parseKeyName
 function  parseKeyName(line: string): string {
 
     const  colon = line.indexOf(':');
@@ -4558,7 +4531,6 @@ function  cutQuotation(str: string) {
     }
 }
 
-// cutTag
 function  cutTag(line: string): string {
     if (line[0] === '#') {
         var  separatorIndex = line.indexOf(' ');
@@ -4594,7 +4566,6 @@ function  isBackSlashParameter(checkingString: string, index: number): boolean {
     return  (backSlashCount % 2 === 1);
 }
 
-// CommandEnum
 enum CommandEnum {
     unknown,
     check,
@@ -4602,7 +4573,6 @@ enum CommandEnum {
     search,
 }
 
-// SettingsTree
 class SettingsTree {
     indices = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
     indicesWithIf = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
@@ -4838,7 +4808,6 @@ interface  SettingsTree_addCurrentSettingsInIfTag {
     outOfFalseBlocks: Map</*lineNum*/ number, boolean>;
 };
 
-// ReplaceToTagTree
 class  ReplaceToTagTree {
     replaceTo: {[index: string]: {[name: string]: Setting}} = {};
     outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();
@@ -5284,7 +5253,6 @@ interface NotFoundNameInSameAsTag {
     referencedVariableNames: string[];
 }
 
-// SettingsInformation
 interface SettingsInformation {
     index: string;
     lineNum: number;
@@ -5293,10 +5261,8 @@ interface SettingsInformation {
     inSettings: boolean;
 }
 
-// Settings
 type Settings = {[name: string]: Setting}
 
-// Setting
 interface Setting {
     value: string;
     lineNum: number;  // This count is the same as #to: tag count
@@ -5307,7 +5273,6 @@ interface Setting {
     sameAsWasChecked?: boolean;
 }
 
-// searchDefinedSettingIndices
 function  searchDefinedSettingIndices(
     variableName: string,
     currentSettingIndex: string,
@@ -5327,7 +5292,6 @@ function  searchDefinedSettingIndices(
     }
 }
 
-// searchDefinedSettingIndexInCurrentLevel
 function  searchDefinedSettingIndexInCurrentLevel(
     variableName: string,
     indexWithoutIf: string,
@@ -5359,7 +5323,6 @@ function  searchDefinedSettingIndexInCurrentLevel(
     }
 }
 
-// Thesaurus
 class Thesaurus {
     synonym: {[word: string]: string} = {};  // the value is the normalized word
     get  enabled(): boolean { return Object.keys(this.synonym).length !== 0; }
@@ -5620,10 +5583,8 @@ class FoundLine {
     }
 }
 
-// SearchTargetType
 type SearchTargetType = '' | 'normalized' | 'withoutTags';
 
-// MatchedPart
 class MatchedPart {
     position: number = 0;  // in line or in normalizedTargetKeywords (SearchTargetType=='normalized')
     length: number = 0;
@@ -5632,20 +5593,17 @@ class MatchedPart {
     targetType: SearchTargetType = '';
 }
 
-// SearchKeyword
 class SearchKeyword {
     keyword: string = '';
     startLineNum: number = 0;
     direction: Direction = Direction.Following;
 }
 
-// AbstractLineNumGetter
 interface  AbstractLineNumGetter {
     regularExpression: string;
     type: string;
 }
 
-// LineNumGetter
 interface  LineNumGetter  extends AbstractLineNumGetter {
     regularExpression: string;
     type: string;
@@ -5656,7 +5614,6 @@ interface  LineNumGetter  extends AbstractLineNumGetter {
     address: string;
 }
 
-// FigurePointGetter
 interface  FigurePointGetter  extends AbstractLineNumGetter {
     regularExpression: string;
     type: string;
@@ -5668,21 +5625,18 @@ interface  FigurePointGetter  extends AbstractLineNumGetter {
     outputFolder: string;
 }
 
-// LocalKeepGetter
 interface  LocalKeepGetter  extends AbstractLineNumGetter {
     regularExpression: string;
     type: string;
     filePathRegularExpressionIndex: number;
 }
 
-// FilePathAndKeyword
 interface  FilePathAndKeyword {
     filePath: string;
     keyword: string;
     csvOption: boolean;
 }
 
-// splitFilePathAndKeyword
 function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FilePathAndKeyword {
 
     const  verboseMode = 'verbose' in programOptions;
@@ -5732,7 +5686,6 @@ function  splitFilePathAndKeyword(address: string, getter: LineNumGetter): FileP
     } as FilePathAndKeyword;
 }
 
-// getFilePathFromKeepGetter
 function  getFilePathFromKeepGetter(address: string, getter: LocalKeepGetter): string {
 
     const  verboseMode = 'verbose' in programOptions;
@@ -5761,28 +5714,23 @@ function  getFilePathFromKeepGetter(address: string, getter: LocalKeepGetter): s
     return  parameters[getter.filePathRegularExpressionIndex];
 }
 
-// searchAsText
 async function  searchAsText(getter: LineNumGetter, address: string): /* linkableAddress */ Promise<FilePathLineNum> {
     const  { filePath, keyword, csvOption } = splitFilePathAndKeyword(address,  getter);
     if ( ! fs.existsSync(filePath)) {
-        if ( ! ('noFileExistCheck' in programOptions)) {
-            console.log(translate`ERROR: not found a file or folder at` + ` "${getTestablePath(filePath)}"`);
-        }
         return  { filePath, lineNum: notFound };
     }
     if (fs.lstatSync(filePath).isDirectory()) {
-        return  { filePath, lineNum: notFound };
+        return  { filePath, lineNum: notSearchedInFile };
     }
 
     if (keyword) {
         var  lineNum = await lib.searchAsTextSub({input: fs.createReadStream(filePath)}, keyword, csvOption);
     } else {
-        var  lineNum = 0;
+        var  lineNum = notSearchedInFile;
     }
     return  { filePath, lineNum };
 }
 
-// FigurePoint
 interface  FigurePoint {
     filePath: string;
     name: string;
@@ -5790,7 +5738,6 @@ interface  FigurePoint {
     y: number;
 }
 
-// parseFigureParameters
 function  parseFigureParameters(address: string, getter: FigurePointGetter): FigurePoint {
 
     const  verboseMode = 'verbose' in programOptions;
@@ -5844,7 +5791,6 @@ function  parseFigureParameters(address: string, getter: FigurePointGetter): Fig
     } as FigurePoint;
 }
 
-// getPointedFigurePath
 async function  getPointedFigurePath(getter: FigurePointGetter, address: string): /* linkableAddress */ Promise<string> {
     const  { filePath, name, x, y } = parseFigureParameters(address,  getter);
     const  fileExists =  fs.existsSync(filePath)  &&  fs.lstatSync(filePath).isFile();
@@ -5880,7 +5826,6 @@ async function  getPointedFigurePath(getter: FigurePointGetter, address: string)
     return  outputImagePath;
 }
 
-// Verb
 interface Verb {
     regularExpression: string;
     label: string;
@@ -5889,7 +5834,6 @@ interface Verb {
     requestedCommandFolder: boolean;
 }
 
-// verbVar
 namespace VerbVariable {
     export const  ref = '${ref}';
     export const  windowsRef = '${windowsRef}';
@@ -5902,13 +5846,11 @@ namespace VerbVariable {
 }
 const  verbVar = VerbVariable;
 
-// FilePathLineNum
 class FilePathLineNum {
     filePath: string = '';
     lineNum: number = 0;
 }
 
-// KeyValue
 class KeyValue {
     key: string = '';
     value: string = '';
@@ -5921,13 +5863,11 @@ function  value(keyValue: any[]) {
     return  keyValue[1];
 }
 
-// Direction
 enum Direction {
     Above = -1,
     Following = +1,
 }
 
-// GlossaryTag
 interface GlossaryTag {
     indentPosition: number;
     indentAtTag: string;
@@ -5935,13 +5875,11 @@ interface GlossaryTag {
     glossaryWords: string;
 }
 
-// ScoreTag
 interface ScoreTag {
     indentPosition: number;
     plusScore: number;
 }
 
-// IfTag
 interface  IfTag {
     indentLength: number;
     resultOfIf: boolean;
@@ -5949,25 +5887,21 @@ interface  IfTag {
     isReplacable: boolean;
 }
 
-// IfTagForConditionScanner
 interface  IfTagForConditionScanner {
     indentLength: number;
     trueCondition: string;
 }
 
-// EnableFileTemplateIfExistTag
 interface  EnableFileTemplateIfExistTag {
     indentLength: number;
     resultOfIf: boolean;
 }
 
-// EvaluationLog
 interface  EvaluationLog {
     before: string;
     after: string;
 }
 
-// Parser
 class  Parser {
     command = CommandEnum.unknown;
     errorCount = 0;
@@ -6003,7 +5937,6 @@ class  Parser {
     }
 }
 
-// WriteBuffer
 class  WriteBuffer {
     stream: fs.WriteStream;
     lineBuffer: string[];
@@ -6054,7 +5987,6 @@ class  WriteBuffer {
     }
 }
 
-// cutLastLF
 function  cutLastLF(message: string) {
     if (message.slice(-1) === '\n') {
         message = message.substring(0, message.length - 1);
@@ -6100,7 +6032,6 @@ function  writeToStdout(message: string, a2?: any, a3?: any) {
 }
 const  processStdoutWrite = process.stdout.write;
 
-// startTestRedirect
 export function  startTestRedirect() {
     if (withJest  ||  programOptions.stdoutBuffer) {
         console.log = println;
@@ -6109,7 +6040,6 @@ export function  startTestRedirect() {
     }
 }
 
-// endTestRedirect
 export function  endTestRedirect() {
     if (withJest  ||  programOptions.stdoutBuffer) {
         console.log = consoleLog;
@@ -6118,7 +6048,6 @@ export function  endTestRedirect() {
     }
 }
 
-// lastOf
 function  lastOf<T>(array: Array<T>): T {
     return  array[array.length - 1];
 }
@@ -6324,6 +6253,8 @@ const  maxNumber = 999999999;
 const  pathColor = chalk.cyan;
 const  lineNumColor = chalk.keyword('gray');
 const  matchedColor = chalk.green.bold;
+const  notSearchedInFile = 0;
+const  notFoundInFile = -2;
 const  notFound = -1;
 var    inputFileParentPath = '';
 var    locale = '';

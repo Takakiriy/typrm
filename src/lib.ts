@@ -43,7 +43,6 @@ export function  copyFileSync(sourceFilePath: string, destinationFilePath: strin
 	fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
 
-// rmdirSync
 export function  rmdirSync(folderPath: string) {
     if (fs.existsSync(folderPath)) {
         fs.rmdirSync(folderPath, {recursive: true});
@@ -76,7 +75,6 @@ export async function  replaceFileAsync(sourceFilePath: string, replaceFunction:
     fs.writeFileSync(destinationFilePath, replacedText);
 }
 
-// searchAsTextSub
 export async function  searchAsTextSub(readlineOptions: ReadLineOptions, keyword: string, csvOption: boolean): /* lineNum */ Promise<number> {
     if (csvOption) {
         var    keywords = await parseCSVColumns(keyword);
@@ -124,18 +122,16 @@ export async function  searchAsTextSub(readlineOptions: ReadLineOptions, keyword
         throw exception;
     }
     if ( ! breaking) {
-        lineNum = 0;
+        lineNum = notFoundInFile;
     }
 
     return  lineNum;
 }
 
-// addDefaultReadLineOptions
 function  addDefaultReadLineOptions(localOptions: ReadLineOptions): ReadLineOptions {
     return {crlfDelay: Infinity, ...localOptions};
 }
 
-// pathResolve
 export function  pathResolve(path_: string) {
 
     // '/c/home' format to current OS format
@@ -151,19 +147,6 @@ export function  pathResolve(path_: string) {
     return path_
 }
 
-// replacePathToSlashed
-export function  replacePathToSlashed(path_: string): string {
-    if (path_.substring(0,2) === "\\\\") {
-        return  path_.replace(/\//g, '\\');
-    } else {
-        if (/^([A-Z]):/.test(path_)) {
-            path_ = path_[0].toLowerCase() + path_.substring(1);
-        }
-        return  path_.replace(/\\([^ ])/g, '/$1');
-    }
-}
-
-// UnexpectedLine
 export interface  UnexpectedLine {
     contentsLineNum: number;
     contentsLine: string;
@@ -221,14 +204,17 @@ export function  isFullPath(path: string): boolean {
     return  isFullPath;
 }
 
-// isInFileSystem
 export function  isInFileSystem(path_: string): boolean {
     return  ! path_.includes('://');
 }
 
-// getExistingParentPath
 export function  getExistingParentPath(path_: string): string {
-    path_ = path_.replace(/\//g, path.sep);
+    if (path.sep === '/') {
+        path_ = replacePathToSlashed(path_);
+    } else {
+        path_ = replaceToPathForWindows(path_);
+    }
+
     if ( ! (path_[0] === path.sep || path_.substr(1,2) === ':' + path.sep)) {
         return  getHomePath();
     }
@@ -236,12 +222,56 @@ export function  getExistingParentPath(path_: string): string {
         if (fs.existsSync(path_)) {
             return  path_;
         }
-        path_ = path.dirname(path_);
+        const  nextPath = path.dirname(path_);
+        if (nextPath === path_) {
+            return  getHomePath();
+        }
+        path_ = nextPath;
     }
     return  getHomePath();
 }
 
-// checkNotInGitWorking
+// export function  withHomeVariable(path_: string) {
+//     const  home = getHomePath();
+//     const  homeL = home.toLowerCase().replace(/\\/g, '/');
+//     const  pathL = path_.toLowerCase().replace(/\\/g, '/');
+
+//     if (pathL.startsWith(homeL)) {
+//         return  '${HOME}' + path_.substring(home.length);
+//     } else {
+//         return  path_;
+//     }
+// }
+
+export function  replacePathToSlashed(path_: string): string {
+    if (path_.substring(0,2) === "\\\\") {
+        return  path_.replace(/\//g, '\\');  // Windows network path
+    } else {
+        path_ = path_.replace(/\\([^ ]|$)/g, '/$1');
+        if (/^([A-Za-z]):/.test(path_)) {
+            path_ = path_[0].toLowerCase() + path_.substring(1);
+            if (fs.existsSync('/mnt/c')) {
+                path_ = '/mnt/' + path_[0] +':'+ path_.substring(2);
+            }
+        } else if (path_.startsWith('/mnt/')  &&  /[A-Za-z]/.test(path_[5])  &&  (path_[6] === '/'  ||  path_[6] === undefined)) {
+            if ( ! fs.existsSync('/mnt/c')) {
+                path_ = path_[5] +':'+ path_.substring(6);
+            }
+        }
+        return  path_;
+    }
+}
+
+export function  replaceToPathForWindows(path_: string): string {
+    if (path_.startsWith('/mnt/')  &&  /[a-z]/.test(path_[5])  &&  (path_[6] === '/'  ||  path_[6] === undefined)) {
+        return  path_[5].toUpperCase() +':'+ path_.substring(6).replace(/\//g, '\\');
+    } else if (path_[1] === ':') {
+        return  path_.substring(0,2).toUpperCase() + path_.substring(2).replace(/\//g, '\\');
+    } else {
+        return  path_.replace(/\//g, '\\');
+    }
+}
+
 export function  checkNotInGitWorking() {
     var  path_ = process.cwd();
 
@@ -260,7 +290,6 @@ export function  checkNotInGitWorking() {
     }
 }
 
-// getTestWorkFolderFullPath
 export function  getTestWorkFolderFullPath(): string {
     var  path_ = process.cwd();
 
@@ -334,7 +363,6 @@ export async function  getGlobbyParameters(targetPath: string, baseFullPath: str
     };
 }
 
-// GlobbyParameters
 interface  GlobbyParameters {
     targetFolderFullPath: string;
     globbyParameters: string[];
@@ -369,7 +397,6 @@ export function  cutLast(input: string, keyword: string): string {
     }
 }
 
-// cutIndent
 export function  cutIndent(lines: string[]) {
     const  nullLength = 99999;
 
@@ -392,7 +419,6 @@ export function  cutIndent(lines: string[]) {
     return  lines;
 }
 
-// unexpandVariable
 export function  unexpandVariable(expanded: string, keyValues: string[][], out_replacedIndices: number[]|null = null): string {
     var  replacing = expanded;
 
@@ -424,7 +450,6 @@ export function  unexpandVariable(expanded: string, keyValues: string[][], out_r
     return  unexpanded;
 }
 
-// getIndentWithoutHyphen
 function  getIndentWithoutHyphen(line: string): string | null {
     const  match = indentHyphenRegularExpression.exec(line);
     if (match === null) {
@@ -773,7 +798,6 @@ export function  checkExpectedTextContents(testingContents: string[], expectedPa
     }
 }
 
-// coloredDiff
 export function  coloredDiff(redLine: string, greenLine: string, redHeaderLength: number = 0, greenHeaderLength: number = 0): ColoredDiff {
     const  green = chalk.bgGreen.black;
     const  red = chalk.bgRed.black;
@@ -797,13 +821,11 @@ export function  coloredDiff(redLine: string, greenLine: string, redHeaderLength
     return {greenLine, redLine};
 }
 
-// ColoredDiff
 interface  ColoredDiff {
     greenLine: string;
     redLine: string;
 }
 
-// parseCSVColumns
 export async function  parseCSVColumns(columns: string): Promise<string[]> {
     if (!columns) {
         return  [];  // stream.Readable.from(undefined) occurs an error
@@ -835,7 +857,6 @@ export async function  parseCSVColumns(columns: string): Promise<string[]> {
     }
 }
 
-// parseCSVColumnPositions
 export function  parseCSVColumnPositions(csv: string, columns: string[]): number[] {
     const  positions: number[] = [];
     var  searchPosition = 0;
@@ -848,12 +869,10 @@ export function  parseCSVColumnPositions(csv: string, columns: string[]): number
     return  positions;
 }
 
-// escapeRegularExpression
 export function  escapeRegularExpression(expression: string) {
     return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
 
-// replace
 export function  replace(input: string, replacers: ReplaceParameter[]): string {
     var  replacing = input;
     for (const replacer of replacers) {
@@ -879,7 +898,6 @@ export function  replace(input: string, replacers: ReplaceParameter[]): string {
     return  replaced;
 }
 
-// replaceAsync
 export async function  replaceAsync(input: string, replacers: ReplaceParameter[]): Promise<string> {
     var  replacing = input;
     for (const replacer of replacers) {
@@ -950,7 +968,6 @@ export async function  replaceAsync(input: string, replacers: ReplaceParameter[]
     return  replaced;
 }
 
-// ReplaceParameter
 interface ReplaceParameter {
     from?: string;
     fromCSV?: string;
@@ -958,7 +975,6 @@ interface ReplaceParameter {
     to: string;
 }
 
-// WritableMemoryStream
 class WritableMemoryStream extends Writable {
     private array: string[];
 
@@ -981,13 +997,10 @@ class WritableMemoryStream extends Writable {
 // Split secrets from environment variables in order to prevent child process inheritance
 type  Secrets = {[name: string]: string | undefined};
 
-// dotenvSecrets
 const  dotenvSecrets: Secrets = {};
 
-// dotenvInheritToProcessEnv
 var  dotenvInheritToProcessEnv = false;
 
-// loadDotEnvSecrets
 export function  loadDotEnvSecrets(inheritProcessEnv: boolean = false) {
     dotenvInheritToProcessEnv = inheritProcessEnv;
     if (inheritProcessEnv) {
@@ -1009,12 +1022,10 @@ export function  loadDotEnvSecrets(inheritProcessEnv: boolean = false) {
     }
 }
 
-// getDotEnvSecrets
 export function  getDotEnvSecrets(): Secrets {
     return  dotenvSecrets;
 }
 
-// getProcessEnvAndDotEnvSecrets
 export function  getProcessEnvAndDotEnvSecrets(): Secrets {
     if (dotenvInheritToProcessEnv) {
         return  process.env;
@@ -1037,7 +1048,6 @@ export const  indentHyphenRegularExpression = /^(( |\t)*)-(( |\t)*)/;
 
 // Data group
 
-// isSameArray
 export function  isSameArray<T>(log: T[], answer: T[]): boolean {
     if (log.length !== answer.length) {
         return  false;
@@ -1060,7 +1070,6 @@ export function  isSameArrayOf<T>(log: T[], answer: T[]): boolean {
     return isSame;
 }
 
-// getCommonItems
 export function  getCommonItems<T>(arrayA: T[], arrayB: T[]): T[] {
     const  commonItems = [] as T[];
     for (const item of arrayA) {
@@ -1071,7 +1080,6 @@ export function  getCommonItems<T>(arrayA: T[], arrayB: T[]): T[] {
     return  commonItems;
 }
 
-// cutSameItems
 export function  cutSameItems<T>(array: T[]): T[] {
     return  Array.from(new Set<T>(array));
 }
@@ -1115,7 +1123,6 @@ export function  fastUniqueFilter<T>(
 	);
 }
 
-// parseMap
 export async function  parseMap<keyT, valueT>(mapString: string): Promise<Map<keyT, valueT>> {
     const  startIndex = mapString.indexOf('{');
     const  lastIndex = mapString.lastIndexOf('}');
@@ -1201,7 +1208,6 @@ export async function  parseMap<keyT, valueT>(mapString: string): Promise<Map<ke
     return  map;
 }
 
-// isAlphabetIndex
 export function  isAlphabetIndex(index: string): boolean {
     const  lastCharacter = index.slice(-1);
     const  lastCharacterIsNumber = ! isNaN(lastCharacter as any);
@@ -1236,7 +1242,6 @@ export function  fromAlphabetIndex(index: string): number {
     }
 }
 
-// cutAlphabetInIndex
 export function  cutAlphabetInIndex(index: string): string {
     for (var  parentIndex = index;  parentIndex !== '/';  parentIndex = path.dirname(parentIndex)) {
         const  lastCharacter = parentIndex.slice(-1);
@@ -1248,7 +1253,6 @@ export function  cutAlphabetInIndex(index: string): string {
     return  parentIndex;
 }
 
-// hasInterfaceOf
 export namespace  hasInterfaceOf {
     export function  Error(object: any): object is Error {
         return (
@@ -1274,7 +1278,6 @@ var  objectCount = 0;
 
 // User interface group
 
-// InputOption
 export class InputOption {
     inputLines: string[];
     nextLineIndex: number;
@@ -1289,7 +1292,6 @@ export class InputOption {
 
 const  testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\typrm\test_data`+'\\';
 
-// inputOption
 const inputOption = new InputOption([
 /*
     testBaseFolder +`____.yaml`,
@@ -1297,7 +1299,6 @@ const inputOption = new InputOption([
 */
 ]);
 
-// setInputOption
 export function  setInputOption(option: InputOption) {
     Object.assign(inputOption, option);
 }
@@ -1346,23 +1347,19 @@ export async function  inputPath( guide: string ) {
     }
 }
 
-// inputSkip
 export function  inputSkip(count: number) {
     inputOption.nextParameterIndex += count;
 }
 
-// setInputEchoBack
 export function setInputEchoBack(isEnabled: boolean) {
     inputEchoBack = isEnabled;
 }
 var  inputEchoBack = false;
 
-// getInputEchoBack
 export function getInputEchoBack(): boolean {
     return  inputEchoBack;
 }
 
-// StandardInputBuffer
 class  StandardInputBuffer {
     readlines: readline.Interface | undefined;
     inputBuffer: string[] = [];
@@ -1423,7 +1420,6 @@ export function  cutEscapeSequence(textWithEscapeSequence: string) {
     return  textWithEscapeSequence.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
 
-// getSnapshot
 export function  getSnapshot(label: string, deafultSnapshot: string | undefined = undefined) {
     if ( ! (label in snapshots)) {
         if ( ! deafultSnapshot) {
@@ -1514,5 +1510,6 @@ export function  cc( targetCount: number = 9999999, label: string = '0' ) {
     return  { isTarget, debugOut };
 }
 const  gCount: {[name: string]: number} = {};
+const  notFoundInFile = -2;
 const  notFound = -1;
 

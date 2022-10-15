@@ -34,7 +34,6 @@ export function copyFileSync(sourceFilePath, destinationFilePath) {
     fs.mkdirSync(destinationFolderPath, { recursive: true });
     fs.copyFileSync(sourceFilePath, destinationFilePath);
 }
-// rmdirSync
 export function rmdirSync(folderPath) {
     if (fs.existsSync(folderPath)) {
         fs.rmdirSync(folderPath, { recursive: true });
@@ -64,7 +63,6 @@ export async function replaceFileAsync(sourceFilePath, replaceFunction, destinat
     }
     fs.writeFileSync(destinationFilePath, replacedText);
 }
-// searchAsTextSub
 export async function searchAsTextSub(readlineOptions, keyword, csvOption) {
     if (csvOption) {
         var keywords = await parseCSVColumns(keyword);
@@ -115,15 +113,13 @@ export async function searchAsTextSub(readlineOptions, keyword, csvOption) {
         throw exception;
     }
     if (!breaking) {
-        lineNum = 0;
+        lineNum = notFoundInFile;
     }
     return lineNum;
 }
-// addDefaultReadLineOptions
 function addDefaultReadLineOptions(localOptions) {
     return { crlfDelay: Infinity, ...localOptions };
 }
-// pathResolve
 export function pathResolve(path_) {
     // '/c/home' format to current OS format
     if (path_.length >= 3) {
@@ -177,12 +173,80 @@ export function isFullPath(path) {
     if (colonPosition === notFound) {
         var isFullPath = (separatorPosition === 0);
     }
-    else {
+    else if (colonPosition < separatorPosition) {
         var isFullPath = (separatorPosition === colonPosition + 1);
+    }
+    else {
+        var isFullPath = (separatorPosition === 0);
     }
     return isFullPath;
 }
-// checkNotInGitWorking
+export function isInFileSystem(path_) {
+    return !path_.includes('://');
+}
+export function getExistingParentPath(path_) {
+    if (path.sep === '/') {
+        path_ = replacePathToSlashed(path_);
+    }
+    else {
+        path_ = replaceToPathForWindows(path_);
+    }
+    if (!(path_[0] === path.sep || path_.substr(1, 2) === ':' + path.sep)) {
+        return getHomePath();
+    }
+    while (path_ !== path.sep) {
+        if (fs.existsSync(path_)) {
+            return path_;
+        }
+        const nextPath = path.dirname(path_);
+        if (nextPath === path_) {
+            return getHomePath();
+        }
+        path_ = nextPath;
+    }
+    return getHomePath();
+}
+// export function  withHomeVariable(path_: string) {
+//     const  home = getHomePath();
+//     const  homeL = home.toLowerCase().replace(/\\/g, '/');
+//     const  pathL = path_.toLowerCase().replace(/\\/g, '/');
+//     if (pathL.startsWith(homeL)) {
+//         return  '${HOME}' + path_.substring(home.length);
+//     } else {
+//         return  path_;
+//     }
+// }
+export function replacePathToSlashed(path_) {
+    if (path_.substring(0, 2) === "\\\\") {
+        return path_.replace(/\//g, '\\'); // Windows network path
+    }
+    else {
+        path_ = path_.replace(/\\([^ ]|$)/g, '/$1');
+        if (/^([A-Za-z]):/.test(path_)) {
+            path_ = path_[0].toLowerCase() + path_.substring(1);
+            if (fs.existsSync('/mnt/c')) {
+                path_ = '/mnt/' + path_[0] + ':' + path_.substring(2);
+            }
+        }
+        else if (path_.startsWith('/mnt/') && /[A-Za-z]/.test(path_[5]) && (path_[6] === '/' || path_[6] === undefined)) {
+            if (!fs.existsSync('/mnt/c')) {
+                path_ = path_[5] + ':' + path_.substring(6);
+            }
+        }
+        return path_;
+    }
+}
+export function replaceToPathForWindows(path_) {
+    if (path_.startsWith('/mnt/') && /[a-z]/.test(path_[5]) && (path_[6] === '/' || path_[6] === undefined)) {
+        return path_[5].toUpperCase() + ':' + path_.substring(6).replace(/\//g, '\\');
+    }
+    else if (path_[1] === ':') {
+        return path_.substring(0, 2).toUpperCase() + path_.substring(2).replace(/\//g, '\\');
+    }
+    else {
+        return path_.replace(/\//g, '\\');
+    }
+}
 export function checkNotInGitWorking() {
     var path_ = process.cwd();
     if (!path_.includes('extract_git_branches')) {
@@ -198,7 +262,6 @@ export function checkNotInGitWorking() {
         path_ = path.dirname(path_);
     }
 }
-// getTestWorkFolderFullPath
 export function getTestWorkFolderFullPath() {
     var path_ = process.cwd();
     if (!path_.includes('extract_git_branches')) {
@@ -298,7 +361,6 @@ export function cutLast(input, keyword) {
         return input;
     }
 }
-// cutIndent
 export function cutIndent(lines) {
     const nullLength = 99999;
     var minIndentLength = nullLength;
@@ -316,7 +378,6 @@ export function cutIndent(lines) {
     }
     return lines;
 }
-// unexpandVariable
 export function unexpandVariable(expanded, keyValues, out_replacedIndices = null) {
     var replacing = expanded;
     var replacedTag = '\r\n'; // This is not matched with any values
@@ -342,7 +403,6 @@ export function unexpandVariable(expanded, keyValues, out_replacedIndices = null
     const unexpanded = replacing;
     return unexpanded;
 }
-// getIndentWithoutHyphen
 function getIndentWithoutHyphen(line) {
     const match = indentHyphenRegularExpression.exec(line);
     if (match === null) {
@@ -693,7 +753,6 @@ export function checkExpectedTextContents(testingContents, expectedParts, anyLin
         }
     }
 }
-// coloredDiff
 export function coloredDiff(redLine, greenLine, redHeaderLength = 0, greenHeaderLength = 0) {
     const green = chalk.bgGreen.black;
     const red = chalk.bgRed.black;
@@ -714,7 +773,6 @@ export function coloredDiff(redLine, greenLine, redHeaderLength = 0, greenHeader
     }
     return { greenLine, redLine };
 }
-// parseCSVColumns
 export async function parseCSVColumns(columns) {
     if (!columns) {
         return []; // stream.Readable.from(undefined) occurs an error
@@ -743,7 +801,6 @@ export async function parseCSVColumns(columns) {
         return [columns];
     }
 }
-// parseCSVColumnPositions
 export function parseCSVColumnPositions(csv, columns) {
     const positions = [];
     var searchPosition = 0;
@@ -754,11 +811,9 @@ export function parseCSVColumnPositions(csv, columns) {
     }
     return positions;
 }
-// escapeRegularExpression
 export function escapeRegularExpression(expression) {
     return expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }
-// replace
 export function replace(input, replacers) {
     var replacing = input;
     for (const replacer of replacers) {
@@ -782,7 +837,6 @@ export function replace(input, replacers) {
     const replaced = replacing;
     return replaced;
 }
-// replaceAsync
 export async function replaceAsync(input, replacers) {
     var replacing = input;
     for (const replacer of replacers) {
@@ -849,7 +903,6 @@ export async function replaceAsync(input, replacers) {
     const replaced = replacing;
     return replaced;
 }
-// WritableMemoryStream
 class WritableMemoryStream extends Writable {
     constructor() {
         super();
@@ -863,11 +916,8 @@ class WritableMemoryStream extends Writable {
         return this.array.join('');
     }
 }
-// dotenvSecrets
 const dotenvSecrets = {};
-// dotenvInheritToProcessEnv
 var dotenvInheritToProcessEnv = false;
-// loadDotEnvSecrets
 export function loadDotEnvSecrets(inheritProcessEnv = false) {
     dotenvInheritToProcessEnv = inheritProcessEnv;
     if (inheritProcessEnv) {
@@ -884,11 +934,9 @@ export function loadDotEnvSecrets(inheritProcessEnv = false) {
         }
     }
 }
-// getDotEnvSecrets
 export function getDotEnvSecrets() {
     return dotenvSecrets;
 }
-// getProcessEnvAndDotEnvSecrets
 export function getProcessEnvAndDotEnvSecrets() {
     if (dotenvInheritToProcessEnv) {
         return process.env;
@@ -907,7 +955,6 @@ export const indentRegularExpression = /^( |\t)*/;
 //    const  rightOfHyphen = match[3];
 export const indentHyphenRegularExpression = /^(( |\t)*)-(( |\t)*)/;
 // Data group
-// isSameArray
 export function isSameArray(log, answer) {
     if (log.length !== answer.length) {
         return false;
@@ -929,7 +976,6 @@ export function isSameArrayOf(log, answer) {
     const isSame = (matched.length === answer.length && log.length === answer.length);
     return isSame;
 }
-// getCommonItems
 export function getCommonItems(arrayA, arrayB) {
     const commonItems = [];
     for (const item of arrayA) {
@@ -939,7 +985,6 @@ export function getCommonItems(arrayA, arrayB) {
     }
     return commonItems;
 }
-// cutSameItems
 export function cutSameItems(array) {
     return Array.from(new Set(array));
 }
@@ -965,7 +1010,6 @@ export function lastUniqueFilterFunction(isSameFunction) {
 export function fastUniqueFilter(array, getKeyFunction) {
     return Array.from(new Map(array.map((element) => [getKeyFunction(element), element])).values());
 }
-// parseMap
 export async function parseMap(mapString) {
     const startIndex = mapString.indexOf('{');
     const lastIndex = mapString.lastIndexOf('}');
@@ -1048,7 +1092,6 @@ export async function parseMap(mapString) {
     // }
     return map;
 }
-// isAlphabetIndex
 export function isAlphabetIndex(index) {
     const lastCharacter = index.slice(-1);
     const lastCharacterIsNumber = !isNaN(lastCharacter);
@@ -1083,7 +1126,6 @@ export function fromAlphabetIndex(index) {
         return NaN;
     }
 }
-// cutAlphabetInIndex
 export function cutAlphabetInIndex(index) {
     for (var parentIndex = index; parentIndex !== '/'; parentIndex = path.dirname(parentIndex)) {
         const lastCharacter = parentIndex.slice(-1);
@@ -1094,7 +1136,6 @@ export function cutAlphabetInIndex(index) {
     }
     return parentIndex;
 }
-// hasInterfaceOf
 export var hasInterfaceOf;
 (function (hasInterfaceOf) {
     function Error(object) {
@@ -1117,7 +1158,6 @@ export function getObjectID(object) {
 const objectIDs = new WeakMap;
 var objectCount = 0;
 // User interface group
-// InputOption
 export class InputOption {
     constructor(inputLines) {
         this.inputLines = inputLines;
@@ -1126,14 +1166,12 @@ export class InputOption {
     }
 }
 const testBaseFolder = String.raw `R:\home\mem_cache\MyDoc\src\TypeScript\typrm\test_data` + '\\';
-// inputOption
 const inputOption = new InputOption([
 /*
     testBaseFolder +`____.yaml`,
     String.raw `file`,
 */
 ]);
-// setInputOption
 export function setInputOption(option) {
     Object.assign(inputOption, option);
 }
@@ -1176,20 +1214,16 @@ export async function inputPath(guide) {
         return pathResolve(key);
     }
 }
-// inputSkip
 export function inputSkip(count) {
     inputOption.nextParameterIndex += count;
 }
-// setInputEchoBack
 export function setInputEchoBack(isEnabled) {
     inputEchoBack = isEnabled;
 }
 var inputEchoBack = false;
-// getInputEchoBack
 export function getInputEchoBack() {
     return inputEchoBack;
 }
-// StandardInputBuffer
 class StandardInputBuffer {
     constructor() {
         this.inputBuffer = [];
@@ -1244,7 +1278,6 @@ export function getInputObject() {
 export function cutEscapeSequence(textWithEscapeSequence) {
     return textWithEscapeSequence.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
-// getSnapshot
 export function getSnapshot(label, deafultSnapshot = undefined) {
     if (!(label in snapshots)) {
         if (!deafultSnapshot) {
@@ -1334,5 +1367,6 @@ export function cc(targetCount = 9999999, label = '0') {
     return { isTarget, debugOut };
 }
 const gCount = {};
+const notFoundInFile = -2;
 const notFound = -1;
 //# sourceMappingURL=lib.js.map

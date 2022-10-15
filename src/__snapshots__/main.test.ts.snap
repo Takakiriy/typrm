@@ -479,27 +479,27 @@ checked file count = 1, template count = 1
 exports[`checks file contents >> First >> environment_variable: sourceFileContents 1`] = `
 "setting: #settings:
     __Base__: ../../file_target/1
-    $env.TYPRM_TEST_ENV:  __TestEnv__
+    $env.TYPRM_TEST_ENV2: __TestEnv__
     $env.TYPRM_TEST_PATH: __PathEnv__
     $env.TEST_SECRET: __Secret__
 OK:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
-        - TYPRM_TEST_ENV  = __TestEnv__  #OK  #template: TYPRM_TEST_ENV  = $env.TYPRM_TEST_ENV
+        - TYPRM_TEST_ENV2 = __TestEnv__  #OK  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
         - TYPRM_TEST_PATH = __PathEnv__  #OK  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
         - TEST_SECRET = __Secret__  #OK  #template: TEST_SECRET = $env.TEST_SECRET
 NG-a:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
-        - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+        - TYPRM_TEST_ENV2 = __Bad__  #NG-a  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
 NG-b:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
-        - TYPRM_TEST_ENV  = __TestEnv__  #NG-b  #template: TYPRM_TEST_ENV  = $env.TYPRM_TEST_ENV
+        - TYPRM_TEST_ENV2 = __TestEnv__  #NG-b  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
         - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
 NG-c:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
-        - TYPRM_TEST_ENV = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+        - TYPRM_TEST_ENV2 = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
 NG-d:
     ../../file_target/1/file_5.yaml : |  #file-template: __Base__/file_5.yaml
-        - TYPRM_TEST_ENV  = __TestEnv__  #NG-d  #template: TYPRM_TEST_ENV  = $env.TYPRM_TEST_ENV
+        - TYPRM_TEST_ENV2 = __TestEnv__  #NG-d  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
         - TYPRM_TEST_PATH = __PathEnv__  #NG-d  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
 "
 `;
@@ -507,15 +507,15 @@ NG-d:
 exports[`checks file contents >> First >> environment_variable: stdout 1`] = `
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:1: setting: #settings:
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:3:     $env.TYPRM_TEST_ENV:  __TestEnv__
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:3:     $env.TYPRM_TEST_ENV2: __TestEnv__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV2 = __Bad__  #NG-a  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
     Warning: Not matched with the template.
-    Expected: TYPRM_TEST_ENV = __TestEnv__
+    Expected: TYPRM_TEST_ENV2 = __TestEnv__
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV = __Bad__  #NG-a  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV2 = __Bad__  #NG-a  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:0: (Not found)
     Warning: Not same as file contents
-    Expected: - TYPRM_TEST_ENV = __Bad__  #NG-a
+    Expected: - TYPRM_TEST_ENV2 = __Bad__  #NG-a
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:1: setting: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:4:     $env.TYPRM_TEST_PATH: __PathEnv__
@@ -528,10 +528,10 @@ exports[`checks file contents >> First >> environment_variable: stdout 1`] = `
     Warning: Not same as file contents
     Expected: - TYPRM_TEST_PATH = __Bad__  #NG-b
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:20:         - TYPRM_TEST_ENV = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV = $env.TYPRM_TEST_ENV
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:20:         - TYPRM_TEST_ENV2 = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:0: (Not found)
     Warning: Not same as file contents
-    Expected: - TYPRM_TEST_ENV = testEnv  #NG-c
+    Expected: - TYPRM_TEST_ENV2 = testEnv  #NG-c
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:24:         - TYPRM_TEST_PATH = __PathEnv__  #NG-d  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:9: - TYPRM_TEST_PATH = C:\\\\_____Test  #NG-d
@@ -2219,9 +2219,9 @@ Verbose: Phase 1: parse settings ...  \${HOME}/GitProjects/GitHub/typrm/src/test
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
-        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV2 == testEnv
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
-        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV2 != testEnv
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
@@ -2295,7 +2295,7 @@ Verbose: Phase 3: check ...
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
-        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV == testEnv  (true, TYPRM_TEST_ENV = testEnv)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV2 == testEnv  (true, TYPRM_TEST_ENV2 = testEnv)
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
@@ -2303,7 +2303,7 @@ Verbose: Phase 3: check ...
     Warning: Not matched with the template.
     Expected: value2
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
-        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV != testEnv  (false, TYPRM_TEST_ENV = testEnv)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV2 != testEnv  (false, TYPRM_TEST_ENV2 = testEnv)
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
         Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
 
@@ -2333,9 +2333,9 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
         bad2  #template: var2
     #if: $settings.var2 != value2
         bad2  #template: var2
-    #if: $env.TYPRM_TEST_ENV == testEnv
+    #if: $env.TYPRM_TEST_ENV2 == testEnv
         bad2  #template: var2
-    #if: $env.TYPRM_TEST_ENV != testEnv
+    #if: $env.TYPRM_TEST_ENV2 != testEnv
         bad2  #template: var2
     #if: true
         bad2  #template: var2
@@ -6107,11 +6107,21 @@ typrm keyword: exit()
 "
 `;
 
-exports[`typrm shell >> search >> snippet_environment_variable: stdout 1`] = `
+exports[`typrm shell >> search >> snippet_environment_variable: stdout-Linux 1`] = `
 "typrm keyword: snippet_environment_variable
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:197: typrm shell >> search >> snippet_environment_variable:
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:201:     snippet_environment_variable: #keyword:
-    - (testEnv)
+    - (\${HOME}/GitProjects/GitHub/typrm/src/test_data)
+    - s3C6E72
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> snippet_environment_variable: stdout-Windows 1`] = `
+"typrm keyword: snippet_environment_variable
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:197: typrm shell >> search >> snippet_environment_variable:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:201:     snippet_environment_variable: #keyword:
+    - (\${HOME}\\\\GitProjects\\\\GitHub\\\\typrm\\\\src\\\\test_data)
     - s3C6E72
 typrm keyword: exit()
 "
@@ -6130,12 +6140,12 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
-"typrm keyword: #ref: "../README.md#parameters"
-Recommend: #ref: ../README.md#parameters
-../README.md:5
+"typrm keyword: #ref: "\${HOME}/GitProjects/GitHub/typrm/README.md#parameters"
+Recommend: #ref: ~/GitProjects/GitHub/typrm/README.md#parameters
+\${HOME}/GitProjects/GitHub/typrm/README.md:5
     7.Test Echo, 0.Folder
 typrm keyword or number: 7
- "ref:  ../README.md#parameters";  echo  "file: ../README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
+ "ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters";  echo  "file: \${HOME}/GitProjects/GitHub/typrm/README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
 typrm keyword or number: 
 typrm keyword: 7
 typrm keyword: exit()
@@ -6143,13 +6153,13 @@ typrm keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
-"typrm keyword: #ref: "../README.md#parameters"
-Recommend: #ref: ../README.md#parameters
-../README.md:5
+"typrm keyword: #ref: "\${HOME}/GitProjects/GitHub/typrm/README.md#parameters"
+Recommend: #ref: ~/GitProjects/GitHub/typrm/README.md#parameters
+\${HOME}/GitProjects/GitHub/typrm/README.md:5
     7.Test Echo, 0.Folder
 typrm keyword or number: 7
-ref:  ../README.md#parameters
-file: ../README.md
+ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters
+file: \${HOME}/GitProjects/GitHub/typrm/README.md
 fragment: parameters
 lineNum: 5
 typrm keyword or number: 
@@ -6160,8 +6170,8 @@ typrm keyword: exit()
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
 "typrm keyword: file_path
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
-../README.md:1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
+\${HOME}/GitProjects/GitHub/typrm/README.md:1
     7.Test Echo, 0.Folder
 typrm keyword or number: exit()
 "
@@ -6169,8 +6179,8 @@ typrm keyword or number: exit()
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
 "typrm keyword: file_path
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ../README.md#typrm
-../README.md:1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
+\${HOME}/GitProjects/GitHub/typrm/README.md:1
     7.Test Echo, 0.Folder
 typrm keyword or number: exit()
 "
