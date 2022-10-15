@@ -9,6 +9,7 @@ import * as child_process from 'child_process';
 import * as lib from "./lib";
 import sharp from 'sharp';
 import { pp } from "./lib";
+var  __dirname: string = path.resolve();
 
 // main
 export async function  main() {
