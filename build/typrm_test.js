@@ -13,7 +13,8 @@ else {
 }
 const scriptPath = `../build/typrm.js`;
 const testFolderPath = `test_data` + path.sep;
-const normalizedHomePath = 'c' + lib.getHomePath().substring(1).replace(/\\/g, '/');
+var normalizedHomePath = lib.getHomePath().replace(/\\/g, '/');
+normalizedHomePath = normalizedHomePath[0].toLowerCase() + normalizedHomePath.substring(1);
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
 process.env.TYPRM_COMMAND_FOLDER = process.cwd();

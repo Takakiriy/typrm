@@ -20,7 +20,8 @@ if (process.env.windir) {
 } else {
     var  testingOS = 'Linux';
 }
-const  normalizedHomePath = 'c' + lib.getHomePath().substring(1).replace(/\\/g, '/');
+var  normalizedHomePath = lib.getHomePath().replace(/\\/g, '/');
+normalizedHomePath = normalizedHomePath[0].toLowerCase() + normalizedHomePath.substring(1);
 process.env.TYPRM_TEST_ENV = lib.getFullPath('test_data', __dirname);
 process.env.TYPRM_TEST_SEARCH = 'search';
 process.env.TYPRM_TEST_ENV2 = 'testEnv';
@@ -1043,7 +1044,7 @@ describe("searches keyword tag >>", () => {
             ["search", "picture"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", locale: "en-US" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
-            'ERROR: not found a file or folder at "\\path"\n' +
+            'ERROR: not found a file or folder at "/path"\n'.replace(/\//g, path.sep) +
             lib.getHomePath() + '\n' +
             '    0.Folder\n',
         ],[
@@ -1195,7 +1196,7 @@ describe("searches glossary tag >>", () => {
         ["search", "picture"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', test: "", locale: 'en-US' },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('picture')}:  ${refColor('#ref: /path#hash')}  #search: ${searchColor('keyword')}\n` +
-        'ERROR: not found a file or folder at "\\path#hash"\n' +
+        'ERROR: not found a file or folder at "/path#hash"\n'.replace(/\//g, path.sep) +
         lib.getHomePath() +'\n'+
         '    0.Folder\n',
     ],[
@@ -1443,8 +1444,7 @@ describe("print reference >>", () => {
                     "    0.Folder\n"
                 : // Linux, mac
                     "Recommend: #ref: /Users\n" +
-                    `ERROR: not found a file or folder at \"/Users\"\n` +
-                    lib.getHomePath() +"\n" +  // USERPROFILE, if pc is not found
+                    "/Users\n" +
                     "    0.Folder\n",
             ],[
                 "root",
@@ -1464,7 +1464,7 @@ describe("print reference >>", () => {
                     "    0.Folder\n"
                 : // Linux, mac
                     "Recommend: #ref: c:/\n" +
-                    `ERROR: not found a file or folder at \"C:/\"\n` +
+                    `ERROR: not found a file or folder at \"c:/\"\n` +
                     lib.getHomePath() +"\n" +  // USERPROFILE, if pc is not found
                     "    0.Folder\n",
             ],[
@@ -1620,20 +1620,41 @@ describe("print reference >>", () => {
                 : // mac
                     "Verbose: Option and environment variables:\n" +
                     `    Verbose: TYPRM_TEST_ENV = ${__dirname}/test_data\n` +
+                    "    Verbose: TYPRM_TEST_SEARCH = search\n" +
+                    "    Verbose: TYPRM_TEST_ENV2 = testEnv\n" +
                     "    Verbose: TYPRM_TEST_PATH = C:\\Test\n" +
-                    "    Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
-                    "        Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
-                    "        Verbose: type: text\n" +
-                    "        Verbose: filePathRegularExpressionIndex: 1\n" +
-                    "        Verbose: keywordRegularExpressionIndex: 7\n" +
-                    "        Verbose: csvOptionRegularExpressionIndex: 3\n" +
-                    "        Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
-                    "        Verbose: address: ${file}:${lineNum}\n" +
+                    ( defaultUsesLineNumGetter ?
+                        "    Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                        "        Verbose: regularExpression: ^https?://\n" +
+                        "        Verbose: type: keep\n" +
+                        "        Verbose: filePathRegularExpressionIndex: undefined\n" +
+                        "    Verbose: TYPRM_LINE_NUM_GETTER[1]:\n" +
+                        "        Verbose: regularExpression: ^(.*\\.html)(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                        "        Verbose: type: keep\n" +
+                        "        Verbose: filePathRegularExpressionIndex: 1\n" +
+                        "    Verbose: TYPRM_LINE_NUM_GETTER[2]:\n" +
+                        "        Verbose: regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                        "        Verbose: type: text\n" +
+                        "        Verbose: filePathRegularExpressionIndex: 1\n" +
+                        "        Verbose: keywordRegularExpressionIndex: 6\n" +
+                        "        Verbose: csvOptionRegularExpressionIndex: 2\n" +
+                        "        Verbose: targetMatchIdRegularExpressionIndex: 4\n" +
+                        "        Verbose: address: ${file}:${lineNum}\n"
+                    :
+                        "    Verbose: TYPRM_LINE_NUM_GETTER[0]:\n" +
+                        "        Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                        "        Verbose: type: text\n" +
+                        "        Verbose: filePathRegularExpressionIndex: 1\n" +
+                        "        Verbose: keywordRegularExpressionIndex: 7\n" +
+                        "        Verbose: csvOptionRegularExpressionIndex: 3\n" +
+                        "        Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
+                        "        Verbose: address: ${file}:${lineNum}\n"
+                    ) +
                     "    Verbose: TYPRM_VERB[0]:\n" +
-                    "        Verbose: regularExpression: ^.*\\.md(#.*)?\$\n" +
+                    "        Verbose: regularExpression: ^.*\\.(md|html)(#.*)?\$\n" +
                     "        Verbose: label: 7.Test Echo\n" +
                     "        Verbose: number: 7\n" +
-                    "        Verbose: command: echo  \"{ref: \${ref}, windowsRef: \${windowsRef}, file: \${file}, windowsFile: \${windowsFile}, existingAddress: ${existingAddress}, windowsExistingAddress: ${windowsExistingAddress}, fragment: \${fragment}, lineNum: ${lineNum}}\"\n" +
+                    "        Verbose: command: wr='${windowsRef}' wf='${windowsFile}' we='${windowsExistingAddress}'  bash -c  'echo  \"{ref: \${ref}, windowsRef: \${wr}, file: \${file}, windowsFile: \${wf}, existingAddress: ${existingAddress}, windowsExistingAddress: ${we}, fragment: \${fragment}, lineNum: ${lineNum}}\"'\n" +
                     "    Verbose: TYPRM_VERB[1]:\n" +
                     "        Verbose: regularExpression: ^.*\\.(svg|svgz)(#.*)?\$\n" +
                     "        Verbose: label: 1.View\n" +
@@ -1646,13 +1667,23 @@ describe("print reference >>", () => {
                     "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
                     `    Verbose: address in ref tag: ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md\n` +
                     "    Verbose: type: text\n" +
-                    "    Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
-                    "    Verbose: filePathRegularExpressionIndex: 1\n" +
-                    "    Verbose: keywordRegularExpressionIndex: 7\n" +
-                    "    Verbose: csvOptionRegularExpressionIndex: 3\n" +
-                    "    Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
-                    "    Verbose: address: ${file}:${lineNum}\n" +
-                    `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, md, , , , , ]\n` +
+                    ( defaultUsesLineNumGetter ?
+                        "    Verbose: regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                        "    Verbose: filePathRegularExpressionIndex: 1\n" +
+                        "    Verbose: keywordRegularExpressionIndex: 6\n" +
+                        "    Verbose: csvOptionRegularExpressionIndex: 2\n" +
+                        "    Verbose: targetMatchIdRegularExpressionIndex: 4\n" +
+                        "    Verbose: address: ${file}:${lineNum}\n" +
+                        `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, , , , , ]\n`
+                    :
+                        "    Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
+                        "    Verbose: filePathRegularExpressionIndex: 1\n" +
+                        "    Verbose: keywordRegularExpressionIndex: 7\n" +
+                        "    Verbose: csvOptionRegularExpressionIndex: 3\n" +
+                        "    Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
+                        "    Verbose: address: ${file}:${lineNum}\n" +
+                        `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, md, , , , , ]\n`
+                    ) +
                     "Error that verb number 4 is not defined\n",
             ],
             // Others test is "search_mode_ref_verb".

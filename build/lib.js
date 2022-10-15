@@ -199,7 +199,7 @@ export function getExistingParentPath(path_) {
             return path_;
         }
         const nextPath = path.dirname(path_);
-        if (nextPath === path_) {
+        if (nextPath === path_ || nextPath === '.') { // dirname('c:/') === '.' in mac
             return getHomePath();
         }
         path_ = nextPath;
