@@ -10,6 +10,7 @@ import * as lib from "./lib";
 import sharp from 'sharp';
 import { pp } from "./lib";
 var  __dirname: string = path.resolve();
+// var  debugSearchScore = false;
 
 // main
 export async function  main() {
@@ -2972,6 +2973,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 
     // search
     for (const inputFileFullPath of fileFullPaths) {
+        // if (debugSearchScore) {
+        //     console.log(`searchSub: ${inputFileFullPath}`);
+        // }
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -3267,13 +3271,14 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 }
 
 function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, thesaurus: Thesaurus): FoundLine {
+    const  found = subMain();
+    return  found;
 
     function  subMain() {
         const  bestFound = targetStrings.reduce(
             (bestFound: FoundLine, aTargetString: string, stringIndex: number) => {
                 const  keywords = keyphrase.split(' ');
                 const  found = new FoundLine();
-
                 var    previousPosition = -1;
                 var    isNormalizedMatched = false;
                 const  normalizedTargetKeywords = thesaurus.normalize(aTargetString);
@@ -3295,6 +3300,9 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                         }
                         found.score += notNormalizedScore;
                         found.matchedKeywordCount += 1;
+                        // if (debugSearchScore) {
+                        //     console.log(`    getSubMatchedScore: ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                        // }
                     }
                     if (result.position !== notFound) {
                         matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
@@ -3310,11 +3318,14 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                                 normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, targetType, found);
                             if (result.score !== 0) {
                                 if (result.position > previousPosition) {
-                                    found.score += result.score * orderMatchScore;
+                                    found.score += result.score + orderMatchScore;
                                 } else {
                                     found.score += result.score;
                                 }
                                 found.matchedKeywordCount += 1;
+                                // if (debugSearchScore) {
+                                //     console.log(`    getSubMatchedScore(thesaurus): ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                                // }
                             }
                             if (result.position !== notFound) {
                                 matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
@@ -3350,6 +3361,9 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                     } else {
                         found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTargetKeywords.split(' ').length);
                     }
+                    // if (debugSearchScore) {
+                    //     console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                    // }
                 }
                 const  matches = bestFound.matches.concat(found.matches);
                 if (isNormalizedMatched) {
@@ -3418,9 +3432,6 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
         }
         return { score, position };
     }
-
-    const  found = subMain();
-    return  found;
 }
 
 function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
@@ -3488,6 +3499,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     }
 
     for (const inputFileFullPath of await listUpFilePaths()) {
+        // if (debugSearchScore) {
+        //     console.log(`searchWithoutTags: ${inputFileFullPath}`);
+        // }
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -3523,6 +3537,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                         lineFullMatchScore + keywords.trim().length - line.trim().length;
                     foundLines.push(found);
+                    // if (debugSearchScore) {
+                    //     console.log(`    searchWithoutTags(full match): ${found.score}, ${line}`);
+                    // }
                 }
 
                 // shuffled keywords match
@@ -3571,6 +3588,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                             matchCount += 1;
 
                             foundLines.push(found);
+                            // if (debugSearchScore) {
+                            //     console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
+                            // }
                         }
                     }
                 }
@@ -5325,8 +5345,8 @@ function  searchDefinedSettingIndexInCurrentLevel(
 }
 
 class Thesaurus {
-    synonym: {[word: string]: string} = {};  // the value is the normalized word
-    get  enabled(): boolean { return Object.keys(this.synonym).length !== 0; }
+    synonym = new Map<string, string>();  // the value is the normalized word
+    get  enabled(): boolean { return this.synonym.size !== 0; }
 
     async  load(csvFilePath: string): Promise<void> {
         const  promise = new Promise<void>((resolveFunction, _rejectFunction) => {
@@ -5342,7 +5362,7 @@ class Thesaurus {
                             const  synonyms = columns;
                             synonyms.forEach( (synonym: string) => {
 
-                                this.synonym[synonym.toLowerCase()] = normalizedKeyword;
+                                this.synonym.set(synonym.toLowerCase(), normalizedKeyword);
                             });
                         }
                     })
@@ -5357,9 +5377,9 @@ class Thesaurus {
         const  words = keyphrase.split(' ');
         for (let i = 0;  i < words.length;  i+=1) {
             const  word = words[i].toLowerCase();
-            if (word in this.synonym) {
+            if (this.synonym.has(word)) {
 
-                words[i] = this.synonym[word];
+                words[i] = this.synonym.get(word)!;
             }
         }
         const   normalizedKeyphrase = words.join(' ');
