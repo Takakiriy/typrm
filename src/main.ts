@@ -2324,12 +2324,14 @@ async function  check(checkingFilePath?: string) {
     const  currentFolderBackUp = process.cwd();
     const  copyTags: CopyTag.Properties[] = await CopyTag.scanAllTemplate(checkingFilePath);
     var    fileCount = 0;
+    var    toTagCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
             fileCount += 1;
 
             await checkRoutine(inputFileFullPath, copyTags, parser);
         }
+        toTagCount = parser.toTagList.length;
         parser.flushToTagList();
     } catch (e: any) {
         console.log('');
@@ -2343,7 +2345,8 @@ async function  check(checkingFilePath?: string) {
 
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
-    console.log(`checked file count = ${fileCount}, template count = ${parser.templateCount}`);
+    console.log(`checked file count = ${fileCount}, template count = ${parser.templateCount}, ` +
+        `#to tag count = ${toTagCount}`);
 }
 
 namespace CopyTag {
