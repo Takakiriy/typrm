@@ -1670,10 +1670,16 @@ search (s) コマンドに `#ref:` タグを付けてファイルのパスとパ
 行番号に置き換えて表示するには、
 `TYPRM_LINE_NUM_GETTER` 環境変数に以下のような YAML を設定します。
 ただし、`regularExpression` の設定は環境に応じて編集してください。
+`#ref:` タグの値が複数の `regularExpression` にマッチした場合、上に書かれた設定が優先されます。
+`type` が `keep` に設定されている `regularExpression` にマッチした場合は、行番号に置き換えません。
 
 Windows の PowerShell の場合:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
+        - #
+            regularExpression: ^(.*\.(pdf|html))(:csv)?(:id=([0-9]+))?(#(.*))?`$
+            type: keep
+            filePathRegularExpressionIndex: 1
         - #
             regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?`$
             type: text
@@ -1689,6 +1695,10 @@ Windows の PowerShell の場合:
 bash, zsh の場合:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
+        - #
+            regularExpression: ^(.*\.(pdf|html))(:csv)?(:id=([0-9]+))?(#(.*))?$
+            type: keep
+            filePathRegularExpressionIndex: 1
         - #
             regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$
             type: text

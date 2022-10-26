@@ -1753,10 +1753,16 @@ set the `TYPRM_LINE_NUM_GETTER` environment variable in YAML format
 as follows.
 Note that you should edit the `regularExpression` setting
 according to your environment.
+If `#ref:` tag value was matched with multiple `regularExpression`, the settings written above take precedence.
+If it matches a `regularExpression` with `type` set to `keep`, it will not be replaced with the line number.
 
 Case of Windows PowerShell:
 
     ${env:TYPRM_LINE_NUM_GETTER} = @"
+        - #
+            regularExpression: ^(.*\.(pdf|html))(:csv)?(:id=([0-9]+))?(#(.*))?`$
+            type: keep
+            filePathRegularExpressionIndex: 1
         - #
             regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?`$
             type: text
@@ -1772,6 +1778,10 @@ Case of Windows PowerShell:
 Case of bash or zsh:
 
     export  TYPRM_LINE_NUM_GETTER=$(cat <<- '__HERE_DOCUMENT__'
+        - #
+            regularExpression: ^(.*\.(pdf|html))(:csv)?(:id=([0-9]+))?(#(.*))?$
+            type: keep
+            filePathRegularExpressionIndex: 1
         - #
             regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$
             type: text

@@ -10,6 +10,7 @@ import * as lib from "./lib";
 import sharp from 'sharp';
 import { pp } from "./lib";
 var __dirname = path.resolve();
+// var  debugSearchScore = false;
 // main
 export async function main() {
     startTestRedirect();
@@ -2793,6 +2794,9 @@ async function searchSub(keyword, isMutual) {
     }
     // search
     for (const inputFileFullPath of fileFullPaths) {
+        // if (debugSearchScore) {
+        //     console.log(`searchSub: ${inputFileFullPath}`);
+        // }
         const reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -3073,6 +3077,8 @@ async function searchSub(keyword, isMutual) {
     }
 }
 function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
+    const found = subMain();
+    return found;
     function subMain() {
         const bestFound = targetStrings.reduce((bestFound, aTargetString, stringIndex) => {
             const keywords = keyphrase.split(' ');
@@ -3099,6 +3105,9 @@ function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
                     }
                     found.score += notNormalizedScore;
                     found.matchedKeywordCount += 1;
+                    // if (debugSearchScore) {
+                    //     console.log(`    getSubMatchedScore: ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                    // }
                 }
                 if (result.position !== notFound) {
                     matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
@@ -3112,12 +3121,15 @@ function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
                         const result = getSubMatchedScore(normalizedTargetKeywords, normalizedKeyword, normalizedKeyword.toLowerCase(), stringIndex, targetType, found);
                         if (result.score !== 0) {
                             if (result.position > previousPosition) {
-                                found.score += result.score * orderMatchScore;
+                                found.score += result.score + orderMatchScore;
                             }
                             else {
                                 found.score += result.score;
                             }
                             found.matchedKeywordCount += 1;
+                            // if (debugSearchScore) {
+                            //     console.log(`    getSubMatchedScore(thesaurus): ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                            // }
                         }
                         if (result.position !== notFound) {
                             matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
@@ -3155,6 +3167,9 @@ function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
                 else {
                     found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTargetKeywords.split(' ').length);
                 }
+                // if (debugSearchScore) {
+                //     console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                // }
             }
             const matches = bestFound.matches.concat(found.matches);
             if (isNormalizedMatched) {
@@ -3215,8 +3230,6 @@ function getKeywordMatchingScore(targetStrings, keyphrase, thesaurus) {
         }
         return { score, position };
     }
-    const found = subMain();
-    return found;
 }
 function compareScoreAndSoOn(a, b) {
     var different = 0;
@@ -3275,6 +3288,9 @@ async function searchWithoutTags(keywords) {
         return false;
     }
     for (const inputFileFullPath of await listUpFilePaths()) {
+        // if (debugSearchScore) {
+        //     console.log(`searchWithoutTags: ${inputFileFullPath}`);
+        // }
         const reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -3310,6 +3326,9 @@ async function searchWithoutTags(keywords) {
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                         lineFullMatchScore + keywords.trim().length - line.trim().length;
                     foundLines.push(found);
+                    // if (debugSearchScore) {
+                    //     console.log(`    searchWithoutTags(full match): ${found.score}, ${line}`);
+                    // }
                 }
                 // shuffled keywords match
                 else if (matchCount < programOptions.foundCountMax) {
@@ -3352,6 +3371,9 @@ async function searchWithoutTags(keywords) {
                         if (keywordIndex !== notFound) {
                             matchCount += 1;
                             foundLines.push(found);
+                            // if (debugSearchScore) {
+                            //     console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
+                            // }
                         }
                     }
                 }
@@ -4895,9 +4917,9 @@ function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, s
 }
 class Thesaurus {
     constructor() {
-        this.synonym = {}; // the value is the normalized word
+        this.synonym = new Map(); // the value is the normalized word
     }
-    get enabled() { return Object.keys(this.synonym).length !== 0; }
+    get enabled() { return this.synonym.size !== 0; }
     async load(csvFilePath) {
         const promise = new Promise((resolveFunction, _rejectFunction) => {
             fs.createReadStream(csvFilePath)
@@ -4908,7 +4930,7 @@ class Thesaurus {
                     columns.shift();
                     const synonyms = columns;
                     synonyms.forEach((synonym) => {
-                        this.synonym[synonym.toLowerCase()] = normalizedKeyword;
+                        this.synonym.set(synonym.toLowerCase(), normalizedKeyword);
                     });
                 }
             })
@@ -4922,8 +4944,8 @@ class Thesaurus {
         const words = keyphrase.split(' ');
         for (let i = 0; i < words.length; i += 1) {
             const word = words[i].toLowerCase();
-            if (word in this.synonym) {
-                words[i] = this.synonym[word];
+            if (this.synonym.has(word)) {
+                words[i] = this.synonym.get(word);
             }
         }
         const normalizedKeyphrase = words.join(' ');
