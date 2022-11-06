@@ -121,6 +121,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
             const log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
                 `#to: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
             parser.toTagList.push(log);
+            parser.totalToTagCount += 1;
         }
     }
     if (parser.outputToTagList) {
@@ -2175,13 +2176,11 @@ async function check(checkingFilePath) {
     const currentFolderBackUp = process.cwd();
     const copyTags = await CopyTag.scanAllTemplate(checkingFilePath);
     var fileCount = 0;
-    var toTagCount = 0;
     try {
         for (const inputFileFullPath of await listUpFilePaths(checkingFilePath)) {
             fileCount += 1;
             await checkRoutine(inputFileFullPath, copyTags, parser);
         }
-        toTagCount = parser.toTagList.length;
         parser.flushToTagList();
     }
     catch (e) {
@@ -2196,7 +2195,7 @@ async function check(checkingFilePath) {
     console.log('');
     console.log(`${translate('Warning')}: ${parser.warningCount}, ${translate('Error')}: ${parser.errorCount}`);
     console.log(`checked file count = ${fileCount}, template count = ${parser.templateCount}, ` +
-        `#to tag count = ${toTagCount}`);
+        `#to tag count = ${parser.totalToTagCount}`);
 }
 var CopyTag;
 (function (CopyTag) {
@@ -5394,6 +5393,7 @@ class Parser {
         this.ifTagErrorMessageIsEnabled = true;
         this.outputToTagList = false;
         this.toTagList = [];
+        this.totalToTagCount = 0;
         this.originalTagList = [];
     }
     flushToTagList() {

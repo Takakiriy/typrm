@@ -5762,7 +5762,7 @@ exports[`typrm shell >> replace >> check: stdout 1`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: #c
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5774,7 +5774,7 @@ typrm keyword: #c
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: exit()
 "
 `;
@@ -5791,7 +5791,7 @@ exports[`typrm shell >> replace >> check: stdout 2`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: #check:
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5803,7 +5803,7 @@ typrm keyword: #check:
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: exit()
 "
 `;
@@ -5820,7 +5820,7 @@ exports[`typrm shell >> replace >> check: stdout 3`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: #c _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5832,7 +5832,7 @@ typrm keyword: #c _tmp.yaml
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: exit()
 "
 `;
@@ -5849,7 +5849,7 @@ exports[`typrm shell >> replace >> check: stdout 4`] = `
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: #check: _tmp.yaml
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1 => value1_replaced
@@ -5861,7 +5861,7 @@ typrm keyword: #check: _tmp.yaml
     Expected: value1
 
 Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
+checked file count = 1, template count = 1, #to tag count = 1
 typrm keyword: exit()
 "
 `;

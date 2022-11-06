@@ -2,9 +2,9 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Build and basic test",
             "type": "node",
             "request": "launch",
-            "name": "Run TypeScript",
             "preLaunchTask": "TypeScript Compile Task",
             "program": "${workspaceFolder}/src/typrm_test.ts",
             "runtimeArgs": ["--experimental-specifier-resolution=node"],
@@ -14,6 +14,37 @@
             "outFiles": [
                 "${workspaceFolder}/build/**/*.js"
             ]
+        },
+        {
+            "name": "Debug from launch",
+            "type": "node",
+            "request": "launch",
+            "preLaunchTask": "TypeScript Compile Task",
+            "program": "${workspaceFolder}/src/typrm.ts",
+            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "args": ["--verbose"],
+            "cwd": "${workspaceFolder}/src",
+            "smartStep": true,
+            "outFiles": [
+                "${workspaceFolder}/build/**/*.js"
+            ]
+        },
+        {
+            "name": "Attach a process",
+            "type": "node",
+            "request": "attach",
+            "processId": "${command:PickProcess}"
+        },
+        {
+            "name": "Debug Jest Tests (under constuct)",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest",
+                "--runInBand",
+                "--coverage", "false"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

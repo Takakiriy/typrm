@@ -159,6 +159,7 @@ declare class Parser {
     ifTagErrorMessageIsEnabled: boolean;
     outputToTagList: boolean;
     toTagList: string[];
+    totalToTagCount: number;
     originalTagList: string[];
     flushToTagList(): void;
 }
