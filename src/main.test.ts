@@ -170,7 +170,9 @@ describe("checks template value >>", () => {
     ])("%s", async (caseName, options) => {
         initializeTestInputFile(`checks template value >> ${caseName}: sourceFileContents 1`);
         if ('multiFiles' in options) {
-            lib.copyFileSync(`${testFolderPath}_tmp/_tmp.yaml`, `${testFolderPath}_tmp/_tmp_2.yaml`);
+            chdirInProject('src');
+            writeFileSync(`${testFolderPath}_tmp/_tmp_2.yaml`,
+                lib.getSnapshot(`checks template value >> ${caseName}: sourceFileContents 2`));
         }
         process.chdir('empty_folder');
 

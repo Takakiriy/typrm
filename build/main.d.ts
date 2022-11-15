@@ -161,6 +161,7 @@ declare class Parser {
     toTagList: string[];
     totalToTagCount: number;
     originalTagList: string[];
+    flushedOriginalTagListCount: number;
     flushToTagList(): void;
 }
 export declare function startTestRedirect(): void;

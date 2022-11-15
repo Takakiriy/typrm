@@ -23,6 +23,7 @@ command: #keyword: typrm command list
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
                     printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
                         getRelatedLineNumGetter:  #ref: ${GitHub}/typrm/src/main.ts#function  getRelatedLineNumGetter
+                        # // print the address and recommend
                         searchAsText:  #ref: ${GitHub}/typrm/src/main.ts#function  searchAsText
                 runVerb:  #ref: ${GitHub}/typrm/src/main.ts#function  runVerb
                 openDocument:  #ref: ${GitHub}/typrm/src/main.ts#function  openDocument
@@ -32,6 +33,12 @@ command: #keyword: typrm command list
             #// parent: #search: mainMain
             check:  #ref: ${GitHub}/typrm/src/main.ts#function  check(
                 checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#function  checkRoutine
+                    // List up original tag
+                    // List up to tag
+                    // Check the "#same-as:" tag.
+                    // Check the condition by "#expect:" tag.
+                    // Check if previous line has "template" replaced contents.
+                    // Check target file contents by "#file-template:" tag.
     replace:  #keyword: typrm replace
         code:
             #// parent: #search: mainMain

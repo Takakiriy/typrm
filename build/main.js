@@ -3558,7 +3558,7 @@ async function printRef(refTagAndAddress, option = printRefOptionDefault) {
     if (recommended.startsWith(lib.replacePathToSlashed(lib.getHomePath()))) {
         recommended = '~' + recommended.substring(lib.getHomePath().length);
     }
-    // print the address
+    // print the address and recommend
     if (option.print && lib.isFullPath(address)) {
         if (recommended !== addressBefore) {
             console.log('Recommend: #ref: ' + recommended);
@@ -5395,13 +5395,20 @@ class Parser {
         this.toTagList = [];
         this.totalToTagCount = 0;
         this.originalTagList = [];
+        this.flushedOriginalTagListCount = 0;
     }
     flushToTagList() {
         this.outputToTagList = true;
         if (this.originalTagList.length >= 1) {
             console.log('');
             for (const log of this.originalTagList) {
-                console.log(log);
+                if (this.flushedOriginalTagListCount < maxShownOriginalTagListCount) {
+                    console.log(log);
+                }
+                this.flushedOriginalTagListCount += 1;
+                if (this.flushedOriginalTagListCount === maxShownOriginalTagListCount) {
+                    console.log(`...(${translate('Display of further original tags will be omitted')})`);
+                }
             }
             this.originalTagList = [];
         }
@@ -5559,6 +5566,7 @@ function translate(englishLiterals, ...values) {
             "Not found a variable name specified in the same-as tag.": "same-as タグに指定した変数名が見つかりません",
             "ref tag value \"${0}\" must be full path. Then you can specify the path with a variable.": "ref タグの値 \"${0}\" をフルパスに修正してください。その際、変数を指定できます。",
             "ERROR: not found a file or folder at": "エラー: ファイルまたはフォルダーが見つかりません",
+            "Display of further original tags will be omitted": "これ以上の original タグの表示は割愛します",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -5715,4 +5723,5 @@ export var programArguments = [];
 export var programOptions = {};
 export const foundCountMaxDefault = "10";
 export const snippetLineCountDefault = "5";
+const maxShownOriginalTagListCount = 5;
 //# sourceMappingURL=main.js.map

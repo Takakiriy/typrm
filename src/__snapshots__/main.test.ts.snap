@@ -1365,14 +1365,18 @@ exports[`checks template value >> list_to_tag_original_tag_in_multi_files: answe
 "
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:2: #original: varA: valueA1 => valueA0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:3: #original: varB1: valueB1 => value-B1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:4: #original: varB2: valueB2 => value-B2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:5: #original: varB3: valueB3 => value-B3
+...(Display of further original tags will be omitted)
 
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:2: #to: varA: valueA1 => valueA2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:6: #to: varB: valueB1 => valueB2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:10: #to: varB1: valueB1 => valueB2
 
 Warning: 0, Error: 0
-checked file count = 2, template count = 4, #to tag count = 4
+checked file count = 2, template count = 8, #to tag count = 4
 "
 `;
 
@@ -1383,6 +1387,24 @@ exports[`checks template value >> list_to_tag_original_tag_in_multi_files: sourc
 body:
     - valueA1  #template: varA
     - valueB1  #template: varB  #to: valueB2
+"
+`;
+
+exports[`checks template value >> list_to_tag_original_tag_in_multi_files: sourceFileContents 2`] = `
+"settings: #settings:
+    varA: valueA1  #original: valueA0  #to: valueA2
+    varB1: valueB1  #original: value-B1
+    varB2: valueB2  #original: value-B2
+    varB3: valueB3  #original: value-B3
+    varB4: valueB4  #original: value-B4
+    varB5: valueB5  #original: value-B5
+body:
+    - valueA1  #template: varA
+    - valueB1  #template: varB1  #to: valueB2
+    - valueB2  #template: varB2
+    - valueB3  #template: varB3
+    - valueB4  #template: varB4
+    - valueB5  #template: varB5
 "
 `;
 
