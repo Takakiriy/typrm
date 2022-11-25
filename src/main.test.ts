@@ -917,6 +917,11 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_word_match_is_better_than_same_case
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':18:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ipad')} pro, ${matchedColor('ipad')} nano\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':17:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('iPad')}\n`,
+        // ],[
+        //     "participle_is_better_than_different_case",
+        //     ["search", "str"],
+        //     { folder: "test_data/search/2", disableFindAll: '', test: "", "foundCountMax": "20" },  // section: test_of_word_match_is_better_than_same_case
+        //     pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':17:') + ` ____ \n`,
         ],[
             "target word count",
             ["search", "new task"],
@@ -1078,6 +1083,7 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
+// if (caseName !== 'participle_is_better_than_different_case') {return;}  // || subCase !== '____'
         const  isWindowsEnvironment = (path.sep === '\\');
         const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
         if (!isWindowsEnvironment && isWindowsCase) {
@@ -1086,6 +1092,7 @@ describe("searches keyword tag >>", () => {
 
         await  callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
+// expect('test code').toBe('deleted skip code.');
     });
 
     describe("thesaurus >>", () => {

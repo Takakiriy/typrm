@@ -210,3 +210,6 @@ cut_long_line:
 test_of_double_space:
     1: #keyword: big  boss
     2: #keyword: super  big  boss
+participle_is_better_than_different_case:
+    2:  #keyword: str replace
+    12: #keyword: stripe

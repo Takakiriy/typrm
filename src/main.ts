@@ -1820,6 +1820,45 @@ class  WordPositions {
     }
 }
 
+class Particples {
+    keyphrase: string = '';
+    words: ParticpleWord[] = [];
+}
+
+class ParticpleWord {
+    specified: string = '';
+    specifiedLowerCase: string = '';
+    normalized: string = '';
+    normalizedLowerCase: string = '';
+    commonPartLowerCase: string = '';
+    particples: string[] = [];  // original, s, ed, ing (lower)
+}
+
+function  newParticplesFromKeyphrase(keyphrase: string, thesaurus: Thesaurus) {
+    const  keywords = keyphrase.replace(/ +/g, ' ').split(' '); 
+
+    return {
+        keyphrase: keyphrase,
+        words: keywords.map(keyword => {
+            const  normalized = thesaurus.normalize(keyword);
+            const  specifiedLowerCase = keyword.toLowerCase()
+            return {
+                specified: keyword,
+                specifiedLowerCase: specifiedLowerCase,
+                normalized: normalized,
+                normalizedLowerCase: normalized.toLowerCase(),
+                commonPartLowerCase: specifiedLowerCase,
+                particples: [
+                    specifiedLowerCase,
+                    specifiedLowerCase + 's',
+                    specifiedLowerCase + 'ed',
+                    specifiedLowerCase + 'ing',
+                    specifiedLowerCase + 's'],
+            } as ParticpleWord;
+        }),
+    } as Particples;
+}
+
 async function  replace(inputFileOrFolderPath: string) {
     await  replaceMain(inputFileOrFolderPath, 'replace');
 }
@@ -2937,27 +2976,27 @@ async function  search() {
 async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefResult> {
     keyword = keyword.trim();
 
-    // keywordWithTag = ...
+    // keywordWithoutTag = ...
     const  searchTagIndex = tagIndexOf(keyword, searchLabel);
     if (searchTagIndex !== notFound) {
-        var  keywordWithTag = getValue(keyword, searchTagIndex + searchLabel.length);
+        var  keywordWithoutTag = getValue(keyword, searchTagIndex + searchLabel.length);
     } else {
         const  keywordTagIndex = tagIndexOf(keyword, keywordLabel);
         if (keywordTagIndex !== notFound) {
-            var  keywordWithTag = getValue(keyword, keywordTagIndex + keywordLabel.length);
-            if (keywordWithTag === '') {
+            var  keywordWithoutTag = getValue(keyword, keywordTagIndex + keywordLabel.length);
+            if (keywordWithoutTag === '') {
                 const  colonIndex = keyword.indexOf(':');
                 if (colonIndex !== notFound) {
-                    keywordWithTag = keyword.substring(0, colonIndex);
-                    if (keywordWithTag.startsWith('- ')) {
-                        keywordWithTag = keywordWithTag.substring(2);
+                    keywordWithoutTag = keyword.substring(0, colonIndex);
+                    if (keywordWithoutTag.startsWith('- ')) {
+                        keywordWithoutTag = keywordWithoutTag.substring(2);
                     }
                 } else {
-                    keywordWithTag = '';
+                    keywordWithoutTag = '';
                 }
             }
         } else {
-            var  keywordWithTag = keyword;
+            var  keywordWithoutTag = keyword;
         }
     }
 
@@ -2972,12 +3011,13 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
         }
         await  thesaurus.load(thesaurusFilePath);
     }
+    const  keywordParticples = newParticplesFromKeyphrase(keywordWithoutTag, thesaurus);
 
     // search
     for (const inputFileFullPath of fileFullPaths) {
-        // if (debugSearchScore) {
-        //     console.log(`searchSub: ${inputFileFullPath}`);
-        // }
+        if (debugSearchScore) {
+            console.log(`searchSub: ${inputFileFullPath}`);
+        }
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -3054,7 +3094,8 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                         return [];
                     });
 
-                const  found = getKeywordMatchingScore(columns, keywordWithTag, thesaurus);
+                // const  found = getKeywordMatchingScore(columns, keywordWithoutTag, thesaurus);
+                const  found = getKeywordMatchingScoreV2(columns, keywordParticples, thesaurus);
                 if (found.matchedKeywordCount >= 1) {
                     const  unescapedLine = unscapePercentByte(line);
                     if (withParameter) {
@@ -3142,7 +3183,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                         const  wordInGlossary = glossaryTag.glossaryWords +
                             line.substr(currentIndent.length, colonPosition - currentIndent.length);
 
-                        const  found = getKeywordMatchingScore([wordInGlossary], keywordWithTag, thesaurus);
+                        const  found = getKeywordMatchingScore([wordInGlossary], keywordWithoutTag, thesaurus);
                         if (found.matchedKeywordCount >= 1  &&  colonPosition !== notFound) {
 
                             found.score += glossaryMatchScore + plusScore;
@@ -3205,7 +3246,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             }
         }
     }
-    const  keyphraseWordCount = keywordWithTag.replace(/ +/g, ' ').split(' ').length;
+    const  keyphraseWordCount = keywordWithoutTag.replace(/ +/g, ' ').split(' ').length;
 
     // searchWithoutTags (find all)
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
@@ -3272,14 +3313,191 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     }
 }
 
+function  getKeywordMatchingScoreV2(targetStrings: string[], keywordParticples: Particples, thesaurus: Thesaurus): FoundLine {
+    const  found = subMain();
+    return  found;
+
+    function  subMain() {
+        const  keyphrase = keywordParticples.keyphrase;
+
+        const  bestFound = targetStrings.reduce(
+            (bestFound: FoundLine, aTargetString: string, stringIndex: number) => {
+                const  found = new FoundLine();
+                var    previousPosition = -1;
+                var    isNormalizedMatched = false;
+                const  aTargetStringLowerCase = aTargetString.toLowerCase();
+                const  normalizedTargetKeywords = thesaurus.normalize(aTargetString);
+                const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
+                const  wordPositions = new WordPositions();
+                const  normalizedWordPositions = new WordPositions();
+                wordPositions.setPhrase(aTargetString);
+                normalizedWordPositions.setPhrase(normalizedTargetKeywords);
+                const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
+                const  participleMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
+                const  partMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
+
+                // #focus: score
+                for (const keyword of keywordParticples.words) {
+                    if (keyword.specified === '') {continue;}
+
+                    const  result = getSubMatchedScore(aTargetString, aTargetStringLowerCase, keyword.specified, keyword.specifiedLowerCase, stringIndex, '', found);
+                    if (result.score !== 0) {
+                        if (result.position > previousPosition) {
+                            found.score += result.score + orderMatchScore;
+                        } else {
+                            found.score += result.score;
+                        }
+                        found.score += notNormalizedScore;
+                        found.matchedKeywordCount += 1;
+                        if (debugSearchScore) {
+                            console.log(`    getSubMatchedScore: ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                        }
+                    }
+                    if (result.position !== notFound) {
+                        if (result.score === fullMatchScore  ||  result.score === wordsMatchScore) {
+                            matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                        }
+                        partMatchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                        previousPosition = result.position;
+                    }
+                    const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
+                    if (useThesaurus) {
+                        if (keyword.normalized !== keyword.specified  ||  normalizedTargetKeywords !== aTargetString) {
+                            const  targetType = (normalizedTargetKeywords === aTargetString) ? '' : 'normalized';
+
+                            const  result = getSubMatchedScore(normalizedTargetKeywords, normalizedTargetKeywordsLowerCase,
+                                keyword.normalized, keyword.normalizedLowerCase, stringIndex, targetType, found);
+                            if (result.score !== 0) {
+                                if (result.position > previousPosition) {
+                                    found.score += result.score + orderMatchScore;
+                                } else {
+                                    found.score += result.score;
+                                }
+                                found.matchedKeywordCount += 1;
+                                if (debugSearchScore) {
+                                    console.log(`    getSubMatchedScore(thesaurus): ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                                }
+                            }
+                            if (result.position !== notFound) {
+                                if (result.score === fullMatchScore  ||  result.score === wordsMatchScore) {
+                                    matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                                }
+                                partMatchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
+                                previousPosition = result.position;
+                                if (normalizedTargetKeywords !== aTargetString) {
+                                    isNormalizedMatched = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (found.matchedKeywordCount < keywordParticples.words.length) {
+                    found.score = 0;
+                }
+                if (found.score !== 0) {
+                    if ( ! isNormalizedMatched) {
+                        var  matchedTargetString = aTargetString;
+                    } else {
+                        var  matchedTargetString = normalizedTargetKeywords;
+                    }
+                    // e.g.
+                    // keyphrase = "aa bbb ccc"
+                    // matchedTargetString = "aabbb ccc dd ee"
+                    // score += character count
+                    // matchedKeywordCount = 3;
+                    // matchedTargetKeywordCount = 2
+                    // testedWordCount = 4
+                    found.score += 2 * (keyphrase.length - matchedTargetString.length);
+                        // 2 is double score from the score of different (upper/loser) case
+                    found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
+                    found.partMatchedTargetKeywordCount = partMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+                    if ( ! isNormalizedMatched) {
+                        found.targetWordCount = aTargetString.split(' ').length;
+                    } else {
+                        found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTargetKeywords.split(' ').length);
+                    }
+                    if (debugSearchScore) {
+                        console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                    }
+                }
+                const  matches = bestFound.matches.concat(found.matches);
+                if (isNormalizedMatched) {
+                    bestFound.normalizedTargetsKeywords.push(normalizedTargetKeywords);
+                } else {
+                    bestFound.normalizedTargetsKeywords.push('');
+                }
+                const  normalizedTargetsKeywords = bestFound.normalizedTargetsKeywords;
+
+                if (compareScoreAndSoOn(bestFound, found) < 0) {
+                    bestFound = found;
+                }
+                bestFound.matches = matches;
+                bestFound.normalizedTargetsKeywords = normalizedTargetsKeywords;
+                return bestFound;
+            }, new FoundLine());
+
+        return  bestFound;
+    }
+
+    interface  Result {
+        score: number;
+        position: number;
+    }
+
+    function  getSubMatchedScore(targetString: string, targetStringLowerCase: string, keyword: string,
+            lowerKeyword: string, stringIndex: number, targetType: SearchTargetType, found: FoundLine): Result {
+        var  score = 0;
+        var  position = notFound;
+
+        if ((position = targetString.indexOf(keyword)) !== notFound) {
+            if (targetString.length === keyword.length) {
+                score = fullMatchScore;
+            } else {
+                if (
+                    (position === 0  ||  targetString[position - 1] === ' ' ) &&
+                    (position + keyword.length === targetString.length  ||  targetString[position + keyword.length] === ' ')
+                ) {
+                    score = wordsMatchScore;
+                } else {
+                    score = partMatchScore;
+                }
+            }
+        } else if ((position = targetStringLowerCase.indexOf(lowerKeyword)) !== notFound) {
+            if (targetString.length === lowerKeyword.length) {
+                score = caseIgnoredFullMatchScore;
+            } else {
+                if (
+                    (position === 0  ||  targetString[position - 1] === ' ' ) &&
+                    (position + keyword.length === targetString.length  ||  targetString[position + keyword.length] === ' ')
+                ) {
+                    score = caseIgnoredWordMatchScore;
+                } else {
+                    score = caseIgnoredPartMatchScore;
+                }
+            }
+        }
+        if (position !== notFound) {
+            const  matched = new MatchedPart();
+            matched.position = position;
+            matched.length = keyword.replace(/"/g, '""').length;
+            matched.targetWordsIndex = stringIndex;
+            matched.matchedString = targetString.substr(position, matched.length);
+            matched.targetType = targetType;
+            found.matches.push(matched);
+        }
+        return { score, position };
+    }
+}
+
 function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, thesaurus: Thesaurus): FoundLine {
     const  found = subMain();
     return  found;
 
     function  subMain() {
+        const  keywords = keyphrase.replace(/ +/g, ' ').split(' ');  //  ToDo: Particples
+
         const  bestFound = targetStrings.reduce(
             (bestFound: FoundLine, aTargetString: string, stringIndex: number) => {
-                const  keywords = keyphrase.replace(/ +/g, ' ').split(' ');
                 const  found = new FoundLine();
                 var    previousPosition = -1;
                 var    isNormalizedMatched = false;
@@ -3288,8 +3506,11 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                 const  normalizedWordPositions = new WordPositions();
                 wordPositions.setPhrase(aTargetString);
                 normalizedWordPositions.setPhrase(normalizedTargetKeywords);
-                const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 )
+                const  matchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
+                const  participleMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
+                const  partMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
 
+                // #focus: score
                 for (const keyword of keywords) {
                     if (keyword === '') {continue;}
 
@@ -3302,12 +3523,15 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                         }
                         found.score += notNormalizedScore;
                         found.matchedKeywordCount += 1;
-                        // if (debugSearchScore) {
-                        //     console.log(`    getSubMatchedScore: ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
-                        // }
+                        if (debugSearchScore) {
+                            console.log(`    getSubMatchedScore: ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                        }
                     }
                     if (result.position !== notFound) {
-                        matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                        if (result.score === fullMatchScore  ||  result.score === wordsMatchScore) {
+                            matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                        }
+                        partMatchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
                         previousPosition = result.position;
                     }
                     const  useThesaurus = (result.score === 0  &&  result.position === notFound  &&  thesaurus.enabled);
@@ -3325,12 +3549,15 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                                     found.score += result.score;
                                 }
                                 found.matchedKeywordCount += 1;
-                                // if (debugSearchScore) {
-                                //     console.log(`    getSubMatchedScore(thesaurus): ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
-                                // }
+                                if (debugSearchScore) {
+                                    console.log(`    getSubMatchedScore(thesaurus): ${keyword}, ${aTargetString}, ${result.score} => ${found.score}`);
+                                }
                             }
                             if (result.position !== notFound) {
-                                matchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
+                                if (result.score === fullMatchScore  ||  result.score === wordsMatchScore) {
+                                    matchedCountsByWord[wordPositions.getWordIndex(result.position)] += 1;
+                                }
+                                partMatchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
                                 previousPosition = result.position;
                                 if (normalizedTargetKeywords !== aTargetString) {
                                     isNormalizedMatched = true;
@@ -3358,14 +3585,15 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
                     found.score += 2 * (keyphrase.length - matchedTargetString.length);
                         // 2 is double score from the score of different (upper/loser) case
                     found.matchedTargetKeywordCount = matchedCountsByWord.filter((count)=>(count >= 1)).length;
+                    found.partMatchedTargetKeywordCount = partMatchedCountsByWord.filter((count)=>(count >= 1)).length;
                     if ( ! isNormalizedMatched) {
                         found.targetWordCount = aTargetString.split(' ').length;
                     } else {
                         found.targetWordCount = Math.max(aTargetString.split(' ').length, normalizedTargetKeywords.split(' ').length);
                     }
-                    // if (debugSearchScore) {
-                    //     console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
-                    // }
+                    if (debugSearchScore) {
+                        console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                    }
                 }
                 const  matches = bestFound.matches.concat(found.matches);
                 if (isNormalizedMatched) {
@@ -3441,7 +3669,7 @@ function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
 
     // matchedTargetKeywordCount
     if (different === 0) {
-        different = a.matchedTargetKeywordCount - b.matchedTargetKeywordCount;
+        different = a.partMatchedTargetKeywordCount - b.partMatchedTargetKeywordCount;
     }
 
     // testedWordCount
@@ -3501,9 +3729,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     }
 
     for (const inputFileFullPath of await listUpFilePaths()) {
-        // if (debugSearchScore) {
-        //     console.log(`searchWithoutTags: ${inputFileFullPath}`);
-        // }
+        if (debugSearchScore) {
+            console.log(`searchWithoutTags: ${inputFileFullPath}`);
+        }
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -3533,15 +3761,15 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                         targetType: 'withoutTags',
                     });
                     found.matchedKeywordCount = keywordCount;
-                    found.matchedTargetKeywordCount = keywordCount;  // not keywordsLowerCase.length
+                    found.partMatchedTargetKeywordCount = keywordCount;  // not keywordsLowerCase.length
                     found.targetWordCount = line.split(' ').filter((keyword)=>(keyword !== '')).length;
                     found.tagLabel = 'find all';
                     found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
                         lineFullMatchScore + keywords.trim().length - line.trim().length;
                     foundLines.push(found);
-                    // if (debugSearchScore) {
-                    //     console.log(`    searchWithoutTags(full match): ${found.score}, ${line}`);
-                    // }
+                    if (debugSearchScore) {
+                        console.log(`    searchWithoutTags(full match): ${found.score}, ${line}`);
+                    }
                 }
 
                 // shuffled keywords match
@@ -3562,7 +3790,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                             targetType: 'withoutTags',
                         });
                         found.matchedKeywordCount = keywordCount;
-                        found.matchedTargetKeywordCount = keywordsLowerCase.length;
+                        found.partMatchedTargetKeywordCount = keywordsLowerCase.length;
                         found.targetWordCount = line.split(' ').filter((keyword)=>(keyword !== '')).length;
                         found.tagLabel = 'find all';
                         found.score = (wordsMatchScore + orderMatchScore + notNormalizedScore) * found.matchedKeywordCount +
@@ -3590,9 +3818,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                             matchCount += 1;
 
                             foundLines.push(found);
-                            // if (debugSearchScore) {
-                            //     console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
-                            // }
+                            if (debugSearchScore) {
+                                console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
+                            }
                         }
                     }
                 }
@@ -5402,6 +5630,7 @@ class FoundLine {
     matches: MatchedPart[] = [];
     matchedKeywordCount: number = 0;
     matchedTargetKeywordCount: number = 0;
+    partMatchedTargetKeywordCount: number = 0;
     targetWordCount: number = 0;
     normalizedTargetsKeywords: string[] = [];  // '' = not matched in "normalized" target words
     rightOfTargetKeywords: number[] = [];
@@ -5559,7 +5788,8 @@ class FoundLine {
             }
         }
         if (debugSearchScore) {
-            var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
+            var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, ` +
+                `matchedCount: ${this.matchedTargetKeywordCount}, partMatchedCount: ${this.partMatchedTargetKeywordCount})`;
         } else {
             var  debugString = ``;
         }
@@ -6271,7 +6501,7 @@ const  numberRegularExpression = /^[0-9]+$/;
 const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
 const  lineFullMatchScore = 3;
 const  suffledLineFullMatchScore = 1;
-const  fullMatchScore = 100;
+const  fullMatchScore = 10000;
 const  keywordMatchScore = 7;
 const  glossaryMatchScore = 5;
 const  caseIgnoredFullMatchScore = 8;
