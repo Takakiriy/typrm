@@ -19,7 +19,7 @@ command: #keyword: typrm command list
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                     searchWithoutTags:
                     FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
-                        # ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
+                        # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
                     printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
                         getRelatedLineNumGetter:  #ref: ${GitHub}/typrm/src/main.ts#function  getRelatedLineNumGetter

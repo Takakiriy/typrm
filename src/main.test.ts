@@ -932,6 +932,12 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
         ],[
+            "test_of_double_space",
+            ["search", "big  boss"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_target_word_count
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':212:') + `     2: ${keywordLabelColor('#keyword:')} super  ${matchedColor('big')}  ${matchedColor('boss')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':211:') + `     1: ${keywordLabelColor('#keyword:')} ${matchedColor('big')}  ${matchedColor('boss')}\n`,
+        ],[
             "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },

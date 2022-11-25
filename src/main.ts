@@ -10,7 +10,7 @@ import * as lib from "./lib";
 import sharp from 'sharp';
 import { pp } from "./lib";
 var  __dirname: string = path.resolve();
-// var  debugSearchScore = false;
+var  debugSearchScore = false;
 
 // main
 export async function  main() {
@@ -3205,7 +3205,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             }
         }
     }
-    const  keyphraseWordCount = keywordWithTag.split(' ').length;
+    const  keyphraseWordCount = keywordWithTag.replace(/ +/g, ' ').split(' ').length;
 
     // searchWithoutTags (find all)
     foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
@@ -3279,7 +3279,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keyphrase: string, th
     function  subMain() {
         const  bestFound = targetStrings.reduce(
             (bestFound: FoundLine, aTargetString: string, stringIndex: number) => {
-                const  keywords = keyphrase.split(' ');
+                const  keywords = keyphrase.replace(/ +/g, ' ').split(' ');
                 const  found = new FoundLine();
                 var    previousPosition = -1;
                 var    isNormalizedMatched = false;
@@ -5558,7 +5558,7 @@ class FoundLine {
                 coloredLine = keywordLabelColor( glossaryLabel ) +' '+ coloredLine;
             }
         }
-        if (false) {
+        if (debugSearchScore) {
             var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
         } else {
             var  debugString = ``;
