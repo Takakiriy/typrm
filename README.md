@@ -2107,14 +2107,16 @@ You can find more informations of tags by searching this page.
 
 ## Environment variable list
 
-- `TYPRM_COMMAND_FOLDER` Current folder when executing any command
-- `TYPRM_COMMAND_SYMBOL` Characters to enter when executing any command
-- `TYPRM_FOLDER` Folder to be searched
-- `TYPRM_FOUND_COUNT_MAX` Maximum number displayed in search results
-- `TYPRM_LINE_NUM_GETTER` Setting to search by the keyword specified in the `#ref:` tag
-- `TYPRM_OPEN_DOCUMENT` Command to open with # and number after search
-- `TYPRM_SNIPPET_LINE_COUNT` Maximum number of lines to display snippets
-- `TYPRM_THESAURUS` Thesaurus file path
-- `TYPRM_VERB` Command to execute from the menu when the searched line contains the `#ref:` tag
+- `TYPRM_COMMAND_FOLDER`: Current folder when executing any command
+- `TYPRM_COMMAND_SYMBOL`: Characters to enter when executing any command
+- `TYPRM_FOLDER`: Folder to be searched
+- `TYPRM_FOUND_COUNT_MAX`: Maximum number displayed in search results
+- `TYPRM_LINE_NUM_GETTER`: Setting to search by the keyword specified in the `#ref:` tag
+- `TYPRM_OPEN_DOCUMENT`: Command to open with # and number after search
+- `TYPRM_SNIPPET_LINE_COUNT`: Maximum number of lines to display snippets
+- `TYPRM_THESAURUS`: Thesaurus file path
+- `TYPRM_VERB`: Command to execute from the menu when the searched line contains the `#ref:` tag
+- `TYPRM_WORD_SEPARATORS`: A sequence of delimiters for words to search.
+    Default is `` ~!^&*#()=+[{]}\\|;: '"`,.<>/?`` and Japanese separators
 
 You can find more informations of environment variables by searching this page.

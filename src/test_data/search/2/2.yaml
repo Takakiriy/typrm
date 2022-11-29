@@ -13,9 +13,9 @@ test_of_1_word_search_score:
     #keyword: second
     #keyword: secondary
     #keyword: second screen
-test_of_word_match_is_better_than_same_case:
+word match is better than same case:
     #keyword: iPad
-    #keyword: ipad pro, ipad nano
+    #keyword: ipads
 test_of_target_word_count:
     #keyword: new tasks
     #keyword: new tasks only
@@ -211,5 +211,15 @@ test_of_double_space:
     1: #keyword: big  boss
     2: #keyword: super  big  boss
 participle_is_better_than_different_case:
-    2:  #keyword: str replace
+    1:  #keyword: str
+    2:  #keyword: str:
+    3a: #keyword: strs
+    3b: #keyword: stred
+    3c: #keyword: string
+    6:  #keyword: STR
+    7:  #keyword: str replace
+    8a: #keyword: strs replace
+    8b: #keyword: stred replace
+    8c: #keyword: string replace
+    11: #keyword: STRS
     12: #keyword: stripe

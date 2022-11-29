@@ -17,6 +17,7 @@ command: #keyword: typrm command list
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
+                    foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
                     searchWithoutTags:
                     FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;

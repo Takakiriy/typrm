@@ -17,6 +17,7 @@ async function callMain() {
         .option("--command-symbol <s>", "The charactor before shell command", process.env.TYPRM_COMMAND_SYMBOL)
         .option("--command-folder <s>", "The charactor before shell command", process.env.TYPRM_COMMAND_FOLDER)
         .option("--color")
+        .option("--word-separators <s>", "Word separator charactors", process.env.TYPRM_WORD_SEPARATORS || main.wordSeparatorsDefault)
         .option("--thesaurus <>", "The thesaurus CSV file path", process.env.TYPRM_THESAURUS)
         .option("--disable-find-all")
         .option("--replace-mode")
