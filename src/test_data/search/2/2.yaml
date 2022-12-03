@@ -223,3 +223,7 @@ participle_is_better_than_different_case:
     8c: #keyword: string replace
     11: #keyword: STRS
     12: #keyword: stripe
+few_word_count:
+    #keyword: bluetooth mini
+    #keyword: bluetooth speaker
+    #keyword: mini speaker

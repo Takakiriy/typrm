@@ -3062,15 +3062,14 @@ async function searchSub(keyword, isMutual) {
             }
         }
     }
-    const keyphraseWordCount = keywordWithoutTag.replace(/ +/g, ' ').split(' ').length;
+    const maximumHitWordCount = foundLines.reduce((previousMinimumHitWordCount, found) => (Math.max(previousMinimumHitWordCount, found.matchedKeywordCount)), 0);
     // searchWithoutTags (find all)
-    foundLines = foundLines.filter((found) => (found.matchedKeywordCount >= keyphraseWordCount));
+    foundLines = foundLines.filter((found) => (found.matchedKeywordCount === maximumHitWordCount));
     foundLines.sort(compareScoreAndSoOn);
     if (!('disableFindAll' in programOptions) && !isMutual) {
-        const foundLineWithoutTags = await searchWithoutTags(keyword);
-        // const  foundLineHasScore = foundLineWithoutTags.filter((found)=>(found.score >= 2));
-        // foundLines = [... foundLineHasScore, ... foundLines];
-        // foundLines.sort(compareScoreAndSoOn);
+        var foundLineWithoutTags = await searchWithoutTags(keyword);
+        const maximumHitWordCount2 = foundLineWithoutTags.reduce((previousMinimumHitWordCount, found) => (Math.max(previousMinimumHitWordCount, found.matchedKeywordCount)), 0);
+        foundLineWithoutTags = foundLineWithoutTags.filter((found) => (found.matchedKeywordCount === maximumHitWordCount2));
         foundLineWithoutTags.sort(compareScoreAndSoOn);
         foundLines = [...foundLineWithoutTags, ...foundLines];
         foundLines = foundLines.filter(lib.lastUniqueFilterFunction((found1, found2) => found1.path == found2.path && found1.lineNum == found2.lineNum));
@@ -3231,9 +3230,6 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                     }
                 }
             }
-            if (found.matchedKeywordCount < keywordsParticples.words.length) {
-                found.score = 0;
-            }
             if (found.score !== 0) {
                 if (!isNormalizedMatched) {
                     var matchedTargetString = aTargetString;
@@ -3302,7 +3298,9 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                         matchedKeyword = keyword;
                     }
                     else {
-                        partMatchPosition = position;
+                        if (keyword.length >= 2) {
+                            partMatchPosition = position;
+                        }
                     }
                 }
             }
@@ -3336,7 +3334,9 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                             matchedKeyword = lowerKeyword;
                         }
                         else {
-                            caseIgnoredPartMatchPosition = position;
+                            if (keyword.length >= 2) {
+                                caseIgnoredPartMatchPosition = position;
+                            }
                         }
                     }
                 }
@@ -3371,7 +3371,7 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                     position = caseIgnoredPartMatchPosition;
                 }
             }
-            if (position !== notFound) {
+            if (score >= 1) {
                 const matched = new MatchedPart();
                 matched.position = position;
                 matched.length = matchedKeyword.replace(/"/g, '""').length;
@@ -3379,6 +3379,9 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                 matched.matchedString = targetString.substr(position, matched.length);
                 matched.targetType = targetType;
                 found.matches.push(matched);
+            }
+            else {
+                position = notFound;
             }
         }
         return { score, position };
@@ -3393,6 +3396,10 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
 }
 function compareScoreAndSoOn(a, b) {
     var different = 0;
+    // matchedKeywordCount
+    if (different === 0) {
+        different = a.matchedKeywordCount - b.matchedKeywordCount;
+    }
     // partMatchedTargetKeywordCount
     if (different === 0) {
         different = a.partMatchedTargetKeywordCount - b.partMatchedTargetKeywordCount;

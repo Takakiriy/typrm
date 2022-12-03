@@ -896,6 +896,13 @@ describe("searches keyword tag >>", () => {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
         ], [
+            "few_word_count",
+            ["search", "mini bluetooth speaker"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':228:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':227:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
+        ], [
             "test_of_double_space",
             ["search", "big  boss"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },

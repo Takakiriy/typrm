@@ -280,7 +280,9 @@ Commands executed
   it is not necessary to enclose it in " ".
   However, two or more blanks will be one.
 - Specifying multiple words results in an AND search.
-- OR search is not possible. You can OR search by several times search.
+- If the AND search does not find any hits,
+  as many words as possible that match the AND search will be displayed
+  (equivalent to OR search).
 - Even if the case is different, it will be hit,
   but the text with the same case will be displayed at the top.
   In typrm, the text that hits the top is displayed at the bottom.
