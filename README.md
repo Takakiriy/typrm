@@ -284,8 +284,11 @@ Commands executed
   as many words as possible that match the AND search will be displayed
   (equivalent to OR search).
 - Even if the case is different, it will be hit,
-  but the text with the same case will be displayed at the top.
-  In typrm, the text that hits the top is displayed at the bottom.
+  the text with the same case will be priority hit.
+  In typrm, the text that priority hit is displayed at the bottom.
+- If there is a partial match, the participle (-ed, -ing, -s, -er) match
+  will be priority hit (displayed at the bottom).
+  For example, if you search for play, playing will be prior than playground.
 
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values

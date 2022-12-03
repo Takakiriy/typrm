@@ -270,6 +270,8 @@ bash
 - 大文字小文字が違っていてもヒットしますが、
   大文字小文字が同じテキストが上位に表示されます。
   typrm では上位にヒットしたテキストが下側に表示されます。
+- 一部だけマッチする場合、分詞など（-ed, -ing, -s, -er）にマッチするほうが上位（下側）に表示されます。
+  たとえば、play で検索した場合、playground より playing が上位になります。
 
     $ typrm Comma Separated Value
     .../text.txt:1: #keyword: CSV, comma separated values

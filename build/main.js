@@ -1677,39 +1677,49 @@ function newParticplesFromKeyphrase(keyphrase, thesaurus) {
     return {
         keyphrase: keyphrase,
         words: keywords.map((keyword) => {
-            const specifiedLowerCase = keyword.toLowerCase();
+            const keywordLowerCase = keyword.toLowerCase();
+            const keywordE = (keyword.slice(-1) === 'e') ? keyword.slice(0, -1) : keyword; // cut last "e"
+            const keywordS = (keyword.slice(-1) === 's') ? keyword + 'e' : keyword; // add last "e"
+            const keywordLowerCaseE = keywordE.toLowerCase();
             return {
                 specified: keyword,
-                specifiedLowerCase: specifiedLowerCase,
-                commonPartLowerCase: specifiedLowerCase,
+                specifiedLowerCase: keywordLowerCase,
+                commonPartLowerCase: keywordLowerCaseE,
                 particples: [
-                    keyword + 'ing',
-                    keyword + 'ed',
-                    keyword + 's'
+                    keywordE + 'ing',
+                    keywordE + 'er',
+                    keywordE + 'ed',
+                    keywordS + 's'
                 ],
                 caseIgnoredParticples: [
-                    specifiedLowerCase + 'ing',
-                    specifiedLowerCase + 'ed',
-                    specifiedLowerCase + 's'
+                    keywordLowerCaseE + 'ing',
+                    keywordLowerCaseE + 'er',
+                    keywordLowerCaseE + 'ed',
+                    keywordS.toLowerCase() + 's'
                 ],
             };
         }),
         normalizedWords: keywords.map(keyword => {
             const normalized = thesaurus.normalize(keyword);
             const normalizedLowerCase = normalized.toLowerCase();
+            const normalizedE = (normalized.slice(-1) === 'e') ? normalized.slice(0, -1) : normalized; // cut last "e"
+            const normalizedS = (normalized.slice(-1) === 's') ? normalized + 'e' : normalized; // add last "e"
+            const normalizedLowerCaseE = normalizedE.toLowerCase();
             return {
                 specified: normalized,
                 specifiedLowerCase: normalizedLowerCase,
-                commonPartLowerCase: normalizedLowerCase,
+                commonPartLowerCase: normalizedLowerCaseE,
                 particples: [
-                    normalized + 'ing',
-                    normalized + 'ed',
-                    normalized + 's'
+                    normalizedE + 'ing',
+                    normalizedE + 'er',
+                    normalizedE + 'ed',
+                    normalizedS + 's'
                 ],
                 caseIgnoredParticples: [
-                    normalizedLowerCase + 'ing',
-                    normalizedLowerCase + 'ed',
-                    normalizedLowerCase + 's'
+                    normalizedLowerCaseE + 'ing',
+                    normalizedLowerCaseE + 'er',
+                    normalizedLowerCaseE + 'ed',
+                    normalizedS.toLowerCase() + 's'
                 ],
             };
         }),

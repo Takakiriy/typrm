@@ -215,15 +215,23 @@ participle_is_better_than_different_case:
     2:  #keyword: str:
     3a: #keyword: strs
     3b: #keyword: stred
-    3c: #keyword: string
+    3c: #keyword: strer
+    3d: #keyword: string
     6:  #keyword: STR
     7:  #keyword: str replace
     8a: #keyword: strs replace
     8b: #keyword: stred replace
-    8c: #keyword: string replace
+    8c: #keyword: strer replace
+    8d: #keyword: string replace
     11: #keyword: STRS
     12: #keyword: stripe
 few_word_count:
     #keyword: bluetooth mini
     #keyword: bluetooth speaker
     #keyword: mini speaker
+special_participle:
+    #keyword: saver
+    #keyword: saved
+    #keyword: saving
+    #keyword: saves
+    #keyword: classes
