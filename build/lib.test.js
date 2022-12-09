@@ -781,11 +781,12 @@ describe("string >>", () => {
         expect(lib.chageToAlphabets('きゃきゅきょ しゃしゅしょ ちゃちゅちょ にゃにゅにょ ひゃひゅひょ ふぁふぃふぇふぉ みゃみゅみょ りゃりゅりょ')).toBe('kyakyukyo shashusho chachucho nyanyunyo hyahyuhyo fafifefo myamyumyo ryaryuryo');
         expect(lib.chageToAlphabets('がぎぐげご ざじずぜぞ だぢづでど ばびぶべぼ ぱぴぷぺぽ')).toBe('gagigugego zajizuzezo dadidudedo babibubebo papipupepo');
         expect(lib.chageToAlphabets('ぎゃぎゅぎょ じゃじゅじょ ぢゃぢゅぢょ びゃびゅびょ ぴゃぴゅぴょ')).toBe('gyagyugyo jajujo dyadyudyo byabyubyo pyapyupyo');
-        expect(lib.chageToAlphabets('ぁぃぅぇぉゔぁゔぃゔゔぇゔぉうぃうぇすぁすぃすぅすぇすぉでゃでぃでゅでぇでょくぁくぃくぅくぇくぉ')).toBe('lalilulelovavivuvevowiweswaswiswusweswodhadhidhudhedhoqaqiquqeqo');
+        expect(lib.chageToAlphabets('ぁぃぅぇぉゔぁゔぃゔゔぇゔぉうぃうぇすぁすぃすぅすぇすぉでゃでぃでゅでぇでょくぁくぃくぅくぇくぉ')).toBe('lalilulelovavivuvevowiweswaswiswusweswodhadelidhudeledhoqaqiquqeqo');
         expect(lib.chageToAlphabets('っかっきっくっけっこっさっしっすっせっそったっちっつってっとっはっひっふっへっほっふぁっふぃっふぇっふぉ')).toBe('kkakkikkukkekkossassissussessottattittuttettohhahhiffuhhehhoffaffiffeffo');
         expect(lib.chageToAlphabets('っまっみっむっめっもっやっゆっよっいぇっらっりっるっれっろっぁっぃっぅっぇっぉ')).toBe('mmammimmummemmoyyayyuyyoyyerrarrirrurrerrollallillullello');
         expect(lib.chageToAlphabets('っがっぎっぐっげっごっざっじっずっぜっぞっだっぢっづっでっどっばっびっぶっべっぼっぱっぴっぷっぺっぽ')).toBe('ggaggigguggeggozzazzizzuzzezzoddaddidduddeddobbabbibbubbebboppappippuppeppo');
         expect(lib.chageToAlphabets('！”＃＄％＆’（）ー＝＾〜＼｜＠｀「『；＋：＊」』、＜。＞・？＿')).toBe('!"#$%&\'()-=^~\\|@`[{;+:*]},<.>/?_');
+        expect(lib.chageToAlphabets('でぇて ')).toBe('delete ');
     });
 });
 describe("data >>", () => {

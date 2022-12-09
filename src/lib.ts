@@ -845,7 +845,7 @@ export function  chageToAlphabets(inputString: string): string {
         'ゔぁ':'va', 'ゔぃ':'vi', 'ゔ':'vu', 'ゔぇ':'ve', 'ゔぉ':'vo', 'うぃ':'wi', 'うぇ':'we',
         'くぁ':'qa', 'くぃ':'qi', 'くぅ':'qu', 'くぇ':'qe', 'くぉ':'qo',
         'すぁ':"swa", 'すぃ':"swi", 'すぅ':"swu", 'すぇ':"swe", 'すぉ':"swo",
-        'でゃ':'dha', 'でぃ':'dhi', 'でゅ':'dhu', 'でぇ':'dhe', 'でょ':'dho',
+        'でゃ':'dha', 'でぃ':'deli','でゅ':'dhu', 'でぇ':'dele','でょ':'dho',
         'っか':'kka', 'っき':'kki', 'っく':'kku', 'っけ':'kke', 'っこ':'kko', 'っさ':'ssa', 'っし':'ssi', 'っす':'ssu', 'っせ':'sse', 'っそ':'sso',
         'った':'tta', 'っち':'tti', 'っつ':'ttu', 'って':'tte', 'っと':'tto',
         'っは':'hha', 'っひ':'hhi', 'っふ':'ffu', 'っへ':'hhe', 'っほ':'hho', 'っふぁ':'ffa', 'っふぃ':'ffi', 'っふぇ':'ffe', 'っふぉ':'ffo',
