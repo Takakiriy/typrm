@@ -3002,6 +3002,15 @@ async function  search() {
 }
 
 async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefResult> {
+    const  lastIsSpace = (' '+'　').includes(keyword.slice(-1));
+    if (lastIsSpace || zenkakuAlphabetExpression.test(keyword)) {
+        const  oldKeyword = keyword;
+
+        keyword = lib.chageToAlphabets(keyword);
+        if (keyword !== oldKeyword) {
+            console.log(`keyword="${keyword.trim()}"`);
+        }
+    }
     keyword = keyword.trim();
 
     // keywordWithoutTag = ...
@@ -6491,6 +6500,7 @@ const  copyTemplateLabel = "#copy-template:";
 const  typrmEnvPrefix = 'TYPRM_';
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]+$/;
+const  zenkakuAlphabetExpression = /[ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ！”＃＄％＆’（）ー＝＾〜＼｜＠｀「『；＋：＊」』、＜。＞・？＿]/;
 const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
 
 // Scores

@@ -770,6 +770,23 @@ describe("string >>", () => {
             expect(result.greenLine).toBe(`green: 012${green('aa')}589${green('X')}`);
         });
     });
+    describe("chageToAlphabets >>", () => {
+        expect(lib.chageToAlphabets('ｃｄ')).toBe('cd');
+        expect(lib.chageToAlphabets('ｃｄ ')).toBe('cd ');
+        expect(lib.chageToAlphabets('ｃｄ　')).toBe('cd ');
+        expect(lib.chageToAlphabets('んｐｍ てｓｔ ')).toBe('npm test ');
+        expect(lib.chageToAlphabets('んｐｍ　てｓｔ　')).toBe('npm test ');
+        expect(lib.chageToAlphabets('あｂｃｄえｆｇｈいｊｋｌｍんおｐｑｒｓｔうｖｗｘｙｚ')).toBe('abcdefghijklmnopqrstuvwxyz');
+        expect(lib.chageToAlphabets('かきくけこ さしすせそ たちつてと なにぬねの はひふへほ まみむめも やゆよ らりるれろ わをん')).toBe('kakikukeko sasisuseso tatituteto naninuneno hahifuheho mamimumemo yayuyo rarirurero wawon');
+        expect(lib.chageToAlphabets('きゃきゅきょ しゃしゅしょ ちゃちゅちょ にゃにゅにょ ひゃひゅひょ ふぁふぃふぇふぉ みゃみゅみょ りゃりゅりょ')).toBe('kyakyukyo shashusho chachucho nyanyunyo hyahyuhyo fafifefo myamyumyo ryaryuryo');
+        expect(lib.chageToAlphabets('がぎぐげご ざじずぜぞ だぢづでど ばびぶべぼ ぱぴぷぺぽ')).toBe('gagigugego zajizuzezo dadidudedo babibubebo papipupepo');
+        expect(lib.chageToAlphabets('ぎゃぎゅぎょ じゃじゅじょ ぢゃぢゅぢょ びゃびゅびょ ぴゃぴゅぴょ')).toBe('gyagyugyo jajujo dyadyudyo byabyubyo pyapyupyo');
+        expect(lib.chageToAlphabets('ぁぃぅぇぉゔぁゔぃゔゔぇゔぉうぃうぇすぁすぃすぅすぇすぉでゃでぃでゅでぇでょくぁくぃくぅくぇくぉ')).toBe('lalilulelovavivuvevowiweswaswiswusweswodhadhidhudhedhoqaqiquqeqo');
+        expect(lib.chageToAlphabets('っかっきっくっけっこっさっしっすっせっそったっちっつってっとっはっひっふっへっほっふぁっふぃっふぇっふぉ')).toBe('kkakkikkukkekkossassissussessottattittuttettohhahhiffuhhehhoffaffiffeffo');
+        expect(lib.chageToAlphabets('っまっみっむっめっもっやっゆっよっいぇっらっりっるっれっろっぁっぃっぅっぇっぉ')).toBe('mmammimmummemmoyyayyuyyoyyerrarrirrurrerrollallillullello');
+        expect(lib.chageToAlphabets('っがっぎっぐっげっごっざっじっずっぜっぞっだっぢっづっでっどっばっびっぶっべっぼっぱっぴっぷっぺっぽ')).toBe('ggaggigguggeggozzazzizzuzzezzoddaddidduddeddobbabbibbubbebboppappippuppeppo');
+        expect(lib.chageToAlphabets('！”＃＄％＆’（）ー＝＾〜＼｜＠｀「『；＋：＊」』、＜。＞・？＿')).toBe('!"#$%&\'()-=^~\\|@`[{;+:*]},<.>/?_');
+    });
 });
 describe("data >>", () => {
     test("stableUniqueFilterFunction >>", async () => {

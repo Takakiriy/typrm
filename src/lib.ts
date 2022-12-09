@@ -821,6 +821,70 @@ export function  coloredDiff(redLine: string, greenLine: string, redHeaderLength
     return {greenLine, redLine};
 }
 
+export function  chageToAlphabets(inputString: string): string {
+    const  japaneseTable: {[i: string]: string} = {
+        'あ':'a', 'ｂ':'b', 'ｃ':'c', 'ｄ':'d', 'え':'e', 'ｆ':'f', 'ｇ':'g', 'ｈ':'h',
+        'い':'i', 'ｊ':'j', 'ｋ':'k', 'ｌ':'l', 'ｍ':'m', 'ｎ':'n',
+        'お':'o', 'ｐ':'p', 'ｑ':'q', 'ｒ':'r', 'ｓ':'s', 'ｔ':'t', 'う':'u', 'ｖ':'v', 'ｗ':'w', 'ｘ':'x', 'ｙ':'y', 'ｚ':'z',
+        '　':' ', '！':'!', '”':'"', '＃':'#', '＄':'$', '％':'%', '＆':'&', '’':'\'', '（':'(', '）':')',
+        'ー':'-', '＝':'=', '＾':'^', '〜':'~', '＼':'\\', '￥':'\\', '｜':'|', '＠':'@', '｀':'`', '「':'[', '『':'{',
+        '；':';', '＋':'+', '：':':', '＊':'*', '」':']', '』':'}', '、':',', '＜':'<', '。':'.', '＞':'>', '・':'/', '？':'?', '＿':'_',
+        'か':'ka', 'き':'ki', 'く':'ku', 'け':'ke', 'こ':'ko', 'さ':'sa', 'し':'si', 'す':'su', 'せ':'se', 'そ':'so',
+        'た':'ta', 'ち':'ti', 'つ':'tu', 'て':'te', 'と':'to', 'な':'na', 'に':'ni', 'ぬ':'nu', 'ね':'ne', 'の':'no',
+        'は':'ha', 'ひ':'hi', 'ふ':'fu', 'へ':'he', 'ほ':'ho', 'ま':'ma', 'み':'mi', 'む':'mu', 'め':'me', 'も':'mo',
+        'や':'ya', 'ゆ':'yu', 'よ':'yo', 'ら':'ra', 'り':'ri', 'る':'ru', 'れ':'re', 'ろ':'ro', 'わ':'wa', 'を':'wo', 'ん':'n',
+        'きゃ':'kya', 'きゅ':'kyu', 'きょ':'kyo', 'しゃ':'sha', 'しゅ':'shu', 'しょ':'sho', 'ちゃ':'cha', 'ちゅ':'chu', 'ちょ':'cho',
+        'にゃ':'nya', 'にゅ':'nyu', 'にょ':'nyo', 'ひゃ':'hya', 'ひゅ':'hyu', 'ひょ':'hyo', 'ふぁ':'fa', 'ふぃ':'fi', 'ふぇ':'fe', 'ふぉ':'fo',
+        'みゃ':'mya', 'みゅ':'myu', 'みょ':'myo', 'りゃ':'rya', 'りゅ':'ryu', 'りょ':'ryo',
+        'が':'ga', 'ぎ':'gi', 'ぐ':'gu', 'げ':'ge', 'ご':'go', 'ざ':'za', 'じ':'ji', 'ず':'zu', 'ぜ':'ze', 'ぞ':'zo',
+        'だ':'da', 'ぢ':'di', 'づ':'du', 'で':'de', 'ど':'do',
+        'ば':'ba', 'び':'bi', 'ぶ':'bu', 'べ':'be', 'ぼ':'bo', 'ぱ':'pa', 'ぴ':'pi', 'ぷ':'pu', 'ぺ':'pe', 'ぽ':'po',
+        'ぎゃ':'gya', 'ぎゅ':'gyu', 'ぎょ':'gyo', 'じゃ':'ja', 'じゅ':'ju', 'じょ':'jo', 'ぢゃ':'dya', 'ぢゅ':'dyu', 'ぢょ':'dyo',
+        'びゃ':'bya', 'びゅ':'byu', 'びょ':'byo', 'ぴゃ':'pya', 'ぴゅ':'pyu', 'ぴょ':'pyo',
+        'ぁ':'la', 'ぃ':'li', 'ぅ':'lu', 'ぇ':'le', 'ぉ':'lo',
+        'ゔぁ':'va', 'ゔぃ':'vi', 'ゔ':'vu', 'ゔぇ':'ve', 'ゔぉ':'vo', 'うぃ':'wi', 'うぇ':'we',
+        'くぁ':'qa', 'くぃ':'qi', 'くぅ':'qu', 'くぇ':'qe', 'くぉ':'qo',
+        'すぁ':"swa", 'すぃ':"swi", 'すぅ':"swu", 'すぇ':"swe", 'すぉ':"swo",
+        'でゃ':'dha', 'でぃ':'dhi', 'でゅ':'dhu', 'でぇ':'dhe', 'でょ':'dho',
+        'っか':'kka', 'っき':'kki', 'っく':'kku', 'っけ':'kke', 'っこ':'kko', 'っさ':'ssa', 'っし':'ssi', 'っす':'ssu', 'っせ':'sse', 'っそ':'sso',
+        'った':'tta', 'っち':'tti', 'っつ':'ttu', 'って':'tte', 'っと':'tto',
+        'っは':'hha', 'っひ':'hhi', 'っふ':'ffu', 'っへ':'hhe', 'っほ':'hho', 'っふぁ':'ffa', 'っふぃ':'ffi', 'っふぇ':'ffe', 'っふぉ':'ffo',
+        'っま':'mma', 'っみ':'mmi', 'っむ':'mmu', 'っめ':'mme', 'っも':'mmo', 'っや':'yya', 'っゆ':'yyu', 'っいぇ':'yye', 'っよ':'yyo',
+        'っら':'rra', 'っり':'rri', 'っる':'rru', 'っれ':'rre', 'っろ':'rro', 'っわ':'wwa',  'っうぃ':'wwi',  'っうぇ':'wwe', 'っを':'wwo',
+        'っが':'gga', 'っぎ':'ggi', 'っぐ':'ggu', 'っげ':'gge', 'っご':'ggo', 'っざ':'zza', 'っじ':'zzi', 'っず':'zzu', 'っぜ':'zze', 'っぞ':'zzo',
+        'っだ':'dda', 'っぢ':'ddi', 'っづ':'ddu', 'っで':'dde', 'っど':'ddo',
+        'っば':'bba', 'っび':'bbi', 'っぶ':'bbu', 'っべ':'bbe', 'っぼ':'bbo', 'っぱ':'ppa', 'っぴ':'ppi', 'っぷ':'ppu', 'っぺ':'ppe', 'っぽ':'ppo',
+        'っぁ':'lla', 'っぃ':'lli', 'っぅ':'llu', 'っぇ':'lle', 'っぉ':'llo',
+    };
+    const  second = ['ゃ', 'ゅ', 'ょ', 'ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ'];
+    var  output = '';
+
+    for (let i = 0;  i < inputString.length;  i += 1) {
+        const  input = inputString.substr(i, 1);
+        const  nextInput = inputString.substr(i + 1, 1);
+        if (second.includes(nextInput)  ||  input === 'っ') {
+            const  withLittle = input + nextInput;
+            const  with2Little = input + nextInput + inputString.substr(i + 2, 1);
+            if (with2Little in japaneseTable) {
+                output += japaneseTable[with2Little];
+                i += 2;
+            } else if (withLittle in japaneseTable) {
+                output += japaneseTable[withLittle];
+                i += 1;
+            } else {
+                output += japaneseTable[input];
+            }
+        } else {
+            if (input in japaneseTable) {
+                output += japaneseTable[input];
+            } else {
+                output += input;
+            }
+        }
+    }
+    return  output;
+}
+
 interface  ColoredDiff {
     greenLine: string;
     redLine: string;
