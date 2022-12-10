@@ -6520,7 +6520,7 @@ const  copyTemplateLabel = "#copy-template:";
 const  typrmEnvPrefix = 'TYPRM_';
 const  indentRegularExpression = /^( |¥t)*/;
 const  numberRegularExpression = /^[0-9]+$/;
-const  zenkakuAlphabetExpression = /[ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ！”＃＄％＆’（）ー＝＾〜＼｜＠｀「『；＋：＊」』、＜。＞・？＿]/;
+const  zenkakuAlphabetExpression = /[ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ！”＃＄％＆’（）＝＾〜＼｜＠｀「『；＋：＊」』、＜。＞・？＿]/;
 const  variablePattern = "\\$\\{[^\\}]+\\}";  // ${__Name__}
 
 // Scores

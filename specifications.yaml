@@ -4,7 +4,12 @@ command: #keyword: typrm command list
         test:
             keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword tag >>"
             glossary tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches glossary tag >>"
+            idiom: #ref: ${GitHub}/typrm/src/main.test.ts#"idiom"
+                #ref: ${GitHub}/typrm/src/lib.ts#splitIdioms
+            kana mode: #ref: ${GitHub}/typrm/src/main.test.ts#"kana_mode"
+                #ref: ${GitHub}/typrm/src/lib.ts#chageToAlphabets
             find all: #ref: ${GitHub}/typrm/src/main.test.ts#describe("find all >>"
+                #search: searchWithoutTags
             mutual search: #ref: ${GitHub}/typrm/src/main.test.ts#describe("mutual search >>"
             ref tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("print reference >>"
             TYPRM_LINE_NUM_GETTER: #ref: ${GitHub}/typrm/src/main.test.ts#describe("line number getter >>"
@@ -18,7 +23,7 @@ command: #keyword: typrm command list
                     getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
-                    searchWithoutTags:
+                    searchWithoutTags: #keyword: searchWithoutTags 
                     FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =

@@ -926,6 +926,17 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')}${matchedColor('set')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')} ${matchedColor('set')}\n`,
         ], [
+            "kana_mode",
+            ["search", "ぎｔ"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            `keyword="git"\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('git')}\n`,
+        ], [
+            "kana_mode_bug",
+            ["search", "ワード"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':241:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ワード')}\n`,
+        ], [
             "bug case (1)",
             ["search", "go lang"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },

@@ -235,3 +235,7 @@ special_participle:
     #keyword: saving
     #keyword: saves
     #keyword: classes
+kana_mode:
+    #keyword: git
+kana_mode_bug:
+    #keyword: ワード
