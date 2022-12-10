@@ -773,6 +773,47 @@ export function coloredDiff(redLine, greenLine, redHeaderLength = 0, greenHeader
     }
     return { greenLine, redLine };
 }
+export function splitIdioms(idioms, words) {
+    var output = '';
+    const minimumWordLength = 2;
+    const dictionary = new Set();
+    for (const word of words) {
+        if (word.length >= minimumWordLength) {
+            dictionary.add(word);
+        }
+    }
+    const idiomArray = idioms.split(' ');
+    for (const idiom of idiomArray) {
+        var splitWords = '';
+        for (let offset = 0; offset < idiom.length;) {
+            var found = false;
+            var word = '';
+            for (let length = idiom.length - offset; length >= minimumWordLength; length -= 1) {
+                word = idiom.substr(offset, length);
+                if (dictionary.has(word)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                splitWords += word + ' ';
+                offset += word.length;
+            }
+            else {
+                splitWords = '';
+                break;
+            }
+        }
+        if (splitWords !== '') {
+            output += splitWords;
+        }
+        else {
+            output += idiom + ' ';
+        }
+    }
+    output = output.substring(0, output.length - 1);
+    return output;
+}
 export function chageToAlphabets(inputString) {
     const japaneseTable = {
         'あ': 'a', 'ｂ': 'b', 'ｃ': 'c', 'ｄ': 'd', 'え': 'e', 'ｆ': 'f', 'ｇ': 'g', 'ｈ': 'h',

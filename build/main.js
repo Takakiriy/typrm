@@ -2809,6 +2809,15 @@ async function search() {
     }
 }
 async function searchSub(keyword, isMutual) {
+    const thesaurus = new Thesaurus();
+    if ('thesaurus' in programOptions) {
+        const thesaurusFilePath = programOptions.thesaurus;
+        if (!fs.existsSync(thesaurusFilePath)) {
+            throw new Error(`not found the thesaurus file "${lib.getFullPath(thesaurusFilePath, process.cwd())}"`);
+        }
+        await thesaurus.load(thesaurusFilePath);
+    }
+    // chageToAlphabets
     const lastIsSpace = (' ' + '　').includes(keyword.slice(-1));
     if (lastIsSpace || zenkakuAlphabetExpression.test(keyword)) {
         const oldKeyword = keyword;
@@ -2818,6 +2827,7 @@ async function searchSub(keyword, isMutual) {
         }
     }
     keyword = keyword.trim();
+    keyword = lib.splitIdioms(keyword, thesaurus.getWords());
     // keywordWithoutTag = ...
     const searchTagIndex = tagIndexOf(keyword, searchLabel);
     if (searchTagIndex !== notFound) {
@@ -2847,14 +2857,6 @@ async function searchSub(keyword, isMutual) {
     // ...
     const fileFullPaths = await listUpFilePaths();
     var foundLines = [];
-    const thesaurus = new Thesaurus();
-    if ('thesaurus' in programOptions) {
-        const thesaurusFilePath = programOptions.thesaurus;
-        if (!fs.existsSync(thesaurusFilePath)) {
-            throw new Error(`not found the thesaurus file "${lib.getFullPath(thesaurusFilePath, process.cwd())}"`);
-        }
-        await thesaurus.load(thesaurusFilePath);
-    }
     const keywordsParticples = newParticplesFromKeyphrase(keywordWithoutTag, thesaurus);
     // search
     for (const inputFileFullPath of fileFullPaths) {
@@ -5121,6 +5123,7 @@ function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, s
 class Thesaurus {
     constructor() {
         this.synonym = new Map(); // the value is the normalized word
+        this.idiomWords = [];
     }
     get enabled() { return this.synonym.size !== 0; }
     async load(csvFilePath) {
@@ -5128,13 +5131,16 @@ class Thesaurus {
             fs.createReadStream(csvFilePath)
                 .pipe(csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data', (columns) => {
-                if (columns.length >= 1) {
+                if (columns.length >= 2) {
                     const normalizedKeyword = columns[0];
                     columns.shift();
                     const synonyms = columns;
                     synonyms.forEach((synonym) => {
                         this.synonym.set(synonym.toLowerCase(), normalizedKeyword);
                     });
+                }
+                else if (columns.length === 1) {
+                    this.idiomWords.push(columns[0]);
                 }
             })
                 .on('end', () => {
@@ -5153,6 +5159,17 @@ class Thesaurus {
         }
         const normalizedKeyphrase = words.join(' ');
         return normalizedKeyphrase;
+    }
+    getWords() {
+        const words = [];
+        for (const [key, value] of this.synonym.entries()) {
+            words.push(key);
+            words.push(value);
+        }
+        for (const word of this.idiomWords) {
+            words.push(word);
+        }
+        return words;
     }
 }
 // FoundLine

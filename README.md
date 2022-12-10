@@ -379,8 +379,8 @@ the path of the thesaurus file.
 The thesaurus file is in CSV format.
 Only synonyms can be specified for the thesaurus.
 
-    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
-    .../script.yaml:1: #keyword: JavaScript
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm search js
+    .../script.yaml:1: #keyword: JavaScript (js)
 
 Exmple of thesaurus.csv:
 
@@ -388,6 +388,22 @@ Exmple of thesaurus.csv:
     document, doc
     source, src
     destination, dst, dest
+
+Even if you enter the search keyword without separating each word of the idiom by space,
+typrm searches separately for each word.
+However, each word must be written in the thesaurus file.
+If you write two or more words in one line, they will be registered as separate words and also as synonyms.
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm search timeout
+    .../thread.yaml:1: #keyword: time out
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm search tmout
+    .../thread.yaml:1: #keyword: time out
+
+Exmple of thesaurus.csv:
+
+    time, tm
+    out
 
 
 ### Write secret data in a safe place - .env file

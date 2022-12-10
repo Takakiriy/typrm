@@ -821,6 +821,50 @@ export function  coloredDiff(redLine: string, greenLine: string, redHeaderLength
     return {greenLine, redLine};
 }
 
+export function  splitIdioms(idioms: string, words: string[]): string {
+    var    output = '';
+    const  minimumWordLength = 2;
+
+    const  dictionary = new Set<string>();
+    for (const word of words) {
+        if (word.length >= minimumWordLength) {
+            dictionary.add(word);
+        }
+    }
+    const  idiomArray = idioms.split(' ');
+
+    for (const idiom of idiomArray) {
+        var  splitWords = '';
+        for (let offset = 0;  offset < idiom.length; ) {
+            var  found = false;
+            var  word = '';
+            for (let length = idiom.length - offset;  length >= minimumWordLength;  length -= 1) {
+                word = idiom.substr(offset, length);
+
+                if (dictionary.has(word)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                splitWords += word + ' ';
+                offset += word.length;
+            } else {
+                splitWords = '';
+                break;
+            }
+        }
+        if (splitWords !== '') {
+            output += splitWords
+        } else {
+            output += idiom + ' ';
+        }
+    }
+    output = output.substring(0, output.length - 1);
+
+    return  output;
+}
+
 export function  chageToAlphabets(inputString: string): string {
     const  japaneseTable: {[i: string]: string} = {
         'あ':'a', 'ｂ':'b', 'ｃ':'c', 'ｄ':'d', 'え':'e', 'ｆ':'f', 'ｇ':'g', 'ｈ':'h',
@@ -876,6 +920,7 @@ export function  chageToAlphabets(inputString: string): string {
             }
         } else {
             if (input in japaneseTable) {
+
                 output += japaneseTable[input];
             } else {
                 output += input;

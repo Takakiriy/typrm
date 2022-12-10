@@ -770,6 +770,16 @@ describe("string >>", () => {
             expect(result.greenLine).toBe(`green: 012${green('aa')}589${green('X')}`);
         });
     });
+    describe("splitIdioms >>", () => {
+        expect(lib.splitIdioms('timeout', ['time', 'out'])).toBe('time out');
+        expect(lib.splitIdioms('timeout timeout', ['long', 'time', 'out'])).toBe('time out time out');
+        expect(lib.splitIdioms('timeou', ['time', 'out'])).toBe('timeou');
+        expect(lib.splitIdioms('timeouts', ['time', 'out'])).toBe('timeouts');
+        expect(lib.splitIdioms('time out', ['other', 'words'])).toBe('time out');
+        expect(lib.splitIdioms('タイムアウト', ['タイム', 'time', 'アウト'])).toBe('タイム アウト');
+        expect(lib.splitIdioms('clipboard', ['clip', 'board'])).toBe('clip board');
+        expect(lib.splitIdioms('clipboard', ['clip', 'board', 'clipboard'])).toBe('clipboard');
+    });
     describe("chageToAlphabets >>", () => {
         expect(lib.chageToAlphabets('ｃｄ')).toBe('cd');
         expect(lib.chageToAlphabets('ｃｄ ')).toBe('cd ');

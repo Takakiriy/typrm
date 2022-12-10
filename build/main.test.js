@@ -1092,6 +1092,31 @@ describe("searches keyword tag >>", () => {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} DI (object dep${matchedColor('end')}ency injection)\n` +
                     pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} DI ${matchedColor('object')} (dep${matchedColor('end')}ency injection object), ${matchedColor('end')} ${matchedColor('object')}\n` +
                     pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} ${matchedColor('end')}\n`,
+            ], [
+                "idiom",
+                ["search", "マウスクリック"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('マウス')} ${matchedColor('クリック')}\n`,
+            ], [
+                "idiom_synonym_1",
+                ["search", "timeout"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} タイム アウト (${matchedColor('time')} ${matchedColor('out')})\n`,
+            ], [
+                "idiom_synonym_2",
+                ["search", "タイムアウト"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('タイム')} ${matchedColor('アウト')}\n`,
+            ], [
+                "idiom_compound_word",
+                ["search", "グッドルッキング"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('グッドルッキング')}\n`,
+            ], [
+                "idiom_reverse",
+                ["search", "マウス クリック"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('マウス')}${matchedColor('クリック')}\n`,
             ],
         ])("%s", async (caseName, arguments_, options, answer) => {
             chdirInProject('src');

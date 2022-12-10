@@ -3002,6 +3002,16 @@ async function  search() {
 }
 
 async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefResult> {
+    const  thesaurus = new Thesaurus();
+    if ('thesaurus' in programOptions) {
+        const  thesaurusFilePath = programOptions.thesaurus;
+        if ( ! fs.existsSync(thesaurusFilePath)) {
+            throw  new Error(`not found the thesaurus file "${lib.getFullPath(thesaurusFilePath, process.cwd())}"`);
+        }
+        await  thesaurus.load(thesaurusFilePath);
+    }
+
+    // chageToAlphabets
     const  lastIsSpace = (' '+'　').includes(keyword.slice(-1));
     if (lastIsSpace || zenkakuAlphabetExpression.test(keyword)) {
         const  oldKeyword = keyword;
@@ -3011,7 +3021,10 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             console.log(`keyword="${keyword.trim()}"`);
         }
     }
+
     keyword = keyword.trim();
+
+    keyword = lib.splitIdioms(keyword, thesaurus.getWords());
 
     // keywordWithoutTag = ...
     const  searchTagIndex = tagIndexOf(keyword, searchLabel);
@@ -3040,14 +3053,6 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     // ...
     const  fileFullPaths: string[] = await listUpFilePaths();
     var  foundLines: FoundLine[] = [];
-    const  thesaurus = new Thesaurus();
-    if ('thesaurus' in programOptions) {
-        const  thesaurusFilePath = programOptions.thesaurus;
-        if ( ! fs.existsSync(thesaurusFilePath)) {
-            throw  new Error(`not found the thesaurus file "${lib.getFullPath(thesaurusFilePath, process.cwd())}"`);
-        }
-        await  thesaurus.load(thesaurusFilePath);
-    }
     const  keywordsParticples = newParticplesFromKeyphrase(keywordWithoutTag, thesaurus);
 
     // search
@@ -5566,6 +5571,7 @@ function  searchDefinedSettingIndexInCurrentLevel(
 
 class Thesaurus {
     synonym = new Map<string, string>();  // the value is the normalized word
+    idiomWords: string[] = [];
     get  enabled(): boolean { return this.synonym.size !== 0; }
 
     async  load(csvFilePath: string): Promise<void> {
@@ -5576,7 +5582,7 @@ class Thesaurus {
                     csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data',
                     (columns: string[]) => {
-                        if (columns.length >= 1) {
+                        if (columns.length >= 2) {
                             const  normalizedKeyword = columns[0];
                             columns.shift();
                             const  synonyms = columns;
@@ -5584,6 +5590,8 @@ class Thesaurus {
 
                                 this.synonym.set(synonym.toLowerCase(), normalizedKeyword);
                             });
+                        } else if (columns.length === 1) {
+                            this.idiomWords.push(columns[0]);
                         }
                     })
                 .on('end', () => {
@@ -5604,6 +5612,18 @@ class Thesaurus {
         }
         const   normalizedKeyphrase = words.join(' ');
         return  normalizedKeyphrase;
+    }
+
+    getWords(): string[] {
+        const  words: string[] = [];
+        for (const [key, value] of this.synonym.entries()) {
+            words.push(key);
+            words.push(value);
+        }
+        for (const word of this.idiomWords) {
+            words.push(word);
+        }
+        return  words;
     }
 }
 

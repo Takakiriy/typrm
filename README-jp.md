@@ -392,8 +392,8 @@ C++ TLS で検索すると C++ 用語の TLS だけが見つかります。
 シソーラス ファイル は、CSV 形式です。
 シソーラスは、同義語だけ指定できます。
 
-    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm s js
-    .../script.yaml:1: #keyword: JavaScript
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm search js
+    .../script.yaml:1: #keyword: JavaScript (js)
 
 thesaurus.csv のサンプル:
 
@@ -402,6 +402,21 @@ thesaurus.csv のサンプル:
     source, src
     destination, dst, dest
     string, 文字列
+
+イディオムのそれぞれの語を空白で分けずに検索キーワードに入力しても、語に分けて検索します。
+ただし、シソーラス ファイル にそれぞれの語が書かれている必要があります。
+1行に 2つ以上の語を書いた場合、分ける語として登録されると同時に、同義語としても登録されます。
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm search timeout
+    .../thread.yaml:1: #keyword: time out
+
+    $ TYPRM_THESAURUS=/home/user1/Document/thesaurus.csv  typrm search tmout
+    .../thread.yaml:1: #keyword: time out
+
+thesaurus.csv のサンプル:
+
+    time, tm
+    out
 
 
 ### 秘密データを安全な場所に書く - .env ファイル

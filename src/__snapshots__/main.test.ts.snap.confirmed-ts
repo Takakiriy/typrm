@@ -5739,6 +5739,73 @@ PowerShell, PS
 "
 `;
 
+exports[`searches keyword tag >> thesaurus >> idiom: sourceFileContents 1`] = `
+"#keyword: マウス クリック
+#keyword: マウス
+#keyword: クリック
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+クリック
+マウス
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_compound_word: sourceFileContents 1`] = `
+"#keyword: グッドルッキング
+#keyword: グッド
+#keyword: ルッキング
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_compound_word: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+グッド
+ルッキング
+グッドルッキング
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_reverse: sourceFileContents 1`] = `
+"#keyword: マウスクリック
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_reverse: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_synonym_1: sourceFileContents 1`] = `
+"#keyword: タイム アウト
+#keyword: タイム
+#keyword: アウト
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_synonym_1: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+time, タイム
+out, アウト
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_synonym_2: sourceFileContents 1`] = `
+"#keyword: タイム アウト
+#keyword: タイム
+#keyword: アウト
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> idiom_synonym_2: thesaurus 1`] = `
+"#keyword: thesaurus.csv 
+time, タイム
+out, アウト
+"
+`;
+
 exports[`searches keyword tag >> thesaurus >> ignore case: sourceFileContents 1`] = `
 "#keyword: PowerShell
 "
