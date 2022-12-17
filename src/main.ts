@@ -3377,22 +3377,13 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
 
         const  bestFound = targetStrings.reduce(
             (bestFound: FoundLine, aTargetString: string, stringIndex: number) => {
-                const  found = new FoundLine();
+                var    found = new FoundLine();
                 var    previousPosition = -1;
                 var    isNormalizedMatched = false;
                 const  aTargetStringLowerCase = aTargetString.toLowerCase();
                 const  normalizedTargetKeywords = thesaurus.normalize(aTargetString);
                 const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
-                const  wordPositions = new WordPositions();
-                const  normalizedWordPositions = new WordPositions();
-                wordPositions.setPhrase(aTargetString);
-                normalizedWordPositions.setPhrase(normalizedTargetKeywords);
-                const  superMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
-                const  semiMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
-                const  participleMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
-                const  caseIgnoredSuperMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
-                const  caseIgnoredParticipleMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
-                const  partMatchedCountsByWord: number[] = new Array<number>(wordPositions.length + normalizedWordPositions.length).fill( 0 );
+                const  matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
 
                 // #focus: score
                 for (let wordIndex = 0;  wordIndex < keywordsParticples.words.length;  wordIndex += 1) {
@@ -3415,27 +3406,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                         // }
                     }
                     if (result.position !== notFound) {
-                        const  wordPosition = wordPositions.getWordIndex(result.position);
-                        if (result.score === fullMatchScore ||  result.score == wordsSuperMatchScore) {
-                            superMatchedCountsByWord[wordPosition] += 1;
-                            caseIgnoredSuperMatchedCountsByWord[wordPosition] += 1;
-                            semiMatchedCountsByWord[wordPosition] += 1;
-                            participleMatchedCountsByWord[wordPosition] += 1;
-                            caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                        } else if (result.score === caseIgnoredFullMatchScore  ||  result.score === caseIgnoredWordSuperMatchScore) {
-                            caseIgnoredSuperMatchedCountsByWord[wordPosition] += 1;
-                            caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                        } else if (result.score === wordsSemiMatchScore) {
-                            semiMatchedCountsByWord[wordPosition] += 1;
-                            participleMatchedCountsByWord[wordPosition] += 1;
-                            caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                        } else if (result.score === particpleFullMatchScore  ||  result.score === particpleWordMatchScore) {
-                            participleMatchedCountsByWord[wordPosition] += 1;
-                            caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                        } else if (result.score === caseIgnoredParticpleWordMatchScore) {
-                            caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                        }
-                        partMatchedCountsByWord[wordPosition] += 1;
+                        matchedCounts.setFoundPosition(result.position, result.score, false);
                         found.matchedSearchKeywordCount += 1;
                         previousPosition = result.position;
                     }
@@ -3459,27 +3430,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                                 // }
                             }
                             if (result.position !== notFound) {
-                                const  wordPosition = wordPositions.getWordIndex(result.position);
-                                if (result.score === fullMatchScore  ||  result.score == wordsSuperMatchScore) {
-                                    superMatchedCountsByWord[wordPosition] += 1;
-                                    caseIgnoredSuperMatchedCountsByWord[wordPosition] += 1;
-                                    semiMatchedCountsByWord[wordPosition] += 1;
-                                    participleMatchedCountsByWord[wordPosition] += 1;
-                                    caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                                } else if (result.score === caseIgnoredFullMatchScore  ||  result.score === caseIgnoredWordSuperMatchScore) {
-                                    caseIgnoredSuperMatchedCountsByWord[wordPosition] += 1;
-                                    caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                                } else if (result.score === wordsSemiMatchScore) {
-                                    semiMatchedCountsByWord[wordPosition] += 1;
-                                    participleMatchedCountsByWord[wordPosition] += 1;
-                                    caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                                } else if (result.score === particpleFullMatchScore  ||  result.score === particpleWordMatchScore) {
-                                    participleMatchedCountsByWord[wordPosition] += 1;
-                                    caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                                } else if (result.score === caseIgnoredParticpleWordMatchScore) {
-                                    caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
-                                }
-                                partMatchedCountsByWord[wordPositions.length + normalizedWordPositions.getWordIndex(result.position)] += 1;
+                                matchedCounts.setFoundPosition(result.position, result.score, true);
                                 found.matchedSearchKeywordCount += 1;
                                 previousPosition = result.position;
                                 if (normalizedTargetKeywords !== aTargetString) {
@@ -3496,21 +3447,21 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                         var  matchedTargetString = normalizedTargetKeywords;
                     }
                     // e.g.
-                    // keyphrase = "aa bbb ccc"
-                    // matchedTargetString = "aabbb ccc dd ee"
+                    //     keyphrase = "aa bbb ccc"
+                    //     matchedTargetString = "aabbb ccc dd ee"
                     // score += character count
-                    // matchedKeywordCount = 3;
-                    // matchedTargetKeywordCount = 2
-                    // testedWordCount = 4
+                    // searchKeywordCount = 3
+                    // superMatchedTargetKeywordCount = 1  // ccc
+                    // semiMatchedTargetKeywordCount = 1
+                    // participleMatchedTargetKeywordCount = 1
+                    // caseIgnoredSuperMatchedTargetKeywordCount = 1
+                    // caseIgnoredParticipleMatchedTargetKeywordCount = 1
+                    // partMatchedTargetKeywordCount = 2
+                    // targetWordCount = 4
                     found.score += 2 * (keyphrase.length - matchedTargetString.length);
                         // 2 is double score from the score of different (upper/loser) case
                     found.searchKeywordCount = keywordsParticples.words.length;
-                    found.superMatchedTargetKeywordCount = superMatchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    found.semiMatchedTargetKeywordCount = semiMatchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    found.participleMatchedTargetKeywordCount = participleMatchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    found.caseIgnoredSuperMatchedTargetKeywordCount = caseIgnoredSuperMatchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    found.caseIgnoredParticipleMatchedTargetKeywordCount = caseIgnoredParticipleMatchedCountsByWord.filter((count)=>(count >= 1)).length;
-                    found.partMatchedTargetKeywordCount = partMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+                    found = matchedCounts.countFoundWords(found);
                     if ( ! isNormalizedMatched) {
                         found.targetWordCount = aTargetString.split(' ').length;
                     } else {
@@ -3679,6 +3630,78 @@ function  isSuperSeparator(checkingCharacter: string) {
 
 function  isSeparator(checkingCharacter: string) {
     return  programOptions.wordSeparators.includes(checkingCharacter);
+}
+
+class  MatchedCounts {
+    wordPositions: WordPositions;
+    normalizedWordPositions: WordPositions;
+    superMatchedCountsByWord: number[];
+    semiMatchedCountsByWord: number[];
+    participleMatchedCountsByWord: number[];
+    caseIgnoredSuperMatchedCountsByWord: number[];
+    caseIgnoredParticipleMatchedCountsByWord: number[];
+    partMatchedCountsByWord: number[];
+
+    constructor(targetString: string, normalizedTargetKeywords: string) {
+        this.wordPositions = new WordPositions();
+        this.normalizedWordPositions = new WordPositions();
+        this.wordPositions.setPhrase(targetString);
+        this.normalizedWordPositions.setPhrase(normalizedTargetKeywords);
+
+        const  countersLength = this.wordPositions.length + this.normalizedWordPositions.length;
+        this.superMatchedCountsByWord = new Array<number>(countersLength).fill( 0 );
+        this.semiMatchedCountsByWord = new Array<number>(countersLength).fill( 0 );
+        this.participleMatchedCountsByWord = new Array<number>(countersLength).fill( 0 );
+        this.caseIgnoredSuperMatchedCountsByWord = new Array<number>(countersLength).fill( 0 );
+        this.caseIgnoredParticipleMatchedCountsByWord = new Array<number>(countersLength).fill( 0 );
+        this.partMatchedCountsByWord = new Array<number>(countersLength).fill( 0 );
+    }
+
+    setFoundPosition(foundPosition: number, score: number, useThesaurus: boolean) {
+        if (foundPosition === notFound) {
+            return;
+        }
+        const  wordPosition = this.wordPositions.getWordIndex(foundPosition);
+        if (useThesaurus) {
+            var  normalizedWordPosition = this.wordPositions.length + this.normalizedWordPositions.getWordIndex(foundPosition);
+        } else {
+            var  normalizedWordPosition = notFound;
+        }
+        if (score === fullMatchScore  ||  score == wordsSuperMatchScore) {
+            this.superMatchedCountsByWord[wordPosition] += 1;
+            this.caseIgnoredSuperMatchedCountsByWord[wordPosition] += 1;
+            this.semiMatchedCountsByWord[wordPosition] += 1;
+            this.participleMatchedCountsByWord[wordPosition] += 1;
+            this.caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
+        } else if (score === caseIgnoredFullMatchScore  ||  score === caseIgnoredWordSuperMatchScore) {
+            this.caseIgnoredSuperMatchedCountsByWord[wordPosition] += 1;
+            this.caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
+        } else if (score === wordsSemiMatchScore) {
+            this.semiMatchedCountsByWord[wordPosition] += 1;
+            this.participleMatchedCountsByWord[wordPosition] += 1;
+            this.caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
+        } else if (score === particpleFullMatchScore  ||  score === particpleWordMatchScore) {
+            this.participleMatchedCountsByWord[wordPosition] += 1;
+            this.caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
+        } else if (score === caseIgnoredParticpleWordMatchScore) {
+            this.caseIgnoredParticipleMatchedCountsByWord[wordPosition] += 1;
+        }
+        if (useThesaurus) {
+            this.partMatchedCountsByWord[normalizedWordPosition] += 1;
+        } else {
+            this.partMatchedCountsByWord[wordPosition] += 1;
+        }
+    }
+
+    countFoundWords(found: FoundLine): FoundLine {
+        found.superMatchedTargetKeywordCount = this.superMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+        found.semiMatchedTargetKeywordCount = this.semiMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+        found.participleMatchedTargetKeywordCount = this.participleMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+        found.caseIgnoredSuperMatchedTargetKeywordCount = this.caseIgnoredSuperMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+        found.caseIgnoredParticipleMatchedTargetKeywordCount = this.caseIgnoredParticipleMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+        found.partMatchedTargetKeywordCount = this.partMatchedCountsByWord.filter((count)=>(count >= 1)).length;
+        return  found;
+    }
 }
 
 function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
@@ -5823,7 +5846,7 @@ class FoundLine {
     matchedSearchKeywordCount: number = 0;  // hit count to search keyword
     superMatchedTargetKeywordCount: number = 0;  // e.g. "str"   // hit count to target keyword
     semiMatchedTargetKeywordCount: number = 0;                   // e.g. "str."
-    participleMatchedTargetKeywordCount: number = 0;             // e.g. "strs"
+    participleMatchedTargetKeywordCount: number = 0;             // e.g. "strs", "stred", "string"
     caseIgnoredSuperMatchedTargetKeywordCount: number = 0;       // e.g. "STR"
     caseIgnoredParticipleMatchedTargetKeywordCount: number = 0;  // e.g. "STRs"
     partMatchedTargetKeywordCount: number = 0;                   // e.g. "stripe", "STRIPE", "STRS"
