@@ -22,9 +22,12 @@ command: #keyword: typrm command list
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
-                    foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
-                        # // Debug score compare in 2 founds
+                        setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all
+                        addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
+                    foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
+                        compareScoreAndSoOn:  #ref: ${GitHub}/typrm/src/main.ts#function  compareScoreAndSoOn
+                        # // Debug score compare in 2 founds
                     FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
