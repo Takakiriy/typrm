@@ -1602,8 +1602,10 @@ export function  ppClear() {
 // Example:
 //   var c = cc().debugOut;  // Set break point here and watch the variable c
 // Example:
-//   if ( cc(2).isTarget )
+//   if ( cc(1).isTarget )  // count up and if count is 1
 //   var d = pp('');  // Set break point here and watch the variable d
+// Example:
+//   if ( gCount[0] >= 1 )  // if count is 1 or over
 export function  cc( targetCount: number = 9999999, label: string = '0' ) {
     if (!(label in gCount)) {
         gCount[label] = 0;
@@ -1611,14 +1613,14 @@ export function  cc( targetCount: number = 9999999, label: string = '0' ) {
 
     gCount[label] += 1;
     pp( `${label}:countThrough[${label}] = ${gCount[label]}` );
-    const isTarget = ( gCount[label] === targetCount );
+    const  isTarget = ( gCount[label] === targetCount );
 
     if (isTarget) {
         pp( '    **** It is before the target! ****' );
     }
     return  { isTarget, debugOut };
 }
-const  gCount: {[name: string]: number} = {};
+export const  gCount: {[name: string]: number} = {};
 const  notFoundInFile = -2;
 const  notFound = -1;
 

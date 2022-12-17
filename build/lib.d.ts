@@ -122,4 +122,7 @@ export declare function cc(targetCount?: number, label?: string): {
     isTarget: boolean;
     debugOut: string[];
 };
+export declare const gCount: {
+    [name: string]: number;
+};
 export {};

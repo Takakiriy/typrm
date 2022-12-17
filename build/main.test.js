@@ -794,7 +794,7 @@ describe("searches keyword tag >>", () => {
             "sharp",
             ["search", 'space sharp is #. "parcent 20" is "%20".'],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':94:') + `     ${keywordLabelColor('#keyword:')} "${matchedColor('space')} ${matchedColor('sharp')} ${matchedColor('is')}is${matchedColor('is')} ${matchedColor('#.')} ${matchedColor('""parcent')}${matchedColor(' 20"')}" i${matchedColor('s ""%20"')}"."\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':94:') + `     ${keywordLabelColor('#keyword:')} "${matchedColor('space')} ${matchedColor('sharp')} ${matchedColor('is')} ${matchedColor('#.')} ${matchedColor('""parcent')}${matchedColor(' 20"')}" i${matchedColor('s ""%20"')}"."\n`,
             // This is little wrong answer
         ], [
             "ignore case",
@@ -868,51 +868,77 @@ describe("searches keyword tag >>", () => {
         ], [
             "participle_is_better_than_different_case",
             ["search", "str"],
-            { folder: "test_data/search/2", disableFindAll: '', test: "", "foundCountMax": "20" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':227:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':226:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STRS')}\n` +
+            { folder: "test_data/search/2", test: "", "foundCountMax": "40" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':241:') + `     full 12: ${matchedColor('str')}ipe\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':240:') + `     full 11: ${matchedColor('STR')}S\n` + // ToDo: add STRs
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':227:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':226:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STRS')}\n` + // ToDo: change to (STR)S
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     full 8d: ${matchedColor('string')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':238:') + `     full 8c: ${matchedColor('strer')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':237:') + `     full 8b: ${matchedColor('stred')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':236:') + `     full 8a: ${matchedColor('strs')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':235:') + `     full 7:  ${matchedColor('str')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':234:') + `     full 6:  ${matchedColor('STR')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':233:') + `     full 3d: ${matchedColor('string')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':232:') + `     full 3c: ${matchedColor('strer')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':231:') + `     full 3b: ${matchedColor('stred')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':230:') + `     full 3a: ${matchedColor('strs')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     full 2   ${matchedColor('str')}:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':228:') + `     full 1:  ${matchedColor('str')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':225:') + `     8d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':223:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':224:') + `     8c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':223:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':222:') + `     8a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')} replace\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':221:') + `     7:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')} replace\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':220:') + `     6:  ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':219:') + `     3d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':217:') + `     3b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':218:') + `     3c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':217:') + `     3b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':216:') + `     3a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':214:') + `     1:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}\n`,
         ], [
+            "multiple_search_words_hit_is_better_than_one_word",
+            ["search", "launch", "json"],
+            { folder: "test_data/search/2", test: "", "foundCountMax": "40" },
+            // "json others", "json" are not shown.
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':257:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('launch')}pad.${matchedColor('json')}\n`,
+        ], [
+            "find_all_many_match_is_better_than_keyword_one_match",
+            ["search", "nex", "pre"],
+            { folder: "test_data/search/2", test: "", "foundCountMax": "20" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':261:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('nex')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':262:') + `     ${matchedColor('nex')}t ${matchedColor('pre')}v\n`,
+        ], [
             "special_participle",
             ["search", "save", "class"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':237:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('classes')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':235:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saving')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':233:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saver')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':234:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saved')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':236:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saves')}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':251:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('classes')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':249:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saving')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':250:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saves')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':248:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saved')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':247:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saver')}\n`,
         ], [
             "target word count",
             ["search", "new task"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':21:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')} only\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':20:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':22:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':22:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':20:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n`,
         ], [
             "target word count 3",
             ["search", "world wide web"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':67:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('web')} ${matchedColor('World')} ${matchedColor('wide')}, ${matchedColor('World')} ${matchedColor('wide')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':66:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':65:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
         ], [
             "few_word_count",
             ["search", "mini bluetooth speaker"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':230:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':231:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':244:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':243:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':245:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
         ], [
             "test_of_double_space",
             ["search", "big  boss"],
@@ -930,12 +956,12 @@ describe("searches keyword tag >>", () => {
             ["search", "ぎｔ"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             `keyword="git"\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('git')}\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':253:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('git')}\n`,
         ], [
             "kana_mode_bug",
             ["search", "ワード"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':241:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ワード')}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':255:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ワード')}\n`,
         ], [
             "bug case (1)",
             ["search", "go lang"],
@@ -957,26 +983,26 @@ describe("searches keyword tag >>", () => {
             "output order (3)",
             ["search", "grape"],
             { folder: "test_data/search/2", disableFindAll: '', test: "", foundCountMax: "99" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':32:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':42:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':40:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':41:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('GRAPE')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':32:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':30:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':31:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('grape')}fruit\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':43:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':39:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':33:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':45:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':29:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':47:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':45:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':46:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('GRAPE')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':35:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':37:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':35:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':36:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('grape')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':44:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':48:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':34:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':38:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':44:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':38:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':34:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
         ], [
             "output order (4)",
             ["search", "main", "stage"],
@@ -988,31 +1014,31 @@ describe("searches keyword tag >>", () => {
             "output order (5)",
             ["search", "silver", "arrow"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':56:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':54:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':55:') + `     ${keywordLabelColor('#keyword:')} [${matchedColor('silver')}/super-system], ${matchedColor('SILVER')} ${matchedColor('Arrows')}\n`,
         ], [
             "output order (6)",
             ["search", "tool", "release"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':59:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')} now\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':60:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':58:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, ${matchedColor('Tool')} deploy\n`,
         ], [
             "many result",
             ["search", "hello"],
             { folder: "test_data/search/2", disableFindAll: '', test: "", locale: "en-US" },
             '... (To show more result, restart typrm with --found-count-max option)\n' +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':99:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':101:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':103:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':105:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':96:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':98:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':100:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':102:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':101:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':99:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':97:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':106:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':104:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':106:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':102:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':100:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':98:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':96:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n`,
         ], [
             "without tag parameter",
             ["search", "specular"],
@@ -1036,8 +1062,8 @@ describe("searches keyword tag >>", () => {
             "score tag",
             ["search", "score_tag"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':192:') + `         11: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':195:') + `         13: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':195:') + `         13: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':192:') + `         11: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':196:') + `     2: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':194:') + `             112: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n`,
         ], [
@@ -1080,7 +1106,7 @@ describe("searches keyword tag >>", () => {
         expect(main.stdout).toBe(answer);
     });
     describe("thesaurus >>", () => {
-        test.each([
+        test.only.each([
             [
                 "acronym search keyword",
                 ["search", "PS"],
@@ -1194,15 +1220,15 @@ describe("searches glossary tag >>", () => {
             "glossary is less score than keyword",
             ["search", "grape"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + `     keyword:  ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
         ], [
             "glossary with empty line",
             ["search", "space"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}1:\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}2:\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}2:\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}1:\n`,
         ], [
             "glossary with parameters (1)",
             ["search", "category1 apple"],
@@ -1247,17 +1273,17 @@ describe("find all >>", () => {
             "1st",
             ["search", "find_all_abc"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':108:') + `     ${matchedColor('find_all_abc')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':110:') + `     ${matchedColor('find_all_abc')}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':110:') + `     ${matchedColor('find_all_abc')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':108:') + `     ${matchedColor('find_all_abc')}\n`,
         ], [
-            "shffle",
+            "shuffle",
             ["search", "find_all_1  find_all_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n`,
         ], [
-            "shffle jp",
+            "shuffle jp",
             ["search", "find_all_1\u{3000}find_all_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n` +
@@ -1266,12 +1292,11 @@ describe("find all >>", () => {
         ], [
             "full match",
             ["search", "full_match_1  full_match_1  full_match_2"],
-            { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':120:') + `     ${matchedColor('full_match_1')}  ${matchedColor('full_match_2')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':119:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':122:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':123:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':124:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n`,
+            { folder: "test_data/search/2", test: "", locale: "en-US", "foundCountMax": "3" },
+            `... (To show more result, restart typrm with --found-count-max option)\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':120:') + `     ${matchedColor('full_match_1')}  ${matchedColor('full_match_2')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':121:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':119:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n`,
         ], [
             "full match or keyword tag",
             ["search", "fk_1 fk_2"],

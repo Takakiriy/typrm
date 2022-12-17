@@ -118,11 +118,11 @@ find all >> shuffle:
 find all >> full match:
     full_match_1  full_match_1  full_match_2
     full_match_1  full_match_2
-        ... 2 keywords match is shown
     full_match_1  full_match_1  full_match_2
-    full_match_1  full_match_1  full_match_2
-    full_match_1  full_match_1  full_match_2
-        ... 4th full match is not shown
+    many match is not shown ...
+    full_match_1  full_match_2
+    ...
+    ...
 find all >> search tag:
     - #keyword: find_search_tag_1
     - link  #search: find_search_tag_1
@@ -225,6 +225,20 @@ participle_is_better_than_different_case:
     8d: #keyword: string replace
     11: #keyword: STRS
     12: #keyword: stripe
+    full 1:  str
+    full 2   str:
+    full 3a: strs
+    full 3b: stred
+    full 3c: strer
+    full 3d: string
+    full 6:  STR
+    full 7:  str replace
+    full 8a: strs replace
+    full 8b: stred replace
+    full 8c: strer replace
+    full 8d: string replace
+    full 11: STRS
+    full 12: stripe
 few_word_count:
     #keyword: bluetooth mini
     #keyword: bluetooth speaker
@@ -239,3 +253,10 @@ kana_mode:
     #keyword: git
 kana_mode_bug:
     #keyword: ワード
+multiple_search_words_hit_is_better_than_one_word:
+    #keyword: launchpad.json
+    #keyword: json
+    #keyword: json others
+find_all_many_match_is_better_than_keyword_one_match:
+    #keyword: nex
+    next prev
