@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import sharp from 'sharp';
-import { cc } from "./lib";
+// import { pp, cc } from "./lib";
 var  __dirname: string = path.resolve();
 // var  debugSearchScore = false;
 
@@ -1823,6 +1823,7 @@ class  WordPositions {
 interface  Particples {
     keyphrase: string;
     words: ParticpleWord[];
+    formalWordsLowerCase: string[];
     normalizedWords: ParticpleWord[];
 }
 
@@ -1861,6 +1862,7 @@ function  newParticplesFromKeyphrase(keyphrase: string, thesaurus: Thesaurus): P
                     keywordS.toLowerCase() + 's'],
             };
         }),
+        formalWordsLowerCase: keywords.map(keyword => thesaurus.normalize(keyword).toLocaleLowerCase()),
         normalizedWords: keywords.map(keyword => {
             const  normalized = thesaurus.normalize(keyword);
             const  normalizedLowerCase = normalized.toLowerCase()
@@ -3318,6 +3320,10 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     //     }
     // }
 
+    if (thesaurus.errorMessage) {
+        console.log(thesaurus.errorMessage);
+    }
+
     // console.log(foundLineInformation)
     const  foundCountMax = parseInt(programOptions.foundCountMax);
     if (foundLines.length > foundCountMax) {
@@ -3381,7 +3387,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                 var    previousPosition = -1;
                 var    isNormalizedMatched = false;
                 const  aTargetStringLowerCase = aTargetString.toLowerCase();
-                const  normalizedTargetKeywords = thesaurus.normalize(aTargetString);
+                const  normalizedTargetKeywords = thesaurus.normalize(aTargetString, keywordsParticples.formalWordsLowerCase);
                 const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
                 const  matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
 
@@ -5766,7 +5772,9 @@ function  searchDefinedSettingIndexInCurrentLevel(
 
 class Thesaurus {
     synonym = new Map<string, string>();  // the value is the normalized word
+    formalLowerCase = new Set<string>();
     idiomWords: string[] = [];
+    errorMessage: string = '';
     get  enabled(): boolean { return this.synonym.size !== 0; }
 
     async  load(csvFilePath: string): Promise<void> {
@@ -5777,6 +5785,7 @@ class Thesaurus {
                     csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data',
                     (columns: string[]) => {
+                        this.formalLowerCase.add(columns[0].toLowerCase());
                         if (columns.length >= 2) {
                             const  normalizedKeyword = columns[0];
                             columns.shift();
@@ -5796,13 +5805,39 @@ class Thesaurus {
         return  promise;
     }
 
-    normalize(keyphrase: string): string {
+    // normalize:  #search: typrm thesaurus relation
+    normalize(keyphrase: string, relationUntilFormalKeywordsLowerCase?: string[]): string {
         const  words = keyphrase.split(' ');
+        const  foreignKeywords = new Set<string>();
         for (let i = 0;  i < words.length;  i+=1) {
-            const  word = words[i].toLowerCase();
-            if (this.synonym.has(word)) {
 
-                words[i] = this.synonym.get(word)!;
+            var  wordLowerCase = words[i].toLowerCase();
+            if ( ! relationUntilFormalKeywordsLowerCase) {
+                if (this.formalLowerCase.has(wordLowerCase)) {
+                    continue;
+                }
+            } else {
+                if (relationUntilFormalKeywordsLowerCase.includes(wordLowerCase)) {
+                    continue;
+                }
+            }
+            foreignKeywords.clear();
+
+            while (this.synonym.has(wordLowerCase)) {
+
+                words[i] = this.synonym.get(wordLowerCase)!;
+                if ( ! relationUntilFormalKeywordsLowerCase) {
+                    break;
+                }
+                wordLowerCase = words[i].toLowerCase();
+                if (relationUntilFormalKeywordsLowerCase!.includes(wordLowerCase)) {
+                    break;
+                }
+                if (foreignKeywords.has(wordLowerCase)) {
+                    this.errorMessage = `ERROR: thesaurus has infinite loop: ${Array.from(foreignKeywords)}`;
+                    break;
+                }
+                foreignKeywords.add(wordLowerCase);
             }
         }
         const   normalizedKeyphrase = words.join(' ');

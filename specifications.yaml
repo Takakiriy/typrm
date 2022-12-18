@@ -22,6 +22,7 @@ command: #keyword: typrm command list
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
+                        thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
                         setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
@@ -232,3 +233,31 @@ other specifications:
                 # class ReplaceToTagTree {
                 #     moveToLine_Immutably(parser: Parser, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_for_moveToLine {
                 #         return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;
+    thesaurus relation: #keyword: typrm thesaurus relation
+        thesaurus.csv:
+            JavaScript, js
+            TypeScript, ts, JavaScript
+            React, rc, TypeScript
+        search ts:
+            search
+                ts  →  TypeScript
+                TypeScript  →  TypeScript              // search keyword is normalized "without" relation
+            target
+                JavaScript  → (TypeScript) found       // target keyword is normalized "with" relation, but TypeScript is not normalized because it is a search keyword
+                TypeScript  →  TypeScript  found
+                React       →  React       not found
+        search js:
+            search
+                js  →  JavaScript
+                JavaScript  →  JavaScript              // search keyword is normalized "without" relation
+            target
+                JavaScript  →  JavaScript  found       // target keyword JavaScript is not normalized because it is a search keyword
+                TypeScript  →  TypeScript  not found
+                React       →  React       not found
+        search rc:
+            search
+                rc  →  React
+            target
+                JavaScript  → (React)  found     // search keyword is normalized with multi relations
+                TypeScript  → (React)  found  
+                React       →  React   found  

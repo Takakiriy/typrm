@@ -19,7 +19,8 @@ You can execute the command just by copy and paste the displayed command.
     - [Search target folder settings](#search-target-folder-settings)
     - [Search priorities and set snippets](#search-priorities-and-set-snippets)
     - [Details of the search command](#details-of-the-search-command)
-    - [#glossary tags and the thesaurus file](#glossary-tags-and-the-thesaurus-file)
+    - [#glossary tags](#glossary-tags)
+    - [thesaurus file](#thesaurus-file)
     - [Write secret data in a safe place - .env file](#write-secret-data-in-a-safe-place---env-file)
   - [Replace (replace command, reset command) - make a command input just by copy and paste](#replace-replace-command-reset-command---make-a-command-input-just-by-copy-and-paste)
     - [Replace by #to tag](#replace-by-to-tag)
@@ -109,6 +110,9 @@ Sample text file `MyLinux.yaml` content:
 
 Specify the path of the folder containing the file to be searched
 in the `TYPRM_FOLDER` environment variable or the `--folder` option.
+
+This search is full-text search to the contents of the searched file.
+As mentioned above, contents with `#keyword:` tags are given priority displayed.
 
 Environment variables are written in the script
 that you create when you install typrm.
@@ -258,7 +262,7 @@ When running in Visual Studio Code terminal,
 you can open the file at the found location (path)
 by holding down the Ctrl key and clicking.
 
-If you enter # and a number (e.g. #1) after searching,
+If you enter **# and a number** (e.g. #1) after searching,
 the command you set for the 'TYPRM_OPEN_DOCUMENT' environment variable
 will be executed.
 The input number is the number counted from the bottom of the search results.
@@ -275,6 +279,8 @@ bash
 Commands executed
 
     code -g "/home/user1/text.txt:1"
+
+**Details of search**
 
 - If specifying a search keyword consisting of multiple words,
   it is not necessary to enclose it in " ".
@@ -320,7 +326,7 @@ Setting a positive value for the `#score:` tag gives priority.
         application: #keyword:
 
 You can specify multiple keywords to be written
-by CSV format (comma separated values) after the `#keyword:` tag
+by **CSV format** (comma separated values) after the `#keyword:` tag
 in the text file.
 
     #keyword: CSV, comma separated values, "a,b"
@@ -345,7 +351,7 @@ are not searched.
     original:
         #keyword: abc  #// searchable
 
-### #glossary tags and the thesaurus file
+### #glossary tags
 
 If you add the `#glossary:` tag,
 words up to the colon is searchable keywords
@@ -374,6 +380,9 @@ and you will be able to perform a combination search.
 In the above case, if your input keyword was TLS, typrm shows both TLS.
 If your input keyword was C++ TLS, typrm shows only TLS in C++ glossary.
 
+
+### thesaurus file
+
 `--thesaurus` option or in the TYPRM_THESAURUS environment variable is
 the path of the thesaurus file.
 The thesaurus file is in CSV format.
@@ -389,7 +398,7 @@ Exmple of thesaurus.csv:
     source, src
     destination, dst, dest
 
-Even if you enter the search keyword without separating each word of the idiom by space,
+Even if you enter the search keyword without separating each word of the **idiom** by space,
 typrm searches separately for each word.
 However, each word must be written in the thesaurus file.
 If you write two or more words in one line, they will be registered as separate words and also as synonyms.
@@ -404,6 +413,74 @@ Exmple of thesaurus.csv:
 
     time, tm
     out
+
+Subset keyword of **inclusion relationship** can be specified
+at the the second column or right column.
+For example, you can specify the following settings that
+TypeScript is a superset of JavaScript.
+
+Exmple of thesaurus.csv:
+
+    JavaScript
+    TypeScript, JavaScript
+
+If you save this setting, even when you search with TypeScript array,
+JavaScript array will be hit and displayed.
+Also, TypeScript array will be hit.
+
+Exmple of search command:
+
+    typrm search  TypeScript array
+
+Exmple of search target:
+
+    #keyword: JavaScript array
+    #keyword: TypeScript array
+
+Searching with JavaScript array does not hit TypeScript array.
+
+Exmple of search command:
+
+    typrm search  JavaScript array
+
+Exmple of search target:
+
+    #keyword: JavaScript array
+
+With the following settings,
+when you enter the abbreviation "ts" as a search keyword,
+JavaScript and "js" will also be searched.
+
+Exmple of thesaurus.csv:
+
+    JavaScript, js
+    TypeScript, ts, JavaScript
+
+Exmple of search command:
+
+    typrm search  ts array
+
+Exmple of search target:
+
+    #keyword: JavaScript array
+    #keyword: TypeScript array
+    #keyword: js array
+    #keyword: ts array
+
+Above TypeScript and ts are synonyms, not inclusion relationships.
+Above TypeScript and JavaScript are inclusion relationships.
+Above ts and js are also inclusion relationships.
+
+If below inclusion relationships keyword does not exist
+at the 1st column of another row, it is not inclusion relationships.
+Below TypeScript and JavaScript are not inclusion relationships.
+
+Exmple of thesaurus.csv:
+
+    JavaScript, js
+    TypeScript, ts, js
+
+Above js is whether synonymous with JavaScript or TypeScript is undecided.
 
 
 ### Write secret data in a safe place - .env file

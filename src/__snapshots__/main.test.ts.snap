@@ -5739,6 +5739,19 @@ PowerShell, PS
 "
 `;
 
+exports[`searches keyword tag >> thesaurus >> error_of_circular_reference: sourceFileContents 1`] = `
+"#keyword: JavaScript
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> error_of_circular_reference: thesaurus 1`] = `
+"#keyword: thesaurus.csv
+TypeScript, ts, JavaScript
+JavaScript, js, Script
+Script, JavaScript
+"
+`;
+
 exports[`searches keyword tag >> thesaurus >> idiom: sourceFileContents 1`] = `
 "#keyword: マウス クリック
 #keyword: マウス
@@ -5816,6 +5829,61 @@ exports[`searches keyword tag >> thesaurus >> ignore case: thesaurus 1`] = `
 PowerShell, PS
 PowerShell, PS
 PowerShell, PS
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> normalized_word_match_1: sourceFileContents 1`] = `
+"#keyword: js file
+#keyword: ts file
+#keyword: JavaScript file
+#keyword: TypeScript file
+#keyword: jsx file
+#keyword: tsx file
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> normalized_word_match_1: thesaurus 1`] = `
+"#keyword: thesaurus.csv
+JavaScript, js
+TypeScript, ts, JavaScript
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> normalized_word_match_2: sourceFileContents 1`] = `
+"#keyword: js file
+#keyword: ts file
+#keyword: JavaScript file
+#keyword: TypeScript file
+#keyword: jsx file
+#keyword: tsx file
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> normalized_word_match_2: thesaurus 1`] = `
+"#keyword: thesaurus.csv
+JavaScript, js
+TypeScript, ts, JavaScript
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> related_normalized_word_match: sourceFileContents 1`] = `
+"#keyword: js file
+#keyword: ts file
+#keyword: rc file
+#keyword: JavaScript file
+#keyword: TypeScript file
+#keyword: React file
+#keyword: jsx file
+#keyword: tsx file
+#keyword: rct file
+"
+`;
+
+exports[`searches keyword tag >> thesaurus >> related_normalized_word_match: thesaurus 1`] = `
+"#keyword: thesaurus.csv
+JavaScript, js
+TypeScript, ts, JavaScript
+React     , rc, TypeScript
 "
 `;
 

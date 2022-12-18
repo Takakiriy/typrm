@@ -8,6 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import sharp from 'sharp';
+// import { pp, cc } from "./lib";
 var __dirname = path.resolve();
 // var  debugSearchScore = false;
 // main
@@ -1698,6 +1699,7 @@ function newParticplesFromKeyphrase(keyphrase, thesaurus) {
                 ],
             };
         }),
+        formalWordsLowerCase: keywords.map(keyword => thesaurus.normalize(keyword).toLocaleLowerCase()),
         normalizedWords: keywords.map(keyword => {
             const normalized = thesaurus.normalize(keyword);
             const normalizedLowerCase = normalized.toLowerCase();
@@ -3158,7 +3160,7 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
             var previousPosition = -1;
             var isNormalizedMatched = false;
             const aTargetStringLowerCase = aTargetString.toLowerCase();
-            const normalizedTargetKeywords = thesaurus.normalize(aTargetString);
+            const normalizedTargetKeywords = thesaurus.normalize(aTargetString, keywordsParticples.formalWordsLowerCase);
             const normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
             const matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
             // #focus: score
@@ -5293,6 +5295,7 @@ function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, s
 class Thesaurus {
     constructor() {
         this.synonym = new Map(); // the value is the normalized word
+        this.formalLowerCase = new Set();
         this.idiomWords = [];
     }
     get enabled() { return this.synonym.size !== 0; }
@@ -5301,6 +5304,7 @@ class Thesaurus {
             fs.createReadStream(csvFilePath)
                 .pipe(csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',', relax_column_count: true }))
                 .on('data', (columns) => {
+                this.formalLowerCase.add(columns[0].toLowerCase());
                 if (columns.length >= 2) {
                     const normalizedKeyword = columns[0];
                     columns.shift();
@@ -5319,12 +5323,36 @@ class Thesaurus {
         });
         return promise;
     }
-    normalize(keyphrase) {
+    // normalize:  #search: typrm thesaurus relation
+    normalize(keyphrase, relationUntilFormalKeywordsLowerCase) {
         const words = keyphrase.split(' ');
+        const foreignKeywords = new Set();
         for (let i = 0; i < words.length; i += 1) {
-            const word = words[i].toLowerCase();
-            if (this.synonym.has(word)) {
-                words[i] = this.synonym.get(word);
+            var wordLowerCase = words[i].toLowerCase();
+            if (!relationUntilFormalKeywordsLowerCase) {
+                if (this.formalLowerCase.has(wordLowerCase)) {
+                    continue;
+                }
+            }
+            else {
+                if (relationUntilFormalKeywordsLowerCase.includes(wordLowerCase)) {
+                    continue;
+                }
+            }
+            foreignKeywords.clear();
+            while (this.synonym.has(wordLowerCase)) {
+                words[i] = this.synonym.get(wordLowerCase);
+                if (!relationUntilFormalKeywordsLowerCase) {
+                    break;
+                }
+                wordLowerCase = words[i].toLowerCase();
+                if (relationUntilFormalKeywordsLowerCase.includes(wordLowerCase)) {
+                    break;
+                }
+                if (foreignKeywords.has(wordLowerCase)) {
+                    throw new Error(`ERROR: thesaurus has infinite loop`);
+                }
+                foreignKeywords.add(wordLowerCase);
             }
         }
         const normalizedKeyphrase = words.join(' ');
