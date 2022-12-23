@@ -3313,8 +3313,8 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 
     // Debug score compare in 2 founds
     // {
-    //     const  a = foundLines.find((x)=> (x.targetKeyphrase === '    full_match_1  full_match_1  full_match_2'  &&  x.tagLabel === 'find all'))!;
-    //     const  b = foundLines.find((x)=> (x.targetKeyphrase === '    full_match_1  full_match_2'  &&  x.tagLabel === 'find all'))!;
+    //     const  a = foundLines.find((x)=> (x.targetKeyphrase === 'docker compose'  &&  x.tagLabel !== ''))!;
+    //     const  b = foundLines.find((x)=> (x.targetKeyphrase === 'docker compose container'  &&  x.tagLabel !== ''))!;
     //     if (a && b) {
     //         var  compare = compareScoreAndSoOn(a, b);  // Set break point here
     //     }
@@ -3737,10 +3737,11 @@ function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
     // tagLabel (tag)
     if (different === 0) {
         if (a.tagLabel !== b.tagLabel) {
-            if (a.tagLabel === keywordLabel) {
-                different = +1;
-            } else if (b.tagLabel === keywordLabel) {
-                different = -1;
+            if (a.tagLabel === keywordLabel  ||  a.tagLabel === glossaryLabel) {
+                different += 1;
+            }
+            if (b.tagLabel === keywordLabel  ||  b.tagLabel === glossaryLabel) {
+                different -= 1;
             }
         }
     }

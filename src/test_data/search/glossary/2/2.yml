@@ -39,3 +39,8 @@ search score comparison glossary and keyword:
         comparison glossary and keyword: 3
     keyword:
         #keyword: search score comparison glossary and keyword
+glossary_all_match_is_greater_score_than_keyword_part_match:
+    parent: #glossary:
+        docker compose:
+    keywordTag:
+        #keyword: docker compose container
