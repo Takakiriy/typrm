@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import sharp from 'sharp';
-// import { pp, cc } from "./lib";
+// import { pp, cc, ccCount } from "./lib";
 var __dirname = path.resolve();
 // var  debugSearchScore = false;
 // main
@@ -3103,6 +3103,9 @@ async function searchSub(keyword, isMutual) {
     //         var  compare = compareScoreAndSoOn(a, b);  // Set break point here
     //     }
     // }
+    if (thesaurus.errorMessage) {
+        console.log(thesaurus.errorMessage);
+    }
     // console.log(foundLineInformation)
     const foundCountMax = parseInt(programOptions.foundCountMax);
     if (foundLines.length > foundCountMax) {
@@ -3252,13 +3255,11 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                 //     console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
                 // }
             }
+            var matchedNormalized = '';
             if (found.score !== 0) {
                 const matches = bestFound.matches.concat(found.matches);
                 if (isNormalizedMatched) {
-                    bestFound.normalizedTargetsKeywords.push(normalizedTargetKeywords);
-                }
-                else {
-                    bestFound.normalizedTargetsKeywords.push('');
+                    matchedNormalized = normalizedTargetKeywords;
                 }
                 const normalizedTargetsKeywords = bestFound.normalizedTargetsKeywords;
                 if (compareScoreAndSoOn(bestFound, found) < 0) {
@@ -3267,6 +3268,7 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                 bestFound.matches = matches;
                 bestFound.normalizedTargetsKeywords = normalizedTargetsKeywords;
             }
+            bestFound.normalizedTargetsKeywords.push(matchedNormalized);
             return bestFound;
         }, new FoundLine());
         return bestFound;
@@ -5297,6 +5299,7 @@ class Thesaurus {
         this.synonym = new Map(); // the value is the normalized word
         this.formalLowerCase = new Set();
         this.idiomWords = [];
+        this.errorMessage = '';
     }
     get enabled() { return this.synonym.size !== 0; }
     async load(csvFilePath) {
@@ -5350,7 +5353,8 @@ class Thesaurus {
                     break;
                 }
                 if (foreignKeywords.has(wordLowerCase)) {
-                    throw new Error(`ERROR: thesaurus has infinite loop`);
+                    this.errorMessage = `ERROR: thesaurus has infinite loop: ${Array.from(foreignKeywords)}`;
+                    break;
                 }
                 foreignKeywords.add(wordLowerCase);
             }
@@ -5456,7 +5460,7 @@ class FoundLine {
         if (line.length > length_limit) {
             line = line.substring(0, length_limit) + terminator + line.substring(length_limit + 1);
         }
-        for (const match of colorParts) {
+        for (const match of colorParts) { // match is one of this.matches: MatchedPart[]
             if (match.targetType === 'normalized' && !inNormalizedWords) {
                 inNormalizedWords = true;
                 coloredLine += line.substring(previousPosition, this.rightOfTargetKeywords[match.targetWordsIndex]) +

@@ -118,11 +118,11 @@ export declare function getSnapshot(label: string, deafultSnapshot?: string | un
 export declare function pp(message: any): string[];
 export declare const debugOut: string[];
 export declare function ppClear(): string[];
-export declare function cc(targetCount?: number, label?: string): {
+export declare function cc(targetCount?: number | null, label?: string): {
     isTarget: boolean;
     debugOut: string[];
 };
-export declare const gCount: {
+export declare const ccCount: {
     [name: string]: number;
 };
 export {};

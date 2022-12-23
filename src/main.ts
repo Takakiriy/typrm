@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
 import * as lib from "./lib";
 import sharp from 'sharp';
-// import { pp, cc } from "./lib";
+// import { pp, cc, ccCount } from "./lib";
 var  __dirname: string = path.resolve();
 // var  debugSearchScore = false;
 
@@ -3477,12 +3477,11 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                     //     console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
                     // }
                 }
+                var  matchedNormalized = '';
                 if (found.score !== 0) {
                     const  matches = bestFound.matches.concat(found.matches);
                     if (isNormalizedMatched) {
-                        bestFound.normalizedTargetsKeywords.push(normalizedTargetKeywords);
-                    } else {
-                        bestFound.normalizedTargetsKeywords.push('');
+                        matchedNormalized = normalizedTargetKeywords;
                     }
                     const  normalizedTargetsKeywords = bestFound.normalizedTargetsKeywords;
 
@@ -3492,6 +3491,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                     bestFound.matches = matches;
                     bestFound.normalizedTargetsKeywords = normalizedTargetsKeywords;
                 }
+                bestFound.normalizedTargetsKeywords.push(matchedNormalized);
                 return bestFound;
             }, new FoundLine());
 
@@ -5946,7 +5946,7 @@ class FoundLine {
             line = line.substring(0, length_limit) + terminator + line.substring(length_limit + 1);
         }
 
-        for (const match of colorParts) {
+        for (const match of colorParts) {  // match is one of this.matches: MatchedPart[]
             if (match.targetType === 'normalized'  &&  ! inNormalizedWords) {
                 inNormalizedWords = true;
                 coloredLine += line.substring(previousPosition, this.rightOfTargetKeywords[match.targetWordsIndex]) +

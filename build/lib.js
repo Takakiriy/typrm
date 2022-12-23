@@ -1396,13 +1396,16 @@ export function getSnapshot(label, deafultSnapshot = undefined) {
     return snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');
 }
 // pp
-// Debug print.
 // #keyword: lib.ts pp
+//     Debug print.
 // Example:
 //    pp(var);
 // Example:
-//    var d = pp(var);
-//    d = d;  // Set break point here and watch the variable d
+//    pp('---var');
+//    pp(var);
+// Example:
+//    var d = pp('---var');
+//    pp(var);  // Set break point here and watch the variable d
 // Example:
 //    var d = ppClear();
 //    pp(var);
@@ -1452,30 +1455,38 @@ export function ppClear() {
     return debugOut;
 }
 // cc
-// Through counter.
 // #keyword: lib.ts cc
+// Through counter.
 // Example:
-//   cc();
-// Example:
-//   var c = cc().debugOut;  // Set break point here and watch the variable c
-// Example:
-//   if ( cc(1).isTarget )  // count up and if count is 1
-//   var d = pp('');  // Set break point here and watch the variable d
-// Example:
-//   if ( gCount[0] >= 1 )  // if count is 1 or over
+//     count up: |
+//         cc();
+//     print a data and count up: |
+//         var d = pp(data);
+//         cc();
+//     Mark of got debug target data layer 1: |
+//         if (argument == '____') {
+//         cc(null, 'L1');}
+//     if target data layer 1 counter value is 1 or over: |
+//         if ( ccCount['L1'] >= 1 ) {
+//         var d = pp(data);}
+//     count up and if counter value is 1 ...: |
+//         if ( cc(1).isTarget ) {
+//         var d = pp('');}  // Set break point here and watch the variable d
+//     count up and look at debug output: |
+//         var c = cc().debugOut;  // Set break point here and watch the variable c
 export function cc(targetCount = 9999999, label = '0') {
-    if (!(label in gCount)) {
-        gCount[label] = 0;
+    if (!(label in ccCount)) {
+        ccCount[label] = 0;
     }
-    gCount[label] += 1;
-    pp(`${label}:countThrough[${label}] = ${gCount[label]}`);
-    const isTarget = (gCount[label] === targetCount);
+    ccCount[label] += 1;
+    pp(`${label}:countThrough[${label}] = ${ccCount[label]}`);
+    const isTarget = (ccCount[label] === targetCount);
     if (isTarget) {
         pp('    **** It is before the target! ****');
     }
     return { isTarget, debugOut };
 }
-export const gCount = {};
+export const ccCount = {};
 const notFoundInFile = -2;
 const notFound = -1;
 //# sourceMappingURL=lib.js.map

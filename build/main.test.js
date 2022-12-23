@@ -1150,6 +1150,11 @@ describe("searches keyword tag >>", () => {
                     pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('React')} file)\n` +
                     pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')} ${matchedColor('file')}\n`,
             ], [
+                "error_of_circular_reference",
+                ["search", "ts"],
+                { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
+                `ERROR: thesaurus has infinite loop: script,javascript\n`,
+            ], [
                 "score",
                 ["search", "object end"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
