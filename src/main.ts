@@ -3730,8 +3730,19 @@ function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
     }
 
     // partMatchedTargetKeywordCount (part)
+    // semiMatchedKeywordCount (semi) (1)
     if (different === 0) {
         different = a.partMatchedTargetKeywordCount - b.partMatchedTargetKeywordCount + kPoint;
+        if (different !== 0) {
+            if (
+                a.partMatchedTargetKeywordCount === a.semiMatchedTargetKeywordCount  &&
+                b.partMatchedTargetKeywordCount === b.semiMatchedTargetKeywordCount)
+            {
+                const  aNotMatchCount = a.targetWordCount - a.semiMatchedTargetKeywordCount;
+                const  bNotMatchCount = b.targetWordCount - b.semiMatchedTargetKeywordCount;
+                different = bNotMatchCount - aNotMatchCount;
+            }
+        }
     }
 
     // tagLabel (tag)
@@ -3777,7 +3788,7 @@ function  compareScoreAndSoOn(a: FoundLine, b: FoundLine) {
         different = a.superMatchedTargetKeywordCount - b.superMatchedTargetKeywordCount + kPoint;
     }
 
-    // semiMatchedKeywordCount (semi)
+    // semiMatchedKeywordCount (semi) (2)
     if (different === 0) {
         different = a.semiMatchedTargetKeywordCount - b.semiMatchedTargetKeywordCount + kPoint;
     }
@@ -6829,5 +6840,5 @@ export var  programOptions: {[key: string]: any} = {};
 export const  foundCountMaxDefault = "10";
 export const  snippetLineCountDefault = "5";
 export const  wordSuperSeparatorsDefault = " "+ jpsp;
-export const  wordSeparatorsDefault = "~!^&*#()=+[{]}\\|;:'\"`,.<>/?、。（）「」【】";
+export const  wordSeparatorsDefault = "~!^&*#()=+-[{]}\\|;:'\"`,.<>/?、。（）「」【】";
 const  maxShownOriginalTagListCount = 5;

@@ -260,3 +260,6 @@ multiple_search_words_hit_is_better_than_one_word:
 find_all_many_match_is_better_than_keyword_one_match:
     #keyword: nex
     next prev
+idiom_few_word_count:
+    #keyword: docker-compose down
+    #keyword: docker compose down -v

@@ -940,6 +940,12 @@ describe("searches keyword tag >>", () => {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':243:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':245:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
         ], [
+            "idiom_few_word_count",
+            ["search", "docker compose down"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':265:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down')} -v\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':264:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down')}\n`,
+        ], [
             "test_of_double_space",
             ["search", "big  boss"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
@@ -1246,8 +1252,8 @@ describe("searches glossary tag >>", () => {
             ["search", "search score comparison glossary"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':39:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword: 3\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':38:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')}: 2\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':41:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('search')} ${matchedColor('score')} ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword\n`,
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':41:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('search')} ${matchedColor('score')} ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':38:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')}: 2\n`,
         ], [
             "glossary is less score than keyword",
             ["search", "grape"],
@@ -1255,6 +1261,12 @@ describe("searches glossary tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + `     keyword:  ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
+        ], [
+            "glossary_all_match_is_greater_score_than_keyword_part_match",
+            ["search", "docker", "compose"],
+            { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':46:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} container\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':44:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('docker')} ${matchedColor('compose')}:\n`,
         ], [
             "glossary with empty line",
             ["search", "space"],

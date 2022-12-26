@@ -992,6 +992,12 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':243:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':245:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
         ],[
+            "idiom_few_word_count",
+            ["search", "docker compose down"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':265:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down')} -v\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':264:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down')}\n`,
+        ],[
             "test_of_double_space",
             ["search", "big  boss"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_target_word_count

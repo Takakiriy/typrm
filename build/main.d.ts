@@ -182,5 +182,5 @@ export declare var programOptions: {
 export declare const foundCountMaxDefault = "10";
 export declare const snippetLineCountDefault = "5";
 export declare const wordSuperSeparatorsDefault: string;
-export declare const wordSeparatorsDefault = "~!^&*#()=+[{]}\\|;:'\"`,.<>/?\u3001\u3002\uFF08\uFF09\u300C\u300D\u3010\u3011";
+export declare const wordSeparatorsDefault = "~!^&*#()=+-[{]}\\|;:'\"`,.<>/?\u3001\u3002\uFF08\uFF09\u300C\u300D\u3010\u3011";
 export {};

@@ -3097,8 +3097,8 @@ async function searchSub(keyword, isMutual) {
     }
     // Debug score compare in 2 founds
     // {
-    //     const  a = foundLines.find((x)=> (x.targetKeyphrase === '    full_match_1  full_match_1  full_match_2'  &&  x.tagLabel === 'find all'))!;
-    //     const  b = foundLines.find((x)=> (x.targetKeyphrase === '    full_match_1  full_match_2'  &&  x.tagLabel === 'find all'))!;
+    //     const  a = foundLines.find((x)=> (x.targetKeyphrase === 'docker compose'  &&  x.tagLabel !== ''))!;
+    //     const  b = foundLines.find((x)=> (x.targetKeyphrase === 'docker compose container'  &&  x.tagLabel !== ''))!;
     //     if (a && b) {
     //         var  compare = compareScoreAndSoOn(a, b);  // Set break point here
     //     }
@@ -3491,17 +3491,26 @@ function compareScoreAndSoOn(a, b) {
         different = a.matchedSearchKeywordCount - b.matchedSearchKeywordCount + kPoint;
     }
     // partMatchedTargetKeywordCount (part)
+    // semiMatchedKeywordCount (semi) (1)
     if (different === 0) {
         different = a.partMatchedTargetKeywordCount - b.partMatchedTargetKeywordCount + kPoint;
+        if (different !== 0) {
+            if (a.partMatchedTargetKeywordCount === a.semiMatchedTargetKeywordCount &&
+                b.partMatchedTargetKeywordCount === b.semiMatchedTargetKeywordCount) {
+                const aNotMatchCount = a.targetWordCount - a.semiMatchedTargetKeywordCount;
+                const bNotMatchCount = b.targetWordCount - b.semiMatchedTargetKeywordCount;
+                different = bNotMatchCount - aNotMatchCount;
+            }
+        }
     }
     // tagLabel (tag)
     if (different === 0) {
         if (a.tagLabel !== b.tagLabel) {
-            if (a.tagLabel === keywordLabel) {
-                different = +1;
+            if (a.tagLabel === keywordLabel || a.tagLabel === glossaryLabel) {
+                different += 1;
             }
-            else if (b.tagLabel === keywordLabel) {
-                different = -1;
+            if (b.tagLabel === keywordLabel || b.tagLabel === glossaryLabel) {
+                different -= 1;
             }
         }
     }
@@ -3531,7 +3540,7 @@ function compareScoreAndSoOn(a, b) {
     if (different === 0) {
         different = a.superMatchedTargetKeywordCount - b.superMatchedTargetKeywordCount + kPoint;
     }
-    // semiMatchedKeywordCount (semi)
+    // semiMatchedKeywordCount (semi) (2)
     if (different === 0) {
         different = a.semiMatchedTargetKeywordCount - b.semiMatchedTargetKeywordCount + kPoint;
     }
@@ -6199,6 +6208,6 @@ export var programOptions = {};
 export const foundCountMaxDefault = "10";
 export const snippetLineCountDefault = "5";
 export const wordSuperSeparatorsDefault = " " + jpsp;
-export const wordSeparatorsDefault = "~!^&*#()=+[{]}\\|;:'\"`,.<>/?、。（）「」【】";
+export const wordSeparatorsDefault = "~!^&*#()=+-[{]}\\|;:'\"`,.<>/?、。（）「」【】";
 const maxShownOriginalTagListCount = 5;
 //# sourceMappingURL=main.js.map
