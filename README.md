@@ -276,6 +276,10 @@ bash
     /home/user1/text.txt:1: #keyword: CSV, comma separated values
     typrm keyword: #1
 
+PowerShell
+
+    PS> ${env:TYPRM_OPEN_DOCUMENT} = "code -g `"`${ref}`""
+
 Commands executed
 
     code -g "/home/user1/text.txt:1"
