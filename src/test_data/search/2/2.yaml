@@ -164,7 +164,7 @@ snippet_depth_tag:
                 s115
             s12
         s2
-    snippet_depth_2L: #keyword:  #snippet-depth: 2
+    snippet_depth_2Long: #keyword:  #snippet-depth: 2
         s1
             s11
                 s111
@@ -212,31 +212,31 @@ test_of_double_space:
     2: #keyword: super  big  boss
 participle_is_better_than_different_case:
     1:  #keyword: str
-    2:  #keyword: str:
+    2:  #keyword: str.
     3a: #keyword: strs
     3b: #keyword: stred
     3c: #keyword: strer
     3d: #keyword: string
-    6:  #keyword: STR
+    6a: #keyword: STR
+    6b: #keyword: STRs
     7:  #keyword: str replace
     8a: #keyword: strs replace
     8b: #keyword: stred replace
     8c: #keyword: strer replace
-    8d: #keyword: string replace
     11: #keyword: STRS
     12: #keyword: stripe
     full 1:  str
-    full 2   str:
+    full 2:  str.
     full 3a: strs
     full 3b: stred
     full 3c: strer
     full 3d: string
-    full 6:  STR
+    full 6a: STR
+    full 6b: STRs
     full 7:  str replace
     full 8a: strs replace
     full 8b: stred replace
     full 8c: strer replace
-    full 8d: string replace
     full 11: STRS
     full 12: stripe
 few_word_count:
@@ -260,6 +260,28 @@ multiple_search_words_hit_is_better_than_one_word:
 find_all_many_match_is_better_than_keyword_one_match:
     #keyword: nex
     next prev
-idiom_few_word_count:
-    #keyword: docker-compose down
-    #keyword: docker compose down -v
+idiom_few_word_count_by_word_separator:
+    sort:
+        #keyword: docker-compose down00
+        #keyword: docker compose down00 -v
+        #keyword: Docker-Compose Down00
+        Docker recompose Down00 and any other words
+        docker-compose-down00
+    compare 1,2:
+        #keyword: docker-compose down12
+        #keyword: docker compose down12 -v
+    compare 1,3:
+        #keyword: docker-compose down13
+        #keyword: Docker-Compose Down13
+    compare 1,4:
+        #keyword: docker-compose down14
+        Docker recompose Down14 and any other words
+    compare 2,3:
+        #keyword: docker compose down23 -v
+        #keyword: Docker-Compose Down23
+    compare 2,4:
+        #keyword: docker compose down24 -v
+        Docker recompose Down24 and any other words
+    compare 3,4:
+        #keyword: Docker-Compose Down34
+        Docker recompose Down34 and any other words

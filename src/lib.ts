@@ -821,6 +821,20 @@ export function  coloredDiff(redLine: string, greenLine: string, redHeaderLength
     return {greenLine, redLine};
 }
 
+export function  toWordArray(idiom: string): string[] {
+    const  normalizedIdiom = idiom.replace(/\u{3000}/ug,' ').trim().replace(/ +/g, ' ');
+    if (normalizedIdiom) {
+        return  normalizedIdiom.split(' ');
+    } else {
+        return  [];
+    }
+}
+
+export function  getWordCount(idiom: string): number {
+    return  idiom.replace(/\u{3000}/ug,' ').split(' ').filter((word)=>(word !== '')).length;
+        // '\u{3000}': Japanese space
+}
+
 export function  splitIdioms(idioms: string, words: string[]): string {
     var    output = '';
     const  minimumWordLength = 2;
@@ -1597,6 +1611,28 @@ export function  ppClear() {
     return debugOut;
 }
 
+// ff
+// #keyword: lib.ts ff
+// Condition flag.
+// Example:
+//     Mark of got debug target data layer 1 (L1): |
+//         ff('L1', argument == '____');
+//     if current data is target data layer 1 (L1): |
+//         if ( ff('L1') ) {
+//         var d = pp('____');}
+export function  ff( conditionName: string, condition: boolean|null = null ) {
+    if (condition !== null) {
+        ffFlags[conditionName] = condition;
+    }
+
+    if (conditionName in ffFlags) {
+        return  ffFlags[conditionName];
+    } else {
+        return  false;
+    }
+}
+export const  ffFlags: {[name: string]: boolean} = {};
+
 // cc
 // #keyword: lib.ts cc
 // Through counter.
@@ -1606,12 +1642,6 @@ export function  ppClear() {
 //     print a data and count up: |
 //         var d = pp(data);
 //         cc();
-//     Mark of got debug target data layer 1: |
-//         if (argument == '____') {
-//         cc(null, 'L1');}
-//     if target data layer 1 counter value is 1 or over: |
-//         if ( ccCount['L1'] >= 1 ) {
-//         var d = pp(data);}
 //     count up and if counter value is 1 ...: |
 //         if ( cc(1).isTarget ) {
 //         var d = pp('');}  // Set break point here and watch the variable d
@@ -1634,4 +1664,3 @@ export function  cc( targetCount: number|null = 9999999, label: string = '0' ) {
 export const  ccCount: {[name: string]: number} = {};
 const  notFoundInFile = -2;
 const  notFound = -1;
-

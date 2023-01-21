@@ -24,7 +24,7 @@ command: #keyword: typrm command list
                         getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                         thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
                         setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
-                    searchWithoutTags: #keyword: searchWithoutTags,  typrm find all
+                    searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
                         compareScoreAndSoOn:  #ref: ${GitHub}/typrm/src/main.ts#function  compareScoreAndSoOn

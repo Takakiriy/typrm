@@ -41,6 +41,8 @@ export declare function cutIndent(lines: string[]): string[];
 export declare function unexpandVariable(expanded: string, keyValues: string[][], out_replacedIndices?: number[] | null): string;
 export declare function checkExpectedTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
 export declare function coloredDiff(redLine: string, greenLine: string, redHeaderLength?: number, greenHeaderLength?: number): ColoredDiff;
+export declare function toWordArray(idiom: string): string[];
+export declare function getWordCount(idiom: string): number;
 export declare function splitIdioms(idioms: string, words: string[]): string;
 export declare function chageToAlphabets(inputString: string): string;
 interface ColoredDiff {
@@ -118,6 +120,10 @@ export declare function getSnapshot(label: string, deafultSnapshot?: string | un
 export declare function pp(message: any): string[];
 export declare const debugOut: string[];
 export declare function ppClear(): string[];
+export declare function ff(conditionName: string, condition?: boolean | null): boolean;
+export declare const ffFlags: {
+    [name: string]: boolean;
+};
 export declare function cc(targetCount?: number | null, label?: string): {
     isTarget: boolean;
     debugOut: string[];

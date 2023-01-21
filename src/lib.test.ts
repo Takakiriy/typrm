@@ -70,7 +70,7 @@ describe("string >>", () => {
             });
         });
 
-        test("replaced indices >>", () => {
+        test("replaced indices", () => {
             const  replacedIndices: number[] = [];
             const  unexpectedLine = lib.unexpandVariable('abc_def_$g',
                 [['${abc}', 'def'], ['${d}', 'abc'], ['${n}', 'not found'], ['\\$', '$']],
@@ -859,18 +859,45 @@ describe("string >>", () => {
         });
     });
 
-    describe("splitIdioms >>", () => {
+    test("toWordArray", () => {
+        const  jpsp = String.fromCodePoint(0x3000);  // Japanese space
+
+        expect(lib.toWordArray('some words')).toEqual(['some', 'words']);
+        expect(lib.toWordArray('some  words')).toEqual(['some', 'words']);
+        expect(lib.toWordArray(`some${jpsp}words`)).toEqual(['some', 'words']);
+        expect(lib.toWordArray(`some${jpsp}${jpsp}words`)).toEqual(['some', 'words']);
+        expect(lib.toWordArray(' some words ')).toEqual(['some', 'words']);
+        expect(lib.toWordArray(`${jpsp}some words${jpsp}`)).toEqual(['some', 'words']);
+        expect(lib.toWordArray('word')).toEqual(['word']);
+        expect(lib.toWordArray('')).toEqual([]);
+    });
+
+    test("getWordCount", () => {
+        const  jpsp = String.fromCodePoint(0x3000);  // Japanese space
+
+        expect(lib.getWordCount('some words')).toBe(2);
+        expect(lib.getWordCount('some  words')).toBe(2);
+        expect(lib.getWordCount(`some${jpsp}words`)).toBe(2);
+        expect(lib.getWordCount(`some${jpsp}${jpsp}words`)).toBe(2);
+        expect(lib.getWordCount(' some words ')).toBe(2);
+        expect(lib.getWordCount(`${jpsp}some words${jpsp}`)).toBe(2);
+        expect(lib.getWordCount('word')).toBe(1);
+        expect(lib.getWordCount('')).toBe(0);
+    });
+
+    test("splitIdioms", () => {
         expect(lib.splitIdioms('timeout', ['time', 'out'])).toBe('time out');
         expect(lib.splitIdioms('timeout timeout', ['long', 'time', 'out'])).toBe('time out time out');
         expect(lib.splitIdioms('timeou',   ['time', 'out'])).toBe('timeou');
         expect(lib.splitIdioms('timeouts', ['time', 'out'])).toBe('timeouts');
         expect(lib.splitIdioms('time out',  ['other', 'words'])).toBe('time out');
+        expect(lib.splitIdioms('double  space  timeout',  ['time', 'out'])).toBe('double  space  time out');
         expect(lib.splitIdioms('タイムアウト', ['タイム', 'time', 'アウト'])).toBe('タイム アウト');
         expect(lib.splitIdioms('clipboard', ['clip', 'board'])).toBe('clip board');
         expect(lib.splitIdioms('clipboard', ['clip', 'board', 'clipboard'])).toBe('clipboard');
     });
 
-    describe("chageToAlphabets >>", () => {
+    test("chageToAlphabets", () => {
         expect(lib.chageToAlphabets('ｃｄ')).toBe('cd');
         expect(lib.chageToAlphabets('ｃｄ ')).toBe('cd ');
         expect(lib.chageToAlphabets('ｃｄ　')).toBe('cd ');
@@ -900,7 +927,7 @@ describe("string >>", () => {
 });
 
 describe("data >>", () => {
-    test("stableUniqueFilterFunction >>", async () => {
+    test("stableUniqueFilterFunction", async () => {
         const  array1 = [
             {id: 1, value:'A'},
             {id: 2, value:'B'},
@@ -917,7 +944,7 @@ describe("data >>", () => {
         ]);
     });
 
-    test("lastUniqueFilterFunction >>", async () => {
+    test("lastUniqueFilterFunction", async () => {
         const  array1 = [
             {id: 1, value:'A'},
             {id: 2, value:'B'},
@@ -934,7 +961,7 @@ describe("data >>", () => {
         ]);
     });
 
-    test("fastUniqueFilter >>", async () => {
+    test("fastUniqueFilter", async () => {
         const  array1 = [
             {id: 1, value:'A'},
             {id: 2, value:'B'},
@@ -949,7 +976,7 @@ describe("data >>", () => {
             {id: 3, value:'C'},
         ]);
     });
-    test("parseMap >>", async () => {
+    test("parseMap", async () => {
         const  resultMap = await lib.parseMap<number,string>(`Map {
             1 =>  "a",
             5 =>  "bb",
@@ -973,14 +1000,14 @@ describe("data >>", () => {
 
 describe("alphabetIndex >>", () => {
 
-    test("isAlphabetIndex >>", () => {
+    test("isAlphabetIndex", () => {
         expect(lib.isAlphabetIndex('/1/a')).toBe(true);
         expect(lib.isAlphabetIndex('/1')).toBe(false);
         expect(lib.isAlphabetIndex('/2')).toBe(false);
         expect(lib.isAlphabetIndex('/1/a/b')).toBe(true);
     });
 
-    test("getAlphabetIndex >>", () => {
+    test("getAlphabetIndex", () => {
         expect(lib.getAlphabetIndex(1)).toBe('a');
         expect(lib.getAlphabetIndex(2)).toBe('b');
         expect(lib.getAlphabetIndex(3)).toBe('c');
@@ -990,7 +1017,7 @@ describe("alphabetIndex >>", () => {
         expect(lib.getAlphabetIndex(28)).toBe('z28z');
     });
 
-    test("fromAlphabetIndex >>", () => {
+    test("fromAlphabetIndex", () => {
         expect(lib.fromAlphabetIndex('a')).toBe(1);
         expect(lib.fromAlphabetIndex('b')).toBe(2);
         expect(lib.fromAlphabetIndex('c')).toBe(3);
@@ -1000,7 +1027,7 @@ describe("alphabetIndex >>", () => {
         expect(lib.fromAlphabetIndex('z28z')).toBe(28);
     });
 
-    test("cutAlphabetInIndex >>", () => {
+    test("cutAlphabetInIndex", () => {
         expect(lib.cutAlphabetInIndex('/1/a')).toBe('/1');
         expect(lib.cutAlphabetInIndex('/1/a/b')).toBe('/1');
         expect(lib.cutAlphabetInIndex('/1')).toBe('/1');
@@ -1015,7 +1042,7 @@ describe("alphabetIndex >>", () => {
 
 describe("file and file path >>", () => {
 
-    test("isFullPath >>", () => {
+    test("isFullPath", () => {
         expect(lib.isFullPath('/path')).toEqual(true);
         expect(lib.isFullPath('\\path')).toEqual(true);
         expect(lib.isFullPath('\\\\pc\\path')).toEqual(true);
@@ -1026,7 +1053,7 @@ describe("file and file path >>", () => {
         expect(lib.isFullPath('/file.md:csv#a,b')).toEqual(true);
     });
 
-    test("isInFileSystem >>", () => {
+    test("isInFileSystem", () => {
         expect(lib.isInFileSystem('/path')).toEqual(true);
         expect(lib.isInFileSystem('\\path')).toEqual(true);
         expect(lib.isInFileSystem('\\\\pc\\path')).toEqual(true);
@@ -1042,7 +1069,7 @@ describe("file and file path >>", () => {
         // https://bugs.chromium.org/p/chromium/issues/detail?id=1299624
     });
 
-    test("getExistingParentPath >>", () => {
+    test("getExistingParentPath", () => {
         fs.mkdirSync(`${__dirname}/_lib_test`, {recursive: true});
         expect(lib.getExistingParentPath(`${__dirname}/_lib_test/sub/s`)).toEqual(`${__dirname}/_lib_test`.replace(/\//g, path.sep));
         expect(lib.getExistingParentPath(`${__dirname}/_lib_test/sub/s`.replace(/\//g, path.sep))).toEqual(`${__dirname}/_lib_test`.replace(/\//g, path.sep));
@@ -1060,7 +1087,7 @@ describe("file and file path >>", () => {
     //     expect(lib.withHomeVariable(`${homePathWindows}\\bin`)).toEqual('${HOME}\\bin');
     // });
 
-    test("replacePathToSlashed >>", () => {
+    test("replacePathToSlashed", () => {
         expect(lib.replacePathToSlashed('\\path\\to')).toEqual('/path/to');
         expect(lib.replacePathToSlashed('\\path\\to\\ space')).toEqual('/path/to\\ space');
         expect(lib.replacePathToSlashed('\\\\pc\\folder\\sub/file.yaml')).toEqual('\\\\pc\\folder\\sub\\file.yaml');
@@ -1089,7 +1116,7 @@ describe("file and file path >>", () => {
         }
     });
 
-    test("replaceToPathForWindows >>", () => {
+    test("replaceToPathForWindows", () => {
         expect(lib.replaceToPathForWindows('C:\\path\\to')).toEqual('C:\\path\\to');
         expect(lib.replaceToPathForWindows('c:/path/to')).toEqual('C:\\path\\to');
         expect(lib.replaceToPathForWindows('/mnt/c/path/to')).toEqual('C:\\path\\to');

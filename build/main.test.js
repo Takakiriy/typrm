@@ -870,28 +870,28 @@ describe("searches keyword tag >>", () => {
             ["search", "str"],
             { folder: "test_data/search/2", test: "", "foundCountMax": "40" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':241:') + `     full 12: ${matchedColor('str')}ipe\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':240:') + `     full 11: ${matchedColor('STR')}S\n` + // ToDo: add STRs
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     full 2   ${matchedColor('str')}:\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     full 8d: ${matchedColor('string')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':238:') + `     full 8c: ${matchedColor('strer')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':237:') + `     full 8b: ${matchedColor('stred')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':236:') + `     full 8a: ${matchedColor('strs')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':235:') + `     full 7:  ${matchedColor('str')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':234:') + `     full 6:  ${matchedColor('STR')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':240:') + `     full 11: ${matchedColor('STR')}S\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     full 2:  ${matchedColor('str')}.\n` + // "str length" is prior than "str.length"
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     full 8c: ${matchedColor('strer')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':238:') + `     full 8b: ${matchedColor('stred')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':237:') + `     full 8a: ${matchedColor('strs')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':236:') + `     full 7:  ${matchedColor('str')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':235:') + `     full 6b: ${matchedColor('STRs')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':234:') + `     full 6a: ${matchedColor('STR')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':233:') + `     full 3d: ${matchedColor('string')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':232:') + `     full 3c: ${matchedColor('strer')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':231:') + `     full 3b: ${matchedColor('stred')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':230:') + `     full 3a: ${matchedColor('strs')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':228:') + `     full 1:  ${matchedColor('str')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':227:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':226:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STRS')}\n` + // ToDo: change to (STR)S
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}:\n` + // "str length" is prior than "str.length"
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':225:') + `     8d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':224:') + `     8c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':223:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':222:') + `     8a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':221:') + `     7:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')} replace\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':220:') + `     6:  ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':226:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}S\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.\n` + // "str length" is prior than "str.length"
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':225:') + `     8c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':224:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':223:') + `     8a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':222:') + `     7:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')} replace\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':221:') + `     6b: ${keywordLabelColor('#keyword:')} ${matchedColor('STRs')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':220:') + `     6a: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':219:') + `     3d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':218:') + `     3c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':217:') + `     3b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')}\n` +
@@ -940,11 +940,50 @@ describe("searches keyword tag >>", () => {
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':243:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':245:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
         ], [
-            "idiom_few_word_count",
-            ["search", "docker compose down"],
-            { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':265:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down')} -v\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':264:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down')}\n`,
+            "idiom_few_word_count_by_word_separator",
+            ["search", "docker compose down00"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':268:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down00')} and any other words\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':269:') + `         ${matchedColor('docker')}-${matchedColor('compose')}-${matchedColor('down00')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':266:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down00')} -v\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':267:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down00')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':265:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down00')}\n`,
+        ], [
+            "idiom_few_word_count_by_word_separator_12",
+            ["search", "docker compose down12"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':272:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down12')} -v\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':271:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down12')}\n`,
+        ], [
+            "idiom_few_word_count_by_word_separator_13",
+            ["search", "docker compose down13"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':275:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down13')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':274:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down13')}\n`,
+        ], [
+            "idiom_few_word_count_by_word_separator_14",
+            ["search", "docker compose down14"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':278:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down14')} and any other words\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':277:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down14')}\n`,
+        ], [
+            "idiom_few_word_count_by_word_separator_23",
+            ["search", "docker compose down23"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':280:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down23')} -v\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':281:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down23')}\n`,
+        ], [
+            "idiom_few_word_count_by_word_separator_24",
+            ["search", "docker compose down24"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':284:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down24')} and any other words\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':283:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down24')} -v\n`,
+        ], [
+            "idiom_few_word_count_by_word_separator_34",
+            ["search", "docker compose down34"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':287:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down34')} and any other words\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':286:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down34')}\n`,
         ], [
             "test_of_double_space",
             ["search", "big  boss"],
@@ -1630,6 +1669,9 @@ describe("print reference >>", () => {
                 (testingOS === 'Windows')
                     ? // Windows
                         "Verbose: Option and environment variables:\n" +
+                            "    Verbose: --word-super-separators, TYPRM_WORD_SUPER_SEPARATORS: \" 　\"\n" +
+                            "    Verbose: --word-separators, TYPRM_WORD_SEPARATORS: \"~!^&*#()=+-[{]}\\|;:'\"`,.<>/?、。（）「」【】\"\n" +
+                            "    Verbose: programOptionsWordSeparators: \" 　~!^&*#()=+-[{]}\\|;:'\"`,.<>/?、。（）「」【】\"\n" +
                             `    Verbose: TYPRM_TEST_ENV = ${__dirname}\\test_data\n` +
                             "    Verbose: TYPRM_TEST_SEARCH = search\n" +
                             "    Verbose: TYPRM_TEST_ENV2 = testEnv\n" +
@@ -1696,6 +1738,9 @@ describe("print reference >>", () => {
                             "Error that verb number 4 is not defined\n"
                     : // mac
                         "Verbose: Option and environment variables:\n" +
+                            "    Verbose: --word-super-separators, TYPRM_WORD_SUPER_SEPARATORS: \" 　\"\n" +
+                            "    Verbose: --word-separators, TYPRM_WORD_SEPARATORS: \"~!^&*#()=+-[{]}\\|;:'\"`,.<>/?、。（）「」【】\"\n" +
+                            "    Verbose: programOptionsWordSeparators: \" 　~!^&*#()=+-[{]}\\|;:'\"`,.<>/?、。（）「」【】\"\n" +
                             `    Verbose: TYPRM_TEST_ENV = ${__dirname}/test_data\n` +
                             "    Verbose: TYPRM_TEST_SEARCH = search\n" +
                             "    Verbose: TYPRM_TEST_ENV2 = testEnv\n" +

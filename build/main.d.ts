@@ -174,13 +174,14 @@ export declare const private_: {
     makeSettingTree: typeof makeSettingTree;
     makeReplaceToTagTree: typeof makeReplaceToTagTree;
 };
+export declare const foundCountMaxDefault = "10";
+export declare const snippetLineCountDefault = "5";
+export declare const wordSuperSeparatorsDefault: string;
+export declare const wordSeparatorsDefault = "~!^&*#()=+-[{]}\\|;:'\"`,.<>/?\u3001\u3002\uFF08\uFF09\u300C\u300D\u3010\u3011";
 export declare var stdout: string;
 export declare var programArguments: string[];
 export declare var programOptions: {
     [key: string]: any;
 };
-export declare const foundCountMaxDefault = "10";
-export declare const snippetLineCountDefault = "5";
-export declare const wordSuperSeparatorsDefault: string;
-export declare const wordSeparatorsDefault = "~!^&*#()=+-[{]}\\|;:'\"`,.<>/?\u3001\u3002\uFF08\uFF09\u300C\u300D\u3010\u3011";
+export declare var programOptionsWordSeparators: string;
 export {};

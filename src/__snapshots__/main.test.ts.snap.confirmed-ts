@@ -6244,7 +6244,7 @@ typrm keyword: exit()
 
 exports[`typrm shell >> search >> snippet_depth_2: stdout 1`] = `
 "typrm keyword: snippet_depth_2
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:167:     snippet_depth_2L: #keyword:  #snippet-depth: 2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:167:     snippet_depth_2Long: #keyword:  #snippet-depth: 2
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml:177:     snippet_depth_2S: #keyword:  #snippet-depth: 2
     s1
         s11
