@@ -3213,6 +3213,8 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     var  glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
                     if (glossaryWords !== '') {
                         glossaryWords += ' ';  // ' ' is a word separator
+                    } else {
+                        glossaryWords = parseKeyName(line) + ' ';  // Keywords at the left of glossary tag
                     }
 
                     glossaryTags.push({

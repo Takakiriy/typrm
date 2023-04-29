@@ -3008,6 +3008,9 @@ async function searchSub(keyword, isMutual) {
                     if (glossaryWords !== '') {
                         glossaryWords += ' '; // ' ' is a word separator
                     }
+                    else {
+                        glossaryWords = parseKeyName(line) + ' '; // Keywords at the left of glossary tag
+                    }
                     glossaryTags.push({
                         indentPosition: -1,
                         glossaryWords,

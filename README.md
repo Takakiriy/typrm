@@ -29,6 +29,7 @@ You can execute the command just by copy and paste the displayed command.
     - [For Windows](#for-windows)
     - [For mac](#for-mac)
     - [For CentOS 7](#for-centos-7)
+    - [Node.js options](#nodejs-options)
   - [settings tag and #template tag: replaces settings values](#settings-tag-and-template-tag-replaces-settings-values)
     - [Reference a part of the variable name from another variable - #same-as tag](#reference-a-part-of-the-variable-name-from-another-variable---same-as-tag)
     - [The details of settings](#the-details-of-settings)
@@ -335,6 +336,11 @@ in the text file.
 
     #keyword: CSV, comma separated values, "a,b"
 
+If keyword was not written at right of `#keyword:` tag,
+the keyword is from the beginning of the line to the colon.
+
+    CSV: #keyword:
+
 When specifying keywords that include ` #` (blank and #), write `"%20"#`.
 ` #` (blank and #) are interpreted as the next tags.
 When specifying a keyword that contains `"%`, write `""%25"`.
@@ -362,12 +368,19 @@ words up to the colon is searchable keywords
 that written in the indent line one step deeper than
 the indent of the line tagged with `#glossary:`.
 
-    glossary:  #glossary:
+    file:  #glossary:
         CSV: comma separated values
         SSV: space separated values
         #comment: This is not search target. 
 
 In the above case, you will be able to search for CSV and SSV.
+If keyword was not written at right of `#glossary:` tag,
+the additional keyword is from the beginning of the line to the colon.
+In the above case, the search target is the same as
+if you wrote the following with `#keyword:` tag.
+
+    #keyword: file CSV
+
 Lines with indents that are two or more steps deep are not searchable,
 but if you write the `#glossary:` tag at deeper positions, they will be searchable.
 
@@ -904,9 +917,11 @@ To use typrm, you must install Node.js.
                 echo  "`${env:TYPRM_OPEN_DOCUMENT} = `"code -g `"`"`${ref}`"" >> "${script}"
                 echo  "" > ${script}
 
-                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+                echo  "node --no-warnings --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
                 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// Make the script run
+
+            See [Node.js options] for options when starting node.
 
     If you use Git bash:
         Install Git for Windows:
@@ -929,7 +944,9 @@ To use typrm, you must install Node.js.
                 echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
                 echo  "" >> "${script}"
 
-                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+                echo  "node --no-warnings --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+
+        See [Node.js options] for options when starting node.
 
     Check to use typrm command:
         Open new PowerShell or new Git bash:
@@ -977,10 +994,12 @@ To use typrm, you must install Node.js.
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
         echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
         echo  "" >> "${script}"
-        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        echo  "node --no-warnings --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
         chmod +x  "${script}"
         unset script
         mkdir -p  "${HOME}/Documents/typrm"
+
+        See [Node.js options] for options when starting node.
 
     Check to use typrm command:
         typrm --version
@@ -1043,10 +1062,12 @@ To use typrm, you must install Node.js.
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
         echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
         echo  "" >> "${script}"
-        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
+        echo  "node --no-warnings --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x  "${script}"
         unset script
         mkdir -p  "${HOME}/Documents/typrm"
+
+        See [Node.js options] for options when starting node.
 
     Check to use typrm command:
         typrm --version
@@ -1058,6 +1079,19 @@ To use typrm, you must install Node.js.
         - rm  "${HOME}/Downloads/typrm.zip"
         - rm -rf  "${HOME}/Downloads/typrm-master"
         - rm -rf  "${HOME}/Downloads/typrm-develop"  (If it exists)
+
+### Node.js options
+
+Depending on the version of Node.js, it is necessary to change the node option when starting typrm.
+
+Node.js 18.x:
+
+    node  --no-warnings --es-module-specifier-resolution=node  ...
+
+Node.js 14.x:
+
+    node --experimental-modules --es-module-specifier-resolution=node  ...
+
 
 ## settings tag and #template tag: replaces settings values
 
@@ -1698,6 +1732,7 @@ which is not escaped with `\` on the command line,
 but you cannot refer to it in typrm shell.
 The definition of the environment variable is usually written in the script file
 that starts typrm.
+For options when starting node, see [Node.js options](#nodejs-options).
 
 `0.Folder` is a menu of functions for executing commands related to files (see below).
 
@@ -1705,13 +1740,13 @@ Case of Windows PS1 script file:
 ${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
 
     ${env:TYPRM_books} = "C:\Users\____\Documents\books"
-    node --experimental-modules --es-module-specifier-resolution=node  ____\build\typrm.js $PsBoundParameters.Values $args
+    node --no-warnings --es-module-specifier-resolution=node  ____\build\typrm.js $PsBoundParameters.Values $args
 
 Case of Linux bash or mac zsh script file:
 ${HOME}/bin/typrm:
 
     export TYPRM_books="/home/____/Documents/books"
-    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
+    node --no-warnings --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 If you specify the `#ref:` tag and a path without environment variables
 in the search command, typrm displays the parameters of the `#ref:` tag
@@ -1776,7 +1811,8 @@ You can add your defined commands to the list of commands.
 
 To allow you to choose commands other than `0.Folder`,
 such as` 1.View` and `7.Echo` commands,
-set the` TYPRM_VERB` environment variable in YAML format as follows:
+set the` TYPRM_VERB` environment variable in YAML format as follows,
+for options when starting node, see [Node.js options](#nodejs-options):
 
 Case of Windows PowerShell:
 
@@ -1792,7 +1828,7 @@ Case of Windows PowerShell:
             regularExpression: .*
             command: 'echo  "ref:  `${ref}";  echo  "file: `${file}";  echo  "windowsFile: `${windowsFile}";  echo  "fragment: `${fragment}"'
     "@
-    node --experimental-modules --es-module-specifier-resolution=node   C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --no-warnings --es-module-specifier-resolution=node   C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 Case of mac zsh:
 
@@ -1814,7 +1850,7 @@ Case of mac zsh:
             command: 'code --goto "${ref}"'
     __HERE_DOCUMENT__
     )
-    node --experimental-modules --es-module-specifier-resolution=node   ____/build/typrm.js "$@"
+    node --no-warnings --es-module-specifier-resolution=node   ____/build/typrm.js "$@"
 
 You can write variable references in the `command` parameter.
 
@@ -1857,6 +1893,7 @@ Note that you should edit the `regularExpression` setting
 according to your environment.
 If `#ref:` tag value was matched with multiple `regularExpression`, the settings written above take precedence.
 If it matches a `regularExpression` with `type` set to `keep`, it will not be replaced with the line number.
+For options when starting node, see [Node.js options](#nodejs-options).
 
 Case of Windows PowerShell:
 
@@ -1875,7 +1912,7 @@ Case of Windows PowerShell:
             address: "`${file}:`${lineNum}"
     "@
 
-    node --experimental-modules --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --no-warnings --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 Case of bash or zsh:
 
@@ -1895,7 +1932,7 @@ Case of bash or zsh:
     __HERE_DOCUMENT__
     )
 
-    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
+    node --no-warnings --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 For `type`, specify `text`.
 
@@ -2165,9 +2202,11 @@ You can set the break point, click at the left of line number of the source file
 
 ### Test using Jest
 
+- When running tests, place the project folder in `${HOME}/GitProjects/GitHub/typrm/`.
 - Visual Studio Code >> Terminal >> New Terminal >> (1:__shell__ at the left of +) >> Create JavaScript Debug Terminal
 - npm test
     - To debug a particular file, specify part of the file name. e.g. npm test main  #// Debug src/main.test.ts
+    - To debug a particular test function, change `test` to `test.only`
 - Restart the test:
     - Continue button:  #// Run to the end of program
     - Press `f` key in the terminal running `npm test`

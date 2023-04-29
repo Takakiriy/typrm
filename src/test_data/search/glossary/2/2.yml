@@ -22,8 +22,8 @@ glossary with parameters: #glossary: category1  #// comment
     apple: juice
 
 comment in glossary:  #glossary:
-    #comment: not hit
-    comment: hit
+    #commentA: not hit
+    commentA: hit
 emphasize search and ref tag:  #glossary:
     picture:  #ref: /path#hash  #search: keyword
 nested glossary tag:  #glossary: level-1
@@ -44,3 +44,5 @@ glossary_all_match_is_greater_score_than_keyword_part_match:
         docker compose:
     keywordTag:
         #keyword: docker compose container
+glossary_01_without_parameter_with_comment: #glossary:  #// comment
+    123: 456

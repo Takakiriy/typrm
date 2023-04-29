@@ -31,6 +31,7 @@ typrm は自分がよく参照するドキュメントや自分が使いやす�
     - [Windows の場合](#windows-の場合)
     - [mac の場合](#mac-の場合)
     - [CentOS 7 の場合](#centos-7-の場合)
+    - [Node.js のオプション](#nodejs-のオプション)
   - [設定タグと #template タグを使って設定値を置き換えます](#設定タグと-template-タグを使って設定値を置き換えます)
     - [変数名の一部を別の変数から参照します - #same-as タグ](#変数名の一部を別の変数から参照します---same-as-タグ)
     - [設定の詳細](#設定の詳細)
@@ -350,6 +351,10 @@ PowerShell
 
     #keyword: CSV, comma separated values, "a,b"
 
+`#keyword:` タグの右が無い場合、行頭からコロンまでがキーワードになります。
+
+    CSV: #keyword:
+
 ` #`（空白と#）を含むキーワードを指定するときは、`"%20"#` と書いてください。
 ` #`（空白と#）は次のタグとして解釈されます。
 `"%` を含むキーワードを指定するときは、`""%25"` と書いてください。
@@ -375,12 +380,17 @@ CSV の部分に文法の問題があるときに表示される警告を抑制�
 `#glossary:` （用語）タグを付けると、`#glossary:` タグを付けた行のインデントより
 1段深いインデントの行に書かれたコロンまでの部分が検索対象のキーワードになります。
 
-    用語:  #glossary:
+    file:  #glossary:
         CSV: comma separated values
         SSV: space separated values
         #comment: ここは検索されません
 
 上記の場合、CSV と SSV を検索できるようになります。
+`#glossary:` タグの右が無い場合、行頭からコロンまでのキーワードも検索対象になります。
+上記の場合、下記を `#keyword:` タグで書いたときと同様の検索対象になります。
+
+    #keyword: file CSV
+
 2段以上深いインデントの行は対象外ですが、
 深い位置にも `#glossary:` タグを書けば対象になります。
 
@@ -904,9 +914,11 @@ typrm を使うには Node.js のインストールが必要です。
                 echo  "`${env:TYPRM_OPEN_DOCUMENT} = `"code -g `"`"`${ref}`"" >> "${script}"
                 echo  "" > ${script}
 
-                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
+                echo  "node --no-warnings --es-module-specifier-resolution=node  ${current_folder}\build\typrm.js `$PsBoundParameters.Values `$args" >> ${script}
 
                 Set-ExecutionPolicy  RemoteSigned  -Scope CurrentUser  #// スクリプトを実行できるようにします
+
+        node 起動時のオプションは [Node.js のオプション] を参照
 
     Git bash を使う場合:
         Git for Windows をインストールします:
@@ -929,7 +941,9 @@ typrm を使うには Node.js のインストールが必要です。
                 echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
                 echo  "" >> "${script}"
 
-                echo  "node --experimental-modules --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+                echo  "node --no-warnings --es-module-specifier-resolution=node  ${current_folder}/build/typrm.js \"\$@\"" >> ${script}
+
+        node 起動時のオプションは [Node.js のオプション] を参照
 
     typrm が使えることを確認します:
         PowerShell または Git bash を新しく開いて:
@@ -977,10 +991,12 @@ typrm を使うには Node.js のインストールが必要です。
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
         echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
         echo  "" >> "${script}"
-        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
+        echo  "node --no-warnings --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> "${script}"
         chmod +x  "${script}"
         unset script
         mkdir -p  "${HOME}/Documents/typrm"
+
+        node 起動時のオプションは [Node.js のオプション] を参照
 
     typrm が使えることを確認します:
         typrm --version
@@ -1043,10 +1059,12 @@ typrm を使うには Node.js のインストールが必要です。
         echo  "export  TYPRM_FOLDER=\"${typrm_folder}\"" >> "${script}"
         echo  "export  TYPRM_OPEN_DOCUMENT=\"code -g \\\"\\${ref}\\\"" >> "${script}"
         echo  "" >> "${script}"
-        echo  "node --experimental-modules --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
+        echo  "node --no-warnings --es-module-specifier-resolution=node  $(pwd)/build/typrm.js \"\$@\"" >> ${script}
         chmod +x  "${script}"
         unset script
         mkdir -p  "${HOME}/Documents/typrm"
+
+        node 起動時のオプションは [Node.js のオプション] を参照
 
     typrm が使えることを確認します:
         typrm --version
@@ -1058,6 +1076,18 @@ typrm を使うには Node.js のインストールが必要です。
         - rm  "${HOME}/Downloads/typrm.zip"
         - rm -rf  "${HOME}/Downloads/typrm-master"
         - rm -rf  "${HOME}/Downloads/typrm-develop"  （存在する場合のみ）
+
+### Node.js のオプション
+
+Node.js のバージョンによって、typrm 起動時の node オプションを変える必要があります。
+
+Node.js 18.x:
+
+    node  --no-warnings --es-module-specifier-resolution=node  ...
+
+Node.js 14.x:
+
+    node --experimental-modules --es-module-specifier-resolution=node  ...
 
 
 ## 設定タグと #template タグを使って設定値を置き換えます
@@ -1653,6 +1683,7 @@ typrm の search コマンドのパラメーターや、typrm shell のプロン
 追加しないとコマンドラインに `\` でエスケープしない `$` で参照することはできますが、
 typrm shell では参照できなくなります。
 環境変数の定義は、たとえば typrm を起動する スクリプト ファイル の中に書きます。
+なお、node 起動時のオプションは [Node.js のオプション](#nodejs-のオプション) を参照。
 
 `0.Folder` は、ファイルに関連するコマンドを実行する機能のメニューです（後記）。
 
@@ -1660,13 +1691,13 @@ Windows の PS1 スクリプト ファイル の場合:
 ${env:USERPROFILE}\AppData\Local\Microsoft\WindowsApps\typrm.ps1:
 
     ${env:TYPRM_books} = "C:\Users\____\Documents\books"
-    node --experimental-modules --es-module-specifier-resolution=node  ____\build\typrm.js $PsBoundParameters.Values $args
+    node --no-warnings --es-module-specifier-resolution=node  ____\build\typrm.js $PsBoundParameters.Values $args
 
 Linux の bash や mac の zsh の スクリプト ファイル の場合:
 ${HOME}/bin/typrm:
 
     export TYPRM_books="/home/____/Documents/books"
-    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
+    node --no-warnings --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 typrm の search コマンドに `#ref:` タグと環境変数のないパスを指定すると、
 マニュアルに書くべき `#ref:` タグのパラメーターも一緒に表示されます。
@@ -1728,6 +1759,7 @@ typrm shell に入って `#ref:` タグでファイルのパスを表示した�
 `0.Folder` 以外のコマンド、たとえば `1.View` コマンドと `7.Echo` コマンド
 を選べるようにするには、
 `TYPRM_VERB` 環境変数に以下のように YAML 形式で設定します。
+なお、node 起動時のオプションは [Node.js のオプション](#nodejs-のオプション) を参照。
 
 Windows の PowerShell の場合:
 
@@ -1743,7 +1775,7 @@ Windows の PowerShell の場合:
             regularExpression: .*
             command: 'echo  "ref:  `${ref}";  echo  "file: `${file}";  echo  "windowsFile: `${windowsFile}";  echo  "fragment: `${fragment}"'
     "@
-    node --experimental-modules --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --no-warnings --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 mac の zsh の場合:
 
@@ -1765,7 +1797,7 @@ mac の zsh の場合:
             command: 'code --goto "${ref}"'
     __HERE_DOCUMENT__
     )
-    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
+    node --no-warnings --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 `command` には command 固有の変数参照を含めることができます。
 
@@ -1802,6 +1834,7 @@ search (s) コマンドに `#ref:` タグを付けてファイルのパスとパ
 ただし、`regularExpression` の設定は環境に応じて編集してください。
 `#ref:` タグの値が複数の `regularExpression` にマッチした場合、上に書かれた設定が優先されます。
 `type` が `keep` に設定されている `regularExpression` にマッチした場合は、行番号に置き換えません。
+なお、node 起動時のオプションは [Node.js のオプション](#nodejs-のオプション) を参照。
 
 Windows の PowerShell の場合:
 
@@ -1820,7 +1853,7 @@ Windows の PowerShell の場合:
             address: "`${file}:`${lineNum}"
     "@
 
-    node --experimental-modules --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
+    node --no-warnings --es-module-specifier-resolution=node  C:\Users\____\Downloads\typrm-master\build\typrm.js $PsBoundParameters.Values $args
 
 bash, zsh の場合:
 
@@ -1840,7 +1873,7 @@ bash, zsh の場合:
     __HERE_DOCUMENT__
     )
 
-    node --experimental-modules --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
+    node --no-warnings --es-module-specifier-resolution=node  ____/build/typrm.js "$@"
 
 `type` には、`text` を指定します。
 
@@ -2093,9 +2126,11 @@ Jest を使うテストと Jest を使わないテストがあります。
 
 ### Jest を使うテスト
 
+- テストを実行するときは、プロジェクト フォルダー を `${HOME}/GitProjects/GitHub/typrm/` に配置します
 - Visual Studio Code >> Terminal >> New Terminal >>（＋の左の 1:__shell__）>> Create JavaScript Debug Terminal
 - npm test
     - 特定のファイルをデバッグするときは、ファイル名の一部を指定します。例：npm test main  #// src/main.test.ts をデバッグします
+    - 特定のテスト関数をデバッグするときは、test を test.only に変えます
 - テストを再起動します:
     - Continue ボタン:  #// 最後まで実行します
     - npm test が動いている Terminal で f キーを押します

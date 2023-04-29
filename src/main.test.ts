@@ -22,6 +22,12 @@ if (process.env.windir) {
 }
 var  normalizedHomePath = lib.getHomePath().replace(/\\/g, '/');
 normalizedHomePath = normalizedHomePath[0].toLowerCase() + normalizedHomePath.substring(1);
+var  projectRootPath = lib.getFullPath('..', __dirname).replace(/\\/g, '/');
+var  projectRootPathInAnswer = '${HOME}' + projectRootPath.substring(normalizedHomePath.length);
+if (projectRootPathInAnswer !== '${HOME}/GitProjects/GitHub/typrm') {
+    throw new Error('When running tests, place the project folder in `${HOME}/GitProjects/GitHub/typrm/`.');
+    // See "specifications.yaml" file
+}
 process.env.TYPRM_TEST_ENV = lib.getFullPath('test_data', __dirname);
 process.env.TYPRM_TEST_SEARCH = 'search';
 process.env.TYPRM_TEST_ENV2 = 'testEnv';
@@ -567,7 +573,7 @@ describe("replaces settings >>", () => {
 
             // Check
             if (caseName !== "same name error") {  // Case of relace 1, replace 2
-                if (!changingFilePath) { throw new Error('unexpected');} 
+                if (!changingFilePath) { throw new Error('unexpected'); } 
                 const  fileContentsBefore = sourceFileContents;
                 const  fileContentsAfter  = fs.readFileSync(changingFilePath).toString();
 
@@ -1175,7 +1181,7 @@ describe("searches keyword tag >>", () => {
             "Multi folder",  // and test of long path length > short path length
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('ABC')}: abc\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],[
             "target is file",
@@ -1308,40 +1314,40 @@ describe("searches glossary tag >>", () => {
         "1st",
         ["search", "ABC"],
         { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n`,
     ],[
         "ignore case",
         ["search", "abc"],
         { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n`,
     ],[
         "word",
         ["search", "AB"],
         { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('AB')}C: abc\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('AB')}C: abc\n`,
     ],[
         "nested indent",  // 2段以上深いインデントは対象外です
         ["search", "ABC"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('ABC')}D: abcd\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':4:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('ABC')}: abc\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Nested tag must not be matched:    ${matchedColor('ABC')}D: abcd\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':4:') + ` ${keywordLabelColor('#glossary:')} Nested tag must not be matched:    ${matchedColor('ABC')}: abc\n`,
     ],[
         "skip comment",
-        ["search", "comment"],
+        ["search", "commentA"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':26:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('comment')}: hit\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':26:') + ` ${keywordLabelColor('#glossary:')} comment in glossary:    ${matchedColor('commentA')}: hit\n`,
     ],[
         "output order (1)",
         ["search", "de"],
         { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('DE')}: de\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('de')}: de\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('DE')}: de\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('de')}: de\n`,
     ],[
         "output order (2)",
         ["search", "DE"],
         { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('de')}: de\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('DE')}: de\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('de')}: de\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('DE')}: de\n`,
     ],[
         "output order (3)",
         ["search", "search score comparison glossary"],
@@ -1353,21 +1359,21 @@ describe("searches glossary tag >>", () => {
         "glossary is less score than keyword",
         ["search", "grape"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('grape')}:\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')} glossary2:        ${matchedColor('grape')}:\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')} glossary1:        ${matchedColor('grape')}:\n` +
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':12:') + `     keyword:  ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
     ],[
         "glossary_all_match_is_greater_score_than_keyword_part_match",
         ["search", "docker", "compose"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':46:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} container\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':44:') + ` ${keywordLabelColor('#glossary:')}         ${matchedColor('docker')} ${matchedColor('compose')}:\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':44:') + ` ${keywordLabelColor('#glossary:')} parent:        ${matchedColor('docker')} ${matchedColor('compose')}:\n`,
     ],[
         "glossary with empty line",
         ["search", "space"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}2:\n` +
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('space')}1:\n`,
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')} glossary with empty line:    ${matchedColor('space')}2:\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')} glossary with empty line:    ${matchedColor('space')}1:\n`,
     ],[
         "glossary with parameters (1)",
         ["search", "category1 apple"],
@@ -1379,10 +1385,15 @@ describe("searches glossary tag >>", () => {
         { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
     ],[
+        "glossary_01_without_parameter_with_comment",
+        ["search", "glossary_01  123"],
+        { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':48:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('glossary_01')}_without_parameter_with_comment:    ${matchedColor('123')}: 456\n`,
+    ],[
         "emphasize search and ref tag",
         ["search", "picture"],
         { folder: "test_data/search/glossary/2", disableFindAll: '', test: "", locale: 'en-US' },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('picture')}:  ${refColor('#ref: /path#hash')}  #search: ${searchColor('keyword')}\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/2/2.yml') + lineNumColor(':28:') + ` ${keywordLabelColor('#glossary:')} emphasize search and ref tag:    ${matchedColor('picture')}:  ${refColor('#ref: /path#hash')}  #search: ${searchColor('keyword')}\n` +
         'ERROR: not found a file or folder at "/path#hash"\n'.replace(/\//g, path.sep) +
         lib.getHomePath() +'\n'+
         '    0.Folder\n',
@@ -1398,7 +1409,7 @@ describe("searches glossary tag >>", () => {
         "Multi folder",
         ["search", "ABC"],
         { folder: "test_data/search/1, test_data/search/glossary/1", disableFindAll: '', test: "" },
-        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')}     ${matchedColor('ABC')}: abc\n` +
+        pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/glossary/1/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n` +
         pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
     ],
     ])("%s", async (_caseName, arguments_, options, answer) => {

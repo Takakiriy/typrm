@@ -20,10 +20,13 @@ command: #keyword: typrm command list
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
-                    getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
-                        getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
-                        thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
-                        setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
+                    # // keyword tag (#keyword:)
+                        getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
+                            getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
+                            thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
+                            setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
+                    # // glossary tag (#glossary:)
+                        #  if (glossaryTag) {
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
@@ -120,7 +123,14 @@ tag:
                 template_if_1_error
             replaces settings >>
                 2_replace_9_template_if_1_OK
-test 詳細:
+test details:
+    About ${HOME}:
+        Abstract: When running tests, place the project folder in `${HOME}/GitProjects/GitHub/typrm/`.
+        ${HOME} in the test data:
+            main.test.ts: |  #ref: ~/GitHub/typrm/src/main.test.ts
+                pathColor('${HOME}/GitProjects/GitHub/typrm/
+            __snapshots__: |  #ref: ~/GitHub/typrm/src/__snapshots__/main.test.ts.snap
+                __Project__: ~/GitProjects/GitHub/typrm
     機能からテストを探す場合: #search: typrm command list
     Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
         main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
