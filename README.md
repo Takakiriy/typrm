@@ -1090,6 +1090,10 @@ Node.js 18.x:
 
 Node.js 14.x:
 
+    node --es-module-specifier-resolution=node  ...
+
+Node.js 12.x:
+
     node --experimental-modules --es-module-specifier-resolution=node  ...
 
 
