@@ -489,7 +489,7 @@ describe("replaces settings >>", () => {
         });
         const updatedFileContents = fs.readFileSync(filePath).toString();
         chdirInProject('src');
-        expect(main.stdout).toMatchSnapshot('stdout');
+        expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout');
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         lib.rmdirSync(testFolderPath + '_tmp');
     });
@@ -668,7 +668,7 @@ describe("replaces settings >>", () => {
             });
             chdirInProject('src');
             const replacedFileContents = fs.readFileSync(filePath).toString();
-            expect(main.stdout).toMatchSnapshot('stdout');
+            expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout');
             if (!options.includes('ErrorCase')) {
                 expect(replacedFileContents).toMatchSnapshot('replacedFileContents');
                 // Test Main >> reset
@@ -729,7 +729,7 @@ describe("replaces settings >>", () => {
             });
             chdirInProject('src');
             const verboseOutput = main.stdout.substring(main.stdout.indexOf('Verbose: Phase 3: replace ...'));
-            expect(verboseOutput).toMatchSnapshot('verbose');
+            expect(lib.cutEscapeSequence(verboseOutput)).toMatchSnapshot('verbose');
             lib.rmdirSync(testFolderPath + '_tmp');
         });
     });

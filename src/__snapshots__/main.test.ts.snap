@@ -3526,38 +3526,7 @@ exports[`replaces settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`]
             After  Replacing: fi
         \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/fi\\"
 
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
-    Error: template target values after replace are conflicted. You should add #to: tags at setting variables in other templates.
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Full__: folder/file  #to: fo/fi
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Folder__: folder
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     __File__: file  #to: fi
-    replaced (1): - \\"folder/fi\\"
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         #template-at(-1): __File__
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
-            Before Replacing: file
-            After  Replacing: fi
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/fi\\"
-    replaced (2): - \\"folder/file\\"
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:         #template-at(-2): __Folder__
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
-            Before Replacing: folder
-            After  Replacing: folder
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
-    replaced (3): - \\"folder/fi\\"
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         #template-at(-3): __Folder__/__File__
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
-            Before Replacing: folder/file
-            After  Replacing: folder/fi
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/fi\\"
-    replaced (4): - \\"fo/fi\\"
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         #template-at(-4): \\"__Full__\\"
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"folder/file\\"
-            Before Replacing: \\"folder/file\\"
-            After  Replacing: \\"fo/fi\\"
-        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     - \\"fo/fi\\"
-
-Warning: 0, Error: 2
+Warning: 0, Error: 1
 "
 `;
 
@@ -4910,23 +4879,23 @@ body:
 
 exports[`replaces settings >> replace to tag >> 7E_VariableCount_Error: stdout 1`] = `
 "
-Error of the value count in #to tag:
+ERROR: The parameter count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:        #to: a
     Variable count in the template tag: 2
-    Variable count in the to tag: 1
+    Value count in the to tag: 1
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __SetA__: a
 
-Error of the value count in #to tag:
+ERROR: The parameter count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:        #to: a, b, c
     Variable count in the template tag: 2
-    Variable count in the to tag: 3
+    Value count in the to tag: 3
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetA__: a
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetB__: b
 
-Error of the value count in #to tag:
+ERROR: The parameter count in #to tag:
     To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:        #to: a
     Variable count in the template tag: 0
-    Variable count in the to tag: 1
+    Value count in the to tag: 1
 
 Warning: 0, Error: 3
 "
@@ -5114,7 +5083,7 @@ exports[`replaces settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_E
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
     Error: template target values after replace are conflicted. You should add #to: tags at setting variables in other templates.
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
-    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __Full__: ValueB1_ValueB2
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __Full__: ValueB1_ValueB2  #to: ValueB9_ValueB9
     \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         __Part__: ValueB1
     replaced (1): ValueB9_ValueB9
         \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         #template: __Full__

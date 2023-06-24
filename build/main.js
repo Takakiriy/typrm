@@ -321,7 +321,7 @@ function getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines
     }
     return lib.cutLast(errorMessage, '\n');
 }
-function getVariablesForErrorMessage(indent, variableNames, settingTree, lines, inputFilePath) {
+function getVariablesForErrorMessage(indent, variableNames, settingTree, lines, inputFilePath, options = {}) {
     var errorMessage = '';
     var settingIndices = [];
     for (let settingIndex = settingTree.currentSettingIndex; settingIndex !== '/'; settingIndex = path.dirname(settingIndex)) {
@@ -337,9 +337,24 @@ function getVariablesForErrorMessage(indent, variableNames, settingTree, lines, 
                 for (const variableName of variableNames) {
                     const variable = settingTree.currentSettings[variableName];
                     if (lib.cutAlphabetInIndex(variable.settingsIndex) === parentSettingIndex) {
+                        var line = lines[variable.lineNum - 1];
+                        if (options.replaceToTag) {
+                            if (variableName in options.replaceToTag) {
+                                if (line.indexOf(' #to:') == notFound) {
+                                    const before = getValue(line, line.indexOf(':'));
+                                    const after = options.replaceToTag[variableName].value;
+                                    if (after !== before) {
+                                        line = line.trimRight() + `  #to: ${after}`;
+                                    }
+                                }
+                            }
+                        }
+                        if (options.coloredValue) {
+                            line = getLineWithColoredValue(line);
+                        }
                         variableMessages.push({
                             lineNum: variable.lineNum,
-                            message: `${getTestablePath(inputFilePath)}:${variable.lineNum}: ${lines[variable.lineNum - 1]}\n`,
+                            message: `${getTestablePath(inputFilePath)}:${variable.lineNum}: ${line}\n`,
                         });
                     }
                 }
@@ -821,7 +836,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
             if (isReadingSetting) {
                 const separator = line.indexOf(':');
                 if (separator !== notFound) {
-                    const keyOrNot = line.substr(0, separator).trim();
+                    const keyOrNot = line.substring(0, separator).trim();
                     if (keyOrNot[0] !== '#') {
                         variableName = keyOrNot;
                         value = getValue(line, separator);
@@ -912,7 +927,7 @@ async function makeReplaceToTagTree(parser, settingTree) {
                                 }
                             }
                             if (parser.command !== CommandEnum.check) {
-                                console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${newValue.value}`);
+                                console.log(`${getTestablePath(parser.filePath)}:${lineNum}: #to: ${variableName}: ${getLineWithColoredValue(newValue.value)}`);
                             }
                         }
                         previousTemplateTag = null;
@@ -1421,11 +1436,12 @@ class TemplateTag {
             const toValues = await lib.parseCSVColumns(toValue);
             if (toValues.length !== keys.length) {
                 console.log('');
-                console.log('Error of the value count in #to tag:');
+                console.log(`ERROR: ${translate(`The parameter count in #to tag:`)}`);
                 console.log(`    To tag: ${getTestablePath(parser.filePath)}:${parser.lineNum}:${parser.line}`);
-                console.log(`    Variable count in the template tag: ${keys.length}`);
-                console.log(`    Variable count in the to tag: ${toValues.length}`);
+                console.log(`    ${translate('Variable count in the template tag:')} ${keys.length}`);
+                console.log(`    ${translate('Value count in the to tag:')} ${toValues.length}`);
                 parser.errorCount += 1;
+                parser.toTagError = true;
             }
             for (let i = 0; i < keys.length; i += 1) {
                 if (i < toValues.length && toValues[i]) {
@@ -1839,7 +1855,7 @@ async function replaceSub(inputFilePath, parser, command) {
                     parser.errorCount += 1;
                 }
             }
-            // #copy tag
+            // #copy tag   #breadcrumb:
             if (copyTagIndent) {
                 if (!line.startsWith(copyTagIndent) && line.trim() !== '') {
                     copyTagIndent = '';
@@ -1899,7 +1915,7 @@ async function replaceSub(inputFilePath, parser, command) {
                     }
                 }
             }
-            // #settings tag
+            // #settings tag   #breadcrumb:
             if (settingLabel.test(line) && !line.includes(disableLabel)) {
                 isSetting = true;
                 settingIndentLength = indentRegularExpression.exec(line)[0].length;
@@ -1910,7 +1926,7 @@ async function replaceSub(inputFilePath, parser, command) {
             else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isSetting) {
                 isSetting = false;
             }
-            // In settings
+            // In settings   #breadcrumb:
             if (isSetting) {
                 const separator = line.indexOf(':');
                 if (separator !== notFound) {
@@ -1931,7 +1947,7 @@ async function replaceSub(inputFilePath, parser, command) {
                                 console.log(`    Verbose:     replace from: ${oldValue}`);
                                 console.log(`    Verbose:     replace to  : ${newValue}`);
                             }
-                            // Change a settings value
+                            // Change a settings value   #breadcrumb:
                             const { original, spaceAndComment } = getReplacedLineInSettings(line, separator, oldValue, newValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
                             const newLine = line.substring(0, separator + 1) + ' ' + newValue + original + spaceAndComment;
                             writer.write(newLine + "\n");
@@ -1942,7 +1958,7 @@ async function replaceSub(inputFilePath, parser, command) {
                         }
                     }
                 }
-                // Out of settings
+                // Out of settings   #breadcrumb:
             }
             else {
                 const templateTag = parseTemplateTag(line, parser);
@@ -1964,26 +1980,31 @@ async function replaceSub(inputFilePath, parser, command) {
                     && toTagTree.currentIsOutOfFalseBlock) {
                     const replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
                     const commonCase = (templateTag.label !== templateIfLabel);
+                    const emphasizedColor = chalk.yellowBright;
                     if (!copyTagIndent) { // if common case
                         if (commonCase) {
                             var expected = getExpectedLine(oldSetting, templateTag.template);
                             var replaced = getReplacedLine(newSetting, templateTag.template);
+                            var coloredReplaced = emphasizedColor(replaced);
                         }
                         else { // if (templateTag.label === templateIfLabel)
                             templateTag.evaluate(newSetting);
                             var expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
                             var replaced = getReplacedLine(newSetting, templateTag.newTemplate);
+                            var coloredReplaced = emphasizedColor(replaced);
                         }
                     }
                     else { // if copyTagIndent
                         if (commonCase) {
                             var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.template);
                             var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template);
+                            var coloredReplaced = emphasizedColor(replaced);
                         }
                         else { // if (templateTag.label === templateIfLabel)
                             templateTag.evaluate(newSetting);
                             var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.oldTemplate);
                             var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate);
+                            var coloredReplaced = emphasizedColor(replaced);
                         }
                     }
                     if (replacingLine.includes(expected)) {
@@ -2015,7 +2036,8 @@ async function replaceSub(inputFilePath, parser, command) {
                                 variableNames: templateTag.scanKeys(Object.keys(settingTree.currentSettings)),
                                 targetLineNum: lineNum,
                                 expected: before,
-                                replaced: after.replace(/\$/g, '$$')
+                                replaced: after.replace(/\$/g, '$$'),
+                                coloredReplaced: coloredReplaced.replace(/\$/g, '$$')
                             });
                             if (parser.verbose) {
                                 if (before !== after) {
@@ -2040,7 +2062,8 @@ async function replaceSub(inputFilePath, parser, command) {
                                 variableNames: templateTag.scanKeys(Object.keys(settingTree.currentSettings)),
                                 targetLineNum: lineNum + templateTag.lineNumOffset,
                                 expected: before,
-                                replaced: after.replace(/\$/g, '$$')
+                                replaced: after.replace(/\$/g, '$$'),
+                                coloredReplaced: coloredReplaced.replace(/\$/g, '$$')
                             });
                             var lengthSortedTemplates = checkedTemplateTags[outputTargetLineNum].slice();
                             lengthSortedTemplates = lengthSortedTemplates.sort((b, a) => (a.expected.length - b.expected.length));
@@ -2125,7 +2148,7 @@ async function replaceSub(inputFilePath, parser, command) {
                                 errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
                                 errorMessage += `    ${translate('Error')}: ${translate('template target values after replace are conflicted.')}` +
                                     ` ${translate('You should add #to: tags at setting variables in other templates.')}\n`;
-                                errorMessage += getVariablesForErrorMessage('    ', variableNames, settingTree, lines, parser.filePath) + '\n';
+                                errorMessage += getVariablesForErrorMessage('    ', variableNames, settingTree, lines, parser.filePath, { coloredValue: true, replaceToTag: toTagTree.currentNewSettings }) + '\n';
                                 var templateNum = 0;
                                 for (const template of checkedTemplateTags[outputTargetLineNum]) {
                                     const replacedLine = lines[outputTargetLineNum - 1].replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
@@ -2134,7 +2157,7 @@ async function replaceSub(inputFilePath, parser, command) {
                                     errorMessage += `        ${getTestablePath(inputFilePath)}:${template.templateLineNum}: ${lines[template.templateLineNum - 1]}\n`;
                                     errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
                                     errorMessage += `            ${translate('Before Replacing')}: ${template.expected.trim()}\n`;
-                                    errorMessage += `            ${translate('After  Replacing')}: ${template.replaced.trim()}\n`;
+                                    errorMessage += `            ${translate('After  Replacing')}: ${template.coloredReplaced.trim()}\n`;
                                     errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacedLine}\n`;
                                 }
                                 conflictErrors[outputTargetLineNum] = lib.cutLast(errorMessage, '\n');
@@ -2189,6 +2212,7 @@ async function replaceSub(inputFilePath, parser, command) {
                     }
                 }
             }
+            // Output a line, if not yet   #breadcrumb:
             if (!output) {
                 if (!cutReplaceToTagEnabled) {
                     writer.write(line + "\n");
@@ -2209,9 +2233,12 @@ async function replaceSub(inputFilePath, parser, command) {
                 }
             }
         }
-        for (const conflictError of Object.values(conflictErrors)) {
-            console.log(conflictError);
-            parser.errorCount += 1;
+        if (!parser.toTagError) {
+            for (const conflictError of Object.values(conflictErrors)) {
+                console.log(conflictError);
+                parser.errorCount += 1;
+                break; // Error message count should be 1, because user can focus on one place.
+            }
         }
         if (!hasLastLF) {
             writer.cutLastLF();
@@ -2223,6 +2250,7 @@ async function replaceSub(inputFilePath, parser, command) {
                     const newFileContents = writer.getAllLines();
                     const oldFileContents = fileContents;
                     if (newFileContents !== oldFileContents) {
+                        // Overwite the file   #breadcrumb:
                         fs.copyFileSync(updatingFilePath, inputFilePath);
                     }
                 }
@@ -4564,10 +4592,38 @@ function getValue(line, separatorIndex = -1) {
         var comment = value.indexOf(' #');
     }
     if (comment !== notFound) {
-        value = value.substr(0, comment).trim();
+        value = value.substring(0, comment).trim();
     }
     value = unscapePercentByte(value);
     return value;
+}
+function getLineWithColoredValue(line) {
+    const toIndex = line.indexOf(' #to:');
+    if (toIndex == notFound) {
+        // __Value__:                 #//
+        //          ^separatorIndex  ^nextSharpIndex
+        var separatorIndex = line.indexOf(':');
+    }
+    else {
+        // __Value__:  #//   #to:      #//
+        //                  ^toIndex  ^nextSharpIndex
+        //                      ^separatorIndex
+        var separatorIndex = toIndex + 4;
+    }
+    var nextSharpIndex = line.indexOf(' #', separatorIndex);
+    if (nextSharpIndex == notFound) {
+        nextSharpIndex = line.length;
+    }
+    const value = line.substring(separatorIndex + 1, nextSharpIndex).trim();
+    const valueIndex = line.indexOf(value, separatorIndex);
+    if (value.length === 0) {
+        return line;
+    }
+    else {
+        return line.substring(0, valueIndex) +
+            chalk.yellowBright(value) +
+            line.substring(valueIndex + value.length);
+    }
 }
 function unscapePercentByte(value) {
     var found = 0;
@@ -5892,6 +5948,7 @@ class Parser {
         this.command = CommandEnum.unknown;
         this.errorCount = 0;
         this.warningCount = 0;
+        this.toTagError = false;
         this.templateCount = 0;
         this.verbose = false;
         this.filePath = '';
@@ -6074,6 +6131,9 @@ function translate(englishLiterals, ...values) {
             "ref tag value \"${0}\" must be full path. Then you can specify the path with a variable.": "ref タグの値 \"${0}\" をフルパスに修正してください。その際、変数を指定できます。",
             "ERROR: not found a file or folder at": "エラー: ファイルまたはフォルダーが見つかりません",
             "Display of further original tags will be omitted": "これ以上の original タグの表示は割愛します",
+            "The parameter count in #to tag:": "#to タグのパラメーターの数",
+            "Variable count in the template tag:": "#template タグの中の変数の数:",
+            "Value count in the to tag:": "#to タグの中の値の数:",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",

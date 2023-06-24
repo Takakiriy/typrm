@@ -151,6 +151,7 @@ declare class Parser {
     command: CommandEnum;
     errorCount: number;
     warningCount: number;
+    toTagError: boolean;
     templateCount: number;
     verbose: boolean;
     filePath: string;
