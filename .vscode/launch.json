@@ -22,7 +22,7 @@
             "preLaunchTask": "TypeScript Compile Task",
             "program": "${workspaceFolder}/src/typrm.ts",
             "runtimeArgs": ["--experimental-specifier-resolution=node"],
-            "args": ["--verbose"],
+            "args": ["check", "--verbose"],
             "cwd": "${workspaceFolder}/src",
             "smartStep": true,
             "outFiles": [

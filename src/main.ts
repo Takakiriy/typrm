@@ -25,12 +25,12 @@ export async function  main() {
         }
 
         // debug
-        // if (true) {
-        //     var d = pp('');
-        //     d=d;
-        //     // If exception was raised, this code does not execute.
-        //     // Set a break point at the catch block of calling "main.main"
-        // }
+            // if (true) {
+            //     var d = lib.pp('');
+            //     d=d;  // Set break point here and watch the variable d
+            //     // If exception was raised, this code does not execute.
+            //     // Set a break point at the catch block of calling "main.main"
+            // }
     }
 }
 
@@ -2725,6 +2725,9 @@ namespace CopyTag {
                     var    targetLine = copyTagDollerContents[lineNumOffset];
                     const  templateInSourceLine = templateRegExp.exec(sourceLine);
                     const  templateInTargetLine = templateRegExp.exec(targetLine);
+                    if (targetLine === undefined) {
+                        break;
+                    }
 
                     if (templateInSourceLine  &&  ! templateInTargetLine) {
 
