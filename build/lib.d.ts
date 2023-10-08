@@ -51,6 +51,7 @@ interface ColoredDiff {
 }
 export declare function parseCSVColumns(columns: string): Promise<string[]>;
 export declare function parseCSVColumnPositions(csv: string, columns: string[]): number[];
+export declare function getAllQuotedCSVLine(columns: string[] | number[]): string;
 export declare function escapeRegularExpression(expression: string): string;
 export declare function replace(input: string, replacers: ReplaceParameter[]): string;
 export declare function replaceAsync(input: string, replacers: ReplaceParameter[]): Promise<string>;

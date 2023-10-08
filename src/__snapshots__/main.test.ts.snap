@@ -3604,7 +3604,7 @@ check:
 
 exports[`replaces settings >> in 2_replace_11_nested_if AB: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_02__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60: #to: __Switch_02__: B
 
 Warning: 0, Error: 0
 "
@@ -3666,7 +3666,8 @@ case B:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
-AB:   #template: __Set_01__
+1:
+    AB:   #template: __Set_01__
 settings: #settings:
     __Switch_01__: A
     __Switch_02__: B  #original: A
@@ -3680,7 +3681,8 @@ settings: #settings:
             __Set_01__: BA
         case B:  #if: $settings.__Switch_02__ == B
             __Set_01__: BB
-AB:   #template: __Set_01__
+2:
+    AB:   #template: __Set_01__
 case A after:  #if: $settings.__Switch_01__ == A
                     case A:  #if: $settings.__Switch_02__ == A
                         AA  #template: __Set_01__
@@ -3696,7 +3698,7 @@ case B after:  #if: $settings.__Switch_01__ == B
 
 exports[`replaces settings >> in 2_replace_11_nested_if BA: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch1__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58: #to: __Switch_01__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_01__: B
 
 Warning: 0, Error: 0
 "
@@ -3758,7 +3760,8 @@ case B:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
-BA:   #template: __Set_01__
+1:
+    BA:   #template: __Set_01__
 settings: #settings:
     __Switch_01__: B  #original: A
     __Switch_02__: A
@@ -3772,7 +3775,8 @@ settings: #settings:
             __Set_01__: BA
         case B:  #if: $settings.__Switch_02__ == B
             __Set_01__: BB
-BA:   #template: __Set_01__
+2:
+    BA:   #template: __Set_01__
 case A after:  #if: $settings.__Switch_01__ == A
                     case A:  #if: $settings.__Switch_02__ == A
                         AA  #template: __Set_01__
@@ -3789,8 +3793,8 @@ case B after:  #if: $settings.__Switch_01__ == B
 exports[`replaces settings >> in 2_replace_11_nested_if BB: stdout 1`] = `
 "\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch1__: B
 \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __Switch2__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58: #to: __Switch_01__: B
-\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_02__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_01__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60: #to: __Switch_02__: B
 
 Warning: 0, Error: 0
 "
@@ -3852,7 +3856,8 @@ case B:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
-BB:   #template: __Set_01__
+1:
+    BB:   #template: __Set_01__
 settings: #settings:
     __Switch_01__: B  #original: A
     __Switch_02__: B  #original: A
@@ -3866,7 +3871,8 @@ settings: #settings:
             __Set_01__: BA
         case B:  #if: $settings.__Switch_02__ == B
             __Set_01__: BB
-BB:   #template: __Set_01__
+2:
+    BB:   #template: __Set_01__
 case A after:  #if: $settings.__Switch_01__ == A
                     case A:  #if: $settings.__Switch_02__ == A
                         AA  #template: __Set_01__
@@ -3943,7 +3949,8 @@ case B:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
-AA:   #template: __Set_01__
+1:
+    AA:   #template: __Set_01__
 settings: #settings:
     __Switch_01__: A
     __Switch_02__: A
@@ -3957,7 +3964,8 @@ settings: #settings:
             __Set_01__: BA
         case B:  #if: $settings.__Switch_02__ == B
             __Set_01__: BB
-AA:   #template: __Set_01__
+2:
+    AA:   #template: __Set_01__
 case A after:  #if: $settings.__Switch_01__ == A
                     case A:  #if: $settings.__Switch_02__ == A
                         AA  #template: __Set_01__
@@ -4027,7 +4035,8 @@ case B:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
-AA:   #template: __Set_01__
+1:
+    AA:   #template: __Set_01__
 settings: #settings:
     __Switch_01__: A
     __Switch_02__: A
@@ -4041,7 +4050,8 @@ settings: #settings:
             __Set_01__: BA
         case B:  #if: $settings.__Switch_02__ == B
             __Set_01__: BB
-AA:   #template: __Set_01__
+2:
+    AA:   #template: __Set_01__
 case A after:  #if: $settings.__Switch_01__ == A
                     case A:  #if: $settings.__Switch_02__ == A
                         AA  #template: __Set_01__
@@ -6520,19 +6530,19 @@ exports[`unit test >> makeSettingTree >> 1st: answer indicesWithIf 1`] = `
     52 => "/b/a",
     54 => "/b/b",
     56 => "/",
-    60 => "/c",
-    61 => "/c/a",
-    63 => "/c/b",
-    65 => "/d",
-    66 => "/d/a",
-    68 => "/d/b",
-    70 => "/",
-    71 => "/e",
-    72 => "/e/a",
-    74 => "/e/b",
-    76 => "/f",
-    77 => "/f/a",
-    79 => "/f/b",
+    61 => "/c",
+    62 => "/c/a",
+    64 => "/c/b",
+    66 => "/d",
+    67 => "/d/a",
+    69 => "/d/b",
+    71 => "/",
+    73 => "/e",
+    74 => "/e/a",
+    76 => "/e/b",
+    78 => "/f",
+    79 => "/f/a",
+    81 => "/f/b",
 }
 "
 `;
@@ -6593,7 +6603,8 @@ case B:  #if: $settings.__Switch_01__ == B
                         BA  #template: __Set_01__
                     case B:  #if: $settings.__Switch_02__ == B
                         BB  #template: __Set_01__
-AA:   #template: __Set_01__
+1:
+    AA:   #template: __Set_01__
 settings: #settings:
     __Switch_01__: A
     __Switch_02__: A
@@ -6607,7 +6618,8 @@ settings: #settings:
             __Set_01__: BA
         case B:  #if: $settings.__Switch_02__ == B
             __Set_01__: BB
-AA:   #template: __Set_01__
+2:
+    AA:   #template: __Set_01__
 case A after:  #if: $settings.__Switch_01__ == A
                     case A:  #if: $settings.__Switch_02__ == A
                         AA  #template: __Set_01__

@@ -4,6 +4,8 @@ command: #keyword: typrm command list
         test:
             keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword tag >>"
             glossary tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches glossary tag >>"
+            parent match: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword and parent >>"
+                code:  #search: plusParentMatchScore
             idiom: #ref: ${GitHub}/typrm/src/main.test.ts#"idiom"
                 #ref: ${GitHub}/typrm/src/lib.ts#splitIdioms
             kana mode: #ref: ${GitHub}/typrm/src/main.test.ts#"kana_mode"
@@ -20,18 +22,21 @@ command: #keyword: typrm command list
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
-                    # // keyword tag (#keyword:)
+                    # // keyword tag  #// (#keyword:)
                         getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                             getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                             thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
                             setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
-                    # // glossary tag (#glossary:)
+                        plusParentMatchScore:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
+                        # foundLines.push(found);
+                    # // glossary tag  #// (#glossary:)
                         #  if (glossaryTag) {
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
                         compareScoreAndSoOn:  #ref: ${GitHub}/typrm/src/main.ts#function  compareScoreAndSoOn
                         # // Debug score compare in 2 founds
+                    #   console.log(foundLineInformation.toString());
                     FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
@@ -77,6 +82,13 @@ tag:
             Japanese: #ref: ${GitHub}/typrm/README-jp.md### タグ一覧
         code: #ref: ${GitHub}/typrm/src/main.ts#const  originalLabel = 
     keyword tag:
+        specifications:
+            escape: #keyword: escape in typrm tag,  "%20"#,  ""%25",  space sharp (_#),  double quatation percent ("%)
+                in README: |
+                    -   When specifying keywords that include ` #` (blank and #), write `"%20"#`.
+                    -   When specifying a keyword that contains `"%`, write `""%25"`.
+                test: searches keyword tag >> sharp
+                code: unscapePercentByte
         test: #search: keyword tag test
         code: #search: typrm search
     copy tag:  #keyword:#copy:
@@ -92,7 +104,17 @@ tag:
                 CopyTag.scanAllTemplate:  #ref: ${GitHub}/typrm/src/main.ts#// CopyTag.scanAllTemplate
                 checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#function  checkRoutine
                     CheckParser.evaluate:  #ref: ${GitHub}/typrm/src/main.ts#// CheckParser.evaluate
+                        _evaluateCopyTagStart:
+                            # // if copyLabel
+                            # // if copyTemplateLabel
+                        _evaluateCopyTagContents:
+                            # this.parsingCopyTag.contents.push(comparableLine);
                 CopyTag.check:  #ref: ${GitHub}/typrm/src/main.ts#// CopyTag.check
+                    # // Cut keyword tags
+                    checkExpectedTextContents:
+                        _main:
+                            # if (result === Result.same) {
+                            #     unexpectedLine = null;
             replace:  #ref: ${GitHub}/typrm/src/main.ts#function  replace(
                 #// parent: #search: replaceSub
                 replaceSub:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
@@ -124,6 +146,7 @@ tag:
             replaces settings >>
                 2_replace_9_template_if_1_OK
 test details:
+    機能からテストを探す場合: #search: typrm command list
     About ${HOME}:
         Abstract: When running tests, place the project folder in `${HOME}/GitProjects/GitHub/typrm/`.
         ${HOME} in the test data:
@@ -131,7 +154,6 @@ test details:
                 pathColor('${HOME}/GitProjects/GitHub/typrm/
             __snapshots__: |  #ref: ~/GitHub/typrm/src/__snapshots__/main.test.ts.snap
                 __Project__: ~/GitProjects/GitHub/typrm
-    機能からテストを探す場合: #search: typrm command list
     Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
         main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
         拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:
@@ -199,6 +221,11 @@ test details:
             コードの説明:
                 IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
 other specifications:
+    Debug:
+        debugSearchScore:
+            How to use: set to true
+        coloredStrings:
+            How to use: cut comment out of debug code
     start up:
         start from shell:
             main:  #ref: ${GitHub}/typrm/src/main.ts#function  main(

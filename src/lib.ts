@@ -992,6 +992,10 @@ export function  parseCSVColumnPositions(csv: string, columns: string[]): number
     return  positions;
 }
 
+export function  getAllQuotedCSVLine(columns: string[] | number[]): string {
+    return  columns.map((s) => ('"' + s.toString().replace(/"/g, '""') + '"')).join(',');
+}
+
 export function  escapeRegularExpression(expression: string) {
     return  expression.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 }

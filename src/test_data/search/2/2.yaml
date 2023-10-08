@@ -285,3 +285,31 @@ idiom_few_word_count_by_word_separator:
     compare 3,4:
         #keyword: Docker-Compose Down34
         Docker recompose Down34 and any other words
+searches keyword and parent:
+    1st case:
+        parent1A:
+            child1: #keyword:
+        parent1B:
+            child1: #keyword:
+    grand parent case:
+        parent1GA:
+            parent:
+                #keyword: childG1
+        parent1GB:
+            parent:
+                #keyword: childG1
+    many keyword than parent case:
+        #focus: childK1, parent1K
+        parentK(1):
+            #keyword: childK1 parent1K
+        parent1K:
+            #keyword: childK1
+        parentK[1]:
+            parent1K  #keyword: childK1
+        #focus: childK2, parent2K
+        parentK[2]:
+            parent2K  #keyword: childK2
+        parent2K:
+            #keyword: childK2
+        parentK(2):
+            #keyword: childK2 parent2K
