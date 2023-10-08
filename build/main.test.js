@@ -801,7 +801,8 @@ describe("searches keyword tag >>", () => {
             ["search", 'space sharp is #. "parcent 20" is "%20".'],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':94:') + `     ${keywordLabelColor('#keyword:')} "${matchedColor('space')} ${matchedColor('sharp')} ${matchedColor('is')} ${matchedColor('#.')} ${matchedColor('""parcent')}${matchedColor(' 20"')}" i${matchedColor('s ""%20"')}"."\n`,
-            // This is little wrong answer
+            // This answer coloring is not correct. Correct behavior is not supported, yet.
+            // "%20"# specification is specified in "settings tag and #template tag: replaces settings values" in README.md
         ], [
             "ignore case",
             ["search", "DO It"],
@@ -1361,9 +1362,53 @@ describe("searches glossary tag >>", () => {
         expect(main.stdout).toBe(answer);
     });
 });
+describe("searches keyword and parent >>", () => {
+    test.each([[
+            "1st",
+            ["search", "parent1A child1"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            // (The answer is not to show) pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':293:') + `             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':291:') + ` ${matchedColor('parent1A')} >>             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n`,
+        ], [
+            "1st another",
+            ["search", "parent1B child1"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            // (The answer is not to show) pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':291:') + `             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':293:') + ` ${matchedColor('parent1B')} >>             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n`,
+        ], [
+            "grand parent",
+            ["search", "childG1 parent1GA"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            // (The answer is not to show) pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':300:') + `                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':297:') + ` ${matchedColor('parent1GA')} >>                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n`,
+        ], [
+            "grand parent another",
+            ["search", "childG1 parent1GB"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            // (The answer is not to show) pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':297:') + `                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':300:') + ` ${matchedColor('parent1GB')} >>                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n`,
+        ], [
+            "many keyword than parent",
+            ["search", "childK1 parent1K"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':306:') + ` ${matchedColor('parent1K')} >>             ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':308:') + `             ${matchedColor('parent1K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':304:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')} ${matchedColor('parent1K')}\n`,
+        ], [
+            "many keyword than parent another",
+            ["search", "parent2K childK2"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':313:') + ` ${matchedColor('parent2K')} >>             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':311:') + `             ${matchedColor('parent2K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':315:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')} ${matchedColor('parent2K')}\n`,
+        ],
+    ])("%s", async (_caseName, arguments_, options, answer) => {
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
+    });
+});
 describe("find all >>", () => {
-    test.each([
-        [
+    test.each([[
             "1st",
             ["search", "find_all_abc"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },

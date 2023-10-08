@@ -19,6 +19,7 @@ You can execute the command just by copy and paste the displayed command.
     - [Search target folder settings](#search-target-folder-settings)
     - [Search priorities and set snippets](#search-priorities-and-set-snippets)
     - [Details of the search command](#details-of-the-search-command)
+    - [escape in typrm tag](#escape-in-typrm-tag)
     - [#glossary tags](#glossary-tags)
     - [thesaurus file](#thesaurus-file)
     - [Write secret data in a safe place - .env file](#write-secret-data-in-a-safe-place---env-file)
@@ -313,6 +314,11 @@ Commands executed
 
 - If you increase the number of words, the search result will be refined.
   If you reduce the number of words, the related content will also be hit.
+- From the line that matches `#keyword:`, search for a line with a shallower indentation upwards,
+   If the shallower line contains a word that did not match `#keyword:`, it will be hit higher.
+   Search upwards until there are no more indentations.
+   In YAML, this process is equivalent to searching including the row contents of the parent mapping (object).
+   Shallow line searches will search with the same score regardless of the presence or absence of the `#keyword:` tag.
 - If the keyphrase you enter contains `#search:`, the entire line where
   `#search:` is replaced with `#keyword:` will also be hit.
 
@@ -341,9 +347,8 @@ the keyword is from the beginning of the line to the colon.
 
     CSV: #keyword:
 
-When specifying keywords that include ` #` (blank and #), write `"%20"#`.
-` #` (blank and #) are interpreted as the next tags.
-When specifying a keyword that contains `"%`, write `""%25"`.
+When specifying keywords that include ` #` (blank and #) or `"%`, write an [escape in typrm tag](#escape-in-typrm-tag).
+
 If you want to suppress the warning of the CSV part that has syntax problem,
 write `#disable-tag-tool:`.
 The `#keyword:` tag parameter is not treated as a keyword.
@@ -360,6 +365,16 @@ are not searched.
         #keyword: def  #// not searchable
     original:
         #keyword: abc  #// searchable
+
+
+### escape in typrm tag
+
+When specifying keywords that include ` #` (blank and #), write `"%20"#`.
+Otherwise, ` #` (blank and #) is interpreted as the next tags.
+
+When specifying a keyword that contains `"%`, write `""%25"`.
+Otherwise, `"%` is interpreted as an escape in typrm tag.
+
 
 ### #glossary tags
 
