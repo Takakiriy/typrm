@@ -5732,7 +5732,8 @@ Script, JavaScript
 `;
 
 exports[`searches keyword tag >> thesaurus >> idiom: sourceFileContents 1`] = `
-"#keyword: マウス クリック
+"#// Keywords cannot be written on this first line. Because it is matched by parent match function.
+#keyword: マウス クリック
 #keyword: マウス
 #keyword: クリック
 "
@@ -5771,7 +5772,8 @@ exports[`searches keyword tag >> thesaurus >> idiom_reverse: thesaurus 1`] = `
 `;
 
 exports[`searches keyword tag >> thesaurus >> idiom_synonym_1: sourceFileContents 1`] = `
-"#keyword: タイム アウト
+"#// Keywords cannot be written on this first line. Because it is matched by parent match function.
+#keyword: タイム アウト
 #keyword: タイム
 #keyword: アウト
 "
@@ -5785,7 +5787,8 @@ out, アウト
 `;
 
 exports[`searches keyword tag >> thesaurus >> idiom_synonym_2: sourceFileContents 1`] = `
-"#keyword: タイム アウト
+"#// Keywords cannot be written on this first line. Because it is matched by parent match function.
+#keyword: タイム アウト
 #keyword: タイム
 #keyword: アウト
 "
@@ -5812,7 +5815,8 @@ PowerShell, PS
 `;
 
 exports[`searches keyword tag >> thesaurus >> normalized_word_match_1: sourceFileContents 1`] = `
-"#keyword: js file
+"#// Keywords cannot be written on this first line. Because it is matched by parent match function.
+#keyword: js file
 #keyword: ts file
 #keyword: JavaScript file
 #keyword: TypeScript file
@@ -5829,7 +5833,8 @@ TypeScript, ts, JavaScript
 `;
 
 exports[`searches keyword tag >> thesaurus >> normalized_word_match_2: sourceFileContents 1`] = `
-"#keyword: js file
+"#// Keywords cannot be written on this first line. Because it is matched by parent match function.
+#keyword: js file
 #keyword: ts file
 #keyword: JavaScript file
 #keyword: TypeScript file
@@ -5846,7 +5851,8 @@ TypeScript, ts, JavaScript
 `;
 
 exports[`searches keyword tag >> thesaurus >> related_normalized_word_match: sourceFileContents 1`] = `
-"#keyword: js file
+"#// Keywords cannot be written on this first line. Because it is matched by parent match function.
+#keyword: js file
 #keyword: ts file
 #keyword: rc file
 #keyword: JavaScript file

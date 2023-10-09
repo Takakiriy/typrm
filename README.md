@@ -317,6 +317,7 @@ Commands executed
 - From the line that matches `#keyword:`, search for a line with a shallower indentation upwards,
    If the shallower line contains a word that did not match `#keyword:`, it will be hit higher.
    Search upwards until there are no more indentations.
+   Also, the first line is searched.
    In YAML, this process is equivalent to searching including the row contents of the parent mapping (object).
    Shallow line searches will search with the same score regardless of the presence or absence of the `#keyword:` tag.
 - If the keyphrase you enter contains `#search:`, the entire line where

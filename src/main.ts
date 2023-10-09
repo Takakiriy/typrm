@@ -1844,7 +1844,7 @@ interface  Particples {
     words: ParticpleWord[];
     formalWordsLowerCase: string[];
     normalizedWords: ParticpleWord[];
-    keyphraseHasEscapeRequest: boolean;
+    // keyphraseHasEscapeRequest: boolean;  // Deleted
 }
 // Particples related functions:
 //      newParticplesFromKeyphrase
@@ -1911,7 +1911,6 @@ function  newParticplesFromKeyphrase(keyphrase: string, thesaurus: Thesaurus): P
                     normalizedS.toLowerCase() + 's'],
             };
         }),
-        keyphraseHasEscapeRequest: words.some((word)=>(word.specified.includes(' #') || word.specified.includes('"%'))),
     };
 }
 
@@ -6294,34 +6293,38 @@ class FoundLine {
         var    minIndent = indentRegularExpression.exec(lines[lineNum-1])![0];
         minIndent += 1;  // This code returns (indent < minIndent) true. Because current line is one of search target.
 
-        while (lineNum >= 1) {
+        const  searchTargetLineNums: number[] = [];
+        while (lineNum >= 2) {
             var  line = lines[lineNum-1];
             var  indent = indentRegularExpression.exec(line)![0];
 
             if (indent < minIndent) {
                 minIndent = indent;
-                // if (keywordsParticples.keyphraseHasEscapeRequest) {
-                //     line = unscapePercentByte(line);
-                // }
-                if (lineNum === currentLineNum) {
-                    line = cutKeywordTag(line);
-                }
 
-                let  foundAtParent = getKeywordMatchingScore([line], keywordsParticples, thesaurus);
-                    // Search targets are not only keywords in keyword tag.
-                if (foundAtParent  &&  foundAtParent.matches.length >= 1) {
-
-                    parentMatches = foundAtParent.matches.map((x)=> x.matchedString).concat(parentMatches);
-                    parentMatchedCount.push(foundAtParent.matches.length);
-                    if (lineNum === currentLineNum) {
-                        notParentMatches = foundAtParent.matches.slice();  // copy
-                    }
-                    parentScore += foundAtParent.score;
-                } else {
-                    parentMatchedCount.push(0);
-                }
+                searchTargetLineNums.push(lineNum);
             }
             lineNum -= 1;
+        }
+        searchTargetLineNums.push(1);
+        for (const lineNum of searchTargetLineNums) {
+            var  line = lines[lineNum-1];
+            if (lineNum === currentLineNum) {
+                line = cutKeywordTag(line);
+            }
+
+            let  foundAtParent = getKeywordMatchingScore([line], keywordsParticples, thesaurus);
+                // Search targets are not only keywords in keyword tag.
+            if (foundAtParent  &&  foundAtParent.matches.length >= 1) {
+
+                parentMatches = foundAtParent.matches.map((x)=> x.matchedString).concat(parentMatches);
+                parentMatchedCount.push(foundAtParent.matches.length);
+                if (lineNum === currentLineNum) {
+                    notParentMatches = foundAtParent.matches.slice();  // copy
+                }
+                parentScore += foundAtParent.score;
+            } else {
+                parentMatchedCount.push(0);
+            }
         }
         if (parentMatches.length >= 1) {
             const  found = this;

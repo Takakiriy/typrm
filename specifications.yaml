@@ -27,7 +27,7 @@ command: #keyword: typrm command list
                             getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
                             thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
                             setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
-                        plusParentMatchScore:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
+                        plusParentMatchScore: #keyword:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
                         # foundLines.push(found);
                     # // glossary tag  #// (#glossary:)
                         #  if (glossaryTag) {
@@ -83,7 +83,7 @@ tag:
         code: #ref: ${GitHub}/typrm/src/main.ts#const  originalLabel = 
     keyword tag:
         specifications:
-            escape: #keyword: escape in typrm tag,  "%20"#,  ""%25",  space sharp (_#),  double quatation percent ("%)
+            escape: #keyword: escape in typrm tag  #// "%20"#,  ""%25",  space sharp (_#),  double quatation percent ("%)
                 in README: |
                     -   When specifying keywords that include ` #` (blank and #), write `"%20"#`.
                     -   When specifying a keyword that contains `"%`, write `""%25"`.

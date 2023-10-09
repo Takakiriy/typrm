@@ -313,3 +313,5 @@ searches keyword and parent:
             #keyword: childK2
         parentK(2):
             #keyword: childK2 parent2K
+    1st line matched case:
+        #keyword: child3
