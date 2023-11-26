@@ -1094,7 +1094,27 @@ export function isSameArray(log, answer) {
 // isSameArrayOf
 // T: string, nunmber
 // If only order had difference, this returns true
-export function isSameArrayOf(log, answer) {
+// #ref: ${typrm_files}/ref/JavaScript-AI.yaml#label: isSameArrayOf
+export function isSameArrayOf(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+    const countMap = {};
+    for (const item of arr1) {
+        const key = JSON.stringify(item);
+        countMap[key] = (countMap[key] || 0) + 1;
+    }
+    for (const item of arr2) {
+        const key = JSON.stringify(item);
+        if (!countMap[key]) {
+            return false;
+        }
+        countMap[key] -= 1;
+    }
+    return Object.values(countMap).every(count => count === 0);
+}
+// Old implement. There is a bug.  #ref: ${typrm_files}/ref/JavaScript-AI.yaml#label: isSameArrayOf
+function isSameArrayOfOld(log, answer) {
     const matched = log.filter((item) => answer.includes(item));
     const isSame = (matched.length === answer.length && log.length === answer.length);
     return isSame;
@@ -1411,6 +1431,9 @@ export function getSnapshot(label, deafultSnapshot = undefined) {
     const snapshot = snapshots[label];
     return snapshot.substr(2, snapshot.length - 4).replace(/\\\"/g, '"');
 }
+export function mark(object, label = "mark") {
+    object._mark = label; // Add an attribute dynamically
+}
 // pp
 // #keyword: lib.ts pp
 //     Debug print.
@@ -1463,7 +1486,7 @@ export function pp(message) {
     }
     return debugOut;
 }
-export const debugOut = [];
+globalThis.debugOut = [];
 // ppClear
 // #keyword: ppClear
 export function ppClear() {

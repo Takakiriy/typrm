@@ -36,13 +36,27 @@
             "processId": "${command:PickProcess}"
         },
         {
-            "name": "Debug Jest Tests (under constuct)",
+            "name": "Debug Jest Tests",
             "type": "node",
             "request": "launch",
             "runtimeArgs": [
-                "--inspect-brk", "${workspaceRoot}/node_modules/.bin/jest",
+                "--inspect-brk",
+                "${workspaceRoot}/node_modules/.bin/jest",
                 "--runInBand",
                 "--coverage", "false"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Debug Windows Jest Tests",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceRoot}/node_modules/jest/bin/jest.js",
+                "--runInBand",
+                "--coverage", "false"
+            ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         }

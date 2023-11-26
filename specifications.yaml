@@ -1,10 +1,11 @@
 #keyword: typrm specifications
 command: #keyword: typrm command list
-    search:  #keyword: typrm search
+    search:  #keyword: typrm search  #focus: getSubMatchedScore, toString
         test:
             keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword tag >>"
             glossary tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches glossary tag >>"
             parent match: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword and parent >>"
+                test:  searches keyword and parent >>
                 code:  #search: plusParentMatchScore
             idiom: #ref: ${GitHub}/typrm/src/main.test.ts#"idiom"
                 #ref: ${GitHub}/typrm/src/lib.ts#splitIdioms
@@ -23,9 +24,11 @@ command: #keyword: typrm command list
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     # // keyword tag  #// (#keyword:)
-                        getKeywordMatchingScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
+                        getKeywordMatchingScore: #🌟  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                             getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
-                            thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
+                            # if (useThesaurus) {
+                                thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
+                                getSubMatchedScore:
                             setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
                         plusParentMatchScore: #keyword:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
                         # foundLines.push(found);
@@ -33,11 +36,12 @@ command: #keyword: typrm command list
                         #  if (glossaryTag) {
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
+                    (filter): #🌟  # foundLines = foundLines.filter((found) => (found.matchedSearchKeywordCount === maximumHitWordCount));
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
                         compareScoreAndSoOn:  #ref: ${GitHub}/typrm/src/main.ts#function  compareScoreAndSoOn
                         # // Debug score compare in 2 founds
                     #   console.log(foundLineInformation.toString());
-                    FoundLine.toString:  #ref: ${GitHub}/typrm/src/main.ts:csv#FoundLine,toString
+                    FoundLine.toString: #🌟  #ref: ${GitHub}/typrm/src/main.ts:csv#getString(): string
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
                     printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
@@ -75,7 +79,7 @@ command: #keyword: typrm command list
         code:
             #// parent: #search: mainMain
             reset:  #ref: ${GitHub}/typrm/src/main.ts#function  reset(
-tag:
+tag: #keyword: typrm tags
     list:
         document:
             English: #ref: ${GitHub}/typrm/README-jp.md### Tag list
@@ -91,6 +95,12 @@ tag:
                 code: unscapePercentByte
         test: #search: keyword tag test
         code: #search: typrm search
+    search tag:
+        test:
+            - searches keyword tag >> CSV ignored colon before search tag
+            - find all >> search tag
+        code:
+            const  searchTagIndex = tagIndexOf(keyword, searchLabel);
     copy tag:  #keyword:#copy:
         document:
             English: #ref: ${GitHub}/typrm/README-jp.md### #copy tag: check the text is the same
@@ -145,8 +155,10 @@ tag:
                 template_if_1_error
             replaces settings >>
                 2_replace_9_template_if_1_OK
-test details:
-    機能からテストを探す場合: #search: typrm command list
+test:
+    test:  #// 機能からテストを探す場合
+        #search: typrm command list
+        #search: typrm tags
     About ${HOME}:
         Abstract: When running tests, place the project folder in `${HOME}/GitProjects/GitHub/typrm/`.
         ${HOME} in the test data:
@@ -220,12 +232,14 @@ test details:
                 次に __Settings1__ を置き換えるときの置き換える前は、(check/yesだった)[check/no] と [check/not banana/no] で 1種類（2箇所）:
             コードの説明:
                 IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
+debug:
+    Print all log:  #// Break at last of operations.
+        How to use: Cut comment out of debug code. Near the "Debug last print" in "main.ts"
+    debugSearchScore:
+        How to use: Set to true. Near the "debugSearchScore" in "main.ts"
+    coloredStrings:
+        How to use: Cut comment out of debug code. Near the "coloredStrings" in "main.ts"
 other specifications:
-    Debug:
-        debugSearchScore:
-            How to use: set to true
-        coloredStrings:
-            How to use: cut comment out of debug code
     start up:
         start from shell:
             main:  #ref: ${GitHub}/typrm/src/main.ts#function  main(

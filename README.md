@@ -376,6 +376,8 @@ Otherwise, ` #` (blank and #) is interpreted as the next tags.
 When specifying a keyword that contains `"%`, write `""%25"`.
 Otherwise, `"%` is interpreted as an escape in typrm tag.
 
+It will be displayed in the search results instead of the escaped characters (space and #).
+
 
 ### #glossary tags
 

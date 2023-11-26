@@ -70,7 +70,7 @@ export declare function getProcessEnvAndDotEnvSecrets(): Secrets;
 export declare const indentRegularExpression: RegExp;
 export declare const indentHyphenRegularExpression: RegExp;
 export declare function isSameArray<T>(log: T[], answer: T[]): boolean;
-export declare function isSameArrayOf<T>(log: T[], answer: T[]): boolean;
+export declare function isSameArrayOf<T>(arr1: T[], arr2: T[]): boolean;
 export declare function getCommonItems<T>(arrayA: T[], arrayB: T[]): T[];
 export declare function cutSameItems<T>(array: T[]): T[];
 export declare function stableUniqueFilterFunction<T>(isSameFunction: {
@@ -118,8 +118,11 @@ declare class StandardInputBuffer {
 export declare function getInputObject(): StandardInputBuffer;
 export declare function cutEscapeSequence(textWithEscapeSequence: string): string;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
+export declare function mark(object: any, label?: string | number | boolean): void;
 export declare function pp(message: any): string[];
-export declare const debugOut: string[];
+declare global {
+    export var debugOut: string[];
+}
 export declare function ppClear(): string[];
 export declare function ff(conditionName: string, condition?: boolean | null): boolean;
 export declare const ffFlags: {

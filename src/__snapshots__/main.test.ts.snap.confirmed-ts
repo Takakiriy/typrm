@@ -5875,7 +5875,8 @@ React     , rc, TypeScript
 exports[`searches keyword tag >> thesaurus >> score: sourceFileContents 1`] = `
 "#keyword: object end
 #keyword: object DI
-#keyword: DI object, end object
+#keyword: end object
+#keyword: DI object
 "
 `;
 

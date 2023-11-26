@@ -315,3 +315,15 @@ searches keyword and parent:
             #keyword: childK2 parent2K
     1st line matched case:
         #keyword: child3
+    bug case 1:
+        parentB 1:
+            ParentB and 1: #keyword:
+        parentB 2:
+            PARENTB and: #keyword:
+        2:
+            parentB: #keyword:
+    bug case 2:
+        1:
+            #keyword: ParentPA parentPB
+        parentPA:
+            #keyword: ParentPA parentPB parentPC
