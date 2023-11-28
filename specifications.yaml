@@ -92,7 +92,7 @@ tag: #keyword: typrm tags
                     -   When specifying keywords that include ` #` (blank and #), write `"%20"#`.
                     -   When specifying a keyword that contains `"%`, write `""%25"`.
                 test: searches keyword tag >> sharp
-                code: unscapePercentByte
+                code: unescapePercentByte, escapePercentByte
         test: #search: keyword tag test
         code: #search: typrm search
     search tag:

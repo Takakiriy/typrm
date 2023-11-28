@@ -3204,7 +3204,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
 
                 let  found = getKeywordMatchingScore(columns, keywordsParticples, thesaurus);
                 if (found.matchedSearchKeywordCount >= 1) {
-                    const  unescapedLine = unscapePercentByte(line);
+                    const  unescapedLine = unescapePercentByte(line);
                     if (withParameter) {
                         var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
                     } else {
@@ -3446,7 +3446,7 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
     //   keywordsParticples.keyphrase = 'ts file'
     //   keyword = 'ts', 'file'
     // Debug
-    //   const  isDebug = (targetStrings[0] === 'js file');
+//   const  isDebug = (targetStrings[0] === 'js file');
     const  found = subMain();
     return  found;
 
@@ -3531,7 +3531,6 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
                             if ( ! isFoundWithoutNormalized) {
                                 if (normalizedTargetKeywords !== aTargetString) {
                                     normalizedMatched.matchedString = '';
-                                    normalizedMatched.length = 0;
                                     normalizedMatched.position = notFound;
                                 }
                             }
@@ -3704,10 +3703,9 @@ function  getKeywordMatchingScore(targetStrings: string[], keywordsParticples: P
 
             if (score >= 1) {
                 matched.position = position;
-                matched.length = matchedKeyword.replace(/"/g, '""').length;
                 matched.targetWordsIndex = stringIndex;
                 matched.searchWordIndex = wordIndex;
-                matched.matchedString = targetString.substr(position, matched.length);
+                matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
                 matched.targetType = targetType;
             } else {
                 position = notFound;
@@ -4185,7 +4183,6 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                     found.matches.push({
                         position: line.indexOf(fullMatchKeywords),
                         normalizedPosition: notFound,
-                        length: fullMatchKeywords.length,
                         targetWordsIndex: -1,
                         searchWordIndex: -1,
                         matchedString: fullMatchKeywords,
@@ -4335,7 +4332,6 @@ function  addParticiplesFoundCountInFullSearch(found: FoundLine, line: string, k
     found.matches.push({
         position: keywordIndex,
         normalizedPosition: notFound,
-        length: matchedKeyword.length,
         targetWordsIndex: -1,
         searchWordIndex: -1,
         matchedString: matchedKeyword,
@@ -5182,7 +5178,7 @@ function  getValue(line: string, separatorIndex: number = -1) {
         value = value.substring(0, comment).trim();
     }
 
-    value = unscapePercentByte(value);
+    value = unescapePercentByte(value);
     return  value;
 }
 
@@ -5215,7 +5211,7 @@ function  getLineWithColoredValue(line: string): string {
     }
 }
 
-function  unscapePercentByte(value: string): string {
+function  unescapePercentByte(value: string): string {
     var  found = 0;
     for (;;) {
         const  found20 = value.indexOf('"%20"', found);
@@ -5243,6 +5239,10 @@ function  unscapePercentByte(value: string): string {
         }
     }
     return  value;
+}
+
+function  escapePercentByte(value: string): string {
+    return  value.replace(/"/g, '""');
 }
 
 function  hasRefTag(keywords: string) {
@@ -6227,6 +6227,7 @@ class Thesaurus {
 
 // FoundLine
 // Found the keyword and matched part in the line
+// See. "getKeywordMatchingScore" function.
 class FoundLine {
     path: string = '';
     lineNum: number = 0;
@@ -6279,24 +6280,25 @@ class FoundLine {
         const  colorParts: MatchedPart[] = [];
         var  previousPart = new MatchedPart();
         previousPart.position = -1;
-        previousPart.length = 0;
+        previousPart.matchedString = '';
         for (const part of sortedParts) {
-            if (part.position + part.length >= length_limit) {
+            if (part.position + part.matchedString.length >= length_limit) {
                 // no push
             } else if (part.targetType === 'normalized') {
                 colorParts.push(part);
 
             // previous: <------>
             // current:          <------>
-            } else if (part.position >= previousPart.position + previousPart.length) {
+            } else if (part.position >= previousPart.position + previousPart.matchedString.length) {
 
                 colorParts.push(part);
 
             // previous: <------>
             // current:  <--------->
-            } else if (part.position + part.length > previousPart.position + previousPart.length) {
+            } else if (part.position + part.matchedString.length > previousPart.position + previousPart.matchedString.length) {
                 const  previousColorPart = colorParts[colorParts.length - 1];
-                previousColorPart.length = part.position + part.length - previousColorPart.position;
+                const  partLength = part.position + part.matchedString.length - previousColorPart.position;
+                previousColorPart.matchedString = previousColorPart.matchedString.substring(0, partLength);
 
             // previous: <------> | <------>
             // current:  <---->   | <------>
@@ -6314,9 +6316,9 @@ class FoundLine {
         const  normalizedColorParts: MatchedPart[] = [];
         var  previousPart = new MatchedPart();
         previousPart.normalizedPosition = -1;
-        previousPart.length = 0;
+        previousPart.normalizedMatchedString = '';
         for (const part of normalizedSortedParts) {
-            if (part.position + part.length >= length_limit) {
+            if (part.position + part.normalizedMatchedString.length >= length_limit) {
                 // no push
             } else if (part.targetType === 'normalized') {
                 normalizedColorParts.push(part);
@@ -6359,9 +6361,9 @@ class FoundLine {
 
             coloredLine +=
                 line.substring(previousPosition,  match.position) +
-                matchedColor( line.substr(match.position, match.length) );
-            previousPosition = match.position + match.length;
-            // coloredStrings.push(line.substr(match.position, match.length));
+                matchedColor( line.substr(match.position, match.matchedString.length) );
+            previousPosition = match.position + match.matchedString.length;
+            // coloredStrings.push(line.substr(match.position, match.matchedString.length));
         }
         if (hasNormalizedWords) {
             for (const match of normalizedColorParts) {
@@ -6382,9 +6384,9 @@ class FoundLine {
             coloredLine = coloredLine.substring(0, terminatorPosition);
         }
         // if (true) {
-        //     var d = lib.pp('coloredStrings:');
-        //     lib.pp(lib.getAllQuotedCSVLine(coloredStrings));
-        //     d = [];
+            //     var d = lib.pp('coloredStrings:');
+            //     lib.pp(lib.getAllQuotedCSVLine(coloredStrings));
+            //     d = [];
         // }
 
         // ...
@@ -6580,7 +6582,6 @@ class FoundLine {
                     found.matches.unshift({
                         position: 0,
                         normalizedPosition: notFound,
-                        length: parentPhrase.length,
                         targetWordsIndex: -1,
                         searchWordIndex: -1,
                         matchedString: parentPhrase,
@@ -6633,7 +6634,6 @@ type SearchTargetType = '' | 'normalized' | 'withoutTags';  // '' = with tags
 
 class MatchedPart {
     position: number = -1;  // in matched line
-    length: number = 0;
     matchedString: string = '';  // matched word or part of matched word
     targetWordsIndex: number = -1;  // Words index of "targetStrings" array argument of "getKeywordMatchingScore" function.
     searchWordIndex: number = -1;   // Word index of search keywords.

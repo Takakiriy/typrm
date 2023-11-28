@@ -844,7 +844,7 @@ describe("searches keyword tag >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n`,
         ],[
-            "double quotation",
+            "double quotation",  // #search: escape in typrm tag
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml') + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('double')} ${matchedColor('quotation')} ${matchedColor('is')} ${matchedColor('"".')}"\n`,
@@ -1210,7 +1210,7 @@ describe("searches keyword tag >>", () => {
     ])("%s", async (caseName, arguments_, options, answer) => {
         const  isWindowsEnvironment = (path.sep === '\\');
         const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
-        if (!isWindowsEnvironment && isWindowsCase) {
+        if ( ! isWindowsEnvironment && isWindowsCase) {
             return;
         }
 
