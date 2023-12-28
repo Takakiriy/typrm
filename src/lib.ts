@@ -1697,6 +1697,10 @@ export function  cc( targetCount: number|null = 9999999, label: string = '0' ) {
     }
     return  { isTarget, debugOut };
 }
-export const  ccCount: {[name: string]: number} = {};
+declare global {
+    export var  ccCount: {[name: string]: number};
+}
+(globalThis as any).ccCount = {}
+// export const  ccCount: {[name: string]: number} = {};
 const  notFoundInFile = -2;
 const  notFound = -1;

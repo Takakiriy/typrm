@@ -259,6 +259,7 @@ other specifications:
                 16:         setting:
                 31:     B:
                 32:         setting:
+                37:         #if: $settings.target_ == app
             lineNum = 16 >> settingStack: |
                 { lineNum:  0, index: '/',    indentLevel: 0, ...}
                 { lineNum:  2, index: '/1',   indentLevel: 4, ...}
@@ -271,6 +272,11 @@ other specifications:
                 { lineNum:  0, index: '/', ...}
                 { lineNum:  2, index: '/1', ...}
                 { lineNum: 32, index: '/1/2', ...}
+            lineNum = 37 >> settingStack: |
+                { lineNum:  0, index: '/', ...}
+                { lineNum:  2, index: '/1', ...}
+                { lineNum: 32, index: '/1/2', ...}
+                { lineNum: 37, index: '/1/2/a', ...}
     outOfFalseBlocks:  #focus: outOfFalseBlocks, indicesWithIf
         moveToLine (SettingsTree):
             moveToLine_Immutably:

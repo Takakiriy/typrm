@@ -418,7 +418,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     });
     var  isReadingSetting = false;
     var  setting: Settings = {};
-    var  currentSettingIndex = '/';
+    var  currentSettingIndex = '/';  // #search: settingStack of typrm makeSettingTree
     var  lineNum = 0;
     var  settingIndentLength = 0;
     tree.indices.set(1, '/');
@@ -465,7 +465,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     setting = {}
                     settingStack.pop();
                     if (parser.verbose) {
-                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:  #// currentSettingIndex: ${currentSettingIndex}`);
                     }
 
                     const  nextSetting = settingStack[settingStack.length - 1];
@@ -497,6 +497,9 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             while (indent.length <= settingStack[currentSettingStackIndex].startIndentLevel) {
                 settingStack.pop();
                 currentSettingStackIndex -= 1;
+                if (parser.verbose) {
+                    console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
+                }
 
                 const  setting_ = settingStack[settingStack.length - 1];
                 if ( ! (currentSettingIndex in tree.settings)) {
@@ -571,21 +574,13 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
                     var  isNewSettings = false;
                 } else {
                     const  parentSetting = currentSetting;
-                    const  parentIndex = parentSetting.index;
                     const  setting_ = settingStack[settingStack.length - 1];
-                    if (parentIndex === '/') {
-                        var  previousIndex = `/1`;
-                    } else {
-                        var  previousIndex = `${parentIndex}/1`;
-                    }
-                    var  previousIndentIsDeeper = false;
-                    if (previousIndex in tree.settingsInformation) {
-                        var  previousIndentIsDeeper = 
-                            tree.settingsInformation[previousIndex].indent.length > indent.length;
-                    }
+                    const  previousNeighborIndex = getPreviousNeighborIndex(parentSetting.index, Object.keys(tree.settingsInformation));
+                    const  previousNeighborIndentIsDeeper = previousNeighborIndex in tree.settingsInformation  &&
+                        tree.settingsInformation[previousNeighborIndex].indent.length > indent.length;
 
                     // insert parent settings
-                    if (previousIndentIsDeeper) {
+                    if (previousNeighborIndentIsDeeper) {
                         const  ceilingLineNum = indentStack[indentStack.length - 2].lineNum;
                         const  shiftingIndices: string[] = [];
                         for (const [index, settingsInformation] of Object.entries(tree.settingsInformation)) {
@@ -680,7 +675,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
                 //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
+                console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
             }
         } else if (indent.length <= settingIndentLength  &&  isReadingSetting) {
             isReadingSetting = false;
@@ -770,7 +765,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
                 //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}`);
+                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}  #// currentSettingIndex: ${currentSettingIndex}`);
             }
         }
     }
@@ -817,6 +812,29 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
     }
 
     return  tree;
+}
+
+function  getPreviousNeighborIndex(currentParentIndex: string, settingsIndices: string[]): string {
+    // e.g. settingsIndices = ['/1', '/2', '/2/1', '/2/2', '/2/2/1']
+    // e.g. currentParentIndex = '/2'
+    if (currentParentIndex === '/') {
+        var  parentIndexWithSlash = `/`;
+    } else {
+        var  parentIndexWithSlash = `${currentParentIndex}/`;
+    }
+    const  parentIndexWithSlashLength = parentIndexWithSlash.length;
+
+    const  sameLevelIndices = settingsIndices.filter(index =>
+        index.startsWith(parentIndexWithSlash)  &&  ! index.substring(parentIndexWithSlashLength).includes('/'));
+        // e.g. ['/2/1', '/2/2']
+    const  sameLevelDeepestIndexNumMax = sameLevelIndices
+        .map(index => parseInt(index.substring(parentIndexWithSlashLength)))
+        .reduce((numA, numB) => Math.max(numA, numB), -Infinity);
+        // e.g. 2
+    const  previousNeighborIndex = parentIndexWithSlash + sameLevelDeepestIndexNumMax.toString();
+        // e.g. '/2/2'
+
+    return  previousNeighborIndex;
 }
 
 function  insertParentIndexNum(indexBefore: string, firstShiftingIndex: string): string {

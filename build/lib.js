@@ -1540,7 +1540,8 @@ export function cc(targetCount = 9999999, label = '0') {
     }
     return { isTarget, debugOut };
 }
-export const ccCount = {};
+globalThis.ccCount = {};
+// export const  ccCount: {[name: string]: number} = {};
 const notFoundInFile = -2;
 const notFound = -1;
 //# sourceMappingURL=lib.js.map

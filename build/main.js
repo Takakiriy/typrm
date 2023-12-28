@@ -386,7 +386,7 @@ async function makeSettingTree(parser) {
     });
     var isReadingSetting = false;
     var setting = {};
-    var currentSettingIndex = '/';
+    var currentSettingIndex = '/'; // #search: settingStack of typrm makeSettingTree
     var lineNum = 0;
     var settingIndentLength = 0;
     tree.indices.set(1, '/');
@@ -424,7 +424,7 @@ async function makeSettingTree(parser) {
                     setting = {};
                     settingStack.pop();
                     if (parser.verbose) {
-                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:`);
+                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:  #// currentSettingIndex: ${currentSettingIndex}`);
                     }
                     const nextSetting = settingStack[settingStack.length - 1];
                     const parentSettingIndex = path.dirname(nextSetting.index);
@@ -456,6 +456,9 @@ async function makeSettingTree(parser) {
             while (indent.length <= settingStack[currentSettingStackIndex].startIndentLevel) {
                 settingStack.pop();
                 currentSettingStackIndex -= 1;
+                if (parser.verbose) {
+                    console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
+                }
                 const setting_ = settingStack[settingStack.length - 1];
                 if (!(currentSettingIndex in tree.settings)) {
                     if (isReadingSetting) {
@@ -530,20 +533,12 @@ async function makeSettingTree(parser) {
                 }
                 else {
                     const parentSetting = currentSetting;
-                    const parentIndex = parentSetting.index;
                     const setting_ = settingStack[settingStack.length - 1];
-                    if (parentIndex === '/') {
-                        var previousIndex = `/1`;
-                    }
-                    else {
-                        var previousIndex = `${parentIndex}/1`;
-                    }
-                    var previousIndentIsDeeper = false;
-                    if (previousIndex in tree.settingsInformation) {
-                        var previousIndentIsDeeper = tree.settingsInformation[previousIndex].indent.length > indent.length;
-                    }
+                    const previousNeighborIndex = getPreviousNeighborIndex(parentSetting.index, Object.keys(tree.settingsInformation));
+                    const previousNeighborIndentIsDeeper = previousNeighborIndex in tree.settingsInformation &&
+                        tree.settingsInformation[previousNeighborIndex].indent.length > indent.length;
                     // insert parent settings
-                    if (previousIndentIsDeeper) {
+                    if (previousNeighborIndentIsDeeper) {
                         const ceilingLineNum = indentStack[indentStack.length - 2].lineNum;
                         const shiftingIndices = [];
                         for (const [index, settingsInformation] of Object.entries(tree.settingsInformation)) {
@@ -636,7 +631,7 @@ async function makeSettingTree(parser) {
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
                 //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: settings`);
+                console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
             }
         }
         else if (indent.length <= settingIndentLength && isReadingSetting) {
@@ -724,7 +719,7 @@ async function makeSettingTree(parser) {
             if (parser.verbose) {
                 // console.log(`Verbose: settings ${currentSettingIndex}`);
                 //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}`);
+                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}  #// currentSettingIndex: ${currentSettingIndex}`);
             }
         }
     }
@@ -769,6 +764,26 @@ async function makeSettingTree(parser) {
         }
     }
     return tree;
+}
+function getPreviousNeighborIndex(currentParentIndex, settingsIndices) {
+    // e.g. settingsIndices = ['/1', '/2', '/2/1', '/2/2', '/2/2/1']
+    // e.g. currentParentIndex = '/2'
+    if (currentParentIndex === '/') {
+        var parentIndexWithSlash = `/`;
+    }
+    else {
+        var parentIndexWithSlash = `${currentParentIndex}/`;
+    }
+    const parentIndexWithSlashLength = parentIndexWithSlash.length;
+    const sameLevelIndices = settingsIndices.filter(index => index.startsWith(parentIndexWithSlash) && !index.substring(parentIndexWithSlashLength).includes('/'));
+    // e.g. ['/2/1', '/2/2']
+    const sameLevelDeepestIndexNumMax = sameLevelIndices
+        .map(index => parseInt(index.substring(parentIndexWithSlashLength)))
+        .reduce((numA, numB) => Math.max(numA, numB), -Infinity);
+    // e.g. 2
+    const previousNeighborIndex = parentIndexWithSlash + sameLevelDeepestIndexNumMax.toString();
+    // e.g. '/2/2'
+    return previousNeighborIndex;
 }
 function insertParentIndexNum(indexBefore, firstShiftingIndex) {
     if (indexBefore === '/') {
@@ -2990,7 +3005,7 @@ async function searchSub(keyword, isMutual) {
                 });
                 let found = getKeywordMatchingScore(columns, keywordsParticples, thesaurus);
                 if (found.matchedSearchKeywordCount >= 1) {
-                    const unescapedLine = unscapePercentByte(line);
+                    const unescapedLine = unescapePercentByte(line);
                     if (withParameter) {
                         var positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
                     }
@@ -3296,7 +3311,6 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                         if (!isFoundWithoutNormalized) {
                             if (normalizedTargetKeywords !== aTargetString) {
                                 normalizedMatched.matchedString = '';
-                                normalizedMatched.length = 0;
                                 normalizedMatched.position = notFound;
                             }
                         }
@@ -3464,10 +3478,9 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
             }
             if (score >= 1) {
                 matched.position = position;
-                matched.length = matchedKeyword.replace(/"/g, '""').length;
                 matched.targetWordsIndex = stringIndex;
                 matched.searchWordIndex = wordIndex;
-                matched.matchedString = targetString.substr(position, matched.length);
+                matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
                 matched.targetType = targetType;
             }
             else {
@@ -3922,7 +3935,6 @@ async function searchWithoutTags(keywords) {
                     found.matches.push({
                         position: line.indexOf(fullMatchKeywords),
                         normalizedPosition: notFound,
-                        length: fullMatchKeywords.length,
                         targetWordsIndex: -1,
                         searchWordIndex: -1,
                         matchedString: fullMatchKeywords,
@@ -4065,7 +4077,6 @@ function addParticiplesFoundCountInFullSearch(found, line, keywordIndex, partici
     found.matches.push({
         position: keywordIndex,
         normalizedPosition: notFound,
-        length: matchedKeyword.length,
         targetWordsIndex: -1,
         searchWordIndex: -1,
         matchedString: matchedKeyword,
@@ -4831,7 +4842,7 @@ function getValue(line, separatorIndex = -1) {
     if (comment !== notFound) {
         value = value.substring(0, comment).trim();
     }
-    value = unscapePercentByte(value);
+    value = unescapePercentByte(value);
     return value;
 }
 function getLineWithColoredValue(line) {
@@ -4862,7 +4873,7 @@ function getLineWithColoredValue(line) {
             line.substring(valueIndex + value.length);
     }
 }
-function unscapePercentByte(value) {
+function unescapePercentByte(value) {
     var found = 0;
     for (;;) {
         const found20 = value.indexOf('"%20"', found);
@@ -4894,6 +4905,9 @@ function unscapePercentByte(value) {
         }
     }
     return value;
+}
+function escapePercentByte(value) {
+    return value.replace(/"/g, '""');
 }
 function hasRefTag(keywords) {
     return keywords.trim().startsWith(refLabel);
@@ -5730,6 +5744,7 @@ class Thesaurus {
 }
 // FoundLine
 // Found the keyword and matched part in the line
+// See. "getKeywordMatchingScore" function.
 class FoundLine {
     constructor() {
         this.path = '';
@@ -5780,9 +5795,9 @@ class FoundLine {
         const colorParts = [];
         var previousPart = new MatchedPart();
         previousPart.position = -1;
-        previousPart.length = 0;
+        previousPart.matchedString = '';
         for (const part of sortedParts) {
-            if (part.position + part.length >= length_limit) {
+            if (part.position + part.matchedString.length >= length_limit) {
                 // no push
             }
             else if (part.targetType === 'normalized') {
@@ -5790,14 +5805,15 @@ class FoundLine {
                 // previous: <------>
                 // current:          <------>
             }
-            else if (part.position >= previousPart.position + previousPart.length) {
+            else if (part.position >= previousPart.position + previousPart.matchedString.length) {
                 colorParts.push(part);
                 // previous: <------>
                 // current:  <--------->
             }
-            else if (part.position + part.length > previousPart.position + previousPart.length) {
+            else if (part.position + part.matchedString.length > previousPart.position + previousPart.matchedString.length) {
                 const previousColorPart = colorParts[colorParts.length - 1];
-                previousColorPart.length = part.position + part.length - previousColorPart.position;
+                const partLength = part.position + part.matchedString.length - previousColorPart.position;
+                previousColorPart.matchedString = previousColorPart.matchedString.substring(0, partLength);
                 // previous: <------> | <------>
                 // current:  <---->   | <------>
             }
@@ -5814,9 +5830,9 @@ class FoundLine {
         const normalizedColorParts = [];
         var previousPart = new MatchedPart();
         previousPart.normalizedPosition = -1;
-        previousPart.length = 0;
+        previousPart.normalizedMatchedString = '';
         for (const part of normalizedSortedParts) {
-            if (part.position + part.length >= length_limit) {
+            if (part.position + part.normalizedMatchedString.length >= length_limit) {
                 // no push
             }
             else if (part.targetType === 'normalized') {
@@ -5856,9 +5872,9 @@ class FoundLine {
         for (const match of colorParts) { // match is one of this.matches: MatchedPart[]
             coloredLine +=
                 line.substring(previousPosition, match.position) +
-                    matchedColor(line.substr(match.position, match.length));
-            previousPosition = match.position + match.length;
-            // coloredStrings.push(line.substr(match.position, match.length));
+                    matchedColor(line.substr(match.position, match.matchedString.length));
+            previousPosition = match.position + match.matchedString.length;
+            // coloredStrings.push(line.substr(match.position, match.matchedString.length));
         }
         if (hasNormalizedWords) {
             for (const match of normalizedColorParts) {
@@ -6065,7 +6081,6 @@ class FoundLine {
                     found.matches.unshift({
                         position: 0,
                         normalizedPosition: notFound,
-                        length: parentPhrase.length,
                         targetWordsIndex: -1,
                         searchWordIndex: -1,
                         matchedString: parentPhrase,
@@ -6109,7 +6124,6 @@ function getParentPhrase(parentMatches, notParentMatches, matchesInKeywordTag) {
 class MatchedPart {
     constructor() {
         this.position = -1; // in matched line
-        this.length = 0;
         this.matchedString = ''; // matched word or part of matched word
         this.targetWordsIndex = -1; // Words index of "targetStrings" array argument of "getKeywordMatchingScore" function.
         this.searchWordIndex = -1; // Word index of search keywords.

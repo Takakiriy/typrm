@@ -132,7 +132,9 @@ export declare function cc(targetCount?: number | null, label?: string): {
     isTarget: boolean;
     debugOut: string[];
 };
-export declare const ccCount: {
-    [name: string]: number;
-};
+declare global {
+    export var ccCount: {
+        [name: string]: number;
+    };
+}
 export {};
