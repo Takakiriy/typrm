@@ -1,5 +1,1070 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`checks >> file contents >> First >> NG: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:7:         user: 'user2'  #template: __User__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:4:             user: 'user1'
+    Warning: Not same as file contents
+    Expected:     user: 'user2'
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:10:     login user2  #template: __User__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0: (Not found)
+    Warning: Not same as file contents
+    Expected: login user2
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/NG_1_changing.yaml:12:     login user2  #template: __User__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh:0: (Not found)
+    Warning: Not same as file contents
+    Expected: login user2
+
+Warning: 3, Error: 0
+checked file count = 1, template count = 6, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> OK: stdout 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 6, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> any_lines: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:16:             not fourth  #template: __Fourth__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:3:     second
+    Warning: Not same as file contents
+    Expected: not fourth
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/any_lines_1_changing.yaml:41:             3 NG not end
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:21:     3 NG start
+    Warning: Not same as file contents
+    Expected: 3 NG not end
+
+Warning: 2, Error: 0
+checked file count = 1, template count = 9, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> empty_line: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/empty_line_1_changing.yaml:5:     not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:33:     BAD
+    Warning: Not same as file contents
+    Expected: not good
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> environment_variable: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:1: setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:3:     $env.TYPRM_TEST_ENV2: __TestEnv__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV2 = __Bad__  #NG-a  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
+    Warning: Not matched with the template.
+    Expected: TYPRM_TEST_ENV2 = __TestEnv__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:13:         - TYPRM_TEST_ENV2 = __Bad__  #NG-a  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: - TYPRM_TEST_ENV2 = __Bad__  #NG-a
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:1: setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:4:     $env.TYPRM_TEST_PATH: __PathEnv__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:17:         - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+    Warning: Not matched with the template.
+    Expected: TYPRM_TEST_PATH = __PathEnv__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:17:         - TYPRM_TEST_PATH = __Bad__  #NG-b      #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:6: - TYPRM_TEST_PATH = C:\\\\Test  #NG-b
+    Warning: Not same as file contents
+    Expected: - TYPRM_TEST_PATH = __Bad__  #NG-b
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:20:         - TYPRM_TEST_ENV2 = __TestEnv__  #NG-c  #template: TYPRM_TEST_ENV2 = $env.TYPRM_TEST_ENV2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: - TYPRM_TEST_ENV2 = testEnv  #NG-c
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/environment_variable_1_changing.yaml:24:         - TYPRM_TEST_PATH = __PathEnv__  #NG-d  #template: TYPRM_TEST_PATH = $env.TYPRM_TEST_PATH
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_5.yaml:9: - TYPRM_TEST_PATH = C:\\\\_____Test  #NG-d
+    Warning: Not same as file contents
+    Expected: - TYPRM_TEST_PATH = C:\\\\Test  #NG-d
+
+Warning: 6, Error: 0
+checked file count = 1, template count = 14, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> exist_if: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/exist_if_1_changing.yaml:5:         second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:36:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/exist_if_1_changing.yaml:15:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:36:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/exist_if_1_changing.yaml:20:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:36:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+Warning: 3, Error: 0
+checked file count = 1, template count = 4, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> file name: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:2:     __Base__: sub
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:3: nano bad/dummy.txt:  #file-template: __Base__/dummy.txt
+    Warning: Not matched with the template.
+    Expected: sub/dummy.txt
+
+Error of not found the target file:
+  NotFound: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/sub/dummy.txt
+  Template: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/file name_1_changing.yaml:4
+
+Warning: 1, Error: 1
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> if: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:9:         user: 'user1'  #template: __Stage__
+    Warning: Not matched with the template.
+    Expected: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:13:             user: 'user1'  #template: __Stage__
+    Warning: Not matched with the template.
+    Expected: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:15:             Checks
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:28:             - check: 'yes'  #template: __Stage__
+    Warning: Not matched with the template.
+    Expected: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:33:             - check: 'yes'  #template: __Stage__
+    Warning: Not matched with the template.
+    Expected: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:3: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:4:     __Stage__: develop  #// develop, staging, product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:43:         - check: 'yes'  #template: __Stage__
+    Warning: Not matched with the template.
+    Expected: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:48:             Checks if develop  #template: __Stage__
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:57:             Checks if not product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if not product
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:59:             Checks if not product
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if not product
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:61:         Checks else part
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks else part
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:66:             Checks if $env.typrm_aaa == aaa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if $env.typrm_aaa == aaa
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:75:             Checks if $env.typrm_aaa != bbb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if $env.typrm_aaa != bbb
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:78:             Checks if $env.typrm_aaa != \\"\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if $env.typrm_aaa != \\"\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:87:             Checks if $env.undefined == \\"\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: Checks if $env.undefined == \\"\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:90:     #if: value == value
+    Error: if tag syntax
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/if_1_changing.yaml:91:     #if: $env.value = value
+    Error: if tag syntax
+
+Warning: 14, Error: 2
+checked file count = 1, template count = 34, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> First >> multi_paths: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/multi_paths_1_changing.yaml:13:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_2_target.yaml:28:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/document/multi_paths_1_changing.yaml:13:             second not good
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_8_others_3_target.yaml:7:     second BAD
+    Warning: Not same as file contents
+    Expected: second not good
+
+Warning: 2, Error: 0
+checked file count = 1, template count = 5, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> Multi folder >> all: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2:     correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2:     correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
+
+Warning: 2, Error: 0
+checked file count = 2, template count = 2, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> Multi folder >> file in 1st folder: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/file_1.yaml:2:     correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> Multi folder >> file in 2nd folder: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2:     correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> file contents >> Multi folder >> full path: stdout 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/file_2.yaml:2:     correct contents
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_0_one_error_2_target.yaml:0: (Not found)
+    Warning: Not same as file contents
+    Expected: correct contents
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> 1_template_1_ok: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 8, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> 1_template_2_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         __Key2__: value2  #コメント
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:         - echo  \\"value  2\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:             #template: - echo  \\"__Key2__\\"
+    Warning: Not matched with the template.
+    Expected: - echo  \\"value2\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:         key1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         - v1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:             #template: - key1
+    Warning: Not matched with the template.
+    Expected: - value1
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:         - __ \\"value3\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:             #template: - \\"Key3\\"
+    Warning: Not matched with the template.
+    Expected: - \\"value3\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         - __ \\"value3\\"  #template: - \\"Key3\\"
+    Warning: Not matched with the template.
+    Expected: - \\"value3\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:25:         - value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26:             #template: - key1
+    Warning: Not matched with the template.
+    Expected: - value11
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         - １行に２つのケース： value1, value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:             #template: key1, key1
+    Warning: Not matched with the template.
+    Expected: value11, value11
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29:         - １行に２つのケース： value11, value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:             #template: key1, key1
+    Warning: Not matched with the template.
+    Expected: value11, value11
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         - ２行上のケース： \\"value11x\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:             #template-at(-2): \\"key1\\"
+    Warning: Not matched with the template.
+    Expected: \\"value11\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         - ３行上のケース： \\"value11x\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37:             #template-at(-3): \\"key1\\"
+    Warning: Not matched with the template.
+    Expected: \\"value11\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38:         - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
+    Warning: Not matched with the template.
+    Expected: \\"value11\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:40: #template-at(1): \\"key1\\"
+    Error: The parameter must be less than 0
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42: #template-at(2): \\"key1\\"
+    Error: The parameter must be less than 0
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:43:         - value  #template: __Undefined__
+    Warning: Not matched with the template.
+    Expected: __Undefined__
+
+Warning: 11, Error: 2
+checked file count = 1, template count = 13, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> 1_template_3_if: answer 1`] = `
+"
+Error of duplicated variable name:
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:82
+  ContentsA: target1: banana
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:84
+  ContentsB: target1: yellow
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:             __Setting1__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27:         - no  #template: __Setting1__
+    Warning: Not matched with the template.
+    Expected: yes
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:             __Setting2__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:         - no  #template: __Setting2__
+    Warning: Not matched with the template.
+    Expected: yes
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:             __Env1__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29:         - no  #template: __Env1__
+    Warning: Not matched with the template.
+    Expected: yes
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:             __Env2__: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:         - no  #template: __Env2__
+    Warning: Not matched with the template.
+    Expected: yes
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:         fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:31:         - no  #template: fruit
+    Warning: Not matched with the template.
+    Expected: banana
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         bird: swan
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:32:         - no  #template: bird
+    Warning: Not matched with the template.
+    Expected: swan
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:35:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39:         fish: yes
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:         - no  #template: fish
+    Warning: Not matched with the template.
+    Expected: yes
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:45:         fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50:         - 💤  #template-if: $settings.fruit == banana
+    Warning: Not matched with the template.
+    Expected: 🌟
+
+Error of not expected condition:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58
+  Contents: $settings.color1 == black
+
+Error of not expected condition:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59
+  Contents: $settings.color1 != yellow
+
+Error of not expected condition:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:62
+  Contents: false
+
+Error of not expected condition:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:70
+  Contents: $settings.color1 == black
+
+Error of not expected condition:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:71
+  Contents: $settings.color1 != yellow
+
+Error of not expected condition:
+  typrmFile: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:74
+  Contents: false
+
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:84
+  Not referenced: target1
+
+Warning: 9, Error: 7
+checked file count = 1, template count = 12, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> case_sensitive_variable_name: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable__: Value
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     value: #template: __Variable__  #// The value is different in case
+    Warning: Not matched with the template.
+    Expected: Value
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 4, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> check files in multi folder >> 1st: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:3:         var: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:3:         var: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/2/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 2, Error: 0
+checked file count = 2, template count = 2, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> check files in multi folder >> with current folder: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:3:         var: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
+    Warning: Not matched with the template.
+    Expected: value1
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> check one file only: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 8, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> environment_variable: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 5, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> list_to_tag_original_tag: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
+
+Warning: 0, Error: 0
+checked file count = 1, template count = 2, #to tag count = 2
+"
+`;
+
+exports[`checks >> template value >> list_to_tag_original_tag_in_multi_files: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:2: #original: varA: valueA1 => valueA0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:3: #original: varB1: valueB1 => value-B1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:4: #original: varB2: valueB2 => value-B2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:5: #original: varB3: valueB3 => value-B3
+...(Display of further original tags will be omitted)
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:2: #to: varA: valueA1 => valueA2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp_2.yaml:10: #to: varB1: valueB1 => valueB2
+
+Warning: 0, Error: 0
+checked file count = 2, template count = 8, #to tag count = 4
+"
+`;
+
+exports[`checks >> template value >> settings >> 1_same_values: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 2_not_same_values_error: answer 1`] = `
+"
+Error of duplicated variable name:
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
+  ContentsA: var1: value1
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4
+  ContentsB: var1: value111
+
+Error of duplicated variable name:
+  typrmFileA: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3
+  ContentsA: var2: value2
+  typrmFileB: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5
+  ContentsB: var2: value222
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var1: value111
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value222
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: value1, value2  #template: var1, var2
+    Warning: Not matched with the template.
+    Expected: value111, value222
+
+Warning: 1, Error: 2
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 3_overwrite: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 8, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 3e_overwrite_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: .....1, .....2, .....3  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value2, value3
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: .....1, .....2, .....3  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value2, value3
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     .....1, .....22, .....33  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value33
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:     .....1, .....22, .....33  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value33
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:             var3: value333
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         .....1, .....22, .....333  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value333
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16:             var3: value333
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         .....1, .....22, .....333  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value333
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:     .....1, .....22, .....33  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value22, value33
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: .....1, .....2, .....3  #template: var1, var2, var3
+    Warning: Not matched with the template.
+    Expected: value1, value2, value3
+
+Warning: 8, Error: 0
+checked file count = 1, template count = 8, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 4_2_neighbor_level_2_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7
+    Warning: double settings are not supported.
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 4_neighbor_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
+    Warning: double settings are not supported.
+    First settings at: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 5_check_same_as_tag: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:         __OperationServer__: OS
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:35:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
+    Warning: Not matched with the value referenced from same-as tag.
+    Same as: __OperationServer__
+    Expected: OS
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __Unknown__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:37:         __Store2__: x      #same-as: __Store{$settings.__Other__}__
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __StoreHost__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30:         __OperationServer__: OS
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33:         __C_S__: Server  #// Client or Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:         __On__: on
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42:         __U__: _
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38:         __Operation3__: 0x  #same-as: __Operati{$settings.__On__}{$settings.__C_S__}{$settings.__U__}_
+    Warning: Not matched with the value referenced from same-as tag.
+    Same as: __OperationServer__
+    Expected: OS
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:39:         __Operation4__: OS  #same-as: __Operati{$settings.__On__}{$settings.__Unknown__}{$settings.__U__}_
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __Unknown__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:34:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41:         __On__: on
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42:         __U__: _
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:40:         __Operation5__: xx  #same-as: __Operati{$settings.__On__}{$settings.__Other__}{$settings.__U__}_
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __OperationHost__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:51:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:54:         __Other__: Host
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:63:             __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
+    Warning: Not found a variable name specified in the same-as tag.
+    Variable Name: __OperationHost__
+
+Warning: 7, Error: 0
+checked file count = 1, template count = 8, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> b1_bug_case_no_root_settings: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 0, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> b2_bug_case_nest_settings: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 6, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 4, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_deep: answer 1`] = `
+"
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36
+  Not referenced: __11A__
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 20, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: BadA:  #template: __A__
+    Warning: Not matched with the template.
+    Expected: ValueA
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     BadA:  #template: __A__
+    Warning: Not matched with the template.
+    Expected: ValueA
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __1A__: Value1A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     Bad1A:  #template: __1A__
+    Warning: Not matched with the template.
+    Expected: Value1A
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     Bad11A:  #template: __11A__
+    Warning: Not matched with the template.
+    Expected: __11A__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:             __11A__: Value11A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         Bad11A:  #template: __11A__
+    Warning: Not matched with the template.
+    Expected: Value11A
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:     BadA:  #template: __A__
+    Warning: Not matched with the template.
+    Expected: ValueA
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __1A__: Value1A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:     Bad1A:  #template: __1A__
+    Warning: Not matched with the template.
+    Expected: Value1A
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:     Bad11A:  #template: __11A__
+    Warning: Not matched with the template.
+    Expected: __11A__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:                 settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:                     __111A__: Value111A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20:                 Bad111A:  #template: __111A__
+    Warning: Not matched with the template.
+    Expected: Value111A
+
+Warning: 9, Error: 0
+checked file count = 1, template count = 9, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_if: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:26: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:                     __C__: ValueC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:             test error  #template: __C__
+    Warning: Not matched with the template.
+    Expected: ValueC
+
+Warning: 1, Error: 0
+checked file count = 1, template count = 6, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_if_disable: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         variable2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: val__ue2: #template: variable2
+    Warning: Not matched with the template.
+    Expected: value2
+
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2
+  Not referenced: variable1
+
+Warning: 2, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_position: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 5, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> template_if_1_error: answer 1`] = `
+"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     🌟 case product:  #template-if: $settings.__Stage__ == product
+    Warning: Not matched with the template.
+    Expected: 💤
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     💤 case product:  #template-if: $settings.__Stage__ == develop
+    Warning: Not matched with the template.
+    Expected: 🌟
+
+Warning: 2, Error: 0
+checked file count = 1, template count = 4, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> template_if_2_referenced_one_side: answer 1`] = `
+"
+Warning: 0, Error: 0
+checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> var_not_ref_1_error: answer 1`] = `
+"
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3
+  Not referenced: key1
+
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
+  Not referenced: Key3
+
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13
+  Not referenced: key1
+
+Warning: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14
+  Not referenced: __Key2__
+
+Warning: 4, Error: 0
+checked file count = 1, template count = 3, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> verbose: answer 1`] = `
+"Verbose: typrm command: check
+Verbose: Phase 1: parse settings ...  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #settings:  #// currentSettingIndex: /1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  #// currentSettingIndex: /1/a
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:  #// currentSettingIndex: /1/a
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  #// currentSettingIndex: /1/b
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     var2: not value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:  #// currentSettingIndex: /1/b
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  #// currentSettingIndex: /1/c
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:  #// currentSettingIndex: /1/c
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  #// currentSettingIndex: /1/d
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:  #// currentSettingIndex: /1/d
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV2 == testEnv  #// currentSettingIndex: /1/e
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:  #// currentSettingIndex: /1/e
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV2 != testEnv  #// currentSettingIndex: /1/f
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:  #// currentSettingIndex: /1/f
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true  #// currentSettingIndex: /1/g
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:  #// currentSettingIndex: /1/g
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false  #// currentSettingIndex: /1/h
+Verbose: settings tree:
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:         settings /1/a define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         settings /1/b define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:         settings /1/c define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         settings /1/d define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         settings /1/e define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15:         settings /1/f define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17:         settings /1/g define
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: scope start
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         settings /1/h define
+Verbose: variables:
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings /1
+        Verbose: var1: value1
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: settings /1/a
+        Verbose: var2: value2
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
+        Verbose: var2: not value2
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:0: settings /
+Verbose: Phase 2: parse \\"original\\" tags ...
+    Verbose: settings \\"/1\\"
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: \\"/1\\"
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
+Verbose: Phase 2: parse \\"#to:\\" tags ...
+Verbose: to tag tree:
+    Verbose: replaceTo:
+        Verbose: settings \\"/\\":
+        Verbose: settings \\"/1\\":
+        Verbose: settings \\"/1/a\\":
+        Verbose: settings \\"/1/b\\":
+        Verbose: settings \\"/1/c\\":
+        Verbose: settings \\"/1/d\\":
+        Verbose: settings \\"/1/e\\":
+        Verbose: settings \\"/1/f\\":
+        Verbose: settings \\"/1/g\\":
+        Verbose: settings \\"/1/h\\":
+    Verbose: outOfFalseBlocks:
+Verbose: Phase 3: check ...
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: end #if:
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:         var1: value1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:     bad  #template: var1
+    Warning: Not matched with the template.
+    Expected: value1
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         bad2  #template: var2
+    Warning: Not matched with the template.
+    Expected: value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV2 == testEnv  (true, TYPRM_TEST_ENV2 = testEnv)
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14:         bad2  #template: var2
+    Warning: Not matched with the template.
+    Expected: value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV2 != testEnv  (false, TYPRM_TEST_ENV2 = testEnv)
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #if: true
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         bad2  #template: var2
+    Warning: Not matched with the template.
+    Expected: value2
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: end #if:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19: #if: false
+
+Warning: 4, Error: 0
+checked file count = 1, template count = 7, #to tag count = 0
+"
+`;
+
 exports[`checks copy tag >> 1 >> NG: sourceFileContents 1`] = `
 "a: #copy: copy_1
     aaa
@@ -2363,6 +3428,2207 @@ exports[`checks template value >> verbose: sourceFileContents 1`] = `
         bad2  #template: var2
     #if: false
         bad2  #template: var2
+"
+`;
+
+exports[`replaces >> in copy tag >> template >> 1: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __VarA__: replacedA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __VarB__: replacedB
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> in copy tag >> template >> 1: updatedFileContents 1`] = `
+"setting: #settings:
+    __VarA__: replacedA  #original: valueA
+    __VarB__: replacedB  #original: valueB
+variable in copy blocks:
+    Template: #copy: variable in copy copy
+        <replacedA>  #template: <__VarA__>
+    Copy: #copy: variable in copy copy
+        <replacedA>  #template: <__VarA__>
+variable in copy-template:
+    Template: #copy-template: variable in copy-template, {__VariableA__: $settings.__VarB__}
+        (replacedB)  #template: (__VariableA__)
+    Copy: #copy: variable in copy-template, {__VariableA__: a1}
+        (a1)
+variable in copy:
+    Template: #copy-template: variable in copy, {__VariableA__: a1}
+        [a1]  #template: [__VariableA__]
+    Copy: #copy: variable in copy, {__VariableA__: $settings.__VarB__}
+        [replacedB]
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__VarB__}
+        <replacedB>  #template: <__VariableA__>
+        <replacedA>  #template: <__VarA__>
+        <replacedB, replacedA>  #template: <__VariableA__, __VarA__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <replacedA>
+        <a1, replacedA>
+"
+`;
+
+exports[`replaces >> in copy tag >> template >> error_not_found_variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __VarA__: replacedA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __VarB__: replacedB
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: setting: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__Unknown__}
+    Error: Not found specified variable name.
+    Variable: __Unknown__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> in copy tag >> template >> error_not_found_variable: updatedFileContents 1`] = `
+"setting: #settings:
+    __VarA__: valueA  #to: replacedA
+    __VarB__: valueB  #to: replacedB
+variable in template and copy block:
+    Template: #copy-template: variable in copy-template copy, {__VariableA__: $settings.__Unknown__}
+        <valueB>  #template: <__VariableA__>
+        <valueA>  #template: <__Unknown__>
+    Copy: #copy: variable in copy-template copy, {__VariableA__: a1}
+        <a1>
+        <valueA>
+"
+`;
+
+exports[`replaces >> settings >> CR LF >>: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> Multi folder >> same name error: stdout 1`] = `
+"
+Error: same file name exists.
+    FileName: 2_replace_1_ok_same_name.yaml
+    Folder: test_data/_changing/1, test_data/_changing/2
+
+Exception: Error: same file name exists \\"2_replace_1_ok_same_name.yaml\\".
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 1_replace: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1_replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 1_replace: updatedFileContents 1`] = `
+"settings: #settings:
+    key1: value1_replaced  #original: value1
+value1_replaced: #template: key1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_1_ok setting 1: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: key1: value1changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __Key2__: value2changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_1_ok setting 1: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは行番号で指定 >> パスするケース
+
+手順A:
+    設定: #settings:
+        key1: value1changed  #original: value1
+        __Key2__: value2changed  #original: value2  #コメント
+            #コメント
+        Key3: value3changed  #original: oldValue3  #コメント
+
+    手順:
+        - cd \\"..\\"
+        - echo  \\"value2changed\\"
+            #template: - echo  \\"__Key2__\\"
+        - value1changed
+            #template: - key1
+        - \\"value3changed\\"
+            #template: - \\"Key3\\"
+        - \\"value3changed\\"
+            #template: - \\"Key3\\"
+        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - １行に２つのケース： value3changed, value3changed
+            #template: Key3, Key3
+
+手順B:
+    設定: #settings:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： \\"value11\\"
+            #// comment
+            #template-at(-2): \\"key1\\"
+        - ３行上のケース： \\"value11\\"
+            #// comment
+            #// comment
+            #template-at(-3): \\"key1\\"
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_1_ok setting 2: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27: #to: key1: value1changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #original: oldValue3  #コメント
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18:         - \\"value3changed\\"
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:             #template: - \\"Key3\\"
+    Warning: Not matched with the template.
+    Expected: - \\"value3\\"
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #original: oldValue3  #コメント
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:         - \\"value3changed\\"  #template: - \\"Key3\\"
+    Warning: Not matched with the template.
+    Expected: - \\"value3\\"
+
+Warning: 2, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_1_ok setting 2: updatedFileContents 1`] = `
+"# 設定値を変更する。設定のセットは行番号で指定 >> パスするケース
+
+手順A:
+    設定: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #original: oldValue3  #コメント
+
+    手順:
+        - cd \\"..\\"
+        - echo  \\"value2\\"
+            #template: - echo  \\"__Key2__\\"
+        - value1
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+        - \\"value3changed\\"
+            #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
+        - \\"value3changed\\"  #template: - \\"Key3\\"
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+
+手順B:
+    設定: #settings:
+        key1: value1changed  #original: value11
+
+    手順:
+        - value1changed
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： \\"value1changed\\"
+            #// comment
+            #template-at(-2): \\"key1\\"
+        - ３行上のケース： \\"value1changed\\"
+            #// comment
+            #// comment
+            #template-at(-3): \\"key1\\"
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_1A_end_of_template: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: key1: value1changed
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_1A_end_of_template: updatedFileContents 1`] = `
+"設定: #settings:
+    key1: value1changed  #original: value1
+value1changed:  <!-- #template: key1 #-->
+value1changed#:  #template: key1#
+value1changed #: #template: key1\\"%20\\"#
+value1changed%#: #template: key1\\"%25\\"#
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_2_error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #to: value3changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+    Error: Not found any replacing target. Modify the template target to old or new value.
+    Expected: - \\"value3\\"
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_2_error: updatedFileContents 1`] = `
+"# 設定値を変更する >> エラーになるケース
+
+手順A:
+    設定: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #to: value3changed
+
+    手順:
+        - cd \\"..\\"
+        - echo  \\"value2\\"
+            #template: - echo  \\"__Key2__\\"
+        - value1
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
+        - \\"value3_bad\\"  #template: - \\"Key3\\"
+
+手順B:
+    設定: #settings:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_3_English: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #コメント  #to: value3changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:21:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+    Error: Not found any replacing target. Modify the template target to old or new value.
+    Expected: - \\"value3\\"
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_3_English: updatedFileContents 1`] = `
+"# Case of that setting tag is English
+
+Process A:
+    settings: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #コメント  #to: value3changed
+
+    steps:
+        - cd \\"..\\"
+        - echo  \\"value2\\"
+            #template: - echo  \\"__Key2__\\"
+        - value1
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+        - \\"value3changed\\"
+            #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
+        - \\"value3_bad\\"  #template: - \\"Key3\\"
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+
+Process B:
+    settings: #settings:
+        key1: value11
+
+    steps:
+        - value11
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+            #// 置き換えないこと
+        - value31
+            #template: - key3
+        - １行に２つのケース： value3, value3
+            #template: Key3, Key3
+        - ２行上のケース： \\"value11\\"
+            #// comment
+            #template-at(-2): \\"key1\\"
+        - ３行上のケース： \\"value11\\"
+            #// comment
+            #// comment
+            #template-at(-3): \\"key1\\"
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_4_Japanese: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: Key3: value3changed
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3  #to: value3changed
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:19:         - \\"value3_bad\\"  #template: - \\"Key3\\"
+    エラー: 置き換える対象が見つかりません。 テンプレートの対象を古い値または新しい値に修正してください。
+    期待: - \\"value3\\"
+
+警告: 0, エラー: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_4_Japanese: updatedFileContents 1`] = `
+"# 設定タグが日本語のケース
+
+手順A:
+    設定: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3  #to: value3changed
+
+    手順:
+        - cd \\"..\\"
+        - echo  \\"value2\\"
+            #template: - echo  \\"__Key2__\\"
+        - value1
+            #template: - key1
+        - \\"value3\\"
+            #template: - \\"Key3\\"
+        - \\"value3\\"  #template: - \\"Key3\\"
+        - \\"value3_bad\\"  #template: - \\"Key3\\"
+
+手順B:
+    設定: #settings:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_5_with_environment_variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Variable__: replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_5_with_environment_variable: updatedFileContents 1`] = `
+"settings: #settings:
+    __Variable__: replaced  #original: value
+    $env.TYPRM_TEST_ENV: $TYPRM_TEST_ENV
+replace:
+    (replaced)-($TYPRM_TEST_ENV)  #template: (__Variable__)-($env.TYPRM_TEST_ENV)
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_6_if both: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: fruit: melon
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #to: __Setting1__: replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_6_if both: updatedFileContents 1`] = `
+"test_of_if_tag_in_settings:
+    settings: #settings:
+        fruit: melon  #original: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: replaced  #original: no
+    check:
+        replaced:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit != banana
+            replaced  #template: __Setting1__
+        old_bug:  #if: $env.unknown == \\"\\"
+            An error occurred by this if parameter.
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_6_if in if block: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __Setting1__: replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_6_if in if block: updatedFileContents 1`] = `
+"test_of_if_tag_in_settings:
+    settings: #settings:
+        fruit: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: replaced  #original: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: no
+    check:
+        replaced:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            replaced  #template: __Setting1__
+        not banana:  #if: $settings.fruit != banana
+            no  #template: __Setting1__
+        old_bug:  #if: $env.unknown == \\"\\"
+            An error occurred by this if parameter.
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_6_if in if variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: fruit: melon
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_6_if in if variable: updatedFileContents 1`] = `
+"test_of_if_tag_in_settings:
+    settings: #settings:
+        fruit: melon  #original: banana
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit != banana
+            __Setting1__: no
+    check:
+        no:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit != banana
+            no  #template: __Setting1__
+        old_bug:  #if: $env.unknown == \\"\\"
+            An error occurred by this if parameter.
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_7_undefined_if: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: fruit: apple
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: settings
+    Error: Defined variables are decreased
+    Not defined variables: __Setting1__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_7_undefined_if: updatedFileContents 1`] = `
+"test_of_undefined_by_if_tag:
+    settings: #settings:
+        fruit: banana  #to: apple
+        banana:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        not banana:  #if: $settings.fruit == melon
+            __Setting1__: no
+    check:
+        yes:  #template: __Setting1__
+        banana:  #if: $settings.fruit == banana
+            yes  #template: __Setting1__
+        not banana:  #if: $settings.fruit == melon
+            no  #template: __Setting1__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_8_one_setting without line num: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: key1: changed1
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_8_one_setting without line num: updatedFileContents 1`] = `
+"手順A:
+    設定: #settings:
+        key1: changed1  #original: value1
+
+    手順:
+        - changed1
+            #template: - key1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_1_OK: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_1_OK: updatedFileContents 1`] = `
+"設定: #settings:
+    __Stage__: develop  #original: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product  #comment
+    🌟 case product:  #template-if: $settings.__Stage__ == develop  #comment
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_2_NG: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: product  #to: develop
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:     case product:  #template-if: $settings.__Stage__ == product
+    Error: Not found any replacing target. Modify the template target to old or new value.
+    Expected: 🌟
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_2_NG: updatedFileContents 1`] = `
+"設定: #settings:
+    __Stage__: product  #to: develop
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    case product:  #template-if: $settings.__Stage__ == product
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_3_not_set: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     🌟 case product:  #template-if: $settings.__Stage__ == product
+  Error: template-if tag related settings are not defined
+  Solution: Set the variable template-if(yes) and template-if(no)
+  Setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_3_not_set: updatedFileContents 1`] = `
+"設定: #settings:
+    __Stage__: product  #to: develop
+手順:
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_4_operators: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Stage__: develop
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_9_template_if_4_operators: updatedFileContents 1`] = `
+"設定: #settings:
+    __Stage__: develop  #original: product
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product
+    🌟 case product:  #template-if: $settings.__Stage__ == develop
+    🌟 case product:  #template-if: $settings.__Stage__ != product
+    💤 case product:  #template-if: $settings.__Stage__ != develop
+    🌟 case product:  #template-if: $settings.__Stage__ != product
+    💤 case product:  #template-if: $settings.__Stage__ != develop
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_10_double_check 1_OK: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Full__: fo/fi
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Folder__: fo
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __File__: fi
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_10_double_check 1_OK: updatedFileContents 1`] = `
+"settings: #settings:
+    __Full__: fo/fi  #original: folder/file
+    __Folder__: fo  #original: folder
+    __File__: fi  #original: file
+check:
+    - \\"fo/fi\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"fo/fi\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"fo/fi\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_10_double_check 2_BadPart: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Full__: fo/fi
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __File__: fi
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
+    Error: template target values after replace are conflicted. You should add #to: tags at setting variables in other templates.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Full__: folder/file  #to: fo/fi
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Folder__: folder
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4:     __File__: file  #to: fi
+    replaced (1): - \\"fo/fi\\"
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:         #template: \\"__Full__\\"
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
+            Before Replacing: \\"folder/file\\"
+            After  Replacing: \\"fo/fi\\"
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"fo/fi\\"
+    replaced (2): - \\"folder/fi\\"
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         #template-at(-2): __Folder__/__File__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
+            Before Replacing: folder/file
+            After  Replacing: folder/fi
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/fi\\"
+    replaced (3): - \\"folder/file\\"
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12:         #template-at(-3): __Folder__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
+            Before Replacing: folder
+            After  Replacing: folder
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
+    replaced (4): - \\"folder/fi\\"
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         #template-at(-4): __File__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/file\\"
+            Before Replacing: file
+            After  Replacing: fi
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9:     - \\"folder/fi\\"
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_10_double_check 2_BadPart: updatedFileContents 1`] = `
+"settings: #settings:
+    __Full__: folder/file  #to: fo/fi
+    __Folder__: folder
+    __File__: file  #to: fi
+check:
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"folder/file\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_10_double_check 3_NoReplace: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_10_double_check 3_NoReplace: updatedFileContents 1`] = `
+"settings: #settings:
+    __Full__: folder/file
+    __Folder__: folder
+    __File__: file
+check:
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+    - \\"folder/file\\"
+        #template: \\"__Full__\\"
+        #template-at(-2): __Folder__/__File__
+        #template-at(-3): __Folder__
+        #template-at(-4): __File__
+    - \\"folder/file\\"
+        #template-at(-1): __File__
+        #template-at(-2): __Folder__
+        #template-at(-3): __Folder__/__File__
+        #template-at(-4): \\"__Full__\\"
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if AB: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60: #to: __Switch_02__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if AB: updatedFileContents 1`] = `
+"nested if:
+    settings: #settings:
+        __Switch1__: A
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings: #settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        AB:   #template: __Set1__
+        C:    #template: __Set2__
+        ab:   #template: __Set22__
+    AB:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+1:
+    AB:   #template: __Set_01__
+settings: #settings:
+    __Switch_01__: A
+    __Switch_02__: B  #original: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+2:
+    AB:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if BA: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_01__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if BA: updatedFileContents 1`] = `
+"nested if:
+    settings: #settings:
+        __Switch1__: B  #original: A
+        __Switch2__: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings: #settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        BA:   #template: __Set1__
+        C:    #template: __Set2__
+        ba:   #template: __Set22__
+    BA:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+1:
+    BA:   #template: __Set_01__
+settings: #settings:
+    __Switch_01__: B  #original: A
+    __Switch_02__: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+2:
+    BA:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if BB: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:59: #to: __Switch_01__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60: #to: __Switch_02__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if BB: updatedFileContents 1`] = `
+"nested if:
+    settings: #settings:
+        __Switch1__: B  #original: A
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings: #settings:
+            __Set2__: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        BB:   #template: __Set1__
+        C:    #template: __Set2__
+        bb:   #template: __Set22__
+    BB:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+1:
+    BB:   #template: __Set_01__
+settings: #settings:
+    __Switch_01__: B  #original: A
+    __Switch_02__: B  #original: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+2:
+    BB:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if C: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Set2__: CC
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_11_nested_if C: updatedFileContents 1`] = `
+"nested if:
+    settings: #settings:
+        __Switch1__: A
+        __Switch2__: A
+        case A:  #if: $settings.__Switch1__ == A
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: AA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: AB
+        case B:  #if: $settings.__Switch1__ == B
+            case A:  #if: $settings.__Switch2__ == A
+                __Set1__: BA
+            case B:  #if: $settings.__Switch2__ == B
+                __Set1__: BB
+    body:
+        settings: #settings:
+            __Set2__: CC  #original: C
+            case A:  #if: $settings.__Switch1__ == A
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: aa
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: ab
+            case B:  #if: $settings.__Switch1__ == B
+                case A:  #if: $settings.__Switch2__ == A
+                    __Set22__: ba
+                case B:  #if: $settings.__Switch2__ == B
+                    __Set22__: bb
+        AA:   #template: __Set1__
+        CC:    #template: __Set2__
+        aa:   #template: __Set22__
+    AA:   #template: __Set1__
+    __Set2__:    #template: __Set2__
+
+    case A:  #if: $settings.__Switch1__ == A
+        case A:  #if: $settings.__Switch2__ == A
+            AA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            AB  #template: __Set1__
+    case B:  #if: $settings.__Switch1__ == B
+        case A:  #if: $settings.__Switch2__ == A
+            BA  #template: __Set1__
+        case B:  #if: $settings.__Switch2__ == B
+            BB  #template: __Set1__
+
+root settings:
+case A:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+1:
+    AA:   #template: __Set_01__
+settings: #settings:
+    __Switch_01__: A
+    __Switch_02__: A
+    case A:  #if: $settings.__Switch_01__ == A
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: AA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: AB
+    case B:  #if: $settings.__Switch_01__ == B
+        case A:  #if: $settings.__Switch_02__ == A
+            __Set_01__: BA
+        case B:  #if: $settings.__Switch_02__ == B
+            __Set_01__: BB
+2:
+    AA:   #template: __Set_01__
+case A after:  #if: $settings.__Switch_01__ == A
+                    case A:  #if: $settings.__Switch_02__ == A
+                        AA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        AB  #template: __Set_01__
+case B after:  #if: $settings.__Switch_01__ == B
+                    case A:  #if: $settings.__Switch_02__ == A
+                        BA  #template: __Set_01__
+                    case B:  #if: $settings.__Switch_02__ == B
+                        BB  #template: __Set_01__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_12_case_sensitive_variable: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __Variable__: After
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __variable__: after2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __variable2__: After2
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_12_case_sensitive_variable: updatedFileContents 1`] = `
+"settings: #settings:
+    __Variable__: After  #original: Value
+    __variable__: after2  #original: value2
+    __variable2__: After2  #original: Value2
+body:
+    After: #template: __Variable__
+    after2: #template: __variable__
+    After2: #template: __variable2__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_13_same_as_tag: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __C_S__: Server
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __OperationClient__: OC_replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_13_same_as_tag: updatedFileContents 1`] = `
+"1:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __C_S__: Server  #original: Client  #// Client or Server
+        __Operation__: OS  #original: OC  #same-as: __Operation{$settings.__C_S__}__
+    ref:
+        OC, OS:  #template: __OperationClient__, __OperationServer__
+        OS:  #template: __Operation__
+2:
+    settings: #settings:
+        __OperationClient__: OC_replaced  #original: OC
+        __OperationServer__: OS
+        __C_S__: Client  #// Client or Server
+        __Operation__: OC_replaced  #original: OC  #same-as: __Operation{$settings.__C_S__}__
+    ref:
+        OC_replaced, OS:  #template: __OperationClient__, __OperationServer__
+        OC_replaced:  #template: __Operation__
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_13e_same_as_tag_error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __C_S__: Unknown
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:         __C_S__: Client  #// Client or Server                         #to: Unknown
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:         __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+    Warning: Not found a variable name.
+    Same as: __OperationUnknown__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> in 2_replace_13e_same_as_tag_error: updatedFileContents 1`] = `
+"1:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __C_S__: Client  #// Client or Server                         #to: Unknown
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+    ref:
+        OC, OS:  #template: __OperationClient__, __OperationServer__
+        OC:  #template: __Operation__
+"
+`;
+
+exports[`replaces >> settings >> in bug_1_template_in_copy_tag: stdout 1`] = `
+"
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> in bug_1_template_in_copy_tag: updatedFileContents 1`] = `
+"settings: #settings:
+    variable: value
+copy template: #copy-template: copy1, { (variable): example }
+    example:  #template: (variable)
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 1_OK: replacedFileContents 1`] = `
+"settings: #settings:
+    __SettingA__: SetAA  #original: SetA
+    __SettingB__: SetB#    #original: SetB      #// SetB#....
+    __SettingC__: SetCCCC  #original: SettingC  #// SetCCCC..
+    __SettingD__: SetDD  #original: SetD      #// CommentD
+    __SettingE__: SetEE  #original: SetE      #// CommentE1      #// CommentE2
+    __SettingF__: SetFF  #original: SetF      #// CommentF1 #// CommentF2
+    __SettingG__: SetGG  #original: SetG      #// CommentG
+    __SettingO__: SettingOther
+    in body:
+        __BodyA__: ValueAA  #original: ValueA
+        __BodyB__: ValueBB  #original: ValueB
+        __BodyC__: ValueCC  #original: ValueC
+        __BodyC2__: ValueCC2  #original: ValueC2
+        __BodyD__: ValueDD  #original: ValueD
+        __BodyE__: ValueEE  #original: ValueE    #// ....
+        __BodyF1__: ValueFF1  #original: ValueF1  #// ..
+        __BodyF2__: ValueFF2  #original: ValueF2
+        __BodyG1__: ValueGG1  #original: ValueG1
+        __BodyG2__: ValueGG2  #original: ValueG2
+        __BodyL__: Valu  #original: ValueLength
+        __BodyAt1__: ValueAtAt1  #original: ValueAt1
+        __BodyAt2__: ValueAtAt2  #original: ValueAt2
+        __BodyAt3__: ValueAtAt3  #original: ValueAt3
+new body:
+    values:
+        - ValueAA   #template: __BodyA__
+        - ValueBB
+            #template: __BodyB__
+        - ValueCC
+            #template: __BodyC__
+        - ValueCC2
+            #template: __BodyC2__  #keyword: dummy
+        - 1. ValueAtAt1
+        - 2. ValueAtAt2
+        - 3. ValueAtAt3
+            #template-at(-3): 1. __BodyAt1__
+            #template-at(-3): 2. __BodyAt2__
+            #template-at(-3): 3. __BodyAt3__
+        #test of empty line
+
+        - -(ValueDD)-             #template: (__BodyD__)
+        - -(ValueEE)-             #template: (__BodyE__)
+        - -(ValueFF1)-(ValueFF2)-  #template: (__BodyF1__)-(__BodyF2__)
+        - -(ValueGG1)-(ValueGG2)-  #template: (__BodyG1__)-(__BodyG2__)
+        - -\\"Valu\\"-'Valu'-
+            #template: \\"__BodyL__\\"-'__BodyL__'
+    settings: #settings: #// in second setting
+        __SubA__: SetSubAA  #original: SetSubA
+    body:
+        SetSubAA   #template: __SubA__
+replace to original tag:
+    settings: #settings:
+        __ToOriginal_A__: value_0
+        __ToOriginal_B__: value_0
+    body:
+        value_0  #template: __ToOriginal_A__
+        value_0  #template: __ToOriginal_B__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 1_OK: resetFileContents 1`] = `
+"settings: #settings:
+    __SettingA__: SetA
+    __SettingB__: SetB      #// SetB#....
+    __SettingC__: SettingC  #// SetCCCC..
+    __SettingD__: SetD      #// CommentD
+    __SettingE__: SetE      #// CommentE1      #// CommentE2
+    __SettingF__: SetF      #// CommentF1 #// CommentF2
+    __SettingG__: SetG      #// CommentG
+    __SettingO__: SettingOther
+    in body:
+        __BodyA__: ValueA
+        __BodyB__: ValueB
+        __BodyC__: ValueC
+        __BodyC2__: ValueC2
+        __BodyD__: ValueD
+        __BodyE__: ValueE    #// ....
+        __BodyF1__: ValueF1  #// ..
+        __BodyF2__: ValueF2
+        __BodyG1__: ValueG1
+        __BodyG2__: ValueG2
+        __BodyL__: ValueLength
+        __BodyAt1__: ValueAt1
+        __BodyAt2__: ValueAt2
+        __BodyAt3__: ValueAt3
+new body:
+    values:
+        - ValueA   #template: __BodyA__
+        - ValueB
+            #template: __BodyB__
+        - ValueC
+            #template: __BodyC__
+        - ValueC2
+            #template: __BodyC2__  #keyword: dummy
+        - 1. ValueAt1
+        - 2. ValueAt2
+        - 3. ValueAt3
+            #template-at(-3): 1. __BodyAt1__
+            #template-at(-3): 2. __BodyAt2__
+            #template-at(-3): 3. __BodyAt3__
+        #test of empty line
+
+        - -(ValueD)-             #template: (__BodyD__)
+        - -(ValueE)-             #template: (__BodyE__)
+        - -(ValueF1)-(ValueF2)-  #template: (__BodyF1__)-(__BodyF2__)
+        - -(ValueG1)-(ValueG2)-  #template: (__BodyG1__)-(__BodyG2__)
+        - -\\"ValueLength\\"-'ValueLength'-
+            #template: \\"__BodyL__\\"-'__BodyL__'
+    settings: #settings: #// in second setting
+        __SubA__: SetSubA
+    body:
+        SetSubA   #template: __SubA__
+replace to original tag:
+    settings: #settings:
+        __ToOriginal_A__: value_0
+        __ToOriginal_B__: value_0
+    body:
+        value_0  #template: __ToOriginal_A__
+        value_0  #template: __ToOriginal_B__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 1_OK: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __SettingA__: SetAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __SettingB__: SetB#
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __SettingC__: SetCCCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __SettingD__: SetDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __SettingE__: SetEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #to: __SettingF__: SetFF
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:9: #to: __SettingG__: SetGG
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:28: #to: __BodyA__: ValueAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30: #to: __BodyB__: ValueBB
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:33: #to: __BodyC__: ValueCC
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36: #to: __BodyC2__: ValueCC2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:41: #to: __BodyAt1__: ValueAtAt1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:43: #to: __BodyAt2__: ValueAtAt2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44: #to: __BodyAt3__: ValueAtAt3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:47: #to: __BodyD__: ValueDD
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:48: #to: __BodyE__: ValueEE
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: #to: __BodyF1__: ValueFF1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:49: #to: __BodyF2__: ValueFF2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __BodyG1__: ValueGG1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __BodyG2__: ValueGG2
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:53: #to: __BodyL__: Valu
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:55: #to: __SubA__: SetSubAA
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:60: #to: __ToOriginal_A__: value_0
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:64: #to: __ToOriginal_B__: value_0
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 2_FileParameter: replacedFileContents 1`] = `
+"settings: #settings:
+    __SettingA__: SetAA  #original: SetA
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 2_FileParameter: resetFileContents 1`] = `
+"settings: #settings:
+    __SettingA__: SetA
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 2_FileParameter: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __SettingA__: SetAA
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 3_SimpleOneLoop: replacedFileContents 1`] = `
+"    settings: #settings: #// simple after template. This test must do one loop in replaceSettingsSub()
+        __SimpleA__: ValueAA  #original: ValueA
+    body:
+        ValueAA   #template: __SimpleA__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 3_SimpleOneLoop: resetFileContents 1`] = `
+"    settings: #settings: #// simple after template. This test must do one loop in replaceSettingsSub()
+        __SimpleA__: ValueA
+    body:
+        ValueA   #template: __SimpleA__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 3_SimpleOneLoop: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #to: __SimpleA__: ValueAA
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 4_IfBlock_OK: replacedFileContents 1`] = `
+"A:
+    settings: #settings:
+        __Switch0__: B  #original: A
+        case A:  #if: $settings.__Switch0__ == A
+            __Set0__: AA
+        case B:  #if: $settings.__Switch0__ == B
+            __Set0__: BB
+    body:
+        B   #template: __Switch0__
+        BB  #template: __Set0__
+
+B:
+    settings: #settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: aa  #original: AA
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB
+    body:
+        A   #template: __Switch1__
+        aa  #template: __Set1__
+
+C:
+    settings: #settings:
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: bb  #original: BB
+    body:
+        B   #template: __Switch2__
+        bb  #template: __Set2__
+
+in body:
+    settings: #settings:
+        __Switch2__: B  #original: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: bb  #original: BB
+    body:
+        B   #template: __Switch2__
+        bb  #template: __Set2__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 4_IfBlock_OK: resetFileContents 1`] = `
+"A:
+    settings: #settings:
+        __Switch0__: A
+        case A:  #if: $settings.__Switch0__ == A
+            __Set0__: AA
+        case B:  #if: $settings.__Switch0__ == B
+            __Set0__: BB
+    body:
+        A   #template: __Switch0__
+        AA  #template: __Set0__
+
+B:
+    settings: #settings:
+        __Switch1__: A
+        case A:  #if: $settings.__Switch1__ == A
+            __Set1__: AA
+        case B:  #if: $settings.__Switch1__ == B
+            __Set1__: BB
+    body:
+        A   #template: __Switch1__
+        AA  #template: __Set1__
+
+C:
+    settings: #settings:
+        __Switch2__: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB
+    body:
+        A   #template: __Switch2__
+        AA  #template: __Set2__
+
+in body:
+    settings: #settings:
+        __Switch2__: A
+        case A:  #if: $settings.__Switch2__ == A
+            __Set2__: AA
+        case B:  #if: $settings.__Switch2__ == B
+            __Set2__: BB
+    body:
+        A   #template: __Switch2__
+        AA  #template: __Set2__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 4_IfBlock_OK: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Switch0__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:25: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: #to: __Set2__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:42: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:43: #to: __Set2__: bb
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 4E_IfBlock_Error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: #to: __Switch2__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: #to: __Set2__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:36: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:40: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:47: #to: __Switch1__: B
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:50: #to: __Switch2__: D
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:52: #to: __Set1__: aa
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:54: #to: __Set1__: bb
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:56: #to: __Set2__: cc
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:58: #to: __Set2__: dd
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:16: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:52: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Error: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:56: \\"#to:\\" tag cannot write in false condition block. Write \\"#to:\\" tags to be true condition.
+
+Warning: 0, Error: 6
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 5_Conflict_Error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #to: __Set1__: B
+
+Error of conflict #to: tag:
+    variableName: __Set1__
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __Set1__: b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: #to: __Set1__: B
+
+Error of conflict #to: tag:
+    variableName: __Set1__
+    valueA: B in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10
+    valueB: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __Set1__: b
+
+Error of conflict #to: tag:
+    variableName: __Set1__
+    valueA: b in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18
+    valueB: c in \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: #to: __Set1__: c
+
+Warning: 0, Error: 3
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 6_VariousTags: replacedFileContents 1`] = `
+"settings: #settings:
+    __WithOriginalTag__: B  #original: a
+body:
+    B  #template: __WithOriginalTag__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 6_VariousTags: resetFileContents 1`] = `
+"settings: #settings:
+    __WithOriginalTag__: a
+body:
+    a  #template: __WithOriginalTag__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 6_VariousTags: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #to: __WithOriginalTag__: B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 7_VariableCount: replacedFileContents 1`] = `
+"settings: #settings:
+    __Set1A__: a  #original: A
+    __Set1B__: b  #original: B
+    __Set2A__: a  #original: A
+    __Set2B__: B
+    __Set3A__: A
+    __Set3B__: b  #original: B
+body:
+    a/b  #template: __Set1A__/__Set1B__
+    a/B  #template: __Set2A__/__Set2B__
+    A/b  #template: __Set3A__/__Set3B__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 7_VariableCount: resetFileContents 1`] = `
+"settings: #settings:
+    __Set1A__: A
+    __Set1B__: B
+    __Set2A__: A
+    __Set2B__: B
+    __Set3A__: A
+    __Set3B__: B
+body:
+    A/B  #template: __Set1A__/__Set1B__
+    A/B  #template: __Set2A__/__Set2B__
+    A/B  #template: __Set3A__/__Set3B__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 7_VariableCount: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: #to: __Set1A__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10: #to: __Set1B__: b
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __Set2A__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:14: #to: __Set3B__: b
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 7E_VariableCount_Error: stdout 1`] = `
+"
+ERROR: The parameter count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6:        #to: a
+    Variable count in the template tag: 2
+    Value count in the to tag: 1
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __SetA__: a
+
+ERROR: The parameter count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:        #to: a, b, c
+    Variable count in the template tag: 2
+    Value count in the to tag: 3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetA__: a
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #to: __SetB__: b
+
+ERROR: The parameter count in #to tag:
+    To tag: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:        #to: a
+    Variable count in the template tag: 0
+    Value count in the to tag: 1
+
+Warning: 0, Error: 3
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 8_ParentSettings: replacedFileContents 1`] = `
+"case 1:
+    settings: #settings:
+        __Parent1__: parent_replaced  #original: parent
+    nest:
+        settings: #settings:
+            __Set1__: value_replaced  #original: value
+        ref:
+            parent_replaced, value_replaced
+                #template: __Parent1__, __Set1__
+case 2:
+    settings: #settings:
+        __Parent2__: parent_replaced  #original: parent
+    nest:
+        settings: #settings:
+            __Set2__: value_replaced  #original: value
+        ref:
+            parent_replaced, value_replaced
+                #template: __Parent2__, __Set2__
+case 3:
+    settings: #settings:
+        __Parent3__: parent_replaced  #original: parent
+    nest:
+        settings: #settings:
+            __Set3__: value
+        ref:
+            parent, value
+    ref:
+        parent_replaced
+            #template: __Parent3__
+case 4:
+    settings: #settings:
+        __Parent4__: parent_replaced  #original: parent
+    nestA:
+        settings: #settings:
+            __Set4__: value_replaced_A  #original: value
+        ref:
+            parent_replaced, value_replaced_A
+                #template: __Parent4__, __Set4__
+    nestB:
+        settings: #settings:
+            __Set4__: value_replaced_B  #original: value
+        ref:
+            parent_replaced, value_replaced_B
+                #template: __Parent4__, __Set4__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 8_ParentSettings: resetFileContents 1`] = `
+"case 1:
+    settings: #settings:
+        __Parent1__: parent
+    nest:
+        settings: #settings:
+            __Set1__: value
+        ref:
+            parent, value
+                #template: __Parent1__, __Set1__
+case 2:
+    settings: #settings:
+        __Parent2__: parent
+    nest:
+        settings: #settings:
+            __Set2__: value
+        ref:
+            parent, value
+                #template: __Parent2__, __Set2__
+case 3:
+    settings: #settings:
+        __Parent3__: parent
+    nest:
+        settings: #settings:
+            __Set3__: value
+        ref:
+            parent, value
+    ref:
+        parent
+            #template: __Parent3__
+case 4:
+    settings: #settings:
+        __Parent4__: parent
+    nestA:
+        settings: #settings:
+            __Set4__: value
+        ref:
+            parent, value
+                #template: __Parent4__, __Set4__
+    nestB:
+        settings: #settings:
+            __Set4__: value
+        ref:
+            parent, value
+                #template: __Parent4__, __Set4__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> 8_ParentSettings: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Parent1__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:6: #to: __Set1__: value_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: #to: __Parent2__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:18: #to: __Set2__: value_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:29: #to: __Parent3__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: #to: __Parent4__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:38: #to: __Set4__: value_replaced_A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44: #to: __Parent4__: parent_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:44: #to: __Set4__: value_replaced_B
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E1_BugCase_IfBlock_DoubleCheck_Error: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:12: #to: __Full__: ValueB9_ValueB9
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
+    Error: template target values after replace are conflicted. You should add #to: tags at setting variables in other templates.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:         __Full__: ValueB1_ValueB2  #to: ValueB9_ValueB9
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8:         __Part__: ValueB1
+    replaced (1): ValueB9_ValueB9
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:11:         #template: __Full__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
+            Before Replacing: ValueB1_ValueB2
+            After  Replacing: ValueB9_ValueB9
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB9_ValueB9
+    replaced (2): ValueB1_ValueB2
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:13:         #template-at(-2): __Part__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
+            Before Replacing: ValueB1
+            After  Replacing: ValueB1
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:10:     ValueB1_ValueB2
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E2_BugCase_ParentSettings: replacedFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Parent1__: parent1
+    1:
+        settings: #settings:
+            __Parent11__: parent11
+        11:
+            settings: #settings:
+                __Parent111__: parent111
+            111:
+                settings: #settings:
+                    __Parent111__: parent111
+            112:
+                settings: #settings:
+                    __Variable__: valueB
+        ref:
+            valueA_replaced  #template: __Variable__
+        ref2:
+            valueA_replaced  #template: __Variable__
+root:
+settings: #settings:
+    __Variable__: valueA_replaced  #original: valueA
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E2_BugCase_ParentSettings: resetFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Parent1__: parent1
+    1:
+        settings: #settings:
+            __Parent11__: parent11
+        11:
+            settings: #settings:
+                __Parent111__: parent111
+            111:
+                settings: #settings:
+                    __Parent111__: parent111
+            112:
+                settings: #settings:
+                    __Variable__: valueB
+        ref:
+            valueA  #template: __Variable__
+        ref2:
+            valueA  #template: __Variable__
+root:
+settings: #settings:
+    __Variable__: valueA
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E2_BugCase_ParentSettings: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable__: valueA_replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E3_ReplaceIncludesPart: replacedFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Variable__: develop  #original: dev
+    develop  #template: __Variable__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E3_ReplaceIncludesPart: resetFileContents 1`] = `
+"bug case:
+    settings: #settings:
+        __Variable__: dev
+    dev  #template: __Variable__
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> E3_ReplaceIncludesPart: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #to: __Variable__: develop
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> bug_case_5: replacedFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21_replaced  #original: value21
+                #if: $settings.__Variable2__ == value2
+                    __Variable21A__: value21A
+                #if: $settings.__Variable2__ != value2
+                    __Variable21A__: value21A_replaced
+            ref:
+                value2_replaced, value21_replaced
+                #template: __Variable2__, __Variable21__
+            child:
+                settings: #settings:
+                    __Variable21__: value21_over  #// overwrite
+                    #if: $settings.__Variable2__ == value2
+                        __Variable211A__: value211A_1
+                    #if: $settings.__Variable2__ != value2
+                        __Variable211A__: value211A_replaced  #original: value211A_2
+                ref:
+                    [value2_replaced, value21_over, value21A_replaced, value211A_replaced]
+                    #template: [__Variable2__, __Variable21__, __Variable21A__, __Variable211A__]
+                ref in if:
+                    value211A_replaced
+                    #template: __Variable211A__
+    settings: #settings:
+        __Variable2__: value2_replaced  #original: value2
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> bug_case_5: resetFileContents 1`] = `
+"bug case:
+    1:
+        settings: #settings:
+            __Variable1__: value1
+root:
+    2:
+        21:
+            settings: #settings:
+                __Variable21__: value21
+                #if: $settings.__Variable2__ == value2
+                    __Variable21A__: value21A
+                #if: $settings.__Variable2__ != value2
+                    __Variable21A__: value21A_replaced
+            ref:
+                value2, value21
+                #template: __Variable2__, __Variable21__
+            child:
+                settings: #settings:
+                    __Variable21__: value21_over  #// overwrite
+                    #if: $settings.__Variable2__ == value2
+                        __Variable211A__: value211A_1
+                    #if: $settings.__Variable2__ != value2
+                        __Variable211A__: value211A_2
+                ref:
+                    [value2, value21_over, value21A, value211A_1]
+                    #template: [__Variable2__, __Variable21__, __Variable21A__, __Variable211A__]
+                ref in if:
+                    value211A_1
+                    #template: __Variable211A__
+    settings: #settings:
+        __Variable2__: value2
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> bug_case_5: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable2__: value2_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #to: __Variable21__: value21_replaced
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30: #to: __Variable211A__: value211A_replaced
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> settings_tree_if: replacedFileContents 1`] = `
+"section:
+    table:
+        cell:
+            - ValueA_Next      #template: __A__
+            - ValueB_Next      #template: __B__
+            - ValueC_Next      #template: __C__
+            - ValueD_Next      #template: __D__
+            - ValueE      #template: __E__
+        settings: #settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ == ValueB_Next
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC_Next  #original: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD_Next
+            __E__: ValueE
+settings: #settings:
+    a: #if: $settings.__A__ == ValueA_Next
+        __B__: ValueB_Next
+    b: #if: $settings.__A__ != ValueA_Next
+        __B__: ValueB
+    __A__: ValueA_Next  #original: ValueA
+    __B2__: ValueB2
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> settings_tree_if: resetFileContents 1`] = `
+"section:
+    table:
+        cell:
+            - ValueA      #template: __A__
+            - ValueB      #template: __B__
+            - ValueC      #template: __C__
+            - ValueD      #template: __D__
+            - ValueE      #template: __E__
+        settings: #settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ == ValueB_Next
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD_Next
+            __E__: ValueE
+settings: #settings:
+    a: #if: $settings.__A__ == ValueA_Next
+        __B__: ValueB_Next
+    b: #if: $settings.__A__ != ValueA_Next
+        __B__: ValueB
+    __A__: ValueA
+    __B2__: ValueB2
+"
+`;
+
+exports[`replaces >> settings >> replace to tag >> settings_tree_if: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:20: #to: __C__: ValueC_Next
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:30: #to: __A__: ValueA_Next
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_1_ok setting 2 >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:8: #original: Key3: value3
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:27: #original: key1: value11
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_6_if both >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: fruit: banana
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7: #original: __Setting1__: no
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_6_if in if block >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5: #original: __Setting1__: yes
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_6_if in if variable >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: fruit: banana
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_10_double_check 1_OK >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2: #original: __Full__: folder/file
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: __Folder__: folder
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #original: __File__: file
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_11_nested_if AB >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #original: __Switch2__: A
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_11_nested_if BA >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: __Switch1__: A
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_11_nested_if BB >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3: #original: __Switch1__: A
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:4: #original: __Switch2__: A
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> reset >> 2_replace_11_nested_if C >>: stdout 1`] = `
+"\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:17: #original: __Set2__: C
+
+Warning: 0, Error: 0
+"
+`;
+
+exports[`replaces >> settings >> verbose >> conflict: verbose 1`] = `
+"Verbose: Phase 3: replace ...
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.00
+    Verbose:     replace from: 1.2
+    Verbose:     replace to  : 2.00
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.00  #original: 1.2
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    Verbose:     replace from: version 1.2 beta
+    Verbose:     replace to  : ver. 2.4 beta
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+    Verbose: replace template variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose:     replace from: 1.2
+        Verbose:     replace to  : 2.00
+    Verbose: replaced
+        Verbose: before: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: after:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+    Verbose: replace template-at(-2) variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose:     replace from: version 1.2 beta
+        Verbose:     replace to  : ver. 2.4 beta
+    Verbose: check not conflicted:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose: replacingLine:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (version 1.2 beta)  #template: __Variable1__
+        Verbose: replace from: version 1.2 beta
+        Verbose: replace to  : ver. 2.4 beta
+        Verbose: replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (_____________)  #template: __Variable1__
+        Verbose: replace from: 1.2
+        Verbose: replace to  : 2.00
+    Verbose: replaced
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+
+\${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+    Error: template target values after replace are conflicted. You should add #to: tags at setting variables in other templates.
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.00
+    \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    replaced (1): (version 2.00 beta)  #template: __Variable1__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+            Before Replacing: 1.2
+            After  Replacing: 2.00
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.00 beta)  #template: __Variable1__
+    replaced (2): (ver. 2.4 beta)  #template: __Variable1__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+            Before Replacing: version 1.2 beta
+            After  Replacing: ver. 2.4 beta
+        \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+
+Warning: 0, Error: 1
+"
+`;
+
+exports[`replaces >> settings >> verbose >> no conflict: verbose 1`] = `
+"Verbose: Phase 3: replace ...
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 1.2  #to: 2.4
+    Verbose:     replace from: 1.2
+    Verbose:     replace to  : 2.4
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:2:     __Variable1__: 2.4  #original: 1.2
+    Verbose: replace a setting: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: version 1.2 beta  #to: ver. 2.4 beta
+    Verbose:     replace from: version 1.2 beta
+    Verbose:     replace to  : ver. 2.4 beta
+    Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:3:     __Variable2__: ver. 2.4 beta  #original: version 1.2 beta
+    Verbose: replace template variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose:     replace from: 1.2
+        Verbose:     replace to  : 2.4
+    Verbose: replaced
+        Verbose: before: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: after:  \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 2.4 beta)  #template: __Variable1__
+    Verbose: replace template-at(-2) variables
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose:     replace from: version 1.2 beta
+        Verbose:     replace to  : ver. 2.4 beta
+    Verbose: check not conflicted:
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+        Verbose: replacingLine:     (version 1.2 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (version 1.2 beta)  #template: __Variable1__
+        Verbose: replace from: version 1.2 beta
+        Verbose: replace to  : ver. 2.4 beta
+        Verbose: replacingLine:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: maskedLine   :     (_____________)  #template: __Variable1__
+        Verbose: replace from: 1.2
+        Verbose: replace to  : 2.4
+        Verbose: wasReplaced = true
+    Verbose: replaced
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:5:     (ver. 2.4 beta)  #template: __Variable1__
+        Verbose: \${HOME}/GitProjects/GitHub/typrm/src/test_data/_tmp/_tmp.yaml:7:     #template-at(-2): __Variable2__
+
+Warning: 0, Error: 0
 "
 `;
 

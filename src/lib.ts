@@ -958,17 +958,17 @@ export async function  parseCSVColumns(columns: string): Promise<string[]> {
     // The inside quote should be parsed as a character data in the column.
     if ( columns[0] === '"'  ||  columns.includes(',')) {
         return new Promise((resolveFunction, rejectFunction) => {
-            var  columnArray: string[] = [];
+            var  parsedColumns: string[] = [];
 
             stream.Readable.from(columns)
                 .pipe(
                     csvParse.parse({ quote: '"', ltrim: true, rtrim: true, delimiter: ',' })
                 )
                 .on('data', (columns: string[]) => {
-                    columnArray = columns;
+                    parsedColumns = columns;
                 })
                 .on('end', () => {
-                    resolveFunction(columnArray);
+                    resolveFunction(parsedColumns);
                 })
                 .on('error', (e: Error) => {
                     e.message = `Error in csv-parse module. Parsing CSV is:\n${columns}\n${e.message}`;

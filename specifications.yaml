@@ -23,16 +23,16 @@ command: #keyword: typrm command list
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
-                    # // keyword tag  #// (#keyword:)
+                    // keyword tag:  #// (#keyword:)
                         getKeywordMatchingScore: #🌟  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
-                            getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts#function  getSubMatchedScore
+                            __getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts# #__getSubMatchedScore
                             # if (useThesaurus) {
                                 thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
-                                getSubMatchedScore:
+                                __getSubMatchedScore:
                             setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
                         plusParentMatchScore: #keyword:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
                         # foundLines.push(found);
-                    # // glossary tag  #// (#glossary:)
+                    // glossary tag:  #// (#glossary:)
                         #  if (glossaryTag) {
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
@@ -233,12 +233,35 @@ test:
             コードの説明:
                 IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
 debug:
-    Print all log:  #// Break at last of operations.
-        How to use: Cut comment out of debug code. Near the "Debug last print" in "main.ts"
-    debugSearchScore:
-        How to use: Set to true. Near the "debugSearchScore" in "main.ts"
-    coloredStrings:
-        How to use: Cut comment out of debug code. Near the "coloredStrings" in "main.ts"
+    debugger:  #// Debug with Visual Studio Code
+        Debug from launch:
+            $ export __Variables__=__Value__
+            $ code __Project__
+            Select "Debug from launch" in "Run and Debug" view
+            Press F5 key
+        Others:
+            $ code __Project__
+            Select "__LaunchName__" in "Run and Debug" view
+            Press F5 key
+    functions:  #// typrm functions debug
+        Search function debug points:
+            How to use:
+                - Set "debugPointLineNum" and "debugFilePathPart" in "main.ts"
+                - Enable "Print all log"
+        Search result order:
+            compareScoreAndSoOn:  #// This shows a compare reason.
+                How to use:
+                    - Change comment out in "compareScoreAndSoOn" in "main.ts"
+                    - Set "debugLineNum" value in "compareScoreAndSoOnDebug" in "main.ts"
+                    - Enable "Print all log"
+            debugSearchScore:  #// This shows matched keyword scores.
+                How to use: Set to true. Near the "debugSearchScore" in "main.ts"
+        Search result color:  #// This shows colored string parts.
+            How to use: Cut comment out of debug code. Near the "coloredStrings" in "main.ts"
+        DebugWatchPoint: #keyword: typrm DebugWatchPoint
+            How to use:
+                - Cut comment out of debug code. Near the "DebugWatchPoint" in "main.ts"
+                - Break at last of operations.
 other specifications:
     start up:
         start from shell:

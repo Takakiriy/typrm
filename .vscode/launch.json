@@ -22,7 +22,7 @@
             "preLaunchTask": "TypeScript Compile Task",
             "program": "${workspaceFolder}/src/typrm.ts",
             "runtimeArgs": ["--experimental-specifier-resolution=node"],
-            "args": ["check", "--verbose"],
+            "args": ["key"],  // "check", "--verbose"
             "cwd": "${workspaceFolder}/src",
             "smartStep": true,
             "outFiles": [
@@ -36,12 +36,13 @@
             "processId": "${command:PickProcess}"
         },
         {
-            "name": "Debug Jest Tests",
+            "name": "Debug Posix Jest Tests",
             "type": "node",
             "request": "launch",
             "runtimeArgs": [
                 "--inspect-brk",
                 "${workspaceRoot}/node_modules/.bin/jest",
+                "main",
                 "--runInBand",
                 "--coverage", "false"],
             "console": "integratedTerminal",
@@ -54,6 +55,7 @@
             "runtimeArgs": [
                 "--inspect-brk",
                 "${workspaceRoot}/node_modules/jest/bin/jest.js",
+                "main",
                 "--runInBand",
                 "--coverage", "false"
             ],

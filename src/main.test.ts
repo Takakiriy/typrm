@@ -154,7 +154,7 @@ describe("typrm shell >>", () => {
     });
 });
 
-describe("checks template value >>", () => {
+describe("checks >> template value >>", () => {
     test.each([
         ["1_template_1_ok", {}],
         ["1_template_2_error", {}],
@@ -270,7 +270,7 @@ describe("checks template value >>", () => {
     });
 });
 
-describe("checks file contents >>", () => {
+describe("checks >> file contents >>", () => {
     test.each([
         [   "OK",
         ],[ "NG",
@@ -326,7 +326,7 @@ describe("checks file contents >>", () => {
     });
 });
 
-describe("checks copy tag >>", () => {
+describe("checks >> copy tag >>", () => {
     const  goodColor = chalk.bgGreen.black;
     const  badColor = chalk.bgRed.black;
     test.each([
@@ -400,7 +400,7 @@ describe("checks copy tag >>", () => {
     });
 });
 
-describe("replaces settings >>", () => {
+describe("replaces >> settings >>", () => {
     test.each([
         [   '1_replace', '', 'en-US', null,
 
@@ -774,7 +774,7 @@ describe("replaces settings >>", () => {
     });
 });
 
-describe("replaces in copy tag >>", () => {
+describe("replaces >> in copy tag >>", () => {
     test.each([
         ['template >> 1'],
         ['template >> error_not_found_variable'],
@@ -795,8 +795,7 @@ describe("replaces in copy tag >>", () => {
     });
 });
 
-describe("searches keyword tag >>", () => {
-    test.skip('sharp (best)',()=>{});
+describe("searches >> keyword tag >>", () => {
     test.each([
         [   "1st",
             ["search", "ABC"],
@@ -924,27 +923,28 @@ describe("searches keyword tag >>", () => {
         ],[ "participle_is_better_than_different_case",
             ["search", "str"],
             { folder: "test_data/search/2", test: "", "foundCountMax": "40" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':241:') + `     full 12: ${matchedColor('str')}ipe\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':240:') + `     full 11: ${matchedColor('STR')}S\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     full 2:  ${matchedColor('str')}.\n` +  // "str length" is prior than "str.length"
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     full 8c: ${matchedColor('strer')} replace\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':238:') + `     full 8b: ${matchedColor('stred')} replace\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':237:') + `     full 8a: ${matchedColor('strs')} replace\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':236:') + `     full 7:  ${matchedColor('str')} replace\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':235:') + `     full 6b: ${matchedColor('STRs')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':234:') + `     full 6a: ${matchedColor('STR')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':233:') + `     full 3d: ${matchedColor('string')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':232:') + `     full 3c: ${matchedColor('strer')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':231:') + `     full 3b: ${matchedColor('stred')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':230:') + `     full 3a: ${matchedColor('strs')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':228:') + `     full 1:  ${matchedColor('str')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':227:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':226:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}S\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.\n` +  // "str length" is prior than "str.length"
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':242:') + `     full 12: ${matchedColor('str')}ipe\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':241:') + `     full 11: ${matchedColor('STR')}S\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':230:') + `     full 2:  ${matchedColor('str')}.\n` +  // "str length" is prior than "str.length"
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':240:') + `     full 8c: ${matchedColor('strer')} replace\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':239:') + `     full 8b: ${matchedColor('stred')} replace\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':238:') + `     full 8a: ${matchedColor('strs')} replace\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':237:') + `     full 7:  ${matchedColor('str')} replace\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':236:') + `     full 6b: ${matchedColor('STRs')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':235:') + `     full 6a: ${matchedColor('STR')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':234:') + `     full 3d: ${matchedColor('string')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':233:') + `     full 3c: ${matchedColor('strer')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':232:') + `     full 3b: ${matchedColor('stred')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':231:') + `     full 3a: ${matchedColor('strs')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':229:') + `     full 1:  ${matchedColor('str')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':228:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':227:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}S\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':226:') + `     8d: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.replace\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':225:') + `     8c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')} replace\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':224:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':223:') + `     8a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')} replace\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':222:') + `     7:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')} replace\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':221:') + `     6b: ${keywordLabelColor('#keyword:')} ${matchedColor('STRs')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':220:') + `     6a: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':219:') + `     3d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')}\n` +
@@ -964,6 +964,13 @@ describe("searches keyword tag >>", () => {
             { folder: "test_data/search/2", test: "", "foundCountMax": "20" },
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':261:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('nex')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':262:') + `     ${matchedColor('nex')}t ${matchedColor('pre')}v\n`,
+
+        ],[ "keyword_tag_and_comment_matched_bug_case",
+            ["search", "happy", "turn"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':333:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('happy')}  #// ${matchedColor('turn')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':332:') + `     ${keywordLabelColor('#keyword:')} dummy, ${matchedColor('happy')} ${matchedColor('turn')} 2\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':331:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('happy')} ${matchedColor('turn')}\n`,
 
         ],[ "special_participle",
             ["search", "save", "class"],
@@ -992,9 +999,9 @@ describe("searches keyword tag >>", () => {
         ],[ "few_word_count",  // related test case is multiple_search_words_hit_is_better_than_one_word
             ["search", "mini bluetooth speaker"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':244:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':243:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
-            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':245:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':349:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':348:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':350:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator",
             ["search", "docker compose down00"],
@@ -1229,10 +1236,11 @@ describe("searches keyword tag >>", () => {
                 ["search", "ts file"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ts')}x ${matchedColor('file')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('TypeScript')} ${matchedColor('file')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} JavaScript ${matchedColor('file')} (${matchedColor('TypeScript')} ${matchedColor('file')})\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('TypeScript')} ${matchedColor('file')})\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('TypeScript')} ${matchedColor('file')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ts')} ${matchedColor('file')}\n`,
+                    // "ts file" must first priority. Other either order is fine.
 
             ],[ "normalized_word_match_2",
                 ["search", "js file"],
@@ -1245,12 +1253,13 @@ describe("searches keyword tag >>", () => {
                 ["search", "rc file"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':10:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')}t ${matchedColor('file')}\n` +
-                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('React')} ${matchedColor('file')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} TypeScript ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} JavaScript ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ts ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
+                pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('React')} ${matchedColor('file')}\n` +
                 pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/_checking/thesaurus/1.yaml') + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')} ${matchedColor('file')}\n`,
+                    // "rc file" must first priority. Other either order is fine.
 
             ],[ "error_of_circular_reference",
                 ["search", "ts"],
@@ -1456,6 +1465,16 @@ describe("searches keyword and parent >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':311:') + `             ${matchedColor('parent2K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':315:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')} ${matchedColor('parent2K')}\n`,
 
+        ],[ "order of keyword glossary and parent",
+            ["search", "command option"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':343:') + `     ${matchedColor('command option')}:\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':336:') + ` ${matchedColor('command')} >>         ${keywordLabelColor('#keyword:')} ${matchedColor('option')}\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':337:') + `     4: ${keywordLabelColor('#keyword:')} ${matchedColor('command')} ${matchedColor('option')} letter\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':339:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('command')}:        ${matchedColor('option')}:\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':341:') + ` ${keywordLabelColor('#glossary:')} 2:        ${matchedColor('command')} ${matchedColor('option')}:\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':342:') + `     1: ${keywordLabelColor('#keyword:')} ${matchedColor('command')} ${matchedColor('option')}\n`,
+
         ],[ "1st line matched case",
             ["search", "child3", "aaa"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
@@ -1546,6 +1565,12 @@ describe("find all >>", () => {
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':151:') + `     ${matchedColor(`- find_search_tag_3`)} :\n` +
             pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':150:') + `     ${matchedColor(`- find_search_tag_3`)}\n`,
                 // The order does not matter
+
+        ],[ "part match",
+            ["search", "thesau"],
+            { folder: "test_data/search/2", test: "", locale: "en-US" },
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':346:') + `     ${matchedColor(`thesau`)}rus.csv:\n` +
+            pathColor('${HOME}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml') + lineNumColor(':345:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor(`thesau`)}rus.csv\n`,
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 
@@ -2012,6 +2037,120 @@ describe("unit test >>", () => {
             expect(toTagTree.replaceTo).toMatchSnapshot('replaceTo');
             lib.rmdirSync(testFolderPath + '_tmp');
         });
+    });
+    describe("FoundLine >> notMatchedTargetWordCount >>", () => {
+        test("1. str", () => {
+            const  targetKeyphrase = "str";
+            const  found = Object.assign(new main.private_.FoundLine(),{
+                line: "    8d: #keyword: " + targetKeyphrase,
+                //     0         1         2         3
+                targetWordCount: 1,
+                matches: [Object.assign(new main.private_.MatchedPart(), { 
+                    position: 0,
+                    matchedString: "str",
+                    targetWordsIndex: 0,
+                    searchWordIndex: 0,
+                    targetType: "strict",
+                    targetTagType: "keyword",
+                    matchedWordType: "wordOrIdiom",
+                    caseSensitiveMatched: true,
+                })],
+            });
+
+            found.notMatchedTargetKeyphrase = __getNotMatchedTargetKeyphrase(
+                targetKeyphrase, found);
+            expect(found.notMatchedTargetWordCount).toBe(0);
+        });
+        test("2. str.replace", () => {
+            const  targetKeyphrase = "str.replace";
+            const  found = Object.assign(new main.private_.FoundLine(),{
+                line: "    8d: #keyword: " + targetKeyphrase,
+                //     0         1         2         3
+                targetWordCount: 1,
+                matches: [Object.assign(new main.private_.MatchedPart(), { 
+                    position: 0,
+                    matchedString: "str",
+                    targetWordsIndex: 0,
+                    searchWordIndex: 0,
+                    targetType: "strict",
+                    targetTagType: "keyword",
+                    matchedWordType: "wordOrIdiomWord",
+                    caseSensitiveMatched: true,
+                })],
+            });
+
+            found.notMatchedTargetKeyphrase = __getNotMatchedTargetKeyphrase(
+                targetKeyphrase, found);
+            expect(found.notMatchedTargetWordCount).toBe(1);
+        });
+        test("3. str replace", () => {
+            const  targetKeyphrase = "str replace";
+            const  found = Object.assign(new main.private_.FoundLine(), {
+                line: "    7:  #keyword: " + targetKeyphrase,
+                //     0         1         2         3
+                targetWordCount: 2,
+                matches: [Object.assign(new main.private_.MatchedPart(), { 
+                    position: 0,
+                    matchedString: "str",
+                    targetWordsIndex: 0,
+                    searchWordIndex: 0,
+                    targetType: "strict",
+                    targetTagType: "keyword",
+                    matchedWordType: "wordOrIdiom",
+                    caseSensitiveMatched: true,
+                })],
+            });
+
+            found.notMatchedTargetKeyphrase = __getNotMatchedTargetKeyphrase(
+                targetKeyphrase, found);
+            expect(found.notMatchedTargetWordCount).toBe(1);
+        });
+        test("4. str and replace", () => {
+            // ToDo Test case keyword "str replace". It matches "str" and "replace"
+            const  targetKeyphrase = "str replace";
+            const  found = Object.assign(new main.private_.FoundLine(), {
+                line: "    7:  #keyword: " + targetKeyphrase,
+                //     0         1         2         3
+                targetWordCount: 2,
+                matches: [Object.assign(new main.private_.MatchedPart(), { 
+                    position: 0,
+                    matchedString: "str",
+                    targetWordsIndex: 0,
+                    searchWordIndex: 0,
+                    targetType: "strict",
+                    targetTagType: "keyword",
+                    matchedWordType: "wordOrIdiom",
+                    caseSensitiveMatched: true,
+                }),Object.assign(new main.private_.MatchedPart(), { 
+                    position: 4,
+                    matchedString: "replace",
+                    targetWordsIndex: 0,
+                    searchWordIndex: 0,
+                    targetType: "strict",
+                    targetTagType: "keyword",
+                    matchedWordType: "wordOrIdiom",
+                    caseSensitiveMatched: true,
+                })],
+            });
+
+            found.notMatchedTargetKeyphrase = __getNotMatchedTargetKeyphrase(
+                targetKeyphrase, found);
+            expect(found.notMatchedTargetWordCount).toBe(0);
+        });
+        const  __getNotMatchedTargetKeyphrase = main.private_.GetKeywordMatchingScore.Class.__getNotMatchedTargetKeyphrase;
+    });
+    describe("searchTargetKeyphrasePosition >>", () => {
+        test.each([
+            //                0         1         2         3
+            ["1st",          "title: #keyword: Title", [15], [17]],
+            ["no_parameter", "    title: #keyword:", [19], [4]],
+            ["CSV-1",        "    title: #keyword: Title 1, Title 2", [19, 28], [21, 30]],
+            ["quoted_CSV",   '#keyword: ABC, "do it", "a,b"', [8, 14, 23], [10, 16, 25]],
+        ])("%s", async (caseName, line, separatorPositions, answer: number[]) => {
+
+            expect(searchTargetKeyphrasePositions(line, separatorPositions)).toEqual(answer);
+        });
+        const  searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
     });
 });
 

@@ -1,3 +1,8 @@
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
 import * as fs from 'fs'; // file system
 import * as path from "path";
 import * as readline from 'readline';
@@ -11,6 +16,9 @@ import sharp from 'sharp';
 // import { pp, ff, cc, ccCount } from "./lib";
 var __dirname = path.resolve();
 var debugSearchScore = false;
+var debugPointLineNum = 0; // 0 = not debug. Search "debugPointLineNum" in this file.
+var debugFilePathPart = "search/2/2.yaml"; // This is used, if "debugPointLineNum" != 0
+var inDebuggingLine = false;
 // main
 export async function main() {
     startTestRedirect();
@@ -22,14 +30,14 @@ export async function main() {
         if (programOptions.stdoutBuffer) {
             process.stdout.write(stdout);
         }
-        // Debug last print - without Jest
-        // if (true) {
-        //     var    d = lib.pp('');
-        //     const  s = getStdOut();
-        //     d = [];  // Set break point here and watch the variable d
-        //     // If exception was raised, this code does not execute.
-        //     // Set a break point at the catch block of calling "main.main"
-        // }
+        DebugWatchPoint();
+    }
+}
+function DebugWatchPoint() {
+    if (true) {
+        var d = lib.pp('');
+        const s = getStdOut();
+        d = []; // Set break point here and watch the variable d
     }
 }
 // mainMain
@@ -342,7 +350,7 @@ function getVariablesForErrorMessage(indent, variableNames, settingTree, lines, 
                         if (options.replaceToTag) {
                             if (variableName in options.replaceToTag) {
                                 if (line.indexOf(' #to:') == notFound) {
-                                    const before = getValue(line, line.indexOf(':'));
+                                    const before = getTagValue(line, line.indexOf(':'));
                                     const after = options.replaceToTag[variableName].value;
                                     if (after !== before) {
                                         line = line.trimRight() + `  #to: ${after}`;
@@ -642,7 +650,7 @@ async function makeSettingTree(parser) {
             const separator = line.indexOf(':');
             if (separator !== notFound) {
                 const key = line.substring(0, separator).trim();
-                const value = getValue(line, separator);
+                const value = getTagValue(line, separator);
                 if (value !== '' && key.length >= 1 && key[0] !== '#') {
                     const previous = setting[key];
                     if (key in setting && value !== previous.value) {
@@ -660,7 +668,7 @@ async function makeSettingTree(parser) {
                     const currentSetting = settingStack[settingStack.length - 2];
                     const sameAsIndex = line.indexOf(' ' + SameAsTag.label);
                     if (sameAsIndex != notFound) {
-                        var sameAs = getValue(line, sameAsIndex + SameAsTag.label.length + 1);
+                        var sameAs = getTagValue(line, sameAsIndex + SameAsTag.label.length + 1);
                     }
                     else {
                         var sameAs = '';
@@ -679,7 +687,7 @@ async function makeSettingTree(parser) {
         // Set condition by "#if:" tag.
         const ifPosition = ifLabelRE.exec(line);
         if (ifPosition && !line.includes(disableLabel)) {
-            const condition = getValue(line, ifPosition.index + ifPosition[0].length);
+            const condition = getTagValue(line, ifPosition.index + ifPosition[0].length);
             tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
             setting = {};
             const setting_ = settingStack[settingStack.length - 2];
@@ -855,13 +863,13 @@ async function makeReplaceToTagTree(parser, settingTree) {
                     const keyOrNot = line.substring(0, separator).trim();
                     if (keyOrNot[0] !== '#') {
                         variableName = keyOrNot;
-                        value = getValue(line, separator);
+                        value = getTagValue(line, separator);
                     }
                 }
             }
             var toLabelIndex = line.indexOf(toLabel);
             if (toLabelIndex !== notFound) {
-                var toValue = getValue(line, toLabelIndex + toLabel.length - 1);
+                var toValue = getTagValue(line, toLabelIndex + toLabel.length - 1);
             }
             else {
                 var toValue = '';
@@ -1040,7 +1048,7 @@ async function makeOriginalTagTree(parser, settingTree) {
                     }
                 }
                 if (variableName !== '' && originalLabelIndex != notFound) {
-                    var originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
+                    var originalValue = getTagValue(line, originalLabelIndex + originalLabel.length - 1);
                     if (parser.verbose) {
                         console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:`);
                         console.log(`    Verbose:     ${variableName}: #original: ${originalValue}`);
@@ -1098,7 +1106,6 @@ async function makeTemplatesInCopyTag(replacingLines) {
         var copyTagIndent = '';
         var copyTagName = '';
         var copyTagLineNum = 0;
-        var copyTagParameterNames = [];
         for await (const line1 of reader) {
             const line = line1;
             lineNum += 1;
@@ -1106,7 +1113,7 @@ async function makeTemplatesInCopyTag(replacingLines) {
                 if (line.startsWith(copyTagIndent)) {
                     const templateIndex = line.indexOf(' ' + templateLabel);
                     if (templateIndex !== notFound) {
-                        const template = getValue(line, templateIndex + templateLabel.length + 1);
+                        const template = getTagValue(line, templateIndex + templateLabel.length + 1);
                         templatesInCopyTag.push({
                             copyTagName,
                             lineNumOffset: lineNum - copyTagLineNum,
@@ -1155,7 +1162,7 @@ function getReplacedLineInSettings(line, separator, oldValue, replacedValue, add
     const originalLabelIndex = line.indexOf(originalLabel);
     const lineIncludesOriginalLabel = (originalLabelIndex !== notFound);
     if (addOriginalTag && lineIncludesOriginalLabel) {
-        const originalValue = getValue(line, originalLabelIndex + originalLabel.length - 1);
+        const originalValue = getTagValue(line, originalLabelIndex + originalLabel.length - 1);
         if (replacedValue === originalValue) {
             cutOriginalTag = true;
         }
@@ -1312,7 +1319,7 @@ class TemplateTag {
                 this.onFileTemplateTagReading(line);
             }
             this.template = line.substr(this.indexInLine + this.label.length).trim();
-            this.template = getValue(this.template);
+            this.template = getTagValue(this.template);
             if (leftOfTemplate === '') {
                 this.lineNumOffset = -1;
             }
@@ -1888,10 +1895,10 @@ async function replaceSub(inputFilePath, parser, command) {
                 const copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
                 if (copyTagIndex !== notFound || copyTemplateTagIndex !== notFound) {
                     if (copyTagIndex !== notFound) { // if copyTagIndex
-                        var copyTagValue = getValue(line, copyTagIndex + copyLabel.length);
+                        var copyTagValue = getTagValue(line, copyTagIndex + copyLabel.length);
                     }
                     else { // if copyTemplateTagIndex
-                        var copyTagValue = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
+                        var copyTagValue = getTagValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
                     }
                     const firstCommaIndex = copyTagValue.indexOf(',');
                     if (firstCommaIndex !== notFound) {
@@ -1955,7 +1962,7 @@ async function replaceSub(inputFilePath, parser, command) {
                         var currentIsOutOfFalse = settingTree.currentIsOutOfFalseBlock;
                     }
                     if (key in oldSetting && replacingKeys.includes(key) && currentIsOutOfFalse) {
-                        const oldValue = getValue(line, separator);
+                        const oldValue = getTagValue(line, separator);
                         // This is not "oldSetting[key].value", because it adds bad #original tag in #if tag block.
                         var newValue = newSetting[key].value;
                         if (newValue !== oldValue) {
@@ -2329,7 +2336,7 @@ var CopyTag;
                 if (copyTagIndex !== notFound || copyTemplateTagIndex !== notFound) {
                     // if copyLabel
                     if (copyTagIndex !== notFound) {
-                        const value = getValue(line, copyTagIndex + copyLabel.length);
+                        const value = getTagValue(line, copyTagIndex + copyLabel.length);
                         const firstCommaIndex = value.indexOf(',');
                         if (firstCommaIndex === notFound) {
                             var copyName = value;
@@ -2351,7 +2358,7 @@ var CopyTag;
                         // if copyTemplateLabel
                     }
                     else {
-                        const value = getValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
+                        const value = getTagValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
                         const firstCommaIndex = value.indexOf(',');
                         if (firstCommaIndex === notFound) {
                             var copyName = value;
@@ -2490,7 +2497,7 @@ var CopyTag;
                         lineNum,
                         line,
                         tagName: copyTemplateLabel,
-                        value: getValue(line, copyTagIndex + copyTemplateLabel.length),
+                        value: getTagValue(line, copyTagIndex + copyTemplateLabel.length),
                         copyName,
                         contents: [],
                         arguments: {},
@@ -2893,13 +2900,13 @@ async function searchSub(keyword, isMutual) {
     const searchTagIndex = tagIndexOf(keyword, searchLabel);
     var foundTag = false;
     if (searchTagIndex !== notFound) {
-        keywordWithoutTag = getValue(keyword, searchTagIndex + searchLabel.length);
+        keywordWithoutTag = getTagValue(keyword, searchTagIndex + searchLabel.length);
         foundTag = true;
     }
     else {
         const keywordTagIndex = tagIndexOf(keyword, keywordLabel);
         if (keywordTagIndex !== notFound) {
-            keywordWithoutTag = getValue(keyword, keywordTagIndex + keywordLabel.length);
+            keywordWithoutTag = getTagValue(keyword, keywordTagIndex + keywordLabel.length);
             foundTag = true;
         }
     }
@@ -2949,6 +2956,10 @@ async function searchSub(keyword, isMutual) {
             const currentIndentLength = currentIndent.length;
             const indexOfKeywordLabel = line.indexOf(keywordLabel);
             const indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
+            inDebuggingLine = (lineNum === debugPointLineNum && inputFileFullPath.includes(debugFilePathPart));
+            if (inDebuggingLine) {
+                console.log(`DEBUG: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
+            }
             // score tag
             if (line !== '') {
                 var scoreChaging = false;
@@ -2966,7 +2977,7 @@ async function searchSub(keyword, isMutual) {
                 if (scoreTagIndex !== notFound) {
                     const scoreTag = {
                         indentPosition: scoreTagIndex,
-                        plusScore: parseInt(getValue(line, scoreTagIndex + scoreLabel.length)),
+                        plusScore: parseInt(getTagValue(line, scoreTagIndex + scoreLabel.length)),
                     };
                     scoreTags.push(scoreTag);
                     scoreChaging = true;
@@ -2984,13 +2995,15 @@ async function searchSub(keyword, isMutual) {
                     var label = keywordLabel;
                     var indexOfLabel = indexOfKeywordLabel;
                     var labelLength = keywordLabel.length;
+                    var targetTagType = 'keyword';
                 }
                 else {
                     var label = searchLabel;
                     var indexOfLabel = indexOfSearchLabelIfMutual;
                     var labelLength = searchLabel.length;
+                    var targetTagType = 'search';
                 }
-                var csv = getValue(line, indexOfLabel + labelLength); // keywords, target words
+                var csv = getTagValue(line, indexOfLabel + labelLength); // keywords, target words
                 if (csv !== '') {
                     var withParameter = true;
                 }
@@ -3003,7 +3016,22 @@ async function searchSub(keyword, isMutual) {
                     console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
                     return [];
                 });
-                let found = getKeywordMatchingScore(columns, keywordsParticples, thesaurus);
+                const columnPositions = lib.parseCSVColumnPositions(csv, columns);
+                if (inDebuggingLine) { // debugPointLineNum
+                    console.log(`DEBUG: keyword tag block in searchSub`);
+                    console.log(`DEBUG: calling getKeywordMatchingScore`);
+                }
+                let found = getKeywordMatchingScore({
+                    targetTagType,
+                    glossaryTitleLength: 0,
+                    targetStrings: columns,
+                    filePath: inputFileFullPath,
+                    keywordsParticples, thesaurus, lineNum
+                });
+                if (inDebuggingLine) { // debugPointLineNum
+                    console.log(`DEBUG: matchedSearchKeywordCount: ${found.matchedSearchKeywordCount}`);
+                    console.log(`DEBUG: getKeywordMatchingScore returns: ${JSON.stringify(found, null, '    ')}`);
+                }
                 if (found.matchedSearchKeywordCount >= 1) {
                     const unescapedLine = unescapePercentByte(line);
                     if (withParameter) {
@@ -3012,13 +3040,11 @@ async function searchSub(keyword, isMutual) {
                     else {
                         var positionOfCSV = unescapedLine.indexOf(csv);
                     }
-                    const columnPositions = lib.parseCSVColumnPositions(csv, columns);
                     found.score += keywordMatchScore + plusScore;
                     found.path = inputFileFullPath;
                     found.lineNum = lineNum;
                     found.line = unescapedLine;
                     found.indentLength = indentRegularExpression.exec(line)[0].length;
-                    found.tagLabel = label;
                     for (const match of found.matches) {
                         match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
                         // match.normalizedPosition += positionOfCSV + columnPositions[match.targetWordsIndex];
@@ -3062,16 +3088,16 @@ async function searchSub(keyword, isMutual) {
                     }
                 }
                 if (line.includes(glossaryLabel) && !line.includes(disableLabel) && !blockDisable.isInBlock) {
-                    var glossaryWords = getValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
-                    if (glossaryWords !== '') {
-                        glossaryWords += ' '; // ' ' is a word separator
+                    var glossaryTitle = getTagValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
+                    if (glossaryTitle !== '') {
+                        glossaryTitle += ' '; // ' ' is a word separator
                     }
                     else {
-                        glossaryWords = parseKeyName(line) + ' '; // Keywords at the left of glossary tag
+                        glossaryTitle = parseKeyName(line) + ' '; // Keywords at the left of glossary tag
                     }
                     glossaryTags.push({
                         indentPosition: -1,
-                        glossaryWords,
+                        glossaryTitle,
                         indentAtTag: indentRegularExpression.exec(line)[0],
                         indentAtFirstContents: '',
                     });
@@ -3087,25 +3113,33 @@ async function searchSub(keyword, isMutual) {
                     }
                     else {
                         const colonPosition = line.indexOf(':', currentIndent.length);
-                        const wordInGlossary = glossaryTag.glossaryWords +
-                            line.substr(currentIndent.length, colonPosition - currentIndent.length);
-                        const found = getKeywordMatchingScore([wordInGlossary], keywordsParticples, thesaurus);
+                        const wordsWithGlossary = glossaryTag.glossaryTitle +
+                            line.substring(currentIndent.length, colonPosition);
+                        if (inDebuggingLine) {
+                            console.log(`DEBUG: in glossary block in searchSub`);
+                        }
+                        const found = getKeywordMatchingScore({
+                            targetTagType: 'glossary',
+                            glossaryTitleLength: glossaryTag.glossaryTitle.length,
+                            targetStrings: [wordsWithGlossary],
+                            filePath: inputFileFullPath,
+                            keywordsParticples, thesaurus, lineNum
+                        });
                         if (found.partMatchedTargetKeywordCount >= 1 && colonPosition !== notFound) {
                             found.score += glossaryMatchScore + plusScore;
                             found.path = inputFileFullPath;
                             found.lineNum = lineNum;
                             found.indentLength = currentIndent.length;
-                            found.tagLabel = glossaryLabel;
-                            if (glossaryTag.glossaryWords === '') {
+                            if (glossaryTag.glossaryTitle === '') {
                                 found.line = line;
                                 for (const match of found.matches) {
                                     match.position += glossaryTag.indentPosition;
                                 }
                             }
                             else {
-                                found.line = glossaryTag.glossaryWords.trim() + ':' + line;
+                                found.line = glossaryTag.glossaryTitle.trim() + ':' + line;
                                 for (const match of found.matches) {
-                                    if (match.position >= glossaryTag.glossaryWords.length) {
+                                    if (match.position >= glossaryTag.glossaryTitle.length) {
                                         match.position += glossaryTag.indentPosition;
                                     }
                                 }
@@ -3157,6 +3191,11 @@ async function searchSub(keyword, isMutual) {
     // searchWithoutTags (find all)
     foundLines = foundLines.filter((found) => (found.matchedSearchKeywordCount === maximumHitWordCount));
     foundLines.sort(compareScoreAndSoOn);
+    if (debugPointLineNum !== 0) {
+        console.log(`DEBUG: maximumHitWordCount filter in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
+        const foundLine = foundLines.find((found) => (found.lineNum === debugPointLineNum && found.path.includes(debugFilePathPart)));
+        console.log(`DEBUG: there is ${foundLine ? '' : 'NOT '}found data.`);
+    }
     if (!('disableFindAll' in programOptions) && !isMutual) {
         var foundLineWithoutTags = await searchWithoutTags(keyword);
         const maximumHitWordCount2 = foundLineWithoutTags.reduce((previousMinimumHitWordCount, found) => (Math.max(previousMinimumHitWordCount, found.matchedSearchKeywordCount)), 0);
@@ -3223,149 +3262,189 @@ async function searchSub(keyword, isMutual) {
         return normalReturn;
     }
 }
-function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
-    // Example:
-    //   targetStrings = ['js file', 'JavaScript TypeScript config']
-    //   keywordsParticples.keyphrase = 'ts file'
-    //   keyword = 'ts', 'file'
-    // Debug
-    //   const  isDebug = (targetStrings[0] === 'js file');
-    const found = subMain();
-    return found;
-    function subMain() {
-        const keyphrase = keywordsParticples.keyphrase;
-        const bestFound = targetStrings.reduce((bestFound, aTargetString, stringIndex) => {
-            var found = new FoundLine();
-            var previousPosition = -1;
-            var isNormalizedMatched = false;
-            const aTargetStringLowerCase = aTargetString.toLowerCase();
-            const normalizedTargetKeywords = thesaurus.normalize(aTargetString, keywordsParticples.formalWordsLowerCase);
-            const normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
-            var matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
-            // #focus: score
-            for (let wordIndex = 0; wordIndex < keywordsParticples.words.length; wordIndex += 1) {
-                const keyword = keywordsParticples.words[wordIndex];
-                const normalizedWord = keywordsParticples.normalizedWords[wordIndex];
-                if (keyword.specified === '') {
-                    continue;
-                }
-                const result = getSubMatchedScore(aTargetString, aTargetStringLowerCase, keyword, stringIndex, wordIndex, '');
-                if (result.score !== 0) {
-                    found.matches.push(result.matched);
-                    result.matched.normalizedPosition = result.matched.position;
-                    result.matched.normalizedMatchedString = result.matched.matchedString;
-                    found.searchKeyphrase = keyphrase;
-                    found.targetKeyphrase = aTargetString;
-                    if (result.position > previousPosition) {
-                        found.score += result.score + orderMatchScore;
+function getKeywordMatchingScore(arg) {
+    return new GetKeywordMatchingScore.Class(arg).getKeywordMatchingScore();
+}
+var GetKeywordMatchingScore;
+(function (GetKeywordMatchingScore) {
+    var _Class_instances, _Class___getSubMatchedScore;
+    ;
+    class Class {
+        constructor(arg, ret = new FoundLine(), isDebug = false) {
+            this.arg = arg;
+            this.ret = ret;
+            this.isDebug = isDebug;
+            _Class_instances.add(this);
+        }
+        getKeywordMatchingScore() {
+            // Debug
+            // const  this.isDebug = (arg.targetStrings[0] === 'js file');
+            const arg = this.arg;
+            const keyphrase = arg.keywordsParticples.keyphrase;
+            var bestFound = new FoundLine();
+            var inDebuggingLine = (arg.lineNum === debugPointLineNum && arg.filePath.includes(debugFilePathPart));
+            if (inDebuggingLine) {
+                console.log(`DEBUG:     in getKeywordMatchingScore`);
+            }
+            for (var targetStingIndex = 0; targetStingIndex < arg.targetStrings.length; targetStingIndex += 1) {
+                const aTargetString = arg.targetStrings[targetStingIndex];
+                var found = new FoundLine();
+                var previousPosition = -1;
+                var isNormalizedMatched = false;
+                const aTargetStringLowerCase = aTargetString.toLowerCase();
+                const normalizedTargetKeywords = arg.thesaurus.normalize(aTargetString, arg.keywordsParticples.formalWordsLowerCase);
+                const normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
+                var matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
+                for (let wordIndex = 0; wordIndex < arg.keywordsParticples.words.length; wordIndex += 1) {
+                    const keyword = arg.keywordsParticples.words[wordIndex];
+                    const normalizedWord = arg.keywordsParticples.normalizedWords[wordIndex];
+                    if (keyword.specified === '') {
+                        continue;
                     }
-                    else {
-                        found.score += result.score;
-                    }
-                    found.score += notNormalizedScore;
-                    if (debugSearchScore) {
-                        console.log(`    getSubMatchedScore: ${keyword.specified}, ${aTargetString}, result score: ${result.score} => ${found.score}`);
-                    }
-                }
-                if (result.position !== notFound) {
-                    matchedCounts.setFoundPosition(result.position, result.score, false);
-                    found.matchedSearchKeywordCount += 1;
-                    previousPosition = result.position;
-                }
-                const isFoundWithoutNormalized = (result.score !== 0 || result.position !== notFound);
-                const useThesaurus = (thesaurus.enabled && (normalizedWord.specified !== keyword.specified || normalizedTargetKeywords !== aTargetString));
-                if (useThesaurus) {
-                    const targetType = (normalizedTargetKeywords === aTargetString) ? '' : 'normalized';
-                    const normalizedResult = getSubMatchedScore(normalizedTargetKeywords, normalizedTargetKeywordsLowerCase, normalizedWord, stringIndex, wordIndex, targetType);
-                    const isFoundWithNormalized = (normalizedResult.score !== 0 || normalizedResult.position !== notFound);
-                    if (isFoundWithNormalized) {
-                        found.searchKeyphrase = keyphrase;
-                        if (!isFoundWithoutNormalized) {
-                            var normalizedMatched = normalizedResult.matched;
-                            found.matches.push(normalizedMatched);
-                            found.targetKeyphrase = aTargetString;
-                            if (normalizedResult.position > previousPosition) {
-                                found.score += normalizedResult.score + orderMatchScore;
-                            }
-                            else {
-                                found.score += normalizedResult.score;
-                            }
+                    const result = __classPrivateFieldGet(this, _Class_instances, "m", _Class___getSubMatchedScore).call(this, aTargetString, aTargetStringLowerCase, keyword, targetStingIndex, wordIndex, 'strict');
+                    if (result.score !== 0) {
+                        found.matches.push(result.matched);
+                        result.matched.normalizedPosition = result.matched.position;
+                        result.matched.normalizedMatchedString = result.matched.matchedString;
+                        if (arg.targetTagType === 'glossary' && result.matched.position < arg.glossaryTitleLength) {
+                            result.matched.targetTagType = 'glossaryHeader';
                         }
                         else {
-                            var normalizedMatched = found.matches[found.matches.length - 1];
+                            result.matched.targetTagType = arg.targetTagType;
                         }
+                        found.searchKeyphrase = keyphrase;
+                        found.targetKeyphrase = aTargetString;
+                        if (result.position > previousPosition) {
+                            found.score += result.score + orderMatchScore;
+                        }
+                        else {
+                            found.score += result.score;
+                        }
+                        found.score += notNormalizedScore;
                         if (debugSearchScore) {
-                            console.log(`    getSubMatchedScore(thesaurus): ${normalizedWord.specified}, ${aTargetString}, result score: ${normalizedResult.score} => ${found.score}`);
+                            console.log(`    getSubMatchedScore: ${keyword.specified}, ${aTargetString}, result score: ${result.score} => ${found.score}`);
                         }
-                        if (!isFoundWithoutNormalized) {
-                            matchedCounts.setFoundPosition(normalizedResult.position, normalizedResult.score, true);
-                            found.matchedSearchKeywordCount += 1;
-                        }
-                        if (normalizedTargetKeywords !== aTargetString) {
-                            isNormalizedMatched = true;
-                        }
-                        const normalizedTargetWordIndex = matchedCounts.normalizedWordPositions.getWordIndex(normalizedMatched.position);
-                        normalizedMatched.normalizedTargetKeyPhrase = normalizedTargetKeywords;
-                        normalizedMatched.normalizedPosition = normalizedResult.position;
-                        normalizedMatched.normalizedMatchedString = normalizedMatched.matchedString;
-                        if (!isFoundWithoutNormalized) {
+                    }
+                    if (result.position !== notFound) {
+                        matchedCounts.setFoundPosition(result.position, result.score, false);
+                        found.matchedSearchKeywordCount += 1;
+                        previousPosition = result.position;
+                    }
+                    const isFoundWithoutNormalized = (result.score !== 0 || result.position !== notFound);
+                    const useThesaurus = (arg.thesaurus.enabled && (normalizedWord.specified !== keyword.specified || normalizedTargetKeywords !== aTargetString));
+                    if (useThesaurus) {
+                        const targetType = (normalizedTargetKeywords === aTargetString) ? 'strict' : 'normalized';
+                        const normalizedResult = __classPrivateFieldGet(this, _Class_instances, "m", _Class___getSubMatchedScore).call(this, normalizedTargetKeywords, normalizedTargetKeywordsLowerCase, normalizedWord, targetStingIndex, wordIndex, targetType);
+                        const isFoundWithNormalized = (normalizedResult.score !== 0 || normalizedResult.position !== notFound);
+                        if (isFoundWithNormalized) {
+                            found.searchKeyphrase = keyphrase;
+                            if (!isFoundWithoutNormalized) {
+                                var normalizedMatched = normalizedResult.matched;
+                                found.matches.push(normalizedMatched);
+                                normalizedMatched.targetTagType = arg.targetTagType;
+                                found.targetKeyphrase = aTargetString;
+                                if (normalizedResult.position > previousPosition) {
+                                    found.score += normalizedResult.score + orderMatchScore;
+                                }
+                                else {
+                                    found.score += normalizedResult.score;
+                                }
+                            }
+                            else {
+                                var normalizedMatched = found.matches[found.matches.length - 1];
+                            }
+                            if (debugSearchScore) {
+                                console.log(`    getSubMatchedScore(thesaurus): ${normalizedWord.specified}, ${aTargetString}, result score: ${normalizedResult.score} => ${found.score}`);
+                            }
+                            if (!isFoundWithoutNormalized) {
+                                matchedCounts.setFoundPosition(normalizedResult.position, normalizedResult.score, true);
+                                found.matchedSearchKeywordCount += 1;
+                            }
                             if (normalizedTargetKeywords !== aTargetString) {
-                                normalizedMatched.matchedString = '';
-                                normalizedMatched.position = notFound;
+                                isNormalizedMatched = true;
+                            }
+                            normalizedMatched.normalizedTargetKeyPhrase = normalizedTargetKeywords;
+                            normalizedMatched.normalizedPosition = normalizedResult.position;
+                            normalizedMatched.normalizedMatchedString = normalizedMatched.matchedString;
+                            if (!isFoundWithoutNormalized) {
+                                if (normalizedTargetKeywords !== aTargetString) {
+                                    normalizedMatched.matchedString = '';
+                                    normalizedMatched.position = notFound;
+                                }
                             }
                         }
                     }
+                } // End of "wordIndex" loop
+                if (found.score !== 0) {
+                    // e.g.
+                    //     keyphrase = "aa bbb ccc"
+                    //     matchedTargetString = "aabbb ccc dd ee"
+                    // score += character count
+                    // searchKeywordCount = 3
+                    // superMatchedTargetKeywordCount = 1  // ccc
+                    // semiMatchedTargetKeywordCount = 1
+                    // participleMatchedTargetKeywordCount = 1
+                    // caseIgnoredSuperMatchedTargetKeywordCount = 1
+                    // caseIgnoredParticipleMatchedTargetKeywordCount = 1
+                    // partMatchedTargetKeywordCount = 2
+                    // targetWordCount = 4
+                    if (!isNormalizedMatched) {
+                        found.score += 2 * (keyphrase.length - aTargetString.length);
+                        // 2 is double score from the score of different (upper/loser) case
+                    }
+                    else {
+                        found.score += 2 * (keyphrase.length - normalizedTargetKeywords.length);
+                        // 2 is double score from the score of different (upper/loser) case
+                    }
+                    if (inDebuggingLine) {
+                        console.log(`DEBUG: in getKeywordMatchingScore`);
+                    }
+                    found.searchKeywordCount = arg.keywordsParticples.words.length;
+                    found.notMatchedTargetKeyphrase = Class.__getNotMatchedTargetKeyphrase(aTargetString, found);
+                    found = matchedCounts.countFoundWords(found);
+                    if (!isNormalizedMatched) {
+                        found.targetWordCount = lib.getWordCount(aTargetString);
+                    }
+                    else {
+                        found.targetWordCount = Math.max(lib.getWordCount(aTargetString), lib.getWordCount(normalizedTargetKeywords));
+                    }
+                    if (debugSearchScore) {
+                        console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                    }
                 }
-            }
-            if (found.score !== 0) {
-                // e.g.
-                //     keyphrase = "aa bbb ccc"
-                //     matchedTargetString = "aabbb ccc dd ee"
-                // score += character count
-                // searchKeywordCount = 3
-                // superMatchedTargetKeywordCount = 1  // ccc
-                // semiMatchedTargetKeywordCount = 1
-                // participleMatchedTargetKeywordCount = 1
-                // caseIgnoredSuperMatchedTargetKeywordCount = 1
-                // caseIgnoredParticipleMatchedTargetKeywordCount = 1
-                // partMatchedTargetKeywordCount = 2
-                // targetWordCount = 4
-                if (!isNormalizedMatched) {
-                    found.score += 2 * (keyphrase.length - aTargetString.length);
-                    // 2 is double score from the score of different (upper/loser) case
-                }
-                else {
-                    found.score += 2 * (keyphrase.length - normalizedTargetKeywords.length);
-                    // 2 is double score from the score of different (upper/loser) case
-                }
-                found.searchKeywordCount = keywordsParticples.words.length;
-                found = matchedCounts.countFoundWords(found);
-                if (!isNormalizedMatched) {
-                    found.targetWordCount = lib.getWordCount(aTargetString);
-                }
-                else {
-                    found.targetWordCount = Math.max(lib.getWordCount(aTargetString), lib.getWordCount(normalizedTargetKeywords));
-                }
-                if (debugSearchScore) {
-                    console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
-                }
-            }
-            if (found.score !== 0) {
-                if (found.matches.some((m) => (m.targetType === 'normalized'))) {
-                    found.normalizedTargetsKeywords = found.matches.map((m) => (m.matchedString));
-                }
-                if (compareScoreAndSoOn(bestFound, found) < 0) {
-                    bestFound = found;
+                if (found.score !== 0) {
+                    if (found.matches.some((m) => (m.targetType === 'normalized'))) {
+                        found.normalizedTargetsKeywords = found.matches.map((m) => (m.matchedString));
+                    }
+                    if (compareScoreAndSoOn(bestFound, found) < 0) {
+                        bestFound = found;
+                    }
                 }
             }
             return bestFound;
-        }, new FoundLine());
-        return bestFound;
+        }
+        static __getNotMatchedTargetKeyphrase(targetKeyphrase, found) {
+            var notMatchedTargetKeyphrase = targetKeyphrase;
+            for (const match of found.matches) {
+                const position = match.position;
+                const length = match.matchedString.length;
+                notMatchedTargetKeyphrase =
+                    notMatchedTargetKeyphrase.substring(0, position) +
+                        ' '.repeat(length) +
+                        notMatchedTargetKeyphrase.substring(position + length);
+            }
+            return notMatchedTargetKeyphrase;
+        }
     }
-    function getSubMatchedScore(targetString, targetStringLowerCase, keywordParticples, stringIndex, wordIndex, targetType) {
+    _Class_instances = new WeakSet(), _Class___getSubMatchedScore = function _Class___getSubMatchedScore(targetString, targetStringLowerCase, keywordParticples, targetStringIndex, wordIndex, targetType) {
+        // Debug
+        // const  isDebug = (targetString === 'STR');
         var score = 0;
         var position = notFound;
         const matched = new MatchedPart();
+        if (this.arg.lineNum === debugPointLineNum && this.arg.filePath.includes(debugFilePathPart)) {
+            console.log(`DEBUG:         in __getSubMatchedScore`);
+        }
         if (targetStringLowerCase.indexOf(keywordParticples.commonPartLowerCase) !== notFound) {
             const keyword = keywordParticples.specified;
             const keywordLowerCase = keywordParticples.specifiedLowerCase;
@@ -3377,15 +3456,21 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                 if (targetString.length === keyword.length) {
                     score = fullMatchScore;
                     matchedKeyword = keyword;
+                    matched.matchedWordType = 'super';
+                    matched.caseSensitiveMatched = true;
                 }
                 else {
                     if (isSuperWordMatch(targetString, position, keyword)) {
                         score = wordsSuperMatchScore;
                         matchedKeyword = keyword;
+                        matched.matchedWordType = 'wordOrIdiom';
+                        matched.caseSensitiveMatched = true;
                     }
                     else if (isWordMatch(targetString, position, keyword)) {
                         score = wordsSemiMatchScore;
                         matchedKeyword = keyword;
+                        matched.matchedWordType = 'wordOrIdiomWord';
+                        matched.caseSensitiveMatched = true;
                     }
                     else {
                         if (keyword.length >= 2) {
@@ -3397,16 +3482,28 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
             if (score === 0) {
                 for (const particple of keywordParticples.particples) {
                     // Case sensitive matched with "particples".
-                    if ((position = targetString.indexOf(particple)) !== notFound) {
+                    const particplePosition = targetString.indexOf(particple);
+                    if (particplePosition !== notFound) {
+                        position = particplePosition;
                         if (targetString.length === particple.length) {
                             score = particpleFullMatchScore;
                             matchedKeyword = particple;
+                            matched.matchedWordType = 'wordOrIdiom';
+                            matched.caseSensitiveMatched = true;
                             break;
                         }
                         else {
-                            if (isWordMatch(targetString, position, particple)) {
+                            if (isSuperWordMatch(targetString, particplePosition, particple)) {
+                                score = wordsSuperMatchScore;
+                                matchedKeyword = particple;
+                                matched.matchedWordType = 'wordOrIdiom';
+                                matched.caseSensitiveMatched = true;
+                            }
+                            else if (isWordMatch(targetString, particplePosition, particple)) {
                                 score = particpleWordMatchScore;
                                 matchedKeyword = particple;
+                                matched.matchedWordType = 'wordOrIdiomWord';
+                                matched.caseSensitiveMatched = true;
                                 break;
                             }
                         }
@@ -3419,15 +3516,21 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
                         matchedKeyword = keywordLowerCase;
+                        matched.matchedWordType = 'super';
+                        matched.caseSensitiveMatched = false;
                     }
                     else {
                         if (isSuperWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordSuperMatchScore;
                             matchedKeyword = keywordLowerCase;
+                            matched.matchedWordType = 'wordOrIdiom';
+                            matched.caseSensitiveMatched = false;
                         }
                         else if (isWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordsSemiMatchScore;
                             matchedKeyword = keywordLowerCase;
+                            matched.matchedWordType = 'wordOrIdiomWord';
+                            matched.caseSensitiveMatched = false;
                         }
                         else {
                             if (keyword.length >= 2) {
@@ -3447,6 +3550,8 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                             if (particpleWordIsCorrectCase(semiMatchedKeyword, particpleLowerCase, commonLength)) {
                                 score = caseIgnoredParticpleFullMatchScore;
                                 matchedKeyword = particpleLowerCase;
+                                matched.matchedWordType = 'wordOrIdiom';
+                                matched.caseSensitiveMatched = false;
                                 break;
                             }
                         }
@@ -3457,6 +3562,8 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                                 if (particpleWordIsCorrectCase(semiMatchedKeyword, particpleLowerCase, commonLength)) {
                                     score = caseIgnoredParticpleWordMatchScore;
                                     matchedKeyword = particpleLowerCase;
+                                    matched.matchedWordType = 'wordOrIdiomWord';
+                                    matched.caseSensitiveMatched = false;
                                     break;
                                 }
                             }
@@ -3468,17 +3575,19 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
                 if (partMatchPosition !== notFound) {
                     score = partMatchScore;
                     matchedKeyword = keyword;
+                    matched.caseSensitiveMatched = true;
                     position = partMatchPosition;
                 }
                 else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
                     matchedKeyword = keywordLowerCase;
+                    matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;
                 }
             }
             if (score >= 1) {
                 matched.position = position;
-                matched.targetWordsIndex = stringIndex;
+                matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
                 matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
                 matched.targetType = targetType;
@@ -3488,8 +3597,9 @@ function getKeywordMatchingScore(targetStrings, keywordsParticples, thesaurus) {
             }
         }
         return { score, position, matched };
-    }
-}
+    };
+    GetKeywordMatchingScore.Class = Class;
+})(GetKeywordMatchingScore || (GetKeywordMatchingScore = {})); // End of namespace
 function isSuperWordMatch(targetString, targetPosition, keyword) {
     return (targetPosition === 0 || isSuperSeparator(targetString[targetPosition - 1])) &&
         (targetPosition + keyword.length === targetString.length ||
@@ -3631,6 +3741,83 @@ function compareScoreAndSoOnRelease(a, b) {
     if (different === 0) {
         different = a.matchedSearchKeywordCount - b.matchedSearchKeywordCount + kPoint;
     }
+    // Count of keyword and glossary tag,  Not matched target word count
+    // matchedKeywordOrGlossaryCount (keywordOrGlossary)
+    if (different === 0) {
+        different = a.matchedKeywordOrGlossaryCount - b.matchedKeywordOrGlossaryCount + kPoint;
+    }
+    // notMatchedTargetWordCount
+    if (different === 0 && a.partMatchedKeywordOrGlossaryCount >= 1) {
+        different = b.notMatchedTargetWordCount - a.notMatchedTargetWordCount - kPoint;
+    }
+    // idiomMatchedKeywordOrGlossaryCount
+    if (different === 0) {
+        different = a.idiomMatchedKeywordOrGlossaryCount - b.idiomMatchedKeywordOrGlossaryCount + kPoint;
+    }
+    // partMatchedKeywordOrGlossaryCount (partMatchedKeywordOrGlossaryCount)
+    if (different === 0) {
+        different = a.partMatchedKeywordOrGlossaryCount - b.partMatchedKeywordOrGlossaryCount + kPoint;
+    }
+    // Word or Idiom word matched with a tag
+    // matchedKeywordCount (keyword)
+    if (different === 0) {
+        different = a.matchedKeywordCount - b.matchedKeywordCount + kPoint;
+    }
+    // matchedGlossaryCount (glossary)
+    if (different === 0) {
+        different = a.matchedGlossaryCount - b.matchedGlossaryCount + kPoint;
+    }
+    // matchedSearchTagCount (matchedSearchTagCount)
+    if (different === 0) {
+        different = a.matchedSearchTagCount - b.matchedSearchTagCount + kPoint;
+    }
+    // Word or Idiom matched with a tag
+    // idiomMatchedKeywordCount
+    if (different === 0) {
+        different = a.idiomMatchedKeywordCount - b.idiomMatchedKeywordCount + kPoint;
+    }
+    // idiomMatchedGlossaryCount
+    if (different === 0) {
+        different = a.idiomMatchedGlossaryCount - b.idiomMatchedGlossaryCount + kPoint;
+    }
+    // idiomMatchedSearchTagCount
+    if (different === 0) {
+        different = a.idiomMatchedSearchTagCount - b.idiomMatchedSearchTagCount + kPoint;
+    }
+    // Part matched with a tag
+    // partMatchedKeywordCount (partMatchedKeywordCount)
+    if (different === 0) {
+        different = a.partMatchedKeywordCount - b.partMatchedKeywordCount + kPoint;
+    }
+    // partMatchedGlossaryCount (partMatchedGlossaryCount)
+    if (different === 0) {
+        different = a.partMatchedGlossaryCount - b.partMatchedGlossaryCount + kPoint;
+    }
+    // partMatchedSearchTagCount (partMatchedSearchTagCount)
+    if (different === 0) {
+        different = a.partMatchedSearchTagCount - b.partMatchedSearchTagCount + kPoint;
+    }
+    // caseSensitiveMatchedKeywordOrGlossaryCount
+    if (different === 0) {
+        different = a.caseSensitiveMatchedKeywordOrGlossaryCount - b.caseSensitiveMatchedKeywordOrGlossaryCount + kPoint;
+    }
+    // Super matched with a tag
+    // superMatchedKeywordOrGlossaryCount
+    if (different === 0) {
+        different = a.superMatchedKeywordOrGlossaryCount - b.superMatchedKeywordOrGlossaryCount + kPoint;
+    }
+    // superMatchedKeywordCount
+    if (different === 0) {
+        different = a.superMatchedKeywordCount - b.superMatchedKeywordCount + kPoint;
+    }
+    // superMatchedGlossaryCount
+    if (different === 0) {
+        different = a.superMatchedGlossaryCount - b.superMatchedGlossaryCount + kPoint;
+    }
+    // superMatchedSearchTagCount
+    if (different === 0) {
+        different = a.superMatchedSearchTagCount - b.superMatchedSearchTagCount + kPoint;
+    }
     // partMatchedTargetKeywordCount (part)
     // semiMatchedTargetKeywordCount (semi) (1)
     // targetWordCount (targetWordCount)
@@ -3645,17 +3832,6 @@ function compareScoreAndSoOnRelease(a, b) {
             }
         }
     }
-    // tagLabel (tag)
-    if (different === 0) {
-        if (a.tagLabel !== b.tagLabel) {
-            if (a.tagLabel === keywordLabel || a.tagLabel === glossaryLabel) {
-                different += 1;
-            }
-            if (b.tagLabel === keywordLabel || b.tagLabel === glossaryLabel) {
-                different -= 1;
-            }
-        }
-    }
     if (different === 0 && allWordsAreSemiMatched) {
         const aNotMatchCount = a.targetWordCount - a.caseIgnoredSemiMatchedTargetKeywordCount;
         const bNotMatchCount = b.targetWordCount - b.caseIgnoredSemiMatchedTargetKeywordCount;
@@ -3667,6 +3843,10 @@ function compareScoreAndSoOnRelease(a, b) {
             a.caseIgnoredParticipleMatchedTargetKeywordCount -
                 b.caseIgnoredParticipleMatchedTargetKeywordCount + kPoint;
     }
+    // // caseIgnoredSemiOrParticipleMatchedTargetKeywordCount (caseIgnoredSemiParticiple)
+    // if (different === 0) {
+    //     different = a.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount - b.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount + kPoint;
+    // }
     // targetWordCount (targetWordCount)
     if (different === 0) {
         different = b.targetWordCount - a.targetWordCount - kPoint;
@@ -3683,13 +3863,13 @@ function compareScoreAndSoOnRelease(a, b) {
             a.caseIgnoredSuperMatchedTargetKeywordCount -
                 b.caseIgnoredSuperMatchedTargetKeywordCount + kPoint;
     }
-    // superMatchedTargetKeywordCount (superMatchedTargetCount)
-    if (different === 0) {
-        different = a.superMatchedTargetKeywordCount - b.superMatchedTargetKeywordCount + kPoint;
-    }
     // semiMatchedTargetKeywordCount (semi) (2)
     if (different === 0) {
         different = a.caseIgnoredSemiMatchedTargetKeywordCount - b.caseIgnoredSemiMatchedTargetKeywordCount + kPoint;
+    }
+    // superMatchedTargetKeywordCount (superMatchedTargetCount)
+    if (different === 0) {
+        different = a.superMatchedTargetKeywordCount - b.superMatchedTargetKeywordCount + kPoint;
     }
     // parentMatchedCount (__NotDefined__)
     if (different === 0) {
@@ -3721,15 +3901,39 @@ function compareScoreAndSoOnRelease(a, b) {
 }
 function compareScoreAndSoOnDebug(a, b) {
     // Synchronized with "compareScoreAndSoOnRelease" at 2023-11-25
-    var debugLineNum = [5, 3]; // Edit this. [debugTarget, compareTarget]
-    var debugTarget = (a.lineNum == debugLineNum[0]) ? a : ((b.lineNum == debugLineNum[0]) ? b : null);
-    var compareTarget = (a.lineNum == debugLineNum[1]) ? a : ((b.lineNum == debugLineNum[1]) ? b : null);
-    var isDebug = (debugTarget !== null && compareTarget !== null);
+    var debugLineNums = [342, 341, 339, 337, 336]; // Edit this in order of priority
+    const indexA = debugLineNums.indexOf(a.lineNum);
+    const indexB = debugLineNums.indexOf(b.lineNum);
+    const isDebug = (indexA !== notFound && indexB !== notFound);
+    const matchedOnlyOneSide = (indexA !== notFound || indexB !== notFound) && (!isDebug);
+    const aIsPrioritized = (indexA < indexB);
+    if (isDebug) {
+        lib.pp(`compareScoreAndSoOnDebug: isDebug = ${isDebug}`);
+        if (aIsPrioritized) {
+            lib.pp(`    a=${a.lineNum}: ${a.line}`);
+            lib.pp(`    b=${b.lineNum}: ${b.line}`);
+        }
+        else {
+            lib.pp(`    b=${b.lineNum}: ${b.line}`);
+            lib.pp(`    a=${a.lineNum}: ${a.line}`);
+        }
+    }
+    else if (matchedOnlyOneSide) {
+        lib.pp(`compareScoreAndSoOnDebug: matchedOnlyOneSide = ${matchedOnlyOneSide}, a.lineNum = ${a.lineNum}, b.lineNum = ${b.lineNum}`);
+    }
+    function getDebugValue(different, aValue, bValue) {
+        if (aIsPrioritized) {
+            return `a=${aValue}, b=${bValue}, ${different > 0 ? 'a' : 'b'} is prioritized (${different > 0 ? 'OK' : 'NG'})`;
+        }
+        else {
+            return `b=${bValue}, a=${aValue}, ${different > 0 ? 'a' : 'b'} is prioritized (${different < 0 ? 'OK' : 'NG'})`;
+        }
+    }
     var different = 0; // plus: a is prior.  minus: b is prior.
     if (a.searchKeywordCount === 0 || b.searchKeywordCount === 0) {
         different = a.searchKeywordCount - b.searchKeywordCount;
         if (isDebug && different) {
-            lib.pp(`searchKeywordCount: ${a.searchKeywordCount}, ${b.searchKeywordCount}`);
+            lib.pp(`    searchKeywordCount: a=${a.searchKeywordCount}, b=${b.searchKeywordCount}, ${different > 0 ? 'a' : 'b'} is prioritized`);
         }
         return different;
     }
@@ -3747,7 +3951,138 @@ function compareScoreAndSoOnDebug(a, b) {
     if (different === 0) {
         different = a.matchedSearchKeywordCount - b.matchedSearchKeywordCount + kPoint;
         if (isDebug && different) {
-            lib.pp(`matchedSearchKeywordCount: ${a.matchedSearchKeywordCount}, ${b.matchedSearchKeywordCount}`);
+            lib.pp(`    matchedSearchCount, matchedSearchKeywordCount: a=${a.matchedSearchKeywordCount}, b=${b.matchedSearchKeywordCount}, ${different > 0 ? 'a' : 'b'} is prioritized`);
+        }
+    }
+    // Count of keyword and glossary tag,  Not matched target word count
+    // matchedKeywordOrGlossaryCount (keywordOrGlossary)
+    if (different === 0) {
+        different = a.matchedKeywordOrGlossaryCount - b.matchedKeywordOrGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    keywordOrGlossary, matchedKeywordOrGlossaryCount: ${getDebugValue(different, a.matchedKeywordOrGlossaryCount, b.matchedKeywordOrGlossaryCount)}`);
+        }
+    }
+    // notMatchedTargetWordCount
+    if (different === 0 && a.partMatchedKeywordOrGlossaryCount >= 1) {
+        different = b.notMatchedTargetWordCount - a.notMatchedTargetWordCount - kPoint;
+        if (isDebug && different) {
+            lib.pp(`    notMatchedTargetWordCount: ${getDebugValue(different, a.notMatchedTargetWordCount, b.notMatchedTargetWordCount)}`);
+        }
+    }
+    // idiomMatchedKeywordOrGlossaryCount
+    if (different === 0) {
+        different = a.idiomMatchedKeywordOrGlossaryCount - b.idiomMatchedKeywordOrGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    idiomMatchedKeywordOrGlossaryCount: ${getDebugValue(different, a.idiomMatchedKeywordOrGlossaryCount, b.idiomMatchedKeywordOrGlossaryCount)}`);
+        }
+    }
+    // partMatchedKeywordOrGlossaryCount (partMatchedKeywordOrGlossaryCount)
+    if (different === 0) {
+        different = a.partMatchedKeywordOrGlossaryCount - b.partMatchedKeywordOrGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    partMatchedKeywordOrGlossaryCount: ${getDebugValue(different, a.partMatchedKeywordOrGlossaryCount, b.partMatchedKeywordOrGlossaryCount)}`);
+        }
+    }
+    // Word or Idiom word matched with a tag
+    // matchedKeywordCount (keyword)
+    if (different === 0) {
+        different = a.matchedKeywordCount - b.matchedKeywordCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    keyword, matchedKeywordCount: ${getDebugValue(different, a.matchedKeywordCount, b.matchedKeywordCount)}`);
+        }
+    }
+    // matchedGlossaryCount (glossary)
+    if (different === 0) {
+        different = a.matchedGlossaryCount - b.matchedGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    glossary, matchedGlossaryCount: ${getDebugValue(different, a.matchedGlossaryCount, b.matchedGlossaryCount)}`);
+        }
+    }
+    // matchedSearchTagCount (matchedSearchTagCount)
+    if (different === 0) {
+        different = a.matchedSearchTagCount - b.matchedSearchTagCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    matchedSearchTagCount: ${getDebugValue(different, a.matchedSearchTagCount, b.matchedSearchTagCount)}`);
+        }
+    }
+    // Word or Idiom matched with a tag
+    // idiomMatchedKeywordCount
+    if (different === 0) {
+        different = a.idiomMatchedKeywordCount - b.idiomMatchedKeywordCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    idiomMatchedKeywordCount: ${getDebugValue(different, a.idiomMatchedKeywordCount, b.idiomMatchedKeywordCount)}`);
+        }
+    }
+    // idiomMatchedGlossaryCount
+    if (different === 0) {
+        different = a.idiomMatchedGlossaryCount - b.idiomMatchedGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    idiomMatchedGlossaryCount: ${getDebugValue(different, a.idiomMatchedGlossaryCount, b.idiomMatchedGlossaryCount)}`);
+        }
+    }
+    // idiomMatchedSearchTagCount
+    if (different === 0) {
+        different = a.idiomMatchedSearchTagCount - b.idiomMatchedSearchTagCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    idiomMatchedSearchTagCount: ${getDebugValue(different, a.idiomMatchedSearchTagCount, b.idiomMatchedSearchTagCount)}`);
+        }
+    }
+    // Part matched with a tag
+    // partMatchedKeywordCount (partMatchedKeywordCount)
+    if (different === 0) {
+        different = a.partMatchedKeywordCount - b.partMatchedKeywordCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    partMatchedKeywordCount: ${getDebugValue(different, a.partMatchedKeywordCount, b.partMatchedKeywordCount)}`);
+        }
+    }
+    // partMatchedGlossaryCount (partMatchedGlossaryCount)
+    if (different === 0) {
+        different = a.partMatchedGlossaryCount - b.partMatchedGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    partMatchedGlossaryCount: ${getDebugValue(different, a.partMatchedGlossaryCount, b.partMatchedGlossaryCount)}`);
+        }
+    }
+    // partMatchedSearchTagCount (partMatchedSearchTagCount)
+    if (different === 0) {
+        different = a.partMatchedSearchTagCount - b.partMatchedSearchTagCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    partMatchedSearchTagCount: ${getDebugValue(different, a.partMatchedSearchTagCount, b.partMatchedSearchTagCount)}`);
+        }
+    }
+    // caseSensitiveMatchedKeywordOrGlossaryCount
+    if (different === 0) {
+        different = a.caseSensitiveMatchedKeywordOrGlossaryCount - b.caseSensitiveMatchedKeywordOrGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    caseSensitiveMatchedKeywordOrGlossaryCount: ${getDebugValue(different, a.caseSensitiveMatchedKeywordOrGlossaryCount, b.caseSensitiveMatchedKeywordOrGlossaryCount)}`);
+        }
+    }
+    // Super matched with a tag
+    // superMatchedKeywordOrGlossaryCount
+    if (different === 0) {
+        different = a.superMatchedKeywordOrGlossaryCount - b.superMatchedKeywordOrGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    superMatchedKeywordOrGlossaryCount: ${getDebugValue(different, a.superMatchedKeywordOrGlossaryCount, b.superMatchedKeywordOrGlossaryCount)}`);
+        }
+    }
+    // superMatchedKeywordCount
+    if (different === 0) {
+        different = a.superMatchedKeywordCount - b.superMatchedKeywordCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    superMatchedKeywordCount: ${getDebugValue(different, a.superMatchedKeywordCount, b.superMatchedKeywordCount)}`);
+        }
+    }
+    // superMatchedGlossaryCount
+    if (different === 0) {
+        different = a.superMatchedGlossaryCount - b.superMatchedGlossaryCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    superMatchedGlossaryCount: ${getDebugValue(different, a.superMatchedGlossaryCount, b.superMatchedGlossaryCount)}`);
+        }
+    }
+    // superMatchedSearchTagCount
+    if (different === 0) {
+        different = a.superMatchedSearchTagCount - b.superMatchedSearchTagCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    superMatchedSearchTagCount: ${getDebugValue(different, a.superMatchedSearchTagCount, b.superMatchedSearchTagCount)}`);
         }
     }
     // partMatchedTargetKeywordCount (part)
@@ -3764,21 +4099,8 @@ function compareScoreAndSoOnDebug(a, b) {
             }
         }
         if (isDebug && different) {
-            lib.pp(`partMatchedTargetKeywordCount(=partMatchedCountsByWord.length): ${a.partMatchedTargetKeywordCount}, ${b.partMatchedTargetKeywordCount}`);
-        }
-    }
-    // tagLabel (tag)
-    if (different === 0) {
-        if (a.tagLabel !== b.tagLabel) {
-            if (a.tagLabel === keywordLabel || a.tagLabel === glossaryLabel) {
-                different += 1;
-            }
-            if (b.tagLabel === keywordLabel || b.tagLabel === glossaryLabel) {
-                different -= 1;
-            }
-            if (isDebug && different) {
-                lib.pp(`tagLabel: ${a.tagLabel}, ${b.tagLabel}`);
-            }
+            lib.pp(`    part, partMatchedTargetKeywordCount(=partMatchedCountsByWord.length): ` +
+                `${getDebugValue(different, a.partMatchedTargetKeywordCount, b.partMatchedTargetKeywordCount)}`);
         }
     }
     if (different === 0 && allWordsAreSemiMatched) {
@@ -3786,9 +4108,10 @@ function compareScoreAndSoOnDebug(a, b) {
         const bNotMatchCount = b.targetWordCount - b.caseIgnoredSemiMatchedTargetKeywordCount;
         different = bNotMatchCount - aNotMatchCount;
         if (isDebug && different) {
-            lib.pp(`NotMatchCount(targetWordCount - caseIgnoredSemiMatchedTargetKeywordCount): ${aNotMatchCount}, ${bNotMatchCount}`);
-            lib.pp(`targetWordCount: ${a.targetWordCount}, ${b.targetWordCount}`);
-            lib.pp(`caseIgnoredSemiMatchedTargetKeywordCount(=caseIgnoredSemiMatchedCountsByWord.length): ${a.caseIgnoredSemiMatchedTargetKeywordCount}, ${b.caseIgnoredSemiMatchedTargetKeywordCount}`);
+            lib.pp(`    NotMatchCount(targetWordCount - caseIgnoredSemiMatchedTargetKeywordCount): ${getDebugValue(different, aNotMatchCount, bNotMatchCount)}`);
+            lib.pp(`        targetWordCount: a=${a.targetWordCount}, b=${b.targetWordCount}`);
+            lib.pp(`        caseIgnoredSemi, caseIgnoredSemiMatchedTargetKeywordCount(=caseIgnoredSemiMatchedCountsByWord.length): ` +
+                `${getDebugValue(different, a.caseIgnoredSemiMatchedTargetKeywordCount, b.caseIgnoredSemiMatchedTargetKeywordCount)}`);
         }
     }
     // caseIgnoredParticipleMatchedTargetKeywordCount (caseIgnoredParticiple)
@@ -3797,14 +4120,21 @@ function compareScoreAndSoOnDebug(a, b) {
             a.caseIgnoredParticipleMatchedTargetKeywordCount -
                 b.caseIgnoredParticipleMatchedTargetKeywordCount + kPoint;
         if (isDebug && different) {
-            lib.pp(`caseIgnoredParticipleMatchedTargetKeywordCount(=caseIgnoredParticipleMatchedCountsByWord.length): ${a.caseIgnoredParticipleMatchedTargetKeywordCount}, ${b.caseIgnoredParticipleMatchedTargetKeywordCount}`);
+            lib.pp(`    caseIgnoredParticiple, caseIgnoredParticipleMatchedTargetKeywordCount(=caseIgnoredParticipleMatchedCountsByWord.length): ` +
+                `${getDebugValue(different, a.caseIgnoredParticipleMatchedTargetKeywordCount, b.caseIgnoredParticipleMatchedTargetKeywordCount)}`);
         }
     }
+    // // caseIgnoredSemiOrParticipleMatchedTargetKeywordCount (caseIgnoredSemiParticiple)
+    // if (different === 0) {
+    //     different = a.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount - b.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount + kPoint;
+    //     if (isDebug && different) { lib.pp(`    caseIgnoredSemiParticiple, caseIgnoredSemiOrParticipleMatchedTargetKeywordCount: `+
+    //         `${getDebugValue(different, a.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount, b.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount)}`); }
+    // }
     // targetWordCount (targetWordCount)
     if (different === 0) {
         different = b.targetWordCount - a.targetWordCount - kPoint;
         if (isDebug && different) {
-            lib.pp(`targetWordCount: ${a.targetWordCount}, ${b.targetWordCount}`);
+            lib.pp(`    targetWordCount: ${getDebugValue(different, a.targetWordCount, b.targetWordCount)}`);
         }
     }
     // participleMatchedTargetKeywordCount (participle)
@@ -3813,7 +4143,8 @@ function compareScoreAndSoOnDebug(a, b) {
             a.participleMatchedTargetKeywordCount -
                 b.participleMatchedTargetKeywordCount + kPoint;
         if (isDebug && different) {
-            lib.pp(`participleMatchedTargetKeywordCount(=participleMatchedCountsByWord.length): ${a.participleMatchedTargetKeywordCount}, ${b.participleMatchedTargetKeywordCount}`);
+            lib.pp(`    participle, participleMatchedTargetKeywordCount(=participleMatchedCountsByWord.length): ` +
+                `${getDebugValue(different, a.participleMatchedTargetKeywordCount, b.participleMatchedTargetKeywordCount)}`);
         }
     }
     // caseIgnoredSuperMatchedTargetKeywordCount (caseIgnoredSuper)
@@ -3822,21 +4153,24 @@ function compareScoreAndSoOnDebug(a, b) {
             a.caseIgnoredSuperMatchedTargetKeywordCount -
                 b.caseIgnoredSuperMatchedTargetKeywordCount + kPoint;
         if (isDebug && different) {
-            lib.pp(`caseIgnoredSuperMatchedTargetKeywordCount(=caseIgnoredSuperMatchedCountsByWord.length): ${a.caseIgnoredSuperMatchedTargetKeywordCount}, ${b.caseIgnoredSuperMatchedTargetKeywordCount}`);
-        }
-    }
-    // superMatchedTargetKeywordCount (superMatchedTargetCount)
-    if (different === 0) {
-        different = a.superMatchedTargetKeywordCount - b.superMatchedTargetKeywordCount + kPoint;
-        if (isDebug && different) {
-            lib.pp(`superMatchedTargetKeywordCount(=superMatchedCountsByWord.length): ${a.superMatchedTargetKeywordCount}, ${b.superMatchedTargetKeywordCount}`);
+            lib.pp(`    caseIgnoredSuper, caseIgnoredSuperMatchedTargetKeywordCount(=caseIgnoredSuperMatchedCountsByWord.length): ` +
+                `${getDebugValue(different, a.caseIgnoredSuperMatchedTargetKeywordCount, b.caseIgnoredSuperMatchedTargetKeywordCount)}`);
         }
     }
     // semiMatchedTargetKeywordCount (semi) (2)
     if (different === 0) {
         different = a.caseIgnoredSemiMatchedTargetKeywordCount - b.caseIgnoredSemiMatchedTargetKeywordCount + kPoint;
         if (isDebug && different) {
-            lib.pp(`caseIgnoredSemiMatchedTargetKeywordCount(=semiMatchedCountsByWord.length): ${a.caseIgnoredSemiMatchedTargetKeywordCount}, ${b.caseIgnoredSemiMatchedTargetKeywordCount}`);
+            lib.pp(`    caseIgnoredSemi, caseIgnoredSemiMatchedTargetKeywordCount: ` +
+                `${getDebugValue(different, a.caseIgnoredSemiMatchedTargetKeywordCount, b.caseIgnoredSemiMatchedTargetKeywordCount)}`);
+        }
+    }
+    // superMatchedTargetKeywordCount (superMatchedTargetCount)
+    if (different === 0) {
+        different = a.superMatchedTargetKeywordCount - b.superMatchedTargetKeywordCount + kPoint;
+        if (isDebug && different) {
+            lib.pp(`    superMatchedTargetCount, superMatchedTargetKeywordCount(=superMatchedCountsByWord.length): ` +
+                `${getDebugValue(different, a.superMatchedTargetKeywordCount, b.superMatchedTargetKeywordCount)}`);
         }
     }
     // parentMatchedCount (__NotDefined__)
@@ -3845,7 +4179,7 @@ function compareScoreAndSoOnDebug(a, b) {
             different = a.parentMatchedCount[i] - b.parentMatchedCount[i] + kPoint;
             if (different !== 0) {
                 if (isDebug && different) {
-                    lib.pp(`parentMatchedCount[${i}]: ${a.parentMatchedCount[i]}, ${b.parentMatchedCount[i]}`);
+                    lib.pp(`    parentMatchedCount[${i}]: ${getDebugValue(different, a.parentMatchedCount[i], b.parentMatchedCount[i])}`);
                 }
                 break;
             }
@@ -3855,7 +4189,7 @@ function compareScoreAndSoOnDebug(a, b) {
     if (different === 0) {
         var different = a.score - b.score + kPoint;
         if (isDebug && different) {
-            lib.pp(`score: ${a.score}, ${b.score}`);
+            lib.pp(`    score: ${getDebugValue(different, a.score, b.score)}`);
         }
     }
     // path
@@ -3867,14 +4201,14 @@ function compareScoreAndSoOnDebug(a, b) {
             different = +1;
         }
         if (isDebug && different) {
-            lib.pp(`path: ${a.path}, ${b.path}`);
+            lib.pp(`    path: ${getDebugValue(different, a.path, b.path)}`);
         }
     }
     // lineNum
     if (different === 0) {
         different = b.lineNum - a.lineNum;
         if (isDebug && different) {
-            lib.pp(`lineNum: ${a.lineNum}, ${b.lineNum}`);
+            lib.pp(`    lineNum: ${getDebugValue(different, a.lineNum, b.lineNum)}`);
         }
     }
     return different;
@@ -3923,8 +4257,14 @@ async function searchWithoutTags(keywords) {
             try {
                 const line = line1;
                 lineNum += 1;
+                if (fullMatchCount >= foundCountSystemMax) {
+                    continue;
+                }
+                if (lineNum === debugPointLineNum && inputFileFullPath.includes(debugFilePathPart)) {
+                    console.log(`DEBUG: in searchWithoutTags`);
+                }
                 // full match
-                if (fullMatchCount < foundCountSystemMax && isFullMatch(line, fullMatchKeywords)) {
+                if (isFullMatch(line, fullMatchKeywords)) {
                     fullMatchCount += 1;
                     const found = new FoundLine();
                     found.path = inputFileFullPath;
@@ -3932,7 +4272,7 @@ async function searchWithoutTags(keywords) {
                     found.line = line;
                     found.searchKeyphrase = keywords;
                     found.targetKeyphrase = line;
-                    found.matches.push({
+                    found.matches.push(Object.assign(new MatchedPart(), {
                         position: line.indexOf(fullMatchKeywords),
                         normalizedPosition: notFound,
                         targetWordsIndex: -1,
@@ -3941,9 +4281,11 @@ async function searchWithoutTags(keywords) {
                         normalizedMatchedString: '',
                         normalizedTargetKeyPhrase: '',
                         targetType: 'withoutTags',
-                    });
+                        targetTagType: 'withoutTags',
+                    }));
                     found.matchedSearchKeywordCount = keywordCount;
                     found.searchKeywordCount = keywordCount;
+                    found.notMatchedTargetKeyphrase = GetKeywordMatchingScore.Class.__getNotMatchedTargetKeyphrase(line, found);
                     found.participleMatchedTargetKeywordCount = keywordCount;
                     found.partMatchedTargetKeywordCount = keywordCount; // not keywordsLowerCase.length
                     found.caseIgnoredParticipleMatchedTargetKeywordCount = keywordCount;
@@ -3951,7 +4293,6 @@ async function searchWithoutTags(keywords) {
                     found.caseIgnoredSuperMatchedTargetKeywordCount = keywordCount;
                     found.caseIgnoredSemiMatchedTargetKeywordCount = keywordCount;
                     found.targetWordCount = lib.getWordCount(line);
-                    found.tagLabel = 'find all';
                     found.score =
                         notNormalizedScore * found.caseIgnoredParticipleMatchedTargetKeywordCount +
                             (wordsSemiMatchScore + orderMatchScore + notNormalizedScore) * found.matchedSearchKeywordCount +
@@ -3962,7 +4303,7 @@ async function searchWithoutTags(keywords) {
                     }
                 }
                 // shuffled keywords match
-                else if (matchCount < foundCountSystemMax) {
+                else {
                     var keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
                     if (keywordIndex !== notFound) {
                         const found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
@@ -3985,11 +4326,16 @@ async function searchWithoutTags(keywords) {
     return foundLines;
 }
 function getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus) {
-    const found = getKeywordMatchingScore([line], keywordsParticples, thesaurus);
+    const found = getKeywordMatchingScore({
+        targetTagType: 'withoutTags',
+        glossaryTitleLength: 0,
+        targetStrings: [line],
+        filePath: inputFileFullPath,
+        keywordsParticples, thesaurus, lineNum
+    });
     found.path = inputFileFullPath;
     found.line = line;
     found.lineNum = lineNum;
-    found.tagLabel = 'find all';
     return found;
 }
 function addParticiplesFoundCountInFullSearch(found, line, keywordIndex, participles) {
@@ -4074,7 +4420,7 @@ function addParticiplesFoundCountInFullSearch(found, line, keywordIndex, partici
             }
         }
     }
-    found.matches.push({
+    found.matches.push(Object.assign(new MatchedPart, {
         position: keywordIndex,
         normalizedPosition: notFound,
         targetWordsIndex: -1,
@@ -4083,7 +4429,8 @@ function addParticiplesFoundCountInFullSearch(found, line, keywordIndex, partici
         normalizedMatchedString: '',
         normalizedTargetKeyPhrase: '',
         targetType: 'withoutTags',
-    });
+        targetTagType: 'withoutTags',
+    }));
     return found;
 }
 async function mutualSearch() {
@@ -4820,9 +5167,8 @@ async function evaluateEnvironmentVariable(lines, filePath, linesLineNum) {
     }
     return evaluatedLines;
 }
-// tagIndexOf
-// /(^| )tag/
 function tagIndexOf(line, tag) {
+    // Tag is /(^| )tag/
     var index = -1;
     for (;;) {
         index = line.indexOf(tag, index + 1);
@@ -4831,7 +5177,31 @@ function tagIndexOf(line, tag) {
         }
     }
 }
-function getValue(line, separatorIndex = -1) {
+function searchTargetKeyphrasePositions(line, separatorPositions) {
+    const positions = [];
+    for (var separatorIndex of separatorPositions) {
+        if (separatorIndex < 0 || separatorIndex > line.length) {
+            throw new Error(`ERROR: In searchTargetKeyphrasePositions, line: ${line}, separatorIndex: ${separatorIndex}`);
+        }
+        for (var position = separatorIndex + 1;; position += 1) {
+            if (line[position] === undefined) { // Right end of line
+                position = -1; // Left of line
+                continue;
+            }
+            else {
+                if (line[position] === ' ' || line[position] === '"') {
+                    continue; // position += 1
+                }
+                else {
+                    positions.push(position);
+                    break;
+                }
+            }
+        }
+    }
+    return positions;
+}
+function getTagValue(line, separatorIndex = -1) {
     var value = line.substring(separatorIndex + 1).trim();
     if (value[0] === '#') {
         var comment = 0;
@@ -5761,6 +6131,7 @@ class FoundLine {
         //      all words ... 5
         this.searchKeyphrase = '';
         this.targetKeyphrase = '';
+        this.notMatchedTargetKeyphrase = ''; // getNotMatchedTargetKeyphrase()
         this.matches = [];
         this.parentMatchedCount = []; // Index is larger closer to the root
         this.matchedSearchKeywordCount = 0; // hit count to search keyword
@@ -5776,17 +6147,125 @@ class FoundLine {
         this.targetWordCount = 0; // hit and not hit
         this.normalizedTargetsKeywords = []; // '' = not matched in "normalized" target words
         this.rightOfTargetKeywords = [];
-        this.tagLabel = ''; // keywordLabel, searchLabel, glossaryLabel, find all
         this.score = 0;
+    }
+    // Removed "tagLabel" on 2024-01-23
+    // Count properties that contain super matched words
+    get superMatchedKeywordOrGlossaryCount() {
+        return this.superMatchedKeywordCount + this.superMatchedGlossaryCount + this.superMatchedGlossaryHeaderCount;
+    }
+    get superMatchedKeywordCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'keyword' && match.matchedWordType === 'super')).length;
+    }
+    get superMatchedSearchTagCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'search' && match.matchedWordType === 'super')).length;
+    }
+    get superMatchedGlossaryCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossary' && match.matchedWordType === 'super')).length;
+    }
+    get superMatchedGlossaryHeaderCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossaryHeader' && match.matchedWordType === 'super')).length;
+    }
+    // Count properties that contain matched words or idioms
+    get idiomMatchedKeywordOrGlossaryCount() {
+        return this.idiomMatchedKeywordCount + this.idiomMatchedGlossaryCount + this.idiomMatchedGlossaryHeaderCount;
+    }
+    get idiomMatchedKeywordCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'keyword' && match.isIdiomMatched)).length;
+    }
+    get idiomMatchedSearchTagCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'search' && match.isIdiomMatched)).length;
+    }
+    get idiomMatchedGlossaryCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossary' && match.isIdiomMatched)).length;
+    }
+    get idiomMatchedGlossaryHeaderCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossaryHeader' && match.isIdiomMatched)).length;
+    }
+    // Count properties that contain matched words or idiom words
+    get matchedKeywordOrGlossaryCount() {
+        return this.matchedKeywordCount + this.matchedGlossaryCount + this.matchedGlossaryHeaderCount;
+    }
+    get matchedKeywordCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'keyword' && match.isMatched)).length;
+    }
+    get matchedSearchTagCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'search' && match.isMatched)).length;
+    }
+    get matchedGlossaryCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossary' && match.isMatched)).length;
+    }
+    get matchedGlossaryHeaderCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossaryHeader' && match.isMatched)).length;
+    }
+    // Count properties that contain matched words or idiom words case sensitive
+    get caseSensitiveMatchedKeywordOrGlossaryCount() {
+        return this.caseSensitiveMatchedKeywordCount + this.caseSensitiveMatchedGlossaryCount + this.caseSensitiveMatchedGlossaryHeaderCount;
+    }
+    get caseSensitiveMatchedKeywordCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'keyword' && match.isCaseSensitiveMatched)).length;
+    }
+    get caseSensitiveMatchedSearchTagCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'search' && match.isCaseSensitiveMatched)).length;
+    }
+    get caseSensitiveMatchedGlossaryCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossary' && match.isCaseSensitiveMatched)).length;
+    }
+    get caseSensitiveMatchedGlossaryHeaderCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossaryHeader' && match.isCaseSensitiveMatched)).length;
+    }
+    // Count properties that contain partially matched words
+    get partMatchedKeywordOrGlossaryCount() {
+        return this.partMatchedKeywordCount + this.partMatchedGlossaryCount + this.partMatchedGlossaryHeaderCount;
+    }
+    get partMatchedKeywordCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'keyword')).length;
+    }
+    get partMatchedSearchTagCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'search')).length;
+    }
+    get partMatchedGlossaryCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossary')).length;
+    }
+    get partMatchedGlossaryHeaderCount() {
+        return this.matches.filter((match) => (match.targetTagType == 'glossaryHeader')).length;
+    }
+    get targetWordCountForCompare() {
+        const allKeywordIsAllMatchedGlossary = this.matches.some((m) => (m.targetTagType === 'glossary' || m.targetTagType === 'glossaryHeader')) &&
+            this.matches.every((m) => (m.targetTagType === 'glossary'));
+        if (allKeywordIsAllMatchedGlossary) {
+            // Minus glossary header count
+            return this.targetWordCount - 1; // 1 is count of string glossaryHeader '__FieldName__:'.
+        }
+        else {
+            return this.targetWordCount;
+        }
+    }
+    get notMatchedTargetWordCount() {
+        const separators = lib.escapeRegularExpression(programOptionsWordSeparators);
+        const allKeywordIsAllMatchedGlossary = this.matches.some((m) => (m.targetTagType === 'glossary' || m.targetTagType === 'glossaryHeader')) &&
+            this.matches.every((m) => (m.targetTagType === 'glossary'));
+        const notMatchedWords = this.notMatchedTargetKeyphrase.split(new RegExp(`[${separators.replace('-', '\\-')}]`)).filter((word) => (word !== ''));
+        if (allKeywordIsAllMatchedGlossary) {
+            // Minus glossary header count
+            return notMatchedWords.length - 1; // 1 is count of string glossaryHeader '__FieldName__:'.
+        }
+        else {
+            return notMatchedWords.length;
+        }
     }
     // Related functions:
     //    compareScoreAndSoOn
     getString() {
-        const length_limit = 200;
+        const lengthLimit = 200;
         // const  isDebug = this.lineNum == 4;
         // if (isDebug) {
         // var d = lib.pp('');
         // }
+        inDebuggingLine = (this.lineNum === debugPointLineNum && this.path.includes(debugFilePathPart));
+        if (inDebuggingLine) {
+            console.log(`DEBUG: in getString`);
+        }
         // colorParts = sort matched (this.matches) positions and merge overrlapping parts.
         const sortedParts = this.matches.sort((a, b) => {
             var diff = a.position - b.position;
@@ -5797,7 +6276,7 @@ class FoundLine {
         previousPart.position = -1;
         previousPart.matchedString = '';
         for (const part of sortedParts) {
-            if (part.position + part.matchedString.length >= length_limit) {
+            if (part.position + part.matchedString.length >= lengthLimit) {
                 // no push
             }
             else if (part.targetType === 'normalized') {
@@ -5820,7 +6299,7 @@ class FoundLine {
             else {
                 // no push
             }
-            previousPart = { ...part };
+            previousPart = Object.assign(new MatchedPart(), part);
         }
         // normalizedColorParts = sort matched (this.matches) positions and merge overrlapping parts.
         const normalizedSortedParts = this.matches.sort((a, b) => {
@@ -5832,7 +6311,7 @@ class FoundLine {
         previousPart.normalizedPosition = -1;
         previousPart.normalizedMatchedString = '';
         for (const part of normalizedSortedParts) {
-            if (part.position + part.normalizedMatchedString.length >= length_limit) {
+            if (part.position + part.normalizedMatchedString.length >= lengthLimit) {
                 // no push
             }
             else if (part.targetType === 'normalized') {
@@ -5854,7 +6333,7 @@ class FoundLine {
             else {
                 // no push
             }
-            previousPart = { ...part };
+            previousPart = Object.assign(new MatchedPart(), part);
         }
         // coloredLine = ...  // Search "matchedColor" and "chalk"
         var coloredLine = '';
@@ -5865,8 +6344,8 @@ class FoundLine {
         var previousNormalizedPosition = 0;
         var hasNormalizedWords = this.matches.some((m) => (m.targetType === 'normalized'));
         var normalizedRight = '';
-        if (line.length > length_limit) {
-            line = line.substring(0, length_limit) + terminator + line.substring(length_limit + 1);
+        if (line.length > lengthLimit) {
+            line = line.substring(0, lengthLimit) + terminator + line.substring(lengthLimit + 1);
         }
         // var  coloredStrings: string[] = [];  // debug
         for (const match of colorParts) { // match is one of this.matches: MatchedPart[]
@@ -5933,7 +6412,7 @@ class FoundLine {
             }
         }
         // search tag
-        if (this.tagLabel !== searchLabel && !thereIsSearchLabel) {
+        if (this.matches[0].targetTagType !== 'search' && !thereIsSearchLabel) {
             const searchColor = chalk.yellow;
             const searchIndex = coloredLine.indexOf(searchLabel);
             if (searchIndex !== notFound) {
@@ -5953,9 +6432,9 @@ class FoundLine {
             }
         }
         // keyword tag, glossary tag
-        if (this.tagLabel === keywordLabel || this.tagLabel === glossaryLabel) {
+        const keywordLabelIndex = coloredLine.indexOf(keywordLabel);
+        if (keywordLabelIndex !== notFound) {
             const keywordLabelColor = chalk.gray;
-            const keywordLabelIndex = coloredLine.indexOf(keywordLabel);
             if (keywordLabelIndex !== notFound && !thereIsKeywordLabel &&
                 (keywordLabelIndex === 0 || coloredLine[keywordLabelIndex - 1] === ' ')) {
                 coloredLine =
@@ -5963,22 +6442,28 @@ class FoundLine {
                         keywordLabelColor(keywordLabel) +
                         coloredLine.substring(keywordLabelIndex + keywordLabel.length);
             }
-            if (this.tagLabel === glossaryLabel) {
-                coloredLine = keywordLabelColor(glossaryLabel) + ' ' + coloredLine;
-            }
+        }
+        if (this.matches.some((match) => (match.targetTagType === 'glossary'))) {
+            const glossaryLabelColor = chalk.gray;
+            coloredLine = glossaryLabelColor(glossaryLabel) + ' ' + coloredLine;
         }
         if (debugSearchScore) {
             var debugString = ` (score: ${this.score}, ` +
                 `searchKeywordCount: ${this.searchKeywordCount}, ` +
                 `targetWordCount: ${this.targetWordCount}, ` +
-                `tag: ${this.tagLabel}, ` +
-                `parentMatchedCount: ${lib.getAllQuotedCSVLine(this.parentMatchedCount)}, ` +
+                `keyword: ${this.matchedKeywordCount}, ` +
+                `glossary: ${this.matchedGlossaryCount}, ` +
+                `glossaryHeader: ${this.matchedGlossaryHeaderCount}, ` +
+                `parentMatchedCount: ${lib.getAllQuotedCSVLine(this.parentMatchedCount) || '[]'}, ` +
                 `matchedSearchCount: ${this.matchedSearchKeywordCount}, ` +
+                `targetWordCountForCompare: ${this.targetWordCountForCompare}, ` +
                 `superMatchedTargetCount: ${this.superMatchedTargetKeywordCount}, ` +
                 `semi: ${this.semiMatchedTargetKeywordCount}, ` +
+                `caseIgnoredSemi: ${this.caseIgnoredSemiMatchedTargetKeywordCount}, ` +
                 `participle: ${this.participleMatchedTargetKeywordCount}, ` +
                 `caseIgnoredSuper: ${this.caseIgnoredSuperMatchedTargetKeywordCount}, ` +
                 `caseIgnoredParticiple: ${this.caseIgnoredParticipleMatchedTargetKeywordCount}, ` +
+                `caseIgnoredSemiParticiple: ${this.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}, ` +
                 `part: ${this.partMatchedTargetKeywordCount})`;
         }
         else {
@@ -5991,7 +6476,7 @@ class FoundLine {
         const snippetDepthIndex = tagIndexOf(line, snippetDepthLabel);
         if (snippetDepthIndex !== notFound) {
             const currentIndent = indentRegularExpression.exec(line)[0];
-            this.snippetDepth = parseInt(getValue(line, snippetDepthIndex + snippetDepthLabel.length));
+            this.snippetDepth = parseInt(getTagValue(line, snippetDepthIndex + snippetDepthLabel.length));
             this.snippetIndentLengths.push(currentIndent.length);
         }
     }
@@ -6051,7 +6536,13 @@ class FoundLine {
             if (lineNum === currentLineNum) {
                 line = cutKeywordTag(line);
             }
-            var foundAtParent = getKeywordMatchingScore([line], keywordsParticples, thesaurus);
+            var foundAtParent = getKeywordMatchingScore({
+                targetTagType: 'parent',
+                glossaryTitleLength: 0,
+                targetStrings: [line],
+                filePath: '',
+                keywordsParticples, thesaurus, lineNum
+            });
             // Search targets are not only keywords in keyword tag.
             var { foundAtParent, foundWordIndex } = _cutAlreadyFoundWords(foundAtParent, foundWordIndex);
             if (foundAtParent && foundAtParent.matches.length >= 1) {
@@ -6078,7 +6569,7 @@ class FoundLine {
                     for (const match of found.matches) {
                         match.position += shift;
                     }
-                    found.matches.unshift({
+                    found.matches.unshift(Object.assign(new MatchedPart(), {
                         position: 0,
                         normalizedPosition: notFound,
                         targetWordsIndex: -1,
@@ -6087,7 +6578,8 @@ class FoundLine {
                         normalizedMatchedString: '',
                         normalizedTargetKeyPhrase: '',
                         targetType: 'withoutTags',
-                    });
+                        targetTagType: 'parent',
+                    }));
                 }
                 found.matches = found.matches.concat(notParentMatches.filter((x) => !matchesInKeywordTag.includes(x.matchedString)));
                 found.score += parentScore / 2;
@@ -6127,10 +6619,23 @@ class MatchedPart {
         this.matchedString = ''; // matched word or part of matched word
         this.targetWordsIndex = -1; // Words index of "targetStrings" array argument of "getKeywordMatchingScore" function.
         this.searchWordIndex = -1; // Word index of search keywords.
-        this.targetType = '';
+        this.targetType = 'strict';
+        this.targetTagType = 'withoutTags';
+        this.matchedWordType = 'notMatched';
+        this.caseSensitiveMatched = false;
         this.normalizedTargetKeyPhrase = '';
         this.normalizedPosition = -1; // in "normalizedTargetKeyPhrase"
         this.normalizedMatchedString = '';
+    }
+    get isMatched() {
+        return this.matchedWordType === 'wordOrIdiomWord' || this.matchedWordType === 'wordOrIdiom' || this.matchedWordType === 'super';
+    }
+    get isIdiomMatched() {
+        return this.matchedWordType === 'wordOrIdiom' || this.matchedWordType === 'super';
+    }
+    get isCaseSensitiveMatched() {
+        return (this.matchedWordType === 'wordOrIdiomWord' || this.matchedWordType === 'wordOrIdiom' || this.matchedWordType === 'super')
+            && this.caseSensitiveMatched;
     }
 }
 class SearchKeyword {
@@ -6610,23 +7115,23 @@ export async function callMainFromJest(parameters, options) {
     }
     finally {
         endTestRedirect();
-        // Debug last print - with Jest
-        // if (true) {
-        //     var    d = lib.pp('');
-        //     const  s = getStdOut();
-        //     d = [];  // Set break point here and watch the variable d
-        // }
+        DebugWatchPoint();
     }
 }
 // private_
 // For the unit test
 export const private_ = {
-    Parser,
+    FoundLine,
+    GetKeywordMatchingScore,
+    MatchedPart,
     makeSettingTree,
     makeReplaceToTagTree,
+    Parser,
+    searchTargetKeyphrasePositions: searchTargetKeyphrasePositions,
 };
 if (process.env.windir) {
     var runningOS = 'Windows';
+    debugFilePathPart = debugFilePathPart.replace(/\//g, "\\");
 }
 else {
     var runningOS = 'Linux';

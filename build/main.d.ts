@@ -2,6 +2,40 @@ export declare function main(): Promise<void>;
 export declare function mainMain(): Promise<void>;
 declare function makeSettingTree(parser: Parser): Promise<SettingsTree>;
 declare function makeReplaceToTagTree(parser: Parser, settingTree: Readonly<SettingsTree>): Promise<ReplaceToTagTree>;
+interface Particples {
+    keyphrase: string;
+    words: ParticpleWord[];
+    formalWordsLowerCase: string[];
+    normalizedWords: ParticpleWord[];
+}
+interface ParticpleWord {
+    specified: string;
+    specifiedLowerCase: string;
+    commonPartLowerCase: string;
+    particples: string[];
+    particplesLowerCase: string[];
+}
+declare namespace GetKeywordMatchingScore {
+    interface Arguments {
+        targetTagType: SearchTargetTagType;
+        glossaryTitleLength: number;
+        targetStrings: string[];
+        keywordsParticples: Particples;
+        thesaurus: Thesaurus;
+        filePath: string;
+        lineNum: number;
+    }
+    class Class {
+        #private;
+        arg: Arguments;
+        ret: FoundLine;
+        private isDebug;
+        getKeywordMatchingScore(): FoundLine;
+        static __getNotMatchedTargetKeyphrase(targetKeyphrase: string, found: FoundLine): string;
+        constructor(arg: Arguments, ret?: FoundLine, isDebug?: boolean);
+    }
+}
+declare function searchTargetKeyphrasePositions(line: string, separatorPositions: number[]): number[];
 declare enum CommandEnum {
     unknown = 0,
     check = 1,
@@ -147,6 +181,98 @@ interface Setting {
     sameAs?: string;
     sameAsWasChecked?: boolean;
 }
+declare class Thesaurus {
+    synonym: Map<string, string>;
+    formalLowerCase: Set<string>;
+    idiomWords: string[];
+    errorMessage: string;
+    get enabled(): boolean;
+    load(csvFilePath: string): Promise<void>;
+    normalize(keyphrase: string, relationUntilFormalKeywordsLowerCase?: string[]): string;
+    getWords(): string[];
+}
+declare class FoundLine {
+    path: string;
+    lineNum: number;
+    line: string;
+    indentLength: number;
+    snippet: string[];
+    snippetDepth: number;
+    snippetIndentLengths: number[];
+    searchKeywordCount: number;
+    searchKeyphrase: string;
+    targetKeyphrase: string;
+    notMatchedTargetKeyphrase: string;
+    matches: MatchedPart[];
+    parentMatchedCount: number[];
+    matchedSearchKeywordCount: number;
+    superMatchedTargetKeywordCount: number;
+    semiMatchedTargetKeywordCount: number;
+    participleMatchedTargetKeywordCount: number;
+    semiOrParticipleMatchedTargetKeywordCount: number;
+    caseIgnoredSuperMatchedTargetKeywordCount: number;
+    caseIgnoredSemiMatchedTargetKeywordCount: number;
+    caseIgnoredParticipleMatchedTargetKeywordCount: number;
+    caseIgnoredSemiOrParticipleMatchedTargetKeywordCount: number;
+    partMatchedTargetKeywordCount: number;
+    targetWordCount: number;
+    normalizedTargetsKeywords: string[];
+    rightOfTargetKeywords: number[];
+    score: number;
+    get superMatchedKeywordOrGlossaryCount(): number;
+    get superMatchedKeywordCount(): number;
+    get superMatchedSearchTagCount(): number;
+    get superMatchedGlossaryCount(): number;
+    get superMatchedGlossaryHeaderCount(): number;
+    get idiomMatchedKeywordOrGlossaryCount(): number;
+    get idiomMatchedKeywordCount(): number;
+    get idiomMatchedSearchTagCount(): number;
+    get idiomMatchedGlossaryCount(): number;
+    get idiomMatchedGlossaryHeaderCount(): number;
+    get matchedKeywordOrGlossaryCount(): number;
+    get matchedKeywordCount(): number;
+    get matchedSearchTagCount(): number;
+    get matchedGlossaryCount(): number;
+    get matchedGlossaryHeaderCount(): number;
+    get caseSensitiveMatchedKeywordOrGlossaryCount(): number;
+    get caseSensitiveMatchedKeywordCount(): number;
+    get caseSensitiveMatchedSearchTagCount(): number;
+    get caseSensitiveMatchedGlossaryCount(): number;
+    get caseSensitiveMatchedGlossaryHeaderCount(): number;
+    get partMatchedKeywordOrGlossaryCount(): number;
+    get partMatchedKeywordCount(): number;
+    get partMatchedSearchTagCount(): number;
+    get partMatchedGlossaryCount(): number;
+    get partMatchedGlossaryHeaderCount(): number;
+    get targetWordCountForCompare(): number;
+    get notMatchedTargetWordCount(): number;
+    getString(): string;
+    evaluateSnippetDepthTag(line: string): void;
+    isSnippetOver(line: string): boolean;
+    plusParentMatchScore(lines: string[], keywordsParticples: Particples, thesaurus: Thesaurus): void;
+}
+declare type SearchTargetType = 'strict' | 'normalized';
+declare type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'parent' | 'withoutTags';
+declare type MatchedWordType = 'super' | // Same letters
+'wordOrIdiom' | // Space separated same letters and participles
+'wordOrIdiomWord' | // Separator speparated same letters and participles
+'part' | 'notMatched';
+declare class MatchedPart {
+    position: number;
+    matchedString: string;
+    targetWordsIndex: number;
+    searchWordIndex: number;
+    targetType: SearchTargetType;
+    targetTagType: SearchTargetTagType;
+    matchedWordType: MatchedWordType;
+    caseSensitiveMatched: boolean;
+    normalizedTargetKeyPhrase: string;
+    normalizedPosition: number;
+    normalizedMatchedString: string;
+    get isMatched(): boolean;
+    get isIdiomMatched(): boolean;
+    get isCaseSensitiveMatched(): boolean;
+}
 declare class Parser {
     command: CommandEnum;
     errorCount: number;
@@ -171,9 +297,13 @@ export declare function callMainFromJest(parameters?: string[], options?: {
     [name: string]: string;
 }): Promise<void>;
 export declare const private_: {
-    Parser: typeof Parser;
+    FoundLine: typeof FoundLine;
+    GetKeywordMatchingScore: typeof GetKeywordMatchingScore;
+    MatchedPart: typeof MatchedPart;
     makeSettingTree: typeof makeSettingTree;
     makeReplaceToTagTree: typeof makeReplaceToTagTree;
+    Parser: typeof Parser;
+    searchTargetKeyphrasePositions: typeof searchTargetKeyphrasePositions;
 };
 export declare const foundCountMaxDefault = "10";
 export declare const snippetLineCountDefault = "5";

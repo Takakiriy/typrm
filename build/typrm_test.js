@@ -69,45 +69,39 @@ async function DoCustomDebug() {
 // TestOfFileCheck
 async function TestOfCommandLine() {
     var returns;
-    var cases = [{
-            "name": "version",
+    var cases = [
+        { "name": "version",
             "parameters": "--version",
             "check": "false",
             "inputLines": "",
-        }, {
-            "name": "locale",
+        }, { "name": "locale",
             "parameters": "search ABC --folder test_data/search/1",
             "check": "true",
             "inputLines": "",
-        },
-        // There are search_mode, search_mode_find test in "main.test.ts".
-        {
-            "name": "search_mode_select_by_number",
+            // There are search_mode, search_mode_find test in "main.test.ts".
+        }, { "name": "search_mode_select_by_number",
             "parameters": "--folder test_data/search/1",
             "check": "false",
             "checkFile": "_out.log",
             "inputLines": "double quotation is\n#1\nexit()\n",
-        }, {
-            "name": "search_mode_ref_verb",
+        }, { "name": "search_mode_ref_verb",
             "parameters": "search",
             "check": "true",
             "inputLines": `#ref: \"${normalizedHomePath}/GitProjects/GitHub/typrm/README.md#parameters\"\n7\n\n7\nexit()\n`,
-        }, {
-            "name": "search_mode_result_has_ref_verb",
+        }, { "name": "search_mode_result_has_ref_verb",
             "parameters": "search  --folder test_data/search/2",
             "check": "true",
             "inputLines": "file_path\nexit()\n",
-        }, {
-            "name": "pointed_figure_1",
+        }, { "name": "pointed_figure_1",
             "parameters": "search  \"#ref: ${normalizedHomePath}/GitProjects/GitHub/typrm/example/figure_1.png?name=test_1&x=404&y=70\"",
             "check": "false",
             "inputLines": "",
-        }, {
-            "name": "pointed_figure_2",
+        }, { "name": "pointed_figure_2",
             "parameters": "search",
             "check": "false",
             "inputLines": "#ref: ${normalizedHomePath}/GitProjects/GitHub/typrm//example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
-        }];
+        }
+    ];
     for (const case_ of cases) {
         if (true || case_.name === 'pointed_figure_1') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);

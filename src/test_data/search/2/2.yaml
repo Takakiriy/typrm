@@ -223,6 +223,7 @@ participle_is_better_than_different_case:
     8a: #keyword: strs replace
     8b: #keyword: stred replace
     8c: #keyword: strer replace
+    8d: #keyword: str.replace
     11: #keyword: STRS
     12: #keyword: stripe
     full 1:  str
@@ -239,10 +240,9 @@ participle_is_better_than_different_case:
     full 8c: strer replace
     full 11: STRS
     full 12: stripe
-few_word_count:
-    #keyword: bluetooth mini
-    #keyword: bluetooth speaker
-    #keyword: mini speaker
+
+
+
 special_participle:
     #keyword: saver
     #keyword: saved
@@ -327,3 +327,24 @@ searches keyword and parent:
             #keyword: ParentPA parentPB
         parentPA:
             #keyword: ParentPA parentPB parentPC
+keyword_tag_and_comment_matched_bug_case:
+    #keyword: happy turn
+    #keyword: dummy, happy turn 2
+    #keyword: happy  #// turn
+order of keyword glossary and parent:
+    command:  #// parent search
+        #keyword: option
+    4: #keyword: command option letter
+    3: #glossary: command
+        option:
+    2: #glossary:
+        command option:
+    1: #keyword: command option
+    command option:
+part match:
+    #keyword: thesaurus.csv
+    thesaurus.csv:
+few_word_count:
+    #keyword: bluetooth mini
+    #keyword: bluetooth speaker
+    #keyword: mini speaker
