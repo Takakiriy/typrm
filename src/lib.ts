@@ -1539,8 +1539,11 @@ class  StandardInputBuffer {
     }
 
     async  input(guide: string): Promise<string> {
-        if (!this.readlines) {
+        if ( ! this.readlines) {
             this.delayedConstructor();
+        }
+        if (this.readlines) {
+            this.readlines.setPrompt(guide);
         }
 
         return  new Promise(

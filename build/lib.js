@@ -1396,6 +1396,9 @@ class StandardInputBuffer {
         if (!this.readlines) {
             this.delayedConstructor();
         }
+        if (this.readlines) {
+            this.readlines.setPrompt(guide);
+        }
         return new Promise((resolve, reject) => {
             const nextLine = this.inputBuffer.shift();
             if (typeof nextLine === 'string') {
