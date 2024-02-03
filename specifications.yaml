@@ -246,14 +246,14 @@ debug:
     functions:  #// typrm functions debug
         Search function debug points:
             How to use:
-                - Set "debugPointLineNum" and "debugFilePathPart" in "main.ts"
-                - Enable "Print all log"
+                - Set "var  debugPointLineNum" and "var  debugFilePathPart" in "main.ts"
+                - Set a break point at "function  DebugWatchPoint" in "main.ts"
         Search result order:
             compareScoreAndSoOn:  #// This shows a compare reason.
                 How to use:
-                    - Change comment out in "compareScoreAndSoOn" in "main.ts"
-                    - Set "debugLineNum" value in "compareScoreAndSoOnDebug" in "main.ts"
-                    - Enable "Print all log"
+                    - Change comment out in "function  compareScoreAndSoOn(" in "main.ts"
+                    - Set "debugLineNums" value in "function  compareScoreAndSoOnDebug" in "main.ts"
+                    - Set a break point at "function  DebugWatchPoint" in "main.ts"
             debugSearchScore:  #// This shows matched keyword scores.
                 How to use: Set to true. Near the "debugSearchScore" in "main.ts"
         Search result color:  #// This shows colored string parts.
