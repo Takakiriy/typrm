@@ -3241,7 +3241,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     keywordsParticples,  thesaurus, lineNum});
                 if (inDebuggingLine) {  // debugPointLineNum
                     lib.pp(`DEBUG: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
-                    lib.pp(`DEBUG: getKeywordMatchingScore returns: ${JSON.stringify(found, null, '    ')}`);
+                    lib.pp(`DEBUG: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
                 }
                 if (found.counts.matchedSearchKeywordCount >= 1) {
                     const  unescapedLine = unescapePercentByte(line);

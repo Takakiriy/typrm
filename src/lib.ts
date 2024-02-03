@@ -1592,6 +1592,21 @@ export function  mark(object: any,  label: string | number | boolean = "mark") {
     object._mark = label;  // Add an attribute dynamically
 }
 
+export function  jsonStringify(object: any, dummy?: any, space?: string): string {
+    // This is JSON.stringify supported circular references object
+    const checkedObjects = new WeakSet();
+
+    return  JSON.stringify(object, (_key, value) => {
+        if (typeof value === "object" && value !== null) {
+            if (checkedObjects.has(value)) {
+                return;  // circular references
+            }
+            checkedObjects.add(value);
+        }
+        return value;
+    }, space);
+}
+
 // pp
 // #keyword: lib.ts pp
 //     Debug print.
