@@ -880,6 +880,8 @@ typrm shell のコロンの前にコマンド記号が表示されていない�
 Windows では **cmd.exe** のコマンドを入力できます。
 バッチファイルを実行することもできます。
 
+    echo %PATH%
+
     example.bat parameter
 
 PowerShell のコマンドを実行する場合は、

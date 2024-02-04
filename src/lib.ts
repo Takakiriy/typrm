@@ -47,7 +47,9 @@ export function  rmdirSync(folderPath: string) {
     if (fs.existsSync(folderPath)) {
         fs.rmdirSync(folderPath, {recursive: true});
             // (node:8328) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+        // fs.rmSync(folderPath, {recursive: true});
             // Property 'rm' does not exist on type 'typeof import("fs")'.ts(2339)
+            // #ref: https://nodejs.org/api/fs.html#:~:text=rmSync
     }
 }
 
@@ -1588,6 +1590,21 @@ export function  getSnapshot(label: string, deafultSnapshot: string | undefined 
 
 export function  mark(object: any,  label: string | number | boolean = "mark") {
     object._mark = label;  // Add an attribute dynamically
+}
+
+export function  jsonStringify(object: any, dummy?: any, space?: string): string {
+    // This is JSON.stringify supported circular references object
+    const checkedObjects = new WeakSet();
+
+    return  JSON.stringify(object, (_key, value) => {
+        if (typeof value === "object" && value !== null) {
+            if (checkedObjects.has(value)) {
+                return;  // circular references
+            }
+            checkedObjects.add(value);
+        }
+        return value;
+    }, space);
 }
 
 // pp

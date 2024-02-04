@@ -348,3 +348,8 @@ few_word_count:
     #keyword: bluetooth mini
     #keyword: bluetooth speaker
     #keyword: mini speaker
+normalized_word_count:
+    #keyword: parentN1 server
+        #// This is super match.
+    parentN node1  #keyword: server
+        #// Matched with keyword tag and parent matched most deep level noramlized words
