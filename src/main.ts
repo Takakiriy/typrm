@@ -7036,7 +7036,7 @@ class FoundLine {
                     notParentMatches.filter((x)=> ! matchesInKeywordTag.includes(x.matchedString)));
                 found.score += parentScore / 2;
                 found.counts.parentMatchedCount = parentMatchedCount;
-                found.counts.matchedSearchKeywordCount += phrase.join(' ').split(' ').length;
+                found.counts.matchedSearchKeywordCount += phrase.length;
             }
         }
 

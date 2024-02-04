@@ -119,6 +119,7 @@ export declare function getInputObject(): StandardInputBuffer;
 export declare function cutEscapeSequence(textWithEscapeSequence: string): string;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
 export declare function mark(object: any, label?: string | number | boolean): void;
+export declare function jsonStringify(object: any, dummy?: any, space?: string): string;
 export declare function pp(message: any): string[];
 declare global {
     export var debugOut: string[];

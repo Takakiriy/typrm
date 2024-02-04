@@ -20,7 +20,7 @@ declare namespace GetKeywordMatchingScore {
         targetTagType: SearchTargetTagType;
         glossaryTitleLength: number;
         targetStrings: string[];
-        keywordsParticples: Particples;
+        searchWordParticples: Particples;
         thesaurus: Thesaurus;
         filePath: string;
         lineNum: number;
@@ -199,11 +199,25 @@ declare class FoundLine {
     snippet: string[];
     snippetDepth: number;
     snippetIndentLengths: number[];
-    searchKeywordCount: number;
     searchKeyphrase: string;
     targetKeyphrase: string;
     notMatchedTargetKeyphrase: string;
     matches: MatchedPart[];
+    counts: FoundCounts;
+    normalizedTargetsKeywords: string[];
+    rightOfTargetKeywords: number[];
+    score: number;
+    constructor();
+    get targetWordCountForCompare(): number;
+    get notMatchedTargetWordCount(): number;
+    getString(): string;
+    evaluateSnippetDepthTag(line: string): void;
+    isSnippetOver(line: string): boolean;
+    plusParentMatchScore(lines: string[], searchWordParticples: Particples, thesaurus: Thesaurus): void;
+}
+declare class FoundCounts {
+    parent: FoundLine;
+    searchKeywordCount: number;
     parentMatchedCount: number[];
     matchedSearchKeywordCount: number;
     superMatchedTargetKeywordCount: number;
@@ -216,9 +230,7 @@ declare class FoundLine {
     caseIgnoredSemiOrParticipleMatchedTargetKeywordCount: number;
     partMatchedTargetKeywordCount: number;
     targetWordCount: number;
-    normalizedTargetsKeywords: string[];
-    rightOfTargetKeywords: number[];
-    score: number;
+    constructor(parent: FoundLine);
     get superMatchedKeywordOrGlossaryCount(): number;
     get superMatchedKeywordCount(): number;
     get superMatchedSearchTagCount(): number;
@@ -244,14 +256,8 @@ declare class FoundLine {
     get partMatchedSearchTagCount(): number;
     get partMatchedGlossaryCount(): number;
     get partMatchedGlossaryHeaderCount(): number;
-    get targetWordCountForCompare(): number;
-    get notMatchedTargetWordCount(): number;
-    getString(): string;
-    evaluateSnippetDepthTag(line: string): void;
-    isSnippetOver(line: string): boolean;
-    plusParentMatchScore(lines: string[], keywordsParticples: Particples, thesaurus: Thesaurus): void;
 }
-declare type SearchTargetType = 'strict' | 'normalized';
+declare type WordType = 'strict' | 'normalized';
 declare type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'parent' | 'withoutTags';
 declare type MatchedWordType = 'super' | // Same letters
 'wordOrIdiom' | // Space separated same letters and participles
@@ -262,7 +268,7 @@ declare class MatchedPart {
     matchedString: string;
     targetWordsIndex: number;
     searchWordIndex: number;
-    targetType: SearchTargetType;
+    targetType: WordType;
     targetTagType: SearchTargetTagType;
     matchedWordType: MatchedWordType;
     caseSensitiveMatched: boolean;
