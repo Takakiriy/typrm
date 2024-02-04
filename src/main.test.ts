@@ -1203,6 +1203,12 @@ describe("searches >> keyword tag >>", () => {
             ["search", "ABC"],
             { folder: `${process.cwd()}\\test_data\\search\\1`, disableFindAll: '', test: "" },
             pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+
+        // ],[ "normalized_word_count",
+        //     ["parentN1 server"],
+        //     { folder: "test_data/search/2", disableFindAll: '', test: "", thesaurus: "test_data/search/2/thesaurus2.csv"},
+        //     pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     parentN node1  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
+        //     pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
         const  isWindowsEnvironment = (path.sep === '\\');

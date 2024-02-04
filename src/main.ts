@@ -3103,41 +3103,41 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     keyword = lib.splitIdioms(keyword, thesaurus.getWords());
 
     // keywordWithoutTag = ...
-    var    keywordWithoutTag = '';
+    var    searchWordWithoutTag = '';
     const  searchTagIndex = tagIndexOf(keyword, searchLabel);
     var    foundTag = false;
     if (searchTagIndex !== notFound) {
 
-        keywordWithoutTag = getTagValue(keyword, searchTagIndex + searchLabel.length);
+        searchWordWithoutTag = getTagValue(keyword, searchTagIndex + searchLabel.length);
         foundTag = true;
     } else {
         const  keywordTagIndex = tagIndexOf(keyword, keywordLabel);
         if (keywordTagIndex !== notFound) {
         
-            keywordWithoutTag = getTagValue(keyword, keywordTagIndex + keywordLabel.length);
+            searchWordWithoutTag = getTagValue(keyword, keywordTagIndex + keywordLabel.length);
             foundTag = true;
         }
     }
     if (foundTag) {
-        if (keywordWithoutTag === '') {
+        if (searchWordWithoutTag === '') {
             const  colonIndex = keyword.indexOf(':');
             if (colonIndex !== notFound) {
-                keywordWithoutTag = keyword.substring(0, colonIndex);
-                if (keywordWithoutTag.startsWith('- ')) {
-                    keywordWithoutTag = keywordWithoutTag.substring(2);
+                searchWordWithoutTag = keyword.substring(0, colonIndex);
+                if (searchWordWithoutTag.startsWith('- ')) {
+                    searchWordWithoutTag = searchWordWithoutTag.substring(2);
                 }
             } else {
-                keywordWithoutTag = '';
+                searchWordWithoutTag = '';
             }
         }
     } else {
-        var  keywordWithoutTag = keyword;
+        var  searchWordWithoutTag = keyword;
     }
 
     // ...
     const  fileFullPaths: string[] = await listUpFilePaths();
     var    foundLines: FoundLine[] = [];
-    const  keywordsParticples = newParticplesFromKeyphrase(keywordWithoutTag, thesaurus);
+    const  searchWordParticples = newParticplesFromKeyphrase(searchWordWithoutTag, thesaurus);
 
     // search
     for (const inputFileFullPath of fileFullPaths) {
@@ -3167,7 +3167,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             const  indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
             inDebuggingLine = (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart));
             if (inDebuggingLine) {
-                lib.pp(`DEBUG: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
+                lib.pp(`#breadcrumb: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
             }
 
             // score tag
@@ -3229,8 +3229,8 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     });
                 const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
                 if (inDebuggingLine) {  // debugPointLineNum
-                    lib.pp(`DEBUG: keyword tag block in searchSub`);
-                    lib.pp(`DEBUG: calling getKeywordMatchingScore`);
+                    lib.pp(`#breadcrumb: keyword tag block in searchSub`);
+                    lib.pp(`#breadcrumb: calling getKeywordMatchingScore line:${lineNum}: ${line}`);
                 }
 
                 let  found = getKeywordMatchingScore({
@@ -3238,10 +3238,10 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                     glossaryTitleLength: 0,
                     targetStrings: columns,
                     filePath: inputFileFullPath,
-                    keywordsParticples,  thesaurus, lineNum});
+                    searchWordParticples,  thesaurus, lineNum});
                 if (inDebuggingLine) {  // debugPointLineNum
-                    lib.pp(`DEBUG: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
-                    lib.pp(`DEBUG: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
+                    lib.pp(`#breadcrumb: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
+                    lib.pp(`#breadcrumb: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
                 }
                 if (found.counts.matchedSearchKeywordCount >= 1) {
                     const  unescapedLine = unescapePercentByte(line);
@@ -3269,7 +3269,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                         found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
                     }
                     found.evaluateSnippetDepthTag(line);
-                    found.plusParentMatchScore(lines, keywordsParticples, thesaurus);
+                    found.plusParentMatchScore(lines, searchWordParticples, thesaurus);
                     foundLines.push(found);
                     snippetScaning.push(found);
                 }
@@ -3330,7 +3330,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                         const  wordsWithGlossary = glossaryTag.glossaryTitle +
                             line.substring(currentIndent.length, colonPosition);
                         if (inDebuggingLine) {
-                            lib.pp(`DEBUG: in glossary block in searchSub`);
+                            lib.pp(`#breadcrumb: in glossary block in searchSub`);
                         }
 
                         const  found = getKeywordMatchingScore({
@@ -3338,7 +3338,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                             glossaryTitleLength: glossaryTag.glossaryTitle.length,
                             targetStrings: [wordsWithGlossary],
                             filePath: inputFileFullPath,
-                            keywordsParticples,  thesaurus,  lineNum});
+                            searchWordParticples,  thesaurus,  lineNum});
                         if (found.counts.partMatchedTargetKeywordCount >= 1  &&  colonPosition !== notFound) {
 
                             found.score += glossaryMatchScore + plusScore;
@@ -3408,9 +3408,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     foundLines = foundLines.filter((found) => (found.counts.matchedSearchKeywordCount === maximumHitWordCount));
     foundLines.sort(compareScoreAndSoOn);
     if (debugPointLineNum !== 0) {
-        lib.pp(`DEBUG: maximumHitWordCount filter in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
+        lib.pp(`#breadcrumb: filter by maximumHitWordCount in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
         const  foundLine = foundLines.find((found)=>(found.lineNum === debugPointLineNum  &&  found.path.includes(debugFilePathPart)));
-        lib.pp(`DEBUG: there is ${foundLine ? '' : 'NOT '}found data.`);
+        lib.pp(`#breadcrumb: there is ${foundLine ? '' : 'NOT '}found data.`);
     }
     if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
 
@@ -3502,7 +3502,7 @@ export interface  Arguments {
     targetTagType: SearchTargetTagType;
     glossaryTitleLength: number;
     targetStrings: string[];
-    keywordsParticples: Particples;
+    searchWordParticples: Particples;
     thesaurus: Thesaurus;
     filePath: string;
     lineNum: number;
@@ -3514,12 +3514,9 @@ export class  Class {
             // Debug
             // const  this.isDebug = (arg.targetStrings[0] === 'js file');
         const  arg = this.arg;
-        const  keyphrase = arg.keywordsParticples.keyphrase;
+        const  keyphrase = arg.searchWordParticples.keyphrase;
         var   bestFound = new FoundLine();
         var   inDebuggingLine = (arg.lineNum === debugPointLineNum  &&  arg.filePath.includes(debugFilePathPart));
-        if (inDebuggingLine) {
-            lib.pp(`DEBUG:     in getKeywordMatchingScore`);
-        }
 
         for (var targetStingIndex = 0;  targetStingIndex < arg.targetStrings.length;  targetStingIndex += 1) {
             const  aTargetString = arg.targetStrings[targetStingIndex];
@@ -3527,17 +3524,20 @@ export class  Class {
             var    previousPosition = -1;
             var    isNormalizedMatched = false;
             const  aTargetStringLowerCase = aTargetString.toLowerCase();
-            const  normalizedTargetKeywords = arg.thesaurus.normalize(aTargetString, arg.keywordsParticples.formalWordsLowerCase);
+            const  normalizedTargetKeywords = arg.thesaurus.normalize(aTargetString, arg.searchWordParticples.formalWordsLowerCase);
             const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
             var    matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
+            if (inDebuggingLine) {
+                lib.pp(`#breadcrumb:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
+            }
 
-            for (let wordIndex = 0;  wordIndex < arg.keywordsParticples.words.length;  wordIndex += 1) {
-                const keyword = arg.keywordsParticples.words[wordIndex];
-                const normalizedWord = arg.keywordsParticples.normalizedWords[wordIndex];
-                if (keyword.specified === '') {continue;}
+            for (let wordIndex = 0;  wordIndex < arg.searchWordParticples.words.length;  wordIndex += 1) {
+                const searchWord = arg.searchWordParticples.words[wordIndex];
+                const normalizedSearchWord = arg.searchWordParticples.normalizedWords[wordIndex];
+                if (searchWord.specified === '') {continue;}
 
                 const  result = this.#__getSubMatchedScore(aTargetString, aTargetStringLowerCase,
-                        keyword, targetStingIndex, wordIndex, 'strict');
+                        searchWord, targetStingIndex, wordIndex, 'strict');
                 if (result.score !== 0) {
 
                     found.matches.push(result.matched);
@@ -3557,7 +3557,7 @@ export class  Class {
                     }
                     found.score += notNormalizedScore;
                     if (debugSearchScore) {
-                        console.log(`    getSubMatchedScore: ${keyword.specified}, ${aTargetString}, result score: ${result.score} => ${found.score}`);
+                        console.log(`    getSubMatchedScore: ${searchWord.specified}, ${aTargetString}, result score: ${result.score} => ${found.score}`);
                     }
                 }
                 if (result.position !== notFound) {
@@ -3566,12 +3566,12 @@ export class  Class {
                     previousPosition = result.position;
                 }
                 const  isFoundWithoutNormalized = (result.score !== 0  ||  result.position !== notFound);
-                const  useThesaurus = (arg.thesaurus.enabled  &&  (normalizedWord.specified !== keyword.specified  ||  normalizedTargetKeywords !== aTargetString));
+                const  useThesaurus = (arg.thesaurus.enabled  &&  (normalizedSearchWord.specified !== searchWord.specified  ||  normalizedTargetKeywords !== aTargetString));
                 if (useThesaurus) {
-                    const  targetType: SearchTargetType = (normalizedTargetKeywords === aTargetString) ? 'strict' : 'normalized';
+                    const  targetWordType: WordType = (normalizedTargetKeywords === aTargetString) ? 'strict' : 'normalized';
 
                     const  normalizedResult = this.#__getSubMatchedScore(normalizedTargetKeywords, normalizedTargetKeywordsLowerCase,
-                            normalizedWord, targetStingIndex, wordIndex, targetType);
+                            normalizedSearchWord, targetStingIndex, wordIndex, targetWordType);
                     const  isFoundWithNormalized = (normalizedResult.score !== 0  ||  normalizedResult.position !== notFound);
                     if (isFoundWithNormalized) {
                         found.searchKeyphrase = keyphrase;
@@ -3590,7 +3590,7 @@ export class  Class {
                             var  normalizedMatched = found.matches[found.matches.length - 1];
                         }
                         if (debugSearchScore) {
-                            console.log(`    getSubMatchedScore(thesaurus): ${normalizedWord.specified}, ${aTargetString}, result score: ${normalizedResult.score} => ${found.score}`);
+                            console.log(`    getSubMatchedScore(thesaurus): ${normalizedSearchWord.specified}, ${aTargetString}, result score: ${normalizedResult.score} => ${found.score}`);
                         }
                         if ( ! isFoundWithoutNormalized) {
                             matchedCounts.setFoundPosition(normalizedResult.position, normalizedResult.score, true);
@@ -3632,9 +3632,9 @@ export class  Class {
                         // 2 is double score from the score of different (upper/loser) case
                 }
                 if (inDebuggingLine) {
-                    lib.pp(`DEBUG: in getKeywordMatchingScore`);
+                    lib.pp(`#breadcrumb:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
                 }
-                found.counts.searchKeywordCount = arg.keywordsParticples.words.length;
+                found.counts.searchKeywordCount = arg.searchWordParticples.words.length;
                 found.notMatchedTargetKeyphrase = Class.__getNotMatchedTargetKeyphrase(aTargetString, found);
                 found = matchedCounts.countFoundWords(found);
                 if ( ! isNormalizedMatched) {
@@ -3643,7 +3643,7 @@ export class  Class {
                     found.counts.targetWordCount = Math.max(lib.getWordCount(aTargetString), lib.getWordCount(normalizedTargetKeywords));
                 }
                 if (debugSearchScore) {
-                    console.log(`    getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                    lib.pp(`#breadcrumb:     getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
                 }
             }
             if (found.score !== 0) {
@@ -3660,20 +3660,20 @@ export class  Class {
         return  bestFound;
     }
 
-    #__getSubMatchedScore(targetString: string, targetStringLowerCase: string, keywordParticples: ParticpleWord,
-            targetStringIndex: number, wordIndex: number, targetType: SearchTargetType): Result {
+    #__getSubMatchedScore(targetString: string, targetStringLowerCase: string, searchWordParticples: ParticpleWord,
+            targetStringIndex: number, wordIndex: number, targetWordType: WordType): Result {
         // Debug
         // const  isDebug = (targetString === 'STR');
         var  score = 0;
         var  position = notFound;
         const  matched = new MatchedPart();
         if (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart)) {
-            lib.pp(`DEBUG:         in __getSubMatchedScore`);
+            lib.pp(`#breadcrumb:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
         }
 
-        if (targetStringLowerCase.indexOf(keywordParticples.commonPartLowerCase) !== notFound) {
-            const  keyword = keywordParticples.specified;
-            const  keywordLowerCase = keywordParticples.specifiedLowerCase;
+        if (targetStringLowerCase.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
+            const  keyword = searchWordParticples.specified;
+            const  keywordLowerCase = searchWordParticples.specifiedLowerCase;
             var  partMatchPosition = notFound;
             var  caseIgnoredPartMatchPosition = notFound;
             var  matchedKeyword = '';
@@ -3704,7 +3704,7 @@ export class  Class {
                 }
             }
             if (score === 0) {
-                for (const particple of keywordParticples.particples) {
+                for (const particple of searchWordParticples.particples) {
 
                     // Case sensitive matched with "particples".
                     const  particplePosition = targetString.indexOf(particple);
@@ -3762,13 +3762,13 @@ export class  Class {
                 }
             }
             if (score === 0) {
-                for (const particpleLowerCase of keywordParticples.particplesLowerCase) {
+                for (const particpleLowerCase of searchWordParticples.particplesLowerCase) {
 
                     // Not case sensitive matched with "particpleLowerCase".
                     if ((position = targetStringLowerCase.indexOf(particpleLowerCase)) !== notFound) {
                         if (targetString.length === particpleLowerCase.length) {
                             const  semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
-                            const  commonLength = keywordParticples.commonPartLowerCase.length;
+                            const  commonLength = searchWordParticples.commonPartLowerCase.length;
                             if (particpleWordIsCorrectCase(semiMatchedKeyword, particpleLowerCase, commonLength)) {
                                 score = caseIgnoredParticpleFullMatchScore;
                                 matchedKeyword = particpleLowerCase;
@@ -3779,7 +3779,7 @@ export class  Class {
                         } else {
                             if (isWordMatch(targetString, position, particpleLowerCase)) {
                                 const  semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
-                                const  commonLength = keywordParticples.commonPartLowerCase.length;
+                                const  commonLength = searchWordParticples.commonPartLowerCase.length;
                                 if (particpleWordIsCorrectCase(semiMatchedKeyword, particpleLowerCase, commonLength)) {
                                     score = caseIgnoredParticpleWordMatchScore;
                                     matchedKeyword = particpleLowerCase;
@@ -3811,7 +3811,7 @@ export class  Class {
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
                 matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
-                matched.targetType = targetType;
+                matched.targetType = targetWordType;
             } else {
                 position = notFound;
             }
@@ -4537,7 +4537,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                     continue;
                 }
                 if (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart)) {
-                    lib.pp(`DEBUG: in searchWithoutTags`);
+                    lib.pp(`#breadcrumb: in searchWithoutTags`);
                 }
 
                 // full match
@@ -4613,7 +4613,7 @@ function  getKeywordMatchingScoreWithoutTags(inputFileFullPath: string, line: st
         glossaryTitleLength: 0,
         targetStrings: [line],
         filePath: inputFileFullPath,
-        keywordsParticples,  thesaurus,  lineNum});
+        searchWordParticples: keywordsParticples,  thesaurus,  lineNum});
     found.path = inputFileFullPath;
     found.line = line;
     found.lineNum = lineNum;
@@ -6692,7 +6692,7 @@ class FoundLine {
             // }
         inDebuggingLine = (this.lineNum === debugPointLineNum  &&  this.path.includes(debugFilePathPart));
         if (inDebuggingLine) {
-            lib.pp(`DEBUG: in getString`);
+            lib.pp(`#breadcrumb: in getString`);
         }
 
         // colorParts = sort matched (this.matches) positions and merge overrlapping parts.
@@ -6945,7 +6945,7 @@ class FoundLine {
         }
     }
 
-    plusParentMatchScore(lines: string[], keywordsParticples: Particples, thesaurus: Thesaurus) {
+    plusParentMatchScore(lines: string[], searchWordParticples: Particples, thesaurus: Thesaurus) {
         var  lineNum = lines.length;
         var  currentLineNum = lineNum;
         if (lineNum <= 1) {
@@ -6955,10 +6955,14 @@ class FoundLine {
         const  parentMatchedCount: number[] = [];
         var    parentScore = 0;
         var    notParentMatches: MatchedPart[] = [];
-        var    foundWordIndex: boolean[] = new Array(keywordsParticples.words.length).fill(false);
+        var    foundWordIndex: boolean[] = new Array(searchWordParticples.words.length).fill(false);
         var    minIndent = indentRegularExpression.exec(lines[lineNum-1])![0];
         minIndent += 1;  // This code returns (indent < minIndent) true. Because current line is one of search target.
         var {foundWordIndex} = _cutAlreadyFoundWords(this, foundWordIndex);
+        const  isDebugging = (lineNum === debugPointLineNum  &&  this.path.includes(debugFilePathPart));
+        if (isDebugging) {
+            lib.pp(`#breadcrumb: plusParentMatchScore, ${this.path}:${lineNum}`);
+        }
 
         const  searchTargetLineNums: number[] = [];
         while (lineNum >= 2) {
@@ -6975,6 +6979,9 @@ class FoundLine {
         searchTargetLineNums.push(1);
         for (const lineNum of searchTargetLineNums) {
             var  line = lines[lineNum-1];
+            if (isDebugging) {
+                lib.pp(`#breadcrumb: plusParentMatchScore line:${lineNum}: ${line}`);
+            }
             if (lineNum === currentLineNum) {
                 line = cutKeywordTag(line);
             }
@@ -6983,8 +6990,8 @@ class FoundLine {
                 targetTagType: 'parent',
                 glossaryTitleLength: 0,
                 targetStrings: [line],
-                filePath: '',
-                keywordsParticples,  thesaurus, lineNum});
+                filePath: this.path,
+                searchWordParticples,  thesaurus, lineNum});
                 // Search targets are not only keywords in keyword tag.
             var {foundAtParent, foundWordIndex} = _cutAlreadyFoundWords(foundAtParent, foundWordIndex);
             if (foundAtParent  &&  foundAtParent.matches.length >= 1) {
@@ -7005,7 +7012,7 @@ class FoundLine {
             const  phrase = getParentPhrase(parentMatches, [], matchesInKeywordTag);
             if (phrase.length >= 1) {
                 const  parentPhrase = getParentPhrase(
-                    parentMatches,  notParentMatches.map((x)=> x.matchedString),  matchesInKeywordTag);
+                    parentMatches,  notParentMatches.map((x)=> x.matchedString),  matchesInKeywordTag).join(' ');
 
                 if (parentPhrase.length >= 1) {
                     found.line = `${parentPhrase} >> ${found.line}`;
@@ -7029,7 +7036,7 @@ class FoundLine {
                     notParentMatches.filter((x)=> ! matchesInKeywordTag.includes(x.matchedString)));
                 found.score += parentScore / 2;
                 found.counts.parentMatchedCount = parentMatchedCount;
-                found.counts.matchedSearchKeywordCount += phrase.split(' ').length;
+                found.counts.matchedSearchKeywordCount += phrase.join(' ').split(' ').length;
             }
         }
 
@@ -7180,7 +7187,7 @@ class  FoundCounts {
     }
 }
 
-function  getParentPhrase(parentMatches: string[], notParentMatches: string[], matchesInKeywordTag: string[]): string {
+function  getParentPhrase(parentMatches: string[], notParentMatches: string[], matchesInKeywordTag: string[]): string[] {
     const  words = new Set<string>();
     for (const aParentWord of parentMatches) {
         words.add(aParentWord);
@@ -7191,10 +7198,10 @@ function  getParentPhrase(parentMatches: string[], notParentMatches: string[], m
     for (const keyword of matchesInKeywordTag) {
         words.delete(keyword);
     }
-    return  Array.from(words).join(' ');
+    return  Array.from(words);
 }
 
-type SearchTargetType = 'strict' | 'normalized';
+type WordType = 'strict' | 'normalized';
 type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'parent' | 'withoutTags';
 type MatchedWordType =
     'super' |            // Same letters
@@ -7209,7 +7216,7 @@ class MatchedPart {
     targetWordsIndex: number = -1;  // Words index of "targetStrings" array argument of "getKeywordMatchingScore" function.
     searchWordIndex: number = -1;   // Word index of search keywords.
 
-    targetType: SearchTargetType = 'strict';
+    targetType: WordType = 'strict';
     targetTagType: SearchTargetTagType = 'withoutTags';
     matchedWordType: MatchedWordType = 'notMatched';
     caseSensitiveMatched: boolean = false;
