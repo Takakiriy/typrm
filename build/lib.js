@@ -5,6 +5,7 @@ import * as readline from 'readline';
 import * as stream from 'stream';
 import * as csvParse from 'csv-parse';
 import * as dotenv from "dotenv";
+import { performance } from 'perf_hooks';
 import chalk from 'chalk';
 import * as diff from 'diff';
 import { Readable, Writable } from 'stream';
@@ -1439,6 +1440,74 @@ export function getSnapshot(label, deafultSnapshot = undefined) {
 export function mark(object, label = "mark") {
     object._mark = label; // Add an attribute dynamically
 }
+export var time;
+(function (time) {
+    function start(label) {
+        const frame = get(label);
+        frame.count += 1;
+        if (frame.start === 0) {
+            frame.start = performance.now();
+        }
+    }
+    time.start = start;
+    function end(label) {
+        const now = performance.now();
+        const frame = get(label);
+        if (frame.start !== 0) {
+            frame.elapsed += now - frame.start;
+        }
+        frame.start = 0;
+    }
+    time.end = end;
+    class TimeFrame {
+        constructor() {
+            this.label = "others";
+            this.start = 0;
+            this.elapsed = 0;
+            this.count = 0;
+        }
+        getString() {
+            const errorMessage = (this.start === 0) ? "" : "  WARNING: timeEnd is not called.";
+            if (this.count <= 1) {
+                return `${this.count}time, ${this.elapsed} msec${errorMessage}`;
+            }
+            else {
+                return `${this.count}times, ${this.elapsed} msec${errorMessage}`;
+            }
+        }
+    }
+    time.TimeFrame = TimeFrame;
+    time.timeFrames = new Map();
+    function get(label) {
+        var frame = time.timeFrames.get(label);
+        if (!frame) {
+            frame = new TimeFrame();
+            frame.label = label;
+            time.timeFrames.set(label, frame);
+        }
+        return frame;
+    }
+    time.get = get;
+    function getTimeFrames(labelPattern) {
+        const re = new RegExp(labelPattern, 'i');
+        const output = [];
+        time.timeFrames.forEach((frame, key) => {
+            if (re.test(key)) {
+                output.push(frame);
+            }
+        });
+        return output.sort((a, b) => (b.elapsed - a.elapsed));
+    }
+    time.getTimeFrames = getTimeFrames;
+    function getTimeFramesString(labelPattern) {
+        const frames = getTimeFrames(labelPattern);
+        const frame = new TimeFrame();
+        frame.count = frames.reduce((previous, frame) => (previous + frame.count), 0);
+        frame.elapsed = frames.reduce((previous, frame) => (previous + frame.elapsed), 0);
+        return frame.getString();
+    }
+    time.getTimeFramesString = getTimeFramesString;
+})(time || (time = {})); // end of namespace  time
 export function jsonStringify(object, dummy, space) {
     // This is JSON.stringify supported circular references object
     const checkedObjects = new WeakSet();

@@ -119,6 +119,21 @@ export declare function getInputObject(): StandardInputBuffer;
 export declare function cutEscapeSequence(textWithEscapeSequence: string): string;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
 export declare function mark(object: any, label?: string | number | boolean): void;
+export declare namespace time {
+    function start(label: string): void;
+    function end(label: string): void;
+    class TimeFrame {
+        label: string;
+        start: number;
+        elapsed: number;
+        count: number;
+        getString(): string;
+    }
+    const timeFrames: Map<string, TimeFrame>;
+    function get(label: string): TimeFrame;
+    function getTimeFrames(labelPattern: string): TimeFrame[];
+    function getTimeFramesString(labelPattern: string): string;
+}
 export declare function jsonStringify(object: any, dummy?: any, space?: string): string;
 export declare function pp(message: any): string[];
 declare global {
