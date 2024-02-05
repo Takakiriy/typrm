@@ -19,6 +19,7 @@ var  debugSearchScore = false;
 var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = "search/2/2.yaml";  // This is used, if "debugPointLineNum" != 0
 var  inDebuggingLine = false;
+var  timeTag = false;
 
 // main
 export async function  main() {
@@ -37,6 +38,7 @@ export async function  main() {
 
 function  DebugWatchPoint() {
     if (true) {
+        printTime();
         var    d = lib.pp('');
         const  s = getStdOut();
         d = [];  // Set break point here and watch the variable d
@@ -3189,6 +3191,7 @@ async function  search() {
 }
 
 async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promise<PrintRefResult> {
+    timeTag && lib.time.start(`searchSub`);
     const  thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
         const  thesaurusFilePath = programOptions.thesaurus;
@@ -3252,6 +3255,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
 
     // search
     for (const inputFileFullPath of fileFullPaths) {
+        timeTag && lib.time.start(`searchSub >> ${inputFileFullPath}`);
         if (debugSearchScore) {
             console.log(`searchSub: ${inputFileFullPath}`);
         }
@@ -3314,6 +3318,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
             // keyword tag
             if ((indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound)
                     &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
+                timeTag && lib.time.start(`searchSub >> keyword >> ${inputFileFullPath}`);
                 if (indexOfKeywordLabel !== notFound) {
                     var  label = keywordLabel;
                     var  indexOfLabel = indexOfKeywordLabel;
@@ -3380,15 +3385,19 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                         found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
                     }
                     found.evaluateSnippetDepthTag(line);
+                    timeTag && lib.time.start(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
                     found.plusParentMatchScore(lines, searchWordParticples, thesaurus);
+                    timeTag && lib.time.end(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
                     foundLines.push(found);
                     snippetScaning.push(found);
                 }
+                timeTag && lib.time.end(`searchSub >> keyword >> ${inputFileFullPath}`);
             }
 
             // glossary tag
             var  glossaryTag: GlossaryTag | undefined = undefined;
             if (line.trim() !== '') {
+                timeTag && lib.time.start(`searchSub >> glossary >> ${inputFileFullPath}`);
                 if (glossaryTags.length >= 1) {
                     glossaryTag = glossaryTags[glossaryTags.length - 1];
                 }
@@ -3475,6 +3484,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                         }
                     }
                 }
+                timeTag && lib.time.end(`searchSub >> glossary >> ${inputFileFullPath}`);
             }
 
             // alarm tag
@@ -3525,6 +3535,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                 }
             }
         }
+        timeTag && lib.time.end(`searchSub >> ${inputFileFullPath}`);
     }
     const  maximumHitWordCount = foundLines.reduce((previous, found) => (
         Math.max(previous, found.counts.matchedSearchKeywordCount)
@@ -3541,6 +3552,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
         lib.pp(`#breadcrumb: there is ${foundLine ? '' : 'NOT '}found data.`);
     }
     if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
+        timeTag && lib.time.start(`searchSub >> searchWithoutTags`);
 
         var  foundLineWithoutTags = await searchWithoutTags(keyword);
         const  maximumHitWordCount2 = foundLineWithoutTags.reduce((previousMinimumHitWordCount, found) => (
@@ -3553,6 +3565,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
             found1.path == found2.path  &&  found1.lineNum == found2.lineNum));
 
         foundLines.sort(compareScoreAndSoOn);
+        timeTag && lib.time.end(`searchSub >> searchWithoutTags`);
     }
 
     // Debug score compare in 2 founds
@@ -3607,6 +3620,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
 
         const  verbReturn = await printRef(refTagAndAddress);
         verbReturn.foundLines = foundLines;
+        timeTag && lib.time.end(`searchSub`);
         return  verbReturn;
     } else {
         const  normalReturn = getEmptyOfPrintRefResult();
@@ -3614,6 +3628,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
             normalReturn.previousKeyword = keyword;
         }
         normalReturn.foundLines = foundLines;
+        timeTag && lib.time.end(`searchSub`);
         return  normalReturn;
     }
 }
@@ -4736,6 +4751,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
         if (debugSearchScore) {
             console.log(`searchWithoutTags: ${inputFileFullPath}`);
         }
+        if (fullMatchCount >= foundCountSystemMax) {
+            break;
+        }
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -4750,6 +4768,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                 const  line: string = line1;
                 lineNum += 1;
                 if (fullMatchCount >= foundCountSystemMax) {
+                    breaking = true
                     continue;
                 }
                 if (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart)) {
@@ -4799,13 +4818,16 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
 
                 // shuffled keywords match
                 else {
+                    if (matchCount < foundCountSystemMax) {
 
-                    var  keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
-                    if (keywordIndex !== notFound) {
-                        const  found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
-                        foundLines.push(found);
-                        if (debugSearchScore) {
-                            console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
+                        var  keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
+                        if (keywordIndex !== notFound) {
+                            const  found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
+                            foundLines.push(found);
+                            matchCount += 1;
+                            if (debugSearchScore) {
+                                console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
+                            }
                         }
                     }
                 }
@@ -7905,6 +7927,17 @@ function  cutLastLF(message: string) {
     return  message;
 }
 
+function  printTime() {
+    console.log(`#time: searchSub: ${lib.time.get('searchSub').getString()}`);
+    console.log(`#time:     keyword: ${lib.time.getTimeFramesString('^searchSub >> keyword >> .*')}`);
+    console.log(`#time:     glossary: ${lib.time.getTimeFramesString('^searchSub >> glossary >> .*')}`);
+    console.log(`#time:     plusParentMatchScore: ${lib.time.getTimeFramesString('^searchSub >> plusParentMatchScore >> .*')}`);
+    console.log(`#time:     searchWithoutTags: ${lib.time.get('searchSub >> searchWithoutTags').getString()}`);
+    for (let frame of lib.time.getTimeFrames('^searchSub >> .*')) {
+        console.log(`#time:     ${frame.label}: ${frame.getString()}`);
+    }
+}
+
 // getStdOut
 // Example:
 //    var d = getStdOut();  // Set break point here and watch the variable d
@@ -8194,7 +8227,7 @@ const  notSearchedInFile = 0;
 const  notFoundInFile = -2;
 const  notFound = -1;
 const  jpsp = String.fromCodePoint(0x3000);  // Japanese space
-const  foundCountSystemMax = 1000;
+const  foundCountSystemMax = 100;
 var    inputFileParentPath = '';
 var    locale = '';
 var    withJest = false;
