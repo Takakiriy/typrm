@@ -11,7 +11,7 @@ import * as csvParse from 'csv-parse';
 import chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
-import * as lib from "./lib";
+import * as lib from "./lib.js";
 import sharp from 'sharp';
 // import { pp, ff, cc, ccCount } from "./lib";
 var __dirname = path.resolve();
