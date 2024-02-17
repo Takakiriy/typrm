@@ -1,6 +1,6 @@
 import * as commander from 'commander';
-import * as main from './main.js';
-import * as lib from './lib.js';
+import * as main from './main';
+import * as lib from './lib';
 
 function  exitFromCommander(e: commander.CommanderError) {
     if (e.code !== 'commander.version') {

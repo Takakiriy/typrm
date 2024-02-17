@@ -45,6 +45,7 @@
                 "main",
                 "--runInBand",
                 "--coverage", "false"],
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         },
@@ -59,6 +60,7 @@
                 "--runInBand",
                 "--coverage", "false"
             ],
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         }

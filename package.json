@@ -4,6 +4,7 @@
     "description": "",
     "scripts": {
         "setup": "npm ci",
+        "build": "tsc  &&  node src/support_node.cjs",
         "test": "jest --watchAll",
         "clean": "powershell rm -r -fo node_modules"
     },
