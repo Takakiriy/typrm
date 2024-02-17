@@ -11,10 +11,11 @@ import * as csvParse from 'csv-parse';
 import chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
-import * as lib from "./lib.js";
+import * as lib from './lib.js';
 import sharp from 'sharp';
-// import { pp, ff, cc, ccCount } from "./lib";
-var __dirname = path.resolve();
+// import { pp, ff, cc, ccCount } from './lib.js';
+var __dirname = process.cwd(); // If const, SyntaxError: Identifier '__dirname' has already been declared
+const typrmProject = __dirname;
 var debugSearchScore = false;
 var debugPointLineNum = 0; // 0 = not debug. Search "debugPointLineNum" in this file.
 var debugFilePathPart = "search/2/2.yaml"; // This is used, if "debugPointLineNum" != 0
@@ -4977,7 +4978,13 @@ var instanceOf;
 function getTestablePath(path_) {
     if ('test' in programOptions) {
         const home = lib.getHomePath();
-        if (path_.startsWith(home)) {
+        if (runningOS === 'Windows') {
+            path_ = lib.replaceToPathForWindows(path_);
+        }
+        if (path_.startsWith(`${typrmProject}${path.sep}`)) {
+            return '${typrmProject}' + lib.replacePathToSlashed(path_.substring(typrmProject.length));
+        }
+        else if (path_.startsWith(`${home}${path.sep}`)) {
             return '${HOME}' + lib.replacePathToSlashed(path_.substring(home.length));
         }
         else if (path_.startsWith(inputFileParentPath + path.sep) && inputFileParentPath !== '') {

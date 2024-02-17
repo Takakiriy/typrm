@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as main from "./main.js";
+import * as main from './main.js';
 import chalk from "chalk";
-import * as lib from "./lib.js";
+import * as lib from './lib.js';
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -19,14 +19,8 @@ if (process.env.windir) {
 else {
     var testingOS = 'Linux';
 }
-var normalizedHomePath = lib.getHomePath().replace(/\\/g, '/');
-normalizedHomePath = normalizedHomePath[0].toLowerCase() + normalizedHomePath.substring(1);
-var projectRootPath = lib.getFullPath('..', __dirname).replace(/\\/g, '/');
-var projectRoot = '${HOME}' + projectRootPath.substring(normalizedHomePath.length);
-if (projectRoot !== '${HOME}/GitProjects/GitHub/typrm') {
-    throw new Error('When running tests, place the project folder in `${HOME}/GitProjects/GitHub/typrm/`.');
-    // See "specifications.yaml" file
-}
+var normalizedProjectRoot = path.dirname(__dirname.replace(/\\/g, "/").replace(/^C/, "c"));
+var projectRoot = '${typrmProject}';
 process.env.TYPRM_TEST_ENV = lib.getFullPath('test_data', __dirname);
 process.env.TYPRM_TEST_SEARCH = 'search';
 process.env.TYPRM_TEST_ENV2 = 'testEnv';
@@ -106,13 +100,25 @@ describe("typrm shell >>", () => {
             ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n', ''],
             ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n', ''],
             ['snippet_environment_variable', 'test_data/search/2', 'snippet_environment_variable\nexit()\n', '-' + testingOS],
-        ])("%s", async (_caseName, folder, input, snapshotTag) => {
+        ])("%s", async (caseName, folder, input, snapshotTag) => {
             chdirInProject('src');
             var typrmOptions = {
                 folder, test: "", locale: "en-US", input,
             };
-            await callMain([], typrmOptions);
-            expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout' + snapshotTag);
+            const normalCase = (caseName !== 'snippet_environment_variable');
+            if (normalCase) {
+                await callMain([], typrmOptions);
+                expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout' + snapshotTag);
+            }
+            else if (caseName === 'snippet_environment_variable') {
+                const typrmProjectPath = '${HOME}\\\\GitHub\\\\typrm';
+                var answerFileContents = lib.getSnapshot(`typrm shell >> search >> snippet_environment_variable: stdout${snapshotTag} 1`);
+                answerFileContents = lib.replace(answerFileContents, [
+                    { from: '${HOME}\\\\GitProjects\\\\GitHub\\\\typrm', to: typrmProjectPath },
+                ]).replace(/\\\\/g, '\\');
+                await callMain([], typrmOptions);
+                expect(lib.cutEscapeSequence(main.stdout)).toBe(answerFileContents);
+            }
         });
     });
     describe("replace >>", () => {
@@ -265,8 +271,13 @@ describe("checks >> file contents >>", () => {
         ]
     ])("First >> %s", async (caseName) => {
         chdirInProject('src');
-        const sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
+        const typrmProjectPath = "~/GitHub/typrm";
+        var sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
+        sourceFileContents = lib.replace(sourceFileContents, [
+            { from: "~/GitProjects/GitHub/typrm", to: typrmProjectPath },
+            { from: "~/GitProjects/GitHub/typrm", to: typrmProjectPath }, // 2nd replace
+        ]);
         lib.rmdirSync(testFolderPath + '_checking');
         writeFileSync(changingFilePath, sourceFileContents);
         process.chdir('empty_folder');
@@ -1482,12 +1493,13 @@ describe("print reference >>", () => {
         });
     });
     describe("recommend >>", () => {
+        const typrmProjectPath = `${lib.getHomePath()}/GitHub/typrm`;
         test.each([
             ["recommend",
                 ["search", "#ref:", `${lib.getHomePath()}/.ssh  ${__dirname}/test_data/search/1/1.yaml  ${__dirname}/test_data/search/2/2.yaml  C:\\Test\\user1  c:\\Test  last\\`],
                 { locale: "en-US", test: "" },
                 'Recommend: #ref: ~/.ssh  ${TEST_ENV}/${TEST_SEARCH}/1/1.yaml  ${TEST_ENV}/${TEST_SEARCH}/2/2.yaml  ${TEST_PATH}/user1  ${TEST_PATH}  last/\n' +
-                    `ERROR: not found a file or folder at \"${lib.getHomePath()}/.ssh  ${lib.getHomePath()}/GitProjects/GitHub/typrm/src/test_data/search/1/1.yaml  ${lib.getHomePath()}/GitProjects/GitHub/typrm/src/test_data/search/2/2.yaml  C:/Test/user1  c:/Test  last/\"\n`.replace(/\//g, path.sep) +
+                    `ERROR: not found a file or folder at \"${lib.getHomePath()}/.ssh  ${typrmProjectPath}/src/test_data/search/1/1.yaml  ${typrmProjectPath}/src/test_data/search/2/2.yaml  C:/Test/user1  c:/Test  last/\"\n`.replace(/\//g, path.sep) +
                     lib.getHomePath() + "\n" + // USERPROFILE, if pc is not found
                     "    0.Folder\n",
             ], ["recommend (2)",
@@ -1640,7 +1652,7 @@ describe("print reference >>", () => {
                             '    Verbose: Envrironment variables defined in ".env" file are not inherit to child processes.\n' +
                             "Verbose: typrm command: search\n" +
                             "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
-                            `    Verbose: address in ref tag: ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md\n` +
+                            `    Verbose: address in ref tag: ${normalizedProjectRoot}/README.md\n` +
                             "    Verbose: type: text\n" +
                             (defaultUsesLineNumGetter ?
                                 "    Verbose: regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
@@ -1649,7 +1661,7 @@ describe("print reference >>", () => {
                                     "    Verbose: csvOptionRegularExpressionIndex: 2\n" +
                                     "    Verbose: targetMatchIdRegularExpressionIndex: 4\n" +
                                     "    Verbose: address: ${file}:${lineNum}\n" +
-                                    `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, , , , , ]\n`
+                                    `    Verbose: matched: [${normalizedProjectRoot}/README.md, ${normalizedProjectRoot}/README.md, , , , , ]\n`
                                 :
                                     "    Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
                                         "    Verbose: filePathRegularExpressionIndex: 1\n" +
@@ -1657,7 +1669,7 @@ describe("print reference >>", () => {
                                         "    Verbose: csvOptionRegularExpressionIndex: 3\n" +
                                         "    Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
                                         "    Verbose: address: ${file}:${lineNum}\n" +
-                                        `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, md, , , , , ]\n`) +
+                                        `    Verbose: matched: [${normalizedProjectRoot}/README.md, ${normalizedProjectRoot}/README.md, md, , , , , ]\n`) +
                             "Error that verb number 4 is not defined\n"
                     : // mac
                         "Verbose: Option and environment variables:\n" +
@@ -1709,7 +1721,7 @@ describe("print reference >>", () => {
                             '    Verbose: Envrironment variables defined in ".env" file are not inherit to child processes.\n' +
                             "Verbose: typrm command: search\n" +
                             "Verbose: Parsed by TYPRM_LINE_NUM_GETTER:\n" +
-                            `    Verbose: address in ref tag: ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md\n` +
+                            `    Verbose: address in ref tag: ${normalizedProjectRoot}/README.md\n` +
                             "    Verbose: type: text\n" +
                             (defaultUsesLineNumGetter ?
                                 "    Verbose: regularExpression: ^(.*?)(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
@@ -1718,7 +1730,7 @@ describe("print reference >>", () => {
                                     "    Verbose: csvOptionRegularExpressionIndex: 2\n" +
                                     "    Verbose: targetMatchIdRegularExpressionIndex: 4\n" +
                                     "    Verbose: address: ${file}:${lineNum}\n" +
-                                    `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, , , , , ]\n`
+                                    `    Verbose: matched: [${normalizedProjectRoot}/README.md, ${normalizedProjectRoot}/README.md, , , , , ]\n`
                                 :
                                     "    Verbose: regularExpression: ^(.*\\.(yaml|md))(:csv)?(:id=([0-9]+))?(#(.*))?$\n" +
                                         "    Verbose: filePathRegularExpressionIndex: 1\n" +
@@ -1726,7 +1738,7 @@ describe("print reference >>", () => {
                                         "    Verbose: csvOptionRegularExpressionIndex: 3\n" +
                                         "    Verbose: targetMatchIdRegularExpressionIndex: 5\n" +
                                         "    Verbose: address: ${file}:${lineNum}\n" +
-                                        `    Verbose: matched: [${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, ${normalizedHomePath}/GitProjects/GitHub/typrm/README.md, md, , , , , ]\n`) +
+                                        `    Verbose: matched: [${normalizedProjectRoot}/README.md, ${normalizedProjectRoot}/README.md, md, , , , , ]\n`) +
                             "Error that verb number 4 is not defined\n",
             ],
             // Others test is "search_mode_ref_verb".

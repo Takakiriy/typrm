@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as lib from "./lib";
+import * as lib from './lib.js';
 import * as path from "path";
 import chalk from 'chalk';
 var anyLinesTag = '#anyLines:';
