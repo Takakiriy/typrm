@@ -15,7 +15,12 @@ import * as lib from './lib.js';
 import sharp from 'sharp';
 // import { pp, ff, cc, ccCount } from './lib.js';
 var __dirname = process.cwd(); // If const, SyntaxError: Identifier '__dirname' has already been declared
-const typrmProject = __dirname;
+if (__dirname.endsWith('/src')) { // In mac, first run __dirname is typrmProject, second run __dirname is typrmProject/src.
+    var typrmProject = path.dirname(__dirname);
+}
+else {
+    var typrmProject = __dirname;
+}
 var debugSearchScore = false;
 var debugPointLineNum = 0; // 0 = not debug. Search "debugPointLineNum" in this file.
 var debugFilePathPart = "search/2/2.yaml"; // This is used, if "debugPointLineNum" != 0

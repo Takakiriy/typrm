@@ -11,10 +11,15 @@ if (process.env.windir) {
 else {
     var testingOS = 'Linux';
 }
-const scriptPath = `../build/typrm.js`;
-const testFolderPath = `test_data` + path.sep;
-var normalizedHomePath = lib.getHomePath().replace(/\\/g, '/');
-normalizedHomePath = normalizedHomePath[0].toLowerCase() + normalizedHomePath.substring(1);
+const optionsForESModulesNodeJs14 = '--experimental-modules --es-module-specifier-resolution=node';
+const optionsForESModulesNodeJs16 = '--no-warnings  --es-module-specifier-resolution=node';
+const optionsForESModulesNodeJs20 = '';
+const optionsForESModules = optionsForESModulesNodeJs20;
+const scriptPath = `./build/typrm.js`;
+const projectRelativePath = path.dirname(__dirname).substring(lib.getHomePath().length + 1);
+const projectRoot = '${HOME}' + path.sep + projectRelativePath;
+const normalizedHomePath = lib.getHomePath().replace(/\\/g, '/').replace(/^C/, "c");
+const testFolderPath = `src/test_data` + path.sep;
 //process.env.TYPRM_THESAURUS = 'test_data/thesaurus/thesaurus.csv';
 //process.env.TYPRM_FOLDER = 'C:/aaaa';
 process.env.TYPRM_COMMAND_FOLDER = process.cwd();
@@ -44,11 +49,11 @@ process.env.TYPRM_VERB = `
 `;
 if (process.env.windir) {
     var testingOS = 'Windows';
-    process.env.TYPRM_OPEN_DOCUMENT = `powershell -Command "Write-Output  'code -g ""\${ref}"""' > test_data\\_out.log"`;
+    process.env.TYPRM_OPEN_DOCUMENT = `powershell -Command "Write-Output  'code -g ""\${ref}"""' > src\\test_data\\_out.log"`;
 }
 else {
     var testingOS = 'mac'; // or Linux
-    process.env.TYPRM_OPEN_DOCUMENT = `echo  "code -g \\"\${ref}\\"" > test_data/_out.log`;
+    process.env.TYPRM_OPEN_DOCUMENT = `echo  "code -g \\"\${ref}\\"" > src/test_data/_out.log`;
 }
 async function main() {
     if (false) {
@@ -61,8 +66,8 @@ async function main() {
 }
 // DoCustomDebug
 async function DoCustomDebug() {
-    const returns = await callChildProccess(`node --experimental-modules --es-module-specifier-resolution=node ${scriptPath} ` +
-        `search  --folder test_data/search/1`, { inputLines: [ /*"exit()"*/] });
+    const returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ` +
+        `search  --folder src/test_data/search/1`, { inputLines: [ /*"exit()"*/] });
     console.log(`(typrm_test.ts stdout) ${returns.stdout}`);
     console.log('Done');
 }
@@ -75,42 +80,50 @@ async function TestOfCommandLine() {
             "check": "false",
             "inputLines": "",
         }, { "name": "locale",
-            "parameters": "search ABC --folder test_data/search/1",
+            "parameters": "search ABC --folder src/test_data/search/1",
             "check": "true",
             "inputLines": "",
             // There are search_mode, search_mode_find test in "main.test.ts".
         }, { "name": "search_mode_select_by_number",
-            "parameters": "--folder test_data/search/1",
+            "parameters": "--folder src/test_data/search/1",
             "check": "false",
             "checkFile": "_out.log",
             "inputLines": "double quotation is\n#1\nexit()\n",
         }, { "name": "search_mode_ref_verb",
             "parameters": "search",
             "check": "true",
-            "inputLines": `#ref: \"${normalizedHomePath}/GitProjects/GitHub/typrm/README.md#parameters\"\n7\n\n7\nexit()\n`,
+            "inputLines": `#ref: \"${normalizedHomePath}/${projectRelativePath}/README.md#parameters\"\n7\n\n7\nexit()\n`,
         }, { "name": "search_mode_result_has_ref_verb",
-            "parameters": "search  --folder test_data/search/2",
+            "parameters": "search  --folder src/test_data/_tmp",
             "check": "true",
             "inputLines": "file_path\nexit()\n",
+            "sourceDataFile": "src/test_data/search/2/2.yaml",
+            "temporaryDataFile": "src/test_data/_tmp/2.yaml",
         }, { "name": "pointed_figure_1",
-            "parameters": "search  \"#ref: ${normalizedHomePath}/GitProjects/GitHub/typrm/example/figure_1.png?name=test_1&x=404&y=70\"",
+            "parameters": "search  \"#ref: ${normalizedHomePath}/" + projectRelativePath + "/example/figure_1.png?name=test_1&x=404&y=70\"",
             "check": "false",
             "inputLines": "",
         }, { "name": "pointed_figure_2",
             "parameters": "search",
             "check": "false",
-            "inputLines": "#ref: ${normalizedHomePath}/GitProjects/GitHub/typrm//example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
+            "inputLines": "#ref: ${normalizedHomePath}/" + projectRelativePath + "/example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
         }
     ];
     for (const case_ of cases) {
-        if (true || case_.name === 'pointed_figure_1') {
+        if (true || case_.name === 'search_mode_result_has_ref_verb') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
-            const optionsForESModules = '--experimental-modules --es-module-specifier-resolution=node';
+            if ("temporaryDataFile" in case_) {
+                lib.copyFileSync(case_.sourceDataFile, case_.temporaryDataFile);
+                lib.replaceFileSync(case_.temporaryDataFile, (text) => (lib.replace(text, [
+                    { from: "GitProjects/GitHub/typrm", to: projectRelativePath.replace(/\\/g, '/') },
+                    { from: "GitProjects/GitHub/typrm", to: projectRelativePath.replace(/\\/g, '/') }
+                ])));
+            }
             // Test Main
             returns = await callChildProccess(`node ${optionsForESModules} ${scriptPath} ${case_.parameters} --test  --stdout-buffer`, { inputLines: case_.inputLines.split('\n') });
             // Redirect is also lost some outputs.
-            //    callChildProccess(`... > test_data/_stdout.log`);
-            //    returns.stdout = fs.readFileSync('test_data/_stdout.log').toString();
+            //    callChildProccess(`... > src/test_data/_stdout.log`);
+            //    returns.stdout = fs.readFileSync('src/test_data/_stdout.log').toString();
             // To flush stdout is also lost some outputs.
             //     console.log('This text will be lost')
             //     process.stdout.write('some data', () => {
@@ -121,22 +134,24 @@ async function TestOfCommandLine() {
             // Check
             if (case_.check === 'true') {
                 const noData = 'no data';
-                const answer = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
-                const answer2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
+                var expectedOutput = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
+                var expectedOutput2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
                 var stdout = returns.stdout;
+                expectedOutput = expectedOutput.replace(/\\/g, '/').replace(/GitProjects\/GitHub\/typrm/g, projectRelativePath.replace(/\\/g, '/'));
+                expectedOutput2 = expectedOutput2.replace(/\\/g, '/').replace(/GitProjects\/GitHub\/typrm/g, projectRelativePath.replace(/\\/g, '/'));
                 stdout = stdout.replace(new RegExp(normalizedHomePath, 'ig'), '${HOME}')
                     .replace(new RegExp(lib.getHomePath().replace(/\\/g, '\\\\'), 'ig'), '${HOME}')
                     .replace(/\\/g, '/');
-                if (stdout !== answer) {
-                    if (answer2 === noData) {
+                if (stdout !== expectedOutput) {
+                    if (expectedOutput2 === noData) {
                         printDifferentPaths('_output.log', '_expected.log');
                     }
                     else {
                         printDifferentPaths('_output.log', '_expected.log', '_expected2.log');
                     }
                     fs.writeFileSync(testFolderPath + "_output.log", stdout);
-                    fs.writeFileSync(testFolderPath + "_expected.log", answer);
-                    fs.writeFileSync(testFolderPath + "_expected2.log", answer2);
+                    fs.writeFileSync(testFolderPath + "_expected.log", expectedOutput);
+                    fs.writeFileSync(testFolderPath + "_expected2.log", expectedOutput2);
                     throw new Error(`in typrm_test >> TestOfCommandLine >> ${case_.name}`);
                 }
             }
@@ -144,7 +159,7 @@ async function TestOfCommandLine() {
                 const snapShotName = `typrm_test >> TestOfCommandLine >> ${case_.name} >> ${case_.checkFile} 1`;
                 const result = fs.readFileSync(testFolderPath + case_.checkFile, 'utf-8')
                     .replace(/\r/g, '').replace(lib.getHomePath(), '${HOME}');
-                var answer = lib.getSnapshot(snapShotName);
+                var answer = lib.getSnapshot(snapShotName).replace(/\$\{typrmProject\}/g, projectRoot);
                 if (testingOS === 'Windows') {
                     answer = answer.replace(/\//g, '\\');
                 }
@@ -160,6 +175,7 @@ async function TestOfCommandLine() {
     deleteFile(testFolderPath + "_output.log");
     deleteFile(testFolderPath + "_expected.log");
     deleteFile(testFolderPath + "_expected2.log");
+    lib.rmdirSync(testFolderPath + '_tmp');
 }
 // callChildProccess
 async function callChildProccess(commandLine, option) {
@@ -244,7 +260,7 @@ class ProcessReturns {
         this.stderr = '';
     }
 }
-const testFolderFullPath = getFullPath(`../src/${testFolderPath}`, __dirname);
+const testFolderFullPath = getFullPath(`../${testFolderPath}`, __dirname);
 const cutBOM = 1;
 const notFound = -1;
 main();

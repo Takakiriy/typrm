@@ -6,6 +6,9 @@ import * as lib from './lib.js';
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
+const projectRelativePath = path.dirname(__dirname).substring(lib.getHomePath().length + 1);
+const normalizedProjectRoot = path.dirname(__dirname.replace(/\\/g, "/").replace(/^C/, "c"));
+const projectRoot = '${typrmProject}';
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
 const keywordLabelColor = chalk.gray;
@@ -19,8 +22,6 @@ if (process.env.windir) {
 else {
     var testingOS = 'Linux';
 }
-var normalizedProjectRoot = path.dirname(__dirname.replace(/\\/g, "/").replace(/^C/, "c"));
-var projectRoot = '${typrmProject}';
 process.env.TYPRM_TEST_ENV = lib.getFullPath('test_data', __dirname);
 process.env.TYPRM_TEST_SEARCH = 'search';
 process.env.TYPRM_TEST_ENV2 = 'testEnv';
@@ -111,11 +112,18 @@ describe("typrm shell >>", () => {
                 expect(lib.cutEscapeSequence(main.stdout)).toMatchSnapshot('stdout' + snapshotTag);
             }
             else if (caseName === 'snippet_environment_variable') {
-                const typrmProjectPath = '${HOME}\\\\GitHub\\\\typrm';
+                const typrmProjectPath = '${HOME}\\\\' + projectRelativePath;
                 var answerFileContents = lib.getSnapshot(`typrm shell >> search >> snippet_environment_variable: stdout${snapshotTag} 1`);
-                answerFileContents = lib.replace(answerFileContents, [
-                    { from: '${HOME}\\\\GitProjects\\\\GitHub\\\\typrm', to: typrmProjectPath },
-                ]).replace(/\\\\/g, '\\');
+                if (testingOS === 'Windows') {
+                    answerFileContents = lib.replace(answerFileContents, [
+                        { from: '${HOME}\\\\GitProjects\\\\GitHub\\\\typrm', to: typrmProjectPath },
+                    ]).replace(/\\\\/g, '\\');
+                }
+                else {
+                    answerFileContents = lib.replace(answerFileContents, [
+                        { from: '${HOME}/GitProjects/GitHub/typrm', to: typrmProjectPath.replace(/\\\\/g, '/') },
+                    ]);
+                }
                 await callMain([], typrmOptions);
                 expect(lib.cutEscapeSequence(main.stdout)).toBe(answerFileContents);
             }
@@ -271,7 +279,7 @@ describe("checks >> file contents >>", () => {
         ]
     ])("First >> %s", async (caseName) => {
         chdirInProject('src');
-        const typrmProjectPath = "~/GitHub/typrm";
+        const typrmProjectPath = "~/" + projectRelativePath.replace(/\\\\/g, '/');
         var sourceFileContents = lib.getSnapshot(`checks file contents >> First >> ${caseName}: sourceFileContents 1`);
         const changingFilePath = 'test_data/_checking/document/' + caseName + "_1_changing.yaml";
         sourceFileContents = lib.replace(sourceFileContents, [
@@ -1493,7 +1501,7 @@ describe("print reference >>", () => {
         });
     });
     describe("recommend >>", () => {
-        const typrmProjectPath = `${lib.getHomePath()}/GitHub/typrm`;
+        const typrmProjectPath = `${lib.getHomePath()}/${projectRelativePath.replace(/\\\\/g, '/')}`;
         test.each([
             ["recommend",
                 ["search", "#ref:", `${lib.getHomePath()}/.ssh  ${__dirname}/test_data/search/1/1.yaml  ${__dirname}/test_data/search/2/2.yaml  C:\\Test\\user1  c:\\Test  last\\`],

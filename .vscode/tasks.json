@@ -9,6 +9,12 @@
             "problemMatcher": [
                 "$tsc-watch"
             ]
+        },
+        {
+            "label": "Run support_node.cjs",
+            "type": "shell",
+            "command": "node src/support_node.cjs",
+            "dependsOn": ["TypeScript Compile Task"]
         }
     ]
 }

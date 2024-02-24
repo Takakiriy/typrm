@@ -5,25 +5,27 @@
             "name": "Build and basic test",
             "type": "node",
             "request": "launch",
-            "preLaunchTask": "TypeScript Compile Task",
+            "preLaunchTask": "Run support_node.cjs",
             "program": "${workspaceFolder}/src/typrm_test.ts",
-            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "runtimeArgs": [],  // v20
+            // "runtimeArgs": ["--experimental-specifier-resolution=node"],  // v18
             "args": [],
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "smartStep": true,
             "outFiles": [
                 "${workspaceFolder}/build/**/*.js"
-            ]
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
         },
         {
-            "name": "Debug from launch",
+            "name": "Debug from launch.json",
             "type": "node",
             "request": "launch",
-            "preLaunchTask": "TypeScript Compile Task",
+            "preLaunchTask": "Run support_node.cjs",
             "program": "${workspaceFolder}/src/typrm.ts",
             "runtimeArgs": ["--experimental-specifier-resolution=node"],
             "args": ["key"],  // "check", "--verbose"
-            "cwd": "${workspaceFolder}/src",
+            "cwd": "${workspaceFolder}",
             "smartStep": true,
             "outFiles": [
                 "${workspaceFolder}/build/**/*.js"

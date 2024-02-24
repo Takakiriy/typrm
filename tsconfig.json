@@ -12,5 +12,6 @@
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "outDir": "build"
-  }
+  },
+  "exclude": ["src/test_data"]
 }

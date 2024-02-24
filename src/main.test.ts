@@ -3,14 +3,13 @@ import * as path from "path";
 import * as main from "./main";
 import chalk from "chalk";
 import * as lib from "./lib";
-import { pp } from "./lib";
 const  callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
 
 const  projectRelativePath = path.dirname(__dirname).substring(lib.getHomePath().length+1);
-var    normalizedProjectRoot = path.dirname(__dirname.replace(/\\/g, "/").replace(/^C/, "c"));
-var    projectRoot = '${typrmProject}';
+const  normalizedProjectRoot = path.dirname(__dirname.replace(/\\/g, "/").replace(/^C/, "c"));
+const  projectRoot = '${typrmProject}';
 const  testFolderPath = `test_data` + path.sep;
 const  matchedColor = chalk.green.bold;
 const  keywordLabelColor = chalk.gray;

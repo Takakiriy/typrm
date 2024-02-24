@@ -9520,7 +9520,7 @@ exports[`typrm shell >> search >> snippet_environment_variable: stdout-Linux 1`]
 "typrm keyword: snippet_environment_variable
 \${typrmProject}/src/test_data/search/2/2.yaml:197: typrm shell >> search >> snippet_environment_variable:
 \${typrmProject}/src/test_data/search/2/2.yaml:201:     snippet_environment_variable: #keyword:
-    - (\${typrmProject}/src/test_data)
+    - (\${HOME}/GitProjects/GitHub/typrm/src/test_data)
     - s3C6E72
 typrm keyword: exit()
 "
@@ -9549,12 +9549,12 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
-"typrm keyword: #ref: "\${typrmProject}/README.md#parameters"
+"typrm keyword: #ref: "\${HOME}/GitProjects/GitHub/typrm/README.md#parameters"
 Recommend: #ref: ~/GitProjects/GitHub/typrm/README.md#parameters
-\${typrmProject}/README.md:5
+\${HOME}/GitProjects/GitHub/typrm/README.md:5
     7.Test Echo, 0.Folder
 typrm keyword or number: 7
- "ref:  \${typrmProject}/README.md#parameters";  echo  "file: \${typrmProject}/README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
+ "ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters";  echo  "file: \${HOME}/GitProjects/GitHub/typrm/README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
 typrm keyword or number: 
 typrm keyword: 7
 typrm keyword: exit()
@@ -9562,13 +9562,13 @@ typrm keyword: exit()
 `;
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
-"typrm keyword: #ref: "\${typrmProject}/README.md#parameters"
+"typrm keyword: #ref: "\${HOME}/GitProjects/GitHub/typrm/README.md#parameters"
 Recommend: #ref: ~/GitProjects/GitHub/typrm/README.md#parameters
-\${typrmProject}/README.md:5
+\${HOME}/GitProjects/GitHub/typrm/README.md:5
     7.Test Echo, 0.Folder
 typrm keyword or number: 7
-ref:  \${typrmProject}/README.md#parameters
-file: \${typrmProject}/README.md
+ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters
+file: \${HOME}/GitProjects/GitHub/typrm/README.md
 fragment: parameters
 lineNum: 5
 typrm keyword or number: 
@@ -9579,8 +9579,8 @@ typrm keyword: exit()
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
 "typrm keyword: file_path
-\${typrmProject}/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
-\${typrmProject}/README.md:1
+\${typrmProject}/src/test_data/_tmp/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
+\${HOME}/GitProjects/GitHub/typrm/README.md:1
     7.Test Echo, 0.Folder
 typrm keyword or number: exit()
 "
@@ -9588,8 +9588,8 @@ typrm keyword or number: exit()
 
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
 "typrm keyword: file_path
-\${typrmProject}/src/test_data/search/2/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
-\${typrmProject}/README.md:1
+\${typrmProject}/src/test_data/_tmp/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
+\${HOME}/GitProjects/GitHub/typrm/README.md:1
     7.Test Echo, 0.Folder
 typrm keyword or number: exit()
 "
