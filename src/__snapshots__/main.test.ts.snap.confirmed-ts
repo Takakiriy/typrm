@@ -470,7 +470,15 @@ Error of not expected condition:
 Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:84
   Not referenced: target1
 
-Warning: 9, Error: 7
+Error of not expected condition:
+  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:87
+  Contents: false
+
+Error of not expected condition:
+  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:88
+  Contents: false
+
+Warning: 9, Error: 9
 checked file count = 1, template count = 12, #to tag count = 0
 "
 `;
@@ -1410,6 +1418,7 @@ sudo nano ../../file_target/1/file_1_ok_and_bad_3_target.sh: |  #file-template: 
     login user2  #template: __User__
 ~/GitProjects/GitHub/typrm/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh : |  #file-template: __Project__/src/test_data/file_target/1/file_1_ok_and_bad_3_target.sh
     login user2  #template: __User__
+./this_is_not_tag.sh: |#file-template: __Base__/this_is_not_tag.sh
 "
 `;
 
@@ -2314,6 +2323,11 @@ test_of_duplicated_variable_name_error:
         target1: banana
         nest:
             target1: yellow
+
+test_of_detecting_expect_tag:
+    #expect: false     #// detect
+    #expect:false      #// detect
+    (#expect: false)   #// not detect the tag
 "
 `;
 

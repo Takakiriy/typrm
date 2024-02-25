@@ -15,7 +15,7 @@ import * as lib from './lib.js';
 import sharp from 'sharp';
 // import { pp, ff, cc, ccCount } from './lib.js';
 var __dirname = process.cwd(); // If const, SyntaxError: Identifier '__dirname' has already been declared
-if (__dirname.endsWith('/src')) { // In mac, first run __dirname is typrmProject, second run __dirname is typrmProject/src.
+if (__dirname.endsWith('src')) { // First run __dirname is typrmProject, second run __dirname is typrmProject/src.
     var typrmProject = path.dirname(__dirname);
 }
 else {
@@ -228,8 +228,8 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
             }
         }
         // Check the condition by "#expect:" tag.
-        if (line.includes(expectLabel) && ifTagParser.thisIsOutOfFalseBlock) {
-            const condition = line.substring(line.indexOf(expectLabel) + expectLabel.length).trim();
+        if (line.includes(expectLabel) && expectLabelRegExp.test(line) && ifTagParser.thisIsOutOfFalseBlock) {
+            const condition = getTagValue(line, line.indexOf(expectLabel) + expectLabel.length - 1);
             const evaluatedContidion = evaluateIfCondition(condition, setting, parser);
             if (typeof evaluatedContidion === 'boolean') {
                 if (!evaluatedContidion) {
@@ -1310,13 +1310,16 @@ class TemplateTag {
         const disabled = (line.indexOf(disableLabel) !== notFound);
         this.label = templateLabel;
         this.indexInLine = line.indexOf(templateLabel);
+        this.indexInLine = modifyIndexOfTagLabel(line, this.indexInLine);
         if (this.indexInLine === notFound) {
             this.label = fileTemplateLabel;
             this.indexInLine = line.indexOf(fileTemplateLabel);
+            this.indexInLine = modifyIndexOfTagLabel(line, this.indexInLine);
         }
         if (this.indexInLine === notFound) {
             this.label = templateIfLabel;
             this.indexInLine = line.indexOf(templateIfLabel);
+            this.indexInLine = modifyIndexOfTagLabel(line, this.indexInLine);
         }
         if (this.indexInLine !== notFound && !disabled) {
             this.isFound = true;
@@ -5218,6 +5221,14 @@ function searchTargetKeyphrasePositions(line, separatorPositions) {
     }
     return positions;
 }
+function modifyIndexOfTagLabel(line, indexOfLabel) {
+    if (indexOfLabel === 0 || line[indexOfLabel - 1] === ' ') {
+        return indexOfLabel;
+    }
+    else {
+        return notFound;
+    }
+}
 function getTagValue(line, separatorIndex = -1) {
     var value = line.substring(separatorIndex + 1).trim();
     if (value[0] === '#') {
@@ -7196,6 +7207,7 @@ const scoreLabel = "#score:";
 const ifLabel = "#if:";
 const ifLabelRE = /(?<= |^)#if:/;
 const expectLabel = "#expect:";
+const expectLabelRegExp = /( |^)#expect:/;
 const searchLabel = "#search:";
 const refLabel = "#ref:";
 const copyDot = '$copy.';

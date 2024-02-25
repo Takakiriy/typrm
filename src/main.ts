@@ -241,8 +241,8 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
         }
 
         // Check the condition by "#expect:" tag.
-        if (line.includes(expectLabel)  &&  ifTagParser.thisIsOutOfFalseBlock) {
-            const  condition = line.substring(line.indexOf(expectLabel) + expectLabel.length).trim();
+        if (line.includes(expectLabel)  &&  expectLabelRegExp.test(line)  &&  ifTagParser.thisIsOutOfFalseBlock) {
+            const  condition = getTagValue(line, line.indexOf(expectLabel) + expectLabel.length - 1);
 
             const  evaluatedContidion = evaluateIfCondition(condition, setting, parser);
             if (typeof evaluatedContidion === 'boolean') {
@@ -1406,15 +1406,18 @@ class  TemplateTag {
 
         this.label = templateLabel;
         this.indexInLine = line.indexOf(templateLabel);
+        this.indexInLine = modifyIndexOfTagLabel(line, this.indexInLine);
         if (this.indexInLine === notFound) {
 
             this.label = fileTemplateLabel;
             this.indexInLine = line.indexOf(fileTemplateLabel);
+            this.indexInLine = modifyIndexOfTagLabel(line, this.indexInLine);
         }
         if (this.indexInLine === notFound) {
 
             this.label = templateIfLabel;
             this.indexInLine = line.indexOf(templateIfLabel);
+            this.indexInLine = modifyIndexOfTagLabel(line, this.indexInLine);
         }
         if (this.indexInLine !== notFound  &&  ! disabled) {
             this.isFound = true;
@@ -5576,6 +5579,14 @@ function  searchTargetKeyphrasePositions(line: string, separatorPositions: numbe
     return  positions;
 }
 
+function  modifyIndexOfTagLabel(line: string, indexOfLabel: number): number {
+    if (indexOfLabel === 0  ||  line[indexOfLabel - 1] === ' ') {
+        return  indexOfLabel;
+    } else {
+        return  notFound;
+    }
+}
+
 function  getTagValue(line: string, separatorIndex: number = -1): string {
 
     var  value = line.substring(separatorIndex + 1).trim();
@@ -7908,6 +7919,7 @@ const  scoreLabel = "#score:";
 const  ifLabel = "#if:";
 const  ifLabelRE = /(?<= |^)#if:/;
 const  expectLabel = "#expect:";
+const  expectLabelRegExp = /( |^)#expect:/;
 const  searchLabel = "#search:";
 const  refLabel = "#ref:";
 const  copyDot = '$copy.';
