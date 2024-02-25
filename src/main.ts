@@ -10,7 +10,7 @@ import * as lib from "./lib";
 import sharp from 'sharp';
 // import { pp, ff, cc, ccCount } from "./lib";
 var  __dirname: string = process.cwd();  // If const, SyntaxError: Identifier '__dirname' has already been declared
-if (__dirname.endsWith('/src')) {  // In mac, first run __dirname is typrmProject, second run __dirname is typrmProject/src.
+if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second run __dirname is typrmProject/src.
     var  typrmProject = path.dirname(__dirname);
 } else {
     var  typrmProject = __dirname;

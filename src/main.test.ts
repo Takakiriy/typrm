@@ -9,7 +9,7 @@ process.chdir(__dirname);
 
 const  projectRelativePath = path.dirname(__dirname).substring(lib.getHomePath().length+1);
 const  normalizedProjectRoot = path.dirname(__dirname.replace(/\\/g, "/").replace(/^C/, "c"));
-const  projectRoot = '${typrmProject}';
+const  typrmProject = '${typrmProject}';  // "getTestablePath" in "main.ts" changes paths to "${typrmProject}".
 const  testFolderPath = `test_data` + path.sep;
 const  matchedColor = chalk.green.bold;
 const  keywordLabelColor = chalk.gray;
@@ -819,7 +819,7 @@ describe("searches >> keyword tag >>", () => {
         [   "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
 
         ],[ "not found",
             ["search", "notFound"],
@@ -829,375 +829,375 @@ describe("searches >> keyword tag >>", () => {
         ],[ "acronym",
             ["s", "ABC"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`
 
         ],[ "ommit command name (1)",
             ["ABC"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`
 
         ],[ "ommit command name (2)",
             ["do", "it"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
 
         ],[ "space",
             ["search", "do it"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
 
         ],[ "comma",
             ["search", "a,b"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n`,
 
         ],[ "double quotation",  // #search: escape in typrm tag
             ["search", 'double quotation is ".'],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('double')} ${matchedColor('quotation')} ${matchedColor('is')} ${matchedColor('"".')}"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('double')} ${matchedColor('quotation')} ${matchedColor('is')} ${matchedColor('"".')}"\n`,
 
         ],[ "sharp",
             ["search", 'space sharp is #. "parcent 20" is "%20".'],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':94:') + `     ${keywordLabelColor('#keyword:')} "${matchedColor('space')} ${matchedColor('sharp')} ${matchedColor('is')} ${matchedColor('#.')} ${matchedColor('""parcent')}${matchedColor(' 20"')}" i${matchedColor('s ""%20"')}"."\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':94:') + `     ${keywordLabelColor('#keyword:')} "${matchedColor('space')} ${matchedColor('sharp')} ${matchedColor('is')} ${matchedColor('#.')} ${matchedColor('""parcent')}${matchedColor(' 20"')}" i${matchedColor('s ""%20"')}"."\n`,
             // This answer coloring is not correct. Correct behavior is not supported, yet.
             // "%20"# specification is specified in "settings tag and #template tag: replaces settings values" in README.md
 
         ],[ "ignore case",
             ["search", "DO It"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} ${matchedColor('it')}", "a,b"\n`,
 
         ],[ "word(1)",
             ["search", "AB"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
 
         ],[ "word(2)",
             ["search", "do"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('do')}uble quotation is ""."\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('do')}uble quotation is ""."\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} it", "a,b"\n`,
 
         ],[ "trim",
             ["search", " do "],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('do')}uble quotation is ""."\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('do')}uble quotation is ""."\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "${matchedColor('do')} it", "a,b"\n`,
 
         ],[ "ignored keyword",
             ["search", "#search: AB  #keyword: AB"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
 
         ],[ "ignored colon before keyword tag",
             ["search", "AB: #keyword:"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
 
         ],[ "ignored hyphen and colon before keyword tag",
             ["search", "- AB: #keyword:"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('AB')}C, "do it", "a,b"\n`,
 
         ],[ "CSV ignored colon before keyword tag",
             ["search", "A,B: #keyword:"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n`,
 
         ],[ "CSV ignored colon before search tag",
             ["search", "A,B: #search:"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n`,
 
         ],[ "words order score",
             ["search", "aaa bbb"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')} xxx\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')} xxx\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')}\n`,
 
         ],[ "words order score (2)",  // It does not show small number of matched words
             ["search", "user", "interface"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_idiom_and_word_score
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':10:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('user')} ${matchedColor('interface')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':10:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('user')} ${matchedColor('interface')}\n`,
 
         ],[ "1 word search score",  // keyword: 1 word： 1 word match > 1 word match in 2 words > 1 word partial match.  '>' means grater than.
             ["search", "second"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_1_word_search_score
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':14:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('second')}ary\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':15:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('second')} screen\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':13:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('second')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':14:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('second')}ary\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':15:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('second')} screen\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':13:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('second')}\n`,
 
         ],[ "word match is better than same case",  // word match and not same case > same case and many partial match.  '>' means grater than.
             ["search", "ipad"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':17:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('iPad')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':18:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ipads')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':17:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('iPad')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':18:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ipads')}\n`,
 
         ],[ "participle_is_better_than_different_case",
             ["search", "str"],
             { folder: "test_data/search/2", test: "", "foundCountMax": "40" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':242:') + `     full 12: ${matchedColor('str')}ipe\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':241:') + `     full 11: ${matchedColor('STR')}S\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':230:') + `     full 2:  ${matchedColor('str')}.\n` +  // "str length" is prior than "str.length"
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':240:') + `     full 8c: ${matchedColor('strer')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':239:') + `     full 8b: ${matchedColor('stred')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':238:') + `     full 8a: ${matchedColor('strs')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':237:') + `     full 7:  ${matchedColor('str')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':236:') + `     full 6b: ${matchedColor('STRs')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':235:') + `     full 6a: ${matchedColor('STR')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':234:') + `     full 3d: ${matchedColor('string')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':233:') + `     full 3c: ${matchedColor('strer')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':232:') + `     full 3b: ${matchedColor('stred')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':231:') + `     full 3a: ${matchedColor('strs')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':229:') + `     full 1:  ${matchedColor('str')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':228:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':227:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}S\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':226:') + `     8d: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':225:') + `     8c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':224:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':223:') + `     8a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':222:') + `     7:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')} replace\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':221:') + `     6b: ${keywordLabelColor('#keyword:')} ${matchedColor('STRs')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':220:') + `     6a: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':219:') + `     3d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':218:') + `     3c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':217:') + `     3b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':216:') + `     3a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':214:') + `     1:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':242:') + `     full 12: ${matchedColor('str')}ipe\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':241:') + `     full 11: ${matchedColor('STR')}S\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':230:') + `     full 2:  ${matchedColor('str')}.\n` +  // "str length" is prior than "str.length"
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':240:') + `     full 8c: ${matchedColor('strer')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':239:') + `     full 8b: ${matchedColor('stred')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':238:') + `     full 8a: ${matchedColor('strs')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':237:') + `     full 7:  ${matchedColor('str')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':236:') + `     full 6b: ${matchedColor('STRs')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':235:') + `     full 6a: ${matchedColor('STR')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':234:') + `     full 3d: ${matchedColor('string')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':233:') + `     full 3c: ${matchedColor('strer')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':232:') + `     full 3b: ${matchedColor('stred')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':231:') + `     full 3a: ${matchedColor('strs')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':229:') + `     full 1:  ${matchedColor('str')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':228:') + `     12: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}ipe\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':227:') + `     11: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}S\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':226:') + `     8d: ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':225:') + `     8c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':224:') + `     8b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':223:') + `     8a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':222:') + `     7:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')} replace\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':215:') + `     2:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}.\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':221:') + `     6b: ${keywordLabelColor('#keyword:')} ${matchedColor('STRs')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':220:') + `     6a: ${keywordLabelColor('#keyword:')} ${matchedColor('STR')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':219:') + `     3d: ${keywordLabelColor('#keyword:')} ${matchedColor('string')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':218:') + `     3c: ${keywordLabelColor('#keyword:')} ${matchedColor('strer')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':217:') + `     3b: ${keywordLabelColor('#keyword:')} ${matchedColor('stred')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':216:') + `     3a: ${keywordLabelColor('#keyword:')} ${matchedColor('strs')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':214:') + `     1:  ${keywordLabelColor('#keyword:')} ${matchedColor('str')}\n`,
 
         ],[ "multiple_search_words_hit_is_better_than_one_word",  // related test case is few_word_count
             ["search", "launch", "json"],
             { folder: "test_data/search/2", test: "", "foundCountMax": "40" },
             // "json others", "json" are not shown.
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':257:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('launch')}pad.${matchedColor('json')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':257:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('launch')}pad.${matchedColor('json')}\n`,
 
         ],[ "find_all_many_match_is_better_than_keyword_one_match",
             ["search", "nex", "pre"],
             { folder: "test_data/search/2", test: "", "foundCountMax": "20" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':261:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('nex')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':262:') + `     ${matchedColor('nex')}t ${matchedColor('pre')}v\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':261:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('nex')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':262:') + `     ${matchedColor('nex')}t ${matchedColor('pre')}v\n`,
 
         ],[ "keyword_tag_and_comment_matched_bug_case",
             ["search", "happy", "turn"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':333:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('happy')}  #// ${matchedColor('turn')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':332:') + `     ${keywordLabelColor('#keyword:')} dummy, ${matchedColor('happy')} ${matchedColor('turn')} 2\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':331:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('happy')} ${matchedColor('turn')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':333:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('happy')}  #// ${matchedColor('turn')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':332:') + `     ${keywordLabelColor('#keyword:')} dummy, ${matchedColor('happy')} ${matchedColor('turn')} 2\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':331:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('happy')} ${matchedColor('turn')}\n`,
 
         ],[ "special_participle",
             ["search", "save", "class"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':251:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('classes')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':249:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saving')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':250:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saves')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':248:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saved')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':247:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saver')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':251:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('classes')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':249:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saving')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':250:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saves')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':248:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saved')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':247:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('saver')}\n`,
 
         ],[ "target word count",
             ["search", "new task"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_target_word_count
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':21:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')} only\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':22:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':20:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':21:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')} only\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':22:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':20:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('new')} ${matchedColor('tasks')}\n`,
 
         ],[ "target word count 3",
             ["search", "world wide web"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':67:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('web')} ${matchedColor('World')} ${matchedColor('wide')}, World wide\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':66:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':65:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':67:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('web')} ${matchedColor('World')} ${matchedColor('wide')}, World wide\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':66:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':65:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('World')} ${matchedColor('wide')} ${matchedColor('web')}\n`,
             // line 67 "World wide" is too few matched word count.
 
         ],[ "few_word_count",  // related test case is multiple_search_words_hit_is_better_than_one_word
             ["search", "mini bluetooth speaker"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':349:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':348:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':350:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':349:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('speaker')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':348:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('bluetooth')} ${matchedColor('mini')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':350:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('mini')} ${matchedColor('speaker')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator",
             ["search", "docker compose down00"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':268:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down00')} and any other words\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':269:') + `         ${matchedColor('docker')}-${matchedColor('compose')}-${matchedColor('down00')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':266:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down00')} -v\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':267:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down00')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':265:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down00')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':268:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down00')} and any other words\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':269:') + `         ${matchedColor('docker')}-${matchedColor('compose')}-${matchedColor('down00')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':266:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down00')} -v\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':267:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down00')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':265:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down00')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator_12",
             ["search", "docker compose down12"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':272:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down12')} -v\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':271:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down12')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':272:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down12')} -v\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':271:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down12')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator_13",
             ["search", "docker compose down13"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':275:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down13')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':274:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down13')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':275:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down13')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':274:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down13')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator_14",
             ["search", "docker compose down14"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':278:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down14')} and any other words\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':277:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down14')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':278:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down14')} and any other words\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':277:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')}-${matchedColor('compose')} ${matchedColor('down14')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator_23",
             ["search", "docker compose down23"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':280:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down23')} -v\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':281:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down23')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':280:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down23')} -v\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':281:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down23')}\n`,
 
         ],[ "idiom_few_word_count_by_word_separator_24",
             ["search", "docker compose down24"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':284:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down24')} and any other words\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':283:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down24')} -v\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':284:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down24')} and any other words\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':283:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} ${matchedColor('down24')} -v\n`,
 
         ],[ "idiom_few_word_count_by_word_separator_34",
             ["search", "docker compose down34"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':287:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down34')} and any other words\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':286:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down34')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':287:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down34')} and any other words\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':286:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down34')}\n`,
 
         ],[ "test_of_double_space",
             ["search", "big  boss"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_target_word_count
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':212:') + `     2: ${keywordLabelColor('#keyword:')} super  ${matchedColor('big')}  ${matchedColor('boss')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':211:') + `     1: ${keywordLabelColor('#keyword:')} ${matchedColor('big')}  ${matchedColor('boss')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':212:') + `     2: ${keywordLabelColor('#keyword:')} super  ${matchedColor('big')}  ${matchedColor('boss')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':211:') + `     1: ${keywordLabelColor('#keyword:')} ${matchedColor('big')}  ${matchedColor('boss')}\n`,
 
         ],[ "compound word",
             ["search", "frame set"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')}${matchedColor('set')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')} ${matchedColor('set')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')}${matchedColor('set')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')} ${matchedColor('set')}\n`,
 
         ],[ "kana_mode",
             ["search", "ぎｔ"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             `keyword="git"\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':253:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('git')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':253:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('git')}\n`,
 
         ],[ "kana_mode_bug",
             ["search", "ワード"],  // "ワ-ド"
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':255:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ワード')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':255:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('ワード')}\n`,
 
         ],[ "bug case (1)",
             ["search", "go lang"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':81:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Go')}_${matchedColor('lang')}uage.yaml, go\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':81:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Go')}_${matchedColor('lang')}uage.yaml, go\n`,
 
         ],[ "output order (1)",
             ["search", "a,b"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n`,
 
         ],[ "output order (2)",
             ["search", "A,B"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ABC, "do it", "${matchedColor('a,b')}"\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} "${matchedColor('A,B')}"\n`,
 
         ],[ "output order (3)",  // word count > word length > different case
             ["search", "grape"],
             { folder: "test_data/search/2", disableFindAll: '', test: "", foundCountMax: "99" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':42:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':40:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':41:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('GRAPE')}fruit\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':32:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':30:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':31:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('grape')}fruit\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':43:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':39:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':33:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':29:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':47:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':45:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':46:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('GRAPE')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':37:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':35:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':36:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('grape')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':48:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':44:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':38:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':34:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':42:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':40:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':41:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('GRAPE')}fruit\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':32:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':30:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':31:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('grape')}fruit\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':43:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':39:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}fruit\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':33:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':29:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}fruit\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':47:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':45:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')} juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':46:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('GRAPE')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':37:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':35:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')} juice\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':36:') + `     ${keywordLabelColor('#keyword:')} pink ${matchedColor('grape')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':48:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':44:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('GRAPE')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':38:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':34:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
 
         ],[ "output order (4)",
             ["search", "main", "stage"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':51:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('main')}ly ${matchedColor('stage')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':50:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Main')} ${matchedColor('stages')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':52:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('main')} ${matchedColor('stages')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':51:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('main')}ly ${matchedColor('stage')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':50:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Main')} ${matchedColor('stages')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':52:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('main')} ${matchedColor('stages')}\n`,
 
         ],[ "output order (5)",
             ["search", "silver", "arrow"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':56:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':54:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':55:') + `     ${keywordLabelColor('#keyword:')} [silver/super-system], ${matchedColor('SILVER')} ${matchedColor('Arrows')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':56:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':54:') + `     ${keywordLabelColor('#keyword:')} add ${matchedColor('SILVER')} ${matchedColor('arrow')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':55:') + `     ${keywordLabelColor('#keyword:')} [silver/super-system], ${matchedColor('SILVER')} ${matchedColor('Arrows')}\n`,
 
         ],[ "output order (6)",
             ["search", "tool", "release"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':59:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')} now\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':60:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, Tool deploy\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':58:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, Tool deploy\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':59:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')} now\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':60:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, Tool deploy\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':58:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('Tool')} ${matchedColor('release')}, Tool deploy\n`,
 
         ],[ "many result",
             ["search", "hello"],
             { folder: "test_data/search/2", disableFindAll: '', test: "", locale: "en-US" },
             '... (To show more result, restart typrm with --found-count-max option)\n' +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':103:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':101:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':99:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':97:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':106:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':104:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':102:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':100:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':98:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':96:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':103:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':101:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':99:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':97:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')} world\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':106:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':104:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':102:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':100:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':98:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':96:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('hello')}\n`,
 
         ],[ "without tag parameter",  // test_of_without_tag_parameter
             ["search", "specular"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':25:') + `         ${matchedColor('specular')} reflection light:  ${keywordLabelColor('#keyword:')}  #// out of keyword parameter\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  ${keywordLabelColor('#keyword:')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  ${keywordLabelColor('#keyword:')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':25:') + `         ${matchedColor('specular')} reflection light:  ${keywordLabelColor('#keyword:')}  #// out of keyword parameter\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':27:') + `         - ${matchedColor('specular')} reflection:  ${keywordLabelColor('#keyword:')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':24:') + `     ${matchedColor('specular')}:  #// the mirror-like reflection  ${keywordLabelColor('#keyword:')}\n`,
 
         ],[ "block-to-disable-tag-tool tag",
             ["search", "document_in_block"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':78:') + `         Making materials:  ${keywordLabelColor('#keyword:')} ${matchedColor('document_in_block')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':78:') + `         Making materials:  ${keywordLabelColor('#keyword:')} ${matchedColor('document_in_block')}\n`,
 
         ],[ "cut_long_line",
             ["search", "cut_long_line_keyword"],
             { folder: "test_data/search/2", disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':209:') + `     until_colored_keyword:  #// ---------------------------------------------------------------------------------------------------------------------------------------------------------------- cut_lon\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':208:') + `     ${matchedColor('cut_long_line_keyword')}  found_line:  #// ------------------------------------------------------------------------------------------------------------------------------------------------------------\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':207:') + `     ${matchedColor('cut_long_line_keyword')}  keyword_line:  ${keywordLabelColor('#keyword:')}  #// -----------------------------------------------------------------------------------------------------------------------------------------------\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':209:') + `     until_colored_keyword:  #// ---------------------------------------------------------------------------------------------------------------------------------------------------------------- cut_lon\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':208:') + `     ${matchedColor('cut_long_line_keyword')}  found_line:  #// ------------------------------------------------------------------------------------------------------------------------------------------------------------\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':207:') + `     ${matchedColor('cut_long_line_keyword')}  keyword_line:  ${keywordLabelColor('#keyword:')}  #// -----------------------------------------------------------------------------------------------------------------------------------------------\n`,
 
         ],[ "score tag",
             ["search", "score_tag"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':195:') + `         13: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':192:') + `         11: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':196:') + `     2: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':194:') + `             112: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':195:') + `         13: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':192:') + `         11: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':196:') + `     2: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':194:') + `             112: ${keywordLabelColor('#keyword:')} ${matchedColor('score_tag')}\n`,
 
         ],[ "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
             'ERROR: not found a file or folder at "/path"\n'.replace(/\//g, path.sep) +
             lib.getHomePath() + '\n' +
             '    0.Folder\n',
@@ -1205,29 +1205,29 @@ describe("searches >> keyword tag >>", () => {
         ],[ "Multi folder",  // and test of long path length > short path length
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
 
         ],[ "target is file",
             ["search", "wonderful"],
             { folder: "test_data/search/2/2.yaml", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':85:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('wonderful')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':85:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('wonderful')}\n`,
 
         ],[ "file extension filter",
             ["search", "target"],
             { folder: "test_data/search/3/*.yaml", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/3/31.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('target')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/3/31.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('target')}\n`,
 
         ],[ "Windows typrm folder path",
             ["search", "ABC"],
             { folder: `${process.cwd()}\\test_data\\search\\1`, disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
 
         ],[ "normalized_word_count",
             ["parentN1 server"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", thesaurus: "test_data/search/2/thesaurus2.csv"},
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     ${matchedColor('parentN node1')}  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     ${matchedColor('parentN node1')}  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
         const  isWindowsEnvironment = (path.sep === '\\');
@@ -1245,45 +1245,45 @@ describe("searches >> keyword tag >>", () => {
             [   "acronym search keyword",
                 ["search", "PS"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('PowerShell')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('PowerShell')}\n`,
 
             ],[ "acronym keyword tag",  // search: PowerShell,  target: PS => PowerShell
                 ["search", "PowerShell"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} PS (${matchedColor('PowerShell')})\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} PS (${matchedColor('PowerShell')})\n`,
 
             ],[ "ignore case",  // search: ps => PS => PowerShell,  target: PowerShell
                 ["search", "ps"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('PowerShell')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('PowerShell')}\n`,
 
             ],[ "normalized_word_match_1",  // search: ts file => TypeScript file,  target: js file => JavaScript file => TypeScript file
                 ["search", "ts file"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ts')}x ${matchedColor('file')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} JavaScript ${matchedColor('file')} (${matchedColor('TypeScript')} ${matchedColor('file')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('TypeScript')} ${matchedColor('file')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('TypeScript')} ${matchedColor('file')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ts')} ${matchedColor('file')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ts')}x ${matchedColor('file')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} JavaScript ${matchedColor('file')} (${matchedColor('TypeScript')} ${matchedColor('file')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('TypeScript')} ${matchedColor('file')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('TypeScript')} ${matchedColor('file')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ts')} ${matchedColor('file')}\n`,
                     // "ts file" must first priority. Other either order is fine.
 
             ],[ "normalized_word_match_2",
                 ["search", "js file"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('js')}x ${matchedColor('file')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('JavaScript')} ${matchedColor('file')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('js')} ${matchedColor('file')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('js')}x ${matchedColor('file')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('JavaScript')} ${matchedColor('file')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('js')} ${matchedColor('file')}\n`,
 
             ],[ "related_normalized_word_match",  // search: ts file => TypeScript file => React file,  target: js file => JavaScript file => TypeScript file => React file
                 ["search", "rc file"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':10:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')}t ${matchedColor('file')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} TypeScript ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} JavaScript ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ts ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('React')} ${matchedColor('file')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')} ${matchedColor('file')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':10:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')}t ${matchedColor('file')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} TypeScript ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} JavaScript ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ts ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} js ${matchedColor('file')} (${matchedColor('React')} ${matchedColor('file')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('React')} ${matchedColor('file')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('rc')} ${matchedColor('file')}\n`,
                     // "rc file" must first priority. Other either order is fine.
 
             ],[ "error_of_circular_reference",
@@ -1294,35 +1294,35 @@ describe("searches >> keyword tag >>", () => {
             ],[ "score",  // search: object end,  target: object DI => object dependency injection
                 ["search", "object end"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} DI ${matchedColor('object')} (dep${matchedColor('end')}ency injection ${matchedColor('object')})\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} DI (${matchedColor('object')} dep${matchedColor('end')}ency injection)\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('end')} ${matchedColor('object')}\n` +
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} ${matchedColor('end')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} DI ${matchedColor('object')} (dep${matchedColor('end')}ency injection ${matchedColor('object')})\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} DI (${matchedColor('object')} dep${matchedColor('end')}ency injection)\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('end')} ${matchedColor('object')}\n` +
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('object')} ${matchedColor('end')}\n`,
 
             ],[ "idiom",
                 ["search", "マウスクリック"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('マウス')} ${matchedColor('クリック')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('マウス')} ${matchedColor('クリック')}\n`,
 
             ],[ "idiom_synonym_1",　// search: timeout => time out,  target: タイム アウト => time out
                 ["search", "timeout"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} タイム アウト (${matchedColor('time')} ${matchedColor('out')})\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} タイム アウト (${matchedColor('time')} ${matchedColor('out')})\n`,
 
             ],[ "idiom_synonym_2",
                 ["search", "タイムアウト"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('タイム')} ${matchedColor('アウト')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('タイム')} ${matchedColor('アウト')}\n`,
 
             ],[ "idiom_compound_word",
                 ["search", "グッドルッキング"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('グッドルッキング')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('グッドルッキング')}\n`,
 
             ],[ "idiom_reverse",
                 ["search", "マウス クリック"],
                 { folder: "test_data/_checking/thesaurus", thesaurus: "test_data/_checking/thesaurus/thesaurus.csv", disableFindAll: '', test: "" },
-                pathColor(`${projectRoot}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('マウス')}${matchedColor('クリック')}\n`,
+                pathColor(`${typrmProject}/src/test_data/_checking/thesaurus/1.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('マウス')}${matchedColor('クリック')}\n`,
             ],
         ])("%s", async (caseName, arguments_, options, answer) => {
             chdirInProject('src');
@@ -1345,86 +1345,86 @@ describe("searches glossary tag >>", () => {
         [   "1st",
             ["search", "ABC"],
             { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n`,
 
         ],[ "ignore case",
             ["search", "abc"],
             { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n`,
 
         ],[ "word",
             ["search", "AB"],
             { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('AB')}C: abc\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('AB')}C: abc\n`,
 
         ],[ "nested indent",  // 2段以上深いインデントは対象外です
             ["search", "ABC"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Nested tag must not be matched:    ${matchedColor('ABC')}D: abcd\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#glossary:')} Nested tag must not be matched:    ${matchedColor('ABC')}: abc\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Nested tag must not be matched:    ${matchedColor('ABC')}D: abcd\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#glossary:')} Nested tag must not be matched:    ${matchedColor('ABC')}: abc\n`,
 
         ],[ "skip comment",
             ["search", "commentA"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':26:') + ` ${keywordLabelColor('#glossary:')} comment in glossary:    ${matchedColor('commentA')}: hit\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':26:') + ` ${keywordLabelColor('#glossary:')} comment in glossary:    ${matchedColor('commentA')}: hit\n`,
 
         ],[ "output order (1)",
             ["search", "de"],
             { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('DE')}: de\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('de')}: de\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('DE')}: de\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('de')}: de\n`,
 
         ],[ "output order (2)",
             ["search", "DE"],
             { folder: "test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('de')}: de\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('DE')}: de\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':9:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('de')}: de\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':8:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('DE')}: de\n`,
 
         ],[ "output order (3)",
             ["search", "search score comparison glossary"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':39:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword: 3\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':41:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('search')} ${matchedColor('score')} ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':38:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')}: 2\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':39:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword: 3\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':41:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('search')} ${matchedColor('score')} ${matchedColor('comparison')} ${matchedColor('glossary')} and keyword\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':38:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('search')} ${matchedColor('score')}:        ${matchedColor('comparison')} ${matchedColor('glossary')}: 2\n`,
 
         ],[ "glossary is less score than keyword",
             ["search", "grape"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')} glossary2:        ${matchedColor('grape')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')} glossary1:        ${matchedColor('grape')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':12:') + `     keyword:  ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':14:') + ` ${keywordLabelColor('#glossary:')} glossary2:        ${matchedColor('grape')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':11:') + ` ${keywordLabelColor('#glossary:')} glossary1:        ${matchedColor('grape')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':12:') + `     keyword:  ${keywordLabelColor('#keyword:')} ${matchedColor('grape')}\n`,
 
         ],[ "glossary_all_match_is_greater_score_than_keyword_part_match",
             ["search", "docker", "compose"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':46:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} container\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':44:') + ` ${keywordLabelColor('#glossary:')} parent:        ${matchedColor('docker')} ${matchedColor('compose')}:\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':46:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('docker')} ${matchedColor('compose')} container\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':44:') + ` ${keywordLabelColor('#glossary:')} parent:        ${matchedColor('docker')} ${matchedColor('compose')}:\n`,
 
         ],[ "glossary with empty line",
             ["search", "space"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')} glossary with empty line:    ${matchedColor('space')}2:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')} glossary with empty line:    ${matchedColor('space')}1:\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':19:') + ` ${keywordLabelColor('#glossary:')} glossary with empty line:    ${matchedColor('space')}2:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':17:') + ` ${keywordLabelColor('#glossary:')} glossary with empty line:    ${matchedColor('space')}1:\n`,
 
         ],[ "glossary with parameters (1)",
             ["search", "category1 apple"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
 
         ],[ "glossary with parameters (2)",
             ["search", "apple category1"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':22:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('category1')}:    ${matchedColor('apple')}: juice\n`,
 
         ],[ "glossary_01_without_parameter_with_comment",
             ["search", "glossary_01  123"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':48:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('glossary_01')}_without_parameter_with_comment:    ${matchedColor('123')}: 456\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':48:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('glossary_01')}_without_parameter_with_comment:    ${matchedColor('123')}: 456\n`,
 
         ],[ "emphasize search and ref tag",
             ["search", "picture"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', test: "", locale: 'en-US' },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':28:') + ` ${keywordLabelColor('#glossary:')} emphasize search and ref tag:    ${matchedColor('picture')}:  ${refColor('#ref: /path#hash')}  #search: ${searchColor('keyword')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':28:') + ` ${keywordLabelColor('#glossary:')} emphasize search and ref tag:    ${matchedColor('picture')}:  ${refColor('#ref: /path#hash')}  #search: ${searchColor('keyword')}\n` +
             'ERROR: not found a file or folder at "/path#hash"\n'.replace(/\//g, path.sep) +
             lib.getHomePath() +'\n'+
             '    0.Folder\n',
@@ -1432,16 +1432,16 @@ describe("searches glossary tag >>", () => {
         ],[ "nested glossary tag",
             ["search", "turnip"],
             { folder: "test_data/search/glossary/2", disableFindAll: '', disableSnippet: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':33:') + ` ${keywordLabelColor('#glossary:')} level-2:        white ${matchedColor('turnip')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':34:') + ` ${keywordLabelColor('#glossary:')} level-1:    ${matchedColor('turnip')} soup:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':32:') + ` ${keywordLabelColor('#glossary:')} level-2:        red ${matchedColor('turnip')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':31:') + ` ${keywordLabelColor('#glossary:')} level-1:    ${matchedColor('turnip')}: #glossary: level-2\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':33:') + ` ${keywordLabelColor('#glossary:')} level-2:        white ${matchedColor('turnip')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':34:') + ` ${keywordLabelColor('#glossary:')} level-1:    ${matchedColor('turnip')} soup:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':32:') + ` ${keywordLabelColor('#glossary:')} level-2:        red ${matchedColor('turnip')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/glossary/2/2.yml`) + lineNumColor(':31:') + ` ${keywordLabelColor('#glossary:')} level-1:    ${matchedColor('turnip')}: #glossary: level-2\n`,
 
         ],[ "Multi folder",
             ["search", "ABC"],
             { folder: "test_data/search/1, test_data/search/glossary/1", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n` +
-            pathColor(`${projectRoot}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+            pathColor(`${typrmProject}/src/test_data/search/glossary/1/1.yaml`) + lineNumColor(':7:') + ` ${keywordLabelColor('#glossary:')} Glossary:    ${matchedColor('ABC')}: abc\n` +
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 
@@ -1456,67 +1456,67 @@ describe("searches keyword and parent >>", () => {
             ["search", "parent1A child1"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             // (The answer is not to show) pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':293:') + `             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':291:') + ` ${matchedColor('parent1A')} >>             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':291:') + ` ${matchedColor('parent1A')} >>             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n`,
 
         ],[ "1st another",
             ["search", "parent1B child1"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             // (The answer is not to show) pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':291:') + `             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':293:') + ` ${matchedColor('parent1B')} >>             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':293:') + ` ${matchedColor('parent1B')} >>             ${matchedColor('child1')}: ${keywordLabelColor('#keyword:')}\n`,
 
         ],[ "grand parent",
             ["search", "childG1 parent1GA"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             // (The answer is not to show) pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':300:') + `                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':297:') + ` ${matchedColor('parent1GA')} >>                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':297:') + ` ${matchedColor('parent1GA')} >>                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n`,
 
         ],[ "grand parent another",
             ["search", "childG1 parent1GB"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             // (The answer is not to show) pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':297:') + `                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':300:') + ` ${matchedColor('parent1GB')} >>                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':300:') + ` ${matchedColor('parent1GB')} >>                 ${keywordLabelColor('#keyword:')} ${matchedColor('childG1')}\n`,
 
         ],[ "many keyword than parent",
             ["search", "childK1 parent1K"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':306:') + ` ${matchedColor('parent1K')} >>             ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':308:') + `             ${matchedColor('parent1K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':304:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')} ${matchedColor('parent1K')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':306:') + ` ${matchedColor('parent1K')} >>             ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':308:') + `             ${matchedColor('parent1K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':304:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK1')} ${matchedColor('parent1K')}\n`,
 
         ],[ "many keyword than parent another",
             ["search", "parent2K childK2"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':313:') + ` ${matchedColor('parent2K')} >>             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':311:') + `             ${matchedColor('parent2K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':315:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')} ${matchedColor('parent2K')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':313:') + ` ${matchedColor('parent2K')} >>             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':311:') + `             ${matchedColor('parent2K')}  ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':315:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('childK2')} ${matchedColor('parent2K')}\n`,
 
         ],[ "order of keyword glossary and parent",
             ["search", "command option"],
             { folder: "test_data/search/2", test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':343:') + `     ${matchedColor('command option')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':336:') + ` ${matchedColor('command')} >>         ${keywordLabelColor('#keyword:')} ${matchedColor('option')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':337:') + `     4: ${keywordLabelColor('#keyword:')} ${matchedColor('command')} ${matchedColor('option')} letter\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':339:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('command')}:        ${matchedColor('option')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':341:') + ` ${keywordLabelColor('#glossary:')} 2:        ${matchedColor('command')} ${matchedColor('option')}:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':342:') + `     1: ${keywordLabelColor('#keyword:')} ${matchedColor('command')} ${matchedColor('option')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':343:') + `     ${matchedColor('command option')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':336:') + ` ${matchedColor('command')} >>         ${keywordLabelColor('#keyword:')} ${matchedColor('option')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':337:') + `     4: ${keywordLabelColor('#keyword:')} ${matchedColor('command')} ${matchedColor('option')} letter\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':339:') + ` ${keywordLabelColor('#glossary:')} ${matchedColor('command')}:        ${matchedColor('option')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':341:') + ` ${keywordLabelColor('#glossary:')} 2:        ${matchedColor('command')} ${matchedColor('option')}:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':342:') + `     1: ${keywordLabelColor('#keyword:')} ${matchedColor('command')} ${matchedColor('option')}\n`,
 
         ],[ "1st line matched case",
             ["search", "child3", "aaa"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':317:') + ` ${matchedColor('aaa')} >>         ${keywordLabelColor('#keyword:')} ${matchedColor('child3')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':317:') + ` ${matchedColor('aaa')} >>         ${keywordLabelColor('#keyword:')} ${matchedColor('child3')}\n`,
 
         ],[ "bug case 1",
             ["search", "parentB"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':320:') + `             ${matchedColor('ParentB')} and 1: ${keywordLabelColor('#keyword:')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':322:') + `             ${matchedColor('PARENTB')} and: ${keywordLabelColor('#keyword:')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':324:') + `             ${matchedColor('parentB')}: ${keywordLabelColor('#keyword:')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':320:') + `             ${matchedColor('ParentB')} and 1: ${keywordLabelColor('#keyword:')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':322:') + `             ${matchedColor('PARENTB')} and: ${keywordLabelColor('#keyword:')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':324:') + `             ${matchedColor('parentB')}: ${keywordLabelColor('#keyword:')}\n`,
 
         ],[ "bug case 2",
             ["search", "parentPA", "parentPB"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':329:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('ParentPA')} ${matchedColor('parentPB')} parentPC\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':327:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('ParentPA')} ${matchedColor('parentPB')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':329:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('ParentPA')} ${matchedColor('parentPB')} parentPC\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':327:') + `             ${keywordLabelColor('#keyword:')} ${matchedColor('ParentPA')} ${matchedColor('parentPB')}\n`,
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 
@@ -1530,72 +1530,72 @@ describe("find all >>", () => {
         [   "1st",
             ["search", "find_all_abc"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':110:') + `     ${matchedColor('find_all_abc')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':108:') + `     ${matchedColor('find_all_abc')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':110:') + `     ${matchedColor('find_all_abc')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':108:') + `     ${matchedColor('find_all_abc')}\n`,
 
         ],[ "shuffle",
             ["search", "find_all_1  find_all_2"],  // double space avoids full match
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n`,
 
         ],[ "shuffle jp",
             ["search", "find_all_1\u{3000}find_all_2"],  // '\u{3000}': Japanese space
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':117:') + `     ${matchedColor('find_all_1')} find_all_3 ${matchedColor('find_all_2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':114:') + `     ${matchedColor('find_all_2')} ${matchedColor('find_all_1')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':113:') + `     ${matchedColor('find_all_1')} ${matchedColor('find_all_2')}\n`,
 
         ],[ "full match",
             ["search", "full_match_1  full_match_1  full_match_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US", "foundCountMax": "3" },
             `... (To show more result, restart typrm with --found-count-max option)\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':120:') + `     ${matchedColor('full_match_1')}  ${matchedColor('full_match_2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':121:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':119:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':120:') + `     ${matchedColor('full_match_1')}  ${matchedColor('full_match_2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':121:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':119:') + `     ${matchedColor('full_match_1  full_match_1  full_match_2')}\n`,
 
         ],[ "full match or keyword tag",
             ["search", "fk_1 fk_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':144:') + `     ${matchedColor('fk_1 fk_2')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':145:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('fk_1')} ${matchedColor('fk_2')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':144:') + `     ${matchedColor('fk_1 fk_2')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':145:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('fk_1')} ${matchedColor('fk_2')}\n`,
 
         ],[ "part full match or keyword tag",
             ["search", "pf_1 pf_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':154:') + `     ${matchedColor('pf_1')}________ ${matchedColor('pf_2')}__________\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':155:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('pf_1')}__ ${matchedColor('pf_2')}__\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':154:') + `     ${matchedColor('pf_1')}________ ${matchedColor('pf_2')}__________\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':155:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('pf_1')}__ ${matchedColor('pf_2')}__\n`,
 
         ],[ "search tag",
             ["search", "- link  #search: find_search_tag_1"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':128:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_1`)}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':128:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_1`)}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':127:') + `     - ${keywordLabelColor('#keyword:')} ${matchedColor('find_search_tag_1')}\n`,
 
         ],[ "full match replaced from search tag",
             ["search", "- link  #search: find_search_tag_2"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':148:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_2`)}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':147:') + `     - link  ${keywordLabelColor('#keyword:')} ${matchedColor(`find_search_tag_2`)}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':148:') + `     ${matchedColor(`-`)} ${matchedColor(`link`)}  ${matchedColor(`#search:`)} ${matchedColor(`find_search_tag_2`)}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':147:') + `     - link  ${keywordLabelColor('#keyword:')} ${matchedColor(`find_search_tag_2`)}\n`,
 
         ],[ "full match replaced from search tag (2)",
             ["search", "find_search_tag_4:  #search:"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':205:') + `     ${matchedColor(`find_search_tag_4`)}:  ${keywordLabelColor('#keyword:')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':205:') + `     ${matchedColor(`find_search_tag_4`)}:  ${keywordLabelColor('#keyword:')}\n`,
 
         ],[ "full match with colon",
             ["search", "- find_search_tag_3 :"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':151:') + `     ${matchedColor(`- find_search_tag_3`)} :\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':150:') + `     ${matchedColor(`- find_search_tag_3`)}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':151:') + `     ${matchedColor(`- find_search_tag_3`)} :\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':150:') + `     ${matchedColor(`- find_search_tag_3`)}\n`,
                 // The order does not matter
 
         ],[ "part match",
             ["search", "thesau"],
             { folder: "test_data/search/2", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':346:') + `     ${matchedColor(`thesau`)}rus.csv:\n` +
-            pathColor(`${projectRoot}/src/test_data/search/2/2.yaml`) + lineNumColor(':345:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor(`thesau`)}rus.csv\n`,
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':346:') + `     ${matchedColor(`thesau`)}rus.csv:\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':345:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor(`thesau`)}rus.csv\n`,
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 
@@ -1609,19 +1609,19 @@ describe("mutual search >>", () => {
         [   "1st",
             ["mutual-search", "AAA"],
             { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':2:') + ` Target: ${keywordLabelColor('#keyword:')} ${matchedColor('AAA')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':2:') + ` Target: ${keywordLabelColor('#keyword:')} ${matchedColor('AAA')}\n`,
 
         ],[ "mutual_tag",
             ["search", "#mutual: AAA"],
             { folder: "test_data/search/mutual/1", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
-            pathColor(`${projectRoot}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':2:') + ` Target: ${keywordLabelColor('#keyword:')} ${matchedColor('AAA')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':1:') + ` Index: #search: ${matchedColor('AAA')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':2:') + ` Target: ${keywordLabelColor('#keyword:')} ${matchedColor('AAA')}\n`,
 
         ],[ "not mutual",
             ["search", "AAA"],
             { folder: "test_data/search/mutual/1", disableFindAll: "", test: "", locale: "en-US" },
-            pathColor(`${projectRoot}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':2:') + ` Target: ${keywordLabelColor('#keyword:')} ${matchedColor('AAA')}\n`,
+            pathColor(`${typrmProject}/src/test_data/search/mutual/1/1.yaml`) + lineNumColor(':2:') + ` Target: ${keywordLabelColor('#keyword:')} ${matchedColor('AAA')}\n`,
         ],
     ])("%s", async (_caseName, arguments_, options, answer) => {
 
