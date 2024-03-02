@@ -38,7 +38,7 @@
             "processId": "${command:PickProcess}"
         },
         {
-            "name": "Debug Posix Jest Tests",
+            "name": "Debug Posix Jest Tests - main",
             "type": "node",
             "request": "launch",
             "runtimeArgs": [
@@ -52,7 +52,7 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Debug Windows Jest Tests",
+            "name": "Debug Windows Jest Tests - main",
             "type": "node",
             "request": "launch",
             "runtimeArgs": [
@@ -63,6 +63,33 @@
                 "--coverage", "false"
             ],
             "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Debug Posix Jest Tests - lib",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceRoot}/node_modules/.bin/jest",
+                "lib",
+                "--runInBand",
+                "--coverage", "false"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "name": "Debug Windows Jest Tests - lib",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--inspect-brk",
+                "${workspaceRoot}/node_modules/jest/bin/jest.js",
+                "lib",
+                "--runInBand",
+                "--coverage", "false"
+            ],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         }

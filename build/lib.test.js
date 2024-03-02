@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as lib from './lib.js';
+import * as lib from "./lib";
 import * as path from "path";
 import chalk from 'chalk';
 var anyLinesTag = '#anyLines:';
@@ -884,6 +884,35 @@ describe("data >>", () => {
             [5, "bb"],
             [22, "ddd"],
         ]);
+    });
+    test("getLocalIsoString, newDateLoosely", async () => {
+        expect(new Date("2020-02-02T12:00:00Z").toISOString()).toBe("2020-02-02T12:00:00.000Z");
+        expect(lib.getLocalIsoString(new Date(`2020-02-02T12:00:00`))).toBe("2020-02-02T12:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02T12:00:00`))).toBe("2020-02-02T12:00:00.000");
+        expect(new Date("2020-02-02").toISOString()).toBe("2020-02-02T00:00:00.000Z");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02`))).toBe("2020-02-02T00:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020`))).toBe("2020-01-01T00:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02`))).toBe("2020-02-01T00:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02 12:00`))).toBe("2020-02-02T12:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02T12:00`))).toBe("2020-02-02T12:00:00.000");
+        // NaN cases. Cases of default Date constructor returns NaN value date object.
+        expect(lib.getLocalIsoString(lib.newDateLoosely("2020-00-00T00:00:00"))).toBe("2020-01-01T00:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-13-00T00:00:00`))).toBe("2020-12-31T23:59:59.999");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-12-00T00:00:00`))).toBe("2020-12-01T00:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-12-32T00:00:00`))).toBe("2020-12-31T23:59:59.999");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02T24:00:00`))).toBe("2020-02-03T00:00:00.000");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02T99:00:00`))).toBe("2020-02-02T23:59:59.999");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02T02:60:00`))).toBe("2020-02-02T02:59:59.999");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02T02:02:60`))).toBe("2020-02-02T02:02:59.999");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`2020-02-02 02:02:60`))).toBe("2020-02-02T02:02:59.999");
+        expect(lib.newDateLoosely(`0000`).toISOString()).toBe("0000-01-01T00:00:00.000Z");
+        expect(lib.newDateLoosely(`0000-00-00`).toISOString()).toBe("0000-01-01T00:00:00.000Z");
+        expect(lib.getLocalIsoString(lib.newDateLoosely(`9999-99-99 99:99:99`))).toBe("9999-12-31T23:59:59.999");
+    });
+    test("getCurrentTimeZoneIsoFormat", async () => {
+        const timeZone = lib.getCurrentTimeZoneIsoFormat();
+        expect(new Date(`2020-02-02T12:00:00${timeZone}`).toISOString()).toBe(new Date(`2020-02-02T12:00`).toISOString());
+        expect(timeZone.substr(3, 1)).toBe(':');
     });
 });
 describe("alphabetIndex >>", () => {

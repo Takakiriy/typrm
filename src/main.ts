@@ -3374,6 +3374,21 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
                 }
             }
 
+            // alarm tag
+            const  indexOfAlarmLabel = line.indexOf(alarmLabel);
+            if (indexOfAlarmLabel !== notFound) {
+                const  timeDate = getTagValue(line, indexOfAlarmLabel + alarmLabel.length);
+
+                const  found = getMissedAlarm(timeDate);
+                if (found.matches.length >= 1) {
+                    found.path = inputFileFullPath;
+                    found.line = line;
+                    found.lineNum = lineNum;
+                    found.matches[0].position = line.indexOf(timeDate);
+                    foundLines.push(found);
+                }
+            }
+
             // found.snippet = ...
             if (snippetScaning.length >= 1) {
                 if ('disableSnippet' in programOptions) {
@@ -3413,7 +3428,9 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
     ), 0);
 
     // searchWithoutTags (find all)
-    foundLines = foundLines.filter((found) => (found.counts.matchedSearchKeywordCount === maximumHitWordCount));
+    foundLines = foundLines.filter((found) =>
+        (found.counts.matchedSearchKeywordCount === maximumHitWordCount)  ||
+        found.matches[0].targetTagType === 'alarm');
     foundLines.sort(compareScoreAndSoOn);
     if (debugPointLineNum !== 0) {
         lib.pp(`#breadcrumb: filter by maximumHitWordCount in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
@@ -3997,16 +4014,40 @@ class  MatchedCounts {
 }
 
 function  compareScoreAndSoOn(a: FoundLine, b: FoundLine): number {
-    // return  compareScoreAndSoOnRelease(a, b);
-    return  compareScoreAndSoOnDebug(a, b);
+    return  compareScoreAndSoOnRelease(a, b);
+    // return  compareScoreAndSoOnDebug(a, b);
 }
 
 function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
-    var  different = 0;  // plus: a is prior.  minus: b is prior.
     const  aa = a.counts;
     const  bb = b.counts;
-    if (aa.searchKeywordCount === 0  ||  bb.searchKeywordCount === 0) {
-        return  aa.searchKeywordCount - bb.searchKeywordCount;
+    var  different = 0;  // plus: a is prior.  minus: b is prior.
+
+    // alarm
+    if (different === 0) {
+        if (a.isMissedAlarm) {
+            if (b.isMissedAlarm) {
+                different = lib.newDateLoosely(a.targetKeyphrase).getTime() - lib.newDateLoosely(b.targetKeyphrase).getTime();
+                if (isNaN(lib.newDateLoosely(a.targetKeyphrase).getDate())) {
+                    different = +1;
+                } else if (isNaN(lib.newDateLoosely(b.targetKeyphrase).getDate())) {
+                    different = -1;
+                }
+            } else {
+                different = +1;
+            }
+        } else {
+            if (b.isMissedAlarm) {
+                different = -1;
+            }
+        }
+    }
+
+    // searchKeywordCount
+    if (different === 0) {
+        if (aa.searchKeywordCount === 0  ||  bb.searchKeywordCount === 0) {
+            return  aa.searchKeywordCount - bb.searchKeywordCount;
+        }
     }
     if (aa.searchKeywordCount < bb.searchKeywordCount) {
         var  kPoint = bb.searchKeywordCount - aa.searchKeywordCount + 0.5;
@@ -4215,7 +4256,7 @@ function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
 
 function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     // Synchronized with "compareScoreAndSoOnRelease" at 2023-11-25
-    var  debugLineNums = [342,341,339,337, 336];  // Edit this in order of priority
+    var  debugLineNums = [9,3,13,7,6,1,11,10];  // Edit this in order of priority
     const  indexA = debugLineNums.indexOf(a.lineNum);
     const  indexB = debugLineNums.indexOf(b.lineNum);
     const  aa = a.counts;
@@ -4226,12 +4267,13 @@ function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     if (isDebug) {
         lib.pp(`compareScoreAndSoOnDebug: isDebug = ${isDebug}`);
         if (aIsPrioritized) {
-            lib.pp(`    a=${a.lineNum}: ${a.line}`);
-            lib.pp(`    b=${b.lineNum}: ${b.line}`);
+            lib.pp(`    a= ${a.lineNum}: ${a.line} (expect to be prioritized)`);
+            lib.pp(`    b= ${b.lineNum}: ${b.line}`);
         } else {
-            lib.pp(`    b=${b.lineNum}: ${b.line}`);
-            lib.pp(`    a=${a.lineNum}: ${a.line}`);
+            lib.pp(`    b= ${b.lineNum}: ${b.line} (expect to be prioritized)`);
+            lib.pp(`    a= ${a.lineNum}: ${a.line}`);
         }
+        lib.pp(`    aIsPrioritized = ${aIsPrioritized}`);
     } else if (matchedOnlyOneSide) {
         lib.pp(`compareScoreAndSoOnDebug: matchedOnlyOneSide = ${matchedOnlyOneSide}, a.lineNum = ${a.lineNum}, b.lineNum = ${b.lineNum}`);
     }
@@ -4243,10 +4285,37 @@ function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
         }
     }
     var  different = 0;  // plus: a is prior.  minus: b is prior.
-    if (aa.searchKeywordCount === 0  ||  bb.searchKeywordCount === 0) {
-        different = aa.searchKeywordCount - bb.searchKeywordCount;
-        if (isDebug && different) { lib.pp(`    searchKeywordCount: a=${aa.searchKeywordCount}, b=${bb.searchKeywordCount}, ${different>0?'a':'b'} is prioritized`); }
-        return  different;
+
+    // alarm
+    if (different === 0) {
+        if (a.isMissedAlarm) {
+            if (b.isMissedAlarm) {
+                different = lib.newDateLoosely(a.targetKeyphrase).getTime() - lib.newDateLoosely(b.targetKeyphrase).getTime();
+                if (isNaN(lib.newDateLoosely(a.targetKeyphrase).getDate())) {
+                    different = +1;
+                } else if (isNaN(lib.newDateLoosely(b.targetKeyphrase).getDate())) {
+                    different = -1;
+                }
+            } else {
+                different = +1;
+            }
+        } else {
+            if (b.isMissedAlarm) {
+                different = -1;
+            }
+        }
+        if (different !== 0) {
+            if (isDebug && different) { lib.pp(`    alarm: ${getDebugValue(different, a.targetKeyphrase, b.targetKeyphrase)}`); }
+        }
+    }
+
+    // searchKeywordCount
+    if (different === 0) {
+        if (aa.searchKeywordCount === 0  ||  bb.searchKeywordCount === 0) {
+            different = aa.searchKeywordCount - bb.searchKeywordCount;
+            if (isDebug && different) { lib.pp(`    searchKeywordCount: ${getDebugValue(different, aa.searchKeywordCount, bb.searchKeywordCount)}`); }
+            return  different;
+        }
     }
     if (aa.searchKeywordCount < bb.searchKeywordCount) {
         var  kPoint = bb.searchKeywordCount - aa.searchKeywordCount + 0.5;
@@ -4260,7 +4329,7 @@ function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     // matchedSearchKeywordCount (matchedSearchCount)
     if (different === 0) {
         different = aa.matchedSearchKeywordCount - bb.matchedSearchKeywordCount + kPoint;
-        if (isDebug && different) { lib.pp(`    matchedSearchCount, matchedSearchKeywordCount: a=${aa.matchedSearchKeywordCount}, b=${bb.matchedSearchKeywordCount}, ${different>0?'a':'b'} is prioritized`); }
+        if (isDebug && different) { lib.pp(`    matchedSearchCount, matchedSearchKeywordCount: ${getDebugValue(different, aa.matchedSearchKeywordCount, bb.matchedSearchKeywordCount)}`); }
     }
 
     // Count of keyword and glossary tag,  Not matched target word count
@@ -4495,6 +4564,40 @@ function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     }
 
     return  different;
+}
+
+function  getMissedAlarm(timeDate: string): FoundLine {
+    const  found = new FoundLine();
+    const  now = new Date();
+    const  timeDateObject = lib.newDateLoosely(timeDate);
+
+    if (timeDateObject <= now) {
+        found.targetKeyphrase = timeDate;
+        found.matches = [Object.assign(new MatchedPart(),{
+            position: 0,
+            matchedString: timeDate,
+            targetWordsIndex: 0,
+            searchWordIndex: 0,
+            targetType: 'strict',
+            targetTagType: 'alarm',
+            matchedWordType: 'super',
+            caseSensitiveMatched: true,
+        })];
+    } else if (isNaN(timeDateObject.getDate())) {
+        found.targetKeyphrase = timeDate;
+        found.matches = [Object.assign(new MatchedPart(),{
+            position: 0,
+            matchedString: timeDate + '(Bad format)',
+            targetWordsIndex: 0,
+            searchWordIndex: 0,
+            targetType: 'strict',
+            targetTagType: 'alarm',
+            matchedWordType: 'super',
+            caseSensitiveMatched: true,
+        })];
+    }
+
+    return  found;
 }
 
 async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
@@ -6702,6 +6805,10 @@ class FoundLine {
         }
     }
 
+    get  isMissedAlarm(): boolean {
+        return  this.matches.length >= 1  &&  this.matches[0].targetTagType === 'alarm';
+    }
+
     // Related functions:
     //    compareScoreAndSoOn
 
@@ -6799,15 +6906,20 @@ class FoundLine {
         if (line.length > lengthLimit) {
             line = line.substring(0, lengthLimit) + terminator + line.substring(lengthLimit + 1);
         }
-        // var  coloredStrings: string[] = [];  // debug
+        var  coloredStrings: string[] = [];  // debug
 
         for (const match of colorParts) {  // match is one of this.matches: MatchedPart[]
+            if (match.targetTagType === 'alarm') {
+                var  matchedString = match.matchedString;
+            } else {
+                var  matchedString = line.substr(match.position, match.matchedString.length);
+            }
 
             coloredLine +=
                 line.substring(previousPosition,  match.position) +
-                matchedColor( line.substr(match.position, match.matchedString.length) );
+                matchedColor( matchedString );
             previousPosition = match.position + match.matchedString.length;
-            // coloredStrings.push(line.substr(match.position, match.matchedString.length));
+            coloredStrings.push(line.substr(match.position, match.matchedString.length));
         }
         if (hasNormalizedWords) {
             for (const match of normalizedColorParts) {
@@ -6816,7 +6928,7 @@ class FoundLine {
                     matchedColor(match.normalizedMatchedString);
                 previousNormalizedPosition = match.normalizedPosition + match.normalizedMatchedString.length;
                 normalizedRight = match.normalizedTargetKeyPhrase.substring(previousNormalizedPosition);
-                // coloredStrings.push(match.normalizedMatchedString);
+                coloredStrings.push(match.normalizedMatchedString);
             }
         }
         coloredLine += line.substring(previousPosition);
@@ -6827,11 +6939,11 @@ class FoundLine {
         if (terminatorPosition !== notFound) {
             coloredLine = coloredLine.substring(0, terminatorPosition);
         }
-        // if (true) {
-            //     var d = lib.pp('coloredStrings:');
-            //     lib.pp(lib.getAllQuotedCSVLine(coloredStrings));
-            //     d = [];
-        // }
+        if (false) {  // coloredStrings debug
+            var d = lib.pp('coloredStrings:');
+            lib.pp(lib.getAllQuotedCSVLine(coloredStrings));
+            d = [];
+        }
 
         // ...
         var  thereIsKeywordLabel = false;
@@ -6885,6 +6997,16 @@ class FoundLine {
                     searchColor( searchKeyword ) +
                     coloredLine.substring(parameterIndex + searchKeyword.length);
             }
+        }
+
+        // alarm tag
+        if (this.matches[0].targetTagType === 'alarm') {
+            const  alarmLabelIndex = coloredLine.indexOf(alarmLabel);
+            const  alarmLabelColor = chalk.redBright;
+            coloredLine =
+                coloredLine.substring(0, alarmLabelIndex) +
+                alarmLabelColor( alarmLabel ) +
+                coloredLine.substring(alarmLabelIndex + alarmLabel.length);
         }
 
         // keyword tag, glossary tag
@@ -7223,7 +7345,7 @@ function  getParentPhrase(parentMatches: string[], notParentMatches: string[], m
 }
 
 type WordType = 'strict' | 'normalized';
-type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'parent' | 'withoutTags';
+type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'alarm' | 'parent' | 'withoutTags';
 type MatchedWordType =
     'super' |            // Same letters
     'wordOrIdiom' |      // Space separated same letters and participles
@@ -7911,6 +8033,7 @@ const  enableFileTemplateIfExistLabel = "#enable-file-template-if-exist:";
 const  keywordLabel = "#keyword:";
 const  keywordTagAndParameterRegExp = /( |^)#keyword:.*?( (?=#)|$)/g;
 const  glossaryLabel = "#glossary:";
+const  alarmLabel = "#alarm:";
 const  mutualTag = "#mutual:";
 const  snippetDepthLabel = "#snippet-depth:"
 const  disableLabel = "#disable-tag-tool:";

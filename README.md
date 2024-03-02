@@ -1,3 +1,5 @@
+( [Japanese](./README-jp.md) )
+
 # typrm
 
 typrm searches and displays for your favorite document text file 
@@ -9,8 +11,6 @@ You can execute the command just by copy and paste the displayed command.
     /path/MyServers.yaml:100: Log In: #keyword: ssh
         ssh webserver-0011-stg.example.com  -i ~/.ssh/stg/id_rsa
             #template: ssh __Server__  -i __Identity__
-
-( [Japanese](./README-jp.md) )
 
 <!-- TOC depthFrom:1 -->
 
@@ -45,6 +45,7 @@ You can execute the command just by copy and paste the displayed command.
     - [Execute commands related to files](#execute-commands-related-to-files)
     - [Search in the file and replace to the line number](#search-in-the-file-and-replace-to-the-line-number)
     - [Display with a pointer at noteworthy location in the image](#display-with-a-pointer-at-noteworthy-location-in-the-image)
+  - [#alarm tag: display after the specified date and time when searching](#alarm-tag-display-after-the-specified-date-and-time-when-searching)
   - [(for developers) How to build the development environment](#for-developers-how-to-build-the-development-environment)
     - [For Windows](#for-windows-1)
     - [For mac](#for-mac-1)
@@ -2081,6 +2082,28 @@ that stores the composite image of the pointer image.
 If you add the --verbose option to the search command of typrm,
 you can check the setting value of the TYPRM_LINE_NUM_GETTER environment variable
 and the result of the value of the `#ref:` tag parsed by the regular expression.
+
+
+## #alarm tag: display after the specified date and time when searching
+
+If you write the date and time after `#alarm:` and the date and time have passed,
+it will appear in the search results no matter what keyword you search for.
+
+    Token expiry (example):  #alarm: 2030-12-15
+
+Write the date and time in ISO format. The time zone is the same as the time zone of the process running typrm.
+
+    #alarm: 2020-12-15        #// Same as 2020-12-15 0:00
+    #alarm: 2020-12-15T12:00
+    #alarm: 2020-12-15 12:00
+    #alarm: 2020-12-15 12:00+00:00
+    #alarm: 2020-12-15 12:00:00
+    #alarm: 2020-12-15 12:00:00+00:00
+    #alarm: 0000-00-00
+    #alarm: 9999-99-99
+
+- If you do not normally search with typrm, you may miss that the specified date and time has passed.
+- You cannot set multiple alarms in a single line.
 
 
 ## (for developers) How to build the development environment

@@ -380,6 +380,108 @@ export function cutIndent(lines) {
     }
     return lines;
 }
+export function getStringBefore(input, keyword) {
+    let keywordIndex = input.indexOf(keyword);
+    if (keywordIndex === -1) {
+        throw new Error(`Not found "${keyword}" in "${input}".`);
+    }
+    return input.substring(0, keywordIndex);
+}
+export function getLocalIsoString(date) {
+    const tzOffset = date.getTimezoneOffset() * (60 * 1000);
+    const localISOTime = (new Date(date.getTime() - tzOffset)).toISOString().slice(0, -1); // Cut last Z
+    return localISOTime;
+}
+export function getCurrentTimeZoneIsoFormat() {
+    // Return value examples: Z, +09:00
+    const now = new Date();
+    const timezoneOffset = -now.getTimezoneOffset();
+    const sign = timezoneOffset >= 0 ? '+' : '-';
+    const padging = (num) => num < 10 ? '0' + num : num.toString();
+    const hours = padging(Math.floor(Math.abs(timezoneOffset) / 60));
+    const minutes = padging(Math.abs(timezoneOffset) % 60);
+    return `${sign}${hours}:${minutes}`;
+}
+export function newDateLoosely(timeDate) {
+    // You can specify like "2020-00-00T00:00", "2020-99-99 99:99:99.999".
+    // If you specify date without time like "2020-01-01", this function returns local time zone 0:00.
+    // It is not same as JavaScript standard.
+    if (timeDate.trim().length <= "0000-00-00 ".length && !timeDate.startsWith("0000")) {
+        timeDate += " 00:00"; // Local time zone
+    }
+    const timeDateObject = new Date(timeDate);
+    if (!isNaN(timeDateObject.getDate())) {
+        return timeDateObject;
+    }
+    // ([0-9]{4})(-[0-9]{1,2})?(-[0-9]{1,2})?( |T)?([0-9]{1,2}:[0-9]{2})?(:[0-9]{2})?(.[0-9]*)?(((\+|-)[0-9]:[0-9])|Z)?
+    // 1.year    2.month       3.day         4     5.hour:minute         6.second    7         8.time zone
+    const yearIndex = 1;
+    const monthIndex = 2;
+    const dayIndex = 3;
+    const hourMinuteIndex = 5;
+    const secondIndex = 6;
+    const match = isoTimeFormat.exec(timeDate);
+    if (match) {
+        if (match[monthIndex]) {
+            const month = parseInt(match[monthIndex].slice(1));
+            if (isNaN(month) || month <= 0) {
+                if (parseInt(match[yearIndex]) == 0) {
+                    timeDate = `0000-01-01`; // UTC 0:00
+                }
+                else {
+                    timeDate = `${match[yearIndex]}-01-01 00:00`;
+                }
+            }
+            else if (month >= 13) {
+                timeDate = `${match[yearIndex]}-12-31 23:59:59.999`; // ToDo: time zone
+            }
+            else if (match[dayIndex]) {
+                const day = parseInt(match[dayIndex].slice(1));
+                const year = parseInt(match[yearIndex]);
+                const maxDay = getMaxDayOfMonth(year, month);
+                const maxDayString = ('0' + maxDay.toString()).substr(-2);
+                if (day <= 0) {
+                    timeDate = `${match[yearIndex]}${match[monthIndex]}-01 00:00`;
+                }
+                else if (day >= maxDay) {
+                    timeDate = `${match[yearIndex]}${match[monthIndex]}-${maxDayString} 23:59:59.999`;
+                }
+                else if (match[hourMinuteIndex]) {
+                    const hourString = match[hourMinuteIndex].slice(0, 2);
+                    const minuteString = match[hourMinuteIndex].slice(-2);
+                    const hour = parseInt(hourString);
+                    const minute = parseInt(minuteString);
+                    if (hour >= 24) {
+                        timeDate = `${match[yearIndex]}${match[monthIndex]}${match[dayIndex]} 23:59:59.999`;
+                    }
+                    else if (minute >= 60) {
+                        timeDate = `${match[yearIndex]}${match[monthIndex]}${match[dayIndex]} ${hourString}:59:59.999`;
+                    }
+                    else if (match[secondIndex]) {
+                        const second = parseInt(match[secondIndex].substring(1));
+                        if (second >= 60) {
+                            timeDate = `${match[yearIndex]}${match[monthIndex]}${match[dayIndex]} ${hourString}:${minuteString}:59.999`;
+                        }
+                    }
+                }
+            }
+        }
+        return new Date(timeDate); // ToDo: time zone
+    }
+    else {
+        const invalidDate = new Date('2000-99-99');
+        return invalidDate;
+    }
+}
+export function getMaxDayOfMonth(year, month) {
+    if (month !== 2) {
+        return maxDayOfMonth[month];
+    }
+    else {
+        const isLeapYear = !isNaN((new Date(year, 2 - 1, 29)).getDate());
+        return (isLeapYear) ? 29 : 28;
+    }
+}
 export function unexpandVariable(expanded, keyValues, out_replacedIndices = null) {
     var replacing = expanded;
     var replacedTag = '\r\n'; // This is not matched with any values
@@ -1559,7 +1661,8 @@ export function cc(targetCount = 9999999, label = '0') {
     return { isTarget, debugOut };
 }
 globalThis.ccCount = {};
-// export const  ccCount: {[name: string]: number} = {};
+globalThis.isoTimeFormat = /([0-9]{4})(-[0-9]{1,2})?(-[0-9]{1,2})?( |T)?([0-9]{1,2}:[0-9]{2})?(:[0-9]{2})?(.[0-9]*)?(((\+|-)[0-9]:[0-9])|Z)?/;
+globalThis.maxDayOfMonth = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const notFoundInFile = -2;
 const notFound = -1;
 //# sourceMappingURL=lib.js.map

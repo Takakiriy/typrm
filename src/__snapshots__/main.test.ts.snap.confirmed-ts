@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`alarm >> 1st: sourceFileContents 1`] = `
+"minimum:  #alarm: 0000-00-00 00:00:00+00:00
+maximum:  #alarm: 9999-99-99 99:99:99-99:99
+start of today:  #alarm: 2024-01-10 00:00
+end of today:    #alarm: 2024-01-10 23:39
+date only:
+    yesterday: #alarm: 2024-01-09
+    today:     #alarm: 2024-01-10  #// comment
+    tomorrow:  #alarm: 2024-01-11
+bad format:    #alarm: 2024--1-10
+#keyword: others
+minimum:  #alarm: 0000-00-00T00:00:00+00:00
+maximum:  #alarm: 9999-99-99T99:99:99-99:99
+start of today:  #alarm: 2024-01-10T00:00
+end of today:    #alarm: 2024-01-10T23:39
+"
+`;
+
+exports[`alarm >> 1st: stdout answer 1`] = `
+"\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:10: #keyword: others
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:1: minimum:  #alarm: 0000-00-00 00:00:00+00:00
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:11: minimum:  #alarm: 0000-00-00T00:00:00+00:00
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:6:     yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:3: start of today:  #alarm: 2024-01-10 00:00
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:7:     today:     #alarm: 2024-01-10  #// comment
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:13: start of today:  #alarm: 2024-01-10T00:00
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:9: bad format:    #alarm: 2024--1-10(Bad format)
+"
+`;
+
 exports[`checks >> file contents >> First >> NG: stdout 1`] = `
 "
 \${typrmProject}/src/test_data/_checking/document/NG_1_changing.yaml:7:         user: 'user2'  #template: __User__

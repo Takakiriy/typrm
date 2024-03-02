@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as main from './main.js';
+import * as main from "./main";
 import chalk from "chalk";
-import * as lib from './lib.js';
+import * as lib from "./lib";
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -12,6 +12,7 @@ const typrmProject = '${typrmProject}'; // "getTestablePath" in "main.ts" change
 const testFolderPath = `test_data` + path.sep;
 const matchedColor = chalk.green.bold;
 const keywordLabelColor = chalk.gray;
+const alarmLabelColor = chalk.redBright;
 const refColor = chalk.yellow;
 const searchColor = chalk.yellow;
 const pathColor = chalk.cyan;
@@ -1756,6 +1757,47 @@ describe("print reference >>", () => {
         });
     });
 });
+describe("alarm >>", () => {
+    test("1st", async () => {
+        fs.mkdirSync(testFolderPath + '_tmp/input', { recursive: true });
+        const now = new Date();
+        const yesterdayObject = new Date();
+        const tomorrowObject = new Date();
+        yesterdayObject.setDate(yesterdayObject.getDate() - 1);
+        tomorrowObject.setDate(tomorrowObject.getDate() + 1);
+        const today = lib.getStringBefore(lib.getLocalIsoString(now), "T");
+        const yesterday = lib.getStringBefore(lib.getLocalIsoString(yesterdayObject), "T");
+        const tomorrow = lib.getStringBefore(lib.getLocalIsoString(tomorrowObject), "T");
+        const targetPath = testFolderPath + '_tmp/input/target_with_alarm.yaml';
+        const answerPath = testFolderPath + '_tmp/answer.log';
+        initializeTestInputFiles({
+            'alarm >> 1st: sourceFileContents 1': targetPath,
+            'alarm >> 1st: stdout answer 1': answerPath,
+        }, (text) => (lib.replace(text, [
+            { from: 'start of today:  #alarm: 2024-01-10 00:00', to: `start of today:  #alarm: ${today} 00:00` },
+            { from: 'end of today:    #alarm: 2024-01-10 23:39', to: `end of today:    #alarm: ${today} 23:39` },
+            { from: 'yesterday: #alarm: 2024-01-09', to: `yesterday: #alarm: ${yesterday}` },
+            { from: 'today:     #alarm: 2024-01-10', to: `today:     #alarm: ${today}` },
+            { from: 'tomorrow:  #alarm: 2024-01-11', to: `tomorrow:  #alarm: ${tomorrow}` },
+            { from: 'start of today:  #alarm: 2024-01-10T00:00', to: `start of today:  #alarm: ${today}T00:00` },
+            { from: 'end of today:    #alarm: 2024-01-10T23:39', to: `end of today:    #alarm: ${today}T23:39` },
+        ])));
+        const foundPath = '${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml';
+        lib.replaceFileSync(answerPath, (text) => (lib.replace(text, [
+            { from: '#keyword:', to: keywordLabelColor('#keyword:') },
+            { from: new RegExp('#alarm:', 'g'), to: alarmLabelColor('#alarm:') },
+            { from: 'others', to: matchedColor('others') },
+            { from: new RegExp('.yaml(:[0-9]+:)', 'g'), to: `.yaml${lineNumColor('$1')}` },
+            { from: new RegExp(lib.escapeRegularExpression(foundPath), 'g'), to: pathColor(foundPath) },
+            { from: new RegExp('([0-9]{4}-[0-9]{2}-[0-9]{2}(( |T)?([0-9]{2}:[0-9]{2}))?(:[0-9]{2}\\+[0-9]{2}:[0-9]{2})?)', 'g'), to: matchedColor('$1') },
+            { from: '2024--1-10(Bad format)', to: matchedColor('2024--1-10(Bad format)') },
+        ])));
+        const answer = fs.readFileSync(answerPath).toString();
+        await callMain(["others"], { folder: testFolderPath + '_tmp/input', test: "", disableFindAll: '', disableSnippet: '' });
+        expect(main.stdout).toBe(answer);
+        lib.rmdirSync(testFolderPath + '_tmp');
+    });
+});
 describe("unit test >>", () => {
     describe("makeSettingTree >>", () => {
         test.each([
@@ -1947,6 +1989,20 @@ function initializeTestInputFile(snapshotName) {
     }
     writeFileSync(filePath, inputContents);
     return { filePath, inputContents };
+}
+function initializeTestInputFiles(filePath, replaceFunction = (x) => (x)) {
+    const fileContents = {};
+    chdirInProject('src');
+    if (fs.existsSync(`${testFolderPath}_tmp`)) {
+        lib.rmdirSync(`${testFolderPath}_tmp`);
+    }
+    for (const [snapshotName, filePath_] of Object.entries(filePath)) {
+        const fileContentsBeforeReplace = lib.getSnapshot(snapshotName);
+        const fileContents_ = replaceFunction(fileContentsBeforeReplace);
+        writeFileSync(filePath_, fileContents_);
+        fileContents[snapshotName] = fileContents_;
+    }
+    return fileContents;
 }
 // writeFileSync
 // #keyword: writeFileSync

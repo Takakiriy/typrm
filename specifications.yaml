@@ -23,7 +23,7 @@ command: #keyword: typrm command list
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
-                    // keyword tag:  #// (#keyword:)
+                    // keyword tag:  #// (#keyword:tag)
                         getKeywordMatchingScore: #🌟  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                             __getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts# #__getSubMatchedScore
                             # if (useThesaurus) {
@@ -32,16 +32,18 @@ command: #keyword: typrm command list
                             setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
                         plusParentMatchScore: #keyword:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
                         # foundLines.push(found);
-                    // glossary tag:  #// (#glossary:)
+                    // glossary tag:  #// (#glossary:tag)
                         #  if (glossaryTag) {
+                    // alarm tag:  #// (#alarm:tag)
+                        getMissedAlarm:
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
-                    (filter): #🌟  # foundLines = foundLines.filter((found) => (found.matchedSearchKeywordCount === maximumHitWordCount));
+                    (filter): #🌟  # foundLines = foundLines.filter((found) => (found.counts.matchedSearchKeywordCount === maximumHitWordCount));
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
                         compareScoreAndSoOn:  #ref: ${GitHub}/typrm/src/main.ts#function  compareScoreAndSoOn
                         # // Debug score compare in 2 founds
                     #   console.log(foundLineInformation.toString());
-                    FoundLine.toString: #🌟  #ref: ${GitHub}/typrm/src/main.ts:csv#getString(): string
+                    FoundLine.toString: #🌟  #ref: ${GitHub}/typrm/src/main.ts#getString(): string
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
                     printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
@@ -257,7 +259,7 @@ debug:
             debugSearchScore:  #// This shows matched keyword scores.
                 How to use: Set to true. Near the "debugSearchScore" in "main.ts"
         Search result color:  #// This shows colored string parts.
-            How to use: Cut comment out of debug code. Near the "coloredStrings" in "main.ts"
+            How to use: Change to true near the "coloredStrings debug" in "main.ts" and set break point to watch "d".
         DebugWatchPoint: #keyword: typrm DebugWatchPoint
             How to use:
                 - Cut comment out of debug code. Near the "DebugWatchPoint" in "main.ts"
@@ -270,6 +272,23 @@ other specifications:
         start from test:
             callMainFromJest:  #ref: ${GitHub}/typrm/src/main.ts#function  callMainFromJest(
                 mainMain:  #keyword:  #ref: ${GitHub}/typrm/src/main.ts#function  mainMains(
+    library: #keyword: typrm library
+        file:
+            initializeTestInputFile:  #ref: main.test.ts
+            initializeTestInputFiles:  #ref: main.test.ts
+            fs.existsSync:  #// standard
+            fs.readFileSync:  #// standard
+            lib.writeFileSync:  #ref: main.test.ts
+            lib.deleteFileSync:  #ref: main.test.ts
+            lib.replaceFileSync:  #ref: lib.ts
+        replace:
+            (string).replace:  #// standard
+            lib.replace:  #ref: lib.ts
+            lib.replaceAsync:  #ref: lib.ts
+            lib.replaceFileSync:  #ref: lib.ts
+        others:
+            lib.chdirInProject:  #ref: main.test.ts
+            fs.mkdirSync:  #// standard
     settingStack of typrm makeSettingTree: #keyword:
         overview: |
             'settingStack' has parent indentLevel.
@@ -282,7 +301,7 @@ other specifications:
                 16:         setting:
                 31:     B:
                 32:         setting:
-                37:         #if: $settings.target_ == app
+                37:         #if__: $settings.target_ == app
             lineNum = 16 >> settingStack: |
                 { lineNum:  0, index: '/',    indentLevel: 0, ...}
                 { lineNum:  2, index: '/1',   indentLevel: 4, ...}
