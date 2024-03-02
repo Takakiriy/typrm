@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as url from 'url';
 import * as path from 'path';
-import * as lib from './lib';
+import * as lib from './lib.js';
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 if (process.env.windir) {
@@ -107,6 +107,10 @@ async function TestOfCommandLine() {
             "parameters": "search",
             "check": "false",
             "inputLines": "#ref: ${normalizedHomePath}/" + projectRelativePath + "/example/figure_1.png?name=test_2&x=404&y=70\nexit()\n",
+        }, { "name": "alarm",
+            "parameters": "search  --folder src/test_data/search/alarm/1.yaml",
+            "check": "true",
+            "inputLines": "#alarm:\nexit()\n",
         }
     ];
     for (const case_ of cases) {
@@ -136,7 +140,7 @@ async function TestOfCommandLine() {
                 const noData = 'no data';
                 var expectedOutput = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}: stdout 1`);
                 var expectedOutput2 = lib.getSnapshot(`typrm_test >> TestOfCommandLine >> ${case_.name} >> ${testingOS}2: stdout 1`, noData);
-                var stdout = returns.stdout;
+                var stdout = returns.stdout; // If stdout == "", check inputLines last is "exit()\n".
                 expectedOutput = expectedOutput.replace(/\\/g, '/').replace(/GitProjects\/GitHub\/typrm/g, projectRelativePath.replace(/\\/g, '/'));
                 expectedOutput2 = expectedOutput2.replace(/\\/g, '/').replace(/GitProjects\/GitHub\/typrm/g, projectRelativePath.replace(/\\/g, '/'));
                 stdout = stdout.replace(new RegExp(normalizedHomePath, 'ig'), '${HOME}')

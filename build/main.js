@@ -11,9 +11,9 @@ import * as csvParse from 'csv-parse';
 import chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
-import * as lib from "./lib";
+import * as lib from './lib.js';
 import sharp from 'sharp';
-// import { pp, ff, cc, ccCount } from "./lib";
+// import { pp, ff, cc, ccCount } from './lib.js';
 var __dirname = process.cwd(); // If const, SyntaxError: Identifier '__dirname' has already been declared
 if (__dirname.endsWith('src')) { // First run __dirname is typrmProject, second run __dirname is typrmProject/src.
     var typrmProject = path.dirname(__dirname);
@@ -2756,17 +2756,19 @@ function execShellCommand(command, requestedCommandFolder = true) {
 async function search() {
     const startIndex = (programArguments[0] === 's' || programArguments[0] === 'search') ? 1 : 0;
     const keyword = programArguments.slice(startIndex).join(' ');
+    const now = new Date();
     let Command;
     (function (Command) {
         Command[Command["search"] = 0] = "search";
-        Command[Command["openDocument"] = 1] = "openDocument";
-        Command[Command["printRef"] = 2] = "printRef";
-        Command[Command["runVerb"] = 3] = "runVerb";
-        Command[Command["check"] = 4] = "check";
-        Command[Command["replace"] = 5] = "replace";
-        Command[Command["reset"] = 6] = "reset";
-        Command[Command["mutualSearch"] = 7] = "mutualSearch";
-        Command[Command["shellCommand"] = 8] = "shellCommand";
+        Command[Command["alarm"] = 1] = "alarm";
+        Command[Command["openDocument"] = 2] = "openDocument";
+        Command[Command["printRef"] = 3] = "printRef";
+        Command[Command["runVerb"] = 4] = "runVerb";
+        Command[Command["check"] = 5] = "check";
+        Command[Command["replace"] = 6] = "replace";
+        Command[Command["reset"] = 7] = "reset";
+        Command[Command["mutualSearch"] = 8] = "mutualSearch";
+        Command[Command["shellCommand"] = 9] = "shellCommand";
     })(Command || (Command = {}));
     ;
     if (keyword !== '') {
@@ -2781,14 +2783,20 @@ async function search() {
                 command = Command.printRef;
             }
         }
+        else if (hasAlarmTag(keyword)) {
+            command = Command.alarm;
+        }
         else if (hasMutualTag(keyword)) {
             command = Command.mutualSearch;
         }
         if (command === Command.search) {
-            await searchSub(keyword, false);
+            await searchSub(keyword, now, false);
+        }
+        else if (command === Command.alarm) {
+            await searchSub(keyword.replace(mutualTag, ''), lib.newDateLoosely(keyword.replace(alarmLabel, '').trim() || '9999-99-99'), false);
         }
         else if (command === Command.mutualSearch) {
-            await searchSub(keyword.replace(mutualTag, ''), true);
+            await searchSub(keyword.replace(mutualTag, ''), now, true);
         }
         else if (command === Command.printRef) {
             await printRef(keyword);
@@ -2835,6 +2843,9 @@ async function search() {
                 else if (hasResetTag(keyword)) {
                     command = Command.reset;
                 }
+                else if (hasAlarmTag(keyword)) {
+                    command = Command.alarm;
+                }
                 else if (hasMutualTag(keyword)) {
                     command = Command.mutualSearch;
                 }
@@ -2842,10 +2853,13 @@ async function search() {
                     command = Command.shellCommand;
                 }
                 if (command === Command.search) {
-                    previousPrint = await searchSub(keyword, false);
+                    previousPrint = await searchSub(keyword, now, false);
+                }
+                else if (command === Command.alarm) {
+                    await searchSub(cutTag(keyword), lib.newDateLoosely(keyword.replace(alarmLabel, '').trim() || '9999-99-99'), false);
                 }
                 else if (command === Command.mutualSearch) {
-                    await searchSub(cutTag(keyword), true);
+                    await searchSub(cutTag(keyword), now, true);
                 }
                 else if (command === Command.openDocument) {
                     const foundLines = previousPrint.foundLines;
@@ -2884,7 +2898,7 @@ async function search() {
         }
     }
 }
-async function searchSub(keyword, isMutual) {
+async function searchSub(keyword, now, isMutual) {
     const thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
         const thesaurusFilePath = programOptions.thesaurus;
@@ -3164,7 +3178,7 @@ async function searchSub(keyword, isMutual) {
             const indexOfAlarmLabel = line.indexOf(alarmLabel);
             if (indexOfAlarmLabel !== notFound) {
                 const timeDate = getTagValue(line, indexOfAlarmLabel + alarmLabel.length);
-                const found = getMissedAlarm(timeDate);
+                const found = getMissedAlarm(timeDate, now);
                 if (found.matches.length >= 1) {
                     found.path = inputFileFullPath;
                     found.line = line;
@@ -4297,9 +4311,8 @@ function compareScoreAndSoOnDebug(a, b) {
     }
     return different;
 }
-function getMissedAlarm(timeDate) {
+function getMissedAlarm(timeDate, now) {
     const found = new FoundLine();
-    const now = new Date();
     const timeDateObject = lib.newDateLoosely(timeDate);
     if (timeDateObject <= now) {
         found.targetKeyphrase = timeDate;
@@ -4334,6 +4347,9 @@ async function searchWithoutTags(keywords) {
     const keywordCount = keywords.split(' ').filter((keyword) => (keyword !== '')).length;
     const thesaurus = new Thesaurus();
     const keywordsParticples = newParticplesFromKeyphrase(keywords, thesaurus);
+    if (keywordsParticples.words.length === 0) {
+        return [];
+    }
     const keyword1PartLowerCase = keywordsParticples.words[0].commonPartLowerCase;
     const keywordsParticples2 = keywordsParticples.words.slice(1);
     var fullMatchKeywords = keywords;
@@ -4551,7 +4567,7 @@ function addParticiplesFoundCountInFullSearch(found, line, keywordIndex, partici
 }
 async function mutualSearch() {
     const keyword = programArguments.slice(1).join(' ');
-    await searchSub(keyword, true);
+    await searchSub(keyword, new Date(), true);
 }
 const printRefOptionDefault = {
     print: true,
@@ -5425,6 +5441,10 @@ function hasReplaceTag(keywords) {
 function hasResetTag(keywords) {
     keywords = keywords.trim();
     return keywords === resetTag || keywords.startsWith(`${resetTag} `);
+}
+function hasAlarmTag(keywords) {
+    keywords = keywords.trim();
+    return keywords === alarmLabel || keywords.startsWith(`${alarmLabel} `);
 }
 function hasMutualTag(keywords) {
     keywords = keywords.trim();

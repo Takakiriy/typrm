@@ -2102,8 +2102,9 @@ Write the date and time in ISO format. The time zone is the same as the time zon
     #alarm: 0000-00-00
     #alarm: 9999-99-99
 
-- If you do not normally search with typrm, you may miss that the specified date and time has passed.
-- You cannot set multiple alarms in a single line.
+- If you do not normally search with typrm, you may miss that the specified date and time has passed
+- You cannot set multiple alarms in a single line
+- If you enter the `#alarm:` tag in the search keyword, the date and time entered in the search keyword will be searched as the current date and time.
 
 
 ## (for developers) How to build the development environment

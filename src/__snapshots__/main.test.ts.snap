@@ -4,7 +4,7 @@ exports[`alarm >> 1st: sourceFileContents 1`] = `
 "minimum:  #alarm: 0000-00-00 00:00:00+00:00
 maximum:  #alarm: 9999-99-99 99:99:99-99:99
 start of today:  #alarm: 2024-01-10 00:00
-end of today:    #alarm: 2024-01-10 23:39
+end of today:    #alarm: 2024-01-10 23:59
 date only:
     yesterday: #alarm: 2024-01-09
     today:     #alarm: 2024-01-10  #// comment
@@ -14,7 +14,7 @@ bad format:    #alarm: 2024--1-10
 minimum:  #alarm: 0000-00-00T00:00:00+00:00
 maximum:  #alarm: 9999-99-99T99:99:99-99:99
 start of today:  #alarm: 2024-01-10T00:00
-end of today:    #alarm: 2024-01-10T23:39
+end of today:    #alarm: 2024-01-10T23:59
 "
 `;
 
@@ -27,6 +27,33 @@ exports[`alarm >> 1st: stdout answer 1`] = `
 \${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:7:     today:     #alarm: 2024-01-10  #// comment
 \${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:13: start of today:  #alarm: 2024-01-10T00:00
 \${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:9: bad format:    #alarm: 2024--1-10(Bad format)
+"
+`;
+
+exports[`alarm >> list: sourceFileContents 1`] = `
+"yesterday: #alarm: 2024-01-09
+today:     #alarm: 2024-01-10  #// comment
+tomorrow:  #alarm: 2024-01-11
+"
+`;
+
+exports[`alarm >> list: stdout answer 1`] = `
+"\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:1: yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:2: today:     #alarm: 2024-01-10  #// comment
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:3: tomorrow:  #alarm: 2024-01-11
+"
+`;
+
+exports[`alarm >> search: sourceFileContents 1`] = `
+"yesterday: #alarm: 2024-01-09
+today:     #alarm: 2024-01-10  #// comment
+tomorrow:  #alarm: 2024-01-11
+"
+`;
+
+exports[`alarm >> search: stdout answer 1`] = `
+"\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:1: yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml:2: today:     #alarm: 2024-01-10  #// comment
 "
 `;
 
@@ -9580,6 +9607,24 @@ typrm keyword: exit()
 "
 `;
 
+exports[`typrm_test >> TestOfCommandLine >> alarm >> Windows: stdout 1`] = `
+"typrm keyword: #alarm:
+\${typrmProject}/src/test_data/search/alarm/1.yaml:1: yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/search/alarm/1.yaml:2: today:     #alarm: 2024-01-10  #// comment
+\${typrmProject}/src/test_data/search/alarm/1.yaml:3: tomorrow:  #alarm: 2024-01-11
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm_test >> TestOfCommandLine >> alarm >> mac: stdout 1`] = `
+"typrm keyword: #alarm:
+\${typrmProject}/src/test_data/search/alarm/1.yaml:1: yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/search/alarm/1.yaml:2: today:     #alarm: 2024-01-10  #// comment
+\${typrmProject}/src/test_data/search/alarm/1.yaml:3: tomorrow:  #alarm: 2024-01-11
+typrm keyword: exit()
+"
+`;
+
 exports[`typrm_test >> TestOfCommandLine >> locale >> Windows: stdout 1`] = `
 "\${typrmProject}/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
 \${typrmProject}/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
@@ -9595,10 +9640,10 @@ exports[`typrm_test >> TestOfCommandLine >> locale >> mac: stdout 1`] = `
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> Windows: stdout 1`] = `
 "typrm keyword: #ref: "\${HOME}/GitProjects/GitHub/typrm/README.md#parameters"
 Recommend: #ref: ~/GitProjects/GitHub/typrm/README.md#parameters
-\${HOME}/GitProjects/GitHub/typrm/README.md:5
+\${HOME}/GitProjects/GitHub/typrm/README.md:7
     7.Test Echo, 0.Folder
 typrm keyword or number: 7
- "ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters";  echo  "file: \${HOME}/GitProjects/GitHub/typrm/README.md";  echo  "fragment: parameters";  echo  "lineNum: 5"
+ "ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters";  echo  "file: \${HOME}/GitProjects/GitHub/typrm/README.md";  echo  "fragment: parameters";  echo  "lineNum: 7"
 typrm keyword or number: 
 typrm keyword: 7
 typrm keyword: exit()
@@ -9624,7 +9669,7 @@ typrm keyword: exit()
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> Windows: stdout 1`] = `
 "typrm keyword: file_path
 \${typrmProject}/src/test_data/_tmp/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
-\${HOME}/GitProjects/GitHub/typrm/README.md:1
+\${HOME}/GitProjects/GitHub/typrm/README.md:3
     7.Test Echo, 0.Folder
 typrm keyword or number: exit()
 "
@@ -9633,7 +9678,7 @@ typrm keyword or number: exit()
 exports[`typrm_test >> TestOfCommandLine >> search_mode_result_has_ref_verb >> mac: stdout 1`] = `
 "typrm keyword: file_path
 \${typrmProject}/src/test_data/_tmp/2.yaml:83:     #keyword: file_path  #ref: ~/GitProjects/GitHub/typrm/README.md#typrm
-\${HOME}/GitProjects/GitHub/typrm/README.md:1
+\${HOME}/GitProjects/GitHub/typrm/README.md:3
     7.Test Echo, 0.Folder
 typrm keyword or number: exit()
 "

@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as main from "./main";
+import * as main from './main.js';
 import chalk from "chalk";
-import * as lib from "./lib";
+import * as lib from './lib.js';
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -1782,21 +1782,48 @@ describe("alarm >>", () => {
             { from: 'start of today:  #alarm: 2024-01-10T00:00', to: `start of today:  #alarm: ${today}T00:00` },
             { from: 'end of today:    #alarm: 2024-01-10T23:39', to: `end of today:    #alarm: ${today}T23:39` },
         ])));
-        const foundPath = '${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml';
-        lib.replaceFileSync(answerPath, (text) => (lib.replace(text, [
-            { from: '#keyword:', to: keywordLabelColor('#keyword:') },
-            { from: new RegExp('#alarm:', 'g'), to: alarmLabelColor('#alarm:') },
-            { from: 'others', to: matchedColor('others') },
-            { from: new RegExp('.yaml(:[0-9]+:)', 'g'), to: `.yaml${lineNumColor('$1')}` },
-            { from: new RegExp(lib.escapeRegularExpression(foundPath), 'g'), to: pathColor(foundPath) },
-            { from: new RegExp('([0-9]{4}-[0-9]{2}-[0-9]{2}(( |T)?([0-9]{2}:[0-9]{2}))?(:[0-9]{2}\\+[0-9]{2}:[0-9]{2})?)', 'g'), to: matchedColor('$1') },
-            { from: '2024--1-10(Bad format)', to: matchedColor('2024--1-10(Bad format)') },
-        ])));
+        lib.replaceFileSync(answerPath, (text) => (lib.replace(text, answerReplace)));
         const answer = fs.readFileSync(answerPath).toString();
         await callMain(["others"], { folder: testFolderPath + '_tmp/input', test: "", disableFindAll: '', disableSnippet: '' });
         expect(main.stdout).toBe(answer);
         lib.rmdirSync(testFolderPath + '_tmp');
     });
+    test("search", async () => {
+        const targetPath = testFolderPath + '_tmp/input/target_with_alarm.yaml';
+        const answerPath = testFolderPath + '_tmp/answer.log';
+        initializeTestInputFiles({
+            'alarm >> search: sourceFileContents 1': targetPath,
+            'alarm >> search: stdout answer 1': answerPath,
+        });
+        lib.replaceFileSync(answerPath, (text) => (lib.replace(text, answerReplace)));
+        const answer = fs.readFileSync(answerPath).toString();
+        await callMain(["#alarm: 2024-01-10"], { folder: testFolderPath + '_tmp/input', test: "", disableFindAll: '', disableSnippet: '' });
+        expect(main.stdout).toBe(answer);
+        lib.rmdirSync(testFolderPath + '_tmp');
+    });
+    test("list", async () => {
+        const targetPath = testFolderPath + '_tmp/input/target_with_alarm.yaml';
+        const answerPath = testFolderPath + '_tmp/answer.log';
+        initializeTestInputFiles({
+            'alarm >> list: sourceFileContents 1': targetPath,
+            'alarm >> list: stdout answer 1': answerPath,
+        });
+        lib.replaceFileSync(answerPath, (text) => (lib.replace(text, answerReplace)));
+        const answer = fs.readFileSync(answerPath).toString();
+        await callMain(["#alarm:"], { folder: testFolderPath + '_tmp/input', test: "", disableFindAll: '', disableSnippet: '' });
+        expect(main.stdout).toBe(answer);
+        lib.rmdirSync(testFolderPath + '_tmp');
+    });
+    const foundPath = '${typrmProject}/src/test_data/_tmp/input/target_with_alarm.yaml';
+    const answerReplace = [
+        { from: '#keyword:', to: keywordLabelColor('#keyword:') },
+        { from: new RegExp('#alarm:', 'g'), to: alarmLabelColor('#alarm:') },
+        { from: 'others', to: matchedColor('others') },
+        { from: new RegExp('.yaml(:[0-9]+:)', 'g'), to: `.yaml${lineNumColor('$1')}` },
+        { from: new RegExp(lib.escapeRegularExpression(foundPath), 'g'), to: pathColor(foundPath) },
+        { from: new RegExp('([0-9]{4}-[0-9]{2}-[0-9]{2}(( |T)?([0-9]{2}:[0-9]{2}))?(:[0-9]{2}\\+[0-9]{2}:[0-9]{2})?)', 'g'), to: matchedColor('$1') },
+        { from: '2024--1-10(Bad format)', to: matchedColor('2024--1-10(Bad format)') },
+    ];
 });
 describe("unit test >>", () => {
     describe("makeSettingTree >>", () => {

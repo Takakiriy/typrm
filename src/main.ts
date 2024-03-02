@@ -2973,11 +2973,13 @@ function  execShellCommand(command: string, requestedCommandFolder: boolean = tr
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
-    enum Command { search, openDocument, printRef, runVerb, check, replace, reset, mutualSearch, shellCommand };
+    const  now = new Date();
+    enum Command { search, alarm, openDocument, printRef, runVerb, check, replace, reset, mutualSearch, shellCommand };
 
     if (keyword !== '') {
         const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
         const  hasVerb = numberRegularExpression.test(lastWord);
+
         var  command = Command.search;
         if (hasRefTag(keyword)) {
             if (hasVerb) {
@@ -2985,16 +2987,19 @@ async function  search() {
             } else {
                 command = Command.printRef;
             }
+        } else if (hasAlarmTag(keyword)) {
+            command = Command.alarm;
         } else if (hasMutualTag(keyword)) {
             command = Command.mutualSearch;
         }
 
         if (command === Command.search) {
 
-            await  searchSub(keyword, false);
+            await  searchSub(keyword, now, false);
+        } else if (command === Command.alarm) {
+            await  searchSub(keyword.replace(mutualTag, ''), lib.newDateLoosely( keyword.replace(alarmLabel, '').trim()  ||  '9999-99-99' ), false);
         } else if (command === Command.mutualSearch) {
-
-            await  searchSub(keyword.replace(mutualTag, ''), true);
+            await  searchSub(keyword.replace(mutualTag, ''), now, true);
         } else if (command === Command.printRef) {
 
             await  printRef(keyword);
@@ -3033,6 +3038,8 @@ async function  search() {
                     command = Command.replace;
                 } else if (hasResetTag(keyword)) {
                     command = Command.reset;
+                } else if (hasAlarmTag(keyword)) {
+                    command = Command.alarm;
                 } else if (hasMutualTag(keyword)) {
                     command = Command.mutualSearch;
                 } else if (hasShellCommandSymbol(keyword)) {
@@ -3041,10 +3048,11 @@ async function  search() {
 
                 if (command === Command.search) {
 
-                    previousPrint = await searchSub(keyword, false);
+                    previousPrint = await searchSub(keyword, now, false);
+                } else if (command === Command.alarm) {
+                    await searchSub(cutTag(keyword), lib.newDateLoosely( keyword.replace(alarmLabel, '').trim()  ||  '9999-99-99' ), false);
                 } else if (command === Command.mutualSearch) {
-
-                    await searchSub(cutTag(keyword), true);
+                    await searchSub(cutTag(keyword), now, true);
                 } else if (command === Command.openDocument) {
                     const  foundLines = previousPrint.foundLines;
                     const  foundIndex = parseInt( keyword.substring(1) );
@@ -3085,7 +3093,7 @@ async function  search() {
     }
 }
 
-async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefResult> {
+async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promise<PrintRefResult> {
     const  thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
         const  thesaurusFilePath = programOptions.thesaurus;
@@ -3379,7 +3387,7 @@ async function  searchSub(keyword: string, isMutual: boolean): Promise<PrintRefR
             if (indexOfAlarmLabel !== notFound) {
                 const  timeDate = getTagValue(line, indexOfAlarmLabel + alarmLabel.length);
 
-                const  found = getMissedAlarm(timeDate);
+                const  found = getMissedAlarm(timeDate, now);
                 if (found.matches.length >= 1) {
                     found.path = inputFileFullPath;
                     found.line = line;
@@ -4566,9 +4574,8 @@ function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     return  different;
 }
 
-function  getMissedAlarm(timeDate: string): FoundLine {
+function  getMissedAlarm(timeDate: string, now: Date): FoundLine {
     const  found = new FoundLine();
-    const  now = new Date();
     const  timeDateObject = lib.newDateLoosely(timeDate);
 
     if (timeDateObject <= now) {
@@ -4605,6 +4612,9 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
     const  keywordCount = keywords.split(' ').filter((keyword)=>(keyword !== '')).length;
     const  thesaurus = new Thesaurus();
     const  keywordsParticples = newParticplesFromKeyphrase(keywords, thesaurus);
+    if (keywordsParticples.words.length === 0) {
+        return  [];
+    }
     const  keyword1PartLowerCase = keywordsParticples.words[0].commonPartLowerCase;
     const  keywordsParticples2 = keywordsParticples.words.slice(1);
     var  fullMatchKeywords = keywords;
@@ -4833,7 +4843,7 @@ function  addParticiplesFoundCountInFullSearch(found: FoundLine, line: string, k
 async function  mutualSearch() {
     const  keyword = programArguments.slice(1).join(' ');
 
-    await  searchSub(keyword, true);
+    await  searchSub(keyword, new Date(), true);
 }
 
 interface  PrintRefOption {
@@ -5789,6 +5799,11 @@ function  hasReplaceTag(keywords: string) {
 function  hasResetTag(keywords: string) {
     keywords = keywords.trim();
     return  keywords === resetTag  ||  keywords.startsWith(`${resetTag} `);
+}
+
+function  hasAlarmTag(keywords: string) {
+    keywords = keywords.trim();
+    return  keywords === alarmLabel  ||  keywords.startsWith(`${alarmLabel} `);
 }
 
 function  hasMutualTag(keywords: string) {

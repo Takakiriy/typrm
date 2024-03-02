@@ -168,6 +168,9 @@ test:
                 pathColor('${HOME}/GitProjects/GitHub/typrm/
             __snapshots__: |  #ref: ~/GitHub/typrm/src/__snapshots__/main.test.ts.snap
                 __Project__: ~/GitProjects/GitHub/typrm
+    Emulate keyboard input:
+        in "typrm.test.ts": Search "inputLines"
+        in "main.test.ts": Search "inputPattern"
     Test >> checks snapshots files are confirmed:  #keyword: typrm checks snapshots files are confirmed
         main.test.ts.snap.confirmed-ts ファイルはテキストファイルの比較ツールを使って手動で編集します:
         拡張子の末尾を .snap にしない理由は、Jest が使っていない .snap ファイルを自動的に削除しようとするからです:
