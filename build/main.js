@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -7502,6 +7503,8 @@ export var programArguments = [];
 export var programOptions = {};
 export var programOptionsWordSeparators = wordSuperSeparatorsDefault + wordSeparatorsDefault;
 =======
+=======
+>>>>>>> 2db5354 (Add benchmark in verbose option.)
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -14963,5 +14966,8 @@ export var stdout = '';
 export var programArguments = [];
 export var programOptions = {};
 export var programOptionsWordSeparators = wordSuperSeparatorsDefault + wordSeparatorsDefault;
+<<<<<<< HEAD
+>>>>>>> 2db5354 (Add benchmark in verbose option.)
+=======
 >>>>>>> 2db5354 (Add benchmark in verbose option.)
 //# sourceMappingURL=main.js.map
