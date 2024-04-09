@@ -8908,13 +8908,13 @@ typrm keyword: exit()
 exports[`typrm_test >> TestOfCommandLine >> search_mode_ref_verb >> mac: stdout 1`] = `
 "typrm keyword: #ref: "\${HOME}/GitProjects/GitHub/typrm/README.md#parameters"
 Recommend: #ref: ~/GitProjects/GitHub/typrm/README.md#parameters
-\${HOME}/GitProjects/GitHub/typrm/README.md:5
+\${HOME}/GitProjects/GitHub/typrm/README.md:7
     7.Test Echo, 0.Folder
 typrm keyword or number: 7
 ref:  \${HOME}/GitProjects/GitHub/typrm/README.md#parameters
 file: \${HOME}/GitProjects/GitHub/typrm/README.md
 fragment: parameters
-lineNum: 5
+lineNum: 7
 typrm keyword or number: 
 typrm keyword: 7
 typrm keyword: exit()

@@ -113,6 +113,7 @@ async function TestOfCommandLine() {
             "inputLines": "#alarm:\nexit()\n",
         }
     ];
+    deleteTestFiles();
     for (const case_ of cases) {
         if (true || case_.name === 'search_mode_result_has_ref_verb') {
             console.log(`\nTestCase: TestOfCommandLine >> ${case_.name}`);
@@ -175,6 +176,9 @@ async function TestOfCommandLine() {
             }
         }
     }
+    deleteTestFiles();
+}
+function deleteTestFiles() {
     deleteFile(testFolderPath + "_out.log");
     deleteFile(testFolderPath + "_output.log");
     deleteFile(testFolderPath + "_expected.log");

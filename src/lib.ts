@@ -1766,6 +1766,10 @@ export function  getTimeFramesString(labelPattern: string): string {
     return  frame.getString();
 }
 
+export function  sleep(milliSeconds: number) {
+    return  new Promise(resolve => setTimeout(resolve, milliSeconds));
+}
+
 }  // end of namespace  time
 
 export function  jsonStringify(object: any, dummy?: any, space?: string): string {

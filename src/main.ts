@@ -37,8 +37,11 @@ export async function  main() {
 }
 
 function  DebugWatchPoint() {
-    if (true) {
+    if ('verbose' in programOptions) {
         printTime();
+        BenchmarkCounters.print();
+    }
+    if (true) {
         var    d = lib.pp('');
         const  s = getStdOut();
         d = [];  // Set break point here and watch the variable d
@@ -3191,6 +3194,8 @@ async function  search() {
 }
 
 async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promise<PrintRefResult> {
+    timeTag = ('verbose' in programOptions);
+    BenchmarkCounters.reset();
     timeTag && lib.time.start(`searchSub`);
     const  thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
@@ -3367,6 +3372,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                         var  positionOfCSV = unescapedLine.indexOf(csv);
                     }
 
+                    BenchmarkCounters.keywordHitCount += 1;
                     found.score += keywordMatchScore + plusScore;
                     found.path = inputFileFullPath;
                     found.lineNum = lineNum;
@@ -3461,6 +3467,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                             searchWordParticples,  thesaurus,  lineNum});
                         if (found.counts.partMatchedTargetKeywordCount >= 1  &&  colonPosition !== notFound) {
 
+                            BenchmarkCounters.glossaryHitCount += 1;
                             found.score += glossaryMatchScore + plusScore;
                             found.path = inputFileFullPath;
                             found.lineNum = lineNum;
@@ -3489,7 +3496,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
 
             // alarm tag
             const  indexOfAlarmLabel = line.indexOf(alarmLabel);
-            if (indexOfAlarmLabel !== notFound) {
+            if (indexOfAlarmLabel !== notFound  &&  alarmLabelRegExp.test(line)) {
                 const  timeDate = getTagValue(line, indexOfAlarmLabel + alarmLabel.length);
 
                 const  found = getMissedAlarm(timeDate, now);
@@ -4778,6 +4785,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                 // full match
                 if (isFullMatch(line, fullMatchKeywords)) {
                     fullMatchCount += 1;
+                    BenchmarkCounters.searchWithoutTagsHitCount += 1;
                     const  found = new FoundLine();
                     found.path = inputFileFullPath;
                     found.lineNum = lineNum;
@@ -4825,6 +4833,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                             const  found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
                             foundLines.push(found);
                             matchCount += 1;
+                            BenchmarkCounters.searchWithoutTagsHitCount += 1;
                             if (debugSearchScore) {
                                 console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
                             }
@@ -7927,14 +7936,32 @@ function  cutLastLF(message: string) {
     return  message;
 }
 
+class  BenchmarkCounters {
+
+    static  keywordHitCount = 0;
+    static  glossaryHitCount = 0;
+    static  searchWithoutTagsHitCount = 0;
+
+    static  print() {
+        console.log(`#benchmark: keywordHitCount: ${this.keywordHitCount}`);
+        console.log(`#benchmark: glossaryHitCount: ${this.glossaryHitCount}`);
+        console.log(`#benchmark: searchWithoutTagsHitCount: ${this.searchWithoutTagsHitCount}`);
+    }
+    static  reset() {
+        BenchmarkCounters.keywordHitCount = 0;
+        BenchmarkCounters.glossaryHitCount = 0;
+        BenchmarkCounters.searchWithoutTagsHitCount = 0;
+    }
+}
+
 function  printTime() {
-    console.log(`#time: searchSub: ${lib.time.get('searchSub').getString()}`);
-    console.log(`#time:     keyword: ${lib.time.getTimeFramesString('^searchSub >> keyword >> .*')}`);
-    console.log(`#time:     glossary: ${lib.time.getTimeFramesString('^searchSub >> glossary >> .*')}`);
-    console.log(`#time:     plusParentMatchScore: ${lib.time.getTimeFramesString('^searchSub >> plusParentMatchScore >> .*')}`);
-    console.log(`#time:     searchWithoutTags: ${lib.time.get('searchSub >> searchWithoutTags').getString()}`);
+    console.log(`#benchmark: searchSub: ${lib.time.get('searchSub').getString()}`);
+    console.log(`#benchmark:     keyword: ${lib.time.getTimeFramesString('^searchSub >> keyword >> .*')}`);
+    console.log(`#benchmark:     glossary: ${lib.time.getTimeFramesString('^searchSub >> glossary >> .*')}`);
+    console.log(`#benchmark:     plusParentMatchScore: ${lib.time.getTimeFramesString('^searchSub >> plusParentMatchScore >> .*')}`);
+    console.log(`#benchmark:     searchWithoutTags: ${lib.time.get('searchSub >> searchWithoutTags').getString()}`);
     for (let frame of lib.time.getTimeFrames('^searchSub >> .*')) {
-        console.log(`#time:     ${frame.label}: ${frame.getString()}`);
+        console.log(`#benchmark:     ${frame.label}: ${frame.getString()}`);
     }
 }
 
@@ -8177,6 +8204,7 @@ const  keywordLabel = "#keyword:";
 const  keywordTagAndParameterRegExp = /( |^)#keyword:.*?( (?=#)|$)/g;
 const  glossaryLabel = "#glossary:";
 const  alarmLabel = "#alarm:";
+const  alarmLabelRegExp = /( |^)#alarm:/;
 const  mutualTag = "#mutual:";
 const  snippetDepthLabel = "#snippet-depth:"
 const  disableLabel = "#disable-tag-tool:";
