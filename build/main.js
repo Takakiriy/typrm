@@ -402,6 +402,9 @@ async function makeSettingTree(parser) {
     var setting = {};
     var currentSettingIndex = '/'; // #search: settingStack of typrm makeSettingTree
     var lineNum = 0;
+    var breaking = false;
+    var exception;
+    var errorLineNum = 0;
     var settingIndentLength = 0;
     tree.indices.set(1, '/');
     tree.indicesWithIf.set(1, '/');
@@ -410,332 +413,367 @@ async function makeSettingTree(parser) {
         console.log(`Verbose: Phase 1: parse settings ...  ${getTestablePath(parser.filePath)}`);
     }
     for await (const line1 of reader) {
-        const line = line1;
-        lineNum += 1;
-        parser.line = line;
-        parser.lineNum = lineNum;
-        // indentStack = ...
-        const indent = indentRegularExpression.exec(line)[0];
-        if (line !== '') {
-            // Pop "indentStack"
-            while (!indent.startsWith(indentStack[indentStack.length - 1].indent)) {
-                indentStack.pop();
-            }
-            // ...
-            const currentIndentStackIndex = indentStack.length - 1;
-            var currentSettingStackIndex = settingStack.length - 2;
-            const previousIndent = indentStack[currentIndentStackIndex];
-            const inIfBlock = lib.isAlphabetIndex(currentSettingIndex);
-            // Pop "settingStack" in #if: block
-            if (inIfBlock) {
-                while (indent.length <= settingStack[currentSettingStackIndex].indent.length) {
-                    const parentSettingStackIndex = currentSettingStackIndex - 1;
-                    const lastEndIf = !lib.isAlphabetIndex(settingStack[parentSettingStackIndex].index);
-                    if (isReadingSetting) {
-                        tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
+        if (breaking) {
+            continue;
+        } // "reader" requests read all lines
+        try {
+            const line = line1;
+            lineNum += 1;
+            parser.line = line;
+            parser.lineNum = lineNum;
+            // indentStack = ...
+            const indent = indentRegularExpression.exec(line)[0];
+            if (line !== '') {
+                // Pop "indentStack"
+                while (!indent.startsWith(indentStack[indentStack.length - 1].indent)) {
+                    indentStack.pop();
+                }
+                // ...
+                const currentIndentStackIndex = indentStack.length - 1;
+                var currentSettingStackIndex = settingStack.length - 2;
+                const previousIndent = indentStack[currentIndentStackIndex];
+                const inIfBlock = lib.isAlphabetIndex(currentSettingIndex);
+                // Pop "settingStack" in #if: block
+                if (inIfBlock) {
+                    while (indent.length <= settingStack[currentSettingStackIndex].indent.length) {
+                        const parentSettingStackIndex = currentSettingStackIndex - 1;
+                        const lastEndIf = !lib.isAlphabetIndex(settingStack[parentSettingStackIndex].index);
+                        if (isReadingSetting) {
+                            tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
+                        }
+                        else {
+                            tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...{} };
+                        }
+                        currentSettingStackIndex -= 1;
+                        setting = {};
+                        settingStack.pop();
+                        if (parser.verbose) {
+                            console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:  #// currentSettingIndex: ${currentSettingIndex}`);
+                        }
+                        const nextSetting = settingStack[settingStack.length - 1];
+                        const parentSettingIndex = path.dirname(nextSetting.index);
+                        const usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
+                        nextSetting.lineNum = 0;
+                        if (parentSettingIndex === '/') {
+                            nextSetting.index = `/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                        }
+                        else {
+                            nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                        }
+                        currentSettingIndex = settingStack[currentSettingStackIndex].index;
+                        tree.indicesWithIf.set(lineNum, currentSettingIndex);
+                        if (lastEndIf) {
+                            if (indent.length <= settingStack[currentSettingStackIndex + 1].indent.length) {
+                                nextSetting.nextAlphabetIndex = path.basename(nextSetting.index);
+                                if (parentSettingIndex === '/') {
+                                    nextSetting.index = `/${nextSetting.nextNumberIndex}`;
+                                }
+                                else {
+                                    nextSetting.index = `${parentSettingIndex}/${nextSetting.nextNumberIndex}`;
+                                }
+                            }
+                            break;
+                        }
                     }
-                    currentSettingStackIndex -= 1;
-                    setting = {};
+                }
+                // Pop "settingStack" out of #if: block
+                while (indent.length <= settingStack[currentSettingStackIndex].startIndentLevel) {
                     settingStack.pop();
+                    currentSettingStackIndex -= 1;
                     if (parser.verbose) {
-                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #if:  #// currentSettingIndex: ${currentSettingIndex}`);
+                        console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
                     }
-                    const nextSetting = settingStack[settingStack.length - 1];
-                    const parentSettingIndex = path.dirname(nextSetting.index);
-                    const usedNumber = lib.fromAlphabetIndex(path.basename(nextSetting.index));
-                    nextSetting.lineNum = 0;
-                    if (parentSettingIndex === '/') {
-                        nextSetting.index = `/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                    const setting_ = settingStack[settingStack.length - 1];
+                    if (!(currentSettingIndex in tree.settings)) {
+                        if (isReadingSetting) {
+                            tree.settings[currentSettingIndex] = setting;
+                        }
+                        tree.indices.set(setting_.startLineNum, currentSettingIndex);
+                        tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
+                        tree.settingsInformation[currentSettingIndex] = {
+                            index: currentSettingIndex,
+                            lineNum: setting_.lineNum,
+                            indent: setting_.indent,
+                            condition: '',
+                            inSettings: isReadingSetting,
+                        };
                     }
                     else {
-                        nextSetting.index = `${parentSettingIndex}/${lib.getAlphabetIndex(usedNumber + 1)}`;
+                        tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
                     }
+                    setting = {};
                     currentSettingIndex = settingStack[currentSettingStackIndex].index;
+                    tree.indices.set(lineNum, currentSettingIndex);
                     tree.indicesWithIf.set(lineNum, currentSettingIndex);
-                    if (lastEndIf) {
-                        if (indent.length <= settingStack[currentSettingStackIndex + 1].indent.length) {
-                            nextSetting.nextAlphabetIndex = path.basename(nextSetting.index);
-                            if (parentSettingIndex === '/') {
-                                nextSetting.index = `/${nextSetting.nextNumberIndex}`;
+                    const nextSetting = setting_;
+                    const parentSettingIndex = path.dirname(nextSetting.index);
+                    const usedNumber = parseInt(path.basename(nextSetting.index));
+                    nextSetting.lineNum = 0;
+                    if (parentSettingIndex === '/') {
+                        nextSetting.index = `/${usedNumber + 1}`;
+                    }
+                    else {
+                        nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
+                    }
+                    nextSetting.nextNumberIndex += 1;
+                }
+                // push "indentStack"
+                if (indent === previousIndent.indent) {
+                    previousIndent.lineNum = lineNum;
+                }
+                else {
+                    indentStack.push({ lineNum, indent });
+                }
+            }
+            // setting = ...
+            if (settingLabel.test(line) && !line.includes(disableLabel)) {
+                isReadingSetting = true;
+                if (indent === '') {
+                    settingStack[0].lineNum = lineNum;
+                    currentSettingIndex = '/';
+                    if (currentSettingIndex in tree.settingsInformation) {
+                        console.log('');
+                        console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
+                        console.log(`    Warning: double settings are not supported.`);
+                        console.log(`    First settings at: ${getTestablePath(parser.filePath)}:` +
+                            `${tree.settingsInformation[currentSettingIndex].lineNum}`);
+                        parser.warningCount += 1;
+                        var isNewSettings = false;
+                    }
+                    else {
+                        var isNewSettings = true;
+                    }
+                }
+                else {
+                    const currentSetting = settingStack[settingStack.length - 2];
+                    if (currentSetting.indent.length === indent.length) {
+                        console.log('');
+                        console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
+                        console.log(`    Warning: double settings are not supported.`);
+                        console.log(`    First settings at: ${getTestablePath(parser.filePath)}:` +
+                            `${tree.settingsInformation[currentSettingIndex].lineNum}`);
+                        parser.warningCount += 1;
+                        var isNewSettings = false;
+                    }
+                    else {
+                        var previousIndentIsDeeper = false; // default
+                        const parentSetting = currentSetting;
+                        const setting_ = settingStack[settingStack.length - 1];
+                        const previousIndex = getPreviousShallowestIndex(parentSetting.index, Object.keys(tree.settingsInformation));
+                        if ( /* null check */previousIndex in tree.settingsInformation) {
+                            var previousIndentIsDeeper = tree.settingsInformation[previousIndex].indent.length > indent.length;
+                        }
+                        // Insert parent index, when there is settings tag after template tags.
+                        //   Example of shiftingIndices (=tree.indices.keys):
+                        //      Before: [/1, /2]
+                        //      After:  [/3/4/1, /3/4/2]
+                        //      parent: /3/4
+                        if (previousIndentIsDeeper) {
+                            const ceilingLineNum = indentStack[indentStack.length - 2].lineNum;
+                            const shiftingIndices = [];
+                            for (const [index, settingsInformation] of Object.entries(tree.settingsInformation)) {
+                                if (settingsInformation.lineNum > ceilingLineNum) {
+                                    shiftingIndices.push(index);
+                                }
+                            }
+                            if (shiftingIndices.length >= 1) {
+                                var firstShiftingIndex = shiftingIndices[0];
+                                if (lib.isAlphabetIndex(firstShiftingIndex)) {
+                                    firstShiftingIndex = setting_.index;
+                                }
+                                shiftingIndices.sort((a, b) => (b.length - a.length));
+                                // tree.indices = ...
+                                for (const [lineNum_, index] of tree.indices.entries()) {
+                                    if (lineNum_ > ceilingLineNum) {
+                                        const indexBefore = index;
+                                        const indexAfter = insertParentIndexNum(firstShiftingIndex, indexBefore);
+                                        tree.indices.set(lineNum_, indexAfter);
+                                    }
+                                }
+                                // tree.indicesWithIf = ...
+                                var lastIndexAfter = '';
+                                for (const [lineNum_, index] of tree.indicesWithIf.entries()) {
+                                    if (lineNum_ > ceilingLineNum) {
+                                        const indexBefore = index;
+                                        const indexAfter = insertParentIndexNum(firstShiftingIndex, indexBefore);
+                                        lastIndexAfter = indexAfter;
+                                        tree.indicesWithIf.set(lineNum_, indexAfter);
+                                    }
+                                }
+                                // tree.settings = ...
+                                // tree.settingsInformation ...
+                                var lastSettingIndexAfter = '';
+                                for (const indexBefore of shiftingIndices) {
+                                    const indexAfter = insertParentIndexNum(firstShiftingIndex, indexBefore);
+                                    lastSettingIndexAfter = indexAfter;
+                                    if (!(indexBefore in tree.settings)) {
+                                        console.log(`WARNING: "tree.settings" does not contain "indexBefore" == "${indexBefore}" in makeSettingTree.`);
+                                    }
+                                    tree.settings[indexAfter] = tree.settings[indexBefore];
+                                    delete tree.settings[indexBefore];
+                                    for (const settings of Object.values(tree.settings[indexAfter])) {
+                                        settings.settingsIndex = indexAfter;
+                                    }
+                                    tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
+                                    tree.settingsInformation[indexAfter].index = indexAfter;
+                                    delete tree.settingsInformation[indexBefore];
+                                }
+                                currentSettingIndex = firstShiftingIndex;
+                                if (lastIndexAfter !== currentSettingIndex) {
+                                    tree.indices.set(lineNum, `${currentSettingIndex}`);
+                                    tree.indicesWithIf.set(lineNum, `${currentSettingIndex}`);
+                                }
+                                settingStack[settingStack.length - 1].index = currentSettingIndex;
+                                var nextNestedIndex = currentSettingIndex + '/' +
+                                    (parseInt(lastSettingIndexAfter.substring(currentSettingIndex.length + 1)) + 1).toString();
                             }
                             else {
-                                nextSetting.index = `${parentSettingIndex}/${nextSetting.nextNumberIndex}`;
+                                var nextNestedIndex = setting_.index + '/1';
                             }
-                        }
-                        break;
-                    }
-                }
-            }
-            // Pop "settingStack" out of #if: block
-            while (indent.length <= settingStack[currentSettingStackIndex].startIndentLevel) {
-                settingStack.pop();
-                currentSettingStackIndex -= 1;
-                if (parser.verbose) {
-                    console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum - 1}: end #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
-                }
-                const setting_ = settingStack[settingStack.length - 1];
-                if (!(currentSettingIndex in tree.settings)) {
-                    if (isReadingSetting) {
-                        tree.settings[currentSettingIndex] = setting;
-                    }
-                    tree.indices.set(setting_.startLineNum, currentSettingIndex);
-                    tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
-                    tree.settingsInformation[currentSettingIndex] = {
-                        index: currentSettingIndex,
-                        lineNum: setting_.lineNum,
-                        indent: setting_.indent,
-                        condition: '',
-                        inSettings: isReadingSetting,
-                    };
-                }
-                else {
-                    tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
-                }
-                setting = {};
-                currentSettingIndex = settingStack[currentSettingStackIndex].index;
-                tree.indices.set(lineNum, currentSettingIndex);
-                tree.indicesWithIf.set(lineNum, currentSettingIndex);
-                const nextSetting = setting_;
-                const parentSettingIndex = path.dirname(nextSetting.index);
-                const usedNumber = parseInt(path.basename(nextSetting.index));
-                nextSetting.lineNum = 0;
-                if (parentSettingIndex === '/') {
-                    nextSetting.index = `/${usedNumber + 1}`;
-                }
-                else {
-                    nextSetting.index = `${parentSettingIndex}/${usedNumber + 1}`;
-                }
-                nextSetting.nextNumberIndex += 1;
-            }
-            // push "indentStack"
-            if (indent === previousIndent.indent) {
-                previousIndent.lineNum = lineNum;
-            }
-            else {
-                indentStack.push({ lineNum, indent });
-            }
-        }
-        // setting = ...
-        if (settingLabel.test(line) && !line.includes(disableLabel)) {
-            isReadingSetting = true;
-            if (indent === '') {
-                settingStack[0].lineNum = lineNum;
-                currentSettingIndex = '/';
-                if (currentSettingIndex in tree.settingsInformation) {
-                    console.log('');
-                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
-                    console.log(`    Warning: double settings are not supported.`);
-                    console.log(`    First settings at: ${getTestablePath(parser.filePath)}:` +
-                        `${tree.settingsInformation[currentSettingIndex].lineNum}`);
-                    parser.warningCount += 1;
-                    var isNewSettings = false;
-                }
-                else {
-                    var isNewSettings = true;
-                }
-            }
-            else {
-                const currentSetting = settingStack[settingStack.length - 2];
-                if (currentSetting.indent.length === indent.length) {
-                    console.log('');
-                    console.log(`${getTestablePath(parser.filePath)}:${lineNum}`);
-                    console.log(`    Warning: double settings are not supported.`);
-                    console.log(`    First settings at: ${getTestablePath(parser.filePath)}:` +
-                        `${tree.settingsInformation[currentSettingIndex].lineNum}`);
-                    parser.warningCount += 1;
-                    var isNewSettings = false;
-                }
-                else {
-                    const parentSetting = currentSetting;
-                    const setting_ = settingStack[settingStack.length - 1];
-                    const previousNeighborIndex = getPreviousNeighborIndex(parentSetting.index, Object.keys(tree.settingsInformation));
-                    const previousNeighborIndentIsDeeper = previousNeighborIndex in tree.settingsInformation &&
-                        tree.settingsInformation[previousNeighborIndex].indent.length > indent.length;
-                    // insert parent settings
-                    if (previousNeighborIndentIsDeeper) {
-                        const ceilingLineNum = indentStack[indentStack.length - 2].lineNum;
-                        const shiftingIndices = [];
-                        for (const [index, settingsInformation] of Object.entries(tree.settingsInformation)) {
-                            if (settingsInformation.lineNum > ceilingLineNum) {
-                                shiftingIndices.push(index);
-                            }
-                        }
-                        if (shiftingIndices.length >= 1) {
-                            const firstShiftingIndex = shiftingIndices[0];
-                            shiftingIndices.sort((a, b) => (b.length - a.length));
-                            for (const [lineNum_, index] of tree.indices.entries()) {
-                                if (lineNum_ > ceilingLineNum) {
-                                    const indexBefore = index;
-                                    const indexAfter = insertParentIndexNum(indexBefore, firstShiftingIndex);
-                                    tree.indices.set(lineNum_, indexAfter);
-                                }
-                            }
-                            var lastIndexAfter = '';
-                            for (const [lineNum_, index] of tree.indicesWithIf.entries()) {
-                                if (lineNum_ > ceilingLineNum) {
-                                    const indexBefore = index;
-                                    const indexAfter = insertParentIndexNum(indexBefore, firstShiftingIndex);
-                                    lastIndexAfter = indexAfter;
-                                    tree.indicesWithIf.set(lineNum_, indexAfter);
-                                }
-                            }
-                            var lastSettingIndexAfter = '';
-                            for (const shiftingIndex of shiftingIndices) {
-                                const indexBefore = shiftingIndex;
-                                const indexAfter = insertParentIndexNum(indexBefore, firstShiftingIndex);
-                                lastSettingIndexAfter = indexAfter;
-                                tree.settings[indexAfter] = tree.settings[indexBefore];
-                                delete tree.settings[indexBefore];
-                                for (const settings of Object.values(tree.settings[indexAfter])) {
-                                    settings.settingsIndex = indexAfter;
-                                }
-                                tree.settingsInformation[indexAfter] = tree.settingsInformation[indexBefore];
-                                tree.settingsInformation[indexAfter].index = indexAfter;
-                                delete tree.settingsInformation[indexBefore];
-                            }
-                            currentSettingIndex = firstShiftingIndex;
-                            if (lastIndexAfter !== currentSettingIndex) {
-                                tree.indices.set(lineNum, `${currentSettingIndex}`);
-                                tree.indicesWithIf.set(lineNum, `${currentSettingIndex}`);
-                            }
-                            settingStack[settingStack.length - 1].index = currentSettingIndex;
-                            var nextNestedIndex = currentSettingIndex + '/' +
-                                (parseInt(lastSettingIndexAfter.substring(currentSettingIndex.length + 1)) + 1).toString();
                         }
                         else {
                             var nextNestedIndex = setting_.index + '/1';
                         }
+                        // setting_ = ...
+                        setting_.lineNum = lineNum;
+                        setting_.indent = indent;
+                        setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
+                        setting_.startIndentLevel = indentStack[indentStack.length - 2].indent.length;
+                        currentSettingIndex = setting_.index;
+                        settingStack.push({
+                            lineNum: 0,
+                            index: nextNestedIndex,
+                            nextNumberIndex: 1,
+                            nextAlphabetIndex: 'a',
+                            indent: '',
+                            startLineNum: 0,
+                            startIndentLevel: -1
+                        });
+                        // tree = ...
+                        tree.indices.set(setting_.startLineNum, currentSettingIndex);
+                        tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
+                        tree.indices = new Map([...tree.indices.entries()].sort(([key1, _item1], [key2, _item2]) => key1 - key2));
+                        tree.indicesWithIf = new Map([...tree.indicesWithIf.entries()].sort(([key1, _item1], [key2, _item2]) => key1 - key2));
+                        var isNewSettings = true;
                     }
-                    else {
-                        var nextNestedIndex = setting_.index + '/1';
-                    }
-                    // ...
-                    setting_.lineNum = lineNum;
-                    setting_.indent = indent;
-                    setting_.startLineNum = indentStack[indentStack.length - 2].lineNum;
-                    setting_.startIndentLevel = indentStack[indentStack.length - 2].indent.length;
-                    currentSettingIndex = setting_.index;
-                    settingStack.push({
-                        lineNum: 0,
-                        index: nextNestedIndex,
-                        nextNumberIndex: 1,
-                        nextAlphabetIndex: 'a',
-                        indent: '',
-                        startLineNum: 0,
-                        startIndentLevel: -1
-                    });
-                    tree.indices.set(setting_.startLineNum, currentSettingIndex);
-                    tree.indicesWithIf.set(setting_.startLineNum, currentSettingIndex);
-                    tree.indices = new Map([...tree.indices.entries()].sort(([key1, _item1], [key2, _item2]) => key1 - key2));
-                    tree.indicesWithIf = new Map([...tree.indicesWithIf.entries()].sort(([key1, _item1], [key2, _item2]) => key1 - key2));
-                    var isNewSettings = true;
+                }
+                if (isNewSettings) {
+                    setting = {};
+                    settingIndentLength = indent.length;
+                    tree.settingsInformation[currentSettingIndex] = {
+                        index: currentSettingIndex,
+                        lineNum,
+                        indent: indentStack[indentStack.length - 1].indent,
+                        condition: '',
+                        inSettings: isReadingSetting,
+                    };
+                }
+                if (parser.verbose) {
+                    // console.log(`Verbose: settings ${currentSettingIndex}`);
+                    //    "currentSettingIndex" should be not shown because it is sometimes changed.
+                    console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
                 }
             }
-            if (isNewSettings) {
+            else if (indent.length <= settingIndentLength && isReadingSetting) {
+                isReadingSetting = false;
+                tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
+            }
+            if (isReadingSetting) {
+                const separator = line.indexOf(':');
+                if (separator !== notFound) {
+                    const key = line.substring(0, separator).trim();
+                    const value = getTagValue(line, separator);
+                    if (value !== '' && key.length >= 1 && key[0] !== '#') {
+                        const previous = setting[key];
+                        if (key in setting && value !== previous.value) {
+                            console.log('');
+                            console.log(translate('Error of duplicated variable name:'));
+                            console.log(`  ${translate('typrmFile')}A: ${getTestablePath(parser.filePath)}:${previous.lineNum}`);
+                            console.log(`  ContentsA: ${key}: ${previous.value}`);
+                            console.log(`  ${translate('typrmFile')}B: ${getTestablePath(parser.filePath)}:${lineNum}`);
+                            console.log(`  ContentsB: ${key}: ${value}`);
+                            parser.errorCount += 1;
+                        }
+                        if (parser.verbose) {
+                            console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
+                        }
+                        const currentSetting = settingStack[settingStack.length - 2];
+                        const sameAsIndex = line.indexOf(' ' + SameAsTag.label);
+                        if (sameAsIndex != notFound) {
+                            var sameAs = getTagValue(line, sameAsIndex + SameAsTag.label.length + 1);
+                        }
+                        else {
+                            var sameAs = '';
+                        }
+                        setting[key] = {
+                            value,
+                            lineNum,
+                            settingsIndex: currentSetting.index,
+                            tag: 'settings',
+                            isReferenced: false,
+                            sameAs,
+                        };
+                    }
+                }
+            }
+            // Set condition by "#if:" tag.
+            const ifPosition = ifLabelRE.exec(line);
+            if (ifPosition && !line.includes(disableLabel)) {
+                const condition = getTagValue(line, ifPosition.index + ifPosition[0].length);
+                tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
                 setting = {};
-                settingIndentLength = indent.length;
+                const setting_ = settingStack[settingStack.length - 2];
+                const nextSetting = settingStack[settingStack.length - 1];
+                const inIfBlock = lib.isAlphabetIndex(setting_.index);
+                const childIsIfBlock = lib.isAlphabetIndex(nextSetting.index);
+                nextSetting.lineNum = lineNum;
+                if (!inIfBlock && !childIsIfBlock) {
+                    if (setting_.index === '/') {
+                        nextSetting.index = '/' + nextSetting.nextAlphabetIndex;
+                    }
+                    else {
+                        nextSetting.index = setting_.index + '/' + nextSetting.nextAlphabetIndex;
+                    }
+                }
+                nextSetting.indent = indent;
+                nextSetting.startLineNum = setting_.startLineNum;
+                nextSetting.startIndentLevel = setting_.startIndentLevel;
+                settingStack.push({
+                    lineNum: 0,
+                    index: nextSetting.index + '/a',
+                    nextNumberIndex: 1,
+                    nextAlphabetIndex: 'a',
+                    indent: '',
+                    startLineNum: 0,
+                    startIndentLevel: -1
+                });
+                currentSettingIndex = nextSetting.index;
+                tree.indicesWithIf.set(lineNum, currentSettingIndex);
                 tree.settingsInformation[currentSettingIndex] = {
                     index: currentSettingIndex,
                     lineNum,
-                    indent: indentStack[indentStack.length - 1].indent,
-                    condition: '',
+                    indent,
+                    condition,
                     inSettings: isReadingSetting,
                 };
-            }
-            if (parser.verbose) {
-                // console.log(`Verbose: settings ${currentSettingIndex}`);
-                //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`    Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #settings:  #// currentSettingIndex: ${currentSettingIndex}`);
-            }
-        }
-        else if (indent.length <= settingIndentLength && isReadingSetting) {
-            isReadingSetting = false;
-            tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
-        }
-        if (isReadingSetting) {
-            const separator = line.indexOf(':');
-            if (separator !== notFound) {
-                const key = line.substring(0, separator).trim();
-                const value = getTagValue(line, separator);
-                if (value !== '' && key.length >= 1 && key[0] !== '#') {
-                    const previous = setting[key];
-                    if (key in setting && value !== previous.value) {
-                        console.log('');
-                        console.log(translate('Error of duplicated variable name:'));
-                        console.log(`  ${translate('typrmFile')}A: ${getTestablePath(parser.filePath)}:${previous.lineNum}`);
-                        console.log(`  ContentsA: ${key}: ${previous.value}`);
-                        console.log(`  ${translate('typrmFile')}B: ${getTestablePath(parser.filePath)}:${lineNum}`);
-                        console.log(`  ContentsB: ${key}: ${value}`);
-                        parser.errorCount += 1;
-                    }
-                    if (parser.verbose) {
-                        console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}:     ${key}: ${value}`);
-                    }
-                    const currentSetting = settingStack[settingStack.length - 2];
-                    const sameAsIndex = line.indexOf(' ' + SameAsTag.label);
-                    if (sameAsIndex != notFound) {
-                        var sameAs = getTagValue(line, sameAsIndex + SameAsTag.label.length + 1);
-                    }
-                    else {
-                        var sameAs = '';
-                    }
-                    setting[key] = {
-                        value,
-                        lineNum,
-                        settingsIndex: currentSetting.index,
-                        tag: 'settings',
-                        isReferenced: false,
-                        sameAs,
-                    };
+                if (parser.verbose) {
+                    // console.log(`Verbose: settings ${currentSettingIndex}`);
+                    //    "currentSettingIndex" should be not shown because it is sometimes changed.
+                    console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}  #// currentSettingIndex: ${currentSettingIndex}`);
                 }
             }
         }
-        // Set condition by "#if:" tag.
-        const ifPosition = ifLabelRE.exec(line);
-        if (ifPosition && !line.includes(disableLabel)) {
-            const condition = getTagValue(line, ifPosition.index + ifPosition[0].length);
-            tree.settings[currentSettingIndex] = { ...tree.settings[currentSettingIndex], ...setting };
-            setting = {};
-            const setting_ = settingStack[settingStack.length - 2];
-            const nextSetting = settingStack[settingStack.length - 1];
-            const inIfBlock = lib.isAlphabetIndex(setting_.index);
-            const childIsIfBlock = lib.isAlphabetIndex(nextSetting.index);
-            nextSetting.lineNum = lineNum;
-            if (!inIfBlock && !childIsIfBlock) {
-                if (setting_.index === '/') {
-                    nextSetting.index = '/' + nextSetting.nextAlphabetIndex;
-                }
-                else {
-                    nextSetting.index = setting_.index + '/' + nextSetting.nextAlphabetIndex;
-                }
-            }
-            nextSetting.indent = indent;
-            nextSetting.startLineNum = setting_.startLineNum;
-            nextSetting.startIndentLevel = setting_.startIndentLevel;
-            settingStack.push({
-                lineNum: 0,
-                index: nextSetting.index + '/a',
-                nextNumberIndex: 1,
-                nextAlphabetIndex: 'a',
-                indent: '',
-                startLineNum: 0,
-                startIndentLevel: -1
-            });
-            currentSettingIndex = nextSetting.index;
-            tree.indicesWithIf.set(lineNum, currentSettingIndex);
-            tree.settingsInformation[currentSettingIndex] = {
-                index: currentSettingIndex,
-                lineNum,
-                indent,
-                condition,
-                inSettings: isReadingSetting,
-            };
-            if (parser.verbose) {
-                // console.log(`Verbose: settings ${currentSettingIndex}`);
-                //    "currentSettingIndex" should be not shown because it is sometimes changed.
-                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${lineNum}: #if: ${condition}  #// currentSettingIndex: ${currentSettingIndex}`);
-            }
+        catch (e) {
+            exception = e;
+            breaking = true;
+            errorLineNum = lineNum;
         }
+    }
+    if (exception) {
+        if (exception instanceof Error) {
+            exception.message = `${exception} in makeSettingTree(${parser.filePath}:${errorLineNum})`;
+        }
+        throw exception;
     }
     if (isReadingSetting) {
         const setting_ = settingStack[settingStack.length - 2];
@@ -779,9 +817,19 @@ async function makeSettingTree(parser) {
     }
     return tree;
 }
-function getPreviousNeighborIndex(currentParentIndex, settingsIndices) {
-    // e.g. settingsIndices = ['/1', '/2', '/2/1', '/2/2', '/2/2/1']
-    // e.g. currentParentIndex = '/2'
+function getPreviousShallowestIndex(currentParentIndex, settingsIndices) {
+    // Example:
+    //      Arguments:
+    //          currentParentIndex = '/2'
+    //          settingsIndices = ['/1', '/2', '/2/1', '/2/2', '/2/2/1']  (or ['/1', '/2', '/2/a', '/2/b'])
+    //          return value: '/2/2'  (or '/2/b')
+    //      File contents:  #focus: current
+    //           settings:  // '/1'
+    //           settings:  // '/2'
+    //              settings:  // '/2/1'
+    //              settings:  // '/2/2' ... return value
+    //                  settings:  // '/2/2/1'
+    //              (current position)
     if (currentParentIndex === '/') {
         var parentIndexWithSlash = `/`;
     }
@@ -790,24 +838,49 @@ function getPreviousNeighborIndex(currentParentIndex, settingsIndices) {
     }
     const parentIndexWithSlashLength = parentIndexWithSlash.length;
     const sameLevelIndices = settingsIndices.filter(index => index.startsWith(parentIndexWithSlash) && !index.substring(parentIndexWithSlashLength).includes('/'));
-    // e.g. ['/2/1', '/2/2']
-    const sameLevelDeepestIndexNumMax = sameLevelIndices
-        .map(index => parseInt(index.substring(parentIndexWithSlashLength)))
-        .reduce((numA, numB) => Math.max(numA, numB), -Infinity);
-    // e.g. 2
-    const previousNeighborIndex = parentIndexWithSlash + sameLevelDeepestIndexNumMax.toString();
-    // e.g. '/2/2'
-    return previousNeighborIndex;
+    // e.g. ['/2/1', '/2/2']  (or ['/2/a', '/2/b'])
+    if (sameLevelIndices.length == 0) {
+        var previousShallowestIndex = "";
+    }
+    else if (!(lib.isAlphabetIndex(sameLevelIndices[0].substring(parentIndexWithSlashLength)))) {
+        const sameLevelMaxIndex = sameLevelIndices
+            .map(index => parseInt(index.substring(parentIndexWithSlashLength)))
+            .reduce((indexA, indexB) => Math.max(indexA, indexB), -Infinity);
+        // e.g. x=2  (max number of /2/x)
+        var previousShallowestIndex = parentIndexWithSlash + sameLevelMaxIndex.toString();
+        // e.g. '/2/2'
+    }
+    else {
+        const sameLevelMaxIndex = lib.getAlphabetIndex(sameLevelIndices
+            .map(index => lib.fromAlphabetIndex(index.substring(parentIndexWithSlashLength)))
+            .reduce((indexA, indexB) => Math.max(indexA, indexB), -Infinity));
+        // e.g. x='b'  (max number of /2/x)
+        var previousShallowestIndex = parentIndexWithSlash + sameLevelMaxIndex.toString();
+        // e.g. '/2/b'
+    }
+    return previousShallowestIndex;
 }
-function insertParentIndexNum(indexBefore, firstShiftingIndex) {
+function insertParentIndexNum(firstShiftingIndex, indexBefore) {
+    // This is called, when there is settings tag after template tags.
     if (indexBefore === '/') {
         return firstShiftingIndex;
     }
-    // e.g. indexBefore = '/2/6/7', firstShiftingIndex = '/2/3'
-    const rightOfInsert = indexBefore.substring(firstShiftingIndex.length); // e.g. '/7'
-    const minus = parseInt(path.basename(firstShiftingIndex)) - 1; // e.g. 2
-    const beforeMinus = parseInt(path.basename(indexBefore.substring(0, indexBefore.length - rightOfInsert.length))); // e.g. 6
-    return `${firstShiftingIndex}/${beforeMinus - minus}${rightOfInsert}`; // e.g. '/2/3/4/7'
+    if (firstShiftingIndex.substr(-2) === '/1') {
+        // e.g. firstShiftingIndex = '/1', indexBefore = '/a', return = '/1/a'
+        // See. "b3_bug_case_if_normal_if" test in "__Project__/src/main.test.ts".
+        const parentLength = firstShiftingIndex.length - '/1'.length; // e.g. 0
+        const rightOfInsert = indexBefore.substring(parentLength); // e.g. '/a'
+        return `${firstShiftingIndex}${rightOfInsert}`; // e.g. '/1/a'
+    }
+    else {
+        // e.g. firstShiftingIndex = '/2/3', indexBefore = '/2/6/7', return = '/2/3/4/7'
+        //                               ^ minus+1              ^^ rightOfInsert
+        //                                                     ^ beforeMinus
+        const rightOfInsert = indexBefore.substring(firstShiftingIndex.length); // e.g. '/7'
+        const minus = parseInt(path.basename(firstShiftingIndex)) - 1; // e.g. 3 - 1 = 2
+        const beforeMinus = parseInt(path.basename(indexBefore.substring(0, indexBefore.length - rightOfInsert.length))); // e.g. 6
+        return `${firstShiftingIndex}/${beforeMinus - minus}${rightOfInsert}`; // e.g. '/2/3/4/7'
+    }
 }
 async function makeReplaceToTagTree(parser, settingTree) {
     const toTagTree = new ReplaceToTagTree();
@@ -1801,6 +1874,9 @@ async function replaceMain(inputFileOrFolderPath, command) {
     catch (e) {
         console.log('');
         console.log('Exception: ' + e.toString());
+        if ((programOptions.test || programOptions.verbose) && e instanceof Error) {
+            console.log(e.stack);
+        }
         parser.errorCount += 1;
     }
     finally {
@@ -1852,6 +1928,9 @@ async function replaceSub(inputFilePath, parser, command) {
     const linesWithoutToTagOnlyLine = [];
     var settingIndentLength = 0;
     var lineNum = 0;
+    var breaking = false;
+    var exception;
+    var errorLineNum = 0;
     var isCheckingTemplateIfKey = false;
     var templateIfKeyError = false;
     var copyTagIndent = '';
@@ -1863,407 +1942,417 @@ async function replaceSub(inputFilePath, parser, command) {
     const templatesInCopyTagAll = await makeTemplatesInCopyTag(lines);
     try {
         for (const line of lines) {
-            var output = false;
-            lineNum += 1;
-            parser.lineNum = lineNum;
-            linesWithoutToTagOnlyLine.push(line);
-            parser.verbose = false;
-            settingTree.moveToLine(parser);
-            parser.verbose = verbose;
-            toTagTree.moveToLine(parser, settingTree);
-            const oldSetting = toTagTree.currentOldSettingsInIfBlock; // not settingTree.currentSettings
-            const newSetting = toTagTree.currentNewSettingsInIfBlock;
-            if (settingTree.wasChanged) {
-                replacingKeys = Object.keys(oldSetting);
-                replacingKeyValues = {};
-                for (const [key, value] of Object.entries(newSetting)) {
-                    replacingKeyValues[key] = value.value;
-                }
-                for (const error of toTagTree.currentNotFoundNameInSameAsTag) {
-                    const settingNames = error.referencedVariableNames.concat([error.settingName]);
-                    console.log('');
-                    console.log(`${getVariablesForErrorMessage('', settingNames, settingTree, lines, parser.filePath)}`);
-                    console.log(`    ${translate('Warning')}: ${translate('Not found a variable name.')}`);
-                    console.log(`    Same as: ${error.notFoundName}`);
-                    parser.errorCount += 1;
-                }
-            }
-            // #copy tag   #breadcrumb:
-            if (copyTagIndent) {
-                if (!line.startsWith(copyTagIndent) && line.trim() !== '') {
-                    copyTagIndent = '';
-                    copyTagLineNum = 0;
+            if (breaking) {
+                continue;
+            } // "reader" requests read all lines
+            try {
+                var output = false;
+                lineNum += 1;
+                parser.lineNum = lineNum;
+                linesWithoutToTagOnlyLine.push(line);
+                parser.verbose = false;
+                settingTree.moveToLine(parser);
+                parser.verbose = verbose;
+                toTagTree.moveToLine(parser, settingTree);
+                const oldSetting = toTagTree.currentOldSettingsInIfBlock; // not settingTree.currentSettings
+                const newSetting = toTagTree.currentNewSettingsInIfBlock;
+                if (settingTree.wasChanged) {
                     replacingKeys = Object.keys(oldSetting);
-                    templatesInCopyTag = [];
-                    oldSettingAndCopyTagParameters = {};
-                    newSettingAndCopyTagParameters = {};
-                }
-            }
-            if (line.includes('#copy')) {
-                const copyTagIndex = tagIndexOf(line, copyLabel);
-                const copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
-                if (copyTagIndex !== notFound || copyTemplateTagIndex !== notFound) {
-                    if (copyTagIndex !== notFound) { // if copyTagIndex
-                        var copyTagValue = getTagValue(line, copyTagIndex + copyLabel.length);
+                    replacingKeyValues = {};
+                    for (const [key, value] of Object.entries(newSetting)) {
+                        replacingKeyValues[key] = value.value;
                     }
-                    else { // if copyTemplateTagIndex
-                        var copyTagValue = getTagValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
-                    }
-                    const firstCommaIndex = copyTagValue.indexOf(',');
-                    if (firstCommaIndex !== notFound) {
-                        const copyTagName = copyTagValue.substring(0, firstCommaIndex);
-                        const parameters = yaml.load(copyTagValue.substring(firstCommaIndex + 1));
-                        const values = Object.entries(parameters).filter(keyValue => !keyValue[1].startsWith(settingsDot))
-                            .map(keyValue => [keyValue[0], {
-                                value: keyValue[1].toString(), lineNum, settingsIndex: '', tag: 'copyArgument', isReferenced: true,
-                            }]);
-                        const variables = Object.entries(parameters).filter(keyValue => keyValue[1].startsWith(settingsDot))
-                            .map(keyValue => [keyValue[0], keyValue[1].toString().substring(settingsDot.length)]);
-                        const copyTagParameters = variables.filter(keyValue => (keyValue[1] in oldSetting));
-                        copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
-                        copyTagLineNum = lineNum;
-                        templatesInCopyTag = templatesInCopyTagAll.filter(item => item.copyTagName === copyTagName);
-                        oldSettingAndCopyTagParameters = {
-                            ...oldSetting,
-                            ...Object.fromEntries(values),
-                            ...Object.fromEntries(copyTagParameters.map(keyValue => [keyValue[0], oldSetting[keyValue[1]]]))
-                        };
-                        newSettingAndCopyTagParameters = {
-                            ...newSetting,
-                            ...Object.fromEntries(values),
-                            ...Object.fromEntries(copyTagParameters.map(keyValue => [keyValue[0], newSetting[keyValue[1]]]))
-                        };
-                        replacingKeys = Object.keys(oldSettingAndCopyTagParameters);
-                        if (copyTagParameters.length < variables.length) {
-                            const foundVaraibleNames = copyTagParameters.map(keyValue => keyValue[1]);
-                            const notFoundVariables = variables.filter(keyValue => !foundVaraibleNames.includes(keyValue[1]))
-                                .map(keyValue => keyValue[1]);
-                            console.log('');
-                            console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
-                            console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                            console.log(`    ${translate('Error')}: ${translate('Not found specified variable name.')}`);
-                            console.log(`    ${translate('Variable')}: ${notFoundVariables.join(', ')}`);
-                            parser.errorCount += 1;
-                        }
+                    for (const error of toTagTree.currentNotFoundNameInSameAsTag) {
+                        const settingNames = error.referencedVariableNames.concat([error.settingName]);
+                        console.log('');
+                        console.log(`${getVariablesForErrorMessage('', settingNames, settingTree, lines, parser.filePath)}`);
+                        console.log(`    ${translate('Warning')}: ${translate('Not found a variable name.')}`);
+                        console.log(`    Same as: ${error.notFoundName}`);
+                        parser.errorCount += 1;
                     }
                 }
-            }
-            // #settings tag   #breadcrumb:
-            if (settingLabel.test(line) && !line.includes(disableLabel)) {
-                isSetting = true;
-                settingIndentLength = indentRegularExpression.exec(line)[0].length;
-                if (!templateIfKeyError) {
-                    isCheckingTemplateIfKey = true;
-                }
-            }
-            else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isSetting) {
-                isSetting = false;
-            }
-            // In settings   #breadcrumb:
-            if (isSetting) {
-                const separator = line.indexOf(':');
-                if (separator !== notFound) {
-                    const key = line.substring(0, separator).trim();
-                    if (command === 'replace') {
-                        var currentIsOutOfFalse = toTagTree.currentIsOutOfFalseBlock;
-                    }
-                    else { // command === 'reset'
-                        var currentIsOutOfFalse = settingTree.currentIsOutOfFalseBlock;
-                    }
-                    if (key in oldSetting && replacingKeys.includes(key) && currentIsOutOfFalse) {
-                        const oldValue = getTagValue(line, separator);
-                        // This is not "oldSetting[key].value", because it adds bad #original tag in #if tag block.
-                        var newValue = newSetting[key].value;
-                        if (newValue !== oldValue) {
-                            if (parser.verbose) {
-                                console.log(`    Verbose: replace a setting: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                                console.log(`    Verbose:     replace from: ${oldValue}`);
-                                console.log(`    Verbose:     replace to  : ${newValue}`);
-                            }
-                            // Change a settings value   #breadcrumb:
-                            const { original, spaceAndComment } = getReplacedLineInSettings(line, separator, oldValue, newValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
-                            const newLine = line.substring(0, separator + 1) + ' ' + newValue + original + spaceAndComment;
-                            writer.write(newLine + "\n");
-                            output = true;
-                            if (parser.verbose) {
-                                console.log(`    Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${newLine}`);
-                            }
-                        }
+                // #copy tag   #breadcrumb:
+                if (copyTagIndent) {
+                    if (!line.startsWith(copyTagIndent) && line.trim() !== '') {
+                        copyTagIndent = '';
+                        copyTagLineNum = 0;
+                        replacingKeys = Object.keys(oldSetting);
+                        templatesInCopyTag = [];
+                        oldSettingAndCopyTagParameters = {};
+                        newSettingAndCopyTagParameters = {};
                     }
                 }
-                // Out of settings   #breadcrumb:
-            }
-            else {
-                const templateTag = parseTemplateTag(line, parser);
-                if (templateTag.isFound) {
-                    parser.templateCount += 1;
-                }
-                else {
-                    if (copyTagIndent) {
-                        const templateInCopyTag = templatesInCopyTag.find(item => item.lineNumOffset === lineNum - copyTagLineNum);
-                        if (templateInCopyTag) {
-                            templateTag.isFound = true;
-                            templateTag.template = templateInCopyTag.template;
-                            templateTag.label = templateLabel;
-                            templateTag.lineNumOffset = 0;
+                if (line.includes('#copy')) {
+                    const copyTagIndex = tagIndexOf(line, copyLabel);
+                    const copyTemplateTagIndex = tagIndexOf(line, copyTemplateLabel);
+                    if (copyTagIndex !== notFound || copyTemplateTagIndex !== notFound) {
+                        if (copyTagIndex !== notFound) { // if copyTagIndex
+                            var copyTagValue = getTagValue(line, copyTagIndex + copyLabel.length);
                         }
-                    }
-                }
-                if (templateTag.isFound && templateTag.includesKey(replacingKeys)
-                    && toTagTree.currentIsOutOfFalseBlock) {
-                    const replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
-                    const commonCase = (templateTag.label !== templateIfLabel);
-                    const emphasizedColor = chalk.yellowBright;
-                    if (!copyTagIndent) { // if common case
-                        if (commonCase) {
-                            var expected = getExpectedLine(oldSetting, templateTag.template);
-                            var replaced = getReplacedLine(newSetting, templateTag.template);
-                            var coloredReplaced = emphasizedColor(replaced);
+                        else { // if copyTemplateTagIndex
+                            var copyTagValue = getTagValue(line, copyTemplateTagIndex + copyTemplateLabel.length);
                         }
-                        else { // if (templateTag.label === templateIfLabel)
-                            templateTag.evaluate(newSetting);
-                            var expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
-                            var replaced = getReplacedLine(newSetting, templateTag.newTemplate);
-                            var coloredReplaced = emphasizedColor(replaced);
-                        }
-                    }
-                    else { // if copyTagIndent
-                        if (commonCase) {
-                            var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.template);
-                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template);
-                            var coloredReplaced = emphasizedColor(replaced);
-                        }
-                        else { // if (templateTag.label === templateIfLabel)
-                            templateTag.evaluate(newSetting);
-                            var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.oldTemplate);
-                            var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate);
-                            var coloredReplaced = emphasizedColor(replaced);
-                        }
-                    }
-                    if (replacingLine.includes(expected)) {
-                        const before = expected;
-                        const after = replaced;
-                        if (parser.verbose && before !== after) {
-                            if (templateTag.lineNumOffset === 0) {
-                                console.log(`    Verbose: replace template variables`);
-                            }
-                            else {
-                                console.log(`    Verbose: replace template-at(${templateTag.lineNumOffset}) variables`);
-                            }
-                            console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                            console.log(`        Verbose:     replace from: ${before}`);
-                            console.log(`        Verbose:     replace to  : ${after}`);
-                        }
-                        if (templateTag.lineNumOffset === 0) {
-                            var replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before), 'g'), after.replace(/\$/g, '$$'));
-                            if (cutReplaceToTagEnabled) {
-                                replacedLine = cutReplaceToTag(replacedLine);
-                            }
-                            writer.write(replacedLine + "\n");
-                            output = true;
-                            const outputTargetLineNum = writer.lineBuffer.length;
-                            checkedTemplateTags[outputTargetLineNum] = [];
-                            checkedTemplateTags[outputTargetLineNum].push({
-                                templateLineNum: lineNum,
-                                template: templateTag.template,
-                                variableNames: templateTag.scanKeys(Object.keys(settingTree.currentSettings)),
-                                targetLineNum: lineNum,
-                                expected: before,
-                                replaced: after.replace(/\$/g, '$$'),
-                                coloredReplaced: coloredReplaced.replace(/\$/g, '$$')
-                            });
-                            if (parser.verbose) {
-                                if (before !== after) {
-                                    console.log(`    Verbose: replaced`);
-                                    console.log(`        Verbose: before: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
-                                    console.log(`        Verbose: after:  ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
-                                }
-                                else {
-                                    console.log(`    Verbose: not replaced`);
-                                    console.log(`        Verbose: after:  ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
-                                }
-                            }
-                        }
-                        else if (templateTag.lineNumOffset <= -1) {
-                            const outputTargetLineNum = writer.lineBuffer.length + 1 + templateTag.lineNumOffset;
-                            if (!(outputTargetLineNum in checkedTemplateTags)) {
-                                checkedTemplateTags[outputTargetLineNum] = [];
-                            }
-                            checkedTemplateTags[outputTargetLineNum].push({
-                                templateLineNum: lineNum,
-                                template: templateTag.template,
-                                variableNames: templateTag.scanKeys(Object.keys(settingTree.currentSettings)),
-                                targetLineNum: lineNum + templateTag.lineNumOffset,
-                                expected: before,
-                                replaced: after.replace(/\$/g, '$$'),
-                                coloredReplaced: coloredReplaced.replace(/\$/g, '$$')
-                            });
-                            var lengthSortedTemplates = checkedTemplateTags[outputTargetLineNum].slice();
-                            lengthSortedTemplates = lengthSortedTemplates.sort((b, a) => (a.expected.length - b.expected.length));
-                            let replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset - 1];
-                            var maskedLine = replacingLine;
-                            const mask = '\n';
-                            var conflictedTemplates = [];
-                            if (parser.verbose) {
-                                console.log(`    Verbose: check not conflicted:`);
-                                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset}: ${replacingLine}`);
-                                console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
-                                console.log(`        Verbose: replacingLine: ${replacingLine}`);
-                                console.log(`        Verbose: maskedLine   : ${maskedLine}`);
-                            }
-                            for (const template of lengthSortedTemplates) {
-                                if (template.expected !== template.replaced) {
-                                    if (parser.verbose) {
-                                        console.log(`        Verbose: replace from: ${template.expected}`);
-                                        console.log(`        Verbose: replace to  : ${template.replaced}`);
-                                    }
-                                    if (template.expected.includes(template.replaced)) {
-                                        // e.g. expected == 'something', replaced = 'some'
-                                        if (replacingLine.includes(template.expected)) {
-                                            var wasReplaced = false;
-                                        }
-                                        else {
-                                            var wasReplaced = replacingLine.includes(replaced);
-                                        }
-                                    }
-                                    else if (template.replaced.includes(template.expected)) {
-                                        // e.g. expected == 'some', replaced = 'something'
-                                        var wasReplaced = replacingLine.includes(template.replaced);
-                                    }
-                                    else {
-                                        // e.g. expected == 'anything', replaced = 'something'
-                                        var wasReplaced = replacingLine.includes(template.replaced);
-                                    }
-                                    var i = 0;
-                                    if (wasReplaced) {
-                                        if (parser.verbose) {
-                                            console.log(`        Verbose: wasReplaced = true`);
-                                        }
-                                    }
-                                    else {
-                                        if (!maskedLine.includes(template.expected)) {
-                                            conflictedTemplates.push(template);
-                                        }
-                                        else {
-                                            for (;;) {
-                                                i = maskedLine.indexOf(template.expected, i);
-                                                if (i === notFound) {
-                                                    break;
-                                                }
-                                                // Replace in template
-                                                replacingLine = replacingLine.replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
-                                                maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substring(i + template.expected.length);
-                                                i += template.expected.length;
-                                            }
-                                            if (parser.verbose) {
-                                                console.log(`        Verbose: replacingLine: ${replacingLine}`);
-                                                console.log(`        Verbose: maskedLine   : ${maskedLine.replace(/\n/g, '_')}`);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            for (const template of lengthSortedTemplates) {
-                                if (!replacingLine.includes(template.replaced)) {
-                                    conflictedTemplates.push(template);
-                                }
-                            }
-                            conflictedTemplates = lib.cutSameItems(conflictedTemplates);
-                            writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine + "\n");
-                            if (conflictedTemplates.length >= 1 || outputTargetLineNum in conflictErrors) {
-                                var variableNames = [];
-                                for (const template of checkedTemplateTags[outputTargetLineNum]) {
-                                    variableNames.push(...template.variableNames);
-                                }
-                                variableNames = lib.cutSameItems(variableNames);
-                                var errorMessage = '';
-                                errorMessage += '\n';
-                                errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
-                                errorMessage += `    ${translate('Error')}: ${translate('template target values after replace are conflicted.')}` +
-                                    ` ${translate('You should add #to: tags at setting variables in other templates.')}\n`;
-                                errorMessage += getVariablesForErrorMessage('    ', variableNames, settingTree, lines, parser.filePath, { coloredValue: true, replaceToTag: toTagTree.currentNewSettings }) + '\n';
-                                var templateNum = 0;
-                                for (const template of checkedTemplateTags[outputTargetLineNum]) {
-                                    const replacedLine = lines[outputTargetLineNum - 1].replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
-                                    templateNum += 1;
-                                    errorMessage += `    replaced (${templateNum}): ${replacedLine.trim()}\n`;
-                                    errorMessage += `        ${getTestablePath(inputFilePath)}:${template.templateLineNum}: ${lines[template.templateLineNum - 1]}\n`;
-                                    errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
-                                    errorMessage += `            ${translate('Before Replacing')}: ${template.expected.trim()}\n`;
-                                    errorMessage += `            ${translate('After  Replacing')}: ${template.coloredReplaced.trim()}\n`;
-                                    errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacedLine}\n`;
-                                }
-                                conflictErrors[outputTargetLineNum] = lib.cutLast(errorMessage, '\n');
-                            }
-                            if (parser.verbose) {
-                                const replacedLine = replacingLine;
-                                if (before !== after) {
-                                    console.log(`    Verbose: replaced`);
-                                    console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset}: ${replacedLine}`);
-                                    console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
-                                }
-                                else {
-                                    console.log(`    Verbose: not replaced`);
-                                    console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
-                                }
-                            }
-                        }
-                    }
-                    else if (replacingLine.includes(replaced)) {
-                        // Do nothing
-                    }
-                    else {
-                        if (parser.errorCount === 0) { // Since only one old value can be replaced at a time
-                            console.log('');
-                            console.log(getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines));
-                            if (expected === replaced) {
-                                console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
-                                parser.warningCount += 1;
-                            }
-                            else {
-                                console.log(`    ${translate('Error')}: ${translate('Not found any replacing target.')} ` +
-                                    `${translate('Modify the template target to old or new value.')}`);
+                        const firstCommaIndex = copyTagValue.indexOf(',');
+                        if (firstCommaIndex !== notFound) {
+                            const copyTagName = copyTagValue.substring(0, firstCommaIndex);
+                            const parameters = yaml.load(copyTagValue.substring(firstCommaIndex + 1));
+                            const values = Object.entries(parameters).filter(keyValue => !keyValue[1].startsWith(settingsDot))
+                                .map(keyValue => [keyValue[0], {
+                                    value: keyValue[1].toString(), lineNum, settingsIndex: '', tag: 'copyArgument', isReferenced: true,
+                                }]);
+                            const variables = Object.entries(parameters).filter(keyValue => keyValue[1].startsWith(settingsDot))
+                                .map(keyValue => [keyValue[0], keyValue[1].toString().substring(settingsDot.length)]);
+                            const copyTagParameters = variables.filter(keyValue => (keyValue[1] in oldSetting));
+                            copyTagIndent = indentRegularExpression.exec(line)[0] + ' ';
+                            copyTagLineNum = lineNum;
+                            templatesInCopyTag = templatesInCopyTagAll.filter(item => item.copyTagName === copyTagName);
+                            oldSettingAndCopyTagParameters = {
+                                ...oldSetting,
+                                ...Object.fromEntries(values),
+                                ...Object.fromEntries(copyTagParameters.map(keyValue => [keyValue[0], oldSetting[keyValue[1]]]))
+                            };
+                            newSettingAndCopyTagParameters = {
+                                ...newSetting,
+                                ...Object.fromEntries(values),
+                                ...Object.fromEntries(copyTagParameters.map(keyValue => [keyValue[0], newSetting[keyValue[1]]]))
+                            };
+                            replacingKeys = Object.keys(oldSettingAndCopyTagParameters);
+                            if (copyTagParameters.length < variables.length) {
+                                const foundVaraibleNames = copyTagParameters.map(keyValue => keyValue[1]);
+                                const notFoundVariables = variables.filter(keyValue => !foundVaraibleNames.includes(keyValue[1]))
+                                    .map(keyValue => keyValue[1]);
+                                console.log('');
+                                console.log(getVariablesForErrorMessage('', [], settingTree, lines, inputFilePath));
+                                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                                console.log(`    ${translate('Error')}: ${translate('Not found specified variable name.')}`);
+                                console.log(`    ${translate('Variable')}: ${notFoundVariables.join(', ')}`);
                                 parser.errorCount += 1;
                             }
-                            console.log(`    ${translate('Expected')}: ${expected.trim()}`);
                         }
                     }
                 }
+                // #settings tag   #breadcrumb:
+                if (settingLabel.test(line) && !line.includes(disableLabel)) {
+                    isSetting = true;
+                    settingIndentLength = indentRegularExpression.exec(line)[0].length;
+                    if (!templateIfKeyError) {
+                        isCheckingTemplateIfKey = true;
+                    }
+                }
+                else if (indentRegularExpression.exec(line)[0].length <= settingIndentLength && isSetting) {
+                    isSetting = false;
+                }
+                // In settings   #breadcrumb:
+                if (isSetting) {
+                    const separator = line.indexOf(':');
+                    if (separator !== notFound) {
+                        const key = line.substring(0, separator).trim();
+                        if (command === 'replace') {
+                            var currentIsOutOfFalse = toTagTree.currentIsOutOfFalseBlock;
+                        }
+                        else { // command === 'reset'
+                            var currentIsOutOfFalse = settingTree.currentIsOutOfFalseBlock;
+                        }
+                        if (key in oldSetting && replacingKeys.includes(key) && currentIsOutOfFalse) {
+                            const oldValue = getTagValue(line, separator);
+                            // This is not "oldSetting[key].value", because it adds bad #original tag in #if tag block.
+                            var newValue = newSetting[key].value;
+                            if (newValue !== oldValue) {
+                                if (parser.verbose) {
+                                    console.log(`    Verbose: replace a setting: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                                    console.log(`    Verbose:     replace from: ${oldValue}`);
+                                    console.log(`    Verbose:     replace to  : ${newValue}`);
+                                }
+                                // Change a settings value   #breadcrumb:
+                                const { original, spaceAndComment } = getReplacedLineInSettings(line, separator, oldValue, newValue, addOriginalTag, cutOriginalTag, cutReplaceToTagEnabled);
+                                const newLine = line.substring(0, separator + 1) + ' ' + newValue + original + spaceAndComment;
+                                writer.write(newLine + "\n");
+                                output = true;
+                                if (parser.verbose) {
+                                    console.log(`    Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${newLine}`);
+                                }
+                            }
+                        }
+                    }
+                    // Out of settings   #breadcrumb:
+                }
                 else {
-                    if (isCheckingTemplateIfKey && templateTag.label === templateIfLabel) {
-                        isCheckingTemplateIfKey = false;
-                        const necessaryVariableNames = getNotSetTemplateIfTagVariableNames(replacingKeys);
-                        if (necessaryVariableNames !== '') {
-                            console.log('');
-                            console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
-                            console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
-                            console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
-                            console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`);
-                            parser.errorCount += 1;
-                            templateIfKeyError = true;
+                    const templateTag = parseTemplateTag(line, parser);
+                    if (templateTag.isFound) {
+                        parser.templateCount += 1;
+                    }
+                    else {
+                        if (copyTagIndent) {
+                            const templateInCopyTag = templatesInCopyTag.find(item => item.lineNumOffset === lineNum - copyTagLineNum);
+                            if (templateInCopyTag) {
+                                templateTag.isFound = true;
+                                templateTag.template = templateInCopyTag.template;
+                                templateTag.label = templateLabel;
+                                templateTag.lineNumOffset = 0;
+                            }
+                        }
+                    }
+                    if (templateTag.isFound && templateTag.includesKey(replacingKeys)
+                        && toTagTree.currentIsOutOfFalseBlock) {
+                        const replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length - 1 + templateTag.lineNumOffset];
+                        const commonCase = (templateTag.label !== templateIfLabel);
+                        const emphasizedColor = chalk.yellowBright;
+                        if (!copyTagIndent) { // if common case
+                            if (commonCase) {
+                                var expected = getExpectedLine(oldSetting, templateTag.template);
+                                var replaced = getReplacedLine(newSetting, templateTag.template);
+                                var coloredReplaced = emphasizedColor(replaced);
+                            }
+                            else { // if (templateTag.label === templateIfLabel)
+                                templateTag.evaluate(newSetting);
+                                var expected = getExpectedLine(oldSetting, templateTag.oldTemplate);
+                                var replaced = getReplacedLine(newSetting, templateTag.newTemplate);
+                                var coloredReplaced = emphasizedColor(replaced);
+                            }
+                        }
+                        else { // if copyTagIndent
+                            if (commonCase) {
+                                var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.template);
+                                var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.template);
+                                var coloredReplaced = emphasizedColor(replaced);
+                            }
+                            else { // if (templateTag.label === templateIfLabel)
+                                templateTag.evaluate(newSetting);
+                                var expected = getExpectedLine(oldSettingAndCopyTagParameters, templateTag.oldTemplate);
+                                var replaced = getReplacedLine(newSettingAndCopyTagParameters, templateTag.newTemplate);
+                                var coloredReplaced = emphasizedColor(replaced);
+                            }
+                        }
+                        if (replacingLine.includes(expected)) {
+                            const before = expected;
+                            const after = replaced;
+                            if (parser.verbose && before !== after) {
+                                if (templateTag.lineNumOffset === 0) {
+                                    console.log(`    Verbose: replace template variables`);
+                                }
+                                else {
+                                    console.log(`    Verbose: replace template-at(${templateTag.lineNumOffset}) variables`);
+                                }
+                                console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                                console.log(`        Verbose:     replace from: ${before}`);
+                                console.log(`        Verbose:     replace to  : ${after}`);
+                            }
+                            if (templateTag.lineNumOffset === 0) {
+                                var replacedLine = line.replace(new RegExp(lib.escapeRegularExpression(before), 'g'), after.replace(/\$/g, '$$'));
+                                if (cutReplaceToTagEnabled) {
+                                    replacedLine = cutReplaceToTag(replacedLine);
+                                }
+                                writer.write(replacedLine + "\n");
+                                output = true;
+                                const outputTargetLineNum = writer.lineBuffer.length;
+                                checkedTemplateTags[outputTargetLineNum] = [];
+                                checkedTemplateTags[outputTargetLineNum].push({
+                                    templateLineNum: lineNum,
+                                    template: templateTag.template,
+                                    variableNames: templateTag.scanKeys(Object.keys(settingTree.currentSettings)),
+                                    targetLineNum: lineNum,
+                                    expected: before,
+                                    replaced: after.replace(/\$/g, '$$'),
+                                    coloredReplaced: coloredReplaced.replace(/\$/g, '$$')
+                                });
+                                if (parser.verbose) {
+                                    if (before !== after) {
+                                        console.log(`    Verbose: replaced`);
+                                        console.log(`        Verbose: before: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
+                                        console.log(`        Verbose: after:  ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
+                                    }
+                                    else {
+                                        console.log(`    Verbose: not replaced`);
+                                        console.log(`        Verbose: after:  ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
+                                    }
+                                }
+                            }
+                            else if (templateTag.lineNumOffset <= -1) {
+                                const outputTargetLineNum = writer.lineBuffer.length + 1 + templateTag.lineNumOffset;
+                                if (!(outputTargetLineNum in checkedTemplateTags)) {
+                                    checkedTemplateTags[outputTargetLineNum] = [];
+                                }
+                                checkedTemplateTags[outputTargetLineNum].push({
+                                    templateLineNum: lineNum,
+                                    template: templateTag.template,
+                                    variableNames: templateTag.scanKeys(Object.keys(settingTree.currentSettings)),
+                                    targetLineNum: lineNum + templateTag.lineNumOffset,
+                                    expected: before,
+                                    replaced: after.replace(/\$/g, '$$'),
+                                    coloredReplaced: coloredReplaced.replace(/\$/g, '$$')
+                                });
+                                var lengthSortedTemplates = checkedTemplateTags[outputTargetLineNum].slice();
+                                lengthSortedTemplates = lengthSortedTemplates.sort((b, a) => (a.expected.length - b.expected.length));
+                                let replacingLine = linesWithoutToTagOnlyLine[linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset - 1];
+                                var maskedLine = replacingLine;
+                                const mask = '\n';
+                                var conflictedTemplates = [];
+                                if (parser.verbose) {
+                                    console.log(`    Verbose: check not conflicted:`);
+                                    console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset}: ${replacingLine}`);
+                                    console.log(`        Verbose: ${getTestablePath(parser.filePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
+                                    console.log(`        Verbose: replacingLine: ${replacingLine}`);
+                                    console.log(`        Verbose: maskedLine   : ${maskedLine}`);
+                                }
+                                for (const template of lengthSortedTemplates) {
+                                    if (template.expected !== template.replaced) {
+                                        if (parser.verbose) {
+                                            console.log(`        Verbose: replace from: ${template.expected}`);
+                                            console.log(`        Verbose: replace to  : ${template.replaced}`);
+                                        }
+                                        if (template.expected.includes(template.replaced)) {
+                                            // e.g. expected == 'something', replaced = 'some'
+                                            if (replacingLine.includes(template.expected)) {
+                                                var wasReplaced = false;
+                                            }
+                                            else {
+                                                var wasReplaced = replacingLine.includes(replaced);
+                                            }
+                                        }
+                                        else if (template.replaced.includes(template.expected)) {
+                                            // e.g. expected == 'some', replaced = 'something'
+                                            var wasReplaced = replacingLine.includes(template.replaced);
+                                        }
+                                        else {
+                                            // e.g. expected == 'anything', replaced = 'something'
+                                            var wasReplaced = replacingLine.includes(template.replaced);
+                                        }
+                                        var i = 0;
+                                        if (wasReplaced) {
+                                            if (parser.verbose) {
+                                                console.log(`        Verbose: wasReplaced = true`);
+                                            }
+                                        }
+                                        else {
+                                            if (!maskedLine.includes(template.expected)) {
+                                                conflictedTemplates.push(template);
+                                            }
+                                            else {
+                                                for (;;) {
+                                                    i = maskedLine.indexOf(template.expected, i);
+                                                    if (i === notFound) {
+                                                        break;
+                                                    }
+                                                    // Replace in template
+                                                    replacingLine = replacingLine.replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
+                                                    maskedLine = maskedLine.substring(0, i) + mask.repeat(template.replaced.length) + maskedLine.substring(i + template.expected.length);
+                                                    i += template.expected.length;
+                                                }
+                                                if (parser.verbose) {
+                                                    console.log(`        Verbose: replacingLine: ${replacingLine}`);
+                                                    console.log(`        Verbose: maskedLine   : ${maskedLine.replace(/\n/g, '_')}`);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                for (const template of lengthSortedTemplates) {
+                                    if (!replacingLine.includes(template.replaced)) {
+                                        conflictedTemplates.push(template);
+                                    }
+                                }
+                                conflictedTemplates = lib.cutSameItems(conflictedTemplates);
+                                writer.replaceAboveLine(templateTag.lineNumOffset, replacingLine + "\n");
+                                if (conflictedTemplates.length >= 1 || outputTargetLineNum in conflictErrors) {
+                                    var variableNames = [];
+                                    for (const template of checkedTemplateTags[outputTargetLineNum]) {
+                                        variableNames.push(...template.variableNames);
+                                    }
+                                    variableNames = lib.cutSameItems(variableNames);
+                                    var errorMessage = '';
+                                    errorMessage += '\n';
+                                    errorMessage += `${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
+                                    errorMessage += `    ${translate('Error')}: ${translate('template target values after replace are conflicted.')}` +
+                                        ` ${translate('You should add #to: tags at setting variables in other templates.')}\n`;
+                                    errorMessage += getVariablesForErrorMessage('    ', variableNames, settingTree, lines, parser.filePath, { coloredValue: true, replaceToTag: toTagTree.currentNewSettings }) + '\n';
+                                    var templateNum = 0;
+                                    for (const template of checkedTemplateTags[outputTargetLineNum]) {
+                                        const replacedLine = lines[outputTargetLineNum - 1].replace(new RegExp(lib.escapeRegularExpression(template.expected), 'g'), template.replaced);
+                                        templateNum += 1;
+                                        errorMessage += `    replaced (${templateNum}): ${replacedLine.trim()}\n`;
+                                        errorMessage += `        ${getTestablePath(inputFilePath)}:${template.templateLineNum}: ${lines[template.templateLineNum - 1]}\n`;
+                                        errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${lines[outputTargetLineNum - 1]}\n`;
+                                        errorMessage += `            ${translate('Before Replacing')}: ${template.expected.trim()}\n`;
+                                        errorMessage += `            ${translate('After  Replacing')}: ${template.coloredReplaced.trim()}\n`;
+                                        errorMessage += `        ${getTestablePath(inputFilePath)}:${outputTargetLineNum}: ${replacedLine}\n`;
+                                    }
+                                    conflictErrors[outputTargetLineNum] = lib.cutLast(errorMessage, '\n');
+                                }
+                                if (parser.verbose) {
+                                    const replacedLine = replacingLine;
+                                    if (before !== after) {
+                                        console.log(`    Verbose: replaced`);
+                                        console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length + templateTag.lineNumOffset}: ${replacedLine}`);
+                                        console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${line}`);
+                                    }
+                                    else {
+                                        console.log(`    Verbose: not replaced`);
+                                        console.log(`        Verbose: ${getTestablePath(inputFilePath)}:${linesWithoutToTagOnlyLine.length}: ${replacedLine}`);
+                                    }
+                                }
+                            }
+                        }
+                        else if (replacingLine.includes(replaced)) {
+                            // Do nothing
+                        }
+                        else {
+                            if (parser.errorCount === 0) { // Since only one old value can be replaced at a time
+                                console.log('');
+                                console.log(getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines));
+                                if (expected === replaced) {
+                                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                                    parser.warningCount += 1;
+                                }
+                                else {
+                                    console.log(`    ${translate('Error')}: ${translate('Not found any replacing target.')} ` +
+                                        `${translate('Modify the template target to old or new value.')}`);
+                                    parser.errorCount += 1;
+                                }
+                                console.log(`    ${translate('Expected')}: ${expected.trim()}`);
+                            }
+                        }
+                    }
+                    else {
+                        if (isCheckingTemplateIfKey && templateTag.label === templateIfLabel) {
+                            isCheckingTemplateIfKey = false;
+                            const necessaryVariableNames = getNotSetTemplateIfTagVariableNames(replacingKeys);
+                            if (necessaryVariableNames !== '') {
+                                console.log('');
+                                console.log(`${getTestablePath(inputFilePath)}:${lineNum}: ${line}`);
+                                console.log(`  ${translate('Error')}: ${translate('template-if tag related settings are not defined')}`);
+                                console.log(`  ${translate('Solution')}: ${translate('Set the variable')} ${necessaryVariableNames}`);
+                                console.log(`  ${translate('Setting')}: ${getTestablePath(inputFilePath)}:${settingTree.settingsInformation[settingTree.currentSettingIndex].lineNum}`);
+                                parser.errorCount += 1;
+                                templateIfKeyError = true;
+                            }
                         }
                     }
                 }
-            }
-            // Output a line, if not yet   #breadcrumb:
-            if (!output) {
-                if (!cutReplaceToTagEnabled) {
-                    writer.write(line + "\n");
-                }
-                else {
-                    if (line.trim() === '') {
+                // Output a line, if not yet   #breadcrumb:
+                if (!output) {
+                    if (!cutReplaceToTagEnabled) {
                         writer.write(line + "\n");
                     }
                     else {
-                        const cutLine = cutReplaceToTag(line);
-                        if (cutLine.trim() === '') {
-                            linesWithoutToTagOnlyLine.pop(); // for template-at tag
+                        if (line.trim() === '') {
+                            writer.write(line + "\n");
                         }
                         else {
-                            writer.write(cutLine + "\n");
+                            const cutLine = cutReplaceToTag(line);
+                            if (cutLine.trim() === '') {
+                                linesWithoutToTagOnlyLine.pop(); // for template-at tag
+                            }
+                            else {
+                                writer.write(cutLine + "\n");
+                            }
                         }
                     }
                 }
+            }
+            catch (e) {
+                exception = e;
+                breaking = true;
+                errorLineNum = lineNum;
             }
         }
         if (!parser.toTagError) {
@@ -2272,6 +2361,12 @@ async function replaceSub(inputFilePath, parser, command) {
                 parser.errorCount += 1;
                 break; // Error message count should be 1, because user can focus on one place.
             }
+        }
+        if (exception) {
+            if (exception instanceof Error) {
+                exception.message = `${exception} in replaceSub(${inputFilePath}:${errorLineNum})`;
+            }
+            throw exception;
         }
         if (!hasLastLF) {
             writer.cutLastLF();
@@ -2310,6 +2405,9 @@ async function check(checkingFilePath) {
     catch (e) {
         console.log('');
         console.log('Exception: ' + e.toString());
+        if ((programOptions.test || programOptions.verbose) && e instanceof Error) {
+            console.log(e.stack);
+        }
         parser.errorCount += 1;
     }
     finally {
@@ -6159,7 +6257,7 @@ function searchDefinedSettingIndices(variableName, currentSettingIndex, settingT
     }
 }
 function searchDefinedSettingIndexInCurrentLevel(variableName, indexWithoutIf, settingTree, parser) {
-    if (variableName in settingTree.settings[indexWithoutIf]) {
+    if ((indexWithoutIf in settingTree.settings) && variableName in settingTree.settings[indexWithoutIf]) {
         return [indexWithoutIf]; // e.g. '/1'
     }
     else { // Search in #if: tag block

@@ -158,6 +158,8 @@ tag: #keyword: typrm tags
             replaces settings >>
                 2_replace_9_template_if_1_OK
 test:
+    test command:
+        npm test  #ref: ./README.md  #ref: ./README-jp.md
     test:  #// 機能からテストを探す場合
         #search: typrm command list
         #search: typrm tags

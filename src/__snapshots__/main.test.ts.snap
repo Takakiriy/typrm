@@ -358,6 +358,45 @@ checked file count = 1, template count = 8, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> 1_template_1_ok: sourceFileContents 1`] = `
+"# #template タグに問題が無いかどうかをチェックする >> パスするケース
+
+手順A:
+    設定: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - cd ".."
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+        - value1
+            #template: - key1
+        - "value3"
+            #template: - "Key3"
+        - "value3"  #template: - "Key3"
+
+手順B:
+    設定: #settings:
+        key1: value11
+
+    手順:
+        - value11
+            #template: - key1
+        - １行に２つのケース： value11, value11
+            #template: key1, key1
+        - ２行上のケース： "value11"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
+"
+`;
+
 exports[`checks >> template value >> 1_template_2_error: answer 1`] = `
 "
 \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
@@ -441,6 +480,54 @@ exports[`checks >> template value >> 1_template_2_error: answer 1`] = `
 
 Warning: 11, Error: 2
 checked file count = 1, template count = 13, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> 1_template_2_error: sourceFileContents 1`] = `
+"# #template タグに問題が無いかどうかをチェックする >> エラーになるケース
+
+手順A:
+    設定: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - cd ".."
+        - echo  "value  2"
+            #template: - echo  "__Key2__"
+        - v1
+            #template: - key1
+        - __ "value3"
+            #template: - "Key3"
+        - __ "value3"  #template: - "Key3"
+
+手順B:
+    設定: #settings:
+        key1: value11
+
+    手順:
+        - value1
+            #template: - key1
+        - １行に２つのケース： value1, value11
+            #template: key1, key1
+        - １行に２つのケース： value11, value1
+            #template: key1, key1
+        - ２行上のケース： "value11x"
+            #// comment
+            #template-at(-2): "key1"
+        - ３行上のケース： "value11x"
+            #// comment
+            #// comment
+            #template-at(-3): "key1"
+        - ０行上のケース： "value11x"  #template-at(0): "key1"
+        - サポート外の at の値：
+            #template-at(1): "key1"
+        - サポート外の at の値：
+            #template-at(2): "key1"
+        - value  #template: __Undefined__
+        - value  #template: __NotFoundExample__  #disable-tag-tool:
 "
 `;
 
@@ -540,6 +627,99 @@ checked file count = 1, template count = 12, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> 1_template_3_if: sourceFileContents 1`] = `
+"test_of_if_tag_in_settings:
+    設定: #settings:
+        fruit: banana
+        bird: swan
+        バナナ:  #if: $settings.fruit == banana
+            __Setting1__: yes
+        バナナ以外:  #if: $settings.fruit != banana
+            __Setting1__: no
+        カラス:  #if: $settings.bird == crow
+            __Setting2__: no
+        カラス以外:  #if: $settings.bird != crow
+            __Setting2__: yes
+        aaa:  #if: $env.typrm_aaa == aaa
+            __Env1__: yes
+        bbb:  #if: $env.typrm_aaa == bbb
+            __Env1__: no
+        not aaa:  #if: $env.typrm_aaa != aaa
+            __Env2__: no
+        not bbb:  #if: $env.typrm_aaa != bbb
+            __Env2__: yes
+    チェックOK:
+        - yes  #template: __Setting1__
+        - yes  #template: __Setting2__
+        - yes  #template: __Env1__
+        - yes  #template: __Env2__
+    チェックNG:
+        - no  #template: __Setting1__
+        - no  #template: __Setting2__
+        - no  #template: __Env1__
+        - no  #template: __Env2__
+        - no  #template: fruit
+        - no  #template: bird
+
+test_of_next_to_if_tag_in_settings:
+    設定: #settings:
+        dummy: banana
+        バナナ:  #if: $settings.dummy != banana
+            __Setting1__: no
+        fish: yes
+    チェックNG:
+        - no  #template: fish
+
+test_of_template_if_define_next_to_if_tag_in_settings:
+    設定: #settings:
+        fruit: banana
+        バナナ:  #if: $settings.fruit != banana
+            __Setting1__: yes
+        template-if(yes): 🌟
+    チェックNG:
+        - 💤  #template-if: $settings.fruit == banana
+
+test_of_expect_tag:
+    設定: #settings:
+        target1: banana
+        color1: yellow
+        #if: $settings.target1 == banana
+            # true   #expect: $settings.color1 == yellow
+            # false  #expect: $settings.color1 == black
+            # false  #expect: $settings.color1 != yellow
+            # true   #expect: $settings.color1 != black
+            #expect: true
+            #expect: false
+        not banana:  #if: $settings.target1 != banana
+            # skip   #expect: $settings.color1 == black
+        #// not banana:  #if: $settings.target1 != banana
+            # skip   #expect: $settings.color1 == black
+    設定外:
+        #if: $settings.target1 == banana
+            # true   #expect: $settings.color1 == yellow
+            # false  #expect: $settings.color1 == black
+            # false  #expect: $settings.color1 != yellow
+            # true   #expect: $settings.color1 != black
+            #expect: true
+            #expect: false
+        not banana:  #if: $settings.target1 != banana
+            # false  #expect: $settings.color1 == black
+        #// not banana:  #if: $settings.target1 != banana
+            # true   #expect: $settings.color1 == black
+
+test_of_duplicated_variable_name_error:
+    設定: #settings:
+        target1: banana
+        nest:
+            target1: yellow
+
+test_of_detecting_expect_tag:
+    #expect: false     #// detect
+    #expect:false      #// detect
+    (#expect: false)   #// not detect the tag
+"
+`;
+
 exports[`checks >> template value >> case_sensitive_variable_name: answer 1`] = `
 "
 \${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
@@ -550,6 +730,20 @@ exports[`checks >> template value >> case_sensitive_variable_name: answer 1`] = 
 
 Warning: 1, Error: 0
 checked file count = 1, template count = 4, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> case_sensitive_variable_name: sourceFileContents 1`] = `
+"settings: #settings:
+    __Variable__: Value
+    __variable__: value2
+    __variable2__: Value2
+OK:
+    Value: #template: __Variable__
+    value2: #template: __variable__
+    Value2: #template: __variable2__
+NG:
+    value: #template: __Variable__  #// The value is different in case
 "
 `;
 
@@ -599,6 +793,20 @@ checked file count = 1, template count = 5, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> environment_variable: sourceFileContents 1`] = `
+"settings: #settings:
+    $env.TYPRM_TEST_PATH: \${TYPRM_TEST_PATH}
+    $env.TYPRM_TEST_ENV: $TYPRM_TEST_ENV
+    $env.{TYPRM_TEST_ENV}: $TYPRM_TEST_ENV
+spippet: #keyword:  #snippet-depth: 1
+    - ($TYPRM_TEST_ENV)  #template: ($env.{TYPRM_TEST_ENV})
+    - ($TYPRM_TEST_ENV)  #template: ($env.TYPRM_TEST_ENV)
+    - ($TYPRM_TEST_ENVIRON)  #template: ($env.TYPRM_TEST_ENVIRON)
+    - $TYPRM_TEST_ENV == $TYPRM_TEST_ENV  #template: $TYPRM_TEST_ENV == $env.TYPRM_TEST_ENV
+    - \${TYPRM_TEST_PATH}  #template: $env.TYPRM_TEST_PATH
+"
+`;
+
 exports[`checks >> template value >> list_to_tag_original_tag: answer 1`] = `
 "
 \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
@@ -608,6 +816,16 @@ exports[`checks >> template value >> list_to_tag_original_tag: answer 1`] = `
 
 Warning: 0, Error: 0
 checked file count = 1, template count = 2, #to tag count = 2
+"
+`;
+
+exports[`checks >> template value >> list_to_tag_original_tag: sourceFileContents 1`] = `
+"settings: #settings:
+    varA: valueA1  #original: valueA0  #to: valueA2
+    varB: valueB1
+body:
+    - valueA1  #template: varA
+    - valueB1  #template: varB  #to: valueB2
 "
 `;
 
@@ -630,10 +848,57 @@ checked file count = 2, template count = 8, #to tag count = 4
 "
 `;
 
+exports[`checks >> template value >> list_to_tag_original_tag_in_multi_files: sourceFileContents 1`] = `
+"settings: #settings:
+    varA: valueA1  #original: valueA0  #to: valueA2
+    varB: valueB1
+body:
+    - valueA1  #template: varA
+    - valueB1  #template: varB  #to: valueB2
+"
+`;
+
+exports[`checks >> template value >> list_to_tag_original_tag_in_multi_files: sourceFileContents 2`] = `
+"settings: #settings:
+    varA: valueA1  #original: valueA0  #to: valueA2
+    varB1: valueB1  #original: value-B1
+    varB2: valueB2  #original: value-B2
+    varB3: valueB3  #original: value-B3
+    varB4: valueB4  #original: value-B4
+    varB5: valueB5  #original: value-B5
+body:
+    - valueA1  #template: varA
+    - valueB1  #template: varB1  #to: valueB2
+    - valueB2  #template: varB2
+    - valueB3  #template: varB3
+    - valueB4  #template: varB4
+    - valueB5  #template: varB5
+"
+`;
+
+exports[`checks >> template value >> one_error: sourceFileContents 1`] = `
+"one_error:
+    settings: #settings:
+        var: value1
+    body:
+        value2  #template: var
+"
+`;
+
 exports[`checks >> template value >> settings >> 1_same_values: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 1_same_values: sourceFileContents 1`] = `
+"settings: #settings:
+    var1: value1
+    var2: value2
+    var1: value1
+    var2: value2
+value1, value2  #template: var1, var2
 "
 `;
 
@@ -663,10 +928,43 @@ checked file count = 1, template count = 1, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings >> 2_not_same_values_error: sourceFileContents 1`] = `
+"settings: #settings:
+    var1: value1
+    var2: value2
+    var1: value111
+    var2: value222
+value1, value2  #template: var1, var2
+"
+`;
+
 exports[`checks >> template value >> settings >> 3_overwrite: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 8, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 3_overwrite: sourceFileContents 1`] = `
+"value1, value2, value3  #template: var1, var2, var3
+settings: #settings:
+    var1: value1
+    var2: value2
+    var3: value3
+value1, value2, value3  #template: var1, var2, var3
+level 1:
+    value1, value22, value33  #template: var1, var2, var3
+    settings: #settings:
+        var2: value22
+        var3: value33
+    value1, value22, value33  #template: var1, var2, var3
+    level 2:
+        value1, value22, value333  #template: var1, var2, var3
+        settings: #settings:
+            var3: value333
+        value1, value22, value333  #template: var1, var2, var3
+    value1, value22, value33  #template: var1, var2, var3
+value1, value2, value3  #template: var1, var2, var3
 "
 `;
 
@@ -748,6 +1046,29 @@ checked file count = 1, template count = 8, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings >> 3e_overwrite_error: sourceFileContents 1`] = `
+".....1, .....2, .....3  #template: var1, var2, var3
+settings: #settings:
+    var1: value1
+    var2: value2
+    var3: value3
+.....1, .....2, .....3  #template: var1, var2, var3
+level 1:
+    .....1, .....22, .....33  #template: var1, var2, var3
+    settings: #settings:
+        var2: value22
+        var3: value33
+    .....1, .....22, .....33  #template: var1, var2, var3
+    level 2:
+        .....1, .....22, .....333  #template: var1, var2, var3
+        settings: #settings:
+            var3: value333
+        .....1, .....22, .....333  #template: var1, var2, var3
+    .....1, .....22, .....33  #template: var1, var2, var3
+.....1, .....2, .....3  #template: var1, var2, var3
+"
+`;
+
 exports[`checks >> template value >> settings >> 4_2_neighbor_level_2_error: answer 1`] = `
 "
 \${typrmProject}/src/test_data/_tmp/_tmp.yaml:7
@@ -759,6 +1080,18 @@ checked file count = 1, template count = 1, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings >> 4_2_neighbor_level_2_error: sourceFileContents 1`] = `
+"root:
+    settings: #settings:
+        var1: value1
+        var2: value2
+        var3: value3
+    value1, value2, value3, value4  #template: var1, var2, var3, var4
+    settings: #settings:
+        var4: value4
+"
+`;
+
 exports[`checks >> template value >> settings >> 4_neighbor_error: answer 1`] = `
 "
 \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6
@@ -767,6 +1100,17 @@ exports[`checks >> template value >> settings >> 4_neighbor_error: answer 1`] = 
 
 Warning: 1, Error: 0
 checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> 4_neighbor_error: sourceFileContents 1`] = `
+"settings: #settings:
+    var1: value1
+    var2: value2
+    var3: value3
+value1, value2, value3, value4  #template: var1, var2, var3, var4
+settings: #settings:
+    var4: value4
 "
 `;
 
@@ -832,10 +1176,89 @@ checked file count = 1, template count = 8, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings >> 5_check_same_as_tag: sourceFileContents 1`] = `
+"1:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __StoreClient__: SC
+        __StoreServer__: SS
+        __C_S__: Client  #// Client or Server
+        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
+        __Store__: SC      #same-as: __Store{$settings.__C_S__}__
+    ref:
+        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
+        OC, SC:  #template: __Operation__, __Store__
+2:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __StoreClient__: SC
+        __StoreServer__: SS
+        __C_S__: Server  #// Client or Server
+        __Operation__: OS  #same-as: __Operation{$settings.__C_S__}__
+        __Store__: SS      #same-as: __Store{$settings.__C_S__}__
+        __Operation3__: OS #same-as: __Operati{$settings.__On__}{$settings.__C_S__}__
+        __On__: on
+    ref:
+        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
+        OS, SS, OS:  #template: __Operation__, __Store__, __Operation3__
+error:
+    settings: #settings:
+        __OperationClient__: OC
+        __OperationServer__: OS
+        __StoreClient__: SC
+        __StoreServer__: SS
+        __C_S__: Server  #// Client or Server
+        __Other__: Host
+        __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
+        __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
+        __Store2__: x      #same-as: __Store{$settings.__Other__}__
+        __Operation3__: 0x  #same-as: __Operati{$settings.__On__}{$settings.__C_S__}{$settings.__U__}_
+        __Operation4__: OS  #same-as: __Operati{$settings.__On__}{$settings.__Unknown__}{$settings.__U__}_
+        __Operation5__: xx  #same-as: __Operati{$settings.__On__}{$settings.__Other__}{$settings.__U__}_
+        __On__: on
+        __U__: _
+    ref:
+        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
+        Ox, SS, x, 0x, OS, xx:  #template: __Operation__, __Store__, __Store2__, __Operation3__, __Operation4__, __Operation5__
+    child:
+        settings: #settings:
+    check to no warning:
+settings: #settings:
+with if tag:
+    settings: #settings:
+        __Type__: B
+        __C_S__: Server  #// Client or Server
+        __Other__: Host
+        #if: $settings.__Type__ == A
+            __OperationClient__: AC
+            __OperationServer__: AS
+            __Operation__: AS  #same-as: __Operation{$settings.__C_S__}__
+        #if: $settings.__Type__ == B
+            __OperationClient__: BC
+            __OperationServer__: BS
+            __Operation__: BS  #same-as: __Operation{$settings.__C_S__}__
+            __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
+    ref:
+        BC, BS:  #template: __OperationClient__, __OperationServer__
+        BS:  #template: __Operation__
+"
+`;
+
 exports[`checks >> template value >> settings >> b1_bug_case_no_root_settings: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 0, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings >> b1_bug_case_no_root_settings: sourceFileContents 1`] = `
+"body:
+    #if: true
+no indent:
+no indent:
+    settings: #settings:
 "
 `;
 
@@ -846,10 +1269,106 @@ checked file count = 1, template count = 6, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1`] = `
+"root:  #// b2_bug_case_nest_settings
+    1:  #// Test of 1
+        settings: #settings:
+            __Var11__: value11
+        ref:
+            value1, value11
+            #template: __Var1__, __Var11__
+    settings: #settings:
+        __Var1__: value1
+    body:  #// Test of 21
+        settings: #settings:
+            __Var12__: value12
+        sub:
+            sub:
+                settings: #settings:
+                    __Var1211__: value1211
+                ref:
+                    value1, value121, value1211
+                    #template: __Var1__, __Var121__, __Var1211__
+            settings: #settings:
+                __Var121__: value121
+root2:  #// Test of 211
+    settings: #settings:
+        __Var2__: value2
+    sub1:
+        sub1:
+            value211: #template: __Var211__
+            settings: #settings:
+                __Var211__: value211
+        sub2:
+            settings: #settings:
+                __Var212__: value212
+            sub1:
+                settings: #settings:
+                    __Var2121__: value2121
+                value2121: #template: __Var2121__
+            sub2:
+                settings: #settings:
+                    __Var2122__: value2122
+                ref:
+                    value21, value212, value2122
+                    #template: __Var21__, __Var212__, __Var2122__
+            sub3:
+                value2123: #template: __Var2123__
+                settings: #settings:
+                    __Var2123__: value2123
+        settings: #settings:
+            __Var21__: value21
+"
+`;
+
+exports[`checks >> template value >> settings >> b3_bug_case_if_normal_if: answer 1`] = `
+"
+\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4: #to: __Var1__: value1 => value11
+\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: #to: __Var2__: value2 => value22
+\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9: #to: __Var3__: value3 => value33
+
+Warning: 0, Error: 0
+checked file count = 1, template count = 3, #to tag count = 3
+"
+`;
+
+exports[`checks >> template value >> settings >> b3_bug_case_if_normal_if: sourceFileContents 1`] = `
+"root:  #// b3_bug_case_if_normal_if
+    body:
+        1: #if: $settings.__Var1__ == value1
+            value1  #template: __Var1__   #to: value11
+        normal:
+            value2  #template: __Var2__   #to: value22
+    body_as_parent_of_normal_block:
+        #if: $settings.__Var3__ == value3
+            value3  #template: __Var3__   #to: value33
+    settings: #settings:
+        __Var1__: value1
+        __Var2__: value2
+        __Var3__: value3
+"
+`;
+
 exports[`checks >> template value >> settings_tree: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 4, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree: sourceFileContents 1`] = `
+"settings: #settings:
+    __A__: ValueA
+    __B__: ValueB
+main:
+    settings: #settings:
+        __1A__: Value1A
+        __1B__: Value1B
+    body:
+        - "ValueA"  #template: "__A__"
+        - "ValueB"  #template: "__B__"
+        - "Value1A"  #template: "__1A__"
+        - "Value1B"  #template: "__1B__"
 "
 `;
 
@@ -860,6 +1379,54 @@ Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:36
 
 Warning: 1, Error: 0
 checked file count = 1, template count = 20, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_deep: sourceFileContents 1`] = `
+"settings: #settings:
+    __A__: ValueA
+section1:
+    settings: #settings:
+        __1A__: Value1A
+    part1:
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        settings: #settings:
+            __11A__: Value11A
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        Value11A:  #template: __11A__
+    part2:
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        settings: #settings:
+            __11A__: Value11A_2
+            #// The next line is for the test of an empty line
+
+        ValueA:  #template: __A__
+        Value1A:  #template: __1A__
+        Value11A_2:  #template: __11A__
+    ValueA:  #template: __A__
+    Value1A:  #template: __1A__
+    __11A__:  #template: __11A__
+    deep:
+        sub:
+            sub2:
+                settings: #settings:
+                    __111A__: Value111A
+                Value111A:  #template: __111A__
+            __111A__:  #template: __111A__
+    grand parent:
+        settings: #settings:
+            __11A__: Value11A_3
+__11A__:  #template: __11A__  #// ground parent of the previous line
+__1A__-1:  #template: __1A__-1
+section2:
+    settings: #settings:
+        __1A__: Value1A_2
+    Value1A_2:  #template: __1A__
+ValueA:  #template: __A__
+__1A__-2:  #template: __1A__-2
 "
 `;
 
@@ -932,6 +1499,32 @@ checked file count = 1, template count = 9, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings_tree_error: sourceFileContents 1`] = `
+"BadA:  #template: __A__
+main:
+    BadA:  #template: __A__
+    Bad1A:  #template: __1A__
+    Bad11A:  #template: __11A__
+    settings: #settings:
+        __1A__: Value1A
+    sub:
+        settings: #settings:
+            __11A__: Value11A
+        Bad11A:  #template: __11A__
+    BadA:  #template: __A__
+    Bad1A:  #template: __1A__
+    Bad11A:  #template: __11A__
+    deep:
+        sub:
+            sub2:
+                settings: #settings:
+                    __111A__: Value111A
+                Bad111A:  #template: __111A__
+settings: #settings:
+    __A__: ValueA
+"
+`;
+
 exports[`checks >> template value >> settings_tree_if: answer 1`] = `
 "
 \${typrmProject}/src/test_data/_tmp/_tmp.yaml:26: settings: #settings:
@@ -943,6 +1536,42 @@ exports[`checks >> template value >> settings_tree_if: answer 1`] = `
 
 Warning: 1, Error: 0
 checked file count = 1, template count = 6, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_if: sourceFileContents 1`] = `
+"section:
+    table:
+        cell:
+            ValueA      #template: __A__
+            ValueB      #template: __B__
+            ValueC      #template: __C__
+            test error  #template: __C__
+            ValueD      #template: __D__
+            ValueE      #template: __E__
+        settings: #settings:
+            a: #if: $settings.__B__ == ValueA
+                __C__: not_used
+            b: #if: $settings.__B__ == ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: ValueC
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: ValueD
+            not b: #if: $settings.__B__ != ValueB
+                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
+                    __C__: not_used
+                not b2: #if: $settings.__B2__ != ValueB2
+                    __C__: not_used
+                __D__: not_used
+            __E__: ValueE
+settings: #settings:
+    a: #if: $settings.__A__ == bad
+        __B__: not_used
+    b: #if: $settings.__A__ != bad
+        __B__: ValueB
+    __A__: ValueA
+    __B2__: ValueB2
 "
 `;
 
@@ -962,10 +1591,33 @@ checked file count = 1, template count = 1, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> settings_tree_if_disable: sourceFileContents 1`] = `
+"settings: #settings:
+    variable1: value1
+    #if: var1 != value1  #disable-tag-tool:
+        variable2: value2
+val__ue2: #template: variable2
+"
+`;
+
 exports[`checks >> template value >> settings_tree_position: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 5, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> settings_tree_position: sourceFileContents 1`] = `
+"ValueA:  #template: __A__
+main1:
+    ValueA:  #template: __A__
+    Value1A:  #template: __1A__
+    settings: #settings:
+        __1A__: Value1A
+    ValueA:  #template: __A__
+    Value1A:  #template: __1A__
+settings: #settings:
+    __A__: ValueA
 "
 `;
 
@@ -988,10 +1640,33 @@ checked file count = 1, template count = 4, #to tag count = 0
 "
 `;
 
+exports[`checks >> template value >> template_if_1_error: sourceFileContents 1`] = `
+"設定: #settings:
+    __Stage__: develop
+    template-if(yes): 🌟
+    template-if(no):  💤
+手順:
+    🌟 case product:  #template-if: $settings.__Stage__ == product
+    💤 case product:  #template-if: $settings.__Stage__ == develop
+    💤 case product:  #template-if: $settings.__Stage__ == product  #comment
+    🌟 case product:  #template-if: $settings.__Stage__ == develop  #comment
+"
+`;
+
 exports[`checks >> template value >> template_if_2_referenced_one_side: answer 1`] = `
 "
 Warning: 0, Error: 0
 checked file count = 1, template count = 1, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> template_if_2_referenced_one_side: sourceFileContents 1`] = `
+"設定: #settings:
+    __Stage__: develop
+    template-if(yes): Do
+    template-if(no):  skip
+手順:
+    Do case product:  #template-if: $settings.__Stage__ == develop
 "
 `;
 
@@ -1011,6 +1686,32 @@ Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:14
 
 Warning: 4, Error: 0
 checked file count = 1, template count = 3, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> var_not_ref_1_error: sourceFileContents 1`] = `
+"A:
+    設定: #settings:
+        key1: value1
+        __Key2__: value2  #コメント
+            #コメント
+        Key3: value3
+
+    手順:
+        - echo  "value2"
+            #template: - echo  "__Key2__"
+B:
+    設定: #settings:
+        key1: value11
+        __Key2__: value2
+        Key3: value3
+    手順: |
+        - echo  "value3"  #template: - echo  "Key3"
+case that the name is same as the value:
+    設定: #settings:
+        keyValue: keyValue
+    手順:
+        keyValue  #template: keyValue
 "
 `;
 
@@ -1064,6 +1765,11 @@ Verbose: variables:
         Verbose: var2: value2
     Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
         Verbose: var2: not value2
+    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:9: settings /1/c
+    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:11: settings /1/d
+    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:13: settings /1/e
+    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:15: settings /1/f
+    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:17: settings /1/g
     Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:0: settings /
 Verbose: Phase 2: parse \\"original\\" tags ...
     Verbose: settings \\"/1\\"
@@ -1127,6 +1833,30 @@ Verbose: Phase 3: check ...
 
 Warning: 4, Error: 0
 checked file count = 1, template count = 7, #to tag count = 0
+"
+`;
+
+exports[`checks >> template value >> verbose: sourceFileContents 1`] = `
+"check_verbose:
+    settings: #settings:
+        var1: value1
+        #if: $settings.var1 == value1
+            var2: value2
+        #if: $settings.var1 != value1
+            var2: not value2
+    bad  #template: var1
+    #if: $settings.var2 == value2
+        bad2  #template: var2
+    #if: $settings.var2 != value2
+        bad2  #template: var2
+    #if: $env.TYPRM_TEST_ENV2 == testEnv
+        bad2  #template: var2
+    #if: $env.TYPRM_TEST_ENV2 != testEnv
+        bad2  #template: var2
+    #if: true
+        bad2  #template: var2
+    #if: false
+        bad2  #template: var2
 "
 `;
 
@@ -2024,1481 +2754,6 @@ checked file count = 1, template count = 1, #to tag count = 0
 exports[`checks file contents >> file_0_one_error: sourceFileContents 1`] = `
 "../../file_target/1/file_0_one_error_2_target.yaml : |  #file-template: ../../file_target/1/file_0_one_error_2_target.yaml
     correct contents
-"
-`;
-
-exports[`checks template value >> 1_template_1_ok: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 8, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> 1_template_1_ok: sourceFileContents 1`] = `
-"# #template タグに問題が無いかどうかをチェックする >> パスするケース
-
-手順A:
-    設定: #settings:
-        key1: value1
-        __Key2__: value2  #コメント
-            #コメント
-        Key3: value3
-
-    手順:
-        - cd ".."
-        - echo  "value2"
-            #template: - echo  "__Key2__"
-        - value1
-            #template: - key1
-        - "value3"
-            #template: - "Key3"
-        - "value3"  #template: - "Key3"
-
-手順B:
-    設定: #settings:
-        key1: value11
-
-    手順:
-        - value11
-            #template: - key1
-        - １行に２つのケース： value11, value11
-            #template: key1, key1
-        - ２行上のケース： "value11"
-            #// comment
-            #template-at(-2): "key1"
-        - ３行上のケース： "value11"
-            #// comment
-            #// comment
-            #template-at(-3): "key1"
-"
-`;
-
-exports[`checks template value >> 1_template_2_error: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:         __Key2__: value2  #コメント
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:12:         - echo  \\"value  2\\"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:13:             #template: - echo  \\"__Key2__\\"
-    Warning: Not matched with the template.
-    Expected: - echo  \\"value2\\"
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:         key1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:14:         - v1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:15:             #template: - key1
-    Warning: Not matched with the template.
-    Expected: - value1
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:16:         - __ \\"value3\\"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:17:             #template: - \\"Key3\\"
-    Warning: Not matched with the template.
-    Expected: - \\"value3\\"
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:8:         Key3: value3
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:18:         - __ \\"value3\\"  #template: - \\"Key3\\"
-    Warning: Not matched with the template.
-    Expected: - \\"value3\\"
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:25:         - value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:26:             #template: - key1
-    Warning: Not matched with the template.
-    Expected: - value11
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:27:         - １行に２つのケース： value1, value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:             #template: key1, key1
-    Warning: Not matched with the template.
-    Expected: value11, value11
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:29:         - １行に２つのケース： value11, value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:30:             #template: key1, key1
-    Warning: Not matched with the template.
-    Expected: value11, value11
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:31:         - ２行上のケース： \\"value11x\\"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:33:             #template-at(-2): \\"key1\\"
-    Warning: Not matched with the template.
-    Expected: \\"value11\\"
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:34:         - ３行上のケース： \\"value11x\\"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:37:             #template-at(-3): \\"key1\\"
-    Warning: Not matched with the template.
-    Expected: \\"value11\\"
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:         key1: value11
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:38:         - ０行上のケース： \\"value11x\\"  #template-at(0): \\"key1\\"
-    Warning: Not matched with the template.
-    Expected: \\"value11\\"
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:40: #template-at(1): \\"key1\\"
-    Error: The parameter must be less than 0
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:42: #template-at(2): \\"key1\\"
-    Error: The parameter must be less than 0
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:43:         - value  #template: __Undefined__
-    Warning: Not matched with the template.
-    Expected: __Undefined__
-
-Warning: 11, Error: 2
-checked file count = 1, template count = 13, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> 1_template_2_error: sourceFileContents 1`] = `
-"# #template タグに問題が無いかどうかをチェックする >> エラーになるケース
-
-手順A:
-    設定: #settings:
-        key1: value1
-        __Key2__: value2  #コメント
-            #コメント
-        Key3: value3
-
-    手順:
-        - cd ".."
-        - echo  "value  2"
-            #template: - echo  "__Key2__"
-        - v1
-            #template: - key1
-        - __ "value3"
-            #template: - "Key3"
-        - __ "value3"  #template: - "Key3"
-
-手順B:
-    設定: #settings:
-        key1: value11
-
-    手順:
-        - value1
-            #template: - key1
-        - １行に２つのケース： value1, value11
-            #template: key1, key1
-        - １行に２つのケース： value11, value1
-            #template: key1, key1
-        - ２行上のケース： "value11x"
-            #// comment
-            #template-at(-2): "key1"
-        - ３行上のケース： "value11x"
-            #// comment
-            #// comment
-            #template-at(-3): "key1"
-        - ０行上のケース： "value11x"  #template-at(0): "key1"
-        - サポート外の at の値：
-            #template-at(1): "key1"
-        - サポート外の at の値：
-            #template-at(2): "key1"
-        - value  #template: __Undefined__
-        - value  #template: __NotFoundExample__  #disable-tag-tool:
-"
-`;
-
-exports[`checks template value >> 1_template_3_if: answer 1`] = `
-"
-Error of duplicated variable name:
-  typrmFileA: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:82
-  ContentsA: target1: banana
-  typrmFileB: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:84
-  ContentsB: target1: yellow
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:             __Setting1__: yes
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:27:         - no  #template: __Setting1__
-    Warning: Not matched with the template.
-    Expected: yes
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:12:             __Setting2__: yes
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:         - no  #template: __Setting2__
-    Warning: Not matched with the template.
-    Expected: yes
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:14:             __Env1__: yes
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:29:         - no  #template: __Env1__
-    Warning: Not matched with the template.
-    Expected: yes
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:20:             __Env2__: yes
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:30:         - no  #template: __Env2__
-    Warning: Not matched with the template.
-    Expected: yes
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:         fruit: banana
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:31:         - no  #template: fruit
-    Warning: Not matched with the template.
-    Expected: banana
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:         bird: swan
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:32:         - no  #template: bird
-    Warning: Not matched with the template.
-    Expected: swan
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:35:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:39:         fish: yes
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:41:         - no  #template: fish
-    Warning: Not matched with the template.
-    Expected: yes
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:44:     設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:45:         fruit: banana
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:50:         - 💤  #template-if: $settings.fruit == banana
-    Warning: Not matched with the template.
-    Expected: 🌟
-
-Error of not expected condition:
-  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:58
-  Contents: $settings.color1 == black
-
-Error of not expected condition:
-  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:59
-  Contents: $settings.color1 != yellow
-
-Error of not expected condition:
-  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:62
-  Contents: false
-
-Error of not expected condition:
-  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:70
-  Contents: $settings.color1 == black
-
-Error of not expected condition:
-  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:71
-  Contents: $settings.color1 != yellow
-
-Error of not expected condition:
-  typrmFile: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:74
-  Contents: false
-
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:84
-  Not referenced: target1
-
-Warning: 9, Error: 7
-checked file count = 1, template count = 12, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> 1_template_3_if: sourceFileContents 1`] = `
-"test_of_if_tag_in_settings:
-    設定: #settings:
-        fruit: banana
-        bird: swan
-        バナナ:  #if: $settings.fruit == banana
-            __Setting1__: yes
-        バナナ以外:  #if: $settings.fruit != banana
-            __Setting1__: no
-        カラス:  #if: $settings.bird == crow
-            __Setting2__: no
-        カラス以外:  #if: $settings.bird != crow
-            __Setting2__: yes
-        aaa:  #if: $env.typrm_aaa == aaa
-            __Env1__: yes
-        bbb:  #if: $env.typrm_aaa == bbb
-            __Env1__: no
-        not aaa:  #if: $env.typrm_aaa != aaa
-            __Env2__: no
-        not bbb:  #if: $env.typrm_aaa != bbb
-            __Env2__: yes
-    チェックOK:
-        - yes  #template: __Setting1__
-        - yes  #template: __Setting2__
-        - yes  #template: __Env1__
-        - yes  #template: __Env2__
-    チェックNG:
-        - no  #template: __Setting1__
-        - no  #template: __Setting2__
-        - no  #template: __Env1__
-        - no  #template: __Env2__
-        - no  #template: fruit
-        - no  #template: bird
-
-test_of_next_to_if_tag_in_settings:
-    設定: #settings:
-        dummy: banana
-        バナナ:  #if: $settings.dummy != banana
-            __Setting1__: no
-        fish: yes
-    チェックNG:
-        - no  #template: fish
-
-test_of_template_if_define_next_to_if_tag_in_settings:
-    設定: #settings:
-        fruit: banana
-        バナナ:  #if: $settings.fruit != banana
-            __Setting1__: yes
-        template-if(yes): 🌟
-    チェックNG:
-        - 💤  #template-if: $settings.fruit == banana
-
-test_of_expect_tag:
-    設定: #settings:
-        target1: banana
-        color1: yellow
-        #if: $settings.target1 == banana
-            # true   #expect: $settings.color1 == yellow
-            # false  #expect: $settings.color1 == black
-            # false  #expect: $settings.color1 != yellow
-            # true   #expect: $settings.color1 != black
-            #expect: true
-            #expect: false
-        not banana:  #if: $settings.target1 != banana
-            # skip   #expect: $settings.color1 == black
-        #// not banana:  #if: $settings.target1 != banana
-            # skip   #expect: $settings.color1 == black
-    設定外:
-        #if: $settings.target1 == banana
-            # true   #expect: $settings.color1 == yellow
-            # false  #expect: $settings.color1 == black
-            # false  #expect: $settings.color1 != yellow
-            # true   #expect: $settings.color1 != black
-            #expect: true
-            #expect: false
-        not banana:  #if: $settings.target1 != banana
-            # false  #expect: $settings.color1 == black
-        #// not banana:  #if: $settings.target1 != banana
-            # true   #expect: $settings.color1 == black
-
-test_of_duplicated_variable_name_error:
-    設定: #settings:
-        target1: banana
-        nest:
-            target1: yellow
-
-test_of_detecting_expect_tag:
-    #expect: false     #// detect
-    #expect:false      #// detect
-    (#expect: false)   #// not detect the tag
-"
-`;
-
-exports[`checks template value >> case_sensitive_variable_name: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     __Variable__: Value
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:     value: #template: __Variable__  #// The value is different in case
-    Warning: Not matched with the template.
-    Expected: Value
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 4, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> case_sensitive_variable_name: sourceFileContents 1`] = `
-"settings: #settings:
-    __Variable__: Value
-    __variable__: value2
-    __variable2__: Value2
-OK:
-    Value: #template: __Variable__
-    value2: #template: __variable__
-    Value2: #template: __variable2__
-NG:
-    value: #template: __Variable__  #// The value is different in case
-"
-`;
-
-exports[`checks template value >> check files in multi folder >> 1st: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_checking/1/one_error_1.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_checking/1/one_error_1.yaml:3:         var: value1
-\${typrmProject}/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
-    Warning: Not matched with the template.
-    Expected: value1
-
-\${typrmProject}/src/test_data/_checking/2/one_error_1.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_checking/2/one_error_1.yaml:3:         var: value1
-\${typrmProject}/src/test_data/_checking/2/one_error_1.yaml:5:         value2  #template: var
-    Warning: Not matched with the template.
-    Expected: value1
-
-Warning: 2, Error: 0
-checked file count = 2, template count = 2, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> check files in multi folder >> with current folder: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_checking/1/one_error_1.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_checking/1/one_error_1.yaml:3:         var: value1
-\${typrmProject}/src/test_data/_checking/1/one_error_1.yaml:5:         value2  #template: var
-    Warning: Not matched with the template.
-    Expected: value1
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> check one file only: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 8, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> environment_variable: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 5, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> environment_variable: sourceFileContents 1`] = `
-"settings: #settings:
-    $env.TYPRM_TEST_PATH: \${TYPRM_TEST_PATH}
-    $env.TYPRM_TEST_ENV: $TYPRM_TEST_ENV
-    $env.{TYPRM_TEST_ENV}: $TYPRM_TEST_ENV
-spippet: #keyword:  #snippet-depth: 1
-    - ($TYPRM_TEST_ENV)  #template: ($env.{TYPRM_TEST_ENV})
-    - ($TYPRM_TEST_ENV)  #template: ($env.TYPRM_TEST_ENV)
-    - ($TYPRM_TEST_ENVIRON)  #template: ($env.TYPRM_TEST_ENVIRON)
-    - $TYPRM_TEST_ENV == $TYPRM_TEST_ENV  #template: $TYPRM_TEST_ENV == $env.TYPRM_TEST_ENV
-    - \${TYPRM_TEST_PATH}  #template: $env.TYPRM_TEST_PATH
-"
-`;
-
-exports[`checks template value >> list_to_tag_original_tag: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
-
-Warning: 0, Error: 0
-checked file count = 1, template count = 2, #to tag count = 2
-"
-`;
-
-exports[`checks template value >> list_to_tag_original_tag: sourceFileContents 1`] = `
-"settings: #settings:
-    varA: valueA1  #original: valueA0  #to: valueA2
-    varB: valueB1
-body:
-    - valueA1  #template: varA
-    - valueB1  #template: varB  #to: valueB2
-"
-`;
-
-exports[`checks template value >> list_to_tag_original_tag_in_multi_files: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: #original: varA: valueA1 => valueA0
-\${typrmProject}/src/test_data/_tmp/_tmp_2.yaml:2: #original: varA: valueA1 => valueA0
-\${typrmProject}/src/test_data/_tmp/_tmp_2.yaml:3: #original: varB1: valueB1 => value-B1
-\${typrmProject}/src/test_data/_tmp/_tmp_2.yaml:4: #original: varB2: valueB2 => value-B2
-\${typrmProject}/src/test_data/_tmp/_tmp_2.yaml:5: #original: varB3: valueB3 => value-B3
-...(Display of further original tags will be omitted)
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: #to: varA: valueA1 => valueA2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: #to: varB: valueB1 => valueB2
-\${typrmProject}/src/test_data/_tmp/_tmp_2.yaml:2: #to: varA: valueA1 => valueA2
-\${typrmProject}/src/test_data/_tmp/_tmp_2.yaml:10: #to: varB1: valueB1 => valueB2
-
-Warning: 0, Error: 0
-checked file count = 2, template count = 8, #to tag count = 4
-"
-`;
-
-exports[`checks template value >> list_to_tag_original_tag_in_multi_files: sourceFileContents 1`] = `
-"settings: #settings:
-    varA: valueA1  #original: valueA0  #to: valueA2
-    varB: valueB1
-body:
-    - valueA1  #template: varA
-    - valueB1  #template: varB  #to: valueB2
-"
-`;
-
-exports[`checks template value >> list_to_tag_original_tag_in_multi_files: sourceFileContents 2`] = `
-"settings: #settings:
-    varA: valueA1  #original: valueA0  #to: valueA2
-    varB1: valueB1  #original: value-B1
-    varB2: valueB2  #original: value-B2
-    varB3: valueB3  #original: value-B3
-    varB4: valueB4  #original: value-B4
-    varB5: valueB5  #original: value-B5
-body:
-    - valueA1  #template: varA
-    - valueB1  #template: varB1  #to: valueB2
-    - valueB2  #template: varB2
-    - valueB3  #template: varB3
-    - valueB4  #template: varB4
-    - valueB5  #template: varB5
-"
-`;
-
-exports[`checks template value >> one_error: sourceFileContents 1`] = `
-"one_error:
-    settings: #settings:
-        var: value1
-    body:
-        value2  #template: var
-"
-`;
-
-exports[`checks template value >> settings >> 1_same_values : answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 1_same_values: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 1_same_values: sourceFileContents 1`] = `
-"settings: #settings:
-    var1: value1
-    var2: value2
-    var1: value1
-    var2: value2
-value1, value2  #template: var1, var2
-"
-`;
-
-exports[`checks template value >> settings >> 2_not_same_values_error: answer 1`] = `
-"
-Error of duplicated variable name:
-  typrmFileA: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2
-  ContentsA: var1: value1
-  typrmFileB: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4
-  ContentsB: var1: value111
-
-Error of duplicated variable name:
-  typrmFileA: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:3
-  ContentsA: var2: value2
-  typrmFileB: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:5
-  ContentsB: var2: value222
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     var1: value111
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     var2: value222
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: value1, value2  #template: var1, var2
-    Warning: Not matched with the template.
-    Expected: value111, value222
-
-Warning: 1, Error: 2
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 2_not_same_values_error: sourceFileContents 1`] = `
-"settings: #settings:
-    var1: value1
-    var2: value2
-    var1: value111
-    var2: value222
-value1, value2  #template: var1, var2
-"
-`;
-
-exports[`checks template value >> settings >> 3_overwrite: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 8, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 3_overwrite: sourceFileContents 1`] = `
-"value1, value2, value3  #template: var1, var2, var3
-settings: #settings:
-    var1: value1
-    var2: value2
-    var3: value3
-value1, value2, value3  #template: var1, var2, var3
-level 1:
-    value1, value22, value33  #template: var1, var2, var3
-    settings: #settings:
-        var2: value22
-        var3: value33
-    value1, value22, value33  #template: var1, var2, var3
-    level 2:
-        value1, value22, value333  #template: var1, var2, var3
-        settings: #settings:
-            var3: value333
-        value1, value22, value333  #template: var1, var2, var3
-    value1, value22, value33  #template: var1, var2, var3
-value1, value2, value3  #template: var1, var2, var3
-"
-`;
-
-exports[`checks template value >> settings >> 3e_overwrite_error: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: .....1, .....2, .....3  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value2, value3
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: .....1, .....2, .....3  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value2, value3
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:8:     .....1, .....22, .....33  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value22, value33
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:12:     .....1, .....22, .....33  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value22, value33
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:15:         settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:16:             var3: value333
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:14:         .....1, .....22, .....333  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value22, value333
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:15:         settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:16:             var3: value333
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:17:         .....1, .....22, .....333  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value22, value333
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         var2: value22
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:11:         var3: value33
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:18:     .....1, .....22, .....33  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value22, value33
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     var2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     var3: value3
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:19: .....1, .....2, .....3  #template: var1, var2, var3
-    Warning: Not matched with the template.
-    Expected: value1, value2, value3
-
-Warning: 8, Error: 0
-checked file count = 1, template count = 8, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 3e_overwrite_error: sourceFileContents 1`] = `
-".....1, .....2, .....3  #template: var1, var2, var3
-settings: #settings:
-    var1: value1
-    var2: value2
-    var3: value3
-.....1, .....2, .....3  #template: var1, var2, var3
-level 1:
-    .....1, .....22, .....33  #template: var1, var2, var3
-    settings: #settings:
-        var2: value22
-        var3: value33
-    .....1, .....22, .....33  #template: var1, var2, var3
-    level 2:
-        .....1, .....22, .....333  #template: var1, var2, var3
-        settings: #settings:
-            var3: value333
-        .....1, .....22, .....333  #template: var1, var2, var3
-    .....1, .....22, .....33  #template: var1, var2, var3
-.....1, .....2, .....3  #template: var1, var2, var3
-"
-`;
-
-exports[`checks template value >> settings >> 4_2_neighbor_level_2_error: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:7
-    Warning: double settings are not supported.
-    First settings at: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 4_2_neighbor_level_2_error: sourceFileContents 1`] = `
-"root:
-    settings: #settings:
-        var1: value1
-        var2: value2
-        var3: value3
-    value1, value2, value3, value4  #template: var1, var2, var3, var4
-    settings: #settings:
-        var4: value4
-"
-`;
-
-exports[`checks template value >> settings >> 4_neighbor_error: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6
-    Warning: double settings are not supported.
-    First settings at: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:1
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 4_neighbor_error: sourceFileContents 1`] = `
-"settings: #settings:
-    var1: value1
-    var2: value2
-    var3: value3
-value1, value2, value3, value4  #template: var1, var2, var3, var4
-settings: #settings:
-    var4: value4
-"
-`;
-
-exports[`checks template value >> settings >> 5_check_same_as_tag: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:30:         __OperationServer__: OS
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:33:         __C_S__: Server  #// Client or Server
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:35:         __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
-    Warning: Not matched with the value referenced from same-as tag.
-    Same as: __OperationServer__
-    Expected: OS
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:36:         __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
-    Warning: Not found a variable name specified in the same-as tag.
-    Variable Name: __Unknown__
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:34:         __Other__: Host
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:37:         __Store2__: x      #same-as: __Store{$settings.__Other__}__
-    Warning: Not found a variable name specified in the same-as tag.
-    Variable Name: __StoreHost__
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:30:         __OperationServer__: OS
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:33:         __C_S__: Server  #// Client or Server
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:41:         __On__: on
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:42:         __U__: _
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:38:         __Operation3__: 0x  #same-as: __Operati{$settings.__On__}{$settings.__C_S__}{$settings.__U__}_
-    Warning: Not matched with the value referenced from same-as tag.
-    Same as: __OperationServer__
-    Expected: OS
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:39:         __Operation4__: OS  #same-as: __Operati{$settings.__On__}{$settings.__Unknown__}{$settings.__U__}_
-    Warning: Not found a variable name specified in the same-as tag.
-    Variable Name: __Unknown__
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:28:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:34:         __Other__: Host
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:41:         __On__: on
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:42:         __U__: _
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:40:         __Operation5__: xx  #same-as: __Operati{$settings.__On__}{$settings.__Other__}{$settings.__U__}_
-    Warning: Not found a variable name specified in the same-as tag.
-    Variable Name: __OperationHost__
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:49: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:51:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:54:         __Other__: Host
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:63:             __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
-    Warning: Not found a variable name specified in the same-as tag.
-    Variable Name: __OperationHost__
-
-Warning: 7, Error: 0
-checked file count = 1, template count = 8, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> 5_check_same_as_tag: sourceFileContents 1`] = `
-"1:
-    settings: #settings:
-        __OperationClient__: OC
-        __OperationServer__: OS
-        __StoreClient__: SC
-        __StoreServer__: SS
-        __C_S__: Client  #// Client or Server
-        __Operation__: OC  #same-as: __Operation{$settings.__C_S__}__
-        __Store__: SC      #same-as: __Store{$settings.__C_S__}__
-    ref:
-        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
-        OC, SC:  #template: __Operation__, __Store__
-2:
-    settings: #settings:
-        __OperationClient__: OC
-        __OperationServer__: OS
-        __StoreClient__: SC
-        __StoreServer__: SS
-        __C_S__: Server  #// Client or Server
-        __Operation__: OS  #same-as: __Operation{$settings.__C_S__}__
-        __Store__: SS      #same-as: __Store{$settings.__C_S__}__
-        __Operation3__: OS #same-as: __Operati{$settings.__On__}{$settings.__C_S__}__
-        __On__: on
-    ref:
-        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
-        OS, SS, OS:  #template: __Operation__, __Store__, __Operation3__
-error:
-    settings: #settings:
-        __OperationClient__: OC
-        __OperationServer__: OS
-        __StoreClient__: SC
-        __StoreServer__: SS
-        __C_S__: Server  #// Client or Server
-        __Other__: Host
-        __Operation__: Ox  #same-as: __Operation{$settings.__C_S__}__
-        __Store__: SS      #same-as: __Store{$settings.__Unknown__}__
-        __Store2__: x      #same-as: __Store{$settings.__Other__}__
-        __Operation3__: 0x  #same-as: __Operati{$settings.__On__}{$settings.__C_S__}{$settings.__U__}_
-        __Operation4__: OS  #same-as: __Operati{$settings.__On__}{$settings.__Unknown__}{$settings.__U__}_
-        __Operation5__: xx  #same-as: __Operati{$settings.__On__}{$settings.__Other__}{$settings.__U__}_
-        __On__: on
-        __U__: _
-    ref:
-        OC, OS, SC, SS:  #template: __OperationClient__, __OperationServer__, __StoreClient__, __StoreServer__
-        Ox, SS, x, 0x, OS, xx:  #template: __Operation__, __Store__, __Store2__, __Operation3__, __Operation4__, __Operation5__
-    child:
-        settings: #settings:
-    check to no warning:
-settings: #settings:
-with if tag:
-    settings: #settings:
-        __Type__: B
-        __C_S__: Server  #// Client or Server
-        __Other__: Host
-        #if: $settings.__Type__ == A
-            __OperationClient__: AC
-            __OperationServer__: AS
-            __Operation__: AS  #same-as: __Operation{$settings.__C_S__}__
-        #if: $settings.__Type__ == B
-            __OperationClient__: BC
-            __OperationServer__: BS
-            __Operation__: BS  #same-as: __Operation{$settings.__C_S__}__
-            __Operation2__: BS  #same-as: __Operation{$settings.__Other__}__
-    ref:
-        BC, BS:  #template: __OperationClient__, __OperationServer__
-        BS:  #template: __Operation__
-"
-`;
-
-exports[`checks template value >> settings >> b1_bug_case_no_root_settings: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 0, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> b1_bug_case_no_root_settings: sourceFileContents 1`] = `
-"body:
-    #if: true
-no indent:
-no indent:
-    settings: #settings:
-"
-`;
-
-exports[`checks template value >> settings >> b2_bug_case_nest_settings: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 6, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1`] = `
-"root:  #// b2_bug_case_nest_settings
-    1:  #// Test of 1
-        settings: #settings:
-            __Var11__: value11
-        ref:
-            value1, value11
-            #template: __Var1__, __Var11__
-    settings: #settings:
-        __Var1__: value1
-    body:  #// Test of 21
-        settings: #settings:
-            __Var12__: value12
-        sub:
-            sub:
-                settings: #settings:
-                    __Var1211__: value1211
-                ref:
-                    value1, value121, value1211
-                    #template: __Var1__, __Var121__, __Var1211__
-            settings: #settings:
-                __Var121__: value121
-root2:  #// Test of 211
-    settings: #settings:
-        __Var2__: value2
-    sub1:
-        sub1:
-            value211: #template: __Var211__
-            settings: #settings:
-                __Var211__: value211
-        sub2:
-            settings: #settings:
-                __Var212__: value212
-            sub1:
-                settings: #settings:
-                    __Var2121__: value2121
-                value2121: #template: __Var2121__
-            sub2:
-                settings: #settings:
-                    __Var2122__: value2122
-                ref:
-                    value21, value212, value2122
-                    #template: __Var21__, __Var212__, __Var2122__
-            sub3:
-                value2123: #template: __Var2123__
-                settings: #settings:
-                    __Var2123__: value2123
-        settings: #settings:
-            __Var21__: value21
-"
-`;
-
-exports[`checks template value >> settings_tree: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 4, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings_tree: sourceFileContents 1`] = `
-"settings: #settings:
-    __A__: ValueA
-    __B__: ValueB
-main:
-    settings: #settings:
-        __1A__: Value1A
-        __1B__: Value1B
-    body:
-        - "ValueA"  #template: "__A__"
-        - "ValueB"  #template: "__B__"
-        - "Value1A"  #template: "__1A__"
-        - "Value1B"  #template: "__1B__"
-"
-`;
-
-exports[`checks template value >> settings_tree_deep: answer 1`] = `
-"
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:36
-  Not referenced: __11A__
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 20, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings_tree_deep: sourceFileContents 1`] = `
-"settings: #settings:
-    __A__: ValueA
-section1:
-    settings: #settings:
-        __1A__: Value1A
-    part1:
-        ValueA:  #template: __A__
-        Value1A:  #template: __1A__
-        settings: #settings:
-            __11A__: Value11A
-        ValueA:  #template: __A__
-        Value1A:  #template: __1A__
-        Value11A:  #template: __11A__
-    part2:
-        ValueA:  #template: __A__
-        Value1A:  #template: __1A__
-        settings: #settings:
-            __11A__: Value11A_2
-            #// The next line is for the test of an empty line
-
-        ValueA:  #template: __A__
-        Value1A:  #template: __1A__
-        Value11A_2:  #template: __11A__
-    ValueA:  #template: __A__
-    Value1A:  #template: __1A__
-    __11A__:  #template: __11A__
-    deep:
-        sub:
-            sub2:
-                settings: #settings:
-                    __111A__: Value111A
-                Value111A:  #template: __111A__
-            __111A__:  #template: __111A__
-    grand parent:
-        settings: #settings:
-            __11A__: Value11A_3
-__11A__:  #template: __11A__  #// ground parent of the previous line
-__1A__-1:  #template: __1A__-1
-section2:
-    settings: #settings:
-        __1A__: Value1A_2
-    Value1A_2:  #template: __1A__
-ValueA:  #template: __A__
-__1A__-2:  #template: __1A__-2
-"
-`;
-
-exports[`checks template value >> settings_tree_error: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: BadA:  #template: __A__
-    Warning: Not matched with the template.
-    Expected: ValueA
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     BadA:  #template: __A__
-    Warning: Not matched with the template.
-    Expected: ValueA
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:7:         __1A__: Value1A
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:     Bad1A:  #template: __1A__
-    Warning: Not matched with the template.
-    Expected: Value1A
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     Bad11A:  #template: __11A__
-    Warning: Not matched with the template.
-    Expected: __11A__
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:         settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:             __11A__: Value11A
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:11:         Bad11A:  #template: __11A__
-    Warning: Not matched with the template.
-    Expected: Value11A
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:22:     __A__: ValueA
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:12:     BadA:  #template: __A__
-    Warning: Not matched with the template.
-    Expected: ValueA
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:7:         __1A__: Value1A
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:13:     Bad1A:  #template: __1A__
-    Warning: Not matched with the template.
-    Expected: Value1A
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:14:     Bad11A:  #template: __11A__
-    Warning: Not matched with the template.
-    Expected: __11A__
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:21: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:18:                 settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:19:                     __111A__: Value111A
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:20:                 Bad111A:  #template: __111A__
-    Warning: Not matched with the template.
-    Expected: Value111A
-
-Warning: 9, Error: 0
-checked file count = 1, template count = 9, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings_tree_error: sourceFileContents 1`] = `
-"BadA:  #template: __A__
-main:
-    BadA:  #template: __A__
-    Bad1A:  #template: __1A__
-    Bad11A:  #template: __11A__
-    settings: #settings:
-        __1A__: Value1A
-    sub:
-        settings: #settings:
-            __11A__: Value11A
-        Bad11A:  #template: __11A__
-    BadA:  #template: __A__
-    Bad1A:  #template: __1A__
-    Bad11A:  #template: __11A__
-    deep:
-        sub:
-            sub2:
-                settings: #settings:
-                    __111A__: Value111A
-                Bad111A:  #template: __111A__
-settings: #settings:
-    __A__: ValueA
-"
-`;
-
-exports[`checks template value >> settings_tree_if: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:26: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:15:                     __C__: ValueC
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:7:             test error  #template: __C__
-    Warning: Not matched with the template.
-    Expected: ValueC
-
-Warning: 1, Error: 0
-checked file count = 1, template count = 6, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings_tree_if: sourceFileContents 1`] = `
-"section:
-    table:
-        cell:
-            ValueA      #template: __A__
-            ValueB      #template: __B__
-            ValueC      #template: __C__
-            test error  #template: __C__
-            ValueD      #template: __D__
-            ValueE      #template: __E__
-        settings: #settings:
-            a: #if: $settings.__B__ == ValueA
-                __C__: not_used
-            b: #if: $settings.__B__ == ValueB
-                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
-                    __C__: ValueC
-                not b2: #if: $settings.__B2__ != ValueB2
-                    __C__: not_used
-                __D__: ValueD
-            not b: #if: $settings.__B__ != ValueB
-                b2: #if: $settings.__B2__ == ValueB2  #// nested if tag
-                    __C__: not_used
-                not b2: #if: $settings.__B2__ != ValueB2
-                    __C__: not_used
-                __D__: not_used
-            __E__: ValueE
-settings: #settings:
-    a: #if: $settings.__A__ == bad
-        __B__: not_used
-    b: #if: $settings.__A__ != bad
-        __B__: ValueB
-    __A__: ValueA
-    __B2__: ValueB2
-"
-`;
-
-exports[`checks template value >> settings_tree_if_disable: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:         variable2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5: val__ue2: #template: variable2
-    Warning: Not matched with the template.
-    Expected: value2
-
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2
-  Not referenced: variable1
-
-Warning: 2, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings_tree_if_disable: sourceFileContents 1`] = `
-"settings: #settings:
-    variable1: value1
-    #if: var1 != value1  #disable-tag-tool:
-        variable2: value2
-val__ue2: #template: variable2
-"
-`;
-
-exports[`checks template value >> settings_tree_position: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 5, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> settings_tree_position: sourceFileContents 1`] = `
-"ValueA:  #template: __A__
-main1:
-    ValueA:  #template: __A__
-    Value1A:  #template: __1A__
-    settings: #settings:
-        __1A__: Value1A
-    ValueA:  #template: __A__
-    Value1A:  #template: __1A__
-settings: #settings:
-    __A__: ValueA
-"
-`;
-
-exports[`checks template value >> template_if_1_error: answer 1`] = `
-"
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: develop
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:     🌟 case product:  #template-if: $settings.__Stage__ == product
-    Warning: Not matched with the template.
-    Expected: 💤
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: 設定: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     __Stage__: develop
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:7:     💤 case product:  #template-if: $settings.__Stage__ == develop
-    Warning: Not matched with the template.
-    Expected: 🌟
-
-Warning: 2, Error: 0
-checked file count = 1, template count = 4, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> template_if_1_error: sourceFileContents 1`] = `
-"設定: #settings:
-    __Stage__: develop
-    template-if(yes): 🌟
-    template-if(no):  💤
-手順:
-    🌟 case product:  #template-if: $settings.__Stage__ == product
-    💤 case product:  #template-if: $settings.__Stage__ == develop
-    💤 case product:  #template-if: $settings.__Stage__ == product  #comment
-    🌟 case product:  #template-if: $settings.__Stage__ == develop  #comment
-"
-`;
-
-exports[`checks template value >> template_if_2_referenced_one_side: answer 1`] = `
-"
-Warning: 0, Error: 0
-checked file count = 1, template count = 1, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> template_if_2_referenced_one_side: sourceFileContents 1`] = `
-"設定: #settings:
-    __Stage__: develop
-    template-if(yes): Do
-    template-if(no):  skip
-手順:
-    Do case product:  #template-if: $settings.__Stage__ == develop
-"
-`;
-
-exports[`checks template value >> var_not_ref_1_error: answer 1`] = `
-"
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:3
-  Not referenced: key1
-
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6
-  Not referenced: Key3
-
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:13
-  Not referenced: key1
-
-Warning: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:14
-  Not referenced: __Key2__
-
-Warning: 4, Error: 0
-checked file count = 1, template count = 3, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> var_not_ref_1_error: sourceFileContents 1`] = `
-"A:
-    設定: #settings:
-        key1: value1
-        __Key2__: value2  #コメント
-            #コメント
-        Key3: value3
-
-    手順:
-        - echo  "value2"
-            #template: - echo  "__Key2__"
-B:
-    設定: #settings:
-        key1: value11
-        __Key2__: value2
-        Key3: value3
-    手順: |
-        - echo  "value3"  #template: - echo  "Key3"
-case that the name is same as the value:
-    設定: #settings:
-        keyValue: keyValue
-    手順:
-        keyValue  #template: keyValue
-"
-`;
-
-exports[`checks template value >> verbose: answer 1`] = `
-"Verbose: typrm command: check
-Verbose: Phase 1: parse settings ...  \${typrmProject}/src/test_data/_tmp/_tmp.yaml
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: #settings:  #// currentSettingIndex: /1
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  #// currentSettingIndex: /1/a
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:5: end #if:  #// currentSettingIndex: /1/a
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  #// currentSettingIndex: /1/b
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:7:     var2: not value2
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:7: end #if:  #// currentSettingIndex: /1/b
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  #// currentSettingIndex: /1/c
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:10: end #if:  #// currentSettingIndex: /1/c
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  #// currentSettingIndex: /1/d
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:12: end #if:  #// currentSettingIndex: /1/d
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV2 == testEnv  #// currentSettingIndex: /1/e
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:14: end #if:  #// currentSettingIndex: /1/e
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV2 != testEnv  #// currentSettingIndex: /1/f
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:16: end #if:  #// currentSettingIndex: /1/f
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:17: #if: true  #// currentSettingIndex: /1/g
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:18: end #if:  #// currentSettingIndex: /1/g
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:19: #if: false  #// currentSettingIndex: /1/h
-Verbose: settings tree:
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4:         settings /1/a define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6:         settings /1/b define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:8: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:         settings /1 define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:9: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:9:         settings /1/c define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:11: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:11:         settings /1/d define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:13: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:13:         settings /1/e define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:15: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:15:         settings /1/f define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:17: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:17:         settings /1/g define
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:19: scope start
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:19:         settings /1/h define
-Verbose: variables:
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:2: settings /1
-        Verbose: var1: value1
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4: settings /1/a
-        Verbose: var2: value2
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: settings /1/b
-        Verbose: var2: not value2
-    Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:0: settings /
-Verbose: Phase 2: parse \\"original\\" tags ...
-    Verbose: settings \\"/1\\"
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:1: settings: \\"/1\\"
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:     var1: value1
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:     var2: value2
-Verbose: Phase 2: parse \\"#to:\\" tags ...
-Verbose: to tag tree:
-    Verbose: replaceTo:
-        Verbose: settings \\"/\\":
-        Verbose: settings \\"/1\\":
-        Verbose: settings \\"/1/a\\":
-        Verbose: settings \\"/1/b\\":
-        Verbose: settings \\"/1/c\\":
-        Verbose: settings \\"/1/d\\":
-        Verbose: settings \\"/1/e\\":
-        Verbose: settings \\"/1/f\\":
-        Verbose: settings \\"/1/g\\":
-        Verbose: settings \\"/1/h\\":
-    Verbose: outOfFalseBlocks:
-Verbose: Phase 3: check ...
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:4: #if: $settings.var1 == value1  (true, var1 = value1)
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:5: end #if:
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:6: #if: $settings.var1 != value1  (false, var1 = value1)
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:7: end #if:
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:3:         var1: value1
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:8:     bad  #template: var1
-    Warning: Not matched with the template.
-    Expected: value1
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:9: #if: $settings.var2 == value2  (true, var2 = value2)
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:10:         bad2  #template: var2
-    Warning: Not matched with the template.
-    Expected: value2
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:10: end #if:
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:11: #if: $settings.var2 != value2  (false, var2 = value2)
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:12: end #if:
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:13: #if: $env.TYPRM_TEST_ENV2 == testEnv  (true, TYPRM_TEST_ENV2 = testEnv)
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:14:         bad2  #template: var2
-    Warning: Not matched with the template.
-    Expected: value2
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:14: end #if:
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:15: #if: $env.TYPRM_TEST_ENV2 != testEnv  (false, TYPRM_TEST_ENV2 = testEnv)
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:16: end #if:
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:17: #if: true
-
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:2:     settings: #settings:
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:5:             var2: value2
-\${typrmProject}/src/test_data/_tmp/_tmp.yaml:18:         bad2  #template: var2
-    Warning: Not matched with the template.
-    Expected: value2
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:18: end #if:
-        Verbose: \${typrmProject}/src/test_data/_tmp/_tmp.yaml:19: #if: false
-
-Warning: 4, Error: 0
-checked file count = 1, template count = 7, #to tag count = 0
-"
-`;
-
-exports[`checks template value >> verbose: sourceFileContents 1`] = `
-"check_verbose:
-    settings: #settings:
-        var1: value1
-        #if: $settings.var1 == value1
-            var2: value2
-        #if: $settings.var1 != value1
-            var2: not value2
-    bad  #template: var1
-    #if: $settings.var2 == value2
-        bad2  #template: var2
-    #if: $settings.var2 != value2
-        bad2  #template: var2
-    #if: $env.TYPRM_TEST_ENV2 == testEnv
-        bad2  #template: var2
-    #if: $env.TYPRM_TEST_ENV2 != testEnv
-        bad2  #template: var2
-    #if: true
-        bad2  #template: var2
-    #if: false
-        bad2  #template: var2
 "
 `;
 

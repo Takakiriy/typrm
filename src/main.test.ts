@@ -188,11 +188,11 @@ describe("checks >> template value >>", () => {
         ["settings_tree_error", {}],
 
     ])("%s", async (caseName, options) => {
-        initializeTestInputFile(`checks template value >> ${caseName}: sourceFileContents 1`);
+        initializeTestInputFile(`checks >> template value >> ${caseName}: sourceFileContents 1`);
         if ('multiFiles' in options) {
             chdirInProject('src');
             writeFileSync(`${testFolderPath}_tmp/_tmp_2.yaml`,
-                lib.getSnapshot(`checks template value >> ${caseName}: sourceFileContents 2`));
+                lib.getSnapshot(`checks >> template value >> ${caseName}: sourceFileContents 2`));
         }
         process.chdir('empty_folder');
 
@@ -206,7 +206,7 @@ describe("checks >> template value >>", () => {
     });
 
     test("check one file only", async () => {
-        initializeTestInputFile(`checks template value >> 1_template_1_ok: sourceFileContents 1`);
+        initializeTestInputFile(`checks >> template value >> 1_template_1_ok: sourceFileContents 1`);
         process.chdir('empty_folder');
 
         await callMain(["check", "_tmp/_tmp.yaml"], {
@@ -229,7 +229,7 @@ describe("checks >> template value >>", () => {
             ],
         ])("%s", async (_caseName, currentFolder, command) => {
             chdirInProject('src');
-            const  sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
+            const  sourceFileContents = lib.getSnapshot(`checks >> template value >> one_error: sourceFileContents 1`);
             lib.rmdirSync(testFolderPath + '_checking');
             writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
             writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
@@ -257,10 +257,11 @@ describe("checks >> template value >>", () => {
             ["5_check_same_as_tag"],
             ["b1_bug_case_no_root_settings"],
             ["b2_bug_case_nest_settings"],
+            ["b3_bug_case_if_normal_if"],  // Test of insertParentIndexNum(firstShiftingIndex: '/1')
             // There are other settings tests in "unit test >>"
 
         ])("%s", async (caseName) => {
-            initializeTestInputFile(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
+            initializeTestInputFile(`checks >> template value >> settings >> ${caseName}: sourceFileContents 1`);
 
             await callMain(["check", "_tmp/_tmp.yaml"], {
                 folder: 'test_data', test: "", locale: "en-US",
@@ -272,7 +273,7 @@ describe("checks >> template value >>", () => {
     });
 
     test("verbose", async () => {
-        initializeTestInputFile(`checks template value >> verbose: sourceFileContents 1`);
+        initializeTestInputFile(`checks >> template value >> verbose: sourceFileContents 1`);
         process.chdir('empty_folder');
 
         await callMain(["check", "_tmp/_tmp.yaml"], {
@@ -2088,7 +2089,7 @@ describe("unit test >>", () => {
             ["1st", { sameInput: "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1"}],
             ["bug_case", {}],
             ["if_and_no_indent", {}],
-            ["below_shallow_settings", { sameInput: "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"}],
+            ["below_shallow_settings", { sameInput: "checks >> template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1"}],
             ["bug_case_2", {}],
             ["bug_case_3", { checkSettings: true }],
             ["bug_case_4", {}],
