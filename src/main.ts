@@ -4962,9 +4962,6 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
         if (debugSearchScore) {
             console.log(`searchWithoutTags: ${inputFileFullPath}`);
         }
-        if (fullMatchCount >= foundCountSystemMax) {
-            break;
-        }
         const  reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -4978,10 +4975,6 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
             try {
                 const  line: string = line1;
                 lineNum += 1;
-                if (fullMatchCount >= foundCountSystemMax) {
-                    breaking = true
-                    continue;
-                }
                 if (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart)) {
                     lib.pp(`#breadcrumb: in searchWithoutTags`);
                 }
@@ -5030,17 +5023,14 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
 
                 // shuffled keywords match
                 else {
-                    if (matchCount < foundCountSystemMax) {
-
-                        var  keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
-                        if (keywordIndex !== notFound) {
-                            const  found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
-                            foundLines.push(found);
-                            matchCount += 1;
-                            BenchmarkCounters.searchWithoutTagsHitCount += 1;
-                            if (debugSearchScore) {
-                                console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
-                            }
+                    var  keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
+                    if (keywordIndex !== notFound) {
+                        const  found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
+                        foundLines.push(found);
+                        matchCount += 1;
+                        BenchmarkCounters.searchWithoutTagsHitCount += 1;
+                        if (debugSearchScore) {
+                            console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
                         }
                     }
                 }
@@ -8463,7 +8453,6 @@ const  notSearchedInFile = 0;
 const  notFoundInFile = -2;
 const  notFound = -1;
 const  jpsp = String.fromCodePoint(0x3000);  // Japanese space
-const  foundCountSystemMax = 100;
 var    inputFileParentPath = '';
 var    locale = '';
 var    withJest = false;

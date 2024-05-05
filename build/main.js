@@ -3013,6 +3013,7 @@ async function search() {
 }
 async function searchSubFaster(keyword, now) {
     // This function is almost same as "searchSub" function.
+    // This function test is #search: search_fast
     const thesaurus = new Thesaurus();
     var searchWordWithoutTag = getSearchWordWithoutTag(keyword);
     const fileFullPaths = await listUpFilePaths();
@@ -3525,7 +3526,7 @@ async function searchSub(keyword, now, isMutual) {
     //     if (a && b) {
     //         var  compare = compareScoreAndSoOn(a, b);  // Set break point here
     //     }
-    // }/
+    // }
     if (thesaurus.errorMessage) {
         console.log(thesaurus.errorMessage);
     }
@@ -4690,9 +4691,6 @@ async function searchWithoutTags(keywords) {
         if (debugSearchScore) {
             console.log(`searchWithoutTags: ${inputFileFullPath}`);
         }
-        if (fullMatchCount >= foundCountSystemMax) {
-            break;
-        }
         const reader = readline.createInterface({
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
@@ -4707,10 +4705,6 @@ async function searchWithoutTags(keywords) {
             try {
                 const line = line1;
                 lineNum += 1;
-                if (fullMatchCount >= foundCountSystemMax) {
-                    breaking = true;
-                    continue;
-                }
                 if (lineNum === debugPointLineNum && inputFileFullPath.includes(debugFilePathPart)) {
                     lib.pp(`#breadcrumb: in searchWithoutTags`);
                 }
@@ -4756,16 +4750,14 @@ async function searchWithoutTags(keywords) {
                 }
                 // shuffled keywords match
                 else {
-                    if (matchCount < foundCountSystemMax) {
-                        var keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
-                        if (keywordIndex !== notFound) {
-                            const found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
-                            foundLines.push(found);
-                            matchCount += 1;
-                            BenchmarkCounters.searchWithoutTagsHitCount += 1;
-                            if (debugSearchScore) {
-                                console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
-                            }
+                    var keywordIndex = line.toLowerCase().indexOf(keyword1PartLowerCase);
+                    if (keywordIndex !== notFound) {
+                        const found = getKeywordMatchingScoreWithoutTags(inputFileFullPath, line, lineNum, keywordsParticples, thesaurus);
+                        foundLines.push(found);
+                        matchCount += 1;
+                        BenchmarkCounters.searchWithoutTagsHitCount += 1;
+                        if (debugSearchScore) {
+                            console.log(`    searchWithoutTags(shuffled match): ${found.score}, ${line}`);
                         }
                     }
                 }
@@ -7740,7 +7732,6 @@ const notSearchedInFile = 0;
 const notFoundInFile = -2;
 const notFound = -1;
 const jpsp = String.fromCodePoint(0x3000); // Japanese space
-const foundCountSystemMax = 100;
 var inputFileParentPath = '';
 var locale = '';
 var withJest = false;
