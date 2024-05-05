@@ -1,5 +1,10 @@
 #keyword: typrm specifications
 command: #keyword: typrm command list
+    option:
+        programOptions:
+            # commander.program.version(
+            #     .option("-d, --folder <>", "The root path of searching folder",  process.env.TYPRM_FOLDER)
+            # Object.assign(main.programOptions, commander.program.opts());
     search:  #keyword: typrm search  #focus: getSubMatchedScore, toString
         test:
             keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword tag >>"
@@ -159,7 +164,8 @@ tag: #keyword: typrm tags
                 2_replace_9_template_if_1_OK
 test:
     test command:
-        npm test  #ref: ./README.md  #ref: ./README-jp.md
+        - npm test  #ref: ./README.md  #ref: ./README-jp.md
+        - Build and basic test in ".vscode/launch.json"
     test:  #// 機能からテストを探す場合
         #search: typrm command list
         #search: typrm tags
@@ -250,6 +256,9 @@ debug:
             $ code __Project__
             Select "__LaunchName__" in "Run and Debug" view
             Press F5 key
+    at start:
+        - #// Error [ERR_MODULE_NOT_FOUND]: Cannot find module '____\typrm\build\main' imported from ____\typrm\build\typrm.js
+            Run "Build and basic test". It runs "src/support_node.cjs".
     functions:  #// typrm functions debug
         Search function debug points:
             How to use:

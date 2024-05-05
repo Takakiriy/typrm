@@ -98,14 +98,16 @@ describe("typrm shell >>", () => {
             ['search_mode', 'test_data/search/1', 'ABC\nexit()\n', ''],
             ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n', ''],
             ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', ''],
+            ['search_fast_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', ''],
             ['snippet_depth_1', 'test_data/search/2', 'snippet_depth_1\nexit()\n', ''],
             ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n', ''],
             ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n', ''],
             ['snippet_environment_variable', 'test_data/search/2', 'snippet_environment_variable\nexit()\n', '-' + testingOS],
         ])("%s", async (caseName, folder, input, snapshotTag) => {
             chdirInProject('src');
-            var  typrmOptions: {folder: string, test?: string, locale: string, input: string} = {
+            var  typrmOptions: {folder: string, test?: string, locale: string, input: string, fast: string} = {
                 folder, test: "", locale: "en-US", input,
+                fast: (caseName.includes('search_fast')) ? "true" : "",
             };
             const  normalCase = (caseName !== 'snippet_environment_variable');
             if (normalCase) {
@@ -813,6 +815,33 @@ describe("replaces >> in copy tag >>", () => {
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         expect(main.stdout).toMatchSnapshot('stdout');
         lib.rmdirSync(testFolderPath + '_tmp');
+    });
+});
+
+describe("search_fast >> keyword tag >>", () => {
+    test.each([
+        [   "1st",
+            ["search", "ABC"],
+            { folder: "test_data/search/1", disableFindAll: '', test: "", fast: "" },
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+        ],[ "words order score",
+            ["search", "aaa bbb"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "", fast: "" },
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')} xxx\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')}\n`,
+        ],
+        // Other related test can be found by searching "search_fast".
+    ])("%s", async (caseName, arguments_, options, answer) => {
+        const  isWindowsEnvironment = (path.sep === '\\');
+        const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
+        if ( ! isWindowsEnvironment && isWindowsCase) {
+            return;
+        }
+
+        await  callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
     });
 });
 
@@ -1826,10 +1855,23 @@ describe("print reference >>", () => {
                 {commandFolder: ".", locale: "en-US", test: ""},
                 `{ref: ${projectPathLinux}/README.md, windowsRef: ${projectPathWindows}\\README.md, file: ${projectPathLinux}/README.md, windowsFile: ${projectPathWindows}\\README.md, existingAddress: ${projectPathLinux}/README.md, windowsExistingAddress: ${projectPathWindows}\\README.md, fragment: , lineNum: 0}\n`,
 
-            ],[ "verb fragment",
-                ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.html#example`, "7"],  // 7 is echo command by "TYPRM_VERB"
-                {commandFolder: ".", locale: "en-US", test: ""},
-                `{ref: ${projectPathLinux}/src/test_data/verb/test.html#example, windowsRef: ${projectPathWindows}\\src\\test_data\\verb\\test.html#example, file: ${projectPathLinux}/src/test_data/verb/test.html, windowsFile: ${projectPathWindows}\\src\\test_data\\verb\\test.html, existingAddress: ${projectPathLinux}/src/test_data/verb/test.html, windowsExistingAddress: ${projectPathWindows}\\src\\test_data\\verb\\test.html, fragment: example, lineNum: 0}\n`,
+            ],[ "verb of not ref tag search",  // Target text is same as "emphasize search and ref tag" test
+                ["search", "picture"],
+                {commandFolder: ".", folder: "test_data/search/2", disableFindAll: '', locale: "en-US", test: ""},
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
+                `\n` +
+                `ERROR: not found a file or folder at "${path.sep}path"\n` +
+                process.env.HOME + `\n` +
+                `    0.Folder\n`,
+
+            ],[ "verb of not ref tag search_fast",  // Target text is same as "emphasize search and ref tag" test
+                ["search", "picture"],
+                {commandFolder: ".", folder: "test_data/search/2", disableFindAll: '', locale: "en-US", test: "", fast: "true"},
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
+                `\n` +
+                chalk.gray(`ERROR: not found a file or folder at "${path.sep}path"`) +`\n`+
+                chalk.gray(process.env.HOME) +`\n`+
+                chalk.gray(`    0.Folder`) +`\n`,
 
             ],[ "verb line num",
                 ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.md#document`, "7"],  // 7 is echo command by "TYPRM_VERB"

@@ -1,6 +1,6 @@
 import * as commander from 'commander';
-import * as main from './main';
-import * as lib from './lib';
+import * as main from './main.js';
+import * as lib from './lib.js';
 function exitFromCommander(e) {
     if (e.code !== 'commander.version') {
         console.log(e.message);
@@ -9,6 +9,7 @@ function exitFromCommander(e) {
 async function callMain() {
     commander.program.version('1.4.0') // previous revision of new features, update package.json, commit and add git tag
         .exitOverride(exitFromCommander)
+        .option("-f, --fast")
         .option("-l, --locale <s>")
         .option("-t, --test")
         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)

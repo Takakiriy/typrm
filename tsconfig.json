@@ -13,5 +13,5 @@
     "sourceMap": true,
     "outDir": "build"
   },
-  "exclude": ["src/test_data"]
+  "exclude": ["src/test_data", "node_modules", "build"]
 }

@@ -210,6 +210,7 @@ declare class FoundLine {
     constructor();
     get targetWordCountForCompare(): number;
     get notMatchedTargetWordCount(): number;
+    get isMissedAlarm(): boolean;
     getString(): string;
     evaluateSnippetDepthTag(line: string): void;
     isSnippetOver(line: string): boolean;
@@ -258,7 +259,7 @@ declare class FoundCounts {
     get partMatchedGlossaryHeaderCount(): number;
 }
 declare type WordType = 'strict' | 'normalized';
-declare type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'parent' | 'withoutTags';
+declare type SearchTargetTagType = 'keyword' | 'glossary' | 'glossaryHeader' | 'search' | 'alarm' | 'parent' | 'withoutTags';
 declare type MatchedWordType = 'super' | // Same letters
 'wordOrIdiom' | // Space separated same letters and participles
 'wordOrIdiomWord' | // Separator speparated same letters and participles

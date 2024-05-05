@@ -3074,14 +3074,16 @@ async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
     const  now = new Date();
-    enum Command { search, alarm, openDocument, printRef, runVerb, check, replace, reset, mutualSearch, shellCommand };
+    enum Command { search, searchFaster, alarm, openDocument, printRef, runVerb, check, replace, reset, mutualSearch, shellCommand };
 
     if (keyword !== '') {
         const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
         const  hasVerb = numberRegularExpression.test(lastWord);
 
         var  command = Command.search;
-        if (hasRefTag(keyword)) {
+        if (programOptions.fast) {
+            command = Command.searchFaster
+        } else if (hasRefTag(keyword)) {
             if (hasVerb) {
                 command = Command.runVerb;
             } else {
@@ -3093,7 +3095,10 @@ async function  search() {
             command = Command.mutualSearch;
         }
 
-        if (command === Command.search) {
+        if (command === Command.searchFaster) {
+
+            await  searchSubFaster(keyword, now);
+        } else if (command === Command.search) {
 
             await  searchSub(keyword, now, false);
         } else if (command === Command.alarm) {
@@ -3148,6 +3153,9 @@ async function  search() {
 
                 if (command === Command.search) {
 
+                    if (programOptions.fast) {
+                        await  searchSubFaster(keyword, now);
+                    }
                     previousPrint = await searchSub(keyword, now, false);
                 } else if (command === Command.alarm) {
                     await searchSub(cutTag(keyword), lib.newDateLoosely( keyword.replace(alarmLabel, '').trim()  ||  '9999-99-99' ), false);
@@ -3193,6 +3201,197 @@ async function  search() {
     }
 }
 
+async function  searchSubFaster(keyword: string, now: Date): Promise<PrintRefResult> {
+    // This function is almost same as "searchSub" function.
+    // This function test is #search: search_fast
+    const  thesaurus = new Thesaurus();
+    var    searchWordWithoutTag = getSearchWordWithoutTag(keyword);
+    const  fileFullPaths: string[] = await listUpFilePaths();
+    var    foundLines: FoundLine[] = [];
+    const  searchWordParticples = newParticplesFromKeyphrase(searchWordWithoutTag, thesaurus);
+
+    // search
+    for (const inputFileFullPath of fileFullPaths) {
+        timeTag && lib.time.start(`searchSub >> ${inputFileFullPath}`);
+        const  reader = readline.createInterface({
+            input: fs.createReadStream(inputFileFullPath),
+            crlfDelay: Infinity
+        });
+        const  blockDisable = new BlockDisableTagParser();
+        const  snippetScaning: FoundLine[] = [];
+        var  lineNum = 0;
+
+        for await (const line1 of reader) {
+            const  line: string = line1;
+            lineNum += 1;
+            blockDisable.evaluate(line);
+            const  indexOfKeywordLabel = line.indexOf(keywordLabel);
+
+            // keyword tag
+            if ((indexOfKeywordLabel !== notFound)
+                    &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
+                timeTag && lib.time.start(`searchSub >> keyword >> ${inputFileFullPath}`);
+                var  label = keywordLabel;
+                var  indexOfLabel = indexOfKeywordLabel;
+                var  labelLength = keywordLabel.length;
+                var  targetTagType: SearchTargetTagType = 'keyword';
+
+                var  csv = getTagValue(line, indexOfLabel + labelLength);  // keywords, target words
+                if (csv !== '') {
+                    var  withParameter = true;
+                } else {
+                    var  withParameter = false;
+                    csv = parseKeyName(line);  // Keywords at the left of keyword tag
+                }
+                const  columns = await lib.parseCSVColumns(csv)
+                    .catch((e: Error) => {
+                        console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
+                        return [];
+                    });
+                const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
+                if (inDebuggingLine) {  // debugPointLineNum
+                    lib.pp(`#breadcrumb: keyword tag block in searchSub`);
+                    lib.pp(`#breadcrumb: calling getKeywordMatchingScore line:${lineNum}: ${line}`);
+                }
+
+                let  found = getKeywordMatchingScore({
+                    targetTagType,
+                    glossaryTitleLength: 0,
+                    targetStrings: columns,
+                    filePath: inputFileFullPath,
+                    searchWordParticples,  thesaurus, lineNum});
+                if (inDebuggingLine) {  // debugPointLineNum
+                    lib.pp(`#breadcrumb: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
+                    lib.pp(`#breadcrumb: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
+                }
+                if (found.counts.matchedSearchKeywordCount >= 1) {
+                    const  unescapedLine = unescapePercentByte(line);
+                    if (withParameter) {
+                        var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
+                    } else {
+                        var  positionOfCSV = unescapedLine.indexOf(csv);
+                    }
+
+                    BenchmarkCounters.keywordHitCount += 1;
+                    found.score += keywordMatchScore;
+                    found.path = inputFileFullPath;
+                    found.lineNum = lineNum;
+                    found.line = unescapedLine;
+                    found.indentLength = indentRegularExpression.exec(line)![0].length;
+                    for (const match of found.matches) {
+                        match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
+                        // match.normalizedPosition += positionOfCSV + columnPositions[match.targetWordsIndex];
+                    }
+                    for (let i=0; i < columnPositions.length; i += 1) {
+                        if (i < columnPositions.length - 1) {
+                            var  rightPosition = csv.lastIndexOf(',', columnPositions[i+1]);
+                        } else {
+                            var  rightPosition = csv.length;
+                        }
+                        found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
+                    }
+                    found.evaluateSnippetDepthTag(line);
+                    timeTag && lib.time.start(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
+                    // found.plusParentMatchScore(lines, searchWordParticples, thesaurus);
+                    timeTag && lib.time.end(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
+                    foundLines.push(found);
+                    snippetScaning.push(found);
+                }
+                timeTag && lib.time.end(`searchSub >> keyword >> ${inputFileFullPath}`);
+            }
+
+            // found.snippet = ...
+            if (snippetScaning.length >= 1) {
+                if ('disableSnippet' in programOptions) {
+                    snippetScaning.length = 0;
+                } else {
+                    const  endsOfSnippets: FoundLine[] = [];
+                    for (const found of snippetScaning) {
+                        if (lineNum > found.lineNum) {
+                            var  endOfSnippet = false;
+                            if ( ! found.isSnippetOver(line)) {
+                                if (found.snippetDepth >= 1  ||  found.snippet.length < parseInt(programOptions.snippetLineCount)) {
+                                    var  snippetLine = line.substring(found.indentLength);
+
+                                    found.snippet.push(snippetLine);
+                                } else {
+                                    found.snippet.pop();
+                                    found.snippet.push('    ....');
+                                    endOfSnippet = true;
+                                }
+                            } else {
+                                endOfSnippet = true;
+                            }
+                            if (endOfSnippet) {
+                                endsOfSnippets.push(found);
+                            }
+                        }
+                    }
+                    for (const removingFound of endsOfSnippets.reverse()) {
+                        snippetScaning.splice(snippetScaning.indexOf(removingFound), 1);
+                    }
+                }
+            }
+        }
+        timeTag && lib.time.end(`searchSub >> ${inputFileFullPath}`);
+    }
+    const  maximumHitWordCount = foundLines.reduce((previous, found) => (
+        Math.max(previous, found.counts.matchedSearchKeywordCount)
+    ), 0);
+
+    foundLines = foundLines.filter((found) =>
+        (found.counts.matchedSearchKeywordCount === maximumHitWordCount)  ||
+        found.matches[0].targetTagType === 'alarm');
+    foundLines.sort(compareScoreAndSoOn);
+
+    // console.log(foundLineInformation)
+    const  foundCountMax = parseInt(programOptions.foundCountMax);
+    if (foundLines.length > foundCountMax) {
+        console.log(`... (` + translate(`To show more result, restart typrm with --found-count-max option`) + ')');
+        var  startFoundIndex = foundLines.length - foundCountMax;
+    } else {
+        var  startFoundIndex = 0;
+    }
+    var  foundCount = 0;
+    for (const foundLineInformation of foundLines) {
+        if (foundCount >= startFoundIndex) {
+
+            console.log(foundLineInformation.getString());
+        }
+        foundCount += 1;
+    }
+
+    // console.log(snippet)
+    if (foundLines.length >= 1  &&  foundLines[foundLines.length - 1].snippet.length >= 1) {
+        const  found = foundLines[foundLines.length - 1];
+        const  snippet = (await evaluateEnvironmentVariable(found.snippet, found.path, found.lineNum)).join('\n');
+        const  snippetColor = chalk.rgb(144,144,160);
+
+        console.log(snippetColor(snippet));
+    }
+
+    // printRef
+    if (foundLines.length >= 1  &&  lastOf(foundLines).line.includes(refLabel)) {
+        const  foundLine = lastOf(foundLines).line;
+        const  refTagPosition = foundLine.indexOf(refLabel);
+        const  nextTagPosition = foundLine.indexOf(' #', refTagPosition + 1);
+        if (nextTagPosition === notFound) {
+            var  refTagAndAddress = foundLine.substring(refTagPosition);
+        } else {
+            var  refTagAndAddress = foundLine.substring(refTagPosition,  nextTagPosition);
+        }
+
+        const  verbReturn = await printRef(refTagAndAddress, {print: true, gray: true});
+        verbReturn.foundLines = foundLines;
+        timeTag && lib.time.end(`searchSub`);
+        return  verbReturn;
+    } else {
+        const  normalReturn = getEmptyOfPrintRefResult();
+        timeTag && lib.time.end(`searchSub`);
+        return  normalReturn;
+    }
+}
+
 async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promise<PrintRefResult> {
     timeTag = ('verbose' in programOptions);
     BenchmarkCounters.reset();
@@ -3221,39 +3420,7 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
 
     keyword = lib.splitIdioms(keyword, thesaurus.getWords());
 
-    // keywordWithoutTag = ...
-    var    searchWordWithoutTag = '';
-    const  searchTagIndex = tagIndexOf(keyword, searchLabel);
-    var    foundTag = false;
-    if (searchTagIndex !== notFound) {
-
-        searchWordWithoutTag = getTagValue(keyword, searchTagIndex + searchLabel.length);
-        foundTag = true;
-    } else {
-        const  keywordTagIndex = tagIndexOf(keyword, keywordLabel);
-        if (keywordTagIndex !== notFound) {
-        
-            searchWordWithoutTag = getTagValue(keyword, keywordTagIndex + keywordLabel.length);
-            foundTag = true;
-        }
-    }
-    if (foundTag) {
-        if (searchWordWithoutTag === '') {
-            const  colonIndex = keyword.indexOf(':');
-            if (colonIndex !== notFound) {
-                searchWordWithoutTag = keyword.substring(0, colonIndex);
-                if (searchWordWithoutTag.startsWith('- ')) {
-                    searchWordWithoutTag = searchWordWithoutTag.substring(2);
-                }
-            } else {
-                searchWordWithoutTag = '';
-            }
-        }
-    } else {
-        var  searchWordWithoutTag = keyword;
-    }
-
-    // ...
+    var    searchWordWithoutTag = getSearchWordWithoutTag(keyword);
     const  fileFullPaths: string[] = await listUpFilePaths();
     var    foundLines: FoundLine[] = [];
     const  searchWordParticples = newParticplesFromKeyphrase(searchWordWithoutTag, thesaurus);
@@ -3548,7 +3715,6 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
         Math.max(previous, found.counts.matchedSearchKeywordCount)
     ), 0);
 
-    // searchWithoutTags (find all)
     foundLines = foundLines.filter((found) =>
         (found.counts.matchedSearchKeywordCount === maximumHitWordCount)  ||
         found.matches[0].targetTagType === 'alarm');
@@ -3558,6 +3724,8 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
         const  foundLine = foundLines.find((found)=>(found.lineNum === debugPointLineNum  &&  found.path.includes(debugFilePathPart)));
         lib.pp(`#breadcrumb: there is ${foundLine ? '' : 'NOT '}found data.`);
     }
+
+    // searchWithoutTags (find all)
     if ( ! ('disableFindAll' in programOptions)  &&  ! isMutual) {
         timeTag && lib.time.start(`searchSub >> searchWithoutTags`);
 
@@ -3586,6 +3754,9 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
 
     if (thesaurus.errorMessage) {
         console.log(thesaurus.errorMessage);
+    }
+    if (programOptions.fast) {
+        console.log("and more full searching...");
     }
 
     // console.log(foundLineInformation)
@@ -3638,6 +3809,40 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
         timeTag && lib.time.end(`searchSub`);
         return  normalReturn;
     }
+}
+
+function  getSearchWordWithoutTag(keyword: string): string {
+    var    searchWordWithoutTag = '';
+    const  searchTagIndex = tagIndexOf(keyword, searchLabel);
+    var    foundTag = false;
+    if (searchTagIndex !== notFound) {
+
+        searchWordWithoutTag = getTagValue(keyword, searchTagIndex + searchLabel.length);
+        foundTag = true;
+    } else {
+        const  keywordTagIndex = tagIndexOf(keyword, keywordLabel);
+        if (keywordTagIndex !== notFound) {
+        
+            searchWordWithoutTag = getTagValue(keyword, keywordTagIndex + keywordLabel.length);
+            foundTag = true;
+        }
+    }
+    if (foundTag) {
+        if (searchWordWithoutTag === '') {
+            const  colonIndex = keyword.indexOf(':');
+            if (colonIndex !== notFound) {
+                searchWordWithoutTag = keyword.substring(0, colonIndex);
+                if (searchWordWithoutTag.startsWith('- ')) {
+                    searchWordWithoutTag = searchWordWithoutTag.substring(2);
+                }
+            } else {
+                searchWordWithoutTag = '';
+            }
+        }
+    } else {
+        var  searchWordWithoutTag = keyword;
+    }
+    return  searchWordWithoutTag;
 }
 
 function  getKeywordMatchingScore(arg: GetKeywordMatchingScore.Arguments): FoundLine {
@@ -4733,7 +4938,6 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
         return  [];
     }
     const  keyword1PartLowerCase = keywordsParticples.words[0].commonPartLowerCase;
-    const  keywordsParticples2 = keywordsParticples.words.slice(1);
     var  fullMatchKeywords = keywords;
     if (tagIndexOf(fullMatchKeywords, searchLabel) !== notFound) {
         fullMatchKeywords = fullMatchKeywords.replace(searchLabel, keywordLabel);
@@ -4973,11 +5177,13 @@ async function  mutualSearch() {
 }
 
 interface  PrintRefOption {
-    print: boolean | undefined; 
+    print: boolean | undefined;
+    gray?: boolean | undefined;
 }
 
 const  printRefOptionDefault = {
     print: true,
+    gray: false,
 } as PrintRefOption;
 
 interface  PrintRefResult {
@@ -5012,7 +5218,7 @@ function  openDocument(ref: string) {
     execShellCommand(command);
 }
 
-async function  printRef(refTagAndAddress: string, option = printRefOptionDefault): Promise<PrintRefResult> {
+async function  printRef(refTagAndAddress: string, option: PrintRefOption = printRefOptionDefault): Promise<PrintRefResult> {
     const  addressBefore = refTagAndAddress.trim().substring(refLabel.length).trim();
     const  variableRe = new RegExp(variablePattern, 'g');  // variableRegularExpression
     const  variables: {[key: string]: undefined} = {};
@@ -5159,21 +5365,22 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     }
 
     // print the address and recommend
+    const  refColor = (option.gray) ? chalk.gray : (x:string)=>(x);
     if (option.print  &&  lib.isFullPath(address)) {
         if (recommended !== addressBefore) {
-            console.log('Recommend: #ref: ' + recommended);
+            console.log(refColor('Recommend: #ref: ' + recommended));
         }
         if (addressLineNum === notFound  &&  ! ('noFileExistCheck' in programOptions)) {
             var  checkedPath = (runningOS === 'Windows') ? lib.replaceToPathForWindows(linkableAddress) : lib.replacePathToSlashed(linkableAddress);
-            console.log(translate`ERROR: not found a file or folder at` + ` "${checkedPath}"`);
+            console.log(refColor(translate`ERROR: not found a file or folder at` + ` "${checkedPath}"`));
         } else {
-            console.log(linkableAddress);
+            console.log(refColor(linkableAddress));
             if (addressLineNum === notFoundInFile) {
-                console.log(existingAddress);
+                console.log(refColor(existingAddress));
             }
         }
         if (existingParentOnly) {
-            console.log(existingAddress);
+            console.log(refColor(existingAddress));
         }
     }
 
@@ -5186,7 +5393,7 @@ async function  printRef(refTagAndAddress: string, option = printRefOptionDefaul
     if (verbs.length >= 1) {
         var  verbMenu = verbs.map((verb) => (verb.label)).join(', ');
         if (verbMenu !== ''  &&  option.print) {
-            console.log('    ' + verbMenu);
+            console.log(refColor('    ' + verbMenu));
         }
     } else {
         var  verbMenu = '';
@@ -8139,6 +8346,7 @@ export async function  callMainFromJest(parameters?: string[], options?: {[name:
     } else {
         programOptions = {};
     }
+    programOptions.fast = ('fast' in programOptions  &&  programOptions['fast']);
     if ( ! ('foundCountMax' in programOptions)) {
         programOptions.foundCountMax = foundCountMaxDefault;
     }

@@ -8776,6 +8776,27 @@ value1_replaced: #template: key1
 "
 `;
 
+exports[`typrm shell >> search >> search_fast_snippet: stdout 1`] = `
+"typrm keyword: snippet_keyword
+\${typrmProject}/src/test_data/search/2/2.yaml:131:     snippet_keyword not priority:  #keyword:
+\${typrmProject}/src/test_data/search/2/2.yaml:136:         snippet_keyword:  #keyword:
+    s1
+        s11
+            s111
+
+        s12
+and more full searching...
+\${typrmProject}/src/test_data/search/2/2.yaml:131:     snippet_keyword not priority:  #keyword:
+\${typrmProject}/src/test_data/search/2/2.yaml:136:         snippet_keyword:  #keyword:
+    s1
+        s11
+            s111
+
+        s12
+typrm keyword: exit()
+"
+`;
+
 exports[`typrm shell >> search >> search_mode: stdout 1`] = `
 "typrm keyword: ABC
 \${typrmProject}/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"

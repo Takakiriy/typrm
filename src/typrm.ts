@@ -10,6 +10,7 @@ function  exitFromCommander(e: commander.CommanderError) {
 async function  callMain() {
     commander.program.version('1.4.0')  // previous revision of new features, update package.json, commit and add git tag
         .exitOverride(exitFromCommander)
+        .option("-f, --fast")
         .option("-l, --locale <s>")
         .option("-t, --test")
         .option("-d, --folder <>", "The root path of searching folder",  process.env.TYPRM_FOLDER)

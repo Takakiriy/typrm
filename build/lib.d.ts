@@ -38,6 +38,11 @@ interface GlobbyParameters {
 export declare function cutLeftOf(input: string, keyword: string): string;
 export declare function cutLast(input: string, keyword: string): string;
 export declare function cutIndent(lines: string[]): string[];
+export declare function getStringBefore(input: string, keyword: string): string;
+export declare function getLocalIsoString(date: Date): string;
+export declare function getCurrentTimeZoneIsoFormat(): string;
+export declare function newDateLoosely(timeDate: string): Date;
+export declare function getMaxDayOfMonth(year: number, month: number): number;
 export declare function unexpandVariable(expanded: string, keyValues: string[][], out_replacedIndices?: number[] | null): string;
 export declare function checkExpectedTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string): UnexpectedLine | null;
 export declare function coloredDiff(redLine: string, greenLine: string, redHeaderLength?: number, greenHeaderLength?: number): ColoredDiff;
@@ -56,7 +61,7 @@ export declare function escapeRegularExpression(expression: string): string;
 export declare function replace(input: string, replacers: ReplaceParameter[]): string;
 export declare function replaceAsync(input: string, replacers: ReplaceParameter[]): Promise<string>;
 interface ReplaceParameter {
-    from?: string;
+    from?: string | RegExp;
     fromCSV?: string;
     lineNum?: number;
     to: string;
@@ -119,6 +124,22 @@ export declare function getInputObject(): StandardInputBuffer;
 export declare function cutEscapeSequence(textWithEscapeSequence: string): string;
 export declare function getSnapshot(label: string, deafultSnapshot?: string | undefined): string;
 export declare function mark(object: any, label?: string | number | boolean): void;
+export declare namespace time {
+    function start(label: string): void;
+    function end(label: string): void;
+    class TimeFrame {
+        label: string;
+        start: number;
+        elapsed: number;
+        count: number;
+        getString(): string;
+    }
+    const timeFrames: Map<string, TimeFrame>;
+    function get(label: string): TimeFrame;
+    function getTimeFrames(labelPattern: string): TimeFrame[];
+    function getTimeFramesString(labelPattern: string): string;
+    function sleep(milliSeconds: number): Promise<unknown>;
+}
 export declare function jsonStringify(object: any, dummy?: any, space?: string): string;
 export declare function pp(message: any): string[];
 declare global {
@@ -137,5 +158,7 @@ declare global {
     export var ccCount: {
         [name: string]: number;
     };
+    export var isoTimeFormat: RegExp;
+    export var maxDayOfMonth: number[];
 }
 export {};

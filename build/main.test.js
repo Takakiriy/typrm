@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as main from "./main";
+import * as main from './main.js';
 import chalk from "chalk";
-import * as lib from "./lib";
+import * as lib from './lib.js';
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);
@@ -98,6 +98,7 @@ describe("typrm shell >>", () => {
             ['search_mode', 'test_data/search/1', 'ABC\nexit()\n', ''],
             ['search_mode_without_tags', 'test_data/search/1', 'Not\nexit()\n', ''],
             ['search_mode_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', ''],
+            ['search_fast_snippet', 'test_data/search/2', 'snippet_keyword\nexit()\n', ''],
             ['snippet_depth_1', 'test_data/search/2', 'snippet_depth_1\nexit()\n', ''],
             ['snippet_depth_2', 'test_data/search/2', 'snippet_depth_2\nexit()\n', ''],
             ['snippet_depth_3', 'test_data/search/2', 'snippet_depth_3\nexit()\n', ''],
@@ -106,6 +107,7 @@ describe("typrm shell >>", () => {
             chdirInProject('src');
             var typrmOptions = {
                 folder, test: "", locale: "en-US", input,
+                fast: (caseName.includes('search_fast')) ? "true" : "",
             };
             const normalCase = (caseName !== 'snippet_environment_variable');
             if (normalCase) {
@@ -184,17 +186,10 @@ describe("checks >> template value >>", () => {
         ["settings_tree_if_disable", {}],
         ["settings_tree_error", {}],
     ])("%s", async (caseName, options) => {
-<<<<<<< HEAD
         initializeTestInputFile(`checks >> template value >> ${caseName}: sourceFileContents 1`);
         if ('multiFiles' in options) {
             chdirInProject('src');
             writeFileSync(`${testFolderPath}_tmp/_tmp_2.yaml`, lib.getSnapshot(`checks >> template value >> ${caseName}: sourceFileContents 2`));
-=======
-        initializeTestInputFile(`checks template value >> ${caseName}: sourceFileContents 1`);
-        if ('multiFiles' in options) {
-            chdirInProject('src');
-            writeFileSync(`${testFolderPath}_tmp/_tmp_2.yaml`, lib.getSnapshot(`checks template value >> ${caseName}: sourceFileContents 2`));
->>>>>>> 2db5354 (Add benchmark in verbose option.)
         }
         process.chdir('empty_folder');
         await callMain(["check"], {
@@ -205,11 +200,7 @@ describe("checks >> template value >>", () => {
         lib.rmdirSync(testFolderPath + '_tmp');
     });
     test("check one file only", async () => {
-<<<<<<< HEAD
         initializeTestInputFile(`checks >> template value >> 1_template_1_ok: sourceFileContents 1`);
-=======
-        initializeTestInputFile(`checks template value >> 1_template_1_ok: sourceFileContents 1`);
->>>>>>> 2db5354 (Add benchmark in verbose option.)
         process.chdir('empty_folder');
         await callMain(["check", "_tmp/_tmp.yaml"], {
             folder: '../test_data', test: "", locale: "en-US",
@@ -229,11 +220,7 @@ describe("checks >> template value >>", () => {
             ],
         ])("%s", async (_caseName, currentFolder, command) => {
             chdirInProject('src');
-<<<<<<< HEAD
             const sourceFileContents = lib.getSnapshot(`checks >> template value >> one_error: sourceFileContents 1`);
-=======
-            const sourceFileContents = lib.getSnapshot(`checks template value >> one_error: sourceFileContents 1`);
->>>>>>> 2db5354 (Add benchmark in verbose option.)
             lib.rmdirSync(testFolderPath + '_checking');
             writeFileSync(`test_data/_checking/1/one_error_1.yaml`, sourceFileContents);
             writeFileSync(`test_data/_checking/2/one_error_1.yaml`, sourceFileContents);
@@ -259,16 +246,10 @@ describe("checks >> template value >>", () => {
             ["5_check_same_as_tag"],
             ["b1_bug_case_no_root_settings"],
             ["b2_bug_case_nest_settings"],
-<<<<<<< HEAD
             ["b3_bug_case_if_normal_if"], // Test of insertParentIndexNum(firstShiftingIndex: '/1')
             // There are other settings tests in "unit test >>"
         ])("%s", async (caseName) => {
             initializeTestInputFile(`checks >> template value >> settings >> ${caseName}: sourceFileContents 1`);
-=======
-            // There are other settings tests in "unit test >>"
-        ])("%s", async (caseName) => {
-            initializeTestInputFile(`checks template value >> settings >> ${caseName}: sourceFileContents 1`);
->>>>>>> 2db5354 (Add benchmark in verbose option.)
             await callMain(["check", "_tmp/_tmp.yaml"], {
                 folder: 'test_data', test: "", locale: "en-US",
             });
@@ -278,11 +259,7 @@ describe("checks >> template value >>", () => {
         });
     });
     test("verbose", async () => {
-<<<<<<< HEAD
         initializeTestInputFile(`checks >> template value >> verbose: sourceFileContents 1`);
-=======
-        initializeTestInputFile(`checks template value >> verbose: sourceFileContents 1`);
->>>>>>> 2db5354 (Add benchmark in verbose option.)
         process.chdir('empty_folder');
         await callMain(["check", "_tmp/_tmp.yaml"], {
             folder: '../test_data', test: "", locale: "en-US", verbose: "",
@@ -744,6 +721,31 @@ describe("replaces >> in copy tag >>", () => {
         expect(updatedFileContents).toMatchSnapshot('updatedFileContents');
         expect(main.stdout).toMatchSnapshot('stdout');
         lib.rmdirSync(testFolderPath + '_tmp');
+    });
+});
+describe("search_fast >> keyword tag >>", () => {
+    test.each([
+        ["1st",
+            ["search", "ABC"],
+            { folder: "test_data/search/1", disableFindAll: '', test: "", fast: "" },
+            pathColor(`${typrmProject}/src/test_data/search/1/1.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('ABC')}, "do it", "a,b"\n`,
+        ], ["words order score",
+            ["search", "aaa bbb"],
+            { folder: "test_data/search/2", disableFindAll: '', test: "", fast: "" },
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':2:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')} xxx\n` +
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':1:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')} xxx\n` +
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':4:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('bbb')} ${matchedColor('aaa')}\n` +
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':3:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('aaa')} ${matchedColor('bbb')}\n`,
+        ],
+        // Other related test can be found by searching "search_fast".
+    ])("%s", async (caseName, arguments_, options, answer) => {
+        const isWindowsEnvironment = (path.sep === '\\');
+        const isWindowsCase = (caseName.indexOf('Windows') !== notFound);
+        if (!isWindowsEnvironment && isWindowsCase) {
+            return;
+        }
+        await callMain(arguments_, options);
+        expect(main.stdout).toBe(answer);
     });
 });
 describe("searches >> keyword tag >>", () => {
@@ -1613,10 +1615,22 @@ describe("print reference >>", () => {
                 ["search", "#ref:", `${projectPathInRefTag}/README.md`, "7"],
                 { commandFolder: ".", locale: "en-US", test: "" },
                 `{ref: ${projectPathLinux}/README.md, windowsRef: ${projectPathWindows}\\README.md, file: ${projectPathLinux}/README.md, windowsFile: ${projectPathWindows}\\README.md, existingAddress: ${projectPathLinux}/README.md, windowsExistingAddress: ${projectPathWindows}\\README.md, fragment: , lineNum: 0}\n`,
-            ], ["verb fragment",
-                ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.html#example`, "7"],
-                { commandFolder: ".", locale: "en-US", test: "" },
-                `{ref: ${projectPathLinux}/src/test_data/verb/test.html#example, windowsRef: ${projectPathWindows}\\src\\test_data\\verb\\test.html#example, file: ${projectPathLinux}/src/test_data/verb/test.html, windowsFile: ${projectPathWindows}\\src\\test_data\\verb\\test.html, existingAddress: ${projectPathLinux}/src/test_data/verb/test.html, windowsExistingAddress: ${projectPathWindows}\\src\\test_data\\verb\\test.html, fragment: example, lineNum: 0}\n`,
+            ], ["verb of not ref tag search",
+                ["search", "picture"],
+                { commandFolder: ".", folder: "test_data/search/2", disableFindAll: '', locale: "en-US", test: "" },
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
+                    `\n` +
+                    `ERROR: not found a file or folder at "${path.sep}path"\n` +
+                    process.env.HOME + `\n` +
+                    `    0.Folder\n`,
+            ], ["verb of not ref tag search_fast",
+                ["search", "picture"],
+                { commandFolder: ".", folder: "test_data/search/2", disableFindAll: '', locale: "en-US", test: "", fast: "true" },
+                pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':62:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('picture')}  ${refColor('#ref: /path')}  #search: ${searchColor('keyword')}\n` +
+                    `\n` +
+                    chalk.gray(`ERROR: not found a file or folder at "${path.sep}path"`) + `\n` +
+                    chalk.gray(process.env.HOME) + `\n` +
+                    chalk.gray(`    0.Folder`) + `\n`,
             ], ["verb line num",
                 ["search", "#ref:", `${projectPathLinux}/src/test_data/verb/test.md#document`, "7"],
                 { commandFolder: ".", locale: "en-US", test: "" },
@@ -1857,11 +1871,7 @@ describe("unit test >>", () => {
             ["1st", { sameInput: "replaces settings >> in 2_replace_11_nested_if: sourceFileContents 1" }],
             ["bug_case", {}],
             ["if_and_no_indent", {}],
-<<<<<<< HEAD
             ["below_shallow_settings", { sameInput: "checks >> template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1" }],
-=======
-            ["below_shallow_settings", { sameInput: "checks template value >> settings >> b2_bug_case_nest_settings: sourceFileContents 1" }],
->>>>>>> 2db5354 (Add benchmark in verbose option.)
             ["bug_case_2", {}],
             ["bug_case_3", { checkSettings: true }],
             ["bug_case_4", {}],
