@@ -3073,12 +3073,12 @@ function  execShellCommand(command: string, requestedCommandFolder: boolean = tr
 async function  search() {
     const  startIndex = (programArguments[0] === 's'  ||  programArguments[0] === 'search') ? 1 : 0;
     const  keyword = programArguments.slice(startIndex).join(' ');
-    const  now = new Date();
     enum Command { search, searchFaster, alarm, openDocument, printRef, runVerb, check, replace, reset, mutualSearch, shellCommand };
 
     if (keyword !== '') {
         const  lastWord = programArguments.length === 0 ? '' :  programArguments[programArguments.length - 1];
         const  hasVerb = numberRegularExpression.test(lastWord);
+        const  now = new Date();
 
         var  command = Command.search;
         if (programOptions.fast) {
@@ -3122,6 +3122,7 @@ async function  search() {
             if (previousPrint.hasVerbMenu) {
                 var  prompt = `keyword or number${programOptions.commandSymbol || ''}:`;
             }
+            const  now = new Date();
 
             // typrm shell
             const  keyword = await lib.input(chalk.gray('typrm') + ' ' + chalk.yellow( prompt ) + ' ');

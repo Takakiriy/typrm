@@ -1629,7 +1629,7 @@ export function jsonStringify(object, dummy, space) {
 }
 // pp
 // #keyword: lib.ts pp
-//     Debug print.
+//     Debug print to memory only. This does not call "console.log".
 // Example:
 //    pp(var);
 // Example:
