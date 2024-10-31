@@ -2732,7 +2732,10 @@ namespace CopyTag {
                 if (line.startsWith(this.copyTagIndent) || line.trim() === '') {
                     if (this.copyTemplateTag) {
                         const  lineNumOffset = this.parsingCopyTag.contents.length;
-                        const  lineInTemplate = this.copyTemplateTag.contents[lineNumOffset];
+                        let    lineInTemplate = this.copyTemplateTag.contents[lineNumOffset];
+                        if ( ! lineInTemplate) {
+                            lineInTemplate = "";
+                        }
                         var  sourceTemplateTag = parseTemplateTag(lineInTemplate, parser);
                     } else {
                         var  sourceTemplateTag = templateTag;
