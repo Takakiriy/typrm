@@ -2879,7 +2879,7 @@ async function search() {
         const hasVerb = numberRegularExpression.test(lastWord);
         const now = new Date();
         var command = Command.search;
-        if (programOptions.fast) {
+        if (programOptions.fast || programOptions.fast2) {
             command = Command.searchFaster;
         }
         else if (hasRefTag(keyword)) {
@@ -2897,7 +2897,7 @@ async function search() {
             command = Command.mutualSearch;
         }
         if (command === Command.searchFaster) {
-            await searchSubFaster(keyword, now);
+            await searchSubFaster(keyword, !!programOptions.fast2, now);
         }
         else if (command === Command.search) {
             await searchSub(keyword, now, false);
@@ -2964,8 +2964,8 @@ async function search() {
                     command = Command.shellCommand;
                 }
                 if (command === Command.search) {
-                    if (programOptions.fast) {
-                        await searchSubFaster(keyword, now);
+                    if (programOptions.fast || programOptions.fast2) {
+                        await searchSubFaster(keyword, !!programOptions.fast2, now);
                     }
                     previousPrint = await searchSub(keyword, now, false);
                 }
@@ -3012,7 +3012,7 @@ async function search() {
         }
     }
 }
-async function searchSubFaster(keyword, now) {
+async function searchSubFaster(keyword, glossaryIsEnabled, now) {
     // This function is almost same as "searchSub" function.
     // This function test is #search: search_fast
     const thesaurus = new Thesaurus();
@@ -3027,13 +3027,16 @@ async function searchSubFaster(keyword, now) {
             input: fs.createReadStream(inputFileFullPath),
             crlfDelay: Infinity
         });
+        const glossaryTags = [];
         const blockDisable = new BlockDisableTagParser();
         const snippetScaning = [];
         var lineNum = 0;
+        var plusScore = 0;
         for await (const line1 of reader) {
             const line = line1;
             lineNum += 1;
             blockDisable.evaluate(line);
+            const currentIndent = indentRegularExpression.exec(line)[0];
             const indexOfKeywordLabel = line.indexOf(keywordLabel);
             // keyword tag
             if ((indexOfKeywordLabel !== notFound)
@@ -3107,6 +3110,98 @@ async function searchSubFaster(keyword, now) {
                     snippetScaning.push(found);
                 }
                 timeTag && lib.time.end(`searchSub >> keyword >> ${inputFileFullPath}`);
+            }
+            // glossary tag
+            if (glossaryIsEnabled) {
+                var glossaryTag = undefined;
+                if (line.trim() !== '') {
+                    timeTag && lib.time.start(`searchSub >> glossary >> ${inputFileFullPath}`);
+                    if (glossaryTags.length >= 1) {
+                        glossaryTag = glossaryTags[glossaryTags.length - 1];
+                    }
+                    if (glossaryTag) {
+                        if (currentIndent.length <= glossaryTag.indentAtTag.length) {
+                            glossaryTags.pop();
+                            if (glossaryTags.length >= 1) {
+                                glossaryTag = glossaryTags[glossaryTags.length - 1];
+                            }
+                            else {
+                                glossaryTag = undefined;
+                            }
+                        }
+                        else {
+                            if (glossaryTag.indentAtFirstContents === '') {
+                                glossaryTag.indentAtFirstContents = currentIndent;
+                                glossaryTag.indentPosition = glossaryTag.indentAtFirstContents.length;
+                            }
+                        }
+                    }
+                    if (line.includes(glossaryLabel) && !line.includes(disableLabel) && !blockDisable.isInBlock) {
+                        var glossaryTitle = getTagValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
+                        if (glossaryTitle !== '') {
+                            glossaryTitle += ' '; // ' ' is a word separator
+                        }
+                        else {
+                            glossaryTitle = parseKeyName(line) + ' '; // Keywords at the left of glossary tag
+                        }
+                        glossaryTags.push({
+                            indentPosition: -1,
+                            glossaryTitle,
+                            indentAtTag: indentRegularExpression.exec(line)[0],
+                            indentAtFirstContents: '',
+                        });
+                    }
+                    if (glossaryTag) {
+                        const characterAtIndent = line[glossaryTag.indentPosition];
+                        const isGlossaryIndentLevel = (characterAtIndent !== ' ' &&
+                            characterAtIndent !== '\t' &&
+                            characterAtIndent !== undefined);
+                        const isComment = (characterAtIndent === '#');
+                        if (!isGlossaryIndentLevel || isComment) {
+                            // Skip this line
+                        }
+                        else {
+                            const colonPosition = line.indexOf(':', currentIndent.length);
+                            const wordsWithGlossary = glossaryTag.glossaryTitle +
+                                line.substring(currentIndent.length, colonPosition);
+                            if (inDebuggingLine) {
+                                lib.pp(`#breadcrumb: in glossary block in searchSub`);
+                            }
+                            const found = getKeywordMatchingScore({
+                                targetTagType: 'glossary',
+                                glossaryTitleLength: glossaryTag.glossaryTitle.length,
+                                targetStrings: [wordsWithGlossary],
+                                filePath: inputFileFullPath,
+                                searchWordParticples, thesaurus, lineNum
+                            });
+                            if (found.counts.partMatchedTargetKeywordCount >= 1 && colonPosition !== notFound) {
+                                BenchmarkCounters.glossaryHitCount += 1;
+                                found.score += glossaryMatchScore + plusScore;
+                                found.path = inputFileFullPath;
+                                found.lineNum = lineNum;
+                                found.indentLength = currentIndent.length;
+                                if (glossaryTag.glossaryTitle === '') {
+                                    found.line = line;
+                                    for (const match of found.matches) {
+                                        match.position += glossaryTag.indentPosition;
+                                    }
+                                }
+                                else {
+                                    found.line = glossaryTag.glossaryTitle.trim() + ':' + line;
+                                    for (const match of found.matches) {
+                                        if (match.position >= glossaryTag.glossaryTitle.length) {
+                                            match.position += glossaryTag.indentPosition;
+                                        }
+                                    }
+                                }
+                                found.evaluateSnippetDepthTag(line);
+                                foundLines.push(found);
+                                snippetScaning.push(found);
+                            }
+                        }
+                    }
+                    timeTag && lib.time.end(`searchSub >> glossary >> ${inputFileFullPath}`);
+                }
             }
             // found.snippet = ...
             if (snippetScaning.length >= 1) {

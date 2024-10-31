@@ -9,7 +9,8 @@ function exitFromCommander(e) {
 async function callMain() {
     commander.program.version('1.4.0') // previous revision of new features, update package.json, commit and add git tag
         .exitOverride(exitFromCommander)
-        .option("-f, --fast")
+        .option("-f, --fast", "Faster search and standard search")
+        .option("--fast2", "Faster search and standard search")
         .option("-l, --locale <s>")
         .option("-t, --test")
         .option("-d, --folder <>", "The root path of searching folder", process.env.TYPRM_FOLDER)

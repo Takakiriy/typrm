@@ -26,7 +26,8 @@ command: #keyword: typrm command list
         code:
             #// parent: #search: mainMain
             search:  #ref: ${GitHub}/typrm/src/main.ts#function  search(
-                searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub
+                searchSubFaster:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSubFaster(
+                searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub(
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     // keyword tag:  #// (#keyword:tag)
                         getKeywordMatchingScore: #🌟  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore

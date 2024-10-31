@@ -1110,7 +1110,7 @@ describe("searches >> keyword tag >>", () => {
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':6:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')}${matchedColor('set')}\n` +
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':5:') + ` ${keywordLabelColor('#keyword:')} ${matchedColor('frame')} ${matchedColor('set')}\n`,
 
-        ],[ "kana_mode",
+        ],[ "kana_mode",  // chageToAlphabets
             ["search", "ぎｔ"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },
             `keyword="git"\n` +
