@@ -114,6 +114,12 @@ export async function  mainMain() {
 
             await  reset(inputFilePath);
         }
+        else if (programArguments[0] === 'check-alarm') {
+            if (verboseMode) {
+                console.log('Verbose: typrm command: check-alarm');
+            }
+            await  checkAlarm()
+        }
         else {
             await  search();
         }
@@ -3068,6 +3074,15 @@ function  execShellCommand(command: string, requestedCommandFolder: boolean = tr
         console.log(stdout_);
     }
     process.chdir(currentFolder);
+}
+
+async function  checkAlarm() {
+    const  now = new Date();
+    const  xSecondsBefore = programOptions.xSecondsBefore as number || 0;
+    const  checkDateTime = new Date();
+    checkDateTime.setSeconds(now.getSeconds() - xSecondsBefore);
+
+    await  searchSub('', checkDateTime, false);
 }
 
 async function  search() {

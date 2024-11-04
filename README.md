@@ -2102,9 +2102,25 @@ Write the date and time in ISO format. The time zone is the same as the time zon
     #alarm: 0000-00-00
     #alarm: 9999-99-99
 
-- If you do not normally search with typrm, you may miss that the specified date and time has passed
 - You cannot set multiple alarms in a single line
 - If you enter the `#alarm:` tag in the search keyword, the date and time entered in the search keyword will be searched as the current date and time.
+
+
+### To show Windows toast notification
+
+To show Windows toast notification (the standard Windows notification)
+when the date and time you set in `#alarm:` tag has passed,
+you can use the PowerShell script `bin/Show-TyprmAlarm.ps1`.
+You can modify this script to suit your needs.
+To install it:
+
+- To open the Startup folder, type `shell:startup` in the address bar and press Enter in File Explorer
+- Create shortcut to the `bin/Show-TyprmAlarm.ps1` file in your Startup folder
+- Right-click and select `Properties`, then change `Target` to the following command:
+
+Target:
+
+    powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "____/Show-TyprmAlarm.ps1.ps1"
 
 
 ## (for developers) How to build the development environment

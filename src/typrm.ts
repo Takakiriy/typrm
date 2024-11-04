@@ -27,6 +27,7 @@ async function  callMain() {
         .option("--replace-mode")
         .option("--stdout-buffer")
         .option("--inherit-dotenv", "false: (default) .env variables are not inherited to child processes. true: inherit")
+        .option("--x-seconds-before <i>", "Notification time before alarm (in seconds)")
         .option("--verbose")
         .parse(process.argv);
     

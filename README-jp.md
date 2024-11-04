@@ -2027,9 +2027,23 @@ TYPRM_LINE_NUM_GETTER 環境変数の設定値、
     #alarm: 0000-00-00
     #alarm: 9999-99-99
 
-- 普段から typrm で検索しない方は、指定した日時を過ぎたことを見逃す可能性があります
 - 1行に複数のアラームを設定することはできません
 - 検索キーワードに `#alarm:` タグを入力すると、検索キーワードに入力した日時が現在の日時として検索します
+
+
+### Windows トースト通知 をさせる
+
+`#alarm:` に設定した日時を過ぎたら Windows トースト通知（Windows の標準的な通知）をさせるには、
+`bin/Show-TyprmAlarm.ps1` にある PowerShell スクリプトを使うとできます。
+このスクリプトは自分の好みに変えても構いません。 インストールするには、
+
+- エクスプローラーを開き、アドレス バー に `shell:startup` と入力して Enter キー を押すと、スタートアップ フォルダー が開きます
+- `bin/Show-TyprmAlarm.ps1` ファイルへのショートカットを スタートアップ フォルダー に作ります
+- 右クリックして `プロパティ` を選び、リンク先を以下のコマンドに変更します。
+
+リンク先:
+
+    powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File "____/Show-TyprmAlarm.ps1.ps1"
 
 
 ## （開発者用） 開発環境の構築手順

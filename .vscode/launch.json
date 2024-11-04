@@ -23,7 +23,8 @@
             "request": "launch",
             "preLaunchTask": "Run support_node.cjs",
             "program": "${workspaceFolder}/src/typrm.ts",
-            "runtimeArgs": ["--experimental-specifier-resolution=node"],
+            "runtimeArgs": [],  // v20
+            // "runtimeArgs": ["--experimental-specifier-resolution=node"],  // v18
             "args": ["check"],  // "check", "--verbose"
             "cwd": "${workspaceFolder}",
             "smartStep": true,

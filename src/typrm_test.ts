@@ -121,6 +121,11 @@ async function  TestOfCommandLine() {
             "parameters": "search  --folder src/test_data/search/alarm/1.yaml",
             "check": "true",
             "inputLines": "#alarm:\nexit()\n",
+
+        },{ "name": "check_alarm",
+            "parameters": "check-alarm  --folder src/test_data/search/alarm/2.yaml  --x-seconds-before 60",
+            "check": "true",
+            "inputLines": "",
         }];
     deleteTestFiles();
     for (const case_ of cases) {

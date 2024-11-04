@@ -8901,6 +8901,20 @@ typrm keyword: exit()
 "
 `;
 
+exports[`typrm_test >> TestOfCommandLine >> check_alarm >> Windows: stdout 1`] = `
+"\${typrmProject}/src/test_data/search/alarm/2.yaml:2: yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/search/alarm/2.yaml:3: today:     #alarm: 2024-01-10  #// comment
+\${typrmProject}/src/test_data/search/alarm/2.yaml:4: tomorrow:  #alarm: 2024-01-11
+"
+`;
+
+exports[`typrm_test >> TestOfCommandLine >> check_alarm >> mac: stdout 1`] = `
+"\${typrmProject}/src/test_data/search/alarm/2.yaml:2: yesterday: #alarm: 2024-01-09
+\${typrmProject}/src/test_data/search/alarm/2.yaml:3: today:     #alarm: 2024-01-10  #// comment
+\${typrmProject}/src/test_data/search/alarm/2.yaml:4: tomorrow:  #alarm: 2024-01-11
+"
+`;
+
 exports[`typrm_test >> TestOfCommandLine >> locale >> Windows: stdout 1`] = `
 "\${typrmProject}/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
 \${typrmProject}/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
