@@ -2110,12 +2110,12 @@ Write the date and time in ISO format. The time zone is the same as the time zon
 
 To show Windows toast notification (the standard Windows notification)
 when the date and time you set in `#alarm:` tag has passed,
-you can use the PowerShell script `bin/Show-TyprmAlarm.ps1`.
-You can modify this script to suit your needs.
+you can use the PowerShell script (.ps1) pick up from `bin/Show-TyprmAlarm.zip`.
+(The reason for using .zip is to maintain UTF-8 with BOM.)
 To install it:
 
 - To open the Startup folder, type `shell:startup` in the address bar and press Enter in File Explorer
-- Create shortcut to the `bin/Show-TyprmAlarm.ps1` file in your Startup folder
+- Create shortcut to the `Show-TyprmAlarm.ps1` file in your Startup folder
 - Right-click and select `Properties`, then change `Target` to the following command:
 
 Target:

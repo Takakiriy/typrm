@@ -2034,11 +2034,12 @@ TYPRM_LINE_NUM_GETTER 環境変数の設定値、
 ### Windows トースト通知 をさせる
 
 `#alarm:` に設定した日時を過ぎたら Windows トースト通知（Windows の標準的な通知）をさせるには、
-`bin/Show-TyprmAlarm.ps1` にある PowerShell スクリプトを使うとできます。
-このスクリプトは自分の好みに変えても構いません。 インストールするには、
+`bin/Show-TyprmAlarm.zip` の中から取り出した PowerShell スクリプト(.ps1)を使うとできます。
+（.zip にしているのは UTF-8 with BOM を維持するためです）
+インストールするには、
 
 - エクスプローラーを開き、アドレス バー に `shell:startup` と入力して Enter キー を押すと、スタートアップ フォルダー が開きます
-- `bin/Show-TyprmAlarm.ps1` ファイルへのショートカットを スタートアップ フォルダー に作ります
+- `Show-TyprmAlarm.ps1` ファイルへのショートカットを スタートアップ フォルダー に作ります
 - 右クリックして `プロパティ` を選び、リンク先を以下のコマンドに変更します。
 
 リンク先:
