@@ -25,7 +25,7 @@
             "program": "${workspaceFolder}/src/typrm.ts",
             "runtimeArgs": [],  // v20
             // "runtimeArgs": ["--experimental-specifier-resolution=node"],  // v18
-            "args": ["check"],  // "check", "--verbose"
+            "args": ["check"],  // "check", "--verbose", "--folder", "__FilePath__"
             "cwd": "${workspaceFolder}",
             "smartStep": true,
             "outFiles": [

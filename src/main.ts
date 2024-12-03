@@ -17,7 +17,8 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
 }
 var  debugSearchScore = false;
 var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
-var  debugFilePathPart = "search/2/2.yaml";  // This is used, if "debugPointLineNum" != 0
+var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
+var  debugScoreList = false;
 var  inDebuggingLine = false;
 var  timeTag = false;
 
@@ -25,6 +26,7 @@ var  timeTag = false;
 export async function  main() {
     startTestRedirect();
     try {
+
         await  mainMain();
     }
     finally {
@@ -1906,6 +1908,9 @@ class  BlockDisableTagParser {
             if (indentLength <= this.blockIndentLength) {
                 this.blockIndentLength = 0;
                 this.isInBlock_ = false;
+                if (debugPointLineNum !== 0) {
+                    lib.pp(`#debugSearchScore: BlockDisableTagParser.isInBlock = false: ${line}`);
+                }
             }
         } else {
             this.isInBlock_ = this.previousLineHasTag;
@@ -1914,6 +1919,9 @@ class  BlockDisableTagParser {
         if (line.includes(searchIfLabel)) {
             this.blockIndentLength = indentLength;
             this.previousLineHasTag = true;
+            if (debugPointLineNum !== 0) {
+                lib.pp(`#debugSearchScore: BlockDisableTagParser.isInBlock = true: ${line}`);
+            }
         } else {
             this.previousLineHasTag = false;
         }
@@ -3606,6 +3614,16 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
             }
 
             // keyword tag
+            if (inDebuggingLine) {  // debugPointLineNum
+                if (indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound) {
+                    if ( line.includes(disableLabel)) {
+                        lib.pp(`#debugSearchScore: Skip by disableLabel, ${inputFileFullPath}:${lineNum}`);
+                    }
+                    if ( blockDisable.isInBlock) {
+                        lib.pp(`#debugSearchScore: Skip by isInBlock, ${inputFileFullPath}:${lineNum}`);
+                    }
+                }
+            }
             if ((indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound)
                     &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
                 timeTag && lib.time.start(`searchSub >> keyword >> ${inputFileFullPath}`);
@@ -3635,8 +3653,8 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                     });
                 const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
                 if (inDebuggingLine) {  // debugPointLineNum
-                    lib.pp(`#breadcrumb: keyword tag block in searchSub`);
-                    lib.pp(`#breadcrumb: calling getKeywordMatchingScore line:${lineNum}: ${line}`);
+                    lib.pp(`#debugSearchScore: keyword tag block in searchSub`);
+                    lib.pp(`#debugSearchScore: calling getKeywordMatchingScore line:${lineNum}: ${line}`);
                 }
 
                 let  found = getKeywordMatchingScore({
@@ -3646,8 +3664,8 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
                     filePath: inputFileFullPath,
                     searchWordParticples,  thesaurus, lineNum});
                 if (inDebuggingLine) {  // debugPointLineNum
-                    lib.pp(`#breadcrumb: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
-                    lib.pp(`#breadcrumb: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
+                    lib.pp(`#debugSearchScore: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
+                    lib.pp(`#debugSearchScore: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
                 }
                 if (found.counts.matchedSearchKeywordCount >= 1) {
                     const  unescapedLine = unescapePercentByte(line);
@@ -3838,9 +3856,9 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
         found.matches[0].targetTagType === 'alarm');
     foundLines.sort(compareScoreAndSoOn);
     if (debugPointLineNum !== 0) {
-        lib.pp(`#breadcrumb: filter by maximumHitWordCount in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
+        lib.pp(`#debugSearchScore: filter by maximumHitWordCount in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
         const  foundLine = foundLines.find((found)=>(found.lineNum === debugPointLineNum  &&  found.path.includes(debugFilePathPart)));
-        lib.pp(`#breadcrumb: there is ${foundLine ? '' : 'NOT '}found data.`);
+        lib.pp(`#debugSearchScore: there is ${foundLine ? '' : 'NOT '}found data.`);
     }
 
     // searchWithoutTags (find all)
@@ -4001,7 +4019,7 @@ export class  Class {
             const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
             var    matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
             if (inDebuggingLine) {
-                lib.pp(`#breadcrumb:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
+                lib.pp(`#debugSearchScore:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
             }
 
             for (let wordIndex = 0;  wordIndex < arg.searchWordParticples.words.length;  wordIndex += 1) {
@@ -4105,7 +4123,7 @@ export class  Class {
                         // 2 is double score from the score of different (upper/loser) case
                 }
                 if (inDebuggingLine) {
-                    lib.pp(`#breadcrumb:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
+                    lib.pp(`#debugSearchScore:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
                 }
                 found.counts.searchKeywordCount = arg.searchWordParticples.words.length;
                 found.notMatchedTargetKeyphrase = Class.__getNotMatchedTargetKeyphrase(aTargetString, found);
@@ -4115,8 +4133,8 @@ export class  Class {
                 } else {
                     found.counts.targetWordCount = Math.max(lib.getWordCount(aTargetString), lib.getWordCount(normalizedTargetKeywords));
                 }
-                if (debugSearchScore) {
-                    lib.pp(`#breadcrumb:     getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
+                if (debugSearchScore && debugScoreList) {
+                    lib.pp(`#debugScoreList:     getSubMatchedScore(final): ${keyphrase}, ${aTargetString}, => ${found.score}`);
                 }
             }
             if (found.score !== 0) {
@@ -4141,7 +4159,7 @@ export class  Class {
         var  position = notFound;
         const  matched = new MatchedPart();
         if (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart)) {
-            lib.pp(`#breadcrumb:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
+            lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
         }
 
         if (targetStringLowerCase.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
@@ -5094,7 +5112,7 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
                 const  line: string = line1;
                 lineNum += 1;
                 if (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart)) {
-                    lib.pp(`#breadcrumb: in searchWithoutTags`);
+                    lib.pp(`#breadcrumb: in searchWithoutTags ${inputFileFullPath}:${lineNum}`);
                 }
 
                 // full match
