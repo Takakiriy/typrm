@@ -6,8 +6,8 @@ command: #keyword: typrm command list
             #     .option("-d, --folder <>", "The root path of searching folder",  process.env.TYPRM_FOLDER)
             # Object.assign(main.programOptions, commander.program.opts());
     search:  #keyword: typrm search  #focus: getSubMatchedScore, toString
-        test:
-            keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword tag >>"
+        test:  #keyword: typrm search test
+            keyword tag: #keyword: keyword tag test  #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches >> keyword tag >>"
             glossary tag: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches glossary tag >>"
             parent match: #ref: ${GitHub}/typrm/src/main.test.ts#describe("searches keyword and parent >>"
                 test:  searches keyword and parent >>
@@ -168,6 +168,7 @@ test:
         - npm test  #ref: ./README.md  #ref: ./README-jp.md
         - Build and basic test in ".vscode/launch.json"
     test:  #// 機能からテストを探す場合
+        #search: typrm search test
         #search: typrm command list
         #search: typrm tags
     About ${HOME}:
@@ -248,11 +249,14 @@ test:
                 IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
 debug:
     debugger:  #// Debug with Visual Studio Code
-        Debug from launch:
+        Debug from launch: |
             $ export __Variables__=__Value__
             $ code __Project__
             Select "Debug from launch" in "Run and Debug" view
+            Write calling "pp" code
+            Set break point at "DebugWatchPoint" in main.ts  #search: typrm DebugWatchPoint
             Press F5 key
+            Watch "debugOut" variable value
         Others:
             $ code __Project__
             Select "__LaunchName__" in "Run and Debug" view

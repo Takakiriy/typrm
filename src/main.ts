@@ -15,8 +15,8 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
 } else {
     var  typrmProject = __dirname;
 }
-var  debugSearchScore = false;
-var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugSearchScore = true;
+var  debugPointLineNum = 357;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -4014,9 +4014,9 @@ export class  Class {
             var    found = new FoundLine();
             var    previousPosition = -1;
             var    isNormalizedMatched = false;
-            const  aTargetStringLowerCase = aTargetString.toLowerCase();
+            const  aTargetStringLowerCase = aTargetString.toLowerCase().replace(/ /g, "");
             const  normalizedTargetKeywords = arg.thesaurus.normalize(aTargetString, arg.searchWordParticples.formalWordsLowerCase);
-            const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
+            const  normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase().replace(/ /g, "");
             var    matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
             if (inDebuggingLine) {
                 lib.pp(`#debugSearchScore:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
@@ -4151,7 +4151,7 @@ export class  Class {
         return  bestFound;
     }
 
-    #__getSubMatchedScore(targetString: string, targetStringLowerCase: string, searchWordParticples: ParticpleWord,
+    #__getSubMatchedScore(targetString: string, targetStringLowerCaseWithoutSpaces: string, searchWordParticples: ParticpleWord,
             targetStringIndex: number, wordIndex: number, targetWordType: WordType): Result {
         // Debug
         // const  isDebug = (targetString === 'STR');
@@ -4162,7 +4162,7 @@ export class  Class {
             lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
         }
 
-        if (targetStringLowerCase.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
+        if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const  keyword = searchWordParticples.specified;
             const  keywordLowerCase = searchWordParticples.specifiedLowerCase;
             var  partMatchPosition = notFound;
@@ -4227,7 +4227,7 @@ export class  Class {
             if (score === 0) {
 
                 // Not case sensitive matched with "keywordLowerCase".
-                if ((position = targetStringLowerCase.indexOf(keywordLowerCase)) !== notFound) {
+                if ((position = targetStringLowerCaseWithoutSpaces.indexOf(keywordLowerCase)) !== notFound) {
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
                         matchedKeyword = keywordLowerCase;
@@ -4256,7 +4256,7 @@ export class  Class {
                 for (const particpleLowerCase of searchWordParticples.particplesLowerCase) {
 
                     // Not case sensitive matched with "particpleLowerCase".
-                    if ((position = targetStringLowerCase.indexOf(particpleLowerCase)) !== notFound) {
+                    if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
                         if (targetString.length === particpleLowerCase.length) {
                             const  semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
                             const  commonLength = searchWordParticples.commonPartLowerCase.length;
