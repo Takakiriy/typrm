@@ -4287,11 +4287,13 @@ export class  Class {
                 if (partMatchPosition !== notFound) {
                     score = partMatchScore;
                     matchedKeyword = keyword;
+                    // matched.matchedWordType = 
                     matched.caseSensitiveMatched = true;
                     position = partMatchPosition;
                 } else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
                     matchedKeyword = keywordLowerCase;
+                    // matched.matchedWordType = 
                     matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;
                 }
