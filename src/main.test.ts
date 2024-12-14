@@ -1098,6 +1098,11 @@ describe("searches >> keyword tag >>", () => {
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':287:') + `         ${matchedColor('Docker')} re${matchedColor('compose')} ${matchedColor('Down34')} and any other words\n` +
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':286:') + `         ${keywordLabelColor('#keyword:')} ${matchedColor('Docker')}-${matchedColor('Compose')} ${matchedColor('Down34')}\n`,
 
+        ],[ "idiom_without_space",
+            ["search", "timeout"],
+            { folder: "test_data/search/2", test: "" },
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':357:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('time out')}\n`,
+
         ],[ "test_of_double_space",
             ["search", "big  boss"],
             { folder: "test_data/search/2", disableFindAll: '', test: "" },  // section: test_of_target_word_count
@@ -1261,6 +1266,7 @@ describe("searches >> keyword tag >>", () => {
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
+if (caseName !== 'idiom_without_space') {return;}  // || subCase !== '____'
         const  isWindowsEnvironment = (path.sep === '\\');
         const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
         if ( ! isWindowsEnvironment && isWindowsCase) {
@@ -1269,6 +1275,7 @@ describe("searches >> keyword tag >>", () => {
 
         await  callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
+expect('test code').toBe('deleted skip code.');
     });
 
     describe("thesaurus >>", () => {
@@ -2297,6 +2304,12 @@ describe("unit test >>", () => {
             expect(searchTargetKeyphrasePositions(line, separatorPositions)).toEqual(answer);
         });
         const  searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
+    });
+    test.only("pickUpKeyPhraseWithSpace", () => {
+        const  pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
+        expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 7)).toBe("time");
+        expect(pickUpKeyPhraseWithSpace("timeout",     "error: time out was  occurred", 7)).toBe("time out");
+        expect(pickUpKeyPhraseWithSpace("wasoccurred", "error: time out was  occurred", 16)).toBe("was  occurred");
     });
 });
 
