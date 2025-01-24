@@ -4363,7 +4363,14 @@ function  isSeparator(checkingCharacter: string) {  // Space and signs
     return  programOptionsWordSeparators.includes(checkingCharacter);
 }
 
-// function  pickUpKeyPhraseWithSpace() {}
+function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInText: number): string {
+    // Example:
+    //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 7) === "time out"
+    var  keyIndex = 0;
+    var  textIndex = Math.trunc(keyPhraseIndexInText);
+
+    return  "______";
+}
 
 class  MatchedCounts {
     wordPositions: WordPositions;
@@ -8510,6 +8517,7 @@ export const  private_ = {
     makeReplaceToTagTree,
     Parser,
     searchTargetKeyphrasePositions: searchTargetKeyphrasePositions,
+    pickUpKeyPhraseWithSpace: pickUpKeyPhraseWithSpace,
 };
 
 if (process.env.windir) {

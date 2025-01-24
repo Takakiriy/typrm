@@ -2305,7 +2305,14 @@ describe("unit test >>", () => {
         });
         const  searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
     });
-// function  pickUpKeyPhraseWithSpace() {}
+    describe("pickUpKeyPhraseWithSpace >>", () => {
+        test.each([
+            ["1st"],
+        ])("%s", async (caseName) => {
+            pickUpKeyPhraseWithSpace();
+        });
+        const  pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
+    });
 });
 
 describe("test of test >>", () => {
