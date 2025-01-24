@@ -4363,6 +4363,8 @@ function  isSeparator(checkingCharacter: string) {  // Space and signs
     return  programOptionsWordSeparators.includes(checkingCharacter);
 }
 
+// function  pickUpKeyPhraseWithSpace() {}
+
 class  MatchedCounts {
     wordPositions: WordPositions;
     normalizedWordPositions: WordPositions;
