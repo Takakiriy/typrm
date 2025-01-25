@@ -15,8 +15,8 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
 } else {
     var  typrmProject = __dirname;
 }
-var  debugSearchScore = true;
-var  debugPointLineNum = 357;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugSearchScore = false;
+var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -44,8 +44,8 @@ function  DebugWatchPoint() {
         BenchmarkCounters.print();
     }
     if (true) {
-        var    d = lib.pp('');
         const  s = getStdOut();
+        var    d = lib.pp('');
         d = [];  // Set break point here and watch the variable d
     }
 }
@@ -4303,7 +4303,7 @@ export class  Class {
                 matched.position = position;
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
-    matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+    // matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
                 matched.matchedString = escapePercentByte(pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position));
 
                 matched.targetType = targetWordType;
@@ -4379,7 +4379,7 @@ function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpace
             textIndex += 1;
             t = textWithSpaces[textIndex];
         }
-        if (t === k) {
+        if (t.toLowerCase() === k.toLowerCase()) {
 
             keyPhrase += t;
         } else {
@@ -4752,7 +4752,8 @@ function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
 
 function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     // Synchronized with "compareScoreAndSoOnRelease" at 2023-11-25
-    var  debugLineNums = [9,3,13,7,6,1,11,10];  // Edit this in order of priority
+    var  debugLineNums = [55, 54, 56];  // Edit this in order of priority
+var    d = lib.pp('');
     const  indexA = debugLineNums.indexOf(a.lineNum);
     const  indexB = debugLineNums.indexOf(b.lineNum);
     const  aa = a.counts;
@@ -7530,23 +7531,23 @@ class FoundLine {
             coloredLine = glossaryLabelColor( glossaryLabel ) +' '+ coloredLine;
         }
         if (debugSearchScore) {
-            var  debugString = ` (score: ${this.score}, ` +
-                `searchKeywordCount: ${this.counts.searchKeywordCount}, ` +
-                `targetWordCount: ${this.counts.targetWordCount}, ` +
-                `keyword: ${this.counts.matchedKeywordCount}, ` +
-                `glossary: ${this.counts.matchedGlossaryCount}, ` +
-                `glossaryHeader: ${this.counts.matchedGlossaryHeaderCount}, ` +
-                `parentMatchedCount: ${lib.getAllQuotedCSVLine(this.counts.parentMatchedCount) || '[]'}, ` +
-                `matchedSearchCount: ${this.counts.matchedSearchKeywordCount}, ` +
-                `targetWordCountForCompare: ${this.targetWordCountForCompare}, ` +
-                `superMatchedTargetCount: ${this.counts.superMatchedTargetKeywordCount}, ` +
-                `semi: ${this.counts.semiMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSemi: ${this.counts.caseIgnoredSemiMatchedTargetKeywordCount}, ` +
-                `participle: ${this.counts.participleMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSuper: ${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}, ` +
-                `caseIgnoredParticiple: ${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSemiParticiple: ${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}, ` +
-                `part: ${this.counts.partMatchedTargetKeywordCount})`;
+            var  debugString = ` {"score": "${this.score}", ` +
+                `"searchKeywordCount": "${this.counts.searchKeywordCount}", ` +
+                `"targetWordCount": "${this.counts.targetWordCount}", ` +
+                `"keyword": "${this.counts.matchedKeywordCount}", ` +
+                `"glossary": "${this.counts.matchedGlossaryCount}", ` +
+                `"glossaryHeader": "${this.counts.matchedGlossaryHeaderCount}", ` +
+                `"parentMatchedCount": "${lib.getAllQuotedCSVLine(this.counts.parentMatchedCount) || '[]'}", ` +
+                `"matchedSearchCount": "${this.counts.matchedSearchKeywordCount}", ` +
+                `"targetWordCountForCompare": "${this.targetWordCountForCompare}", ` +
+                `"superMatchedTargetCount": "${this.counts.superMatchedTargetKeywordCount}", ` +
+                `"semi": "${this.counts.semiMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSemi": "${this.counts.caseIgnoredSemiMatchedTargetKeywordCount}", ` +
+                `"participle": "${this.counts.participleMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSuper": "${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredParticiple": "${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSemiParticiple": "${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}", ` +
+                `"part": "${this.counts.partMatchedTargetKeywordCount}"}`;
         } else {
             var  debugString = ``;
         }

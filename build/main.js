@@ -47,8 +47,8 @@ function DebugWatchPoint() {
         BenchmarkCounters.print();
     }
     if (true) {
-        var d = lib.pp('');
         const s = getStdOut();
+        var d = lib.pp('');
         d = []; // Set break point here and watch the variable d
     }
 }
@@ -3771,9 +3771,9 @@ var GetKeywordMatchingScore;
                 var found = new FoundLine();
                 var previousPosition = -1;
                 var isNormalizedMatched = false;
-                const aTargetStringLowerCase = aTargetString.toLowerCase();
+                const aTargetStringLowerCase = aTargetString.toLowerCase().replace(/ /g, "");
                 const normalizedTargetKeywords = arg.thesaurus.normalize(aTargetString, arg.searchWordParticples.formalWordsLowerCase);
-                const normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase();
+                const normalizedTargetKeywordsLowerCase = normalizedTargetKeywords.toLowerCase().replace(/ /g, "");
                 var matchedCounts = new MatchedCounts(aTargetString, normalizedTargetKeywords);
                 if (inDebuggingLine) {
                     lib.pp(`#debugSearchScore:     in getKeywordMatchingScore(${targetStingIndex}: \"${aTargetString}\")`);
@@ -3919,7 +3919,7 @@ var GetKeywordMatchingScore;
             return notMatchedTargetKeyphrase;
         }
     }
-    _Class_instances = new WeakSet(), _Class___getSubMatchedScore = function _Class___getSubMatchedScore(targetString, targetStringLowerCase, searchWordParticples, targetStringIndex, wordIndex, targetWordType) {
+    _Class_instances = new WeakSet(), _Class___getSubMatchedScore = function _Class___getSubMatchedScore(targetString, targetStringLowerCaseWithoutSpaces, searchWordParticples, targetStringIndex, wordIndex, targetWordType) {
         // Debug
         // const  isDebug = (targetString === 'STR');
         var score = 0;
@@ -3928,7 +3928,7 @@ var GetKeywordMatchingScore;
         if (this.arg.lineNum === debugPointLineNum && this.arg.filePath.includes(debugFilePathPart)) {
             lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
         }
-        if (targetStringLowerCase.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
+        if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const keyword = searchWordParticples.specified;
             const keywordLowerCase = searchWordParticples.specifiedLowerCase;
             var partMatchPosition = notFound;
@@ -3995,7 +3995,7 @@ var GetKeywordMatchingScore;
             }
             if (score === 0) {
                 // Not case sensitive matched with "keywordLowerCase".
-                if ((position = targetStringLowerCase.indexOf(keywordLowerCase)) !== notFound) {
+                if ((position = targetStringLowerCaseWithoutSpaces.indexOf(keywordLowerCase)) !== notFound) {
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
                         matchedKeyword = keywordLowerCase;
@@ -4026,7 +4026,7 @@ var GetKeywordMatchingScore;
             if (score === 0) {
                 for (const particpleLowerCase of searchWordParticples.particplesLowerCase) {
                     // Not case sensitive matched with "particpleLowerCase".
-                    if ((position = targetStringLowerCase.indexOf(particpleLowerCase)) !== notFound) {
+                    if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
                         if (targetString.length === particpleLowerCase.length) {
                             const semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
                             const commonLength = searchWordParticples.commonPartLowerCase.length;
@@ -4058,12 +4058,14 @@ var GetKeywordMatchingScore;
                 if (partMatchPosition !== notFound) {
                     score = partMatchScore;
                     matchedKeyword = keyword;
+                    // matched.matchedWordType = 
                     matched.caseSensitiveMatched = true;
                     position = partMatchPosition;
                 }
                 else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
                     matchedKeyword = keywordLowerCase;
+                    // matched.matchedWordType = 
                     matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;
                 }
@@ -4072,7 +4074,8 @@ var GetKeywordMatchingScore;
                 matched.position = position;
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
-                matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+                // matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+                matched.matchedString = escapePercentByte(pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position));
                 matched.targetType = targetWordType;
             }
             else {
@@ -4098,6 +4101,28 @@ function isSuperSeparator(checkingCharacter) {
 }
 function isSeparator(checkingCharacter) {
     return programOptionsWordSeparators.includes(checkingCharacter);
+}
+function pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces, textWithSpaces, keyPhraseIndexInText) {
+    // Example:
+    //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 7) === "time out"
+    var textIndex = Math.trunc(keyPhraseIndexInText);
+    var keyPhrase = "";
+    for (const k of keyPhraseWithoutSpaces) {
+        var t = textWithSpaces[textIndex];
+        while (t === ' ') {
+            keyPhrase += ' ';
+            textIndex += 1;
+            t = textWithSpaces[textIndex];
+        }
+        if (t.toLowerCase() === k.toLowerCase()) {
+            keyPhrase += t;
+        }
+        else {
+            throw new Error('unexpected in pickUpKeyPhraseWithSpace');
+        }
+        textIndex += 1;
+    }
+    return keyPhrase;
 }
 class MatchedCounts {
     constructor(targetString, normalizedTargetKeywords = '') {
@@ -4412,7 +4437,8 @@ function compareScoreAndSoOnRelease(a, b) {
 }
 function compareScoreAndSoOnDebug(a, b) {
     // Synchronized with "compareScoreAndSoOnRelease" at 2023-11-25
-    var debugLineNums = [9, 3, 13, 7, 6, 1, 11, 10]; // Edit this in order of priority
+    var debugLineNums = [55, 54, 56]; // Edit this in order of priority
+    var d = lib.pp('');
     const indexA = debugLineNums.indexOf(a.lineNum);
     const indexB = debugLineNums.indexOf(b.lineNum);
     const aa = a.counts;
@@ -6967,23 +6993,23 @@ class FoundLine {
             coloredLine = glossaryLabelColor(glossaryLabel) + ' ' + coloredLine;
         }
         if (debugSearchScore) {
-            var debugString = ` (score: ${this.score}, ` +
-                `searchKeywordCount: ${this.counts.searchKeywordCount}, ` +
-                `targetWordCount: ${this.counts.targetWordCount}, ` +
-                `keyword: ${this.counts.matchedKeywordCount}, ` +
-                `glossary: ${this.counts.matchedGlossaryCount}, ` +
-                `glossaryHeader: ${this.counts.matchedGlossaryHeaderCount}, ` +
-                `parentMatchedCount: ${lib.getAllQuotedCSVLine(this.counts.parentMatchedCount) || '[]'}, ` +
-                `matchedSearchCount: ${this.counts.matchedSearchKeywordCount}, ` +
-                `targetWordCountForCompare: ${this.targetWordCountForCompare}, ` +
-                `superMatchedTargetCount: ${this.counts.superMatchedTargetKeywordCount}, ` +
-                `semi: ${this.counts.semiMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSemi: ${this.counts.caseIgnoredSemiMatchedTargetKeywordCount}, ` +
-                `participle: ${this.counts.participleMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSuper: ${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}, ` +
-                `caseIgnoredParticiple: ${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSemiParticiple: ${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}, ` +
-                `part: ${this.counts.partMatchedTargetKeywordCount})`;
+            var debugString = ` {"score": "${this.score}", ` +
+                `"searchKeywordCount": "${this.counts.searchKeywordCount}", ` +
+                `"targetWordCount": "${this.counts.targetWordCount}", ` +
+                `"keyword": "${this.counts.matchedKeywordCount}", ` +
+                `"glossary": "${this.counts.matchedGlossaryCount}", ` +
+                `"glossaryHeader": "${this.counts.matchedGlossaryHeaderCount}", ` +
+                `"parentMatchedCount": "${lib.getAllQuotedCSVLine(this.counts.parentMatchedCount) || '[]'}", ` +
+                `"matchedSearchCount": "${this.counts.matchedSearchKeywordCount}", ` +
+                `"targetWordCountForCompare": "${this.targetWordCountForCompare}", ` +
+                `"superMatchedTargetCount": "${this.counts.superMatchedTargetKeywordCount}", ` +
+                `"semi": "${this.counts.semiMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSemi": "${this.counts.caseIgnoredSemiMatchedTargetKeywordCount}", ` +
+                `"participle": "${this.counts.participleMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSuper": "${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredParticiple": "${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSemiParticiple": "${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}", ` +
+                `"part": "${this.counts.partMatchedTargetKeywordCount}"}`;
         }
         else {
             var debugString = ``;
@@ -7782,6 +7808,7 @@ export const private_ = {
     makeReplaceToTagTree,
     Parser,
     searchTargetKeyphrasePositions: searchTargetKeyphrasePositions,
+    pickUpKeyPhraseWithSpace: pickUpKeyPhraseWithSpace,
 };
 if (process.env.windir) {
     var runningOS = 'Windows';
