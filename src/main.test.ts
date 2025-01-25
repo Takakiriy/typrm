@@ -846,7 +846,7 @@ describe("search_fast >> keyword tag >>", () => {
 });
 
 describe("searches >> keyword tag >>", () => {
-    test.only.each([
+    test.each([
         [   "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
@@ -2305,13 +2305,11 @@ describe("unit test >>", () => {
         });
         const  searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
     });
-    describe("pickUpKeyPhraseWithSpace >>", () => {
-        test.each([
-            ["1st"],
-        ])("%s", async (caseName) => {
-            pickUpKeyPhraseWithSpace();
-        });
+    test.only("pickUpKeyPhraseWithSpace", () => {
         const  pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
+        expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 7)).toBe("time");
+        expect(pickUpKeyPhraseWithSpace("timeout",     "error: time out was  occurred", 7)).toBe("time out");
+        expect(pickUpKeyPhraseWithSpace("wasoccurred", "error: time out was  occurred", 16)).toBe("was  occurred");
     });
 });
 

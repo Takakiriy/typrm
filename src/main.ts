@@ -4303,7 +4303,9 @@ export class  Class {
                 matched.position = position;
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
-                matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+    matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+                matched.matchedString = escapePercentByte(pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position));
+
                 matched.targetType = targetWordType;
             } else {
                 position = notFound;
@@ -4366,10 +4368,27 @@ function  isSeparator(checkingCharacter: string) {  // Space and signs
 function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInText: number): string {
     // Example:
     //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 7) === "time out"
-    var  keyIndex = 0;
-    var  textIndex = Math.trunc(keyPhraseIndexInText);
+    var  textIndex = Math.trunc( keyPhraseIndexInText );
+    var  keyPhrase = "";
 
-    return  "______";
+    for (const  k of keyPhraseWithoutSpaces) {
+        var  t = textWithSpaces[textIndex];
+
+        while (t === ' ') {
+            keyPhrase += ' ';
+            textIndex += 1;
+            t = textWithSpaces[textIndex];
+        }
+        if (t === k) {
+
+            keyPhrase += t;
+        } else {
+            throw new Error('unexpected in pickUpKeyPhraseWithSpace');
+        }
+        textIndex += 1;
+    }
+
+    return  keyPhrase;
 }
 
 class  MatchedCounts {
