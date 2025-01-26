@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as main from './main.js';
+import * as main from "./main";
 import chalk from "chalk";
-import * as lib from './lib.js';
+import * as lib from "./lib";
 const callMain = main.callMainFromJest;
 process.env['typrm_aaa'] = 'aaa';
 process.chdir(__dirname);

@@ -15,10 +15,10 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
 } else {
     var  typrmProject = __dirname;
 }
-var  debugSearchScore = false;
+var  debugSearchScore = true;
 var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
-var  debugScoreList = false;
+var  debugScoreList = true;
 var  inDebuggingLine = false;
 var  timeTag = false;
 
@@ -3582,6 +3582,9 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
             if (inDebuggingLine) {
                 lib.pp(`#breadcrumb: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
             }
+if (lineNum === 54) {
+var isDebug=true;
+}
 
             // score tag
             if (line !== '') {
@@ -4303,8 +4306,8 @@ export class  Class {
                 matched.position = position;
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
-    // matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
-                matched.matchedString = escapePercentByte(pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position));
+    matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+                // matched.matchedString = escapePercentByte(pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position));
 
                 matched.targetType = targetWordType;
             } else {
@@ -4315,6 +4318,9 @@ export class  Class {
     }
 
     static  __getNotMatchedTargetKeyphrase(targetKeyphrase: string, found: FoundLine): string {
+if (targetKeyphrase === "add SILVER arrow")  {
+var isDebug=true;
+}
         var  notMatchedTargetKeyphrase = targetKeyphrase;
 
         for (const match of found.matches) {
@@ -4365,30 +4371,38 @@ function  isSeparator(checkingCharacter: string) {  // Space and signs
     return  programOptionsWordSeparators.includes(checkingCharacter);
 }
 
-function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInText: number): string {
+function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInTextWithoutSpaces: number): string {
     // Example:
-    //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 7) === "time out"
-    var  textIndex = Math.trunc( keyPhraseIndexInText );
-    var  keyPhrase = "";
+    //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 6) === "time out"
+    const  textWithoutSpaces = textWithSpaces.replace(/ /g, '');
+    const  leftTextWithoutSpaces = textWithoutSpaces.substring(0, keyPhraseIndexInTextWithoutSpaces);
+    var  textIndex = 0;
+    var  xWithSpaces = "";
 
-    for (const  k of keyPhraseWithoutSpaces) {
-        var  t = textWithSpaces[textIndex];
+    for (const  xWithoutSpaces of [leftTextWithoutSpaces, keyPhraseWithoutSpaces]) {
+        xWithSpaces = "";
+        for (const  x of xWithoutSpaces) {
+            var  t = textWithSpaces[textIndex];
 
-        while (t === ' ') {
-            keyPhrase += ' ';
+            while (t === ' ') {
+                xWithSpaces += ' ';
+                textIndex += 1;
+                t = textWithSpaces[textIndex];
+            }
+            if (t.toLowerCase() === x.toLowerCase()) {
+
+                xWithSpaces += t;
+            } else {
+                throw new Error('unexpected in pickUpKeyPhraseWithSpace');
+            }
             textIndex += 1;
-            t = textWithSpaces[textIndex];
         }
-        if (t.toLowerCase() === k.toLowerCase()) {
 
-            keyPhrase += t;
-        } else {
-            throw new Error('unexpected in pickUpKeyPhraseWithSpace');
+        for (let  t = textWithSpaces[textIndex];  t === ' ';  textIndex += 1,  t = textWithSpaces[textIndex]) {
         }
-        textIndex += 1;
     }
 
-    return  keyPhrase;
+    return  xWithSpaces;
 }
 
 class  MatchedCounts {
@@ -4510,8 +4524,8 @@ class  MatchedCounts {
 }
 
 function  compareScoreAndSoOn(a: FoundLine, b: FoundLine): number {
-    return  compareScoreAndSoOnRelease(a, b);
-    // return  compareScoreAndSoOnDebug(a, b);
+    // return  compareScoreAndSoOnRelease(a, b);
+    return  compareScoreAndSoOnDebug(a, b);
 }
 
 function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
@@ -4752,7 +4766,7 @@ function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
 
 function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     // Synchronized with "compareScoreAndSoOnRelease" at 2023-11-25
-    var  debugLineNums = [55, 54, 56];  // Edit this in order of priority
+    var  debugLineNums = [55, 56];  // Edit this in order of priority
 var    d = lib.pp('');
     const  indexA = debugLineNums.indexOf(a.lineNum);
     const  indexB = debugLineNums.indexOf(b.lineNum);
@@ -7295,6 +7309,9 @@ class FoundLine {
     }
 
     get  notMatchedTargetWordCount(): number {
+if (this.lineNum === 54) {
+var isDebug= true;
+}
         const  separators = lib.escapeRegularExpression(programOptionsWordSeparators);
         const  allKeywordIsAllMatchedGlossary =
             this.matches.some((m)=> (m.targetTagType === 'glossary'  ||  m.targetTagType ==='glossaryHeader'))  &&
@@ -7534,6 +7551,7 @@ class FoundLine {
             var  debugString = ` {"score": "${this.score}", ` +
                 `"searchKeywordCount": "${this.counts.searchKeywordCount}", ` +
                 `"targetWordCount": "${this.counts.targetWordCount}", ` +
+                `"notMatchedTargetWordCount": "${this.notMatchedTargetWordCount}", ` +
                 `"keyword": "${this.counts.matchedKeywordCount}", ` +
                 `"glossary": "${this.counts.matchedGlossaryCount}", ` +
                 `"glossaryHeader": "${this.counts.matchedGlossaryHeaderCount}", ` +
@@ -7547,6 +7565,28 @@ class FoundLine {
                 `"caseIgnoredSuper": "${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}", ` +
                 `"caseIgnoredParticiple": "${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}", ` +
                 `"caseIgnoredSemiParticiple": "${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}", ` +
+                `"caseSensitiveMatchedKeywordOrGlossaryCount": "${this.counts.caseSensitiveMatchedKeywordOrGlossaryCount}", ` +
+                `"caseSensitiveMatchedKeywordCount": "${this.counts.caseSensitiveMatchedKeywordCount}", ` +
+                `"superMatchedKeywordOrGlossaryCount": "${this.counts.superMatchedKeywordOrGlossaryCount}", ` +
+                `"superMatchedKeywordCount": "${this.counts.superMatchedKeywordCount}", ` +
+                `"superMatchedSearchTagCount": "${this.counts.superMatchedSearchTagCount}", ` +
+                `"superMatchedGlossaryCount": "${this.counts.superMatchedGlossaryCount}", ` +
+                `"superMatchedGlossaryHeaderCount": "${this.counts.superMatchedGlossaryHeaderCount}", ` +
+                `"idiomMatchedKeywordOrGlossaryCount": "${this.counts.idiomMatchedKeywordOrGlossaryCount}", ` +
+                `"idiomMatchedKeywordCount": "${this.counts.idiomMatchedKeywordCount}", ` +
+                `"idiomMatchedSearchTagCount": "${this.counts.idiomMatchedSearchTagCount}", ` +
+                `"idiomMatchedGlossaryHeaderCount": "${this.counts.idiomMatchedGlossaryHeaderCount}", ` +
+                `"matchedKeywordOrGlossaryCount": "${this.counts.matchedKeywordOrGlossaryCount}", ` +
+                `"matchedKeywordCount": "${this.counts.matchedKeywordCount}", ` +
+                `"matchedSearchTagCount": "${this.counts.matchedSearchTagCount}", ` +
+                `"caseSensitiveMatchedSearchTagCount": "${this.counts.caseSensitiveMatchedSearchTagCount}", ` +
+                `"caseSensitiveMatchedGlossaryCount": "${this.counts.caseSensitiveMatchedGlossaryCount}", ` +
+                `"caseSensitiveMatchedGlossaryHeaderCount": "${this.counts.caseSensitiveMatchedGlossaryHeaderCount}", ` +
+                `"partMatchedKeywordOrGlossaryCount": "${this.counts.partMatchedKeywordOrGlossaryCount}", ` +
+                `"partMatchedKeywordCount": "${this.counts.partMatchedKeywordCount}", ` +
+                `"partMatchedSearchTagCount": "${this.counts.partMatchedSearchTagCount}", ` +
+                `"partMatchedGlossaryCount": "${this.counts.partMatchedGlossaryCount}", ` +
+                `"partMatchedGlossaryHeaderCount": "${this.counts.partMatchedGlossaryHeaderCount}", ` +
                 `"part": "${this.counts.partMatchedTargetKeywordCount}"}`;
         } else {
             var  debugString = ``;

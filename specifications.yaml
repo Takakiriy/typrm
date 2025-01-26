@@ -29,6 +29,7 @@ command: #keyword: typrm command list
                 searchSubFaster:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSubFaster(
                 searchSub:  #ref: ${GitHub}/typrm/src/main.ts#function  searchSub(
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
+                    #   lineNum += 1;
                     // keyword tag:  #// (#keyword:tag)
                         getKeywordMatchingScore: #🌟  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
                             __getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts# #__getSubMatchedScore

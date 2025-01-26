@@ -11,9 +11,9 @@ import * as csvParse from 'csv-parse';
 import chalk from 'chalk';
 import * as yaml from 'js-yaml';
 import * as child_process from 'child_process';
-import * as lib from './lib.js';
+import * as lib from "./lib";
 import sharp from 'sharp';
-// import { pp, ff, cc, ccCount } from './lib.js';
+// import { pp, ff, cc, ccCount } from "./lib";
 var __dirname = process.cwd(); // If const, SyntaxError: Identifier '__dirname' has already been declared
 if (__dirname.endsWith('src')) { // First run __dirname is typrmProject, second run __dirname is typrmProject/src.
     var typrmProject = path.dirname(__dirname);
@@ -21,10 +21,10 @@ if (__dirname.endsWith('src')) { // First run __dirname is typrmProject, second 
 else {
     var typrmProject = __dirname;
 }
-var debugSearchScore = false;
+var debugSearchScore = true;
 var debugPointLineNum = 0; // 0 = not debug. Search "debugPointLineNum" in this file.
 var debugFilePathPart = ".yaml"; // This is used, if "debugPointLineNum" != 0
-var debugScoreList = false;
+var debugScoreList = true;
 var inDebuggingLine = false;
 var timeTag = false;
 // main
@@ -4228,8 +4228,8 @@ class MatchedCounts {
     }
 }
 function compareScoreAndSoOn(a, b) {
-    return compareScoreAndSoOnRelease(a, b);
-    // return  compareScoreAndSoOnDebug(a, b);
+    // return  compareScoreAndSoOnRelease(a, b);
+    return compareScoreAndSoOnDebug(a, b);
 }
 function compareScoreAndSoOnRelease(a, b) {
     const aa = a.counts;
