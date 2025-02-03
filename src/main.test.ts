@@ -846,7 +846,7 @@ describe("search_fast >> keyword tag >>", () => {
 });
 
 describe("searches >> keyword tag >>", () => {
-    test.each([
+    test.only.each([
         [   "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
@@ -1266,7 +1266,7 @@ describe("searches >> keyword tag >>", () => {
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
-if (caseName !== 'idiom_without_space') {return;}  // || subCase !== '____'
+if (caseName !== 'output order (5)') {return;}  // || subCase !== '____'
         const  isWindowsEnvironment = (path.sep === '\\');
         const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
         if ( ! isWindowsEnvironment && isWindowsCase) {
@@ -2305,11 +2305,13 @@ describe("unit test >>", () => {
         });
         const  searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
     });
-    test.only("pickUpKeyPhraseWithSpace", () => {
+    test("pickUpKeyPhraseWithSpace", () => {
         const  pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
-        expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 7)).toBe("time");
-        expect(pickUpKeyPhraseWithSpace("timeout",     "error: time out was  occurred", 7)).toBe("time out");
-        expect(pickUpKeyPhraseWithSpace("wasoccurred", "error: time out was  occurred", 16)).toBe("was  occurred");
+        //                                              012345 6789 012 345  67890123
+        expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 6)).toBe("time");
+        expect(pickUpKeyPhraseWithSpace("timeout",     "error: time out was  occurred", 6)).toBe("time out");
+        expect(pickUpKeyPhraseWithSpace("wasoccurred", "error: time out was  occurred", 13)).toBe("was  occurred");  // double space
+        expect(pickUpKeyPhraseWithSpace("timeout",     "error: TIME OUT was  occurred", 6)).toBe("TIME OUT");  // not case sensitive
     });
 });
 

@@ -16,7 +16,7 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
     var  typrmProject = __dirname;
 }
 var  debugSearchScore = true;
-var  debugPointLineNum = 357;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -44,8 +44,8 @@ function  DebugWatchPoint() {
         BenchmarkCounters.print();
     }
     if (true) {
-        var    d = lib.pp('');
         const  s = getStdOut();
+        var    d = lib.pp('');
         d = [];  // Set break point here and watch the variable d
     }
 }
@@ -3582,6 +3582,9 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
             if (inDebuggingLine) {
                 lib.pp(`#breadcrumb: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
             }
+if (lineNum === 54) {
+var isDebug=true;
+}
 
             // score tag
             if (line !== '') {
@@ -4157,6 +4160,7 @@ export class  Class {
         // const  isDebug = (targetString === 'STR');
         var  score = 0;
         var  position = notFound;
+        var  matchedWithoutSpace = false;
         const  matched = new MatchedPart();
         if (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart)) {
             lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
@@ -4228,6 +4232,7 @@ export class  Class {
 
                 // Not case sensitive matched with "keywordLowerCase".
                 if ((position = targetStringLowerCaseWithoutSpaces.indexOf(keywordLowerCase)) !== notFound) {
+                    matchedWithoutSpace = true;
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
                         matchedKeyword = keywordLowerCase;
@@ -4257,6 +4262,7 @@ export class  Class {
 
                     // Not case sensitive matched with "particpleLowerCase".
                     if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
+                        matchedWithoutSpace = true;
                         if (targetString.length === particpleLowerCase.length) {
                             const  semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
                             const  commonLength = searchWordParticples.commonPartLowerCase.length;
@@ -4300,11 +4306,18 @@ export class  Class {
             }
 
             if (score >= 1) {
-                matched.position = position;
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
-    matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
-                matched.matchedString = escapePercentByte(pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position));
+    // matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
+                if ( ! matchedWithoutSpace) {
+                    var  matchedKeyword_ = matchedKeyword;
+                    var  positionWithSpace = position;
+                } else {
+                    var { keyPhraseWithSpace: matchedKeyword_, positionWithSpace: positionWithSpace } =
+                        pickUpKeyPhraseWithSpace(matchedKeyword, targetString, position);
+                }
+                matched.matchedString = escapePercentByte(matchedKeyword_);
+                matched.position = positionWithSpace;
 
                 matched.targetType = targetWordType;
             } else {
@@ -4315,6 +4328,9 @@ export class  Class {
     }
 
     static  __getNotMatchedTargetKeyphrase(targetKeyphrase: string, found: FoundLine): string {
+if (targetKeyphrase === "add SILVER arrow")  {
+var isDebug=true;
+}
         var  notMatchedTargetKeyphrase = targetKeyphrase;
 
         for (const match of found.matches) {
@@ -4365,30 +4381,48 @@ function  isSeparator(checkingCharacter: string) {  // Space and signs
     return  programOptionsWordSeparators.includes(checkingCharacter);
 }
 
-function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInText: number): string {
+function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInTextWithoutSpaces: number): OutoutPickUpKeyPhraseWithSpace {
     // Example:
-    //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 7) === "time out"
-    var  textIndex = Math.trunc( keyPhraseIndexInText );
-    var  keyPhrase = "";
+    //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 6) === "time out"
+    const  textWithoutSpaces = textWithSpaces.replace(/ /g, '');
+    const  leftTextWithoutSpaces = textWithoutSpaces.substring(0, keyPhraseIndexInTextWithoutSpaces);
+    var  textPosition = 0;
+    var  startPositionInText = 0;
+    var  xWithSpaces = "";
 
-    for (const  k of keyPhraseWithoutSpaces) {
-        var  t = textWithSpaces[textIndex];
+    for (const  xWithoutSpaces of [leftTextWithoutSpaces, keyPhraseWithoutSpaces]) {
+        xWithSpaces = "";
+        for (const  x of xWithoutSpaces) {
+            var  t = textWithSpaces[textPosition];
 
-        while (t === ' ') {
-            keyPhrase += ' ';
-            textIndex += 1;
-            t = textWithSpaces[textIndex];
+            while (t === ' ') {
+                xWithSpaces += ' ';
+                textPosition += 1;
+                t = textWithSpaces[textPosition];
+            }
+            if (t.toLowerCase() === x.toLowerCase()) {
+
+                xWithSpaces += t;
+            } else {
+                throw new Error('unexpected in pickUpKeyPhraseWithSpace');
+            }
+            textPosition += 1;
         }
-        if (t === k) {
 
-            keyPhrase += t;
-        } else {
-            throw new Error('unexpected in pickUpKeyPhraseWithSpace');
+        for (let  t = textWithSpaces[textPosition];  t === ' ';  textPosition += 1,  t = textWithSpaces[textPosition]) {
         }
-        textIndex += 1;
+
+        if (xWithoutSpaces === leftTextWithoutSpaces) {
+            startPositionInText = textPosition;
+        }
     }
 
-    return  keyPhrase;
+    return  {keyPhraseWithSpace: xWithSpaces, positionWithSpace: startPositionInText};
+}
+
+interface  OutoutPickUpKeyPhraseWithSpace {
+    keyPhraseWithSpace: string;
+    positionWithSpace: number;
 }
 
 class  MatchedCounts {
@@ -4510,8 +4544,11 @@ class  MatchedCounts {
 }
 
 function  compareScoreAndSoOn(a: FoundLine, b: FoundLine): number {
-    return  compareScoreAndSoOnRelease(a, b);
-    // return  compareScoreAndSoOnDebug(a, b);
+    if ( ! debugSearchScore) {
+        return  compareScoreAndSoOnRelease(a, b);
+    } else {
+        return  compareScoreAndSoOnDebug(a, b);
+    }
 }
 
 function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
@@ -4752,7 +4789,8 @@ function  compareScoreAndSoOnRelease(a: FoundLine, b: FoundLine): number {
 
 function  compareScoreAndSoOnDebug(a: FoundLine, b: FoundLine): number {
     // Synchronized with "compareScoreAndSoOnRelease" at 2023-11-25
-    var  debugLineNums = [9,3,13,7,6,1,11,10];  // Edit this in order of priority
+    // var  debugLineNums = [9,3,13,7,6,1,11,10];  // Edit this in order of priority
+    var  debugLineNums = [55, 56];  // Edit this in order of priority
     const  indexA = debugLineNums.indexOf(a.lineNum);
     const  indexB = debugLineNums.indexOf(b.lineNum);
     const  aa = a.counts;
@@ -7294,6 +7332,9 @@ class FoundLine {
     }
 
     get  notMatchedTargetWordCount(): number {
+if (this.lineNum === 54) {
+var isDebug= true;
+}
         const  separators = lib.escapeRegularExpression(programOptionsWordSeparators);
         const  allKeywordIsAllMatchedGlossary =
             this.matches.some((m)=> (m.targetTagType === 'glossary'  ||  m.targetTagType ==='glossaryHeader'))  &&
@@ -7443,7 +7484,7 @@ class FoundLine {
         if (terminatorPosition !== notFound) {
             coloredLine = coloredLine.substring(0, terminatorPosition);
         }
-        if (false) {  // coloredStrings debug
+        if (true) {  // coloredStrings debug
             var d = lib.pp('coloredStrings:');
             lib.pp(lib.getAllQuotedCSVLine(coloredStrings));
             d = [];
@@ -7530,23 +7571,46 @@ class FoundLine {
             coloredLine = glossaryLabelColor( glossaryLabel ) +' '+ coloredLine;
         }
         if (debugSearchScore) {
-            var  debugString = ` (score: ${this.score}, ` +
-                `searchKeywordCount: ${this.counts.searchKeywordCount}, ` +
-                `targetWordCount: ${this.counts.targetWordCount}, ` +
-                `keyword: ${this.counts.matchedKeywordCount}, ` +
-                `glossary: ${this.counts.matchedGlossaryCount}, ` +
-                `glossaryHeader: ${this.counts.matchedGlossaryHeaderCount}, ` +
-                `parentMatchedCount: ${lib.getAllQuotedCSVLine(this.counts.parentMatchedCount) || '[]'}, ` +
-                `matchedSearchCount: ${this.counts.matchedSearchKeywordCount}, ` +
-                `targetWordCountForCompare: ${this.targetWordCountForCompare}, ` +
-                `superMatchedTargetCount: ${this.counts.superMatchedTargetKeywordCount}, ` +
-                `semi: ${this.counts.semiMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSemi: ${this.counts.caseIgnoredSemiMatchedTargetKeywordCount}, ` +
-                `participle: ${this.counts.participleMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSuper: ${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}, ` +
-                `caseIgnoredParticiple: ${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}, ` +
-                `caseIgnoredSemiParticiple: ${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}, ` +
-                `part: ${this.counts.partMatchedTargetKeywordCount})`;
+            var  debugString = ` {"score": "${this.score}", ` +
+                `"searchKeywordCount": "${this.counts.searchKeywordCount}", ` +
+                `"targetWordCount": "${this.counts.targetWordCount}", ` +
+                `"notMatchedTargetWordCount": "${this.notMatchedTargetWordCount}", ` +
+                `"keyword": "${this.counts.matchedKeywordCount}", ` +
+                `"glossary": "${this.counts.matchedGlossaryCount}", ` +
+                `"glossaryHeader": "${this.counts.matchedGlossaryHeaderCount}", ` +
+                `"parentMatchedCount": "${lib.getAllQuotedCSVLine(this.counts.parentMatchedCount) || '[]'}", ` +
+                `"matchedSearchCount": "${this.counts.matchedSearchKeywordCount}", ` +
+                `"targetWordCountForCompare": "${this.targetWordCountForCompare}", ` +
+                `"superMatchedTargetCount": "${this.counts.superMatchedTargetKeywordCount}", ` +
+                `"semi": "${this.counts.semiMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSemi": "${this.counts.caseIgnoredSemiMatchedTargetKeywordCount}", ` +
+                `"participle": "${this.counts.participleMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSuper": "${this.counts.caseIgnoredSuperMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredParticiple": "${this.counts.caseIgnoredParticipleMatchedTargetKeywordCount}", ` +
+                `"caseIgnoredSemiParticiple": "${this.counts.caseIgnoredSemiOrParticipleMatchedTargetKeywordCount}", ` +
+                `"caseSensitiveMatchedKeywordOrGlossaryCount": "${this.counts.caseSensitiveMatchedKeywordOrGlossaryCount}", ` +
+                `"caseSensitiveMatchedKeywordCount": "${this.counts.caseSensitiveMatchedKeywordCount}", ` +
+                `"superMatchedKeywordOrGlossaryCount": "${this.counts.superMatchedKeywordOrGlossaryCount}", ` +
+                `"superMatchedKeywordCount": "${this.counts.superMatchedKeywordCount}", ` +
+                `"superMatchedSearchTagCount": "${this.counts.superMatchedSearchTagCount}", ` +
+                `"superMatchedGlossaryCount": "${this.counts.superMatchedGlossaryCount}", ` +
+                `"superMatchedGlossaryHeaderCount": "${this.counts.superMatchedGlossaryHeaderCount}", ` +
+                `"idiomMatchedKeywordOrGlossaryCount": "${this.counts.idiomMatchedKeywordOrGlossaryCount}", ` +
+                `"idiomMatchedKeywordCount": "${this.counts.idiomMatchedKeywordCount}", ` +
+                `"idiomMatchedSearchTagCount": "${this.counts.idiomMatchedSearchTagCount}", ` +
+                `"idiomMatchedGlossaryHeaderCount": "${this.counts.idiomMatchedGlossaryHeaderCount}", ` +
+                `"matchedKeywordOrGlossaryCount": "${this.counts.matchedKeywordOrGlossaryCount}", ` +
+                `"matchedKeywordCount": "${this.counts.matchedKeywordCount}", ` +
+                `"matchedSearchTagCount": "${this.counts.matchedSearchTagCount}", ` +
+                `"caseSensitiveMatchedSearchTagCount": "${this.counts.caseSensitiveMatchedSearchTagCount}", ` +
+                `"caseSensitiveMatchedGlossaryCount": "${this.counts.caseSensitiveMatchedGlossaryCount}", ` +
+                `"caseSensitiveMatchedGlossaryHeaderCount": "${this.counts.caseSensitiveMatchedGlossaryHeaderCount}", ` +
+                `"partMatchedKeywordOrGlossaryCount": "${this.counts.partMatchedKeywordOrGlossaryCount}", ` +
+                `"partMatchedKeywordCount": "${this.counts.partMatchedKeywordCount}", ` +
+                `"partMatchedSearchTagCount": "${this.counts.partMatchedSearchTagCount}", ` +
+                `"partMatchedGlossaryCount": "${this.counts.partMatchedGlossaryCount}", ` +
+                `"partMatchedGlossaryHeaderCount": "${this.counts.partMatchedGlossaryHeaderCount}", ` +
+                `"part": "${this.counts.partMatchedTargetKeywordCount}"}`;
         } else {
             var  debugString = ``;
         }
