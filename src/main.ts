@@ -16,7 +16,7 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
     var  typrmProject = __dirname;
 }
 var  debugSearchScore = true;
-var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugPointLineNum = 55;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -4157,7 +4157,7 @@ export class  Class {
     #__getSubMatchedScore(targetString: string, targetStringLowerCaseWithoutSpaces: string, searchWordParticples: ParticpleWord,
             targetStringIndex: number, wordIndex: number, targetWordType: WordType): Result {
         // Debug
-        // const  isDebug = (targetString === 'STR');
+const  isDebug = (targetString === 'SILVER Arrows'  &&  searchWordParticples.specified === 'arrow');
         var  score = 0;
         var  position = notFound;
         var  matchedWithoutSpace = false;
@@ -4165,6 +4165,9 @@ export class  Class {
         if (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart)) {
             lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
         }
+if (isDebug) {
+lib.pp('')
+}
 
         if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const  keyword = searchWordParticples.specified;
@@ -4328,7 +4331,7 @@ export class  Class {
     }
 
     static  __getNotMatchedTargetKeyphrase(targetKeyphrase: string, found: FoundLine): string {
-if (targetKeyphrase === "add SILVER arrow")  {
+if (targetKeyphrase === "SILVER Arrows")  {
 var isDebug=true;
 }
         var  notMatchedTargetKeyphrase = targetKeyphrase;
@@ -7332,7 +7335,7 @@ class FoundLine {
     }
 
     get  notMatchedTargetWordCount(): number {
-if (this.lineNum === 54) {
+if (this.lineNum === 55) {
 var isDebug= true;
 }
         const  separators = lib.escapeRegularExpression(programOptionsWordSeparators);

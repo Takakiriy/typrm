@@ -273,7 +273,7 @@ debug:
         Search result order:
             compareScoreAndSoOn:  #// This shows a compare reason.
                 How to use:
-                    - Change comment out in "function  compareScoreAndSoOn(" in "main.ts"
+                    - Set "debugSearchScore" "true" in "main.ts"
                     - Set "debugLineNums" value in "function  compareScoreAndSoOnDebug" in "main.ts"
                     - Set a break point at "function  DebugWatchPoint" in "main.ts"
             debugSearchScore:  #// This shows matched keyword scores.
