@@ -15,8 +15,8 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
 } else {
     var  typrmProject = __dirname;
 }
-var  debugSearchScore = true;
-var  debugPointLineNum = 55;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugSearchScore = false;
+var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -4161,6 +4161,7 @@ const  isDebug = (targetString === 'SILVER Arrows'  &&  searchWordParticples.spe
         var  score = 0;
         var  position = notFound;
         var  matchedWithoutSpace = false;
+        var  positionIsWithSpace = false;
         const  matched = new MatchedPart();
         if (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart)) {
             lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
@@ -4236,6 +4237,8 @@ lib.pp('')
                 // Not case sensitive matched with "keywordLowerCase".
                 if ((position = targetStringLowerCaseWithoutSpaces.indexOf(keywordLowerCase)) !== notFound) {
                     matchedWithoutSpace = true;
+                    var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
+                    positionIsWithSpace = true;
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
                         matchedKeyword = keywordLowerCase;
@@ -4262,10 +4265,15 @@ lib.pp('')
             }
             if (score === 0) {
                 for (const particpleLowerCase of searchWordParticples.particplesLowerCase) {
+if (isDebug  &&  particpleLowerCase == "arrows") {
+lib.pp('')
+}
 
                     // Not case sensitive matched with "particpleLowerCase".
                     if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
                         matchedWithoutSpace = true;
+                        var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(particpleLowerCase, targetString, position);
+                        positionIsWithSpace = true;
                         if (targetString.length === particpleLowerCase.length) {
                             const  semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
                             const  commonLength = searchWordParticples.commonPartLowerCase.length;
@@ -4312,7 +4320,7 @@ lib.pp('')
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
     // matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
-                if ( ! matchedWithoutSpace) {
+                if ( ! matchedWithoutSpace  ||  positionIsWithSpace) {
                     var  matchedKeyword_ = matchedKeyword;
                     var  positionWithSpace = position;
                 } else {
@@ -4412,7 +4420,7 @@ function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpace
             textPosition += 1;
         }
 
-        for (let  t = textWithSpaces[textPosition];  t === ' ';  textPosition += 1,  t = textWithSpaces[textPosition]) {
+        for (t = textWithSpaces[textPosition];  t === ' ';  textPosition += 1,  t = textWithSpaces[textPosition]) {
         }
 
         if (xWithoutSpaces === leftTextWithoutSpaces) {
