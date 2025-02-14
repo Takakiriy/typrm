@@ -4157,7 +4157,7 @@ export class  Class {
     #__getSubMatchedScore(targetString: string, targetStringLowerCaseWithoutSpaces: string, searchWordParticples: ParticpleWord,
             targetStringIndex: number, wordIndex: number, targetWordType: WordType): Result {
         // Debug
-const  isDebug = (targetString === 'SILVER Arrows'  &&  searchWordParticples.specified === 'arrow');
+const  isDebug = (targetString === 'time out');
         var  score = 0;
         var  position = notFound;
         var  matchedWithoutSpace = false;
@@ -4237,6 +4237,9 @@ lib.pp('')
                 // Not case sensitive matched with "keywordLowerCase".
                 if ((position = targetStringLowerCaseWithoutSpaces.indexOf(keywordLowerCase)) !== notFound) {
                     matchedWithoutSpace = true;
+if (isDebug) {
+lib.pp('')
+}
                     var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
                     positionIsWithSpace = true;
                     if (targetString.length === keywordLowerCase.length) {
