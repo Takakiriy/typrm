@@ -167,6 +167,7 @@ tag: #keyword: typrm tags
 test:
     test command:
         - npm test  #ref: ./README.md  #ref: ./README-jp.md
+        - node node_modules/typescript/bin/tsc --watch  #// VSCode >> Terminal >> Run Task >>  TypeScript Compile Task
         - Build and basic test in ".vscode/launch.json"
     test:  #// 機能からテストを探す場合
         #search: typrm search test
@@ -253,13 +254,15 @@ debug:
         Debug from launch: |
             $ export __Variables__=__Value__
             $ code __Project__
+            $ node node_modules/typescript/bin/tsc --watch  #// VSCode >> Terminal >> Run Task >>  TypeScript Compile Task
             Select "Debug from launch" in "Run and Debug" view
             Write calling "pp" code
             Set break point at "DebugWatchPoint" in main.ts  #search: typrm DebugWatchPoint
             Press F5 key
             Watch "debugOut" variable value
-        Others:
+        Others: |
             $ code __Project__
+            $ node node_modules/typescript/bin/tsc --watch  #// VSCode >> Terminal >> Run Task >>  TypeScript Compile Task
             Select "__LaunchName__" in "Run and Debug" view
             Press F5 key
     at start:
