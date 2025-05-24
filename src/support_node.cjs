@@ -14,18 +14,26 @@ function  addJsExtensionToImports(directory) {
         } else if (file.name.endsWith('.js')) {
             const  filePath = path.join(directory, file.name);
             let    content = fs.readFileSync(filePath, 'utf8');
+            const  relativePath = '../'.repeat(countOccurrences(filePath, '/|\\\\')).substring(1);
 
-            content = content.replace(/from\s+['"]((.+?)\/(.+?))['"]/g, (match, p1) => {
-                if (p1.endsWith('.js') || p1.endsWith('.cjs') || p1.startsWith('http') || p1.startsWith('/')) {
+            content = content.replace(/(from|import)\s+['"]((.+?)\/(.+?))['"]/g, (match, p1, p2) => {
+                if (p2.endsWith('.js') || p2.endsWith('.cjs')  || p2.endsWith('.mjs') || p2.startsWith('http') || p2.startsWith('/')) {
                     return match;
+                } else if (p2.endsWith('_esm')) {
+                    return `${p1} '${p2}.mjs'`;
                 } else {
-                    return `from '${p1}.js'`;
+                    return `${p1} '${p2}.js'`;
                 }
             });
+            content = content.replace(/@src\//g, relativePath);
 
             fs.writeFileSync(filePath, content, 'utf8');
         }
     }
+}
+
+function  countOccurrences(target, keywordRegExp) {
+    return  (target.match(new RegExp(keywordRegExp, 'gi')) || []).length;
 }
 
 main();

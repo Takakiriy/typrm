@@ -35,6 +35,11 @@ declare namespace GetKeywordMatchingScore {
         constructor(arg: Arguments, ret?: FoundLine, isDebug?: boolean);
     }
 }
+declare function pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpaces: string, keyPhraseIndexInTextWithoutSpaces: number): OutoutPickUpKeyPhraseWithSpace;
+interface OutoutPickUpKeyPhraseWithSpace {
+    keyPhraseWithSpace: string;
+    positionWithSpace: number;
+}
 declare function searchTargetKeyphrasePositions(line: string, separatorPositions: number[]): number[];
 declare enum CommandEnum {
     unknown = 0,
@@ -311,6 +316,7 @@ export declare const private_: {
     makeReplaceToTagTree: typeof makeReplaceToTagTree;
     Parser: typeof Parser;
     searchTargetKeyphrasePositions: typeof searchTargetKeyphrasePositions;
+    pickUpKeyPhraseWithSpace: typeof pickUpKeyPhraseWithSpace;
 };
 export declare const foundCountMaxDefault = "10";
 export declare const snippetLineCountDefault = "5";
