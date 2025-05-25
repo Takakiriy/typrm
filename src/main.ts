@@ -4240,27 +4240,28 @@ lib.pp('')
 if (isDebug) {
 lib.pp('')
 }
-                    var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
+                    var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
                     positionIsWithSpace = true;
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
-                        matchedKeyword = keywordLowerCase;
+                        matchedKeyword = keyPhraseWithSpace;
                         matched.matchedWordType = 'super';
                         matched.caseSensitiveMatched = false;
                     } else {
                         if (isSuperWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordSuperMatchScore;
-                            matchedKeyword = keywordLowerCase;
+                            matchedKeyword = keyPhraseWithSpace;
                             matched.matchedWordType = 'wordOrIdiom';
                             matched.caseSensitiveMatched = false;
                         } else if (isWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordsSemiMatchScore;
-                            matchedKeyword = keywordLowerCase;
+                            matchedKeyword = keyPhraseWithSpace;
                             matched.matchedWordType = 'wordOrIdiomWord';
                             matched.caseSensitiveMatched = false;
                         } else {
                             if (keyword.length >= 2) {
                                 caseIgnoredPartMatchPosition = position;
+                                matchedKeyword = keyPhraseWithSpace;
                             }
                         }
                     }
@@ -4275,7 +4276,7 @@ lib.pp('')
                     // Not case sensitive matched with "particpleLowerCase".
                     if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
                         matchedWithoutSpace = true;
-                        var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(particpleLowerCase, targetString, position);
+                        var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(particpleLowerCase, targetString, position);
                         positionIsWithSpace = true;
                         if (targetString.length === particpleLowerCase.length) {
                             const  semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
@@ -4312,7 +4313,7 @@ lib.pp('')
                     position = partMatchPosition;
                 } else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
-                    matchedKeyword = keywordLowerCase;
+                    // matchedKeyword is already set.
                     // matched.matchedWordType = 
                     matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;
