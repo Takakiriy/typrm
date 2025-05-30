@@ -16,7 +16,7 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
     var  typrmProject = __dirname;
 }
 var  debugSearchScore = false;
-var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugPointLineNum = 99999;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -4173,6 +4173,7 @@ lib.pp('')
         if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const  keyword = searchWordParticples.specified;
             const  keywordLowerCase = searchWordParticples.specifiedLowerCase;
+            var  keyPhraseLowerCaseWithSpace = keyword;
             var  partMatchPosition = notFound;
             var  caseIgnoredPartMatchPosition = notFound;
             var  matchedKeyword = '';
@@ -4240,22 +4241,23 @@ lib.pp('')
 if (isDebug) {
 lib.pp('')
 }
-                    var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
+                    var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
                     positionIsWithSpace = true;
+                    keyPhraseLowerCaseWithSpace = keyPhraseWithSpace.toLowerCase();
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
-                        matchedKeyword = keywordLowerCase;
+                        matchedKeyword = keyPhraseLowerCaseWithSpace;
                         matched.matchedWordType = 'super';
                         matched.caseSensitiveMatched = false;
                     } else {
                         if (isSuperWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordSuperMatchScore;
-                            matchedKeyword = keywordLowerCase;
+                            matchedKeyword = keyPhraseLowerCaseWithSpace;
                             matched.matchedWordType = 'wordOrIdiom';
                             matched.caseSensitiveMatched = false;
                         } else if (isWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordsSemiMatchScore;
-                            matchedKeyword = keywordLowerCase;
+                            matchedKeyword = keyPhraseLowerCaseWithSpace;
                             matched.matchedWordType = 'wordOrIdiomWord';
                             matched.caseSensitiveMatched = false;
                         } else {
@@ -4312,7 +4314,7 @@ lib.pp('')
                     position = partMatchPosition;
                 } else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
-                    matchedKeyword = keywordLowerCase;
+                    matchedKeyword = keyPhraseLowerCaseWithSpace;
                     // matched.matchedWordType = 
                     matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;
