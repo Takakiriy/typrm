@@ -16,7 +16,7 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
     var  typrmProject = __dirname;
 }
 var  debugSearchScore = false;
-var  debugPointLineNum = 0;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugPointLineNum = 99999;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -3853,6 +3853,9 @@ var isDebug=true;
     const  maximumHitWordCount = foundLines.reduce((previous, found) => (
         Math.max(previous, found.counts.matchedSearchKeywordCount)
     ), 0);
+    if (debugPointLineNum !== 0) {
+        lib.pp(`#debugSearchScore: foundLines.length = ${foundLines.length}`);
+    }
 
     foundLines = foundLines.filter((found) =>
         (found.counts.matchedSearchKeywordCount === maximumHitWordCount)  ||
@@ -3860,6 +3863,7 @@ var isDebug=true;
     foundLines.sort(compareScoreAndSoOn);
     if (debugPointLineNum !== 0) {
         lib.pp(`#debugSearchScore: filter by maximumHitWordCount in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
+        lib.pp(`#debugSearchScore: foundLines.length = ${foundLines.length}`);
         const  foundLine = foundLines.find((found)=>(found.lineNum === debugPointLineNum  &&  found.path.includes(debugFilePathPart)));
         lib.pp(`#debugSearchScore: there is ${foundLine ? '' : 'NOT '}found data.`);
     }
@@ -4173,6 +4177,7 @@ lib.pp('')
         if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const  keyword = searchWordParticples.specified;
             const  keywordLowerCase = searchWordParticples.specifiedLowerCase;
+            var  keyPhraseLowerCaseWithSpace = keyword;
             var  partMatchPosition = notFound;
             var  caseIgnoredPartMatchPosition = notFound;
             var  matchedKeyword = '';
@@ -4242,20 +4247,21 @@ lib.pp('')
 }
                     var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
                     positionIsWithSpace = true;
+                    keyPhraseLowerCaseWithSpace = keyPhraseWithSpace.toLowerCase();
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
-                        matchedKeyword = keyPhraseWithSpace;
+                        matchedKeyword = keyPhraseLowerCaseWithSpace;
                         matched.matchedWordType = 'super';
                         matched.caseSensitiveMatched = false;
                     } else {
                         if (isSuperWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordSuperMatchScore;
-                            matchedKeyword = keyPhraseWithSpace;
+                            matchedKeyword = keyPhraseLowerCaseWithSpace;
                             matched.matchedWordType = 'wordOrIdiom';
                             matched.caseSensitiveMatched = false;
                         } else if (isWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordsSemiMatchScore;
-                            matchedKeyword = keyPhraseWithSpace;
+                            matchedKeyword = keyPhraseLowerCaseWithSpace;
                             matched.matchedWordType = 'wordOrIdiomWord';
                             matched.caseSensitiveMatched = false;
                         } else {
@@ -4313,7 +4319,7 @@ lib.pp('')
                     position = partMatchPosition;
                 } else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
-                    // matchedKeyword is already set.
+                    matchedKeyword = keyPhraseLowerCaseWithSpace;
                     // matched.matchedWordType = 
                     matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;

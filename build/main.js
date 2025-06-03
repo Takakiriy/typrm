@@ -22,7 +22,7 @@ else {
     var typrmProject = __dirname;
 }
 var debugSearchScore = false;
-var debugPointLineNum = 0; // 0 = not debug. Search "debugPointLineNum" in this file.
+var debugPointLineNum = 99999; // 0 = not debug. Search "debugPointLineNum" in this file.
 var debugFilePathPart = ".yaml"; // This is used, if "debugPointLineNum" != 0
 var debugScoreList = false;
 var inDebuggingLine = false;
@@ -3632,11 +3632,15 @@ async function searchSub(keyword, now, isMutual) {
         timeTag && lib.time.end(`searchSub >> ${inputFileFullPath}`);
     }
     const maximumHitWordCount = foundLines.reduce((previous, found) => (Math.max(previous, found.counts.matchedSearchKeywordCount)), 0);
+    if (debugPointLineNum !== 0) {
+        lib.pp(`#debugSearchScore: foundLines.length = ${foundLines.length}`);
+    }
     foundLines = foundLines.filter((found) => (found.counts.matchedSearchKeywordCount === maximumHitWordCount) ||
         found.matches[0].targetTagType === 'alarm');
     foundLines.sort(compareScoreAndSoOn);
     if (debugPointLineNum !== 0) {
         lib.pp(`#debugSearchScore: filter by maximumHitWordCount in searchSub, maximumHitWordCount = ${maximumHitWordCount}`);
+        lib.pp(`#debugSearchScore: foundLines.length = ${foundLines.length}`);
         const foundLine = foundLines.find((found) => (found.lineNum === debugPointLineNum && found.path.includes(debugFilePathPart)));
         lib.pp(`#debugSearchScore: there is ${foundLine ? '' : 'NOT '}found data.`);
     }
@@ -3942,6 +3946,7 @@ var GetKeywordMatchingScore;
         if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const keyword = searchWordParticples.specified;
             const keywordLowerCase = searchWordParticples.specifiedLowerCase;
+            var keyPhraseLowerCaseWithSpace = keyword;
             var partMatchPosition = notFound;
             var caseIgnoredPartMatchPosition = notFound;
             var matchedKeyword = '';
@@ -4011,30 +4016,32 @@ var GetKeywordMatchingScore;
                     if (isDebug) {
                         lib.pp('');
                     }
-                    var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
+                    var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
                     positionIsWithSpace = true;
+                    keyPhraseLowerCaseWithSpace = keyPhraseWithSpace.toLowerCase();
                     if (targetString.length === keywordLowerCase.length) {
                         score = caseIgnoredFullMatchScore;
-                        matchedKeyword = keywordLowerCase;
+                        matchedKeyword = keyPhraseLowerCaseWithSpace;
                         matched.matchedWordType = 'super';
                         matched.caseSensitiveMatched = false;
                     }
                     else {
                         if (isSuperWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordSuperMatchScore;
-                            matchedKeyword = keywordLowerCase;
+                            matchedKeyword = keyPhraseLowerCaseWithSpace;
                             matched.matchedWordType = 'wordOrIdiom';
                             matched.caseSensitiveMatched = false;
                         }
                         else if (isWordMatch(targetString, position, keyword)) {
                             score = caseIgnoredWordsSemiMatchScore;
-                            matchedKeyword = keywordLowerCase;
+                            matchedKeyword = keyPhraseLowerCaseWithSpace;
                             matched.matchedWordType = 'wordOrIdiomWord';
                             matched.caseSensitiveMatched = false;
                         }
                         else {
                             if (keyword.length >= 2) {
                                 caseIgnoredPartMatchPosition = position;
+                                matchedKeyword = keyPhraseWithSpace;
                             }
                         }
                     }
@@ -4048,7 +4055,7 @@ var GetKeywordMatchingScore;
                     // Not case sensitive matched with "particpleLowerCase".
                     if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
                         matchedWithoutSpace = true;
-                        var { positionWithSpace: position } = pickUpKeyPhraseWithSpace(particpleLowerCase, targetString, position);
+                        var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(particpleLowerCase, targetString, position);
                         positionIsWithSpace = true;
                         if (targetString.length === particpleLowerCase.length) {
                             const semiMatchedKeyword = targetString.substr(position, particpleLowerCase.length);
@@ -4087,7 +4094,7 @@ var GetKeywordMatchingScore;
                 }
                 else if (caseIgnoredPartMatchPosition !== notFound) {
                     score = caseIgnoredPartMatchScore;
-                    matchedKeyword = keywordLowerCase;
+                    matchedKeyword = keyPhraseLowerCaseWithSpace;
                     // matched.matchedWordType = 
                     matched.caseSensitiveMatched = false;
                     position = caseIgnoredPartMatchPosition;

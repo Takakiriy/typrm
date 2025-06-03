@@ -31,12 +31,22 @@ command: #keyword: typrm command list
                     listUpFilePaths:  #ref: ${GitHub}/typrm/src/main.ts#function  listUpFilePaths
                     #   lineNum += 1;
                     // keyword tag:  #// (#keyword:tag)
+                        #     let  found = getKeywordMatchingScore({
                         getKeywordMatchingScore: #🌟  #ref: ${GitHub}/typrm/src/main.ts#function  getKeywordMatchingScore
-                            __getSubMatchedScore:  #ref: ${GitHub}/typrm/src/main.ts# #__getSubMatchedScore
+                            # getKeywordMatchingScore(): FoundLine {
+                            #     const  result = this.#__getSubMatchedScore(aTargetString, aTargetStringLowerCase,
+                            __getSubMatchedScore:
+                                # #__getSubMatchedScore(targetString: string, targetStringLowerCaseWithoutSpaces: string, searchWordParticples: ParticpleWord,
                             # if (useThesaurus) {
-                                thesaurus.normalize:  #ref: ${GitHub}/typrm/src/main.ts#thesaurus.normalize(aTargetString
+                            #     const  normalizedTargetKeywords = arg.thesaurus.normalize(aTargetString, arg.searchWordParticples.formalWordsLowerCase);
+                                normalize: #keyword: typrm thesaurus.normalize
+                                    # normalize(keyphrase: string, relationUntilFormalKeywordsLowerCase?: string[]): string {
+                            #     const  normalizedResult = this.#__getSubMatchedScore(normalizedTargetKeywords, normalizedTargetKeywordsLowerCase,
                                 __getSubMatchedScore:
-                            setFoundPosition:  #ref: ${GitHub}/typrm/src/main.ts#setFoundPosition(foundPosition
+                            #     matchedCounts.setFoundPosition(result.position, result.score, false);
+                            setFoundPosition:
+                                #     setFoundPosition(foundPosition: number, score: number, useThesaurus: boolean = false) {
+                        #     found.plusParentMatchScore(lines, searchWordParticples, thesaurus);
                         plusParentMatchScore: #keyword:  #ref: ${GitHub}/typrm/src/main.ts#found.plusParentMatchScore
                         # foundLines.push(found);
                     // glossary tag:  #// (#glossary:tag)
@@ -45,7 +55,9 @@ command: #keyword: typrm command list
                         getMissedAlarm:
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
                         addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
-                    (filter): #🌟  # foundLines = foundLines.filter((found) => (found.counts.matchedSearchKeywordCount === maximumHitWordCount));
+                    (filter): #🌟
+                        # foundLines = foundLines.filter((found) =>
+                        #   (found.counts.matchedSearchKeywordCount === maximumHitWordCount));
                     foundLines.sort(compareScoreAndSoOn):  #ref: ${GitHub}/typrm/src/main.ts#foundLines.sort(compareScoreAndSoOn)
                         compareScoreAndSoOn:  #ref: ${GitHub}/typrm/src/main.ts#function  compareScoreAndSoOn
                         # // Debug score compare in 2 founds
@@ -355,31 +367,34 @@ other specifications:
                 # class ReplaceToTagTree {
                 #     moveToLine_Immutably(parser: Parser, settingsTree: Readonly<SettingsTree>): ReplaceToTagTree_for_moveToLine {
                 #         return_.currentIsOutOfFalseBlock = outOfFalseBlocks.get(lineNum)!;
-    thesaurus relation: #keyword: typrm thesaurus relation
-        thesaurus.csv:
-            JavaScript, js
-            TypeScript, ts, JavaScript
-            React, rc, TypeScript
-        search ts:
-            search
-                ts  →  TypeScript
-                TypeScript  →  TypeScript              // search keyword is normalized "without" relation
-            target
-                JavaScript  → (TypeScript) found       // target keyword is normalized "with" relation, but TypeScript is not normalized because it is a search keyword
-                TypeScript  →  TypeScript  found
-                React       →  React       not found
-        search js:
-            search
-                js  →  JavaScript
-                JavaScript  →  JavaScript              // search keyword is normalized "without" relation
-            target
-                JavaScript  →  JavaScript  found       // target keyword JavaScript is not normalized because it is a search keyword
-                TypeScript  →  TypeScript  not found
-                React       →  React       not found
-        search rc:
-            search
-                rc  →  React
-            target
-                JavaScript  → (React)  found     // search keyword is normalized with multi relations
-                TypeScript  → (React)  found  
-                React       →  React   found  
+    thesaurus:
+        relation example: #keyword: typrm thesaurus relation
+            thesaurus.csv:
+                JavaScript, js
+                TypeScript, ts, JavaScript
+                React, rc, TypeScript
+            search ts:
+                search
+                    ts  →  TypeScript
+                    TypeScript  →  TypeScript              // search keyword is normalized "without" relation
+                target
+                    JavaScript  → (TypeScript) ... found       // target keyword is normalized "with" relation, but TypeScript is not normalized because it is a search keyword
+                    TypeScript  →  TypeScript  ... found
+                    React       →  React       ... not found
+            search js:
+                search
+                    js  →  JavaScript
+                    JavaScript  →  JavaScript              // search keyword is normalized "without" relation
+                target
+                    JavaScript  →  JavaScript  ... found       // target keyword JavaScript is not normalized because it is a search keyword
+                    TypeScript  →  TypeScript  ... not found
+                    React       →  React       ... not found
+            search rc:
+                search
+                    rc  →  React
+                target
+                    JavaScript  → (React)  ... found     // search keyword is normalized with multi relations
+                    TypeScript  → (React)  ... found  
+                    React       →  React   ... found
+        code:
+            search:  #search: typrm thesaurus.normalize

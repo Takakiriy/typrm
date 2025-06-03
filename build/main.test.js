@@ -1110,7 +1110,7 @@ describe("searches >> keyword tag >>", () => {
                 pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
-        if (caseName !== 'idiom_without_space') {
+        if (caseName !== 'normalized_word_count') {
             return;
         } // || subCase !== '____'
         const isWindowsEnvironment = (path.sep === '\\');
