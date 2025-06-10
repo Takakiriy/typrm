@@ -16,7 +16,7 @@ if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second
     var  typrmProject = __dirname;
 }
 var  debugSearchScore = false;
-var  debugPointLineNum = 99999;  // 0 = not debug. Search "debugPointLineNum" in this file.
+var  debugPointLineNum = 354;  // 0 = not debug. Search "debugPointLineNum" in this file.
 var  debugFilePathPart = ".yaml";  // This is used, if "debugPointLineNum" != 0
 var  debugScoreList = false;
 var  inDebuggingLine = false;
@@ -4033,6 +4033,9 @@ export class  Class {
                 const searchWord = arg.searchWordParticples.words[wordIndex];
                 const normalizedSearchWord = arg.searchWordParticples.normalizedWords[wordIndex];
                 if (searchWord.specified === '') {continue;}
+                if (inDebuggingLine) {
+                    lib.pp(`#debugSearchScore:     searchWord[${wordIndex}]: \"${searchWord.specified}\"`);
+                }
 
                 const  result = this.#__getSubMatchedScore(aTargetString, aTargetStringLowerCase,
                         searchWord, targetStingIndex, wordIndex, 'strict');
@@ -4055,7 +4058,7 @@ export class  Class {
                     }
                     found.score += notNormalizedScore;
                     if (debugSearchScore) {
-                        console.log(`    getSubMatchedScore: ${searchWord.specified}, ${aTargetString}, result score: ${result.score} => ${found.score}`);
+                        console.log(`    getSubMatchedScore: Hit!, ${searchWord.specified}, ${aTargetString}, result score: ${result.score} => ${found.score}`);
                     }
                 }
                 if (result.position !== notFound) {
@@ -4065,6 +4068,9 @@ export class  Class {
                 }
                 const  isFoundWithoutNormalized = (result.score !== 0  ||  result.position !== notFound);
                 const  useThesaurus = (arg.thesaurus.enabled  &&  (normalizedSearchWord.specified !== searchWord.specified  ||  normalizedTargetKeywords !== aTargetString));
+                if (inDebuggingLine) {
+                    lib.pp(`#debugSearchScore:     useThesaurus = ${useThesaurus}`);
+                }
                 if (useThesaurus) {
                     const  targetWordType: WordType = (normalizedTargetKeywords === aTargetString) ? 'strict' : 'normalized';
 
@@ -4088,7 +4094,7 @@ export class  Class {
                             var  normalizedMatched = found.matches[found.matches.length - 1];
                         }
                         if (debugSearchScore) {
-                            console.log(`    getSubMatchedScore(thesaurus): ${normalizedSearchWord.specified}, ${aTargetString}, result score: ${normalizedResult.score} => ${found.score}`);
+                            console.log(`    getSubMatchedScore(thesaurus): Hit!, ${normalizedSearchWord.specified}, ${aTargetString}, result score: ${normalizedResult.score} => ${found.score}`);
                         }
                         if ( ! isFoundWithoutNormalized) {
                             matchedCounts.setFoundPosition(normalizedResult.position, normalizedResult.score, true);
@@ -4161,18 +4167,18 @@ export class  Class {
     #__getSubMatchedScore(targetString: string, targetStringLowerCaseWithoutSpaces: string, searchWordParticples: ParticpleWord,
             targetStringIndex: number, wordIndex: number, targetWordType: WordType): Result {
         // Debug
-const  isDebug = (targetString === 'time out');
         var  score = 0;
         var  position = notFound;
         var  matchedWithoutSpace = false;
         var  positionIsWithSpace = false;
         const  matched = new MatchedPart();
-        if (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart)) {
+        const  isDebug = (this.arg.lineNum === debugPointLineNum  &&  this.arg.filePath.includes(debugFilePathPart));
+        if (isDebug) {
             lib.pp(`#debugScoreList:         in __getSubMatchedScore(target: \"${targetString}\", search: \"${searchWordParticples.specified}\", \"${targetWordType}\")`);
+            if (searchWordParticples.specified.includes(' ')) {
+                lib.pp(`#breadcrumb:         WARNING: search word has multi words. It is never hit any single word target.`)
+            }
         }
-if (isDebug) {
-lib.pp('')
-}
 
         if (targetStringLowerCaseWithoutSpaces.indexOf(searchWordParticples.commonPartLowerCase) !== notFound) {
             const  keyword = searchWordParticples.specified;
@@ -4242,9 +4248,6 @@ lib.pp('')
                 // Not case sensitive matched with "keywordLowerCase".
                 if ((position = targetStringLowerCaseWithoutSpaces.indexOf(keywordLowerCase)) !== notFound) {
                     matchedWithoutSpace = true;
-if (isDebug) {
-lib.pp('')
-}
                     var { keyPhraseWithSpace, positionWithSpace: position } = pickUpKeyPhraseWithSpace(keywordLowerCase, targetString, position);
                     positionIsWithSpace = true;
                     keyPhraseLowerCaseWithSpace = keyPhraseWithSpace.toLowerCase();
@@ -4275,9 +4278,6 @@ lib.pp('')
             }
             if (score === 0) {
                 for (const particpleLowerCase of searchWordParticples.particplesLowerCase) {
-if (isDebug  &&  particpleLowerCase == "arrows") {
-lib.pp('')
-}
 
                     // Not case sensitive matched with "particpleLowerCase".
                     if ((position = targetStringLowerCaseWithoutSpaces.indexOf(particpleLowerCase)) !== notFound) {
@@ -4329,7 +4329,6 @@ lib.pp('')
             if (score >= 1) {
                 matched.targetWordsIndex = targetStringIndex;
                 matched.searchWordIndex = wordIndex;
-    // matched.matchedString = escapePercentByte(targetString.substr(position, matchedKeyword.length));
                 if ( ! matchedWithoutSpace  ||  positionIsWithSpace) {
                     var  matchedKeyword_ = matchedKeyword;
                     var  positionWithSpace = position;
@@ -4345,13 +4344,13 @@ lib.pp('')
                 position = notFound;
             }
         }
+        if (isDebug) {
+            lib.pp(`#debugScoreList:           return {score: ${score}, position: ${position}}`);
+        }
         return { score, position, matched };
     }
 
     static  __getNotMatchedTargetKeyphrase(targetKeyphrase: string, found: FoundLine): string {
-if (targetKeyphrase === "SILVER Arrows")  {
-var isDebug=true;
-}
         var  notMatchedTargetKeyphrase = targetKeyphrase;
 
         for (const match of found.matches) {
@@ -7734,6 +7733,9 @@ var isDebug= true;
                     notParentMatches = foundAtParent.matches.slice();  // copy
                 }
                 parentScore += foundAtParent.score;
+                if (isDebugging) {
+                    lib.pp(`#breadcrumb: foundAtParent.score:${foundAtParent.score}`);
+                }
             } else {
                 parentMatchedCount.push(0);
             }

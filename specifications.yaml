@@ -281,7 +281,7 @@ debug:
         - #// Error [ERR_MODULE_NOT_FOUND]: Cannot find module '____\typrm\build\main' imported from ____\typrm\build\typrm.js
             Run "Build and basic test". It runs "src/support_node.cjs".
     functions:  #// typrm functions debug
-        Search function debug points:
+        Search keyword function debug points:
             How to use:
                 - Set "var  debugPointLineNum" and "var  debugFilePathPart" in "main.ts"
                 - Set a break point at "function  DebugWatchPoint" in "main.ts"

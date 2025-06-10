@@ -1263,6 +1263,7 @@ describe("searches >> keyword tag >>", () => {
             ["parentN1 server"],
             { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", thesaurus: "test_data/search/2/thesaurus2.csv"},
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     ${matchedColor('parentN node1')}  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
+                // Hit "parentN" out of keyword tag.
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
