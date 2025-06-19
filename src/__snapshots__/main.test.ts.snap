@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`typrm shell >> search >> search_fast_snippet: stdout 1`] = `
+"typrm keyword: snippet_keyword
+\${typrmProject}/src/test_data/search/2/2.yaml:131:     snippet_keyword not priority:  #keyword:
+\${typrmProject}/src/test_data/search/2/2.yaml:136:         snippet_keyword:  #keyword:
+    s1
+        s11
+            s111
+
+        s12
+and more full searching...
+\${typrmProject}/src/test_data/search/2/2.yaml:131:     snippet_keyword not priority:  #keyword:
+\${typrmProject}/src/test_data/search/2/2.yaml:136:         snippet_keyword:  #keyword:
+    s1
+        s11
+            s111
+
+        s12
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> search_mode: stdout 1`] = `
+"typrm keyword: ABC
+\${typrmProject}/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
+\${typrmProject}/src/test_data/search/1/1.yaml:3: #keyword: ABC, \\"do it\\", \\"a,b\\"
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> search_mode_snippet: stdout 1`] = `
+"typrm keyword: snippet_keyword
+\${typrmProject}/src/test_data/search/2/2.yaml:131:     snippet_keyword not priority:  #keyword:
+\${typrmProject}/src/test_data/search/2/2.yaml:136:         snippet_keyword:  #keyword:
+    s1
+        s11
+            s111
+
+        s12
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> search_mode_without_tags: stdout 1`] = `
+"typrm keyword: Not
+\${typrmProject}/src/test_data/search/1/1.yaml:2: Not keyword  ABC, \\"do it\\", \\"a,b\\"
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> snippet_depth_1: stdout 1`] = `
+"typrm keyword: snippet_depth_1
+\${typrmProject}/src/test_data/search/2/2.yaml:157:     snippet_depth_1: #keyword:  #snippet-depth: 1
+    s1
+        s11
+            s111
+            s112
+            s113
+            s114
+            s115
+        s12
+    s2
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> snippet_depth_2: stdout 1`] = `
+"typrm keyword: snippet_depth_2
+\${typrmProject}/src/test_data/search/2/2.yaml:167:     snippet_depth_2Long: #keyword:  #snippet-depth: 2
+\${typrmProject}/src/test_data/search/2/2.yaml:177:     snippet_depth_2S: #keyword:  #snippet-depth: 2
+    s1
+        s11
+            s111
+        s12
+typrm keyword: exit()
+"
+`;
+
+exports[`typrm shell >> search >> snippet_depth_3: stdout 1`] = `
+"typrm keyword: snippet_depth_3
+\${typrmProject}/src/test_data/search/2/2.yaml:184: #glossary: glossary:        snippet_depth_3: #snippet-depth: 3
+    s1
+        s11
+            s111
+typrm keyword: exit()
+"
+`;

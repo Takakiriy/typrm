@@ -846,7 +846,7 @@ describe("search_fast >> keyword tag >>", () => {
 });
 
 describe("searches >> keyword tag >>", () => {
-    test.only.each([
+    test.each([
         [   "1st",
             ["search", "ABC"],
             { folder: "test_data/search/1", disableFindAll: '', test: "" },
@@ -1261,13 +1261,19 @@ describe("searches >> keyword tag >>", () => {
 
         ],[ "normalized_word_count",
             ["parentN1 server"],
-            { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", thesaurus: "test_data/search/2/thesaurus2.csv"},
-            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     ${matchedColor('parentN node1')}  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
+            { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", thesaurus: "test_data/search/2/thesaurus1.csv"},
+            pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     ${matchedColor('parentN')} node1  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
                 // Hit "parentN" out of keyword tag.
             pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
+        // ],[ "normalized_multi_word_count",  // Not supported, yet
+            // ["parentN1 server"],
+            // { folder: "test_data/search/2", disableFindAll: '', disableSnippet: '', test: "", thesaurus: "test_data/search/2/thesaurus2.csv"},
+            // pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':354:') + `     ${matchedColor('parentN node1')}  ${keywordLabelColor('#keyword:')} ${matchedColor('server')}\n` +
+            //     // Hit "parentN" out of keyword tag.
+            // pathColor(`${typrmProject}/src/test_data/search/2/2.yaml`) + lineNumColor(':352:') + `     ${keywordLabelColor('#keyword:')} ${matchedColor('parentN1')} ${matchedColor('server')}\n`,
         ],
     ])("%s", async (caseName, arguments_, options, answer) => {
-if (caseName !== 'normalized_word_count') {return;}  // || subCase !== '____'
+// if (caseName !== 'normalized_multi_word_count') {return;}  // || subCase !== '____'
         const  isWindowsEnvironment = (path.sep === '\\');
         const  isWindowsCase = (caseName.indexOf('Windows') !== notFound);
         if ( ! isWindowsEnvironment && isWindowsCase) {
@@ -1276,7 +1282,7 @@ if (caseName !== 'normalized_word_count') {return;}  // || subCase !== '____'
 
         await  callMain(arguments_, options);
         expect(main.stdout).toBe(answer);
-expect('test code').toBe('deleted skip code.');
+// expect('test code').toBe('deleted skip code.');
     });
 
     describe("thesaurus >>", () => {

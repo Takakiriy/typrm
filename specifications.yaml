@@ -54,7 +54,12 @@ command: #keyword: typrm command list
                     // alarm tag:  #// (#alarm:tag)
                         getMissedAlarm:
                     searchWithoutTags: #keyword: searchWithoutTags,  typrm find all  #ref: ${GitHub}/typrm/src/main.ts#function  searchWithoutTags
-                        addParticiplesFoundCountInFullSearch:  #ref: ${GitHub}/typrm/src/main.ts#function  addParticiplesFoundCountInFullSearch
+                        # async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
+                        #     for (const inputFileFullPath of await listUpFilePaths()) {
+                        #         // full match
+                        #         // shuffled keywords match
+                        # addParticiplesFoundCountInFullSearch:  #// Not used, yet
+                            # function  addParticiplesFoundCountInFullSearch(found: FoundLine, line: string, keywordIndex: number, participles: ParticpleWord): FoundLine {
                     (filter): #🌟
                         # foundLines = foundLines.filter((found) =>
                         #   (found.counts.matchedSearchKeywordCount === maximumHitWordCount));
