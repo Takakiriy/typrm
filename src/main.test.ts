@@ -2064,7 +2064,7 @@ describe("print reference >>", () => {
 });
 
 describe("alarm >>", () => {
-    test("1st", async ()=>{
+    test.only("1st", async ()=>{
     	fs.mkdirSync(testFolderPath + '_tmp/input', {recursive: true});
         const  now = new Date();
         const  yesterdayObject = new Date();
