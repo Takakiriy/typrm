@@ -3568,285 +3568,291 @@ async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promis
         const  lines: string[] = [];
         var  lineNum = 0;
         var  plusScore = 0;
+        try {
 
-        for await (const line1 of reader) {
-            const  line: string = line1;
-            lines.push(line)
-            lineNum += 1;
-            blockDisable.evaluate(line);
-            const  currentIndent = indentRegularExpression.exec(line)![0];
-            const  currentIndentLength = currentIndent.length;
-            const  indexOfKeywordLabel = line.indexOf(keywordLabel);
-            const  indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
-            inDebuggingLine = (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart));
-            if (inDebuggingLine) {
-                lib.pp(`#breadcrumb: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
-            }
+            for await (const line1 of reader) {
+                const  line: string = line1;
+                lines.push(line)
+                lineNum += 1;
+                blockDisable.evaluate(line);
+                const  currentIndent = indentRegularExpression.exec(line)![0];
+                const  currentIndentLength = currentIndent.length;
+                const  indexOfKeywordLabel = line.indexOf(keywordLabel);
+                const  indexOfSearchLabelIfMutual = (isMutual) ? line.indexOf(searchLabel) : notFound;
+                inDebuggingLine = (lineNum === debugPointLineNum  &&  inputFileFullPath.includes(debugFilePathPart));
+                if (inDebuggingLine) {
+                    lib.pp(`#breadcrumb: read line in searchSub, ${inputFileFullPath}:${lineNum}`);
+                }
 if (lineNum === 54) {
 var isDebug=true;
 }
 
-            // score tag
-            if (line !== '') {
-                var  scoreChaging = false;
-                while (scoreTags.length >= 1) {
-                    var  deepestScoreTag = scoreTags[scoreTags.length - 1];
-                    if (currentIndentLength < deepestScoreTag.indentPosition) {
+                // score tag
+                if (line !== '') {
+                    var  scoreChaging = false;
+                    while (scoreTags.length >= 1) {
+                        var  deepestScoreTag = scoreTags[scoreTags.length - 1];
+                        if (currentIndentLength < deepestScoreTag.indentPosition) {
 
-                        scoreTags.pop();
+                            scoreTags.pop();
+                            scoreChaging = true;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    const  scoreTagIndex = tagIndexOf(line, scoreLabel);
+                    if (scoreTagIndex !== notFound) {
+                        const scoreTag: ScoreTag = {
+                            indentPosition: scoreTagIndex,
+                            plusScore: parseInt(getTagValue(line, scoreTagIndex + scoreLabel.length)),
+                        };
+                        scoreTags.push(scoreTag);
                         scoreChaging = true;
-                    } else {
-                        break;
+                    }
+                    if (scoreChaging) {
+                        plusScore = scoreTags.reduce((previousReturnValue, scoreTag) => {
+                            return  previousReturnValue + scoreTag.plusScore;
+                        },0);
                     }
                 }
 
-                const  scoreTagIndex = tagIndexOf(line, scoreLabel);
-                if (scoreTagIndex !== notFound) {
-                    const scoreTag: ScoreTag = {
-                        indentPosition: scoreTagIndex,
-                        plusScore: parseInt(getTagValue(line, scoreTagIndex + scoreLabel.length)),
-                    };
-                    scoreTags.push(scoreTag);
-                    scoreChaging = true;
-                }
-                if (scoreChaging) {
-                    plusScore = scoreTags.reduce((previousReturnValue, scoreTag) => {
-                        return  previousReturnValue + scoreTag.plusScore;
-                    },0);
-                }
-            }
-
-            // keyword tag
-            if (inDebuggingLine) {  // debugPointLineNum
-                if (indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound) {
-                    if ( line.includes(disableLabel)) {
-                        lib.pp(`#debugSearchScore: Skip by disableLabel, ${inputFileFullPath}:${lineNum}`);
-                    }
-                    if ( blockDisable.isInBlock) {
-                        lib.pp(`#debugSearchScore: Skip by isInBlock, ${inputFileFullPath}:${lineNum}`);
-                    }
-                }
-            }
-            if ((indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound)
-                    &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
-                timeTag && lib.time.start(`searchSub >> keyword >> ${inputFileFullPath}`);
-                if (indexOfKeywordLabel !== notFound) {
-                    var  label = keywordLabel;
-                    var  indexOfLabel = indexOfKeywordLabel;
-                    var  labelLength = keywordLabel.length;
-                    var  targetTagType: SearchTargetTagType = 'keyword';
-                } else {
-                    var  label = searchLabel;
-                    var  indexOfLabel = indexOfSearchLabelIfMutual;
-                    var  labelLength = searchLabel.length;
-                    var  targetTagType: SearchTargetTagType = 'search';
-                }
-
-                var  csv = getTagValue(line, indexOfLabel + labelLength);  // keywords, target words
-                if (csv !== '') {
-                    var  withParameter = true;
-                } else {
-                    var  withParameter = false;
-                    csv = parseKeyName(line);  // Keywords at the left of keyword tag
-                }
-                const  columns = await lib.parseCSVColumns(csv)
-                    .catch((e: Error) => {
-                        console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
-                        return [];
-                    });
-                const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
+                // keyword tag
                 if (inDebuggingLine) {  // debugPointLineNum
-                    lib.pp(`#debugSearchScore: keyword tag block in searchSub`);
-                    lib.pp(`#debugSearchScore: calling getKeywordMatchingScore line:${lineNum}: ${line}`);
+                    if (indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound) {
+                        if ( line.includes(disableLabel)) {
+                            lib.pp(`#debugSearchScore: Skip by disableLabel, ${inputFileFullPath}:${lineNum}`);
+                        }
+                        if ( blockDisable.isInBlock) {
+                            lib.pp(`#debugSearchScore: Skip by isInBlock, ${inputFileFullPath}:${lineNum}`);
+                        }
+                    }
                 }
-
-                let  found = getKeywordMatchingScore({
-                    targetTagType,
-                    glossaryTitleLength: 0,
-                    targetStrings: columns,
-                    filePath: inputFileFullPath,
-                    searchWordParticples,  thesaurus, lineNum});
-                if (inDebuggingLine) {  // debugPointLineNum
-                    lib.pp(`#debugSearchScore: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
-                    lib.pp(`#debugSearchScore: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
-                }
-                if (found.counts.matchedSearchKeywordCount >= 1) {
-                    const  unescapedLine = unescapePercentByte(line);
-                    if (withParameter) {
-                        var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
+                if ((indexOfKeywordLabel !== notFound  ||  indexOfSearchLabelIfMutual !== notFound)
+                        &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
+                    timeTag && lib.time.start(`searchSub >> keyword >> ${inputFileFullPath}`);
+                    if (indexOfKeywordLabel !== notFound) {
+                        var  label = keywordLabel;
+                        var  indexOfLabel = indexOfKeywordLabel;
+                        var  labelLength = keywordLabel.length;
+                        var  targetTagType: SearchTargetTagType = 'keyword';
                     } else {
-                        var  positionOfCSV = unescapedLine.indexOf(csv);
+                        var  label = searchLabel;
+                        var  indexOfLabel = indexOfSearchLabelIfMutual;
+                        var  labelLength = searchLabel.length;
+                        var  targetTagType: SearchTargetTagType = 'search';
                     }
 
-                    BenchmarkCounters.keywordHitCount += 1;
-                    found.score += keywordMatchScore + plusScore;
-                    found.path = inputFileFullPath;
-                    found.lineNum = lineNum;
-                    found.line = unescapedLine;
-                    found.indentLength = indentRegularExpression.exec(line)![0].length;
-                    for (const match of found.matches) {
-                        match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
-                        // match.normalizedPosition += positionOfCSV + columnPositions[match.targetWordsIndex];
+                    var  csv = getTagValue(line, indexOfLabel + labelLength);  // keywords, target words
+                    if (csv !== '') {
+                        var  withParameter = true;
+                    } else {
+                        var  withParameter = false;
+                        csv = parseKeyName(line);  // Keywords at the left of keyword tag
                     }
-                    for (let i=0; i < columnPositions.length; i += 1) {
-                        if (i < columnPositions.length - 1) {
-                            var  rightPosition = csv.lastIndexOf(',', columnPositions[i+1]);
+                    const  columns = await lib.parseCSVColumns(csv)
+                        .catch((e: Error) => {
+                            console.log(`Warning: ${e.message} in ${inputFileFullPath}:${lineNum}: ${line}`);
+                            return [];
+                        });
+                    const  columnPositions = lib.parseCSVColumnPositions(csv, columns);
+                    if (inDebuggingLine) {  // debugPointLineNum
+                        lib.pp(`#debugSearchScore: keyword tag block in searchSub`);
+                        lib.pp(`#debugSearchScore: calling getKeywordMatchingScore line:${lineNum}: ${line}`);
+                    }
+
+                    let  found = getKeywordMatchingScore({
+                        targetTagType,
+                        glossaryTitleLength: 0,
+                        targetStrings: columns,
+                        filePath: inputFileFullPath,
+                        searchWordParticples,  thesaurus, lineNum});
+                    if (inDebuggingLine) {  // debugPointLineNum
+                        lib.pp(`#debugSearchScore: matchedSearchKeywordCount: ${found.counts.matchedSearchKeywordCount}`);
+                        lib.pp(`#debugSearchScore: getKeywordMatchingScore returns: ${lib.jsonStringify(found, null, '    ')}`);
+                    }
+                    if (found.counts.matchedSearchKeywordCount >= 1) {
+                        const  unescapedLine = unescapePercentByte(line);
+                        if (withParameter) {
+                            var  positionOfCSV = unescapedLine.indexOf(csv, unescapedLine.indexOf(label) + labelLength);
                         } else {
-                            var  rightPosition = csv.length;
-                        }
-                        found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
-                    }
-                    found.evaluateSnippetDepthTag(line);
-                    timeTag && lib.time.start(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
-                    found.plusParentMatchScore(lines, searchWordParticples, thesaurus);
-                    timeTag && lib.time.end(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
-                    foundLines.push(found);
-                    snippetScaning.push(found);
-                }
-                timeTag && lib.time.end(`searchSub >> keyword >> ${inputFileFullPath}`);
-            }
-
-            // glossary tag
-            var  glossaryTag: GlossaryTag | undefined = undefined;
-            if (line.trim() !== '') {
-                timeTag && lib.time.start(`searchSub >> glossary >> ${inputFileFullPath}`);
-                if (glossaryTags.length >= 1) {
-                    glossaryTag = glossaryTags[glossaryTags.length - 1];
-                }
-                if (glossaryTag) {
-                    if (currentIndent.length <= glossaryTag.indentAtTag.length) {
-
-                        glossaryTags.pop();
-                        if (glossaryTags.length >= 1) {
-                            glossaryTag = glossaryTags[glossaryTags.length - 1];
-                        } else {
-                            glossaryTag = undefined;
-                        }
-                    } else {
-                        if (glossaryTag.indentAtFirstContents === '') {
-                            glossaryTag.indentAtFirstContents = currentIndent;
-                            glossaryTag.indentPosition = glossaryTag.indentAtFirstContents.length;
-                        }
-                    }
-                }
-
-                if (line.includes(glossaryLabel)  &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
-                    var  glossaryTitle = getTagValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
-                    if (glossaryTitle !== '') {
-                        glossaryTitle += ' ';  // ' ' is a word separator
-                    } else {
-                        glossaryTitle = parseKeyName(line) + ' ';  // Keywords at the left of glossary tag
-                    }
-
-                    glossaryTags.push({
-                        indentPosition: -1,
-                        glossaryTitle,
-                        indentAtTag: indentRegularExpression.exec(line)![0],
-                        indentAtFirstContents: '',
-                    });
-                }
-
-                if (glossaryTag) {
-                    const  characterAtIndent = line[glossaryTag.indentPosition];
-                    const  isGlossaryIndentLevel = (
-                        characterAtIndent !== ' '  &&
-                        characterAtIndent !== '\t'  &&
-                        characterAtIndent !== undefined
-                    );
-                    const  isComment = (characterAtIndent === '#');
-
-                    if ( ! isGlossaryIndentLevel  ||  isComment) {
-                        // Skip this line
-                    } else {
-                        const  colonPosition = line.indexOf(':', currentIndent.length);
-                        const  wordsWithGlossary = glossaryTag.glossaryTitle +
-                            line.substring(currentIndent.length, colonPosition);
-                        if (inDebuggingLine) {
-                            lib.pp(`#breadcrumb: in glossary block in searchSub`);
+                            var  positionOfCSV = unescapedLine.indexOf(csv);
                         }
 
-                        const  found = getKeywordMatchingScore({
-                            targetTagType: 'glossary',
-                            glossaryTitleLength: glossaryTag.glossaryTitle.length,
-                            targetStrings: [wordsWithGlossary],
-                            filePath: inputFileFullPath,
-                            searchWordParticples,  thesaurus,  lineNum});
-                        if (found.counts.partMatchedTargetKeywordCount >= 1  &&  colonPosition !== notFound) {
-
-                            BenchmarkCounters.glossaryHitCount += 1;
-                            found.score += glossaryMatchScore + plusScore;
-                            found.path = inputFileFullPath;
-                            found.lineNum = lineNum;
-                            found.indentLength = currentIndent.length;
-                            if (glossaryTag.glossaryTitle === '') {
-                                found.line = line;
-                                for (const match of found.matches) {
-                                    match.position += glossaryTag.indentPosition;
-                                }
+                        BenchmarkCounters.keywordHitCount += 1;
+                        found.score += keywordMatchScore + plusScore;
+                        found.path = inputFileFullPath;
+                        found.lineNum = lineNum;
+                        found.line = unescapedLine;
+                        found.indentLength = indentRegularExpression.exec(line)![0].length;
+                        for (const match of found.matches) {
+                            match.position += positionOfCSV + columnPositions[match.targetWordsIndex];
+                            // match.normalizedPosition += positionOfCSV + columnPositions[match.targetWordsIndex];
+                        }
+                        for (let i=0; i < columnPositions.length; i += 1) {
+                            if (i < columnPositions.length - 1) {
+                                var  rightPosition = csv.lastIndexOf(',', columnPositions[i+1]);
                             } else {
-                                found.line = glossaryTag.glossaryTitle.trim() +':'+ line;
-                                for (const match of found.matches) {
-                                    if (match.position >= glossaryTag.glossaryTitle.length) {
+                                var  rightPosition = csv.length;
+                            }
+                            found.rightOfTargetKeywords.push(positionOfCSV + rightPosition);
+                        }
+                        found.evaluateSnippetDepthTag(line);
+                        timeTag && lib.time.start(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
+                        found.plusParentMatchScore(lines, searchWordParticples, thesaurus);
+                        timeTag && lib.time.end(`searchSub >> plusParentMatchScore >> ${inputFileFullPath}`);
+                        foundLines.push(found);
+                        snippetScaning.push(found);
+                    }
+                    timeTag && lib.time.end(`searchSub >> keyword >> ${inputFileFullPath}`);
+                }
+
+                // glossary tag
+                var  glossaryTag: GlossaryTag | undefined = undefined;
+                if (line.trim() !== '') {
+                    timeTag && lib.time.start(`searchSub >> glossary >> ${inputFileFullPath}`);
+                    if (glossaryTags.length >= 1) {
+                        glossaryTag = glossaryTags[glossaryTags.length - 1];
+                    }
+                    if (glossaryTag) {
+                        if (currentIndent.length <= glossaryTag.indentAtTag.length) {
+
+                            glossaryTags.pop();
+                            if (glossaryTags.length >= 1) {
+                                glossaryTag = glossaryTags[glossaryTags.length - 1];
+                            } else {
+                                glossaryTag = undefined;
+                            }
+                        } else {
+                            if (glossaryTag.indentAtFirstContents === '') {
+                                glossaryTag.indentAtFirstContents = currentIndent;
+                                glossaryTag.indentPosition = glossaryTag.indentAtFirstContents.length;
+                            }
+                        }
+                    }
+
+                    if (line.includes(glossaryLabel)  &&  ! line.includes(disableLabel)  &&  ! blockDisable.isInBlock) {
+                        var  glossaryTitle = getTagValue(line, line.indexOf(glossaryLabel) + glossaryLabel.length);
+                        if (glossaryTitle !== '') {
+                            glossaryTitle += ' ';  // ' ' is a word separator
+                        } else {
+                            glossaryTitle = parseKeyName(line) + ' ';  // Keywords at the left of glossary tag
+                        }
+
+                        glossaryTags.push({
+                            indentPosition: -1,
+                            glossaryTitle,
+                            indentAtTag: indentRegularExpression.exec(line)![0],
+                            indentAtFirstContents: '',
+                        });
+                    }
+
+                    if (glossaryTag) {
+                        const  characterAtIndent = line[glossaryTag.indentPosition];
+                        const  isGlossaryIndentLevel = (
+                            characterAtIndent !== ' '  &&
+                            characterAtIndent !== '\t'  &&
+                            characterAtIndent !== undefined
+                        );
+                        const  isComment = (characterAtIndent === '#');
+
+                        if ( ! isGlossaryIndentLevel  ||  isComment) {
+                            // Skip this line
+                        } else {
+                            const  colonPosition = line.indexOf(':', currentIndent.length);
+                            const  wordsWithGlossary = glossaryTag.glossaryTitle +
+                                line.substring(currentIndent.length, colonPosition);
+                            if (inDebuggingLine) {
+                                lib.pp(`#breadcrumb: in glossary block in searchSub`);
+                            }
+
+                            const  found = getKeywordMatchingScore({
+                                targetTagType: 'glossary',
+                                glossaryTitleLength: glossaryTag.glossaryTitle.length,
+                                targetStrings: [wordsWithGlossary],
+                                filePath: inputFileFullPath,
+                                searchWordParticples,  thesaurus,  lineNum});
+                            if (found.counts.partMatchedTargetKeywordCount >= 1  &&  colonPosition !== notFound) {
+
+                                BenchmarkCounters.glossaryHitCount += 1;
+                                found.score += glossaryMatchScore + plusScore;
+                                found.path = inputFileFullPath;
+                                found.lineNum = lineNum;
+                                found.indentLength = currentIndent.length;
+                                if (glossaryTag.glossaryTitle === '') {
+                                    found.line = line;
+                                    for (const match of found.matches) {
                                         match.position += glossaryTag.indentPosition;
                                     }
+                                } else {
+                                    found.line = glossaryTag.glossaryTitle.trim() +':'+ line;
+                                    for (const match of found.matches) {
+                                        if (match.position >= glossaryTag.glossaryTitle.length) {
+                                            match.position += glossaryTag.indentPosition;
+                                        }
+                                    }
                                 }
+                                found.evaluateSnippetDepthTag(line);
+                                foundLines.push(found);
+                                snippetScaning.push(found);
                             }
-                            found.evaluateSnippetDepthTag(line);
-                            foundLines.push(found);
-                            snippetScaning.push(found);
                         }
                     }
+                    timeTag && lib.time.end(`searchSub >> glossary >> ${inputFileFullPath}`);
                 }
-                timeTag && lib.time.end(`searchSub >> glossary >> ${inputFileFullPath}`);
-            }
 
-            // alarm tag
-            const  indexOfAlarmLabel = line.indexOf(alarmLabel);
-            if (indexOfAlarmLabel !== notFound  &&  alarmLabelRegExp.test(line)) {
-                const  timeDate = getTagValue(line, indexOfAlarmLabel + alarmLabel.length);
+                // alarm tag
+                const  indexOfAlarmLabel = line.indexOf(alarmLabel);
+                if (indexOfAlarmLabel !== notFound  &&  alarmLabelRegExp.test(line)) {
+                    const  timeDate = getTagValue(line, indexOfAlarmLabel + alarmLabel.length);
 
-                const  found = getMissedAlarm(timeDate, now);
-                if (found.matches.length >= 1) {
-                    found.path = inputFileFullPath;
-                    found.line = line;
-                    found.lineNum = lineNum;
-                    found.matches[0].position = line.indexOf(timeDate);
-                    foundLines.push(found);
+                    const  found = getMissedAlarm(timeDate, now);
+                    if (found.matches.length >= 1) {
+                        found.path = inputFileFullPath;
+                        found.line = line;
+                        found.lineNum = lineNum;
+                        found.matches[0].position = line.indexOf(timeDate);
+                        foundLines.push(found);
+                    }
                 }
-            }
 
-            // found.snippet = ...
-            if (snippetScaning.length >= 1) {
-                if ('disableSnippet' in programOptions) {
-                    snippetScaning.length = 0;
-                } else {
-                    const  endsOfSnippets: FoundLine[] = [];
-                    for (const found of snippetScaning) {
-                        if (lineNum > found.lineNum) {
-                            var  endOfSnippet = false;
-                            if ( ! found.isSnippetOver(line)) {
-                                if (found.snippetDepth >= 1  ||  found.snippet.length < parseInt(programOptions.snippetLineCount)) {
-                                    var  snippetLine = line.substring(found.indentLength);
+                // found.snippet = ...
+                if (snippetScaning.length >= 1) {
+                    if ('disableSnippet' in programOptions) {
+                        snippetScaning.length = 0;
+                    } else {
+                        const  endsOfSnippets: FoundLine[] = [];
+                        for (const found of snippetScaning) {
+                            if (lineNum > found.lineNum) {
+                                var  endOfSnippet = false;
+                                if ( ! found.isSnippetOver(line)) {
+                                    if (found.snippetDepth >= 1  ||  found.snippet.length < parseInt(programOptions.snippetLineCount)) {
+                                        var  snippetLine = line.substring(found.indentLength);
 
-                                    found.snippet.push(snippetLine);
+                                        found.snippet.push(snippetLine);
+                                    } else {
+                                        found.snippet.pop();
+                                        found.snippet.push('    ....');
+                                        endOfSnippet = true;
+                                    }
                                 } else {
-                                    found.snippet.pop();
-                                    found.snippet.push('    ....');
                                     endOfSnippet = true;
                                 }
-                            } else {
-                                endOfSnippet = true;
-                            }
-                            if (endOfSnippet) {
-                                endsOfSnippets.push(found);
+                                if (endOfSnippet) {
+                                    endsOfSnippets.push(found);
+                                }
                             }
                         }
-                    }
-                    for (const removingFound of endsOfSnippets.reverse()) {
-                        snippetScaning.splice(snippetScaning.indexOf(removingFound), 1);
+                        for (const removingFound of endsOfSnippets.reverse()) {
+                            snippetScaning.splice(snippetScaning.indexOf(removingFound), 1);
+                        }
                     }
                 }
-            }
+            } 
+        } catch (e) {
+            console.log(`inputFileFullPath: ${inputFileFullPath}`);
+            console.log(`lineNum: ${lineNum}`);
+            throw  e;
         }
         timeTag && lib.time.end(`searchSub >> ${inputFileFullPath}`);
     }
@@ -4406,6 +4412,7 @@ function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpace
     //     pickUpKeyPhraseWithSpace("timeout", "error: time out", 6) === "time out"
     const  textWithoutSpaces = textWithSpaces.replace(/ /g, '');
     const  leftTextWithoutSpaces = textWithoutSpaces.substring(0, keyPhraseIndexInTextWithoutSpaces);
+    const  textWithSpacesArray = Array.from(textWithSpaces);  // Change from UTF-16 code unit to code point unit
     var  textPosition = 0;
     var  startPositionInText = 0;
     var  xWithSpaces = "";
@@ -4413,17 +4420,20 @@ function  pickUpKeyPhraseWithSpace(keyPhraseWithoutSpaces: string, textWithSpace
     for (const  xWithoutSpaces of [leftTextWithoutSpaces, keyPhraseWithoutSpaces]) {
         xWithSpaces = "";
         for (const  x of xWithoutSpaces) {
-            var  t = textWithSpaces[textPosition];
+            var  t = textWithSpacesArray[textPosition];
 
             while (t === ' ') {
                 xWithSpaces += ' ';
                 textPosition += 1;
-                t = textWithSpaces[textPosition];
+                t = textWithSpacesArray[textPosition];
             }
             if (t.toLowerCase() === x.toLowerCase()) {
 
                 xWithSpaces += t;
             } else {
+                console.log(`keyPhraseWithoutSpaces: ${keyPhraseWithoutSpaces}`)
+                console.log(`textWithSpaces[textPosition]: ${t}`)
+                console.log(`xWithoutSpaces[i]: ${x}`)
                 throw new Error('unexpected in pickUpKeyPhraseWithSpace');
             }
             textPosition += 1;
@@ -5264,6 +5274,8 @@ async function  searchWithoutTags(keywords: string): Promise<FoundLine[]> {
             }
         }
         if (exception) {
+            console.log(`inputFileFullPath: ${inputFileFullPath}`);
+            console.log(`lineNum: ${lineNum}`);
             throw exception;
         }
     }

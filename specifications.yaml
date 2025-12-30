@@ -184,6 +184,8 @@ tag: #keyword: typrm tags
 test:
     test command:
         - npm test  #ref: ./README.md  #ref: ./README-jp.md
+            #// Run main.test.ts: npm test main
+            #// Search "test of" in test log.
         - node node_modules/typescript/bin/tsc --watch  #// VSCode >> Terminal >> Run Task >>  TypeScript Compile Task
         - Build and basic test in ".vscode/launch.json"
     test:  #// 機能からテストを探す場合
@@ -266,10 +268,13 @@ test:
                 次に __Settings1__ を置き換えるときの置き換える前は、(check/yesだった)[check/no] と [check/not banana/no] で 1種類（2箇所）:
             コードの説明:
                 IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
-debug:
+debug: #keyword: typrm debug specifications
     debugger:  #// Debug with Visual Studio Code
         Debug from launch: |
             $ export __Variables__=__Value__
+            $ export __Variables__=__Value__
+            $ export __Variables__=__Value__
+                ...
             $ code __Project__
             $ node node_modules/typescript/bin/tsc --watch  #// VSCode >> Terminal >> Run Task >>  TypeScript Compile Task
             Select "Debug from launch" in "Run and Debug" view
@@ -277,6 +282,10 @@ debug:
             Set break point at "DebugWatchPoint" in main.ts  #search: typrm DebugWatchPoint
             Press F5 key
             Watch "debugOut" variable value
+        Variables of Interest:
+            searchSub:  #// In searchSub function
+                - inputFileFullPath
+                - lineNum
         Others: |
             $ code __Project__
             $ node node_modules/typescript/bin/tsc --watch  #// VSCode >> Terminal >> Run Task >>  TypeScript Compile Task
