@@ -2064,7 +2064,7 @@ describe("print reference >>", () => {
 });
 
 describe("alarm >>", () => {
-    test.only("1st", async ()=>{
+    test("1st", async ()=>{
     	fs.mkdirSync(testFolderPath + '_tmp/input', {recursive: true});
         const  now = new Date();
         const  yesterdayObject = new Date();
@@ -2312,7 +2312,7 @@ describe("unit test >>", () => {
         });
         const  searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
     });
-    test("pickUpKeyPhraseWithSpace", () => {
+    test.only("pickUpKeyPhraseWithSpace", () => {
         const  pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
         //                                              012345 6789 012 345  67890123
         expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 6)).toBe("time");

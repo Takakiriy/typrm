@@ -12,12 +12,12 @@
                 "$tsc-watch"
             ]
         },
-        {  // #search: typrm issue-001/typrm
+        {
             "label": "Run support_node.cjs",
             "detail": "This task replace Node.js script to fit between ES module import specification and TypeScript import specification.",
             "type": "shell",
-            "command": "node src/support_node.cjs"
-            // "dependsOn": ["TypeScript Compile Task"]  // VSCode stucks, if task depends on other background task.
+            "command": "node src/support_node.cjs",
+            "hide": true
         }
     ]
 }
