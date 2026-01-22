@@ -2315,10 +2315,10 @@ describe("unit test >>", () => {
     test.only("pickUpKeyPhraseWithSpace", () => {
         const  pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
         //                                              012345 6789 012 345  67890123
-        expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 6)).toBe("time");
-        expect(pickUpKeyPhraseWithSpace("timeout",     "error: time out was  occurred", 6)).toBe("time out");
-        expect(pickUpKeyPhraseWithSpace("wasoccurred", "error: time out was  occurred", 13)).toBe("was  occurred");  // double space
-        expect(pickUpKeyPhraseWithSpace("timeout",     "error: TIME OUT was  occurred", 6)).toBe("TIME OUT");  // not case sensitive
+        expect(pickUpKeyPhraseWithSpace("time",        "error: time out was  occurred", 6).keyPhraseWithSpace).toBe("time");
+        expect(pickUpKeyPhraseWithSpace("timeout",     "error: time out was  occurred", 6).keyPhraseWithSpace).toBe("time out");
+        expect(pickUpKeyPhraseWithSpace("wasoccurred", "error: time out was  occurred", 13).keyPhraseWithSpace).toBe("was  occurred");  // double space
+        expect(pickUpKeyPhraseWithSpace("timeout",     "error: TIME OUT was  occurred", 6).keyPhraseWithSpace).toBe("TIME OUT");  // not case sensitive
     });
 });
 
