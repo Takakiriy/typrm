@@ -181,6 +181,47 @@ tag: #keyword: typrm tags
                 template_if_1_error
             replaces settings >>
                 2_replace_9_template_if_1_OK
+develop:
+    Windows:
+        Install VSCode, Git:
+        Install nvm:
+            Download nvm-setup.zip and extract it:
+                https://github.com/coreybutler/nvm-windows/releases  >>  nvm-setup.zip
+            Run nvm-setup.exe:
+                Set all options default setting
+            Install specified version Node.js:
+                PowerShell:
+                    nvm install 20.19.1
+        Download typrm project:
+            cd  "${HOME}"
+            git clone  https://github.com/Takakiriy/typrm/
+        open VSCode typrm project:
+            code  ~/typrm
+        Install Jest extension:  #// If you want to use Testing view
+            #search: JavaScript testing view trouble
+    WSL2 Linux:
+        Install WSL2, Linux, Git, VSCode and Remote Development extension:
+            Connect to Linux via Visual Studio Code (VSCode) Remote Development extension
+        Install nvm:
+            Install nvm:
+                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+            Set environment variables:
+                source ~/.bashrc
+            Check nvm was installed correctly:
+                nvm --version
+            Install specified version Node.js:
+                nvm install 20.19.1
+                node --version
+            If there is your machine in the LAN with the proxy in the company and so on:
+                npm config -g set proxy "http://___.___.___.___:____"
+                npm config -g set https-proxy "http://___.___.___.___:____"
+        Download typrm project:
+            cd  "${HOME}"
+            git clone  https://github.com/Takakiriy/typrm/
+        open VSCode typrm project:
+            code  ~/typrm
+        Install Jest extension:  #// If you want to use Testing view
+            #search: JavaScript testing view trouble
 test:
     test command:
         - npm test  #ref: ./README.md  #ref: ./README-jp.md
@@ -269,6 +310,30 @@ test:
             コードの説明:
                 IfTagParser.thisIsOutOfFalseBlock === true  &&  IfTagParser.isReplacable === false は、[check/not banana/no]
 debug: #keyword: typrm debug specifications
+    open VSCode with your environment variables:
+        Modify typrm script:
+            PowerShell: |
+                param(
+                    [string]$Option,
+                    [string]$Path
+                )
+
+                if ($Option -eq "--code") {
+                    code "${Path}"  #// Open Visual Studio Code with environment variables.
+                }
+                else {
+                    node ____
+                }
+            shell script: |
+                Option="$1"
+                Path="$2"
+                if [ "${Option}" == "--code" ]; then
+                    code  "${Path}"  #// Open Visual Studio Code with environment variables.
+                else
+                    node _____
+                fi
+        Command:
+            typrm --code __TyprmProjectPath__
     debugger:  #// Debug with Visual Studio Code
         Debug from launch: |
             $ export __Variables__=__Value__

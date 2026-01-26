@@ -389,7 +389,7 @@ function  getVariablesForErrorMessage(indent: string, variableNames: string[], s
                     const  variable = settingTree.currentSettings[variableName];
                     if (lib.cutAlphabetInIndex(variable.settingsIndex) === parentSettingIndex) {
                         var  line = lines[variable.lineNum - 1];
-                        if (options.replaceToTag) {
+                        if (options.replaceToTag) { 
                             if (variableName in options.replaceToTag) {
                                 if (line.indexOf(' #to:') == notFound) {
                                     const  before = getTagValue(line, line.indexOf(':'));

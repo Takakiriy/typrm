@@ -2038,7 +2038,7 @@ describe("unit test >>", () => {
         });
         const searchTargetKeyphrasePositions = main.private_.searchTargetKeyphrasePositions;
     });
-    test.only("pickUpKeyPhraseWithSpace", () => {
+    test("pickUpKeyPhraseWithSpace", () => {
         const pickUpKeyPhraseWithSpace = main.private_.pickUpKeyPhraseWithSpace;
         //                                              012345 6789 012 345  67890123
         expect(pickUpKeyPhraseWithSpace("time", "error: time out was  occurred", 6).keyPhraseWithSpace).toBe("time");

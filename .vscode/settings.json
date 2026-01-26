@@ -1,3 +1,6 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "jest.runMode": "on-demand",
+    "jest.jestCommandLine": "npm test --",
+    "jest.rootPath": "."
 }
