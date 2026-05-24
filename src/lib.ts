@@ -1875,7 +1875,9 @@ export const  ffFlags: {[name: string]: boolean} = {};
 // Example:
 //     count up: |
 //         cc();
-//     print a data and count up: |
+//     print current count: |
+//          console.error(cc().countString);
+//     pp a data and count up: |
 //         var d = pp(data);
 //         cc();
 //     count up and if counter value is 1 ...: |
@@ -1891,11 +1893,19 @@ export function  cc( targetCount: number|null = 9999999, label: string = '0' ) {
     ccCount[label] += 1;
     pp( `${label}:countThrough[${label}] = ${ccCount[label]}` );
     const  isTarget = ( ccCount[label] === targetCount );
+    const  count = ccCount[label];
 
     if (isTarget) {
         pp( '    **** It is before the target! ****' );
     }
-    return  { isTarget, debugOut };
+
+    if (label === '0') {
+        var  variableName = "cc";
+    } else {
+        var  variableName = `cc[${label}]`;
+    }
+    return  { isTarget, debugOut, count,
+        countString: `@@@ ${variableName} = ${count} -----------------------------------`};
 }
 declare global {
     export var  ccCount: {[name: string]: number};

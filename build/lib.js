@@ -1713,7 +1713,9 @@ export const ffFlags = {};
 // Example:
 //     count up: |
 //         cc();
-//     print a data and count up: |
+//     print current count: |
+//          console.error(cc().countString);
+//     pp a data and count up: |
 //         var d = pp(data);
 //         cc();
 //     count up and if counter value is 1 ...: |
@@ -1728,10 +1730,18 @@ export function cc(targetCount = 9999999, label = '0') {
     ccCount[label] += 1;
     pp(`${label}:countThrough[${label}] = ${ccCount[label]}`);
     const isTarget = (ccCount[label] === targetCount);
+    const count = ccCount[label];
     if (isTarget) {
         pp('    **** It is before the target! ****');
     }
-    return { isTarget, debugOut };
+    if (label === '0') {
+        var variableName = "cc";
+    }
+    else {
+        var variableName = `cc[${label}]`;
+    }
+    return { isTarget, debugOut, count,
+        countString: `@@@ ${variableName} = ${count} -----------------------------------` };
 }
 globalThis.ccCount = {};
 globalThis.isoTimeFormat = /([0-9]{4})(-[0-9]{1,2})?(-[0-9]{1,2})?( |T)?([0-9]{1,2}:[0-9]{2})?(:[0-9]{2})?(.[0-9]*)?(((\+|-)[0-9]:[0-9])|Z)?/;

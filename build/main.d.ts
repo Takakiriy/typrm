@@ -70,6 +70,7 @@ declare class SettingsTree {
     nextLineNumIndex: number;
     nextIfLineNumIndex: number;
     nextIfLineNum: number;
+    settingsValue(index: string, name: string): string;
     moveToLine(parser: Parser): void;
     moveToLine_Immutably(parser: Readonly<Parser>): SettingsTree_for_moveToLine;
     addCurrentSettingsInIfTag_Immutably(currentIndex: string, currentSettings: Readonly<{

@@ -142,7 +142,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
     for (const index of Object.keys(originalTagTree.replaceTo)) {
         for (const [name, replace] of Object.entries(originalTagTree.replaceTo[index])) {
             const  log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
-                `#original: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
+                `#original: ${name}: ${settingTree.settingsValue(index, name)} => ${replace.value}`;
             parser.originalTagList.push(log);
         }
     }
@@ -152,7 +152,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
     for (const index of Object.keys(toTagTree.replaceTo)) {
         for (const [name, replace] of Object.entries(toTagTree.replaceTo[index])) {
             const  log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
-                `#to: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
+                `#to: ${name}: ${settingTree.settingsValue(index, name)} => ${replace.value}`;
             parser.toTagList.push(log);
             parser.totalToTagCount += 1;
         }
@@ -309,7 +309,11 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
                 parser.flushToTagList();
                 console.log("");
                 console.log(getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines));
-                console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                if (expected === templateTag.template) {
+                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')} ${translate('The template has not been replaced, possibly because the variable was not found.')}`);
+                } else {
+                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                }
                 console.log(`    ${translate('Expected')}: ${expected}`);
                 parser.warningCount += 1;
             }
@@ -6491,7 +6495,7 @@ class SettingsTree {
     indices = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
     indicesWithIf = new Map</*startLineNum*/ number, string>();  // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
     outOfFalseBlocks = new Map</*lineNum*/ number, boolean>();  // #search: outOfFalseBlocks
-    settings: {[index: string]: {[name: string]: Setting}} = {};
+    settings: {[index: string]: {[name: string]: Setting}} = {};  // See. this.settingsValue
     settingsInformation: {[index: string]: SettingsInformation} = {};
 
     // current: current line moved by "moveToLine" method
@@ -6506,6 +6510,20 @@ class SettingsTree {
     nextLineNumIndex = 0;
     nextIfLineNumIndex: number = 0;
     nextIfLineNum: number = 1;
+
+    settingsValue(index: string, name: string): string {
+        // No exception method
+        if (index in this.settings) {
+            if (name in this.settings[index]) {
+
+                return  this.settings[index][name].value;
+            } else {
+                return  `(ERROR: Internal error. SettingsTree.settings[${index}][${name}] is not defined.)`;
+            }
+        } else {
+            return  `(ERROR: Internal error. SettingsTree.settings[${index}] is not defined.)`;
+        }
+    };
 
     moveToLine(parser: Parser) {
         Object.assign(this, this.moveToLine_Immutably(parser));
@@ -8558,6 +8576,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "Settings": "設定",
             "SettingIndex": "設定番号",
             "Not matched with the template.": "テンプレートと一致しません。",
+            "The template has not been replaced, possibly because the variable was not found.": "変数が見つからないためか、テンプレートが置き換わっていません。",
             "Not found any replacing target.": "置き換える対象が見つかりません。",
             "Modify the template target to old or new value.": "テンプレートの対象を古い値または新しい値に修正してください。",
             "The parameter must be less than 0": "パラメーターは 0 より小さくしてください",

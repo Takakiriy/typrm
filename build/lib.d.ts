@@ -153,6 +153,8 @@ export declare const ffFlags: {
 export declare function cc(targetCount?: number | null, label?: string): {
     isTarget: boolean;
     debugOut: string[];
+    count: number;
+    countString: string;
 };
 declare global {
     export var ccCount: {

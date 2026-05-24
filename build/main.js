@@ -137,7 +137,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
     for (const index of Object.keys(originalTagTree.replaceTo)) {
         for (const [name, replace] of Object.entries(originalTagTree.replaceTo[index])) {
             const log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
-                `#original: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
+                `#original: ${name}: ${settingTree.settingsValue(index, name)} => ${replace.value}`;
             parser.originalTagList.push(log);
         }
     }
@@ -146,7 +146,7 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
     for (const index of Object.keys(toTagTree.replaceTo)) {
         for (const [name, replace] of Object.entries(toTagTree.replaceTo[index])) {
             const log = `${getTestablePath(inputFilePath)}:${replace.lineNum}: ` +
-                `#to: ${name}: ${settingTree.settings[index][name].value} => ${replace.value}`;
+                `#to: ${name}: ${settingTree.settingsValue(index, name)} => ${replace.value}`;
             parser.toTagList.push(log);
             parser.totalToTagCount += 1;
         }
@@ -295,7 +295,12 @@ async function checkRoutine(inputFilePath, copyTags, parser) {
                 parser.flushToTagList();
                 console.log("");
                 console.log(getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines));
-                console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                if (expected === templateTag.template) {
+                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')} ${translate('The template has not been replaced, possibly because the variable was not found.')}`);
+                }
+                else {
+                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
+                }
                 console.log(`    ${translate('Expected')}: ${expected}`);
                 parser.warningCount += 1;
             }
@@ -6102,7 +6107,7 @@ class SettingsTree {
         this.indices = new Map(); // e.g. { 1: "/",  4: "/1",  11: "/1/1",  14: "/1/2",  17: "/2" }
         this.indicesWithIf = new Map(); // e.g. { 1: "/",  3: "/1/a",  4: "/1",  7: "/1/a" }
         this.outOfFalseBlocks = new Map(); // #search: outOfFalseBlocks
-        this.settings = {};
+        this.settings = {}; // See. this.settingsValue
         this.settingsInformation = {};
         // current: current line moved by "moveToLine" method
         this.wasChanged = false;
@@ -6116,6 +6121,21 @@ class SettingsTree {
         this.nextIfLineNumIndex = 0;
         this.nextIfLineNum = 1;
     }
+    settingsValue(index, name) {
+        // No exception method
+        if (index in this.settings) {
+            if (name in this.settings[index]) {
+                return this.settings[index][name].value;
+            }
+            else {
+                return `(ERROR: Internal error. SettingsTree.settings[${index}][${name}] is not defined.)`;
+            }
+        }
+        else {
+            return `(ERROR: Internal error. SettingsTree.settings[${index}] is not defined.)`;
+        }
+    }
+    ;
     moveToLine(parser) {
         Object.assign(this, this.moveToLine_Immutably(parser));
     }
@@ -7825,6 +7845,7 @@ function translate(englishLiterals, ...values) {
             "Settings": "設定",
             "SettingIndex": "設定番号",
             "Not matched with the template.": "テンプレートと一致しません。",
+            "The template has not been replaced, possibly because the variable was not found.": "変数が見つからないためか、テンプレートが置き換わっていません。",
             "Not found any replacing target.": "置き換える対象が見つかりません。",
             "Modify the template target to old or new value.": "テンプレートの対象を古い値または新しい値に修正してください。",
             "The parameter must be less than 0": "パラメーターは 0 より小さくしてください",

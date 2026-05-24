@@ -1,5 +1,5 @@
 #keyword: typrm specifications
-command: #keyword: typrm command list
+command call tree: #keyword: typrm command list
     option:
         programOptions:
             # commander.program.version(
@@ -105,6 +105,13 @@ command: #keyword: typrm command list
         code:
             #// parent: #search: mainMain
             reset:  #ref: ${GitHub}/typrm/src/main.ts#function  reset(
+data structure:
+    programArguments:
+    Parser:
+        # class  Parser {
+        #     command = CommandEnum.unknown;
+        #     errorCount = 0;
+        #     warningCount = 0;
 tag: #keyword: typrm tags
     list:
         document:
