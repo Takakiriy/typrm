@@ -13,13 +13,18 @@ import { Readable, Writable } from 'stream';
 // @ts-ignore
 import { snapshots } from './lib-cjs.cjs';
 
+// #section: Main
+    // : File
+    // : String
+    // : Data
+    // : UserInterface
 
-// File group
+// #section: File
 
-// copyFolderSync
-// #keyword: lib.ts copyFolderSync
-// sourceFolder/1.txt => destinationFolderPath/1.txt
 export async function  copyFolderSync(sourceFolderPath: string, destinationFolderPath: string) {
+    // copyFolderSync
+    // #keyword: lib.ts copyFolderSync
+    // sourceFolder/1.txt => destinationFolderPath/1.txt
     const  currentFolderPath = process.cwd();
     const  destinationFolderFullPath = getFullPath(destinationFolderPath, currentFolderPath);
     process.chdir(sourceFolderPath);
@@ -34,10 +39,10 @@ export async function  copyFolderSync(sourceFolderPath: string, destinationFolde
     process.chdir(currentFolderPath);
 }
 
-// copyFileSync
-// #keyword: lib.ts copyFileSync
-// This also makes the copy target folder.
 export function  copyFileSync(sourceFilePath: string, destinationFilePath: string) {
+    // copyFileSync
+    // #keyword: lib.ts copyFileSync
+    // This also makes the copy target folder.
 	const  destinationFolderPath = path.dirname(destinationFilePath);
 	fs.mkdirSync(destinationFolderPath, {recursive: true});
 
@@ -54,10 +59,10 @@ export function  rmdirSync(folderPath: string) {
     }
 }
 
-// replaceFileSync
-// #keyword: lib.ts replaceFileSync
-// replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
 export function  replaceFileSync(sourceFilePath: string, replaceFunction: {(text: string): string}, destinationFilePath: string = '') {
+    // replaceFileSync
+    // #keyword: lib.ts replaceFileSync
+    // replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
     const  text = fs.readFileSync(sourceFilePath, 'utf-8');
     const  replacedText = replaceFunction(text);
     if (destinationFilePath === '') {
@@ -66,10 +71,10 @@ export function  replaceFileSync(sourceFilePath: string, replaceFunction: {(text
     fs.writeFileSync(destinationFilePath, replacedText);
 }
 
-// replaceFileAsync
-// #keyword: lib.ts replaceFileAsync
-// replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
 export async function  replaceFileAsync(sourceFilePath: string, replaceFunction: {(text: string): Promise<string>}, destinationFilePath: string = '') {
+    // replaceFileAsync
+    // #keyword: lib.ts replaceFileAsync
+    // replaceFileSync('a.txt', (text)=>(text.replace('before', 'after')));
     const  text = fs.readFileSync(sourceFilePath, 'utf-8');
     const  replacedText = await replaceFunction(text);
     if (destinationFilePath === '') {
@@ -160,11 +165,11 @@ export interface  UnexpectedLine {
     indentDiff: number;
 }
 
-// getFullPath
-// #keyword: lib.ts JavaScript (js) library getFullPath
-// If "basePath" is current directory, you can call "path.resolve"
-// If the variable has full path and litteral relative path, write `${___FullPath}/relative_path}`
 export function  getFullPath(relativePath: string, basePath: string): string {
+    // getFullPath
+    // #keyword: lib.ts JavaScript (js) library getFullPath
+    // If "basePath" is current directory, you can call "path.resolve"
+    // If the variable has full path and litteral relative path, write `${___FullPath}/relative_path}`
     var    fullPath = '';
     const  slashRelativePath = relativePath.replace(/\\/g,'/');
     const  colonSlashIndex = slashRelativePath.indexOf(':/');
@@ -183,9 +188,9 @@ export function  getFullPath(relativePath: string, basePath: string): string {
     return  fullPath;
 }
 
-// isFullPath
-// #keyword: lib.ts JavaScript (js) library isFullPath
 export function  isFullPath(path: string): boolean {
+    // isFullPath
+    // #keyword: lib.ts JavaScript (js) library isFullPath
     const  colonPosition = path.indexOf(':');
     const  slashPosition = path.indexOf('/');
     const  backSlashPosition = path.indexOf('\\');
@@ -306,9 +311,9 @@ export function  getTestWorkFolderFullPath(): string {
     return  `${path_}/_test_of_extract_git_branches`;
 }
 
-// getHomePath
-// #keyword: lib.ts getHomePath
 export function  getHomePath(): string {
+    // getHomePath
+    // #keyword: lib.ts getHomePath
     if (process.env.HOME) {
         return  process.env.HOME;
     } else if (process.env.USERPROFILE) {
@@ -318,9 +323,9 @@ export function  getHomePath(): string {
     }
 }
 
-// getGlobbyParameters
-// #keyword: lib.ts getGlobbyParameters
 export async function  getGlobbyParameters(targetPath: string, baseFullPath: string): Promise<GlobbyParameters> {
+    // getGlobbyParameters
+    // #keyword: lib.ts getGlobbyParameters
     var    targetFullPath = getFullPath(targetPath, baseFullPath);
     var    fileName = path.basename(targetFullPath);
     const  negated = (fileName[0] === '!');
@@ -372,12 +377,12 @@ interface  GlobbyParameters {
 }
 
 
-// String group
+// #section: String
 
-// cutLeftOf
-// #keyword: lib.ts cutLeftOf
-// cutLeftOf("abcde", "c") == "cde"
 export function  cutLeftOf(input: string, keyword: string): string {
+    // cutLeftOf
+    // #keyword: lib.ts cutLeftOf
+    // cutLeftOf("abcde", "c") == "cde"
     const  keywordPosition = input.indexOf(keyword);
     if (keywordPosition !== notFound) {
 
@@ -387,11 +392,11 @@ export function  cutLeftOf(input: string, keyword: string): string {
     }
 }
 
-// cutLast
-// #keyword: lib.ts cutLast
-// cutLast("ab/", "/") == "ab"
-// cutLast("abc", "/") == "abc"
 export function  cutLast(input: string, keyword: string): string {
+    // cutLast
+    // #keyword: lib.ts cutLast
+    // cutLast("ab/", "/") == "ab"
+    // cutLast("abc", "/") == "abc"
     if (input.endsWith(keyword)) {
 
         return  input.substring(0, input.length - keyword.length);
@@ -575,10 +580,10 @@ function  getIndentWithoutHyphen(line: string): string | null {
     return  indentWithoutHyphen;
 }
 
-// checkExpectedTextContents
-// This ignores different indent depth and different indent width.
 export function  checkExpectedTextContents(testingContents: string[], expectedParts: string[], anyLinesTag: string
         ): UnexpectedLine | null {
+    // checkExpectedTextContents
+    // This ignores different indent depth and different indent width.
 
     return  _main(testingContents, expectedParts, anyLinesTag);
     function  _main(testingContents: string[], expectedParts: string[], anyLinesTag: string
@@ -1283,7 +1288,7 @@ export const  indentRegularExpression = /^( |\t)*/;
 export const  indentHyphenRegularExpression = /^(( |\t)*)-(( |\t)*)/;
 
 
-// Data group
+// #section: Data
 
 export function  isSameArray<T>(log: T[], answer: T[]): boolean {
     if (log.length !== answer.length) {
@@ -1298,11 +1303,11 @@ export function  isSameArray<T>(log: T[], answer: T[]): boolean {
     }
 }
 
-// isSameArrayOf
-// T: string, nunmber
-// If only order had difference, this returns true
-// #ref: ${typrm_files}/ref/JavaScript-AI.yaml#label: isSameArrayOf
 export function  isSameArrayOf<T>(arr1: T[], arr2: T[]): boolean {
+    // isSameArrayOf
+    // T: string, nunmber
+    // If only order had difference, this returns true
+    // #ref: ${typrm_files}/ref/JavaScript-AI.yaml#label: isSameArrayOf
     if (arr1.length !== arr2.length) {
         return false;
     }
@@ -1325,8 +1330,8 @@ export function  isSameArrayOf<T>(arr1: T[], arr2: T[]): boolean {
     return Object.values(countMap).every(count => count === 0);
 }
 
-// Old implement. There is a bug.  #ref: ${typrm_files}/ref/JavaScript-AI.yaml#label: isSameArrayOf
 function  isSameArrayOfOld<T>(log: T[], answer: T[]): boolean {
+    // Old implement. There is a bug.  #ref: ${typrm_files}/ref/JavaScript-AI.yaml#label: isSameArrayOf
     const matched = log.filter( (item) => answer.includes( item ) );
     const isSame = (matched.length === answer.length && log.length === answer.length);
     return isSame;
@@ -1346,12 +1351,12 @@ export function  cutSameItems<T>(array: T[]): T[] {
     return  Array.from(new Set<T>(array));
 }
 
-// stableUniqueFilterFunction
-// const  uniqueArray1 = array1.filter(lib.stableUniqueFilterFunction((element1, element2) =>
-//         element1.path == element2.path));
 export function  stableUniqueFilterFunction<T>(
     isSameFunction: {(element1:T, element2:T): boolean}
 ): {(element: T, index: number, array: T[]): boolean} {
+    // stableUniqueFilterFunction
+    // const  uniqueArray1 = array1.filter(lib.stableUniqueFilterFunction((element1, element2) =>
+    //         element1.path == element2.path));
 
     return  function (element: T, index: number, array: T[]): boolean {
         return  index === array.findIndex(
@@ -1359,12 +1364,12 @@ export function  stableUniqueFilterFunction<T>(
     };
 }
 
-// lastUniqueFilterFunction
-// const  uniqueArray1 = array1.filter(lib.lastUniqueFilterFunction((element1, element2) =>
-//         element1.path == element2.path));
 export function  lastUniqueFilterFunction<T>(
     isSameFunction: {(element1:T, element2:T): boolean}
 ): {(element: T, index: number, array: T[]): boolean} {
+    // lastUniqueFilterFunction
+    // const  uniqueArray1 = array1.filter(lib.lastUniqueFilterFunction((element1, element2) =>
+    //         element1.path == element2.path));
 
     return  function (element: T, index: number, array: T[]): boolean {
         const  matchIndices = array.map((e, index) => isSameFunction(element, e) ? index : -1);
@@ -1373,9 +1378,9 @@ export function  lastUniqueFilterFunction<T>(
     };
 }
 
-// fastUniqueFilter
-// const  uniqueArray1 = lib.fastUniqueFilter(array1, (element) => (element.path));
 export function  fastUniqueFilter<T>(
+    // fastUniqueFilter
+    // const  uniqueArray1 = lib.fastUniqueFilter(array1, (element) => (element.path));
     array: T[],
 	getKeyFunction: {(element1:T): any}
 ): T[] {
@@ -1476,10 +1481,10 @@ export function  isAlphabetIndex(index: string): boolean {
     return  ! lastCharacterIsNumber  &&  index !== '/';
 }
 
-// getAlphabetIndex
-// 1=>a, 2=>b, ..., 25=>y, 26=>z26z, 27=>z27z, ...
-// First charactor and last cahractor must be alphabet.
 export function  getAlphabetIndex(num: number | string): string {
+    // getAlphabetIndex
+    // 1=>a, 2=>b, ..., 25=>y, 26=>z26z, 27=>z27z, ...
+    // First charactor and last cahractor must be alphabet.
     const  index = parseInt(num as any);
     if (index >= 1  &&  index <= 25) {
         const  ascii_code_a_minus1 = 96;
@@ -1489,9 +1494,9 @@ export function  getAlphabetIndex(num: number | string): string {
     }
 }
 
-// fromAlphabetIndex
-// a=>1, b=>2, ..., y=>25, z26z=>26, z27z=>27, ...
 export function  fromAlphabetIndex(index: string): number {
+    // fromAlphabetIndex
+    // a=>1, b=>2, ..., y=>25, z26z=>26, z27z=>27, ...
     const  code = index.charCodeAt(0)
     const  ascii_code_a_minus1 = 96;
     const  ascii_code_y = 121;
@@ -1523,12 +1528,12 @@ export namespace  hasInterfaceOf {
     }
 }
 
-// getObjectID
-// Exmaple:
-//    var  object1={}, object2={}
-//    console.log( objectId(object1) ) // 1
-//    console.log( objectId(object2) ) // 2
 export function  getObjectID(object: any) {
+    // getObjectID
+    // Exmaple:
+    //    var  object1={}, object2={}
+    //    console.log( objectId(object1) ) // 1
+    //    console.log( objectId(object2) ) // 2
     if ( ! objectIDs.has(object)) {
         objectCount += 1;
         objectIDs.set(object, objectCount);
@@ -1538,7 +1543,7 @@ export function  getObjectID(object: any) {
 const  objectIDs = new WeakMap
 var  objectCount = 0;
 
-// User interface group
+// #section: UserInterface
 
 export class InputOption {
     inputLines: string[];
@@ -1565,10 +1570,11 @@ export function  setInputOption(option: InputOption) {
     Object.assign(inputOption, option);
 }
 
-// input
-// #keyword: lib.ts input
-// Example: const name = await input('What is your name? ');
 export async function  input( guide: string ): Promise<string> {
+    // input
+    // #keyword: lib.ts input
+    // Example: const name = await input('What is your name? ');
+
     // Input emulation
     if (inputOption.inputLines) {
         if (inputOption.nextLineIndex < inputOption.inputLines.length) {
@@ -1598,9 +1604,9 @@ export async function  input( guide: string ): Promise<string> {
     return  InputObject.input(guide);
 }
 
-// inputPath
-// Example: const name = await input('What is your name? ');
 export async function  inputPath( guide: string ) {
+    // inputPath
+    // Example: const name = await input('What is your name? ');
     const  key = await input(guide);
     if (key.endsWith('()')) {
         return  key;
@@ -1787,29 +1793,29 @@ export function  jsonStringify(object: any, dummy?: any, space?: string): string
     }, space);
 }
 
-// pp
-// #keyword: lib.ts pp
-//     Debug print to memory only. This does not call "console.log".
-// Example:
-//    pp(var);
-// Example:
-//    pp('---var');
-//    pp(var);
-// Example:
-//    var d = pp('---var');
-//    pp(var);  // Set break point here and watch the variable d
-// Example:
-//    var d = ppClear();
-//    pp(var);
-// Example:
-//    try {
-//
-//        await main();
-//    } finally {
-//        var d = pp('');
-//        d = [];  // Set break point here and watch the variable d
-//    }
 export function  pp(message: any) {
+    // pp
+    // #keyword: lib.ts pp
+    //     Debug print to memory only. This does not call "console.log".
+    // Example:
+    //    pp(var);
+    // Example:
+    //    pp('---var');
+    //    pp(var);
+    // Example:
+    //    var d = pp('---var');
+    //    pp(var);  // Set break point here and watch the variable d
+    // Example:
+    //    var d = ppClear();
+    //    pp(var);
+    // Example:
+    //    try {
+    //
+    //        await main();
+    //    } finally {
+    //        var d = pp('');
+    //        d = [];  // Set break point here and watch the variable d
+    //    }
     if (message instanceof Array) {
         debugOut.push(`length: ${message.length}`);
         for (const element of message) {
@@ -1840,23 +1846,23 @@ declare global {
 }
 (globalThis as any).debugOut = [];
 
-// ppClear
-// #keyword: ppClear
 export function  ppClear() {
+    // ppClear
+    // #keyword: ppClear
     debugOut.length = 0;
     return debugOut;
 }
 
-// ff
-// #keyword: lib.ts ff
-// Condition flag.
-// Example:
-//     Mark of got debug target data layer 1 (L1): |
-//         ff('L1', argument == '____');
-//     if current data is target data layer 1 (L1): |
-//         if ( ff('L1') ) {
-//         var d = pp('____');}
 export function  ff( conditionName: string, condition: boolean|null = null ) {
+    // ff
+    // #keyword: lib.ts ff
+    // Condition flag.
+    // Example:
+    //     Mark of got debug target data layer 1 (L1): |
+    //         ff('L1', argument == '____');
+    //     if current data is target data layer 1 (L1): |
+    //         if ( ff('L1') ) {
+    //         var d = pp('____');}
     if (condition !== null) {
         ffFlags[conditionName] = condition;
     }
@@ -1869,23 +1875,23 @@ export function  ff( conditionName: string, condition: boolean|null = null ) {
 }
 export const  ffFlags: {[name: string]: boolean} = {};
 
-// cc
-// #keyword: lib.ts cc
-// Through counter.
-// Example:
-//     count up: |
-//         cc();
-//     print current count: |
-//          console.error(cc().countString);
-//     pp a data and count up: |
-//         var d = pp(data);
-//         cc();
-//     count up and if counter value is 1 ...: |
-//         if ( cc(1).isTarget ) {
-//         var d = pp('');}  // Set break point here and watch the variable d
-//     count up and look at debug output: |
-//         var c = cc().debugOut;  // Set break point here and watch the variable c
 export function  cc( targetCount: number|null = 9999999, label: string = '0' ) {
+    // cc
+    // #keyword: lib.ts cc
+    // Through counter.
+    // Example:
+    //     count up: |
+    //         cc();
+    //     print current count: |
+    //          console.error(cc().countString);
+    //     pp a data and count up: |
+    //         var d = pp(data);
+    //         cc();
+    //     count up and if counter value is 1 ...: |
+    //         if ( cc(1).isTarget ) {
+    //         var d = pp('');}  // Set break point here and watch the variable d
+    //     count up and look at debug output: |
+    //         var c = cc().debugOut;  // Set break point here and watch the variable c
     if (!(label in ccCount)) {
         ccCount[label] = 0;
     }

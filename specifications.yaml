@@ -229,6 +229,8 @@ develop:
             code  ~/typrm
         Install Jest extension:  #// If you want to use Testing view
             #search: JavaScript testing view trouble
+    build:
+        node  "src/support_node.cjs"
 test:
     test command:
         - npm test  #ref: ./README.md  #ref: ./README-jp.md
