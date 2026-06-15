@@ -6,7 +6,12 @@
             "detail": "You must start manually. This is a VSCode limitation. This task cannot be depend on other tasks.",
             "type": "shell",
             "command": "node_modules/.bin/tsc-watch",
-            "args": ["-p","tsconfig.json","--onSuccess","node src/support_node.cjs"],
+            "args": [
+                "-p",
+                "tsconfig.json",
+                "--onSuccess",
+                "node src/support_node.cjs"
+            ],
             "isBackground": true,
             "problemMatcher": [
                 "$tsc-watch"
@@ -17,7 +22,12 @@
             "detail": "You must start manually. This is a VSCode limitation. This task cannot be depend on other tasks.",
             "type": "shell",
             "command": "node_modules/.bin/tsc-watch.cmd",
-            "args": ["-p","tsconfig.json","--onSuccess","node src/support_node.cjs"],
+            "args": [
+                "-p",
+                "tsconfig.json",
+                "--onSuccess",
+                "node src/support_node.cjs"
+            ],
             "isBackground": true,
             "problemMatcher": [
                 "$tsc-watch"

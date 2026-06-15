@@ -70,6 +70,7 @@ command call tree: #keyword: typrm command list
                     FoundLine.toString: #🌟  #ref: ${GitHub}/typrm/src/main.ts#getString(): string
                         # var  debugString = ` (score: ${this.score}, wordCount: ${this.targetWordCount}, matchedCount: ${this.matchedTargetKeywordCount})`;
                     snippet:  #ref: ${GitHub}/typrm/src/main.ts#const  snippet =
+                        #search: evaluateEnvironmentVariable
                     printRef:  #ref: ${GitHub}/typrm/src/main.ts#function  printRef
                         getRelatedLineNumGetter:  #ref: ${GitHub}/typrm/src/main.ts#function  getRelatedLineNumGetter
                         # // print the address and recommend
@@ -82,12 +83,16 @@ command call tree: #keyword: typrm command list
             #// parent: #search: mainMain
             check:  #ref: ${GitHub}/typrm/src/main.ts#function  check(
                 checkRoutine:  #ref: ${GitHub}/typrm/src/main.ts#function  checkRoutine
-                    // List up original tag
-                    // List up to tag
-                    // Check the "#same-as:" tag.
-                    // Check the condition by "#expect:" tag.
-                    // Check if previous line has "template" replaced contents.
-                    // Check target file contents by "#file-template:" tag.
+                    # async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties[], parser: Parser) {
+                    #     // List up original tag
+                    #     // List up to tag
+                    #     // Check the "#same-as:" tag.
+                    #     // Check the condition by "#expect:" tag.
+                    #     // Check if previous line has "template" replaced contents.
+                    #         var  expected = getExpectedLine(settingForTemplate, templateTag.
+                    getExpectedLine:
+                        getExpectedLineAndEvaluationLog:
+                    #     // Check target file contents by "#file-template:" tag.
     replace:  #keyword: typrm replace
         code:
             #// parent: #search: mainMain
@@ -162,6 +167,40 @@ tag: #keyword: typrm tags
                 #// parent: #search: replaceSub
                 replaceSub:  #ref: ${GitHub}/typrm/src/main.ts#function  replaceSub
                     makeTemplatesInCopyTag:
+    template tags:
+        loadDotEnvSecrets: #keyword:  #// ".env" file
+            dotenv.config();
+            #// process.env.API_KEY
+            #search: dotenv
+            #search: getProcessEnvAndDotEnvSecrets
+        TemplateTag:
+            # class  TemplateTag {
+            #     async  scanKeyValues(toValue: string, allKeys: {[name: string]: Setting}, parser: Parser
+            #         for (const line of this.templateLines) {
+            #             expectedParts.push(getExpectedLineInFileTemplate(setting, line, parser));
+            getExpectedLineInFileTemplate: #search:
+        searchSub:
+            settings tag:  #search: settings tag
+            # const  snippet = (await evaluateEnvironmentVariable(found.snippet, found.path, found.lineNum)).join('\n');
+            evaluateEnvironmentVariable: #keyword:
+                # async function  evaluateEnvironmentVariable(lines: string[], filePath: string, linesLineNum: number): Promise<string[]> {
+                #     evaluatedLines.push(getExpectedLineInFileTemplate(
+                getExpectedLineInFileTemplate:
+                    # const  settingWithSecrets = mergeSecretEnvironmentVariable(setting);
+                    mergeSecretEnvironmentVariable:
+                        # function  mergeSecretEnvironmentVariable(settings: Settings): Settings {
+                        #     for (const [envName, envValue] of Object.entries(lib.getProcessEnvAndDotEnvSecrets())) {
+                        getProcessEnvAndDotEnvSecrets:
+                            # export function  getProcessEnvAndDotEnvSecrets(): Secrets {
+                            #     if (dotenvInheritToProcessEnv) {
+                            #         return  process.env;
+                            #     } else {
+                            #         return  Object.assign(Object.assign({}, process.env), dotenvSecrets);
+                            dotenvSecrets:
+                                # const  dotenvSecrets: Secrets = {};
+                        #         settingsAndEnv[`$env.{${envName}}`] = value;
+                        #         settingsAndEnv[`$env.${envName}`] = value;
+                    # const  after = getExpectedLine(settingWithSecrets, templateTag.template);
     if tag:  #keyword:#if:
         outOfFalseBlocks:  #search:
     same-as tag:
@@ -181,13 +220,16 @@ tag: #keyword: typrm tags
                         # const  sameAsSettings =
                         #     return_.currentNewSettings[settingName] = return_.currentNewSettings[r.variableName];
     settings tag:  #keyword:#settings:
-        #search: settingStack of typrm makeSettingTree
+        makeSettingTree:  #ref: ${GitHub}/typrm/src/main.ts#function  makeSettingTree(
+            #search: settingStack of typrm makeSettingTree
     template-if tag:  #keyword:#template-if:
         test:
             checks template value >>
                 template_if_1_error
             replaces settings >>
                 2_replace_9_template_if_1_OK
+environment variables:
+    #search: evaluateEnvironmentVariable
 develop:
     Windows:
         Install VSCode, Git:
@@ -229,8 +271,6 @@ develop:
             code  ~/typrm
         Install Jest extension:  #// If you want to use Testing view
             #search: JavaScript testing view trouble
-    build:
-        node  "src/support_node.cjs"
 test:
     test command:
         - npm test  #ref: ./README.md  #ref: ./README-jp.md

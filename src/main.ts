@@ -1,13 +1,14 @@
+import chalk from 'chalk';
+import * as child_process from 'child_process';
+import * as csvParse from 'csv-parse';
 import * as fs from 'fs'; // file system
+import globby from 'globby';
+import * as yaml from 'js-yaml';
 import * as path from "path";
 import * as readline from 'readline';
-import globby from 'globby';
-import * as csvParse from 'csv-parse';
-import chalk from 'chalk';
-import * as yaml from 'js-yaml';
-import * as child_process from 'child_process';
-import * as lib from "./lib";
 import sharp from 'sharp';
+import * as lib from "./lib";
+import './SearchContext';
 // import { pp, ff, cc, ccCount } from "./lib";
 var  __dirname: string = process.cwd();  // If const, SyntaxError: Identifier '__dirname' has already been declared
 if (__dirname.endsWith('src')) {  // First run __dirname is typrmProject, second run __dirname is typrmProject/src.
@@ -310,7 +311,7 @@ async function  checkRoutine(inputFilePath: string, copyTags: CopyTag.Properties
                 console.log("");
                 console.log(getErrorMessageOfNotMatchedWithTemplate(templateTag, settingTree, lines));
                 if (expected === templateTag.template) {
-                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')} ${translate('The template has not been replaced, possibly because the variable was not found.')}`);
+                    console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')} ${translate('The variable is not found or the template has not been replaced.')}`);
                 } else {
                     console.log(`    ${translate('Warning')}: ${translate('Not matched with the template.')}`);
                 }
@@ -464,6 +465,11 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             parser.line = line;
             parser.lineNum = lineNum;
 
+            // Debug
+            if (false  &&  lineNum === 13003  &&  parser.filePath.includes('J_code.yaml')) {
+                lineNum = lineNum;
+            }
+
             // indentStack = ...
             const  indent = indentRegularExpression.exec(line)![0];
             if (line !== '') {
@@ -577,7 +583,7 @@ async function  makeSettingTree(parser: Parser): Promise<SettingsTree> {
             }
 
             // setting = ...
-            if (settingLabel.test(line)  &&  ! line.includes(disableLabel)) {
+            if (settingLabel.test(line)  &&  ! line.includes(disableLabel)  &&  ! isReadingSetting) {
                 isReadingSetting = true;
 
                 if (indent === '') {
@@ -1838,9 +1844,15 @@ class  IfTagParser {
                 var  isReplacable = evaluatedContidion.isReplacable;
             } else {
                 if (this.parser.ifTagErrorMessageIsEnabled) {
-                    console.log('');
-                    console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
-                    console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
+                    if (gSearchContext.ifTagSyntaxErrorCount === 0  ||  programOptions.verbose) {
+                        console.log('');
+                        console.log(`${getTestablePath(this.parser.filePath)}:${this.parser.lineNum}: ${line}`);
+                        console.log(`    ${translate('Error')}: ${translate('if tag syntax')}`);
+                        if (gSearchContext.ifTagSyntaxErrorCount === 0) {
+                            console.log(translate`All if tag syntax error are shown by --verbose option.`);
+                        }
+                        gSearchContext.ifTagSyntaxErrorCount += 1;
+                    }
                     this.parser.errorCount += 1;
                 }
                 var  resultOfIf = true;
@@ -3525,6 +3537,7 @@ async function  searchSubFaster(keyword: string, glossaryIsEnabled: boolean, now
 async function  searchSub(keyword: string, now: Date, isMutual: boolean): Promise<PrintRefResult> {
     timeTag = ('verbose' in programOptions);
     BenchmarkCounters.reset();
+    gSearchContext.reset();
     timeTag && lib.time.start(`searchSub`);
     const  thesaurus = new Thesaurus();
     if ('thesaurus' in programOptions) {
@@ -5862,10 +5875,16 @@ function  onEndOfSettingScope(setting: Settings, parser: Parser) {
     for (const key of Object.keys(setting)) {
         if ( ! setting[key].isReferenced) {
             parser.flushToTagList();
-            console.log('');
-            console.log(translate`Warning: ${getTestablePath(parser.filePath)}:${setting[key].lineNum}`);
-            console.log(translate`  Not referenced: ${key}`);
-            parser.warningCount += 1;
+            if (gSearchContext.notReferencedCount == 0  ||  programOptions.verbose) {
+                console.log('');
+                console.log(translate`Warning: ${getTestablePath(parser.filePath)}:${setting[key].lineNum}`);
+                console.log(translate`  Not referenced: ${key}`);
+                if (gSearchContext.notReferencedCount == 0) {
+                    console.log(translate`All not referenced warnings are shown by --verbose option.`);
+                }
+                parser.warningCount += 1;
+            }
+            gSearchContext.notReferencedCount += 1;
         }
     }
 }
@@ -8557,7 +8576,10 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "The parameter count in #to tag:": "#to タグのパラメーターの数",
             "Variable count in the template tag:": "#template タグの中の変数の数:",
             "Value count in the to tag:": "#to タグの中の値の数:",
+            "All not referenced warnings are shown by --verbose option.": "--verbose オプションですべての Not referenced 警告を表示します",
+            "All if tag syntax error are shown by --verbose option.": "--verbose オプションですべての if タグ文法エラーを表示します",
 
+            "if tag syntax": "if タグの文法",
             "key: new_value>": "変数名: 新しい変数値>",
             "template count": "テンプレートの数",
             "in previous check": "前回のチェック",
@@ -8576,7 +8598,7 @@ function  translate(englishLiterals: TemplateStringsArray | string,  ... values:
             "Settings": "設定",
             "SettingIndex": "設定番号",
             "Not matched with the template.": "テンプレートと一致しません。",
-            "The template has not been replaced, possibly because the variable was not found.": "変数が見つからないためか、テンプレートが置き換わっていません。",
+            "The variable is not found or the template has not been replaced.": "変数が見つからないか、テンプレートが置き換わっていません。",
             "Not found any replacing target.": "置き換える対象が見つかりません。",
             "Modify the template target to old or new value.": "テンプレートの対象を古い値または新しい値に修正してください。",
             "The parameter must be less than 0": "パラメーターは 0 より小さくしてください",
